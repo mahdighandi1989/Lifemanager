@@ -6,7 +6,7 @@ ASK=re.compile(r'(?:^|[^آ-ی])بپرس(?![آ-ی])'); ENDQ=re.compile(r'[؟?][»
 STRAY=[r'از خودم می‌پرسم: دقیقاً چه می‌خواهم',r'«روشن می‌بینی[^»]*[؟?][^»]*»',r'همان پرسش را با \*\*تغییرِ کوچک\*\* تکرار']
 for f in sys.argv[1:]:
   d=json.load(open(f))
-  if d.get('task')!='lla_assistant': continue
+  if d.get('task') not in ('lla_assistant','lla_coach'): continue
   head=d['user'].split('# نوبتِ تازه')[0]; bad=[]
   for bl in re.split(r'\n(?=# )',head):
     h=bl.split('\n')[0]

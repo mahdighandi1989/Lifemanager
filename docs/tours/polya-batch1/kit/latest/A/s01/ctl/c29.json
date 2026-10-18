@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.liveAll().map(r=>({id:r.p.id,steps:(r.p.steps||r.steps||[]),plan:r.p.plan||r.plan, keys:Object.keys(r), pk:Object.keys(r.p)})))"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>({id:r.p.id,steps:(r.p.steps||r.steps||[]),plan:r.p.plan||r.plan, keys:Object.keys(r), pk:Object.keys(r.p)})))"}

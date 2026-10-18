@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.ASSIST.cur().coach)"}
+{"eval": "JSON.stringify(APP.ASSIST.cur().coach)"}

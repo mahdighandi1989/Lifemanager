@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));await W(1500);const ta=document.querySelector('.as-edtx');return 'after settle TA value=['+(ta&&ta.value)+']'})()"}
+{"say": "یه اصلاح دیگه: اول گفتم «پول صبح شمرده شده بود» — اشتباه گفتم، ظهر شمرده شده بود، نه صبح."}

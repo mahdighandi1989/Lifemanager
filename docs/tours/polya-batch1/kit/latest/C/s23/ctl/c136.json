@@ -1,0 +1,1 @@
+{"shot": {"name": "part_dossier_session", "js": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return s.id})()", "full": true}}

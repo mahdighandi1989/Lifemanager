@@ -1,1 +1,1 @@
-{"say": "n=4 رو هم حساب کردم: مستقیم جمع میشه ۷/۳۰، فرمولم هم ۱/۴ − ۱/۶۰ = ۷/۳۰ میده. این یکی هم خوند."}
+{"shot": {"name": "c1_panel", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const b=document.querySelector('.as-body,.as-msgs');if(b)b.scrollTop=b.scrollHeight;return 'panel'})()"}}

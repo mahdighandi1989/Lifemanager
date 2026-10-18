@@ -1,1 +1,1 @@
-{"say":"آموختم که مهمونی‌ها حلقه‌ی ضعیفم بودن نه خود رژیم. برای نیمه‌ی دوم: از شنبه هفته‌ای سه بار باشگاه می‌رم، اولین جلسه شنبه ساعت ۶ عصر."}
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"today\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}

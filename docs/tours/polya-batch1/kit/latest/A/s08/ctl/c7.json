@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title]))"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title]))"}

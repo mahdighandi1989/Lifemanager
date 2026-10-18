@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.ASSIST.coachLedger?APP.ASSIST.coachLedger():null)"}
+{"eval": "JSON.stringify(APP.ASSIST.coachLedger?APP.ASSIST.coachLedger():null)"}

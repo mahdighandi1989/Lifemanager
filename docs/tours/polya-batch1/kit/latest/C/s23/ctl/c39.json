@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const c=APP.PR.cases()[0];APP.go('practice',c.id);await W(1200);return document.querySelector('#main').innerText.slice(0,2500)+' || BTNS '+[...document.querySelectorAll('#main button')].map(b=>b.innerText.trim()).filter(Boolean).join(' / ')})()"}
+{"shot": {"name": "c1b_lprob", "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('lprob',p);return p})()", "full": true}}

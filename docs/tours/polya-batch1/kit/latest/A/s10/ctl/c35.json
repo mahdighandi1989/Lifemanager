@@ -1,1 +1,0 @@
-{"eval": "APP.liveAll().map(r=>r.p.id).join(\" \")"}

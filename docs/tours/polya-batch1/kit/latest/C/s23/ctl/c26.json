@@ -1,1 +1,1 @@
-{"exit":true}
+{"shot": {"name": "c0_dossier", "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('dossier',p);return p})()", "full": true}}

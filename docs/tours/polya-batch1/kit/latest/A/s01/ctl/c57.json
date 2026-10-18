@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t||x)]),null,0)"}
+{"eval": "(()=>{const id=APP.liveAll().find(r=>/خرید یا اجاره/.test(r.p.title)).p.id;APP.go('lprob',id,'back');const e=document.getElementById('lpBBest');return e?[...e.options].map(o=>o.value+'='+o.textContent).join(' || '):'NONE '+APP.state.view+' '+APP.state.sub})()"}

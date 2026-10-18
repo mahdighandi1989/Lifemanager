@@ -4650,3 +4650,16 @@ dated stability, mind-card feed) under way.
   note `docs/overhaul/handoff-notes/_pending_tour1_R20_routing_2026-10-18.md`.
 ## 2026-10-18 — FINDING (supervisor, general)
 - دورِ کاملِ ناظر روی `6c1e625`: pytest/build سبز، inventory بدونِ کاهش. دو آزمونِ `test_learning_architecture_graph_browser` (r11/r12 coach) بدونِ `playwright` در `apps/learning-architecture/node_modules` قرمز می‌شوند (prompt_tap.js `require` بی‌شرط) و با `npm i` سبز؛ مشکلِ محیط، نه کد. شش دست‌به‌دستِ `did` بسته شد (verified). RUNLOG ۲۰۲۶-۱۰-۱۸.
+
+## 2026-10-18 — Pólya tour batch 1: round-20 fixes merged; round 21 run (B/C/D); model tier round 21
+- **CHANGE** Merged the four round-20 fixers (coach, live+dossier, practice+sched, routing `lla_coach`). Gate fail=0 (pytest 2095,
+  111 page tests, build, host e2e). Merged two routine commits from `main` (backtest round 14, supervisor round): renumbered the round-20
+  WORKLOG entries 81–84 and regenerated `HANDOFFS.md`. `main` = 81c8d9d9.
+- **FINDING** Round 21: B 0/10, C 0/9, D 0/9 zero-defect. Corrections are much better (C: 5/10 fully applied + 4 partly, vs 1/6; B s18: 6/6;
+  non-corrections never change anything).
+  - Root causes still open: routing decided by keywords; practice cannot be started from chat; corrections do not reach copies worded
+    differently, composed records, dependent verdicts or deadlines; stability declared after a regression; thin session dossier.
+- **FINDING** Model tier round 21 (scenario-level pass/partial/fail): production routing (sonnet for `lla_coach`, haiku for the rest) 5/2/1;
+  haiku alone 1/5/2 (round 20: haiku 2/2/4, sonnet 4/4/0). The routing decision is confirmed. 12 of 51 coaching turns were misrouted (the
+  opening turns of problems stated in chat).
+- **DECISION** Recorded R1–R9 in `docs/tours/polya-batch1/decisions/DECISIONS_R21.md`; the independent bank is `VARIANTS_R21`.

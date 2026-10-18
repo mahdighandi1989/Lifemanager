@@ -1,1 +1,1 @@
-{"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()"}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const cs=APP.PR.cases();const c=cs[0];if(!c)return 'NO CASE';APP.go('practice',c.id);await W(1200);const i=document.querySelector('#main').innerText;return 'CASES '+cs.map(c=>c.id+' T'+c.tid+' '+c.state+' due='+c.due+' sess='+(c.sessions||[]).map(s=>s.d+(s.ok===false?'✗':s.ok===true?'✓':'')+(s.meas&&s.meas.pct!=null?'('+s.meas.pct+')':'')+'['+(s.src||'')+']').join(',')).join(' ;; ')+' || '+i.slice(0,1800)})()"}

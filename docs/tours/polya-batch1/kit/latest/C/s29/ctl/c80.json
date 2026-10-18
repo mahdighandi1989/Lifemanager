@@ -1,1 +1,1 @@
-{"shot": {"name": "part_dossier_s29b", "js": "(()=>{const p=APP.liveAll().find(r=>/چهارضلعی/.test(r.p.title)).p.id;APP.go('dossier',p);return p})()", "full": true}}
+{"say": "امروز دوباره امتحان کردم ولی فقط یادم بود یکی از نیمسازها رو بکشم؛ دومی یادم رفت. شاید ۴۰٪."}

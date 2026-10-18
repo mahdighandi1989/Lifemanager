@@ -1,1 +1,1 @@
-{"say":"نوشت «پرونده ساخته نشد»! آره، بازش کن دیگه."}
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);return __fx.btns().join(\" | \")+\" ## \"+__fx.fields().join(\" ; \")})()"}

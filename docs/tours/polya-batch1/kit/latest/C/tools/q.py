@@ -1,7 +1,7 @@
 # q.py sid [N] -> pending (or N) prompt: turn, turn-question lines, unmarked directives, r10 reply
 import json,sys,re,glob,os
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid=sys.argv[1]; D=f'{T}/round20C/{sid}'
+sid=sys.argv[1]; D=f'{T}/round21C/{sid}'
 if len(sys.argv)>2: n=int(sys.argv[2])
 else:
     n=max(int(f.split('/p')[-1][:-5]) for f in glob.glob(D+'/ai/p*.json'))
@@ -19,5 +19,5 @@ for pt in re.split(r'(?m)^(?=# )',u):
         if l.startswith('- زمینه (نه پرسشِ دوم)'): continue
         if l.strip() in GEN or l.startswith(GEN): continue
         if re.search(r'بپرس|پرسشِ این نوبت|⇐ همان پرسش|یک\*\* پرسش|یک پرسش|پرسشِ نوبت|[؟?]»',l): print('   Q:',l[:300])
-r=f'{T}/round19C/{sid}/ai/r{n}.txt'
+r=f'{T}/round20C/{sid}/ai/r{n}.txt'
 if os.path.exists(r): print(' R10:',json.load(open(r))['reply'][:500], [a.get('do') for a in json.load(open(r)).get('actions',[])])

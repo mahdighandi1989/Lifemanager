@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('e_prob',null,'live');const t=[...document.querySelectorAll('#main input,#main textarea')];F('lpNewTitle','\u0646\u0648\u0631 \u0648 \u0631\u0634\u062f\u0650 \u0644\u0648\u0628\u06cc\u0627');\nconst ids=FL('lpNew');return ids})()\n"}
+{"eval": "(()=>{APP.go('e_prob',null,'live');const t=[...document.querySelectorAll('#main input,#main textarea')];F('lpNewTitle','نور و رشدِ لوبیا');\nconst ids=FL('lpNew');return ids})()\n"}

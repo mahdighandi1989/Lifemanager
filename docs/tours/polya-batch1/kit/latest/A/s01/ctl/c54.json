@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQItems(r.p.id)]))"}
+{"eval": "[...document.querySelectorAll('#lpBBest option')].map(o=>o.value+' = '+o.textContent).join('\\n')\n"}

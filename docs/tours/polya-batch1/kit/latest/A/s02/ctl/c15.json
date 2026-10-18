@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify([...document.querySelectorAll(\".as-panel .mx, .mx\")].map(e=>[e.closest(\"[class*=msg]\")?e.closest(\"[class*=msg]\").className:\"?\",e.getAttribute(\"data-src\"),e.textContent]))"}
+{"eval": "JSON.stringify([...document.querySelectorAll(\".as-panel .mx, .mx\")].map(e=>[e.closest(\"[class*=msg]\")?e.closest(\"[class*=msg]\").className:\"?\",e.getAttribute(\"data-src\"),e.textContent]))"}

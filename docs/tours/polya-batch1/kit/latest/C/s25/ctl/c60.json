@@ -1,1 +1,1 @@
-{"shot": {"name": "c3_dossier", "js": "(()=>{const p=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;APP.go('dossier',p);return p})()", "full": true}}
+{"shot": {"name": "c2_lprob1", "js": "(()=>{const p=APP.liveAll()[0].p.id;APP.go('lprob',p);return p})()", "full": true}}

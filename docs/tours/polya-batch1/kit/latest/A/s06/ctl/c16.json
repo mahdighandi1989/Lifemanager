@@ -1,1 +1,1 @@
-{"eval":"(()=>{C(\".lp-stepsave\");const a=[...document.querySelectorAll(\"[aria-live]\")].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join(\"\");return a+\"\\n\"+BL().slice(-600)})()"}
+{"eval": "(()=>{C(\".lp-stepsave\");const a=[...document.querySelectorAll(\"[aria-live]\")].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join(\"\");return a+\"\\n\"+BL().slice(-600)})()"}

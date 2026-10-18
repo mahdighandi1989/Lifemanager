@@ -1,1 +1,1 @@
-{"shot": {"name": "c3_today", "view": ["today"], "full": true}}
+{"shot": {"name": "c2_dossier1", "js": "(()=>{const p=APP.liveAll()[0].p.id;APP.go('dossier',p);return p})()", "full": true}}

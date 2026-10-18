@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();let d=null;try{d=APP.dossierSess?APP.dossierSess(s.id):APP.dossier(s.id)}catch(e){return 'ERR '+e.message}return 'EVENTS '+((d&&d.events)||[]).map(e=>(e.at||'').slice(0,16)+' '+e.k+' '+String(e.title||'').slice(0,60)).join(' | ')+' || TEXT '+document.querySelector('#main').innerText.slice(0,6000)})()"}

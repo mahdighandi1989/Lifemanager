@@ -1,1 +1,1 @@
-{"reload":true}
+{"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"}

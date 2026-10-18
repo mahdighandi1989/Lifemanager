@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(APP.state.view,APP.state.arg,APP.state.sub);return (document.querySelector('.prc-t24')||{}).innerText||'none'})()"}

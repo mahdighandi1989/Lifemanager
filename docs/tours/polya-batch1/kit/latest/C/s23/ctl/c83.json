@@ -1,0 +1,1 @@
+{"shot": {"name": "part_practice_s23_2", "js": "(async()=>{const c=APP.PR.cases().filter(c=>c.state!=='closed')[0];APP.go('practice',c.id);return c.id})()", "full": true}}

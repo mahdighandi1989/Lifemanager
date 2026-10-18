@@ -31,7 +31,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await p.exposeFunction('__mail', async (r) => { fs.writeFileSync(path.join(D, 'mail', 'm' + (++mc) + '.json'), JSON.stringify(r)); return { status: 'sent' }; });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
   const boot = async (url) => {
-  await p.goto(url || 'file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'); await p.waitForSelector('.nav');
+  await p.goto(url || 'file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html?dev=1&clock=2026-10-17'); await p.waitForSelector('.nav');
   const inj = path.join(D, 'inject.js'); if (fs.existsSync(inj)) await p.evaluate(fs.readFileSync(inj, 'utf8'));
   const num0 = Math.max(100, ...fs.readdirSync(path.join(D, 'sheets')).map(f => +((f.match(/^sh(\d+)/) || [])[1] || 0)));
   await p.evaluate((NUM0) => {

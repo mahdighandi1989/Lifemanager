@@ -1,1 +1,1 @@
-{"eval":"typeof APP.ASSIST.coachLedger+\" \"+JSON.stringify(typeof APP.ASSIST.coachLedger==\"function\"?APP.ASSIST.coachLedger.toString().slice(0,300):APP.ASSIST.coachLedger).slice(0,1500)"}
+{"eval": "typeof APP.ASSIST.coachLedger+\" \"+JSON.stringify(typeof APP.ASSIST.coachLedger==\"function\"?APP.ASSIST.coachLedger.toString().slice(0,300):APP.ASSIST.coachLedger).slice(0,1500)"}

@@ -1,1 +1,1 @@
-{"shot": {"name": "c4_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details.mind-from,details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}
+{"shot": {"name": "c3_lprob1", "js": "(()=>{const p=APP.liveAll()[0].p.id;APP.go('lprob',p);return p})()", "full": true}}

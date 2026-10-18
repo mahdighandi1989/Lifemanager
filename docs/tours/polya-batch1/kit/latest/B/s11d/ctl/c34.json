@@ -1,1 +1,0 @@
-{"eval": "JSON.stringify(APP.liveClosure?APP.liveClosure(APP.state.arg):(window.A&&A.liveClosure?A.liveClosure(APP.state.arg):'nofn'))\n"}

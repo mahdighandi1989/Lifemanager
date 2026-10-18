@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.ASSIST.toggle(true);const b=[...document.querySelectorAll('.as-editb')];return b.length+' :: '+b.map((x,i)=>i+':'+(x.closest('.as-msg,.as-bubble,li,div[class*=msg]')||x.parentElement.parentElement).textContent.slice(0,40)).join(' | ')})()\n"}
+{"eval": "(()=>{const s=APP.ASSIST.cur();const c=s.coach||{};return 'coachkeys='+Object.keys(c).join(',')+' | pl='+JSON.stringify(c.pl||c.plan||c.plans||s.plans||null).slice(0,800)+' | rej='+JSON.stringify(c.rej||c.rejects||c.csLog||null).slice(0,1500)})()\n"}

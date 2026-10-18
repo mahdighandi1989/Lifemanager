@@ -1,0 +1,1 @@
+{"clock":"2026-11-25","eval":"(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()"}

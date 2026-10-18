@@ -1,1 +1,1 @@
-{"eval":"var s=APP.ASSIST.cur();JSON.stringify(APP.ASSIST.coachLedger(s,\"l:\"+APP.state.arg))"}
+{"eval": "var s=APP.ASSIST.cur();JSON.stringify(APP.ASSIST.coachLedger(s,\"l:\"+APP.state.arg))"}

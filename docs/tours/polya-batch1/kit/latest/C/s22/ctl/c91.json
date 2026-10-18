@@ -1,1 +1,1 @@
-{"say": "اشتباه کردم که اون روز کلید صندوق رو دست منشی دادم؛ دیگه این کارو نمی‌کنم."}
+{"shot": {"name": "c2b_lprob", "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('lprob',p);return p})()", "full": true}}

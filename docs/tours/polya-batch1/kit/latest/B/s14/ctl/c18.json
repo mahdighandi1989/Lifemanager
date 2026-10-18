@@ -1,1 +1,1 @@
-{"say":"آره."}
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const r=__fx.btn(/^ساخت موضوع جدید/);await w(1000);return r+\" ## \"+APP.state.view+\" \"+APP.state.arg+\" ## \"+__fx.btns().slice(-10).join(\" | \")+\" ## \"+__fx.fields().join(\" ; \")+\" ## \"+(document.querySelector(\".overlay,[role=dialog]\")||{}).innerText})()"}

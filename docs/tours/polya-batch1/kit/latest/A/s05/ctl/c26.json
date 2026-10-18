@@ -1,1 +1,1 @@
-{"shot":{"name":"dossier_full_2","full":true}}
+{"eval": "(()=>{APP.go('dossier','pb_l_mvggd3vuggn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"}

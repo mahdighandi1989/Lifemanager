@@ -1,1 +1,1 @@
-{"eval":"(()=>{const t=document.getElementById(\"main\").innerText;return (t.match(/.{0,60}مجهول.{0,60}/g)||[]).join(\"\\n\")})()"}
+{"eval": "(()=>{const t=document.getElementById(\"main\").innerText;return (t.match(/.{0,60}مجهول.{0,60}/g)||[]).join(\"\\n\")})()"}

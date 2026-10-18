@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1500);const t=document.querySelector('#main').innerText;return 'TODAY '+APP.today()+' clockflag='+(document.body.innerText.indexOf('ساعتِ آزمایشی')>=0)+' || '+t.slice(0,2500)+' || REM '+JSON.stringify((window.__rem||[]).slice(-6).map(r=>r.key+' '+r.due_date+' '+r.title))})()"}
+{"shot": {"name": "t5_today", "view": ["today"], "full": true}}

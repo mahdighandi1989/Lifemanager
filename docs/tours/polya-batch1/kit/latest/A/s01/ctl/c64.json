@@ -1,1 +1,1 @@
-{"shot":{"name":"dossier_full_1","full":true}}
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqlxsgzjv\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/پروندهٔ کامل/.test(b.textContent));if(b)b.click();return APP.state.view+\" \"+APP.state.arg+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,6000)})()"}

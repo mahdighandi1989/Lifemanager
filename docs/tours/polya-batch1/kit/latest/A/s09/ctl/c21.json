@@ -1,1 +1,1 @@
-{"eval":"(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"}

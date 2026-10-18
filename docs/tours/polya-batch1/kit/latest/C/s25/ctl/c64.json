@@ -1,1 +1,1 @@
-{"say": "نوه‌م تو تکلیفش نوشته بود ۱/۲ + ۱/۳ = ۲/۵ — اون اشتباه کرده بود."}
+{"shot": {"name": "c3_lprob", "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('lprob',p);return p})()", "full": true}}

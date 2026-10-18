@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,g:(s.coach||{}).guess&&s.coach.guess.text})))"}
+{"eval": "JSON.stringify([...document.querySelectorAll(\".as-msg .mx\")].map(e=>e.getAttribute(\"data-src\")))"}

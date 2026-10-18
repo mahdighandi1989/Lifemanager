@@ -1,0 +1,19 @@
+import json
+def qs(what,pct,ok,tag):
+    js=("(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const c=APP.PR.cases().filter(c=>c.state!=='closed')[0];if(!c)return 'NO CASE';APP.go('practice',c.id);await W(1300);"
+        "const q=document.querySelector('#main .prc-quick');if(!q)return 'NO QUICK';q.scrollIntoView({block:'center'});const w=q.querySelector('input[aria-label^=\"جلسهٔ امروز\"]');const m=q.querySelectorAll('input')[1];const s=q.querySelector('select');"
+        "w.value=%s;w.dispatchEvent(new Event('input',{bubbles:true}));if(m&&%s!==null){m.value=String(%s);m.dispatchEvent(new Event('input',{bubbles:true}));}s.value=%s;s.dispatchEvent(new Event('change',{bubbles:true}));await W(300);"
+        "[...q.querySelectorAll('button')].find(b=>/ثبتِ جلسهٔ امروز/.test(b.innerText)).click();await W(1300);const c2=APP.PR.cases().find(x=>x.id===c.id);const i=document.querySelector('#main').innerText;const a=i.indexOf('موعد');"
+        "return 'after: state='+c2.state+' due='+c2.due+' sess='+(c2.sessions||[]).map(s=>s.d+(s.ok===false?'✗':s.ok===true?'✓':'')+(s.meas&&s.meas.pct!=null?'('+s.meas.pct+')':'')+'['+(s.src||'')+']').join(',')+' stable='+JSON.stringify(c2.stable||null).slice(0,200)+' || '+i.slice(Math.max(0,a-200),a+700)})()")%(json.dumps(what,ensure_ascii=False),json.dumps(pct),json.dumps(pct),json.dumps(ok))
+    return [["raw",{"eval":js}],["raw",{"shot":{"name":"part_practice_"+tag,"js":"(async()=>{const c=APP.PR.cases().filter(c=>c.state!=='closed')[0];APP.go('practice',c.id);return c.id})()","full":True}}]]
+CASE="(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const cs=APP.PR.cases();const c=cs[0];if(!c)return 'NO CASE';APP.go('practice',c.id);await W(1200);const i=document.querySelector('#main').innerText;return 'CASES '+cs.map(c=>c.id+' T'+c.tid+' '+c.state+' due='+c.due+' sess='+(c.sessions||[]).map(s=>s.d+(s.ok===false?'✗':s.ok===true?'✓':'')+(s.meas&&s.meas.pct!=null?'('+s.meas.pct+')':'')+'['+(s.src||'')+']').join(',')).join(' ;; ')+' || '+i.slice(0,1800)})()"
+def box(tid,titre):
+    return ("(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const L=APP.liveAll();const r=L.find(r=>/%s/.test(r.p.title))||L[0];APP.go('lprob',r.p.id);await W(1300);const h=[...document.querySelectorAll('#main summary,#main h3,#main h2')].find(x=>/پرونده‌های تمرین/.test(x.innerText));if(!h)return 'NO BOX';let box=h.closest('details')||h.parentElement;if(box.tagName==='DETAILS')box.open=true;const t0=box.innerText.slice(0,400);const sel=box.querySelector('select');sel.value='%d';sel.dispatchEvent(new Event('change',{bubbles:true}));await W(200);box.scrollIntoView({block:'center'});[...box.querySelectorAll('button')].find(b=>/شروع/.test(b.innerText)).click();await W(1500);return 'today='+APP.today()+' pid='+r.p.id+' || box0: '+t0+' || view='+APP.state.view+' '+APP.state.sub+' || '+[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id).join(' ')})()")%(titre,tid)
+def tail(tag,dossiers):
+    out=[["raw",{"shot":{"name":"part_practice_%s_end"%tag,"js":"(async()=>{const c=APP.PR.cases()[0];if(c)APP.go('practice',c.id);return c?c.id:'none'})()","full":True}}],
+     ["raw",{"shot":{"name":"part_mind_%s_tech"%tag,"view":["mind"],"full":True,"js":"(()=>{const h=[...document.querySelectorAll('#main h2,#main h3,#main summary')].find(x=>/کارِ تکنیک‌ها/.test(x.innerText));if(h){const d=h.closest('details');if(d)d.open=true;h.scrollIntoView();}return h?h.innerText:'none'})()"}}],
+     ["raw",{"eval":"(()=>{try{return JSON.stringify(APP.MIND.techWork()).slice(0,2500)}catch(e){return 'ERR '+e.message}})()"}]]
+    for name,rx in dossiers:
+        out.append(["raw",{"shot":{"name":name,"js":"(()=>{const r=APP.liveAll().find(r=>/%s/.test(r.p.title));APP.go('dossier',r?r.p.id:undefined);return r?r.p.id:'none'})()"%rx,"full":True}}])
+        out.append(["raw",{"eval":"(()=>document.querySelector('#main').innerText.slice(0,9000))()"}])
+    return out

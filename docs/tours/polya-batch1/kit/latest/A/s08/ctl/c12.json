@@ -1,1 +1,1 @@
-{"eval0":"(()=>{APP.today=()=>\"2026-10-18\";return JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveClosure(r.p.id).label,APP.liveKindInfo(r.p.id).kind]))})()","say":"خودم یه معما ساختم: ساعت‌های ۵ و ۹ دقیقه، چطوری ۱۳ دقیقه؟ حلش کردم: ۹−۵=۴، بعد ۹+۴=۱۳."}
+{"eval0": "(()=>{0;return JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveClosure(r.p.id).label,APP.liveKindInfo(r.p.id).kind]))})()", "say": "خودم یه معما ساختم: ساعت‌های ۵ و ۹ دقیقه، چطوری ۱۳ دقیقه؟ حلش کردم: ۹−۵=۴، بعد ۹+۴=۱۳.", "clock": "2026-10-18"}

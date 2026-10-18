@@ -1,1 +1,1 @@
-{"shot":{"name":"part_today_1","full":true}}
+{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"}

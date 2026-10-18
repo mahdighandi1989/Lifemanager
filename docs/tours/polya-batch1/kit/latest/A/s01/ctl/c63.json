@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvczjwlwwca\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/پروندهٔ کامل/.test(b.textContent));if(b)b.click();return APP.state.view+\" \"+APP.state.arg+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,6000)})()"}
+{"eval": "JSON.stringify({v:APP.state.view,a:APP.state.arg,t:APP.today(),dev:APP.clock.dev,live:APP.liveAll().map(r=>[r.p.id,r.p.title])})"}

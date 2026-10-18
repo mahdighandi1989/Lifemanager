@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveAll()[0];const pg=APP.S.get('eprog_'+r.p.id);const sv=pg.solve||{};const s=APP.ASSIST.cur()||{};return JSON.stringify({steps:(sv.live||{}).steps,tut:pg.tut,ph:APP.MIND.phases(),coach:s.coach,prom:s.promises,ce:s.coachEv})})()"}
+{"shot": {"name": "c0_today", "view": ["today"], "full": true}}

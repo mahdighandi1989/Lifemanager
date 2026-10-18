@@ -1,1 +1,1 @@
-{"shot":{"name":"corr_0_before_lprob","full":true}}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,r.p.statement]))"}

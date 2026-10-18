@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvd06pjmqu4\");const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"گفت‌وگوهای این مسئله\")).slice(0,200)+\" ... \"+(t.match(/.{0,80}(پروندهٔ تمرین|تمرین بازیابی|برگه سفید).{0,120}/g)||[]).join(\" || \")})()"}
+{"eval": "(()=>JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برگه سفید|۴۱|🧪|پرونده/.test(t))))()"}

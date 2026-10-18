@@ -1,1 +1,1 @@
-{"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()"}
+{"shot": {"name": "t15_today", "view": ["today"], "full": true}}

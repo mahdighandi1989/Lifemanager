@@ -1,1 +1,0 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();const C=s.coach||{};return JSON.stringify({ansBy:C.ansBy,msgs:s.msgs.slice(-7).map(m=>m.role+':'+String(m.text).slice(0,50))})})()"}

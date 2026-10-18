@@ -1,7 +1,8 @@
 #!/bin/bash
-# st.sh sid : create dir, start harness3, run auto (go2) in bg into g_sid.txt
-B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round20B; cd $B; s=$1
-mkdir -p $s; [ -d keep/${s}_aovr ] && cp -r keep/${s}_aovr $s/aovr; cp ../round19B/${SRCS:-$s}/inject.js $s/; [ -f ../round19B/${SRCS:-$s}/off.txt ] && cp ../round19B/${SRCS:-$s}/off.txt $s/
-bash tools/start5.sh $B/$s > $s/pid.txt
-sleep 6; nohup tools/go2.sh $s > g_$s.txt 2>&1 &
-echo "started $s $(cat $s/pid.txt)"
+# st.sh sid [src] : fresh dir (keeps seq/akey/apatch/aovr/stop_*), start harness5, run drv in bg -> g_sid.txt
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21B; cd $B; s=$1; src=${2:-$s}
+mkdir -p $s; cp ../round20B/$src/inject.js $s/ 2>/dev/null || cp tools/inject.js $s/
+echo $src > $s/src.txt
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad && nohup node harness5.js $B/$s >> $B/$s/harness.log 2>&1 &
+echo $! > $B/$s/pid.txt; sleep 7; cd $B; STOPAT=${STOPAT:-0} nohup python3 tools/drv.py $s $src > g_$s.txt 2>&1 &
+echo "started $s src=$src harness=$(cat $s/pid.txt)"

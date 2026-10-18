@@ -1,1 +1,1 @@
-{"eval0":"(()=>{const s=APP.ASSIST&&APP.ASSIST.cur?APP.ASSIST.cur():null;return JSON.stringify(Object.keys(APP.ASSIST||{}).filter(k=>/sess|cur/i.test(k)))})()","say":"آره، ثبتش کن."}
+{"eval0": "(()=>{const s=APP.ASSIST&&APP.ASSIST.cur?APP.ASSIST.cur():null;return JSON.stringify(Object.keys(APP.ASSIST||{}).filter(k=>/sess|cur/i.test(k)))})()", "say": "آره، ثبتش کن."}

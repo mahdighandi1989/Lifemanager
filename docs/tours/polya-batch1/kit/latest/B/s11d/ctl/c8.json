@@ -1,1 +1,0 @@
-{"eval":"[\"lpSat\",\"lpSuff\",\"lpConf\",\"lpIfRef\",\"lpGWant\",\"lpDep\"].map(id=>{const e=document.getElementById(id);return id+\": \"+[...e.options].map(o=>o.value).join(\",\")}).join(\" | \")"}

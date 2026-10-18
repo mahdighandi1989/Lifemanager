@@ -1,1 +1,1 @@
-{"eval": "(()=>{const t='2026-11-12';const d=new Date();const real=new Date(d.getFullYear(),d.getMonth(),d.getDate());const p=t.split('-');const off=Math.round((new Date(+p[0],+p[1]-1,+p[2])-real)/864e5);localStorage.setItem('lla.dev','1');localStorage.setItem('lla.clockOff',String(off));localStorage.removeItem('lla.clockParam');return off})()"}
+{"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/روز ۷/.test(x.txt));if(x&&x.go)x.go();return APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,1500)})()"}

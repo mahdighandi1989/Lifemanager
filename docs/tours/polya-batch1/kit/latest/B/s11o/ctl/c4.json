@@ -1,1 +1,0 @@
-{"eval":"(async()=>{__adv(1);APP.go(\"e_prob\",null,\"live\");await new Promise(r=>setTimeout(r,800));const m=__fx.main(20000);const i=m.indexOf(\"🔭\");return JSON.stringify({f:__fx.fields(),b:__fx.btns().slice(0,40),m:m.slice(i,i+2500)})})()"}

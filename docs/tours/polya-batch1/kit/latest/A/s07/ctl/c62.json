@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({id:c.id,tid:c.tid,subj:c.subj,due:c.due,state:c.state})),fc:APP.S.all('fcast',x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,40),x.p,x.due])})"}

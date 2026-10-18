@@ -1,13 +1,13 @@
-# build_src.py -> round20C/src/<sid>/ctl from round19C/<sid>/ctl: drop trailing exit; real clock instead of APP.today patches;
+# build_src.py -> round21C/src/<sid>/ctl from round20C/<sid>/ctl: drop trailing exit; real clock instead of APP.today patches;
 # a new day starts with [set clock, save PID, exit, helpers+restore]
 import json,os,re,glob,sys
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
 DAYMAP={'s22':{'2026-10-17':'2026-10-18','2026-10-18':'2026-10-19'},'s23':{'2026-10-17':'2026-10-18'},'s26':{'2026-10-17':'2026-10-18'},'s27':{'2026-10-17':'2026-10-18'}}
-HELP=json.load(open(T+'/round19C/s22/ctl/c1.json'))['eval0']
+HELP=json.load(open(T+'/round20C/s22/ctl/c1.json'))['eval0']
 def clk(d): return "(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('%s'))"%d
 def restore(): return HELP+";window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()"
 for sid in sys.argv[1:]:
-    src=sorted(glob.glob(f'{T}/round19C/{sid}/ctl/c*.json'),key=lambda x:int(x.split('/c')[-1][:-5]))
+    src=sorted(glob.glob(f'{T}/round20C/{sid}/ctl/c*.json'),key=lambda x:int(x.split('/c')[-1][:-5]))
     L=[open(f).read() for f in src]
     while L and '"exit"' in L[-1]: L.pop()
     out=[]; cur=None
@@ -23,7 +23,7 @@ for sid in sys.argv[1:]:
             cur=d
         json.loads(t)
         out.append(t)
-    D=f'{T}/round20C/src/{sid}/ctl'; os.makedirs(D,exist_ok=True)
+    D=f'{T}/round21C/src/{sid}/ctl'; os.makedirs(D,exist_ok=True)
     for f in glob.glob(D+'/*'): os.remove(f)
     for i,t in enumerate(out): open(f'{D}/c{i+1}.json','w').write(t)
     print(sid,len(L),'->',len(out))

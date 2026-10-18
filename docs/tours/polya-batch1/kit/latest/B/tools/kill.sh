@@ -1,5 +1,4 @@
 #!/bin/bash
-# kill.sh sid : kill my harness + auto loop for sid
-for p in $(pgrep -f "[h]arness5.js .*round20B/$1\$"); do kill -9 $p; done
-for p in $(pgrep -f "[a]uto.sh $1\$"); do kill $p; done
-for p in $(pgrep -f "[g]o2.sh $1\$"); do kill $p; done
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21B
+for p in $(pgrep -f "[h]arness5.js $B/$1\$"); do kill -9 $p; done
+for p in $(pgrep -f "[d]rv.py $1( |\$)"); do kill $p; done

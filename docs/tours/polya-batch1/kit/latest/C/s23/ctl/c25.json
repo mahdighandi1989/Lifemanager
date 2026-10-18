@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveAll()[0];const pg=APP.S.get('eprog_'+r.p.id);const sv=pg.solve||{};return JSON.stringify({steps:(sv.live||{}).steps,tut:pg.tut,ph:APP.MIND.phases().map(x=>[x.id,x.k,x.n,x.src]),coach:(APP.ASSIST.cur()||{}).coach,prom:(APP.ASSIST.cur()||{}).promises})})()"}
+{"shot": {"name": "c0_lprob", "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('lprob',p);return p})()", "full": true}}

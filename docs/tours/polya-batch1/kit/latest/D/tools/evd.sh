@@ -1,6 +1,6 @@
 #!/bin/bash
 # evd.sh sid DAY 'JS' — like ev.sh with the clock shifted DAY days
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round20D
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21D
 s=$1; o=$(ls $R/$s/out/s*.json|wc -l); for f in $R/$s/ctl/c*.json; do n=$(basename $f .json|tr -d c); [ $n -gt $o ] && rm $f; done
 cd $R/tools && (nohup node harness5.js $R/$s >> $R/$s/harness.log 2>&1 &); sleep 8; cd $R
 timeout 200 python3 tools/run.py $s --day $2 "$3" >/dev/null 2>&1

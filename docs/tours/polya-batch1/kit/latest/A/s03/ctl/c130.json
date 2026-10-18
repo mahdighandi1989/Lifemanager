@@ -1,0 +1,1 @@
+{"eval": "APP.today()+' '+APP.state.view+' '+APP.state.arg+' sess:'+APP.ASSIST.cur().id+' lp:'+(APP.ASSIST.cur().lprob||'')+' | '+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({id:c.id,subj:c.subj.t,due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src])})))"}

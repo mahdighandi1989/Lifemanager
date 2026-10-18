@@ -1,9 +1,8 @@
 #!/bin/bash
-# probe.sh sid 'js-expr' -> run a probe eval in a finished scenario (restart harness, eval, exit), print result
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round20C
-n=$(ls $1/ctl | sed 's/c//;s/.json//' | sort -n | tail -1)
-python3 -c "import json,sys;json.dump({'eval':sys.argv[1]},open('$1/ctl/c$((n+1)).json','w'))" "$2"
-echo '{"exit":true}' > $1/ctl/c$((n+2)).json
-ps aux | grep "[h]arness5c*.js" | grep -q "round20C/$1\$" || bash tools/start.sh $1 >/dev/null
-for i in $(seq 1 90); do [ -f $1/out/s$((n+2)).json ] && break; sleep 2; done
-python3 -c "import json;r=json.load(open('$1/out/s$((n+1)).json'));print(r.get('eval') or r.get('error'))"
+# probe.sh sid jsfile -> append an eval ctl (+exit) to src and run it; print the eval result
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21C
+s=$1; n=$(ls src/$s/ctl/c*.json | wc -l)
+python3 -c "import json,sys;js=open('$2').read();json.dump({'eval':js},open('src/$s/ctl/c$((n+1)).json','w'),ensure_ascii=False)"
+echo '{"exit":true}' > src/$s/ctl/c$((n+2)).json
+T=300 W=300 tools/d.sh $s > $s/probe.txt 2>&1
+python3 -c "import json;print(json.load(open('$s/out/s$((n+1)).json')).get('eval'))"

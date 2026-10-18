@@ -1,1 +1,1 @@
-{"eval": "(()=>{const p=window.__PID||APP.state.arg||(APP.liveAll()[0]||{p:{}}).p.id;localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-19')})()"}
+{"say": "می‌خوام این درس که «برای قالب، مساحتِ کف مهمه نه طول» یادم بمونه. چند روز دیگه دوباره بدون نگاه کردن برای خودم توضیحش بدم و ببینم چقدرش یادمه — برام یه تمرین بذار."}

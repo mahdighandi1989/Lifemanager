@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify({v:APP.state.view,a:APP.state.arg,ids:APP.liveAll().map(r=>r.p.id),coach:(()=>{try{const S=APP.ASSIST.state?APP.ASSIST.state():null;return S}catch(e){return String(e)}})()})"}
+{"eval": "JSON.stringify({v:APP.state.view,a:APP.state.arg,ids:APP.liveAll().map(r=>r.p.id),coach:(()=>{try{const S=APP.ASSIST.state?APP.ASSIST.state():null;return S}catch(e){return String(e)}})()})"}

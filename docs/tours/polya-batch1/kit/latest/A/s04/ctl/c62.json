@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).join(' || ')})()"}

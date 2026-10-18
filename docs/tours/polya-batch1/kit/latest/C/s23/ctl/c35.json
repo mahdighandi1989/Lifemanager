@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify({t28:{n:APP.TM[28].name||APP.TM[28].t,dose:APP.TM[28].dose,ws:(APP.TM[28].ws||[]).map(f=>[f.k,f.t,f.l])},t41:{dose:APP.TM[41].dose,ws:(APP.TM[41].ws||[]).map(f=>[f.k,f.t,f.l])},p28:APP.PR&&APP.PR.POLICY&&APP.PR.POLICY[28],p41:APP.PR.POLICY[41],s28:APP.SCHED.POLICY.T28}).slice(0,5000)"}
+{"shot": {"name": "c1_panel", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const b=document.querySelector('.as-body,.as-msgs');if(b)b.scrollTop=b.scrollHeight;return 'panel'})()"}}

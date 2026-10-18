@@ -1,1 +1,1 @@
-{"shot": {"name": "c2_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details.mind-from,details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}
+{"shot": {"name": "c2_dossier", "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('dossier',p);return p})()", "full": true}}

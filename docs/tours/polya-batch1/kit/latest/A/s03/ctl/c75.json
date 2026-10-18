@@ -1,1 +1,1 @@
-{"say": "یه اصلاح دربارهٔ حدسم: گفتم بیشترین فاصله توی مثلثِ ضلع ۱ ارتفاعشه یعنی √۳/۲ — اشتباه گفتم؛ بیشترین فاصله خودِ ضلعه، یعنی ۱."}
+{"eval": "JSON.stringify({ans:((APP.ASSIST.cur().coach||{}).ansLog||[]).slice(-3).map(a=>[a.q,a.pk,a.src]),own:((APP.ASSIST.cur().coach||{}).ownLog||[]).slice(-2).map(a=>[a.p,a.src]),u:(APP.S.get(\"eprog_pb_l_mvggdoytgmh\")||{}).solve})"}

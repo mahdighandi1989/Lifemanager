@@ -1,1 +1,1 @@
-{"shot": {"name": "c2_today", "view": ["today"], "full": true}}
+{"shot": {"name": "c2_lprob", "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('lprob',p);return p})()", "full": true}}
