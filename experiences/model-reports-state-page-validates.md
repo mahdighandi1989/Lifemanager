@@ -98,3 +98,11 @@ Round 22 showed the turn-question layer drifting in four ways, all from the same
   and deadline notes were being taken as a new chat problem or as a guess. One classifier, consulted by the problem detector, the guess
   detector and the statement holder, removes all three symptoms.
 
+## Update 2026-10-18 (round 22, practice + lists)
+Derive a record's dependent rows from the record itself, never from the path that changed it. A calibration case booked a session only when the
+judgement arrived through the chat action, so a prediction judged on its own page (or in a worksheet row) left the case "stabilising with zero
+sessions" and hid a 90% miss. The fix books the session from every judged linked prediction on save (one per judgement day, removed again when
+the judgement is withdrawn). The same rule picks the record a report refers to: when several candidates share words, use the numbers the person
+said (her stated confidence must equal the record's, other numbers must appear in its text) and ask "which?" only if more than one still fits —
+never invent a new record because no word matched. For lists the model fills from conversation, require the same consent check as for any other
+write, and accept numbers and dates only if they occur in her own message.
