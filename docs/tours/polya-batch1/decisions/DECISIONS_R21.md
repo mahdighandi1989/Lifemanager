@@ -66,3 +66,26 @@ R9 — SMALL (D·s31 her 3 look-back «new problems» lost ⇒ kept in the look-
 - practice (a41, a42, a36): R2, R5.
 - (no backend change expected; if one appears, record it with handoff.py)
 Independent bank VARIANTS_R21 (parallel, no code). Docs numbering decided at merge (check origin/main for routine entries first).
+
+## ADDENDUM — group A (round21A; A 0/10 ⇒ round 21 total 0/38)
+A adds no new root, but confirms R1/R2/R3/R4/R5/R7, and adds these binding items:
+- R7+ (A21-1): the register check reads «تو/شما» only from pronouns and verb endings at the end of a word whose stem is a 2nd-person verb
+  form. Never from «باید/نباید/بیاید/می‌گوید/بیشترین» or other 3rd-person and modal forms. A false rewrite is a defect.
+- R8+ (A21-2, regression): after a step outcome with her reflection, the turn question moves to the NEXT open item (next step, look-back,
+  restatement if she asks for it). Never back to e1 of a step that no longer exists. Root-cause the R20 #142 `L.c0Asked` change.
+- R3+ (A21-3/4/5/6/7/19/20): «خونه/خانه، می‌ارزه/می‌ارزد، نفر/همکار» colloquial ⇄ written equivalence in same-fact matching; conditions
+  and «متناقض» judgements that hold the corrected fact are copy candidates / set aside; the coach-side replacement must not garble (A16
+  remainder); a correction message is never offered as a «صورت» candidate; «هیچ رکوردی ساخته نشده بود» is never shown on a repeated ✏️ when
+  the earlier one did change something; the result block must agree with the page lines in the same prompt.
+- R5+ (A21-9/10/11/16/17/18): ONE Persian date parser for every due field («۱۵ آبان», «پنجشنبه», «هفتهٔ بعد», ISO, «N روز»); T24 chat log
+  judges the 🎯 with her stated confidence; the mind card's calibration row shows measured values; frame/reconstruction cards owned by the
+  problem's retrieval case; late label on overdue cycle steps; the habit block does not fire on a practice request; a case the assistant
+  suggests is linked to her problem/session (never «آزاد»).
+- R4+ (A21-14): one problem's plan never appears in another problem's dossier; no doubled headings («از گفت‌وگو — از گفت‌وگو»).
+- R6+ (A21-12): the open-plan list in the prompt keeps an overdue plan until she answers it; her «آره، انجام دادم» closes it as done.
+- R9+ (A21-22): a guess judged «نادرست» is re-judged when the problem closes verified (re-check prompt to her, not silent).
+- Test infra (A21-21): records made under the dev clock (`simClock`) stay visible after the offset returns to 0, at least in dev mode.
+  Tests must not depend on records vanishing.
+- Parts verdict (roadmap §12): the running lists (assumptions, models, mistakes, ambiguities, Pareto, signal/noise) have had no evidence
+  for two rounds. That is a coverage gap, not proof of uselessness ⇒ do NOT quarantine. Round 22 routes at least two scenarios through them
+  (one math, one life) and judges them.
