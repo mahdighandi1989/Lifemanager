@@ -4,7 +4,7 @@ Scope (DECISIONS_R23 «Fixers / prereq»): Q2 (prerequisite refinements) and Q6 
 Files: `src/app/a44_route.js` (most of it), `src/app/a29_mind.js` (`causes.sys`), `src/app/a40_dossier.js` (one line: system-caused stuck), `src/app/a26_assist.js`
 (`AS.cutManifest` used by `AS.prompt` — the two old `man.slice` truncations replaced), `apps/learning-architecture/AGENTS.md` (§«💬 دستیار» bullet 3: reply contract under a gap sheet).
 Tests: new `tests/test_tour1_r23_prereq.js` + byte copy of the bank `tests/variants/VARIANTS_R23.json`. No old assertion changed.
-Docs: WORKLOG (95), PROGRESS 110, HANDBOOK (§2 bullet, §10 row, §12 row 58). Numbering leaves 94/109 for ageclass (merge order joins them).
+Docs: WORKLOG (95), PROGRESS 110, HANDBOOK (§2 bullet, §10 row, §12 row 59). Numbering leaves 94/109 for ageclass (merge order joins them).
 
 ## Contract: model reports (coach_state / gap), page validates
 - `gap.step` — the step of THIS problem that waits on the sheet (taught in the «# پیش‌نیاز» RULE line). Fallback: the assistant's `steps` item with `s:"now"`, later the
@@ -37,5 +37,5 @@ Docs: WORKLOG (95), PROGRESS 110, HANDBOOK (§2 bullet, §10 row, §12 row 58). 
 - **correction (Q4):** nothing new; the R22 retract line format is still read by the route map.
 
 ## Not done
-- No real-model run (`POST /api/inspection/audit/ai`) for `gap.step` / `sys_done` (HANDBOOK §12 row 58).
+- No real-model run (`POST /api/inspection/audit/ai`) for `gap.step` / `sys_done` (HANDBOOK §12 row 59).
 - A chat-only problem (no live record) shows its waiting step in the conversation, the session dossier and the session route map, not on a 🔭 page (there is none).

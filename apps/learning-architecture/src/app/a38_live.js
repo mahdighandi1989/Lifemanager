@@ -1233,6 +1233,9 @@
   A.liveHeur = function (pid) { var r = rec(pid); if (!r) return []; return heurUsed(r, solOf(pgOf(pid))); };
   var HEUR_FA = { back: "از آخر به عقب", aux: "مسئلهٔ کمکی", move: "حرکت با دلیل", rel: "مسئلهٔ مرتبط", ask: "پرسشِ طرح که پاسخش دادی" };
   var PD = {};
+  /* دورِ ۲۳ (Q3): پیش‌نویسی که دفترِ داستانِ گفت‌وگو (a45) روی رکورد نوشت، با رسمِ بعدی از رکورد خوانده می‌شود — نه از حافظهٔ کهنهٔ همین صفحه */
+  A.liveDraftDrop = function (pid) { delete UD[pid]; delete PD[pid]; try { delete BKD[pid]; } catch (e) { } };
+  A.liveMkSrc = function (sid, m, key, val) { return mkSrc(sid, m, key, val); };
   function planCard(r, pg, s) {
     var pid = r.p.id, L = live(s), nat = natOf(s, r), prac = nat === "practical";
     /* تور ۱: دلیل‌های ثبت‌شده در طرحِ پیشین در فرم می‌مانند؛ پیش‌نویسِ طرح روی رکورد (L.planDraft) تا «به‌کارنرفته» و قلابِ دستیار آن را هم ببینند */
@@ -1679,7 +1682,11 @@
     var stuckT = !!(T.stuck || o.stuck), tx = norm(T.text || ""), ok = function (x) { return x && !isAsked(x) && qOk(s, x, stuckT); };
     /* (۴) پرسشِ بازِ کارتِ طرح/اجرا */
     var pageQ = "", c0Mark = false;
-    if (ph === "u") { var d = L.uDraft || {}; pageQ = wholeOpen(s) ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
+    /* دورِ ۲۳ (Q3، A23-35/B·D5): فهم را در گفت‌وگو تمام کرد (کل + مجهول + داده/شرط، یا طرح/نتیجه — سنجیدهٔ coach_state، a45) ⇒ پرسش‌های فرمِ فهم پرسشِ نوبت نیستند؛
+       فرم با «از گفت‌وگو: … درست است؟» روی صفحه می‌ماند (دوباره پرسیده نمی‌شود) */
+    var storyAhead23 = false; try { storyAhead23 = ph === "u" && !!(A.liveStoryAhead && A.liveStoryAhead(r.p.id)); } catch (e) { }
+    if (ph === "u" && storyAhead23) pageQ = "";
+    else if (ph === "u") { var d = L.uDraft || {}; pageQ = wholeOpen(s) ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
     else if (ph === "p" && Q.length) { var P = tut.plan || [], qi0 = tut.qi && tut.qi.lplan != null ? +tut.qi.lplan : 0;
       for (var k = 0; k < Q.length; k++) { var j = (qi0 + k) % Q.length; if (qOk(s, Q[j]) && !P.some(function (e) { return e && e.src === "live" && e.q === Q[j] && (e.text || e.skip); })) { pageQ = Q[j]; break; } } }
     else if (ph === "c") { var o0 = openStep(s); if (o0 && chatOut(o0)) pageQ = "";   // RN2a (دورِ ۱۹): نتیجه‌اش را در گفت‌وگو گفت و ثبت شد — دوباره پرسیده نمی‌شود

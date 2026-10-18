@@ -333,8 +333,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     R7.b41 = x.sys >= 1 && x.unk === 0;
     // 🔭, route map, dossier (#150)
     const v150 = await p.evaluate((pid) => { APP.go('lprob', pid); const c = document.querySelector('#main .lp-syscard'); const M = APP.ROUTE.model(pid); const d = M.dets.filter(d => d.kind === 'sys')[0];
-      const svg = APP.ROUTE.box(pid).el.textContent; const dz = APP.dossier(pid).events.filter(e => e.k === 'syswait')[0];
-      return { card: c ? c.textContent : '', open: d && d.open, remain: M.remain, svg: /⏸ منتظر #۱۰۱/.test(svg), dz: dz ? dz.title + ' @' + dz.at.slice(0, 10) : '' }; }, pid);
+      const svg = Array.prototype.map.call(APP.ROUTE.box(pid).el.querySelectorAll('[data-full]'), x => x.getAttribute('data-full')).join(' | '); const dz = APP.dossier(pid).events.filter(e => e.k === 'syswait')[0];
+      return { card: c ? c.textContent : '', open: d && d.open, remain: M.remain, svg: /⏸ منتظرِ برگهٔ #۱۰۱ — سنجشِ ایمنی/.test(svg), dz: dz ? dz.title + ' @' + dz.at.slice(0, 10) : '' }; }, pid);
     T(150, /منتظرِ برگهٔ #۱۰۱/.test(v150.card) && v150.open && v150.svg && /منتظرِ برگهٔ #۱۰۱/.test(v150.remain) && /#۱۰۱/.test(v150.dz) && /@\d{4}-\d{2}-\d{2}/.test(v150.dz), v150);
     chk(/منتظرِ برگهٔ #۱۰۱/.test(v150.card) && v150.svg && /#۱۰۱/.test(v150.dz), 'A23-36 / D23-24: 🔭 card, route map point and dossier line carry the sheet id :: ' + JSON.stringify(v150));
     // next turn: prompt carries the waiting record (#154 «آمد؟» ⇒ «هنوز نه — برگهٔ #۱۰۱ باز است»; #158 honest «وقتی ساخته شد خودم خبرت می‌کنم»)

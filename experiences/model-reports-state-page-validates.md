@@ -9,7 +9,8 @@ source:
 created_at: "2026-10-16T12:00:00Z"
 updated_at: "2026-10-18T14:00:00Z"
 updated_at: "2026-10-18T16:00:00Z"
-updated_at: "2026-10-19T12:00:00Z"
+updated_at: "2026-10-18T21:00:00Z"
+updated_at: "2026-10-18T20:00:00Z"
 merged_from: []
 ---
 
@@ -124,7 +125,7 @@ said (her stated confidence must equal the record's, other numbers must appear i
 never invent a new record because no word matched. For lists the model fills from conversation, require the same consent check as for any other
 write, and accept numbers and dates only if they occur in her own message.
 
-## Update 2026-10-19 (round 23, prereq + territory loop)
+## Update 2026-10-18 (round 23, prereq + territory loop)
 Three reusable lessons. (1) **A truncation budget must cut by priority, not from the end.** The assistant's system map was shortened from its tail when the
 prompt was too long — and the tail was exactly the territory list the model needs for a "this is missing, file a sheet" decision. Split such context into
 sections, mark the decision-critical ones as never-cut, and shorten the rest least-harm-first (drop description columns before names, glossaries before
@@ -135,3 +136,15 @@ snapshot of the registry when a capability gap is reported; later, anything new 
 candidate, and it counts only if it shares enough specific words with the waiting step (ignore words common to most registry entries). That keeps the
 "notice ⇒ verify ⇒ resume" loop model-independent, and a mismatch reopens the request instead of silently resuming. For attributing failures, use the
 last step boundary as the evidence of "same step" when events carry no step name, and let an evidenced cause in the same message override a default.
+## Update 2026-10-18 (round 23, story) — a validated report must reach every reader, not just the module that validated it
+The coach's validated reports (said, plan, step, result) were stored only where the chat module kept its own state, while the forms, the stage,
+the dossier and the route map read only the forms. So the system "knew" she had stated the whole and a plan, yet asked for the whole again and
+showed "no plan yet". Lessons:
+- **Write each validated item once into the shared event log** (the same one the dossier and map read) with its source message, and derive every
+  view from that log. A second "chat copy" of the record is the bug, not the fix.
+- **Feed forms only as proposals:** fill an empty field, mark it «from chat — correct?», never overwrite her typed text, never refill a field the
+  chat filled once (her edit wins). Commit stays her click.
+- **One stage source = max(form stage, validated story stage)**; change the readers' source, not the old stage function many callers rely on.
+- **Every event carries its owner** (which problem, by binding time or the problem's chat window); "the only live problem of the session" is not an owner.
+- **Explicit markers beat inference for summary acts:** a "whole in one sentence" is recognised only from her explicit marker ("in one sentence: …"),
+  never from `said:u` alone.
