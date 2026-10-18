@@ -1,1 +1,1 @@
-{"shot":{"name":"corrN1_after_lprob","full":true}}
+{"eval": "(()=>{document.querySelector(\".as-askyes\").click();return \"ok\"})()"}

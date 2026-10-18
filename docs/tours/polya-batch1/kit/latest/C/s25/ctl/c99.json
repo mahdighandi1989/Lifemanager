@@ -1,1 +1,1 @@
-{"shot": {"name": "part_list_models_s25", "full": true}}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('practice',APP.PR.list('models').id);await W(1200);return document.querySelector('#main').innerText.slice(0,1500)})()"}

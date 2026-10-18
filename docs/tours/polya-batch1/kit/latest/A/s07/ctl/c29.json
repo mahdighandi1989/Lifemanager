@@ -1,1 +1,1 @@
-{"eval": "(()=>{C(\".lp-solved\");return APP.state.sub+\"\\n\"+FL(\"lpB(Dom|Lim|Law|Rng)\")+\"\\n\"+MT(\"دامنه\",500)})()"}
+{"eval": "(()=>{F(\"lpStep\",\"گلدانِ ششم را ۲۴ ساعت زیرِ نور می‌گذارم و پس از ۳ هفته قد را می‌سنجم\");S(\"lpClear\",\"بله\");F(\"lpPrem\",\"منحنیِ تفاضل‌ها\");F(\"lpPred\",\"حدود ۱۸ سانت\");S(\"lpConf\",\"70\");F(\"lpWhen\",\"۱۶ آبان\");[...document.querySelectorAll(\"[id^=lpSD_],[id^=lpSC_]\")].slice(0,2).forEach(e=>{if(!e.checked)e.click()});C(\".lp-stepsave\");return TT()})()"}

@@ -1,1 +1,1 @@
-{"shot": {"name": "part_dossier_s26_1", "js": "(()=>{const p=APP.liveAll()[1].p.id;APP.go('dossier',p);return p})()", "full": true}}
+{"shot": {"name": "part_dossier_s26_0", "js": "(()=>{const p=APP.liveAll()[0].p.id;APP.go('dossier',p);return p})()", "full": true}}

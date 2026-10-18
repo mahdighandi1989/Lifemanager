@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",APP.ASSIST.cur().id,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}
+{"say": "چون زوج‌ها دوتا دوتا جلو میرن: ۲، ۴، ۶، ۸، ... و مضرب‌های ۴ یکی در میون بین زوج‌هان. پس از هر دو زوج پشت سر هم، دقیقاً یکی مضرب ۴ه. درسی که گرفتم: وقتی «مربع منهای مربع» دیدم، به ضرب تجزیه‌ش کنم؛ و اگه یه ابزاری رو بلد نیستم، اول همونو یاد بگیرم بعد برگردم سر مسئله."}

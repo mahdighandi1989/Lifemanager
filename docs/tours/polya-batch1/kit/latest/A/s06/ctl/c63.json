@@ -1,1 +1,1 @@
-{"shot":{"name":"dossier22_full_2","full":true}}
+{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"}

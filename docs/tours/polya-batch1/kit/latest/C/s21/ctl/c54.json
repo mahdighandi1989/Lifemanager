@@ -1,1 +1,1 @@
-{"eval": "(()=>{const o=[];APP.liveAll().forEach(r=>{try{const d=APP.dossier(r.p.id);o.push(r.p.title+' :: '+(d.events||[]).map(e=>e.k+'@'+String(e.at||'').slice(0,16)+' '+String(e.title||'').slice(0,50)).join(' | '))}catch(e){o.push('ERR '+e.message)}});return o.join('\\n')})()"}
+{"shot": {"name": "part_dossier_s21_1", "js": "(()=>{const p=APP.liveAll()[1].p.id;APP.go('dossier',p);return p})()", "full": true}}

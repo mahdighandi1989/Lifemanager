@@ -1,6 +1,6 @@
 # recs.py sid [k] -> show the last k rec outputs (evals that start with {"today")
 import json,glob,sys
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22C'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C'
 sid=sys.argv[1]; k=int(sys.argv[2]) if len(sys.argv)>2 else 1; W=int(sys.argv[3]) if len(sys.argv)>3 else 900
 fs=sorted(glob.glob(f'{T}/{sid}/out/s*.json'),key=lambda x:int(x.split('/s')[-1][:-5]))
 R=[]

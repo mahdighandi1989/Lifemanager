@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}
+{"eval": "FL(\"lpBEquiv\")+\" T:\"+APP.liveTransf(\"sqrt((1/2)^2 + (1/2)^2) = sqrt(2)/2\")+\" T2:\"+APP.liveTransf(\"قطر هر مربع √(¼+¼)=√۲/۲\")+\" T3:\"+APP.liveTransf(\"x^2 = 4 پس x = 2\")"}

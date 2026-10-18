@@ -1,1 +1,1 @@
-{"eval": "typeof APP.ASSIST.coachLedger+\" \"+JSON.stringify(typeof APP.ASSIST.coachLedger==\"function\"?APP.ASSIST.coachLedger.toString().slice(0,300):APP.ASSIST.coachLedger).slice(0,1500)"}
+{"eval": "JSON.stringify({reg:APP.ASSIST.cur().coach.reg,plans:APP.ASSIST.cur().plans,prom:APP.ASSIST.cur().promises,sig:APP.ASSIST.regSigns(\"فقط بگو بخرم یا نه؟\")})"}

@@ -1,1 +1,1 @@
-{"shot":{"name":"corrN5_after_chat_plot","fold":false}}
+{"eval": "[...document.querySelectorAll(\"button\")].filter(b=>/بله، این‌جا هم/.test(b.textContent)).length"}

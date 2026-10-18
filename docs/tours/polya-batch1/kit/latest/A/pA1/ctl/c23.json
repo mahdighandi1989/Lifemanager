@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].find(b=>/باز نشد ⇐ پلهٔ بعد/.test(b.textContent));if(!b)return \"NOBTN\";b.click();return TT()+\" | \"+MT(\"نردبانِ راهنمایی\",900)})()"}
+{"eval": "(()=>{APP.go('route','pb_l_mvaqm3fjybe');const t=document.getElementById('main').innerText;const i=t.indexOf('اکنون:');return t.slice(i,i+900)})()"}

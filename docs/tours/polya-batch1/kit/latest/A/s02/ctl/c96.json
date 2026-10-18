@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','pb_l_mvar199dbjp');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}
+{"shot": {"name": "corrN1_recheck_chat", "fold": false}}

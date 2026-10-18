@@ -1,1 +1,1 @@
-{"eval": "(()=>{F('lpPrMeasure','L متر = طول طناب، L ≤ ۴ متر طنابی که داریم');C('.lp-usave');C('.sv-g2');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).slice(-2).join(' || ');\nconst r=st()+'\\nSUB:'+APP.state.sub;const t=document.getElementById('main').innerText;const i=t.indexOf('مسئلهٔ مرتبط از کارهای خودت');\nreturn r+'\\n'+t.slice(i,i+900)})()\n"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"}

@@ -1,1 +1,1 @@
-{"click":".as-editb >> nth=5"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);const b=[...document.querySelectorAll('.as-editb')];return b.length+' :: '+b.map((x,i)=>i+':'+(x.closest('.as-msg,.as-bubble,li,div[class*=msg]')||x.parentElement.parentElement).textContent.slice(0,40)).join(' | ')})()\n"}

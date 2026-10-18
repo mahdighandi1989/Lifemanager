@@ -1,1 +1,1 @@
-{"shot": {"name": "fin_sessdossier", "full": true, "js": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return s.id})()"}}
+{"shot": {"name": "fin_today", "view": ["today"], "full": true}}

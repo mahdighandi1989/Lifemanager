@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('e_prob',null,'live');const t=[...document.querySelectorAll('#main input,#main textarea')];F('lpNewTitle','نور و رشدِ لوبیا');\nconst ids=FL('lpNew');return ids})()\n"}
+{"shot": {"name": "age_card_before", "fold": false}}

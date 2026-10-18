@@ -1,6 +1,6 @@
 #!/bin/bash
 # turn.sh sid 'text' [advdays] : insert a say ctl and run it
-B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22B; cd $B; s=$1
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23B; cd $B; s=$1
 python3 -c "
 import json,sys
 d={'say':sys.argv[1]}

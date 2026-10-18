@@ -1,1 +1,1 @@
-{"eval": "Object.keys(JSON.parse(localStorage.getItem(\"mla.records.v1\"))).filter(k=>/pb_l_/.test(k)).join(\",\")\n"}
+{"eval": "(()=>{const o=JSON.parse(localStorage.getItem(\"mla.records.v1\"));const P=Object.values(o).filter(r=>r&&r.type===\"eprob\"&&r.live);return \"view=\"+APP.state.view+\" arg=\"+APP.state.arg+\" sub=\"+APP.state.sub+\"\\n\"+P.map(r=>r.id+\" | \"+r.title+\" | nat=\"+(r.p&&r.p.nat)+\" natBy=\"+(r.p&&r.p.natBy)).join(\"\\n\")})()\n"}

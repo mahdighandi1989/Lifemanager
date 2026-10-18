@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"mind\",null,null);await w(1000);document.querySelectorAll('#main details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});await w(400);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}

@@ -1,1 +1,1 @@
-{"shot":{"name":"corrN5_before_chat","fold":false}}
+{"eval": "(()=>{APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll(\".as-msg\")];return ms.length+\" msgs; mxv=\"+ms.filter(m=>m.getAttribute(\"data-mxv\")).length+\"; firstcls=\"+(ms[0]&&ms[0].className)+\"; tx=\"+(ms[0]&&ms[0].querySelector(\".as-tx\")?\"y\":\"n\")+\"; svgs=\"+document.querySelectorAll(\".as-panel svg\").length})()"}

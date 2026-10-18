@@ -1,5 +1,5 @@
 import json,os,re,sys
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22A'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23A'
 sid=sys.argv[1]; D=R+'/'+sid+'/ai'
 ns=sorted(int(m.group(1)) for f in os.listdir(D) for m in [re.match(r'p(\d+)\.json$',f)] if m)
 for n in ns:

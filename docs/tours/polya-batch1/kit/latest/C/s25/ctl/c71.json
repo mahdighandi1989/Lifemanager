@@ -1,1 +1,1 @@
-{"say": "اشتباه کردم که دیروز ماشین‌حساب رو به نوه‌م قرض دادم، امروز دستم نبود."}
+{"shot": {"name": "c3_dossier1", "js": "(()=>{const p=APP.liveAll()[0].p.id;APP.go('dossier',p);return p})()", "full": true}}

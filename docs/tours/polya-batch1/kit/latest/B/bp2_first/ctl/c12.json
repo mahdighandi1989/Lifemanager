@@ -1,0 +1,1 @@
+{"eval": "(()=>{const R=JSON.parse(localStorage.getItem(\"mla.records.v1\")||\"{}\");const pid=APP.state.arg;const g=R[\"eprog_\"+pid];return JSON.stringify(g.solve&&g.solve.u).slice(0,2500)+\" ## \"+__fx.main(60000).split(\"\\n\").filter(l=>/ثبت شد|هشدار|اول این|فهم/.test(l)).slice(0,10).join(\" ¦ \")})()"}

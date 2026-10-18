@@ -1,6 +1,6 @@
 # dump.py sid [tagfilter] — per plan item: tag + eval summary + new msgs since previous item
 import json,sys,re,os
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22D/'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23D/'
 s=sys.argv[1]; flt=sys.argv[2] if len(sys.argv)>2 else None
 P=json.load(open(R+s+'.plan.json')); prev=[]
 for i,x in enumerate(P,1):

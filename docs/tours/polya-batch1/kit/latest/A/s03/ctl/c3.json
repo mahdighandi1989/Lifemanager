@@ -1,1 +1,1 @@
-{"say": "باشه، می‌خوام ثابتش کنم ولی بلد نیستم. می‌خوام این رو به‌عنوان مسئلهٔ خودم ثبت کنم و قدم به قدم برم."}
+{"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='2009-03-15';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()"}

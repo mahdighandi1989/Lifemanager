@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqod08ds1\");const e=document.querySelector(\".prc-sec\");if(e)e.scrollIntoView({block:\"center\"});return e?e.innerText.slice(0,600):\"none\"})()"}
+{"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"}

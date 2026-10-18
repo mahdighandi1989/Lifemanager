@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm28hcuh\",\"back\");const s=document.getElementById(\"lpBBest\");return s?[...s.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NOSEL \"+APP.state.sub})()\n"}
+{"eval0": "(()=>{0;APP.go(\"home\");APP.ASSIST.newSession();return 1})()", "say": "سلام. یادته در مورد خونه حرف زدیم؟ همکارم هم الان دقیقاً همین سؤال رو داره که بخره یا اجاره کنه. چی بهش بگم؟", "clock": "2026-11-05"}

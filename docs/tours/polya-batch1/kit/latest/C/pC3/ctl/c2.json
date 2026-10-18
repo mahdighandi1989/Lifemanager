@@ -1,1 +1,1 @@
-{"say": "می‌خوام بدونم مساحت این زمین مثلثی چقدره تا بفهمم چند کیسه بذر لازمه. ثبتش کن."}
+{"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='1974-05-20';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='\u062b\u0628\u062a').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()"}

@@ -1,1 +1,1 @@
-{"shot": {"name": "part_dossier_s22", "js": "(()=>{const p=window.__PID||localStorage.getItem('__PID');APP.go('dossier',p);return p})()", "full": true}}
+{"shot": {"name": "c5_panel", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const b=document.querySelector('.as-body,.as-msgs');if(b)b.scrollTop=b.scrollHeight;return 'panel'})()"}}

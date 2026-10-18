@@ -1,1 +1,1 @@
-{"shot":{"name":"pA1_knot_ladder_rung5","full":true}}
+{"eval": "FL().split(\"\\n\").filter(x=>/^lp/.test(x)&&!/GK/.test(x)).join(\"\\n\").slice(0,1800)+\"\\nBTN:\"+BL().split(\" | \").filter(x=>/^lp/.test(x)).join(\" | \")"}

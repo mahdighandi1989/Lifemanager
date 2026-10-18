@@ -1,1 +1,1 @@
-{"eval": "(()=>{document.querySelector('.as-edsave').click();return 'saved'})()"}
+{"eval": "JSON.stringify(APP.liveClosure(APP.liveAll()[0].p.id))"}

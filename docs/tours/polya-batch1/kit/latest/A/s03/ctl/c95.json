@@ -1,1 +1,1 @@
-{"shot": {"name": "part_today_thu", "full": true}}
+{"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvggdbsw0ng\");const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"گفت‌وگوهای این مسئله\"))})()"}

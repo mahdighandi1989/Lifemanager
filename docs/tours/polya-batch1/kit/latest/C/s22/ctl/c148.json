@@ -1,1 +1,1 @@
-{"shot": {"name": "fin_lprob", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('lprob',p);return p})()"}}
+{"shot": {"name": "part_today_lists_s22", "view": ["today"], "full": true}}

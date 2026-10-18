@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.S.all(\"deadline\",x=>1).map(x=>[x.id,x.what,x.date,x.src&&x.src.span]))"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"}

@@ -1,1 +1,1 @@
-{"shot": {"name": "part_allwork_s26", "js": "(()=>{APP.go('dossier');return 'all'})()", "full": true}}
+{"eval": "(()=>{const o=[];APP.liveAll().forEach(r=>{try{const d=APP.dossier(r.p.id);o.push(r.p.title+' :: '+(d.events||[]).map(e=>e.k+'@'+String(e.at||'').slice(0,16)+' '+String(e.title||'').slice(0,50)).join(' | '))}catch(e){o.push('ERR '+e.message)}});return o.join('\\n')})()"}

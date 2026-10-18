@@ -1,1 +1,1 @@
-{"shot": {"name": "part_mind_s23_tech", "view": ["mind"], "full": true, "js": "(()=>{const h=[...document.querySelectorAll('#main h2,#main h3,#main summary')].find(x=>/کارِ تکنیک‌ها/.test(x.innerText));if(h){const d=h.closest('details');if(d)d.open=true;h.scrollIntoView();}return h?h.innerText:'none'})()"}}
+{"shot": {"name": "part_practice_s23_end", "js": "(async()=>{const c=APP.PR.cases()[0];if(c)APP.go('practice',c.id);return c?c.id:'none'})()", "full": true}}

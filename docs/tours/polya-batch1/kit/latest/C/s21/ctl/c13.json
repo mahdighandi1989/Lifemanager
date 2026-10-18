@@ -1,1 +1,1 @@
-{"say":"کیش با وزیر d7 رو ثبت کردم، شاه میره g8. گیر کردم. هیچ کیشی جواب نمیده. رخ هم که به درد نمی‌خوره."}
+{"eval":"(()=>{const pid=APP.state.arg;const r=APP.liveRec(pid).p;return JSON.stringify({plan:r.plan,steps:(r.steps||[]).map(s=>({t:s.t||s.text,tag:s.tag,fol:s.follows})),tag:APP.liveStepFollowsTag?APP.liveStepFollowsTag(pid,'وزیر به d7 کیش می‌دهد؛ شاه سیاه به g8 فرار می‌کند و با حرکتِ دوم مات نمی‌شود'):'na',tag2:APP.liveStepFollowsTag?APP.liveStepFollowsTag(pid,'با وزیر کیش نمی‌دهم؛ شاه را آزاد می‌گذارم'):'na'}).slice(0,1500);})()"}

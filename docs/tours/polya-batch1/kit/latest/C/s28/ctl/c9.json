@@ -1,1 +1,1 @@
-{"say":"فهرست کردم: پپ، پد، دپ، دد. با حداقل یه پسر سه تا می‌مونه: پپ، پد، دپ. فقط یکیش دوپسره... یعنی ۱/۳! همکارم راست می‌گفت. واقعاً خجالت کشیدم، جلوی همه گفته بودم ۱/۲."}
+{"eval": "(()=>{let sv='';for(let i=0;i<localStorage.length;i++){const v=localStorage.getItem(localStorage.key(i));const j=v?v.indexOf('softLog'):-1;if(j>=0)sv+=v.slice(j,j+300);const k=v?v.indexOf('\"soft\":'):-1;if(k>=0)sv+=' || '+v.slice(k,k+250);}return sv||'NONE';})()\n"}

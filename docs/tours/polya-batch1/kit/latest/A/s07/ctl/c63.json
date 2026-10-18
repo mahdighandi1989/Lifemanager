@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({id:c.id,tid:c.tid,subj:c.subj,due:c.due,state:c.state})),fc:APP.S.all('fcast',x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,40),x.p,x.due])})"}
+{"eval": "APP.today()+' '+APP.state.view+' '+APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>r.p.id+':'+r.p.title+':'+(APP.liveClosure(r.p.id)||{}).state).join(' | ')+' sess:'+APP.ASSIST.cur().id+' lp:'+(APP.ASSIST.cur().lprob||'')"}

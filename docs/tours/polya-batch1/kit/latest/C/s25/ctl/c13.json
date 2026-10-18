@@ -1,1 +1,1 @@
-{"say":"طرحو ثبت کردم. حالا تو اجرا گیر کردم: وقتی از n به n+1 میرم نمی‌دونم دقیقاً چی رو باید نشون بدم."}
+{"eval": "(async()=>{const pid=window.__PID;P('lpPU_a_d2',/حالا به کارش/);F('lpPU_w_d2','در گامِ گذر همین جمله با k=n+1 افزوده می‌شود');await W(300);const t0=document.body.innerText;B(/ثبتِ طرح/);await W(1200);const L0=new Set(t0.split('\\n'));return 'phase='+APP.livePhase(pid)+' '+document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,8).join(' ¦ ');})()\n"}

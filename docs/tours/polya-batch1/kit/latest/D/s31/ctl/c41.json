@@ -1,1 +1,1 @@
-{"eval":"[...document.querySelectorAll(\"#main textarea,#main input,#main select\")].filter(e=>!/^ex_preds/.test(e.id)&&e.offsetParent).map(e=>e.id+\"[\"+(e.getAttribute(\"aria-label\")||\"\").slice(0,60)+\"]\").join(\" ; \")"}
+{"eval":"JSON.stringify(APP.S.all(\"ex\").map(x=>({id:x.id,t:x.tid||x.tech,st:x.status,prc:x.prc,preds:(x.data||{}).preds})))"}

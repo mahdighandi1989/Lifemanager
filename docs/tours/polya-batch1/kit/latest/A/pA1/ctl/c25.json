@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].find(b=>/باز نشد ⇐ پلهٔ بعد/.test(b.textContent));if(!b)return \"NOBTN\";b.click();const t=MT(\"پلهٔ ۳\",700);return TT()+\" | \"+t})()"}
+{"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[4];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');t&&t.scrollIntoView({block:'center'});return g.length+' pts | '+x.getAttribute('aria-label')+' || TIP: '+(t?t.innerText:'')})()"}

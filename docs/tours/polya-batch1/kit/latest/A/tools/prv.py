@@ -1,6 +1,6 @@
 # prv.py SID N : if prev/SID/ai/pN has the same «# نوبتِ تازه» as current pN, write answer from prev rN (ids remapped); exit 0, else 1
 import json,sys,os,re
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22A'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23A'
 s,n=sys.argv[1],sys.argv[2]
 P=f'{R}/prev/{s}/ai'; C=f'{R}/{s}/ai'
 if not os.path.exists(f'{P}/p{n}.json') or not os.path.exists(f'{P}/r{n}.txt'): sys.exit(1)

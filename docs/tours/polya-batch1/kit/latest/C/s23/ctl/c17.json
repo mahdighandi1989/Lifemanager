@@ -1,1 +1,1 @@
-{"eval": "(()=>IDS().split(' | ').filter(x=>/lpBUnit/.test(x)).join())()\n"}
+{"eval": "(()=>{const s=document.getElementById('lpBBest');return 'COACH '+JSON.stringify(APP.liveCoach(window.__PID).q)+' || BEST '+(s?[...s.options].map(o=>o.text).join(' / '):'none')+' || '+T('۴) بازنگری',3500);})()\n"}

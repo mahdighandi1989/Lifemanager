@@ -1,1 +1,1 @@
-{"eval": "(()=>{const c=APP.liveCoach(\"pb_l_mvaqo5vgbtb\");return JSON.stringify({src:c.src,stuckN:c.stuckN,unused:c.unused,rung:c.rung})})()"}
+{"eval": "JSON.stringify(APP.liveKindInfo(\"pb_l_mvaqmsr1vpb\"))+\" PH:\"+APP.livePhase(\"pb_l_mvaqmsr1vpb\")+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",500)"}

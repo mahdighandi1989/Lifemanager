@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const P=document.querySelector('.as-panel');const boxes=[...P.querySelectorAll('*')].filter(e=>/این‌جا هم عوض شود/.test(e.textContent)&&e.children.length<12&&e.querySelector('button'));if(!boxes.length)return 'NOBOX';const out=[];for(const box of boxes){const b=[...box.querySelectorAll('button')].find(b=>/^(بله|آره|عوض)/.test(b.textContent.trim()));if(b){b.click();out.push('clicked '+b.textContent.trim());await new Promise(r=>setTimeout(r,1000));}}return out.join(' | ')||'NOYES'})()"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"}

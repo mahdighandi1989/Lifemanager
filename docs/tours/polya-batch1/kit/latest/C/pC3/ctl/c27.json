@@ -1,1 +1,1 @@
-{"shot": {"name": "pc_dossier", "full": true, "js": "(()=>{const p=window.__PID||localStorage.getItem(\"__PID\")||APP.liveAll()[0].p.id;APP.go(\"dossier\",p);return p})()"}}
+{"eval": "(async()=>{const pid=window.__PID||APP.state.arg;return 'phase='+APP.livePhase(pid)+' IDS '+IDS()+' || BTNS '+BTNS()+' || '+T('۲) طرح',1500)})()"}

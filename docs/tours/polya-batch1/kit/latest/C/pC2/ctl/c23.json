@@ -1,1 +1,1 @@
-{"shot": {"name": "pc_prereq", "view": ["prereq"], "full": true}}
+{"shot": {"name": "pc_dossier", "full": true, "js": "(()=>{const p=window.__PID||localStorage.getItem(\"__PID\")||APP.liveAll()[0].p.id;APP.go(\"dossier\",p);return p})()"}}

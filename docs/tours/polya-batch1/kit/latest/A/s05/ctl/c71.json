@@ -1,1 +1,1 @@
-{"clock": "2026-11-02", "eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"}
+{"eval": "'skip c64 (round-21 workaround: relative due dates instead of Persian dates)'"}

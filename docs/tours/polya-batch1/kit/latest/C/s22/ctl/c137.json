@@ -1,1 +1,1 @@
-{"shot": {"name": "part_list_ambiguities_s22", "full": true}}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const c=APP.PR.list('ambiguities');APP.go('practice',c.id);await W(1200);return JSON.stringify(c.items).slice(0,900)+' || '+document.querySelector('#main').innerText.slice(0,1500)})()"}

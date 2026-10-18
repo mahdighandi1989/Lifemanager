@@ -1,1 +1,1 @@
-{"say": "اشتباه کردم که فر رو زودتر روشن نکردم؛ دفعه بعد زودتر روشنش می‌کنم."}
+{"shot": {"name": "c3b_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}

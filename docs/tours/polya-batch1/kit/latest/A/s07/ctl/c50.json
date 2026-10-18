@@ -1,1 +1,1 @@
-{"shot": {"name": "dossier_full_1", "full": true}}
+{"eval": "[...document.querySelectorAll(\".as-panel svg\")].map(x=>{const m=x.closest(\".as-msg\");return m.innerText.slice(0,50)+\" | inputs=\"+m.querySelectorAll(\"input\").length+\" | ticks=\"+[...x.querySelectorAll(\"text\")].map(t=>t.textContent).join(\",\")}).join(\"\\n\")"}

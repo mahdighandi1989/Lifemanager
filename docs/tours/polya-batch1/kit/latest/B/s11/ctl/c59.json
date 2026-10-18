@@ -1,1 +1,1 @@
-{"eval": "(()=>{const o=JSON.parse(localStorage.getItem(\"mla.records.v1\"));return Object.values(o).filter(r=>r&&r.type===\"eprob\"&&r.live).map(r=>r.id+\" | \"+r.title+\" | \"+JSON.stringify(r.live.p||{}).slice(0,200)).join(\"\\n\")})()\n"}
+{"eval0":"APP.ASSIST.newSession();APP.go(\"whole\");1","say":"سلام دوباره. چند روز پیش مسئله‌ی دومینو رو با رنگ‌آمیزی حل کردم و یه مسئله‌ی تازه ساختم: کدوم دو خونه رو بردارم که بشه پوشوند؟ فکر کنم هر دو خونه‌ای که رنگشون فرق داره کافیه. درسته؟"}

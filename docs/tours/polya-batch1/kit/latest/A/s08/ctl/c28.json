@@ -1,1 +1,1 @@
-{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"}
+{"eval": "(()=>{const m=document.getElementById(\"main\").innerText;const i=m.indexOf(\"سلیقه\");return (m.indexOf(\"بازنگری: \")>=0?\"CARD STILL\":\"card gone\")+\" | \"+m.slice(Math.max(0,i-200),i+150)})()"}

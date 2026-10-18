@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.ASSIST.cur().msgs.filter(m=>m.role==\"ai\").map(m=>m.text))"}
+{"eval": "(()=>{C('.lp-rellink');const t=document.getElementById('main').innerText;const i=t.indexOf('مسئلهٔ مرتبط از کارهای خودت');const a=t.slice(i,i+1200);const f=FL('lpRel|lpSh|lpMap');\nreturn a+'\\n'+f})()\n"}

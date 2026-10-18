@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"}
+{"eval": "(()=>{APP.go(\"dossier\");return document.getElementById(\"main\").innerText.slice(700,2500)})()"}

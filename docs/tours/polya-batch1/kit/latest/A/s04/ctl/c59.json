@@ -1,1 +1,1 @@
-{"shot": {"name": "corr_11_mind_from", "full": true}}
+{"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqmtua2is\");const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"گفت‌وگوهای این مسئله\"))})()"}

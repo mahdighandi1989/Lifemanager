@@ -1,1 +1,1 @@
-{"shot": {"name": "part_t24_persian_date", "sel": ".prc-t24"}}
+{"eval": "JSON.stringify((APP.PR.all?APP.PR.all():[]).map(c=>({id:c.id,tid:c.tid,subj:c.subj,state:c.state,due:c.due,n:(c.sessions||[]).length})))+'\\nPRED:'+JSON.stringify(APP.S.all('pred',x=>1).map(x=>[x.text||x.t||x.st,x.conf,x.due,x.prc||x.case]))"}

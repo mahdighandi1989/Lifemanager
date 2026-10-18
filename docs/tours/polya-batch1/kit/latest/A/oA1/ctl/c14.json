@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go('dossier',APP.S.all('achat',x=>x&&x.msgs&&x.msgs.length)[0].id);const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'),t.indexOf('📜')+3500)})()"}

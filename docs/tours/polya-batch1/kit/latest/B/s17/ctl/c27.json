@@ -1,1 +1,1 @@
-{"click": ".as-editb >> nth=-1"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"}

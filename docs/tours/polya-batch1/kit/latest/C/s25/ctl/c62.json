@@ -1,1 +1,1 @@
-{"say": "یه چیز دیگه: روز اول گفتم «۱۰ تاشو چک کردم» — اشتباه گفتم، ۸ تا بود، نه ۱۰."}
+{"shot": {"name": "c2_dossier1", "js": "(()=>{const p=APP.liveAll()[0].p.id;APP.go('dossier',p);return p})()", "full": true}}

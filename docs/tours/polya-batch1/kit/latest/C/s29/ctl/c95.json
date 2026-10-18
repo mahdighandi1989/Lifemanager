@@ -1,1 +1,1 @@
-{"shot": {"name": "part_dossier_s29a", "js": "(()=>{const p=APP.liveAll().find(r=>/حوض/.test(r.p.title)).p.id;APP.go('dossier',p);return p})()", "full": true}}
+{"eval": "(()=>{try{return JSON.stringify(APP.MIND.techWork()).slice(0,2500)}catch(e){return 'ERR '+e.message}})()"}

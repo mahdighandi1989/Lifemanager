@@ -1,1 +1,1 @@
-{"eval": "[\"lpBEquiv\",\"lpBHyp\",\"lpBConcl\"].map(id=>id+\": \"+[...document.getElementById(id).options].map(o=>o.value+\"=\"+o.textContent).join(\" | \")).join(\"\\n\")"}
+{"shot":{"name":"part_prereq_map_pA1","full":true}}

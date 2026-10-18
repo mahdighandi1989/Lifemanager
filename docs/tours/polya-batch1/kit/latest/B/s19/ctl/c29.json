@@ -1,1 +1,1 @@
-{"eval": "(()=>{const pid=APP.state.arg;const c=APP.liveCoach?APP.liveCoach(pid,{asked:[]}):null;return JSON.stringify(c&&{q:c.q,src:c.src,card:c.card,samePage:c.samePage})})()\n"}
+{"eval0": "__adv(38);APP.go(\"home\");1", "say": "هفته‌ی هشتم! ۴ کیلو کم کردم. وزنم هر دو هفته: ۷۸، ۷۷٫۲، ۷۶٫۵، ۷۵٫۱، ۷۴. پیاده‌روی رو نگه داشتم، دو هفته یه بار وزن کردم، دیگه برنامه عوض نکردم."}

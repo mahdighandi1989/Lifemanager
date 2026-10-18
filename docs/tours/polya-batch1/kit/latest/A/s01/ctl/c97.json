@@ -1,1 +1,1 @@
-{"clock": "2026-11-19", "eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()"}
+{"shot": {"name": "part_today_d7late", "full": true}}

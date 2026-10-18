@@ -1,1 +1,1 @@
-{"eval": "APP.today()+\" | \"+APP.liveAll().map(r=>r.p.title+\":\"+APP.liveClosure(r.p.id).state).join(\" | \")+\" | sess=\"+APP.ASSIST.sessions().length"}
+{"shot": {"name": "part_today_later", "full": true}}

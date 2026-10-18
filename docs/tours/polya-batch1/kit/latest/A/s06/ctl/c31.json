@@ -1,1 +1,1 @@
-{"eval": "APP.liveAll().map(r=>r.p.id).join(\" \")"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQs(r.p.id)]))\n"}

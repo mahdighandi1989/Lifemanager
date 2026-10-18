@@ -1,1 +1,1 @@
-{"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"}
+{"shot": {"name": "corr_10_today_thu", "full": true}}

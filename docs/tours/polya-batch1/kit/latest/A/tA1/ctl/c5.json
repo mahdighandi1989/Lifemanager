@@ -1,0 +1,1 @@
+{"eval": "(()=>{const pid=APP.liveAll()[0].p.id;APP.go(\"lprob\",pid);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"۱۰۱\");const j=t.indexOf(\"برگه\");return \"has101=\"+(i>=0)+\" | \"+(i>=0?t.slice(i-200,i+200):\"\")+\" || barg=\"+(j>=0?t.slice(j-100,j+150):\"\")})()"}

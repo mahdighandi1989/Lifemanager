@@ -1,0 +1,1 @@
+{"eval": "(()=>{document.querySelector('.age-ask .btn.ghost').click();return 'later; card='+document.querySelectorAll('.age-ask').length})()"}

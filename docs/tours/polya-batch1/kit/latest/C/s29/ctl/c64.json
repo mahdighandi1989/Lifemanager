@@ -1,1 +1,1 @@
-{"shot": {"name": "t5_today", "view": ["today"], "full": true}}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1500);const t=document.querySelector('#main').innerText;return 'TODAY '+APP.today()+' || '+t.slice(0,3000)})()"}

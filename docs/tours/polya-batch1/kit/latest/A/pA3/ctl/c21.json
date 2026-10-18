@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify(APP.PRE.all(sc).map(x=>[x.id,x.state]))})()"}

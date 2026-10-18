@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(i,i+2600)})()"}
+{"shot": {"name": "corr_10_today_thu", "full": true}}

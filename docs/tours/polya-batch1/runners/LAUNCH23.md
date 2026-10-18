@@ -1,5 +1,5 @@
 # Round 23 runner brief (common to A, B, C, D)
-Page: /home/user/Lifemanager, main = the round-22 merge (bd687cfb or later), dist freshly built. Do NOT edit the repo.
+Page: /home/user/Lifemanager, main = 574f4a30 (round-22 fixes + age package), dist built 16:02. Do NOT edit the repo.
 Read in order: tour1_polya/RUNNER.md, RUNNER2.md … RUNNER22.md (all ADDENDA), then RUNNER23.md (overrides). Also scenarios.md/json,
 experiences/two-sided-needs-judging-for-scenario-tours.md, DECISIONS_R22.md, docs/decisions/2026-10-15-sources-roadmap.md §9–§16,
 docs/decisions/2026-10-18-age-and-user-scope.md, handoff notes docs/overhaul/handoff-notes/_pending_tour1_R22_*.md and _pending_age_*.md.

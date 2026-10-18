@@ -1,6 +1,6 @@
 #!/bin/bash
 # wp.sh secs sids... -> wait until some sid has a pending prompt with no drive running (or all ended); print status of each
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22C
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C
 T=$1; shift; t0=$(date +%s)
 st(){ s=$1; r=$(ps aux | grep "[d]rive.py $s " | wc -l); n=$(ls $s/ai/p*.json 2>/dev/null | sed 's/.*\/p//;s/.json//' | sort -n | tail -1); 
   if [ $r -gt 0 ]; then echo RUN; elif [ -n "$n" ] && [ ! -f $s/ai/r$n.txt ]; then echo "PEND$n"; else echo IDLE; fi; }

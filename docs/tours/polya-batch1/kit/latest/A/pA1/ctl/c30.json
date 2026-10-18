@@ -1,1 +1,1 @@
-{"eval":"(()=>{const ov=[...document.querySelectorAll(\".overlay, [role=dialog]\")].filter(x=>x.getClientRects().length&&/پیش از فرستادن/.test(x.textContent))[0];if(!ov)return \"NOOV\";const b=[...ov.querySelectorAll(\"button\")].map(b=>b.textContent.trim());const s=[...ov.querySelectorAll(\"button\")].find(b=>/بفرست/.test(b.textContent));s.click();return b.join(\",\")})()"}
+{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.className+\"|\"+b.innerText.slice(0,40)).filter(x=>/حل شد|اثبات|بازنگری/.test(x));return b.join(\" ;; \")})()"}

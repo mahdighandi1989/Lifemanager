@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,lp:s.lprob,log:s.lprobLog,t:s.title})))"}
+{"eval": "JSON.stringify({v:APP.state.view,a:APP.state.arg,t:APP.today(),dev:APP.clock.dev,live:APP.liveAll().map(r=>[r.p.id,r.p.title])})"}

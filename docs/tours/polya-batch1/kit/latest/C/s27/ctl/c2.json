@@ -1,1 +1,1 @@
-{"say":"خب «فهمیدن» یعنی... یه بار فکر می‌کنم یعنی درست جواب دادن، یه بار یعنی تجربه‌ی درونی داشتن، یه بار یعنی وصل کردن معنی کلمه‌ها به چیزای دنیا. نمی‌دونم کدوم."}
+{"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='2003-02-01';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='\u062b\u0628\u062a').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()"}

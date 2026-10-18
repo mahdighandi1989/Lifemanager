@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"}
+{"shot":{"name":"dossier23_full_1","full":true}}

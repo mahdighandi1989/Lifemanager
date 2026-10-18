@@ -1,1 +1,1 @@
-{"shot":{"name":"part_today22_end","full":true}}
+{"eval": "(()=>{APP.go('dossier','achat_mvaqluwpbef3f');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}

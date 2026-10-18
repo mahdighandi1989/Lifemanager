@@ -1,1 +1,1 @@
-{"eval": "(()=>{const m=document.getElementById(\"main\").innerText;const i=m.indexOf(\"سلیقه\");return (m.indexOf(\"بازنگری: \")>=0?\"CARD STILL\":\"card gone\")+\" | \"+m.slice(Math.max(0,i-200),i+150)})()"}
+{"fill": ["#lpRTaste", "معمای ساعت‌شنی رو دوست داشتم چون آخرش یهو جور شد؛ امتحانِ کورکورانهٔ اول رو نه."]}

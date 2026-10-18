@@ -3,7 +3,7 @@
 import json,sys,os,re
 sys.path.insert(0,os.path.dirname(__file__))
 from drvlib import keyhash, pending
-B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22B'
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23B'
 s=sys.argv[1]; D=f'{B}/{s}'
 n=int(sys.argv[2]) if len(sys.argv)>2 else pending(D)
 d=json.load(open(f'{D}/ai/p{n}.json')); u=d['user']

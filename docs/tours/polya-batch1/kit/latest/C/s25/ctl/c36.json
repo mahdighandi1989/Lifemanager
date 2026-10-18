@@ -1,1 +1,1 @@
-{"exit": true}
+{"eval": "(()=>{const L=APP.liveAll();const p=(L.slice(-1)[0]||{p:{}}).p.id;localStorage.setItem('__PID',p);return 'pid '+p+' '+L.map(r=>r.p.title).join(' | ')})()"}

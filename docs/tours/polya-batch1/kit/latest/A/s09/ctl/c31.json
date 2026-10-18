@@ -1,1 +1,1 @@
-{"eval": "\"clock->2026-10-27\"", "clock": "2026-10-27"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

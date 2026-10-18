@@ -1,1 +1,1 @@
-{"say":"دیروز یکشنبه رفتم باشگاه! خسته شدم ولی رفتم، همون که پیش‌بینی کرده بودم."}
+{"eval":"(async()=>{__adv(1);APP.go('today');await new Promise(r=>setTimeout(r,900));return APP.today()+' :: '+__fx.main(30000).split('\\n').filter(l=>/باشگاه|📌|برنامهٔ خودت/.test(l)).join(' ¦ ')})()"}

@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval": "(()=>{const c=APP.liveCoach(window.__PID||APP.state.arg);return c.src+' | '+c.q;})()\n"}

@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"}
+{"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/وارسیِ ماندگاری/.test(x.sub||''));if(!x)return 'NODUE';x.go();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+'\\n'+FL().slice(0,700)+'\\n'+BL().slice(-500)})()"}

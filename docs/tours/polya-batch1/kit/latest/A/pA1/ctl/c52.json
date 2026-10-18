@@ -1,1 +1,1 @@
-{"eval": "FL(\"lpBUse|lpBTaste|lpBHit|lpBBest|lpBNew$|lpBWorked|lpBChk\")"}
+{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"طرح‌ریزی\\t\");const j=t.indexOf(\"علتِ هر گیر\");return t.slice(i,i+1200)+\"\\n----\\n\"+t.slice(j,j+1500)})()"}

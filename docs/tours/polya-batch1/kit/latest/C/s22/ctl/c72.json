@@ -1,1 +1,1 @@
-{"say": "نه صبر کن، اشتباه گفتم: تاریخِ رسید یک روز بعد بود، نه همون روز — پس هنوز معلوم نیست همون برداشت باشه."}
+{"shot": {"name": "c0_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details.mind-from,details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}

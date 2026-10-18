@@ -1,6 +1,6 @@
 # Tour batch 1 (Pólya) — ROUND 23 (read RUNNER.md … RUNNER22.md incl. all ADDENDA, then this; this overrides)
 
-Page: main after the round-22 merge (bd687cfb or later; `build.py --check` in sync, dist newer — else STOP). What changed: DECISIONS_R22.md,
+Page: main 574f4a30 (round-22 merge; `build.py --check` in sync, dist newer — else STOP). What changed: DECISIONS_R22.md,
 handoff notes docs/overhaul/handoff-notes/_pending_tour1_R22_{prereq,correction,turnq,practice}_*.md and _pending_age_*.md.
 - Prerequisite layer: coach_state.prereq {concept, step, quote} validated by the page; diagnostic question; teach only as far as the step;
   mastery re-check; stack of waiting places (nested, several); exact return; 🧩 item with pid; mind card cause per stuck (prerequisite /

@@ -1,1 +1,1 @@
-{"eval0":"__adv(1);1","say":"سلام، یه مسئله‌ی دیگه از تمرین‌ها حل کردم. اول مجهول رو نوشتم: «احتمال اینکه میانگین ۳۶ دانشجو بیشتر از ۱۵.۵ باشه، با میانگین جامعه ۱۵ و انحراف معیار ۳». بعد z = 0.5/(3/6) = 1 و جواب ۰.۱۶. تموم."}
+{"eval":"JSON.stringify(APP.MIND&&APP.MIND.phases?APP.MIND.phases().rows.map(r=>r.id+\":\"+r.k+\"/\"+r.n+\" \"+(r.src||\"\")):null)+\" \"+JSON.stringify((window.__rem||[]).map(r=>r.key+\"@\"+r.due_date))"}

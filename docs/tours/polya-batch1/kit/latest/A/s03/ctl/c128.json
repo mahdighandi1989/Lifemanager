@@ -1,1 +1,1 @@
-{"shot": {"name": "part_practice_on_problem", "sel": ".prc-sec"}}
+{"eval": "(()=>JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برگه سفید|۴۱|🧪|پرونده/.test(t))))()"}

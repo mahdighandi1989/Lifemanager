@@ -1,1 +1,1 @@
-{"eval": "(()=>JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برگه سفید|۴۱|🧪|پرونده/.test(t))))()"}
+{"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/روز ۷/.test(x.txt));if(x&&x.go)x.go();return APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,1500)})()"}

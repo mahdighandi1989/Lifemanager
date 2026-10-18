@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"}
+{"eval": "(()=>{const g=[...document.querySelectorAll(\"#main button\")].filter(b=>/^۲ کامل$|^۲/.test(b.textContent.trim()));g.forEach(b=>b.click());const r=TT();APP.go(\"home\");APP.go(\"today\");return g.length+\" \"+r+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"}

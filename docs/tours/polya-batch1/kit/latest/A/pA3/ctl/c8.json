@@ -1,1 +1,1 @@
-{"eval": "(()=>{const pq=APP.S.all(\"prereq\",x=>1).length;APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return \"prereq=\"+pq+\"\\n\"+t.slice(i,i+1500)})()"}
+{"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+200)})()"}

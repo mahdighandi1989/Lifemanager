@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveCoach(\"pb_l_mvaqo5vgbtb\")).slice(0,600)\n"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,r.p.nat]))\n"}

@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.liveAll().map(r=>[r.p.title.slice(0,35),r.p.type||r.p.kind,r.p.nat,r.p.natBy,JSON.stringify(r.p.origin||null).slice(0,80)]))"}
+{"eval0": "APP.go(\"today\");\"ok\"", "say": "جلسه سوم: خودم الگوی ۱/(1·2·3) + ۱/(2·3·5) + … رو ساختم. حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2)). سه تاشو چک کردم."}

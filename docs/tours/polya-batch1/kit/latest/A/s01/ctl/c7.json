@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify({reg:APP.ASSIST.cur().coach.reg,plans:APP.ASSIST.cur().plans,prom:APP.ASSIST.cur().promises,sig:APP.ASSIST.regSigns(\"فقط بگو بخرم یا نه؟\")})"}
+{"eval": "JSON.stringify(APP.ASSIST.cur().coach)"}

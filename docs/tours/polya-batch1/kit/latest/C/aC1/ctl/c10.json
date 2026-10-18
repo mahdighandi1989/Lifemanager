@@ -1,0 +1,1 @@
+{"shot": {"name": "route_end", "full": true, "js": "(()=>{const p=(APP.ASSIST.cur().id);APP.go('route',p);return p})()"}}

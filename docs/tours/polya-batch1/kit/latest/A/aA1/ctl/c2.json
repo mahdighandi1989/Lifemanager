@@ -1,0 +1,1 @@
+{"eval": "(()=>{const c=document.querySelector(\".age-ask\");return c?c.innerText:\"NOCARD\"})()"}
