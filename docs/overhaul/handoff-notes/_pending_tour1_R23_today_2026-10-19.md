@@ -40,6 +40,8 @@ Files: `a41_practice.js` (most), `a27_tour.js` (plan line, `predTurn23`, rule te
 - **Dossier (correction):** `dedupRet22` keeps one line per change label («برچسب: «…»») when two writers recorded the same correction —
   the first writer's format wins. Raw record values go through `RAWFA`/`hv` in all three views; `A.dossierRawFa(x)` is exported.
 - **Correction result block (correction):** when `N.res.changed` is non-empty the prose no longer repeats the list (one copy, the JSON).
+- **Chat dossier per chat problem (after story e39f270e):** `A.dossierSess(sid, pk)` / `A.dossier("sid|pk")` — events of that problem's window only
+  (`A.STORY.pkAt`), no pk ⇒ latest problem, `"all"` ⇒ whole session; returned `D.sid`, `D.pk`, `D.pks[{pk, from, title}]`. A session with one problem is unchanged.
 - **Lists:** `PR.herQuote(q, s)` (current message, or two pieces from her last two messages); `PR.modelNamed(name, said)`;
   `PR.modelLike(name)` + `PR.modelUseAsk(name, u, host)` (page «همان مدل؟»).
 - **Window:** `PR.lastOnTime(c)` is the one window end (steps shape: `until − 1`); `PR.dueText` uses it.

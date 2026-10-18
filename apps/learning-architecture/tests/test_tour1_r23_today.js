@@ -256,6 +256,21 @@ const HELPERS = () => {
     X('B·D21 s18: the page «کاربستِ مدل» with an overlapping name asks «همان مدل؟» and «بله» books one model with two uses', d.asked && d.items.filter(x => /کمیتِ نامعلوم/.test(x.n)).length === 1 && d.items.filter(x => /کمیتِ نامعلوم/.test(x.n))[0].uses === 2, d);
   });
 
+  /* ===== پروندهٔ گفت‌وگو برای هر مسئلهٔ گفت‌وگو جدا (story ⇒ today، A.STORY.pkAt؛ HANDBOOK §12 ردیفِ ۵۸ ب) ===== */
+  await section('split', async () => {
+    await fresh();
+    const r = await E(async () => { __freshChat();
+      await __say('یه مسئله: مجموع اعداد ۱ تا ۱۰۰ چند میشه؟', 'مجهول چیست؟', [__cs({ ph: 'u', said: ['u'] })]);
+      await __say('حدسم اینه که ۵۰۵۰ میشه.', 'چطور می‌آزمایی‌اش؟', [__cs({ ph: 'p', said: ['guess'], guess: { text: 'حدسم اینه که ۵۰۵۰ میشه' } })]);
+      await __say('یه مسئلهٔ دیگه دارم: یه مستطیل با محیط ۲۰، بیشترین مساحتش چقدره؟', 'مجهول چیست؟', [__cs({ ph: 'u', said: ['u'] })]);
+      await __say('فکر کنم مربع ۵ در ۵ بیشترینه، یعنی ۲۵.', 'چطور می‌آزمایی‌اش؟', [__cs({ ph: 'p', said: ['guess'], guess: { text: 'فکر کنم مربع ۵ در ۵ بیشترینه، یعنی ۲۵' } })]);
+      const s = __cur(), pks = ((s.coach || {}).pkLog || []).map(x => x.pk), D = APP.dossier(s.id), all = APP.dossier(s.id + '|all'), first = D && D.pks ? APP.dossier(s.id + '|' + D.pks[0].pk) : null;
+      const tx = (d) => d ? d.events.map(e => (e.lines || []).join(' ')).join(' ‖ ') : '';
+      const v = APP.V.dossier(s.id); return { pks, n: (D && D.pks || []).length, cur: tx(D), all: tx(all), first: tx(first), chips: v.querySelectorAll('.lp-dpk').length }; });
+    X('today/story: a session with two chat problems gives each its own dossier (latest by default), with «کلِ گفت‌وگو» and one chip per problem',
+      r.n === 2 && /مربع ۵ در ۵/.test(r.cur) && !/۵۰۵۰/.test(r.cur) && /۵۰۵۰/.test(r.first) && !/مربع ۵ در ۵/.test(r.first) && /۵۰۵۰/.test(r.all) && /مربع ۵ در ۵/.test(r.all) && r.chips === 3, r);
+  });
+
   /* ===== A23-12 — پنجرهٔ تمرین یکی ===== */
   await section('a12', async () => {
     await fresh();

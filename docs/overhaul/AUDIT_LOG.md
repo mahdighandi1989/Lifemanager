@@ -4797,9 +4797,21 @@ dated stability, mind-card feed) under way.
   exact-text lookups. Fixed by keeping the exact text.
 - **FINDING** gate30: fail=0 (pytest 2126, 121 page tests, build, host e2e).
 
+## 2026-10-18 — Pólya round 23, fixer «story» (Q3: chat ⇄ page is one story)
+- **FINDING** Root: validated chat work (`coach_state` said/ans/plan/step/result) stayed in `s.coach`; the live problem's forms, stage, dossier,
+  route map and geo strip read only the forms. Symptoms: whole-first asked again after «کلش اینه…» (A23-35 = A22-27), «طرح هنوز نیست» after a
+  chat plan (C23-11), a later live problem restarting at «فهم» (B·D5), chat-problem route origin/destination wrong and nesting lost after
+  chat_solved (B·D2, D23-20), other problems' events on a problem's map/dossier (A23-32), clipped labels, stale strip, no route action (B·D17).
+- **CHANGE** New `a45_story.js`: story ledger → A.EVLOG events + prefill of empty form fields with «از گفت‌وگو … درست است؟»; one stage source
+  `A.liveStoryPhase`; import into a later live problem (`L.chatImp`); event owner `A.STORY.owns`; route action in the prompt. a44 route model
+  (origin, destination, chat plan steps, prerequisite lookup per scope, labels, strip); a40 uses the story stage and the owner rule; minimal hooks
+  in a27 (`C.saidOk`) and a38 (`A.liveDraftDrop`, `A.liveMkSrc`, one `coachCore` condition).
+- **DECISION** Never write `solve.u[1]`/`L.plan` from chat (her confirmation is one click); `A.livePhase` unchanged. Quarantined `destOfR22`.
+- **FINDING** Test: `tests/test_tour1_r23_story.js` red on 574f4a30, green after; bank VARIANTS_R23 Q3 34/34 (#74/#83 second halves belong to Q5/Q4).
 ## 2026-10-19 — Pólya round 23, fixer «today» (Q7: Today / dossier / lists / practice / promises) — LLA WORKLOG (98), PROGRESS 113
 - **FINDING** Today is built by ~20 stacked `A.dueList` wrappers, each adding its own line; "same act" links existed only for plan ⇄ step/🌱/🎯/case with a stored link. Plan + ⏰ follow-up of one call, plan + 🎯 of one test, and card + T41 sheet + solve review of one problem had no link ⇒ 2–3 lines for one act; the plan line printed the raw id «(pl1)».
 - **FINDING** Deadlines closed only on the model's `deadline_done`; chat guesses took outcomes only from a closed problem's answer; a reply to «what will they say and how sure?» was read as a new guess; only assistant-deferred requests became promises; `chat_invent` in a look-back before the chat problem existed was refused ("you didn't ask"); dossier showed raw `refuted/confirmed` and printed each change twice (two writers, two formats); the correction result block listed changes in prose and JSON; `list_add` accepted quotes only from the current message; window end differed between Today (last on-time day) and case text (exclusive end).
 - **CHANGE** `a41_practice.js`: `PR.actMerge` (last Today layer: one line per act, evidence-only links, owner line + «همان کار», plan tap also closes its follow-up), `PR.dlDoneFromHer` + `PR.dlVerb`, `PR.guessOwnTest`, `PR.bookPred`, `PR.herLater` (+ cross-session prompt block and Today line), look-back pending problems (`s.backPend` ⇒ `A.liveKeepBackNew` on `chat_solved`), `PR.herQuote`, `PR.modelNamed`/`PR.modelUseAsk`, `PR.lastOnTime`. `a27_tour.js`: plan line without id + «(دیروز گفتی)», `predTurn23`, rule text without «#», result block without duplicate prose, user-promise wording. `a40_dossier.js`: raw-value map, label-level dedup. `a38_live.js`: one confirmation per creation. `a33`/`a36`: ids on Today items only.
 - **DECISION** "Same act" needs evidence (stored link, or same due day + content overlap); a plan being done is not its prediction's outcome (`f.plan`, never `q.fc`); two equally matching deadlines ⇒ none closed. Rejected: merging every line of a problem; dropping the result JSON.
 - **CHANGE** Tests: `tests/test_tour1_r23_today.js` — 28 runner sentences (26 red on base 574f4a30) + VARIANTS_R23 Q7 20/20 (#168–#187). Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R23_today_2026-10-19.md`.
+- **CHANGE** (after merging story e39f270e) `A.dossierSess(sid, pk)`: one chat dossier per chat problem of the session (`A.STORY.pkAt`), latest by default, `"all"` = whole session; view chips per problem. Test section `split`.

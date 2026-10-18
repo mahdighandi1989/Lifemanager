@@ -2475,6 +2475,7 @@
     do { y = x; x = x.replace(/^(?:پس|یعنی|خب|به\s*(?:زبون|زبان)\s*(?:دیگه|دیگر)|به\s*عبارتِ?\s*(?:دیگه|دیگر)|مجهول(?:م|ش)?(?:\s*(?:اینه|این\s*است))?)(?![آ-ی])[\s،:：«»"]*/, ""); } while (x !== y && x);
     return x || String(t || "");
   }
+  AS.unkPhrase = unkPhrase;   // دورِ ۲۳ (Q3): مقصدِ نقشهٔ مسیر و فرمِ فهم از همان مجهولِ به حرفِ خودش
   var LEARNER_RE = /بچه|پسر(?:م|ام|‌ام)|دختر(?:م|ام|‌ام)|فرزند|شاگرد|دانش[‌\s]?آموز|یادگیرنده|کلاس(?:م|ام|‌ام|مون)|(?:به|برای)\s*(?:کلاس|بچه‌ها)/;
   var ORD = { u: 0, p: 1, c: 2, b: 3 };
   AS.DO.coach_state = function (a) {
@@ -2531,6 +2532,8 @@
     if (!(P && P.live)) { C.ph = ph; C.st = st; }
     /* دورِ ۵ (F2): نشانه‌های همین پیام برای نوبتِ بعد (A.liveCoach(pid,{turn})): گیر/شکست یک نوبت؛ «نتیجه گفت» برای مسئلهٔ زنده تا صفحه ثبتش کند یا شکستی بیاید */
     C.rep = { key: key, stuck: stuck, fail: fail, result: said.indexOf("result") >= 0, pk: pk };
+    /* دورِ ۲۳ (Q3 «گفت‌وگو ⇄ صفحه یک داستان»، C23-11/A23-35/B·D5): همان said/ans ِ سنجیدهٔ همین پیام برای دفترِ داستان (a45_story.js) — یک منبع، نه سنجشِ دوم */
+    C.saidOk = { key: key, at: String(um.at || ""), said: said.slice(), ans: qs.slice(), pk: pk, live: (P && P.live) || "", real: !!real, pasted: !!pasted };
     if (C.resBy) delete C.resBy;   // دورِ ۶ (G1): «نتیجه» دیگر تا ثبتِ صفحه نمی‌ماند — فقط C.rep برای پیامِ بعد
     if (said.indexOf("u") >= 0 && !pasted && unkOk21(unkPhrase(ut))) { var UB = C.unkBy = C.unkBy || {}; UB[pk] = clip(unkPhrase(ut), 160); }   // مجهول به حرفِ خودش (برای سطرِ 🎯 ِ میانهٔ کار)
     /* رویدادِ مرحله (R7): خواندنِ مدل جای خواندنِ الگوی همان پیام */

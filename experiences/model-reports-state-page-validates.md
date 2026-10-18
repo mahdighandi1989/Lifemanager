@@ -9,6 +9,7 @@ source:
 created_at: "2026-10-16T12:00:00Z"
 updated_at: "2026-10-18T14:00:00Z"
 updated_at: "2026-10-18T16:00:00Z"
+updated_at: "2026-10-18T20:00:00Z"
 merged_from: []
 ---
 
@@ -122,3 +123,16 @@ the judgement is withdrawn). The same rule picks the record a report refers to: 
 said (her stated confidence must equal the record's, other numbers must appear in its text) and ask "which?" only if more than one still fits —
 never invent a new record because no word matched. For lists the model fills from conversation, require the same consent check as for any other
 write, and accept numbers and dates only if they occur in her own message.
+
+## Update 2026-10-18 (round 23, story) — a validated report must reach every reader, not just the module that validated it
+The coach's validated reports (said, plan, step, result) were stored only where the chat module kept its own state, while the forms, the stage,
+the dossier and the route map read only the forms. So the system "knew" she had stated the whole and a plan, yet asked for the whole again and
+showed "no plan yet". Lessons:
+- **Write each validated item once into the shared event log** (the same one the dossier and map read) with its source message, and derive every
+  view from that log. A second "chat copy" of the record is the bug, not the fix.
+- **Feed forms only as proposals:** fill an empty field, mark it «from chat — correct?», never overwrite her typed text, never refill a field the
+  chat filled once (her edit wins). Commit stays her click.
+- **One stage source = max(form stage, validated story stage)**; change the readers' source, not the old stage function many callers rely on.
+- **Every event carries its owner** (which problem, by binding time or the problem's chat window); "the only live problem of the session" is not an owner.
+- **Explicit markers beat inference for summary acts:** a "whole in one sentence" is recognised only from her explicit marker ("in one sentence: …"),
+  never from `said:u` alone.
