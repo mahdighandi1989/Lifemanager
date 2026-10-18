@@ -3369,7 +3369,7 @@
     var hadCS = (pp.rep.actions || []).indexOf("coach_state") >= 0;
     var repActs = (pp.rep.actions || []).filter(function (x) { return /^(?:go|live_new|live_\w+|chat_invent|chat_solved|fill|click|start_practice|deadline|card|new_card|save|tour_\w+)$/.test(String(x)); });
     /* صورتِ مسئلهٔ زندهٔ ثبت‌شده (نه C.stmt ِ گفت‌وگو — آن نخستین پیامِ هر سشن است، حتی وقتی خودش یک درخواست است) */
-    var stm = []; try { var bl = AS.boundLive(s); if (bl && bl.r && bl.r.p) stm.push(bl.r.p.statement || ""); var C0 = s.coach || {}; if (C0.stmt && C0.stmt !== clip(pp.u.text, 400)) stm.push(C0.stmt); } catch (e) { }
+    var stm = []; try { var bl = AS.boundLive(s); if (bl && bl.r && bl.r.p) stm.push(bl.r.p.statement || ""); var C0 = s.coach || {}; if (C0.stmt && C0.stmt !== clip(pp.u.text, 400) && C0.stmt !== clip(stripIntro23(pp.u.text), 400)) stm.push(C0.stmt); /* دورِ ۲۳: صورت بی سلام/پیش‌درآمد هم همان پیام است */ } catch (e) { }
     var bTok = pp.before ? tokN(ownText(pp.before.text)) : [];
     var afterT = pp.after.map(function (x) { return String(x.text || ""); }).join("\n");
     var PR = (s.promises || []), teach = false; try { teach = teachMode(s, pp.u.text); } catch (e) { }
@@ -4134,7 +4134,7 @@
   /* دورِ ۲۲ (P3، بانکِ R22 #90/#91): گزارشِ یادآوری/تمرین («فقط ۴۰ درصدشو یادم بود»، «جوابی که تو تمرین گفتم غلطه») داوری بر یادِ خودش است، نه اصلاحِ یک داده */
   var RECALL22 = /(?:تو|توی|در)[\s‌]*(?:تمرین|جلسه[\s‌]*ی?[\s‌]*تمرین|مرور)|یادم[\s‌]*(?:بود|نبود|موند|نموند|رفت)|درصد(?:ش|شو|شه)?[\s‌]*(?:رو|را)?[\s‌]*یادم/;
   AS.RECALL22 = RECALL22;
-  function corrAsk20(mt) { var own = ownText(mt); if (EDIT20.test(String(mt || "").trim()) || OTHER_ERR19b.test(own) || RECALL22.test(own) || MP_REC23.test(own)) return false;   // دورِ ۲۳ (B·D14): خطای یادآوریِ برگهٔ سفید اصلاحِ حرفِ پیشین نیست if (!CORR19b.test(own)) return false;
+  function corrAsk20(mt) { var own = ownText(mt); if (EDIT20.test(String(mt || "").trim()) || OTHER_ERR19b.test(own) || RECALL22.test(own) || MP_REC23.test(own)) return false; /* دورِ ۲۳ (B·D14): خطای یادآوریِ برگهٔ سفید اصلاحِ حرفِ پیشین نیست */ if (!CORR19b.test(own)) return false;
     var m = own.replace(/(?:نوشتم|گفتم)(?![آ-ی])[^.!؟?\n]{1,30}[،,]?[\s‌]*(?:ولی|اما)(?![آ-ی])[^.!؟?\n]*/g, function (x) { return /بود(?![آ-ی])|درست|منظورم|غلط|اشتباه/.test(x) ? x : " "; }); return CORR19b.test(m); }
   AS.corrAsk = corrAsk20;
   /* R8 (دورِ ۲۱، B·D12): نوبتِ اصلاحِ داده — نشانهٔ اصلاح، یا «X نه Y» که Y در پیامِ پیشینِ خودش هست — پرسشِ سلیقه/بازنگریِ باقی‌مانده نمی‌گیرد */
@@ -4610,14 +4610,17 @@
   var INTROP23 = /^(?:من|بنده)[\s‌]+(?:[آ-ی‌]{2,20}(?:م|ام|هستم)|[آ-ی‌]{2,20}[\s‌]+(?:[آ-ی‌]{2,20}[\s‌]+)?هستم)(?:[\s،,]+(?:[0-9۰-۹]{1,3}[\s‌]*(?:سالمه|ساله‌?ام|سالم|سال[\s‌]*دارم)|کلاس[\s‌]*[آ-ی0-9۰-۹‌]{1,10}?(?:م|ام)?|پایهٔ?[\s‌]*[آ-ی0-9۰-۹‌]{1,10}))*(?=[\s،,.!]|$)/;
   var APPMETA23 = /(?:برنامه|اپ|اپلیکیشن|سامانه|نرم[\s‌]?افزار)[^.؟?!\n]{0,30}(?:نصب|راه[\s‌]*انداخت)|(?:نصب|راه[\s‌]*انداخت)[^.؟?!\n]{0,30}(?:برنامه|اپ|سامانه)/;
   var LEADIN23 = /^(?:(?:یه|یک)[\s‌]*(?:چیز|مسئله|مسئلهٔ|سؤال|سوال)[\s‌]*(?:جدید|تازه|دیگه|دیگر)[\s‌]*[:：]|(?:یه|یک)?[\s‌]*(?:سوال|سؤال|مسئله|تمرین|پرسش)(?:[\s‌]+(?:از|توی?|در)[\s‌]+[^.؟?!\n:]{1,30})?[\s‌]*[:：]|(?:یه|یک)[\s‌]*(?:سوال|سؤال|مسئله|تمرین|پرسش)[^.؟?!\n:]{0,40}(?:دارم|داریم|داره)|[^.؟?!\n:]{0,50}(?:سوال|سؤال|سواله|مسئله|تمرین)[^.؟?!\n:]{0,30}(?:داده|دادن|نمی[\s‌]?فهمم|بلد[\s‌]*نیستم|حل[\s‌]*کنم)|(?:می[\s‌]?خواستم|می[\s‌]?خوام)[\s‌]*(?:بپرسم|بدونم|ببینم)(?:[\s‌]*که)?)[\s‌]*[:：]?[\s‌]*/;
+  var ID23 = /(?:^|[\s،,])(?:کلاس|پایهٔ?|سن|ساله|سالمه|معلم|معلمِ|دبیر|دانشجو|دانش[\s‌]*آموز|بازنشسته|مهندس|دکتر|کارمند|اسمم|نامم)(?![آ-ی])/;
   function stripIntro23(t, raw) {
-    var x = String(t == null ? "" : t), prev = null, guard = 0;
+    var x = String(t == null ? "" : t), prev = null, guard = 0, greeted = false;
+    /* «من …م» فقط وقتی معرفی است که پس از سلام بیاید یا نشانهٔ هویت داشته باشد (پایه، سن، نقش، «هستم») — «من از x بدم میاد»، «من ناامیدم» معرفی نیستند */
+    var idOk = function (b) { return greeted || ID23.test(b) || /^(?:بنده|اینجانب)[\s‌]/.test(b) || /^من[\s‌]+[آ-ی‌]{2,20}[\s‌]+هستم/.test(b); };
     while (prev !== x && guard++ < 8) { prev = x; x = x.replace(/^(?:[\s‏‎!.،,]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF\uFE0F])+/, "");
-      var g = GREET23.exec(x); if (g && g[0].trim()) { x = x.slice(g[0].length); continue; }
+      var g = GREET23.exec(x); if (g && g[0].trim()) { x = x.slice(g[0].length); greeted = true; continue; }
       var cut = /^[^.!؟?\n؛]*[.!؟?\n؛]+/.exec(x), first = (cut ? cut[0] : x).trim(), body = first.replace(/[.!؟?\n؛،,\s]+$/, "");
       var bodyNA = body.replace(/[0-9۰-۹]{1,3}[\s‌]*(?:سالمه|ساله‌?ام|ساله[\s‌]*هستم|سالم|سال[\s‌]*دارم)|(?:کلاس|پایهٔ?)[\s‌]*[0-9۰-۹]{1,2}/g, "سن");
-      if (body && !/[؟?]/.test(first) && (INTRO23.test(bodyNA) || APPMETA23.test(body)) && !/[0-9۰-۹]/.test(bodyNA) && (cut || raw)) { x = cut ? x.slice(cut[0].length) : ""; continue; }
-      var ip = INTROP23.exec(x); if (ip && ip[0].trim() && (x.length > ip[0].length + 8 || (raw && !x.slice(ip[0].length).replace(/[\s.!،,]+/g, "")))) { x = x.slice(ip[0].length).replace(/^[\s،,.!]+/, ""); continue; }
+      if (body && !/[؟?]/.test(first) && ((INTRO23.test(bodyNA) && idOk(bodyNA)) || APPMETA23.test(body)) && !/[0-9۰-۹]/.test(bodyNA) && (cut || raw)) { x = cut ? x.slice(cut[0].length) : ""; continue; }
+      var ip = INTROP23.exec(x); if (ip && ip[0].trim() && idOk(ip[0].replace(/[0-9۰-۹]{1,3}[\s‌]*(?:سالمه|ساله‌?ام|سالم)/g, "سن")) && (x.length > ip[0].length + 8 || (raw && !x.slice(ip[0].length).replace(/[\s.!،,]+/g, "")))) { x = x.slice(ip[0].length).replace(/^[\s،,.!]+/, ""); continue; }
       var li = LEADIN23.exec(x); if (li && li[0].trim() && x.length > li[0].length + 8 && (/[:：]\s*$/.test(li[0]) || /^(?:یه|یک)/.test(li[0]) && cut && first.length <= li[0].length + 2 || /بپرسم|بدونم|ببینم/.test(li[0]))) { x = x.slice(li[0].length).replace(/^[\s.،,:]+/, ""); continue; }
     }
     x = x.trim(); return raw ? x : x.length >= 4 ? x : String(t == null ? "" : t).trim();
