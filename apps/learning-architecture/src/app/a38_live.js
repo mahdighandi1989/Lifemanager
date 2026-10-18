@@ -1667,6 +1667,8 @@
     return cu.length ? "بخشِ «" + clip(cu[0].t, 60) + "» از شرط هنوز در هیچ معادله‌ای نیامده — همین بخش را با نمادها بنویس: کدام کمیت‌ها در آن برابر می‌شوند؟"
       : "کدام مجهول هنوز در هیچ معادله‌ای به بقیه بسته نشده — و کدام بخشِ شرط آن را می‌بندد؟";
   }
+  function gapAnswered(lo) { return !!(lo && !lo.auto && (lo.match || (lo.guess && txt(lo.guess.reflect)))); }
+  function restatedAfter(L, lo) { var t = String((lo && (lo.at || lo.d)) || ""); return !!t && (L.restates || []).some(function (x) { return x && String(x.at || "") >= t; }); }
   function coachCore(r, pg, s, opts) {
     var L = live(s), ph = phaseOf(s), key = ph === "done" ? "b" : ph, Q = phaseQs(r, s, key), q = "", tut = pg.tut || {}, o = opts || {}, T = o.turn || {};
     var asked = (o.asked || []).filter(Boolean), isAsked = function (x) { return asked.some(function (a) { return sameQ(a, x); }); };
@@ -1683,8 +1685,9 @@
       else if (o0 && o0.due <= A.today()) pageQ = "موعدِ گامِ «" + clip(o0.text, 60) + "» رسیده: انجامش دادی؟ آنچه شد با پیش‌بینی‌ات («" + clip(o0.pred, 60) + "») چه فاصله‌ای داشت؟ (نتیجه را خودش در صفحه ثبت می‌کند)";
       else if (!o0) { var lc = lastClosed(s), lo = lc && lc.out, c0 = [];
         var failed0 = !!(lo && (lo.done === "no" || lo.prog === "نه" || lo.match === "no"));
-        if (lo && lo.kind !== "proof") c0 = c0.concat(Q.filter(function (x) { return /فاصله/.test(x); }));
-        if (failed0) c0 = c0.concat(Q.filter(function (x) { return /شکلِ?\s*دیگری\s*بیان/.test(x); }));
+        /* دورِ ۲۰ (RO8 سویِ صفحه، A·A14 s04): پرسشی که فرمِ نتیجه یا فرمِ بیانِ تازه همین حالا جواب داد دوباره پرسشِ نوبت نمی‌شود (رفت‌وآمدِ e4/e5) */
+        if (lo && lo.kind !== "proof" && !gapAnswered(lo)) c0 = c0.concat(Q.filter(function (x) { return /فاصله/.test(x); }));
+        if (failed0 && !restatedAfter(L, lo)) c0 = c0.concat(Q.filter(function (x) { return /شکلِ?\s*دیگری\s*بیان/.test(x); }));
         pageQ = c0.filter(ok)[0] || ""; } }
     /* کارتِ روی صفحه: کارتِ خاص (بالاتر از کارتِ عام) ⇐ کارتِ طرح/اجرا */
     var SC = specCards(r, pg, s), card = (SC[0] && SC[0].q) || pageQ;
@@ -1738,7 +1741,7 @@
       var asl = asideList(s), un = overCol ? [] : unusedOf(s, pg), lcF = lastClosed(s), loF = lcF && lcF.out, failedS = !!(loF && !loF.auto && (loF.done === "no" || loF.prog === "نه" || loF.match === "no"));
       var seq = [], qAll = Q.filter(function (x) { return B3_RE.test(norm(x)); })[0] || Q_ALLD;
       if (asl.length && (guessRefuted(s) || !un.length)) seq.push(["داده‌ای که کنار گذاشته بودی («" + clip(asl[0].t, 60) + "»، دلیلت: «" + clip(asl[0].why, 50) + "») هنوز بی‌ربط است؟ دادهٔ کنارگذاشته گاهی همان عنصرِ غایب است.", "stuck-aside"]);
-      if (ph === "c" && failedS) seq.push([Q.filter(function (x) { return /شکلِ?\s*دیگری\s*بیان/.test(x); })[0] || Q_RESTATE_C, "fail-restate"]);
+      if (ph === "c" && failedS && !restatedAfter(L, loF)) seq.push([Q.filter(function (x) { return /شکلِ?\s*دیگری\s*بیان/.test(x); })[0] || Q_RESTATE_C, "fail-restate"]);
       /* R8 (I-live 1، s02): پلهٔ «نامِ داده» فقط داده‌ای را نام می‌برد که کاربر هیچ‌جا (گفت‌وگوی همین مسئله، پیامِ همین نوبت، طرح و گام‌ها) به کارش نبرده —
          عددِ ویژه‌اش یا واژه‌های متمایزش نیامده؛ اگر چنین داده‌ای نماند، این پله کنار می‌رود (پلهٔ بعد: از خواسته به عقب) */
       if (un.length) { seq.push([qAll, "stuck-alldata"]); var unN = unSeen(r, s, un, tx); if (unN.length) seq.push(["دادهٔ «" + clip(unN[0].t, 60) + "» را کجا به کار برده‌ای؟ اگر هنوز نه، در کدام گام جا دارد — یا با دلیل کنارش می‌گذاری؟", "stuck-name"]); }
@@ -1754,7 +1757,7 @@
       cand.forEach(function (c) { if (c[0] !== prevQ) pick(c[0], c[1]); });
     }
     /* شکستِ گزارش‌شده پس از گامی واقعی ⇒ «به شکلِ دیگری بیان کن»؛ بی هیچ گامی هرگز «این گام جواب نداد» (s25) */
-    if (ph === "c" && T.fail && L.steps.some(function (x) { return x.closed && x.out && !x.out.auto; })) pick(Q.filter(function (x) { return /شکلِ?\s*دیگری\s*بیان/.test(x); })[0] || Q_RESTATE_C, "fail-restate");
+    if (ph === "c" && T.fail && L.steps.some(function (x) { return x.closed && x.out && !x.out.auto; }) && !restatedAfter(L, (lastClosed(s) || {}).out)) pick(Q.filter(function (x) { return /شکلِ?\s*دیگری\s*بیان/.test(x); })[0] || Q_RESTATE_C, "fail-restate");
     /* (۴) کارتِ صفحه — موعدِ گامِ باز حتی اگر پیش‌تر پرسیده شده، چون صفحه هنوز همان را می‌پرسد */
     if (!q && pageQ && (ok(pageQ) || (ph === "c" && openStep(s)))) { q = pageQ; src = "page"; }
     /* (۵) نردبان */
@@ -2885,7 +2888,7 @@
      کامل؛ تکه‌ها به همان ترتیبِ پیام می‌مانند؛ سر/پیش‌درآمدِ گزینه با نخستین تکه. اگر q پرسشِ نادرستی را نام برد، همان را نام برده — نه جابه‌جایی، یادداشت
      فقط روی همان (تصمیمِ هماهنگ‌کننده). */
   function fullQ(x) { var t = cleanHead(x).replace(/[؟?]+\s*$/, ""); return /^(?:و\s+)?(?:اگر|اگه)\s/.test(t) || verbal(t); }
-  function anaQ(x) { var t = norm(String(x || "")).replace(/[‌]/g, " "); return /[آ-ی]ش\s*(?:(?:می\s*)?(?:کن(?:د|ی|ید|م)?|بکن(?:د|ی)?|کرد|زن(?:د|ی)|ده(?:د|ی)?))(?=[\s؟?،,.!]|$)/.test(t) && !/^(?:و\s+)?(?:اگر|اگه)\s/.test(t); }
+  function anaQ(x) { var t = norm(String(x || "")).replace(/[‌]/g, " "); return /[آ-ی]ش\s*(?:(?:می\s*)?(?:کن(?:د|ی|ید|م|ه)?|بکن(?:د|ی)?|کرد|زن(?:د|ی)|ده(?:د|ی)?))(?=[\s؟?،,.!]|$)/.test(t) && !/^(?:و\s+)?(?:اگر|اگه)\s/.test(t); }
   A.liveAnaQ = anaQ;
   function qSplit(P, gq) {
     if ((P.qs || []).length < 2 || !optHasQ(P, gq)) return [P];
@@ -4199,6 +4202,11 @@
       return "- «" + clip(x.frag, 80) + "» ⇐ «" + clip(x.fix, 80) + "»: " + (x.dup ? "پیش‌تر اصلاح شده بود؛ چیزِ تازه‌ای عوض نشد." : x.changed.length ? x.changed.map(function (c) { return c.label + (c.old || c.new ? " «" + clip(typeof c.old === "string" ? c.old : "", 40) + "» ⇐ «" + clip(typeof c.new === "string" ? c.new : "", 40) + "»" : ""); }).join("؛ ") : "از آن تکه هیچ رکوردی ساخته نشده بود — نگو چیزی را عوض کردی.") + askLine(asks);
     }).join("\n");
   });
+  if (A.ASSIST && A.ASSIST.promptHooks) A.ASSIST.promptHooks.push(function (s) {
+    var N = s && s.lpOpenNote; if (!N || !(N.list || []).length) return ""; var U0 = umsgs(s), last = U0[U0.length - 1], k = last ? msgId(last) + "|" + String(last.text || "").length : "";
+    if (N.shown && N.shown !== k) return ""; N.shown = k;
+    return "# نتیجهٔ صفحه از نوبتِ پیش\n" + N.list.map(function (x) { return "- " + (x.opened ? "مسئلهٔ زنده باز شد: «" + clip(x.title, 80) + "» (صفحه‌اش جلوی اوست)" : x.dormant ? "مسئلهٔ تازه ثبت شد و کنار ماند: «" + clip(x.title, 80) + "» (باز نشد)" : "مسئلهٔ زنده ثبت شد ولی باز نشد: «" + clip(x.title, 80) + "» (دکمهٔ «باز کن» در گفت‌وگو)"); }).join("\n");
+  });
   /* دورِ ۲۰ (RO2): پرسشِ «این‌جا هم عوض شود؟» که هنوز باز است — مدل نباید بگوید عوض شد، و هر نوبت دوباره نپرسد (پرسش روی صفحه می‌ماند) */
   if (A.ASSIST && A.ASSIST.promptHooks) A.ASSIST.promptHooks.push(function (s) {
     var Q = ((s && s.copyAsk) || []).filter(function (q) { return q.state === "open"; }); if (!Q.length) return "";
@@ -4285,7 +4293,10 @@
               S.all("card").forEach(function (x) { if (!(x.id in seen) && !x.src) { x.src = mkSrc(se.id, m, "card", x.q + " " + x.a); S.put(x); } });
             }
             stampSess(se);
+            /* RO3 (دورِ ۲۰، بانک #53): مدل «باز شد» را فقط از نتیجهٔ صفحه در نوبتِ بعد می‌فهمد */
+            var made = se ? lives().filter(function (x) { return x.sess === se.id && !(x.id in seen); }) : [];
             if (OPEN_AFTER && rec(OPEN_AFTER)) { var st = A.state || {}, typed = st.view !== "lprob" && typeof AS.lpOnForm === "function" && AS.lpOnForm(); if (!(st.view === "lprob" && st.arg === OPEN_AFTER) && !typed) A.go("lprob", OPEN_AFTER); }
+            if (made.length) { var st2 = A.state || {}; se.lpOpenNote = { list: made.map(function (x) { return { pid: x.p.id, title: x.p.title, opened: st2.view === "lprob" && st2.arg === x.p.id, dormant: !!x.dormant }; }), shown: "" }; S.put(se); }
           } catch (e) { console.warn(e); }
           OPEN_AFTER = ""; return res;
         };

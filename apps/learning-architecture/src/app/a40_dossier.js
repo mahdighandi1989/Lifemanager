@@ -382,18 +382,31 @@
       var mid = A.liveMsgId(m);
       if (res.dup) { A.liveEditCommit(s.id, mid, t, { silent: true }); return res; }
       var c = (m.corr || [])[m.corr.length - 1] || {};
-      var go = function () {
-        var se = S.get(s.id) || s;
-        AS.send("[اصلاحِ پیامِ قبلی] «" + clip(c.frag || "", 120) + "» ⇐ «" + clip(c.fix || "", 120) + "» — متنِ درستِ پیامم: «" + clip(t, 400) + "»");
+      /* دورِ ۲۰ (RO5، یک موتور): نوبتِ «[اصلاحِ پیامِ قبلی] …» پیامِ اصلاح‌کننده است؛ مربی (AS.retractApply) درست پیش از ساختنِ پرامپتِ **همان** نوبت می‌دود
+         (پوششِ AS.prompt پایین) تا نتیجهٔ صفحه در همان نوبت به مدل برسد — نه در همان تیک کنارِ AS.send و وابسته به زمان‌بندی */
+      var text = "[اصلاحِ پیامِ قبلی] «" + clip(c.frag || "", 120) + "» ⇐ «" + clip(c.fix || "", 120) + "» — متنِ درستِ پیامم: «" + clip(t, 400) + "»";
+      var run = function (se) {
         var ch = []; if (typeof AS.retractApply === "function") { try { var r2 = AS.retractApply(se, { msg: c.frag, what: res.what || "said", fix: c.fix }); if (r2 && Array.isArray(r2.ch)) ch = r2.ch; } catch (e) { console.warn(e); } }
-        A.liveEditCommit(s.id, mid, t, { ch: ch }); try { AS.paint(); } catch (e) { }
+        A.liveEditCommit(s.id, mid, t, { ch: ch }); setTimeout(function () { try { AS.paint(); } catch (e) { } }, 0);
         /* دورِ ۲۰ (RO3/RO5): یک سطرِ راست پس از هر دو سو (صفحه و مربی) — نه پیش از آن */
         var parts = (res.changed || []).map(function (x) { return x.label; }).concat(ch.map(function (x) { return String(x).replace(/\s*\(اصلاح شد.*$/, ""); }));
         A.toast(parts.length ? "اصلاح شد: " + parts.slice(0, 4).join("؛ ") + ((res.ask || []).length ? " — و در گفت‌وگو پرسیدم «این‌جا هم عوض شود؟»" : "") : (res.ask || []).length ? "از آن تکه چیزی خودکار عوض نشد؛ در گفت‌وگو پرسیدم «این‌جا هم عوض شود؟»" : "متنِ پیام اصلاح شد؛ از آن تکه رکوردی ساخته نشده بود.");
       };
+      var go = function () {
+        EDIT_PEND[s.id] = { text: text, run: run };
+        AS.send(text);
+        /* اگر نوبت ساخته نشد (ارسال رد شد)، برگرداندنِ مربی و متنِ تازهٔ حباب باز هم انجام می‌شود */
+        setTimeout(function () { var P = EDIT_PEND[s.id]; if (P && P.text === text) { delete EDIT_PEND[s.id]; P.run(S.get(s.id) || s); } }, 4000);
+      };
       (function wait(n) { if (!AS.busy()) go(); else if (n < 120) setTimeout(function () { wait(n + 1); }, 500); })(0);
       return res;
     };
+    var EDIT_PEND = {};
+    var rawPrompt = AS.prompt;
+    if (typeof rawPrompt === "function" && !rawPrompt._edit20) {
+      AS.prompt = function (s, msg) { try { var P = s && EDIT_PEND[s.id]; if (P && String(msg) === P.text) { delete EDIT_PEND[s.id]; P.run(s); } } catch (e) { console.warn(e); } return rawPrompt.apply(this, arguments); };
+      AS.prompt._edit20 = true;
+    }
     AS.msgTools = function (s, m) {
       if (!s || !m || m.role !== "user" || sysTurn(m.text)) return null;
       var mid = A.liveMsgId ? A.liveMsgId(m) : "", wrap = h("div", { class: "as-mtools small", dir: "rtl", "data-mid": mid });

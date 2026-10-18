@@ -62,6 +62,15 @@ APP.EVLOG.of({ pid } | { sess })
   `{row: <mind row fa>, sign: "+"|"−"}`. **Practice:** sessions dated with `A.now`; `EVLOG.add({pid, k:"practice", at, title, lines, sign})` for anything not on a case.
 - Status and stages come from one source (`A.livePhase`); the current stage is «در جریان». Step signs are read from `A.MIND.phases({pid})` act `lstep:<pid>:<stepId>`.
 
+## After merging the coach and practice fixers
+- ✏️: a40 no longer calls `AS.retractApply` in the same tick as `AS.send`. It registers the pending edit and runs the coach engine inside a wrapper of `AS.prompt`
+  right before the prompt of the «[اصلاحِ پیامِ قبلی]» turn is built (so `coach.retNote.same` reaches the model in that same turn); a 4 s fallback runs it if the turn
+  never starts. `post()` inside a26 `ask()` is untouched.
+- `APP.liveRetract` accepts the coach's `o.key`; the page's own `ask[]` is the coach's `pending[]` source (see Contract 2).
+- Bank #53: the page writes «مسئلهٔ زنده باز شد: «…»» (or «ثبت شد ولی باز نشد») into the NEXT turn's prompt only (`se.lpOpenNote`, shown once).
+- Bank #142 / #152 / #153: liveCoach does not re-ask the gap question when the outcome form answered it (`match` / guess reflection) nor the restatement when a restatement
+  was saved after the failed step; the understanding draft's filled unknown is not re-asked; «ردش کنه» stays with the guess question.
+
 ## Other changes worth knowing
 
 - `live_new` on her request opens the problem at the end of that turn's actions, also from another problem's page (s29); «فعلاً نه / فقط ببینم» ⇒ only the «باز کن» line.

@@ -385,6 +385,28 @@ const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARI
     19: NC(MTC), 20: NC(MTC), 21: NC(MTC), 22: NC(MTC),
   });
 
+  /* ---- RO3 / RO8 — سهمِ live (بانک #53، #142، #152، #153؛ بقیه مالِ مربی) ---- */
+  const COACH = 'coach (a27) — prompt/claim/turn-question side';
+  const hookAll = (sid, msg) => p.evaluate(([sid, msg]) => { const s = APP.S.get(sid); return APP.ASSIST.promptHooks.map(f => { try { return f(s, msg || '') || ''; } catch (e) { return ''; } }).join('\n'); }, [sid, msg]);
+  await runBank('RO3.claim_after_result', Object.assign({}, ...Array.from({ length: 17 }, (_, i) => ({ [i]: NC(COACH) })), {
+    7: async () => { const x = await setup({ chat: 'U: سلام ‖ A: سلام.' }); await p.evaluate((sid) => { const se = APP.S.get(sid); se.lprob = ''; APP.S.put(se); APP.go('today'); }, x.sid);
+      await actTurn(x.sid, 'یه مسئله‌ی جدید باز کن برای انتخاب دانشگاه', [{ do: 'live_new', title: 'انتخاب دانشگاه', statement: 'نمی‌دانم کدام دانشگاه را انتخاب کنم؛ بین دو شهر مانده‌ام' }]);
+      await p.evaluate((sid) => { const se = APP.S.get(sid); se.msgs.push({ role: 'user', text: 'خب', at: new Date().toISOString(), actions: [] }); APP.S.put(se); }, x.sid);
+      const h1 = await hookAll(x.sid, 'خب'), h2 = await p.evaluate((sid) => { const se = APP.S.get(sid); se.msgs.push({ role: 'user', text: 'بعدی', at: new Date().toISOString(), actions: [] }); APP.S.put(se); return 1; }, x.sid).then(() => hookAll(x.sid, 'بعدی'));
+      return { ok: /مسئلهٔ زنده باز شد: «انتخاب دانشگاه»/.test(h1) && !/مسئلهٔ زنده باز شد/.test(h2), got: { h1: h1.slice(0, 300), h2: /باز شد/.test(h2) } }; },
+  }));
+  await runBank('RO8.turn_edges', Object.assign({}, ...Array.from({ length: 18 }, (_, i) => ({ [i]: NC(COACH) })), {
+    3: async () => { const x = await setup({ chat: 'U: انجام دادم ولی نشد ‖ A: خب.', rec: { dl: [[0, 'داده']], plan: [null, 'طرح'] } });
+      const qs = await p.evaluate((pid) => { const pg = APP.S.get('eprog_' + pid), L = pg.solve.live, t0 = new Date(Date.now() - 3600e3).toISOString();
+        L.steps.push({ id: 'sF', text: 'گامِ اول', pred: 'جواب می‌دهد', conf: 70, at: t0, due: APP.today(), closed: true, out: { at: t0, d: APP.today(), done: 'yes', what: 'جواب نداد', match: 'no', prog: 'نه' } });
+        L.restates = [{ rel: 'other', why: 'به شکلِ دیگری گفتم', at: new Date().toISOString() }]; APP.S.put(pg);
+        const o = []; ['برنامه‌ی تازه‌ام اینه که از آخر شروع کنم', 'خب', 'بعدش چی؟'].forEach(t => { const c = APP.liveCoach(pid, { turn: { text: t } }); o.push(c && c.q || ''); }); return o; }, x.pid);
+      return { ok: qs.every(q => !/شکلِ?\s*دیگری\s*بیان|فاصله/.test(q)), got: qs }; },
+    13: async () => { const x = await setup({ chat: 'U: شروع ‖ A: خوب.' });
+      const q = await p.evaluate((pid) => { const pg = APP.S.get('eprog_' + pid); pg.solve.live.uDraft = { type: 'find', nat: 'practical', one: 'کل', u: 'زمانِ رسیدن', dl: [{ id: 'd1', t: '' }], c: '' }; APP.S.put(pg); const c = APP.liveCoach(pid, { turn: { text: 'خب' } }); return c && c.q || ''; }, x.pid);
+      return { ok: !/مجهول|خواسته/.test(q), got: q }; },
+    14: async () => { const r = await p.evaluate(() => APP.liveAnaQ('کدام حالتِ خاص حدسم رو ردش کنه؟')); return { ok: r === true, got: r }; },
+  }));
   info.res = res; info.bank = Object.assign(info.bank, bankRes);
   console.log(JSON.stringify(info, null, 1));
   Object.keys(bankRes).forEach(k => { const R = bankRes[k]; console.log(k + ': ' + R.pass + ' pass / ' + R.fail.length + ' fail / ' + R.nc.length + ' not covered of ' + R.n); R.nc.forEach(x => console.log('   not covered ' + x)); });
