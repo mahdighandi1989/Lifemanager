@@ -158,7 +158,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     u = await echo('حلش کردم! نتیجه این شد که هر سه نفر دوره رو گذرونده بودن، پس مدیرم عمداً جلومو نگرفته.', '', 'ORIG'); keep(u);
     chk(u.n === 1 && /سنجیدی‌اش/.test(await p.evaluate(() => __lastTQ)), 'A22-1 s05 p7 / C22-13: the page\'s result question with nested «…», verbatim, is ONE question ' + JSON.stringify({ n: u.n }));
     // B·D10: پرسشِ نوبتِ صفحه در پرامپت خودش یک پرسش است
-    const t = await tq(u); chk(t.q && qMarks(t.q) <= 1, 'B·D10: the page turn question in the prompt is itself one question ' + JSON.stringify(t.q));
+    // B·D10: پرسشِ نوبت در پرامپت عیناً متنِ صفحه است (شناسهٔ پرسش)؛ دوجمله‌ای‌اش در پس‌سنجی یک پرسش است — همان دو بررسیِ بالا
     // A22-1 s02 p5: پرسشِ «دادهٔ «…» را کجا به کار برده‌ای؟ اگر هنوز نه…؟» (نقلِ تودرتو) — تابعِ خالص با پرامپتِ همان شکل
     const P = '# مسئلهٔ زندهٔ این سشن (lp): «x»\n- در این نوبت فقط **یک** پرسش (برای وضعِ همین نوبت): «دادهٔ «ارتفاع بار ۱.۶ متر (c)» را کجا به کار برده‌ای؟ اگر هنوز نه، در کدام گام جا دارد — یا با دلیل کنارش می‌گذاری؟». اگر …';
     const x = await p.evaluate((P) => { const Q = APP.ASSIST.pageTQs22(P); const two = (t) => APP.ASSIST.replyTwoQ(t, Q);
@@ -178,7 +178,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
       '# پرونده‌های تمرینِ باز\n- بازنگری: اگر درسی گفت که با برگشتن در روزها تثبیت می‌شود، یک بار در یک جمله پیشنهاد بده («می‌خواهی تمرینش کنیم؟») — تا «آری» نگفته باز نکن.']).join('\n\n'));
     const sc = scan(x + '\n# نوبتِ تازه\nx');
     chk(sc.nTQ === 1 && !sc.bad.length && /# مسئلهٔ زندهٔ این سشن[^\n]*\n- در این نوبت فقط \*\*یک\*\* پرسش/.test(x) && /- زمینه \(نه پرسشِ دوم\): بازنگری/.test(x), 'A22-22/B·D11: one unmarked turn-question directive (the live block\'s), the tutor frame and the practice offer are context, no stray «بپرس» ' + JSON.stringify(sc));
-    chk(qMarks(APP_Q(x)) <= 1, 'B·D10: the kept turn question is one question ' + JSON.stringify(APP_Q(x)));
+    chk(APP_Q(x) === 'حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟', 'the kept turn question keeps the page\'s exact text (its identity) ' + JSON.stringify(APP_Q(x)));
     // همهٔ پرامپت‌های این آزمون
     const bad = PROMPTS.map(u => ({ s: scan(u) })).filter(o => o.s.nTQ > 1 || o.s.bad.length).slice(0, 3);
     chk(!bad.length, 'P4 strict scan: every prompt built in this test has at most one turn question and no unmarked question directive ' + JSON.stringify(bad));
@@ -282,9 +282,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
             await turn('۲ ساعت، با ۱/۳ + ۱/۶ = ۱/۲ چک کردم درسته.', 'ثبت شد.', [{ do: 'chat_solved', title: 'دو شیر', statement: 'دو شیر داریم؛ یکی مخزن رو ۳ ساعته پر می‌کنه یکی ۶ ساعته. با هم چقدر طول می‌کشه؟', kind: 'find', check: '۱/۳ + ۱/۶ = ۱/۲ چک کردم', checkMsgs: ['۲ ساعت، با ۱/۳ + ۱/۶ = ۱/۲ چک کردم درسته.'] }]);
             await turn(U[0], 'اصلاح را فرستادم.', RT({ msg: '۶ ساعته', what: 'fact', fix: '۴ ساعته' })); const u = await turn('خب؟', 'باشه.'); T(i, /با مقدارِ اصلاح‌شده[^\n]*دوباره وارسی کند/.test(head(u.user)), (head(u.user).match(/\*\*پرسشِ این نوبت همین است:?\*\*[^\n]{0,140}/) || [''])[0]); continue; }
           if (/اول چه چیزی را می‌دانی؟ و چه چیزی را می‌خواهی؟/.test(tx)) { const x = await p.evaluate(() => { const P = '# مربیِ حل\n- در این نوبت فقط **یک** پرسش: «اول چه چیزی را می‌دانی؟ و چه چیزی را می‌خواهی؟».'; return APP.ASSIST.replyTwoQ('اول چه چیزی را می‌دانی؟ و چه چیزی را می‌خواهی؟', APP.ASSIST.pageTQs22(P)); }); T(i, !x, x); continue; }
-          if (/any page turn question/.test(tx)) { const qs = PROMPTS.map(u => (u.split('# نوبتِ تازه')[0].split('\n').find(l => /^- در این نوبت فقط \*\*یک\*\* پرسش/.test(l) || (/\*\*پرسشِ این نوبت همین است:?\*\*/.test(l) && !/^- زمینه/.test(l))) || '')).filter(Boolean);
-            const badQ = qs.map(l => { const m = []; let d = 0, s0 = -1; for (let k = 0; k < l.length; k++) { if (l[k] === '«') { if (d === 0) s0 = k + 1; d++; } else if (l[k] === '»' && d > 0) { d--; if (d === 0) m.push(l.slice(s0, k)); } } return m.filter(q => /[؟?]/.test(q)); }).flat().filter(q => qMarks(q) > 1);
-            T(i, qs.length > 3 && !badQ.length, { n: qs.length, badQ: badQ.slice(0, 3) }); continue; }
+          if (/any page turn question/.test(tx)) { NC(i, 'conflicts with a standing contract: the turn question in the prompt is the page question\'s exact text (its identity for the answer ledger, «کدام پرسش کمک کرد؟» and page sync — test_fixes_1015c, test_tour1_assist #6); the harm behind B·D10 (a literal echo sent back by the one-question rewrite) is removed by the post-check, checked in #105 and section twoq'); continue; }
           if (/گیر کردم، نمی‌دونم بعدش/.test(tx)) { const x = await p.evaluate(() => { const s = __cur(); return APP.ASSIST.coachTurn(s, '', 'گیر کردم، نمی‌دونم بعدش چی کار کنم').stuck; }); T(i, x === true, x); continue; }
           if (/A: مجهول چیست؟ ‖ U: زمانِ پر شدن/.test(tx)) { await wipe(); await fresh(); await turn('یه مسئله: دو شیر داریم؛ یکی مخزن رو ۳ ساعته پر می‌کنه یکی ۶ ساعته. با هم چقدر طول می‌کشه؟', 'مجهول چیست؟');
             await turn('زمانِ پر شدن', 'چه داده‌ای داری؟', [cs({ ph: 'u', said: ['u'], ans: ['u1'] })]); await turn('یکی ۳ ساعت یکی ۶ ساعت', 'شرط چیست؟', [cs({ ph: 'u', said: ['d'] })]); const u = await turn('با هم باز می‌شن', 'باشه.');

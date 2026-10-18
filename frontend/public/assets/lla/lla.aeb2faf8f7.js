@@ -40130,8 +40130,8 @@ APP.goFromURL = function (q) {
       var keep = at.filter(function (a) { return a.pre; })[0] || at.filter(function (a) { return a.ex; })[0] ||   /* پشتهٔ پیش‌نیاز (a44، P1) همیشه اول */ at.filter(function (a) { return a.live; })[0] || at[0];
       var L = out.map(function (x) { return String(x || "").split("\n"); });
       at.forEach(function (a) { if (a !== keep) L[a.i][a.j] = demote22(L[a.i][a.j]); });
-      /* پرسشِ نوبتِ نگه‌داشته: هر «…» ِ پرسشیِ ردهٔ بالا یک پرسش */
-      if (keep) { var kl = L[keep.i][keep.j]; topQuotes22(kl).forEach(function (q) { var j = oneQ22(q); if (j !== q) kl = kl.split("«" + q + "»").join("«" + j + "»"); }); L[keep.i][keep.j] = kl; }
+      /* پرسشِ نوبتِ نگه‌داشته عیناً متنِ صفحه می‌ماند (شناسهٔ پرسش برای دفترِ پاسخ‌ها، «کدام پرسش کمک کرد؟» و هم‌گامیِ صفحه) — بازنویسیِ «X؟ Y؟» به یک جمله
+         (oneQ22) این شناسه را می‌شکست (test_fixes_1015c، test_tour1_assist #6)؛ B·D10 از سوی پس‌سنجی بسته است: پرسشِ صفحه، دوجمله‌ای هم، یک پرسش شمرده می‌شود */
       /* پیشنهادِ پرسشیِ بی‌نشان کنارِ پرسشِ نوبت («… پیشنهاد بده («می‌خواهی تمرینش کنیم؟»)») ⇒ زمینه */
       L.forEach(function (ls) { var blk = ""; ls.forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (SKIP22.test(blk) || TQL22.test(l) || !/^- /.test(l) || /^- پرسش‌های/.test(l) || /^- داورِ این مسئله هنوز انتخاب نشده/.test(l) || /^- همهٔ پرسش‌های این مرحله/.test(l)) return;
         if (!CTXL22.test(l) && /پیشنهاد[\s‌]*(?:بده|کن)\s*\(«[^»]*[؟?]»\)/.test(l)) ls[j] = "- زمینه (نه پرسشِ دوم): " + l.replace(/^-\s*/, "");

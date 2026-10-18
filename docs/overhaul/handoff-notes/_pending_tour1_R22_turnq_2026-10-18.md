@@ -8,13 +8,14 @@ handbook/ownership pytest numbering check fails until that branch is merged (ver
 Files changed: `apps/learning-architecture/src/app/a38_live.js` (coachCore successor), `a27_tour.js` (turn signals, re-check, post-check,
 final one-question pass, message classifier, register), `a26_assist.js` (prompt final pass, routing), rebuilt bundle.
 Tests: new `apps/learning-architecture/tests/test_tour1_r22_turnq.js` + byte copy of the bank `tests/variants/VARIANTS_R22.json`.
-Old assertion changed (commented): `tests/test_tour1_r10_coach.js` `nq` treats «؛» and «؟» alike (B·D10: the kept turn question is one sentence).
+No old assertion changed.
 
 ## Contract: one turn question per prompt (everyone who writes prompt blocks)
 - `AS.prompt` (a26) runs `AS.oneTurnQ22(hookOut)` AFTER all `promptHooks` and `promptFilters`. It keeps exactly one turn-question line:
   the turn line of a `# پیش‌نیاز (` block (prereq stack, P1 — always first) > first `**پرسشِ این نوبت همین است:**` line (not context) > the `- در این نوبت فقط **یک** پرسش` line of `# مسئلهٔ زندهٔ این سشن` > the first such line.
   Every other one becomes `- زمینه (نه پرسشِ دوم؛ پرسشِ این نوبت همان یکی است): …` with «بپرس» neutralised.
-- Inside the kept line every top-level «…» question with several «؟» becomes one sentence (`AS.oneQ22`: «X؟ Y؟» ⇒ «X؛ Y؟»). The page card text is untouched.
+- The kept turn line keeps the page question's exact text (its identity for the answer ledger, «کدام پرسش کمک کرد؟», page sync). A two-sentence page question
+  is counted as ONE question by the post-check (B·D10); it is not rewritten in the prompt (that broke test_fixes_1015c and test_tour1_assist #6).
 - A `- …` line (not context, not a turn line, not `- پرسش‌های…`) that contains `پیشنهاد بده («…؟»)` becomes context. **practice fixer:** the a41 line
   «- بازنگری: … پیشنهاد بده («می‌خواهی تمرینش کنیم؟»)» is now demoted by this pass; writing it as context at its source would be cleaner (HANDBOOK §12 #54).
 - Outside the kept turn line, every «بپرس» outside «…» (context lines too) becomes «پرسشِ همین پاسخ کن» — a second imperative "ask" is a second turn
@@ -49,7 +50,7 @@ Old assertion changed (commented): `tests/test_tour1_r10_coach.js` `nq` treats �
   `coach.pQs21`. Consecutive question sentences each with a majority of tokens in the same page question = one; «مثلاً/یعنی …؟» and a one-word head are one;
   ≥2 bullet lines with «؟» are a cheat sheet, not questions to her. The model's own extra questions are still flagged.
 
-## Not done (with reason)
+## Not done (with reason) / corrections
 - A22-27 (whole question asked after she stated it in chat before the problem existed) and dp1 «مجهول چیست؟» repeated: not reproduced in this fixer's
   harness; the bank's «answered question» entry (#108) passes. Left for the next round's evidence.
-- `test_fixes_1015c.js` (tutor per-problem index) and `test_tour1_assist.js` #6 fail on the base build (e3fcb898) as well — not caused by this change.
+- (Corrected) `test_fixes_1015c.js` and `test_tour1_assist.js` #6 were my regression (those tests ignore LLA_FILE, so my base check ran the wrong build): the prompt rewrite `oneQ22` broke the page question's identity. Removed; both green.
