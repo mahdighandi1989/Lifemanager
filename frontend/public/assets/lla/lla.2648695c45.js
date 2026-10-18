@@ -40046,8 +40046,8 @@ APP.goFromURL = function (q) {
     .replace(/\s*—\s*این را بپرس، نه آن را/g, "").replace(/(^|[^آ-ی‌])بپرس(?![آ-ی‌])/g, "$1(نه این نوبت) پرسیدنی"); }
   AS.oneTurnQ22 = function (outs) {
     try { var out = (outs || []).slice(), at = [];
-      out.forEach(function (x, i) { var blk = ""; String(x || "").split("\n").forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (!SKIP22.test(blk) && !CTXL22.test(l) && TQL22.test(l)) at.push({ i: i, j: j, blk: blk, ex: /\*\*پرسشِ این نوبت همین است/.test(l), live: /^# مسئلهٔ زندهٔ این سشن/.test(blk) }); }); });
-      var keep = at.filter(function (a) { return a.ex; })[0] || at.filter(function (a) { return a.live; })[0] || at[0];
+      out.forEach(function (x, i) { var blk = ""; String(x || "").split("\n").forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (!SKIP22.test(blk) && !CTXL22.test(l) && TQL22.test(l)) at.push({ i: i, j: j, blk: blk, ex: /\*\*پرسشِ این نوبت همین است/.test(l), live: /^# مسئلهٔ زندهٔ این سشن/.test(blk), pre: /^# پیش‌نیاز \(/.test(blk) }); }); });
+      var keep = at.filter(function (a) { return a.pre; })[0] || at.filter(function (a) { return a.ex; })[0] ||   /* پشتهٔ پیش‌نیاز (a44، P1) همیشه اول */ at.filter(function (a) { return a.live; })[0] || at[0];
       var L = out.map(function (x) { return String(x || "").split("\n"); });
       at.forEach(function (a) { if (a !== keep) L[a.i][a.j] = demote22(L[a.i][a.j]); });
       /* پرسشِ نوبتِ نگه‌داشته: هر «…» ِ پرسشیِ ردهٔ بالا یک پرسش */
@@ -52327,7 +52327,7 @@ APP.goFromURL = function (q) {
     out.push("- پروندهٔ تازه" + (subjTxt ? " (موضوعِ همین سشن: " + subjTxt + ")" : "") + " فقط پس از «آری» به پیشنهادت یا خواستهٔ صریحِ خودش: {\"do\":\"start_practice\",\"tid\":شمارهٔ تکنیک,\"pid\"|\"topic\"|\"knot\"|\"case\":\"…\",\"consent\":{\"quote\":\"عینِ حرفش\",\"kind\":\"yes\"|\"request\"}} — پروندهٔ بازِ همان تکنیک × موضوع دوباره ساخته نمی‌شود؛ «پرونده» ِ کارخانه/معرفتی پروندهٔ تمرین نیست؛ «تمرین‌هام کجان؟» راهنمایی است، نه ساختن.\n- همهٔ تکنیک‌ها (شماره نام): " + techList());
     if (s && SB.back) {
       var k0 = "b:" + (SB.pids[0] || SB.chat || ""), nU = (s.msgs || []).filter(function (m) { return m && m.role === "user" && !sysT(m.text); }).length, of = s.prcOffer = s.prcOffer || {};
-      if (of[k0] == null || of[k0] === nU) { of[k0] = nU; out.push("- زمینه (نه پرسشِ دوم): بازنگری — اگر درسی گفت که با برگشتن در روزها تثبیت می‌شود، پیشنهادِ تمرین («می‌خواهی تمرینش کنیم؟») فقط وقتی جای پرسشِ این نوبت است که پرسشِ دیگری نیست؛ وگرنه نوبتِ بعد — تا «آری» نگفته باز نکن؛ «نه» ⇒ دوباره پیشنهاد نده."); /* دورِ ۲۲ (C22-3، B·D11): زمینه، نه پرسشِ دوم */ }
+      if (of[k0] == null || of[k0] === nU) { of[k0] = nU; out.push("- زمینه (نه پرسشِ دوم): بازنگری: اگر درسی گفت که با برگشتن در روزها تثبیت می‌شود، پیشنهادِ تمرین («می‌خواهی تمرینش کنیم؟») فقط وقتی جای پرسشِ این نوبت است که پرسشِ دیگری نیست؛ وگرنه نوبتِ بعد — تا «آری» نگفته باز نکن؛ «نه» ⇒ دوباره پیشنهاد نده."); /* دورِ ۲۲ (C22-3، B·D11): زمینه، نه پرسشِ دوم */ }
     }
     return out.join("\n");
   };

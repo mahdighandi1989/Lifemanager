@@ -2,7 +2,7 @@
 
 > Temporary note for the other round-22 fixers and the integrator. Decisions: tour1_polya/DECISIONS_R22.md P4, P5. WORKLOG (92), PROGRESS 107.
 
-Merged: sibling prereq+route branch (95459379, P1/P2) on top of this work; WORKLOG 91 / PROGRESS 106 (correction fixer) still missing, so the
+Merged: prereq+route (95459379, fd496f7e) and practice+lists (23f76e4a) on top of this work; WORKLOG 91 / PROGRESS 106 (correction fixer) still missing, so the
 handbook/ownership pytest numbering check fails until that branch is merged (verified green with the numbers closed up).
 
 Files changed: `apps/learning-architecture/src/app/a38_live.js` (coachCore successor), `a27_tour.js` (turn signals, re-check, post-check,
@@ -12,7 +12,7 @@ Old assertion changed (commented): `tests/test_tour1_r10_coach.js` `nq` treats �
 
 ## Contract: one turn question per prompt (everyone who writes prompt blocks)
 - `AS.prompt` (a26) runs `AS.oneTurnQ22(hookOut)` AFTER all `promptHooks` and `promptFilters`. It keeps exactly one turn-question line:
-  first `**پرسشِ این نوبت همین است:**` line (not context) > the `- در این نوبت فقط **یک** پرسش` line of `# مسئلهٔ زندهٔ این سشن` > the first such line.
+  the turn line of a `# پیش‌نیاز (` block (prereq stack, P1 — always first) > first `**پرسشِ این نوبت همین است:**` line (not context) > the `- در این نوبت فقط **یک** پرسش` line of `# مسئلهٔ زندهٔ این سشن` > the first such line.
   Every other one becomes `- زمینه (نه پرسشِ دوم؛ پرسشِ این نوبت همان یکی است): …` with «بپرس» neutralised.
 - Inside the kept line every top-level «…» question with several «؟» becomes one sentence (`AS.oneQ22`: «X؟ Y؟» ⇒ «X؛ Y؟»). The page card text is untouched.
 - A `- …` line (not context, not a turn line, not `- پرسش‌های…`) that contains `پیشنهاد بده («…؟»)` becomes context. **practice fixer:** the a41 line

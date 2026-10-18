@@ -268,6 +268,8 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     const route = async (msg, newSess) => { await wipe(); await fresh(); const u = await turn(msg); return u.task; };
     for (const [e, i] of BANK.map((e, i) => [e, i])) {
       if (/^P8\./.test(e.rc) && P8MINE.test(e.text)) { await p8(e, i); continue; }
+      /* بانکِ #40 (P1، بخشِ ضمیر به این سهم سپرده شد): «تو این مسئله…» = «در» ⇒ ضمیرِ «تو» نیست */
+      if (/^P1\./.test(e.rc) && /^U: تو این مسئله/.test(e.text)) { const x = await p.evaluate((m) => APP.ASSIST.regSigns(m).to, Uof(i)[0]); T(i, x === false, x); continue; }
       if (!/^P[45]\./.test(e.rc)) continue;
       const tx = e.text, ex = e.expect, U = Uof(i);
       try {
@@ -320,7 +322,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
         NC(i, 'no runnable form in this fixer\'s mechanisms');
       } catch (er) { errors.push('bank#' + i + ' exception: ' + String(er && er.stack || er).split('\n').slice(0, 2).join(' | ')); }
     }
-    const mine = BANK.map((e, i) => [e, i]).filter(([e]) => /^P[45]\./.test(e.rc) || (/^P8\./.test(e.rc) && P8MINE.test(e.text))).map(([, i]) => i);
+    const mine = BANK.map((e, i) => [e, i]).filter(([e]) => /^P[45]\./.test(e.rc) || (/^P8\./.test(e.rc) && P8MINE.test(e.text)) || (/^P1\./.test(e.rc) && /^U: تو این مسئله/.test(e.text))).map(([, i]) => i);
     const miss = mine.filter(i => !(i in info.bank) && !(i in info.nc)); chk(!miss.length, 'bank coverage: every P4/P5 entry judged or given a reason ' + JSON.stringify(miss));
   });
 
