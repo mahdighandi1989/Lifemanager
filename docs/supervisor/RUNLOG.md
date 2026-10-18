@@ -63,3 +63,4 @@
 
 ناظرِ خودکار (Claude Code routine)
 - urgent: صف خالی؛ دست‌به‌دستِ h20261017235926948403 (lla_coach) بسته شد (verified، ۹ تست سبز). شاخه‌های supervisor-pending/* تاریخچهٔ قدیمی دارند (main بازنویسی شده) و دست نخوردند.
+- 2026-10-18 urgent round: queue empty; handoff 2994 verified; supervisor-pending branches left (unrelated histories / already closed on main)
