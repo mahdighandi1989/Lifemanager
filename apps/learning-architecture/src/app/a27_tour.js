@@ -3594,13 +3594,13 @@
     if (!fix || !(quoteIn(fix, ut) || hasFrag(ut, fix) || hasTok20(ut, fix))) return { err: "مقدارِ درست در همین پیامِ او نیست" };
     var M = s.msgs || [], ui = M.indexOf(um), src = null, n = 0, i, one = tok20(frag).length <= 1;
     /* دورِ ۲۲ (P3، C22-6 s25): تکه‌ای که عیناً در پیامی آمده («۱۰ تاشو چک کردم») مقدم است بر هم‌خوانیِ واژه‌به‌واژهٔ پیامِ تازه‌تر («خب ۱۰ تا چک کردم» — «تاشو» ≈ «تا») */
-    for (i = ui - 1; i >= 0 && !src; i--) if (isUser(M[i]) && !EDIT20.test(String(M[i].text || "")) && !!qNorm(frag) && qNorm(M[i].text).indexOf(qNorm(frag)) >= 0) src = M[i];
+    for (i = ui - 1; i >= 0 && !src; i--) if (isUser(M[i]) && !EDIT20.test(String(M[i].text || "")) && exactIn22(M[i].text, frag)) src = M[i];
     for (i = ui - 1; i >= 0 && !src; i--) if (isUser(M[i]) && hasTok20(M[i].text, frag)) src = M[i];
     if (!src && !one) for (i = ui - 1; i >= 0 && !src; i--) if (isUser(M[i]) && (hasFrag(M[i].text, frag) || (frag.length >= 4 && quoteIn(frag, M[i].text)))) src = M[i];
     if (!src && !edit && (hasTok20(ut, frag) || quoteIn(frag, ut))) return { err: "نقل از پیامِ فعلی است، نه پیامِ پیشینش" };
     /* دورِ ۲۲ (P3، بانکِ R22 #72): حرفی که در سشنِ پیشینِ یک مسئلهٔ زنده (حتی حل‌شده) گفته بود — منبع همان پیام در همان سشن است، نه «نیست» */
     var xsS = null; if (!src) { try { var xs0 = (A.liveAll ? A.liveAll() : []).reduce(function (acc, r) { S.all("achat", function (y) { return y && y.id !== s.id && (y.lprob === r.p.id || r.sess === y.id || (y.lprobLog || []).some(function (e) { return e && e.p === r.p.id; })); }).forEach(function (y) { if (acc.indexOf(y) < 0) acc.push(y); }); return acc; }, []);
-      xs0.sort(function (a0, b0) { return String(b0.updated || "").localeCompare(String(a0.updated || "")); }).some(function (y) { var U0 = (y.msgs || []).filter(isUser); for (var k = U0.length - 1; k >= 0; k--) if (!EDIT20.test(String(U0[k].text || "")) && (qNorm(U0[k].text).indexOf(qNorm(frag)) >= 0 || (!one && hasTok20(U0[k].text, frag)))) { src = U0[k]; xsS = y; return true; } return false; }); } catch (e) { } }
+      xs0.sort(function (a0, b0) { return String(b0.updated || "").localeCompare(String(a0.updated || "")); }).some(function (y) { var U0 = (y.msgs || []).filter(isUser); for (var k = U0.length - 1; k >= 0; k--) if (!EDIT20.test(String(U0[k].text || "")) && (exactIn22(U0[k].text, frag) || (!one && hasTok20(U0[k].text, frag)))) { src = U0[k]; xsS = y; return true; } return false; }); } catch (e) { } }
     if (!src) return { err: "تکه در هیچ پیامِ پیشینِ خودِ او در این سشن نیست" };
     if (hasTok20(frag, fix) || (typeof A.liveSameVal === "function" && A.liveSameVal(x.old ? txtOf(x.old) : frag, fix))) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };   // دورِ ۲۲: «۷۴ کیلو» = «۷۴ کیلوئه» به معنا
     /* مقدارِ نادرستی که صریح نام برد («اون شنبه رو یکشنبه کن»، old ِ مدل) باید به‌تنهایی (مرزِ واژه) در آن پیام باشد — «شنبه» درونِ «پنجشنبه» نه */
@@ -3610,6 +3610,10 @@
     return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, key: key, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um), edit: edit, rests: A.liveRestsOf ? A.liveRestsOf(x.rests) : null, srcSess: xsS ? xsS.id : "" };
   }
   AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
+  /* تکه عیناً و با مرزِ واژه در متن است («کتاب» درونِ «کتابخونه» نه) */
+  function n22(x) { return faDigits(String(x || "")).replace(/ك/g, "ک").replace(/ي/g, "ی").replace(/[ً-ٰٟ]/g, "").replace(/[‌\s]+/g, " ").trim().toLowerCase(); }
+  function exactIn22(T, frag) { var a = n22(frag), t = n22(T); if (!a) return false; var i = t.indexOf(a);
+    while (i >= 0) { var pc = t.charAt(i - 1), nc = t.charAt(i + a.length); if (!/[آ-یa-zA-Z0-9]/.test(pc) && !/[آ-یa-zA-Z0-9]/.test(nc)) return true; i = t.indexOf(a, i + 1); } return false; }
   /* جملهٔ پیامِ کنونی که مقدارِ درست در آن است پرسش است؟ (بی مقدارِ درست ⇒ همان پایانِ پیام) */
   function fixQ22(own, fix) {
     var T = String(own || "").trim(), S0 = T.split(/(?<=[.!؟?\n])\s*/).filter(function (x) { return x.trim(); });
@@ -3943,7 +3947,7 @@
     for (var i = ui - 1; i >= 0; i--) if (isUser(M[i]) && (hasFrag(M[i].text, frag) || (frag.length >= 4 && quoteIn(frag, M[i].text)))) { src = M[i]; break; }
     /* دورِ ۲۲ (P3، بانکِ R22 #72): حرفی که در سشنِ پیشینِ یک مسئلهٔ زنده (حتی حل‌شده) گفته بود — منبع همان پیام در همان سشن است، نه «نیست» */
     var xsS = null; if (!src) { try { var xs0 = (A.liveAll ? A.liveAll() : []).reduce(function (acc, r) { S.all("achat", function (y) { return y && y.id !== s.id && (y.lprob === r.p.id || r.sess === y.id || (y.lprobLog || []).some(function (e) { return e && e.p === r.p.id; })); }).forEach(function (y) { if (acc.indexOf(y) < 0) acc.push(y); }); return acc; }, []);
-      xs0.sort(function (a0, b0) { return String(b0.updated || "").localeCompare(String(a0.updated || "")); }).some(function (y) { var U0 = (y.msgs || []).filter(isUser); for (var k = U0.length - 1; k >= 0; k--) if (!EDIT20.test(String(U0[k].text || "")) && (qNorm(U0[k].text).indexOf(qNorm(frag)) >= 0 || (!one && hasTok20(U0[k].text, frag)))) { src = U0[k]; xsS = y; return true; } return false; }); } catch (e) { } }
+      xs0.sort(function (a0, b0) { return String(b0.updated || "").localeCompare(String(a0.updated || "")); }).some(function (y) { var U0 = (y.msgs || []).filter(isUser); for (var k = U0.length - 1; k >= 0; k--) if (!EDIT20.test(String(U0[k].text || "")) && (exactIn22(U0[k].text, frag) || (!one && hasTok20(U0[k].text, frag)))) { src = U0[k]; xsS = y; return true; } return false; }); } catch (e) { } }
     if (!src) return { err: "تکه در هیچ پیامِ پیشینِ خودِ او در این سشن نیست" };
     if (hasFrag(frag, fix)) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };
     for (var j = 0; j <= M.indexOf(src); j++) if (M[j] && M[j].role === "user") n++;
