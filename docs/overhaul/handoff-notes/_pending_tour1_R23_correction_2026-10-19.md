@@ -38,6 +38,12 @@ Docs: WORKLOG (97), PROGRESS 112, HANDBOOK §2 bullet + §10 row + §12 row 57, 
 - `AS.retractApply(s, {msg, fix, what, mid})`: pass `mid` (the edited message id); `retractCheck` then takes that message as the source. Anyone else calling `retractApply` with a
   short fragment should pass `mid` too.
 
+## Contract 6 — bank #83 (Q4 half, after merging story e39f270e)
+
+- An after-turn hook (registered after all modules load, so it runs after the story hook) compares each story plan item (`s.coach.story["L:"+pid].items`, k `plan`) with her typed
+  plan (`L.plan` typed/edited, else `L.planDraft` when it is not a chat fill): the same step with another number («تقسیم بر ۰٫۱۶» ‖ «تقسیم بر ۰٫۲») ⇒ copy ask on `plan`/`planDraft`
+  (`APP.liveStoryNum(typed, chat)`); her copy is never overwritten. Items are marked `cp23` once checked.
+
 ## Bank results (VARIANTS_R23, Q4.corrections, 38 entries)
 
 - 38/38 pass. On the base build (574f4a30), 18 of 38 fail; all 18 runner sentences fail there too.

@@ -1233,6 +1233,9 @@
   A.liveHeur = function (pid) { var r = rec(pid); if (!r) return []; return heurUsed(r, solOf(pgOf(pid))); };
   var HEUR_FA = { back: "از آخر به عقب", aux: "مسئلهٔ کمکی", move: "حرکت با دلیل", rel: "مسئلهٔ مرتبط", ask: "پرسشِ طرح که پاسخش دادی" };
   var PD = {};
+  /* دورِ ۲۳ (Q3): پیش‌نویسی که دفترِ داستانِ گفت‌وگو (a45) روی رکورد نوشت، با رسمِ بعدی از رکورد خوانده می‌شود — نه از حافظهٔ کهنهٔ همین صفحه */
+  A.liveDraftDrop = function (pid) { delete UD[pid]; delete PD[pid]; try { delete BKD[pid]; } catch (e) { } };
+  A.liveMkSrc = function (sid, m, key, val) { return mkSrc(sid, m, key, val); };
   function planCard(r, pg, s) {
     var pid = r.p.id, L = live(s), nat = natOf(s, r), prac = nat === "practical";
     /* تور ۱: دلیل‌های ثبت‌شده در طرحِ پیشین در فرم می‌مانند؛ پیش‌نویسِ طرح روی رکورد (L.planDraft) تا «به‌کارنرفته» و قلابِ دستیار آن را هم ببینند */
@@ -1679,7 +1682,11 @@
     var stuckT = !!(T.stuck || o.stuck), tx = norm(T.text || ""), ok = function (x) { return x && !isAsked(x) && qOk(s, x, stuckT); };
     /* (۴) پرسشِ بازِ کارتِ طرح/اجرا */
     var pageQ = "", c0Mark = false;
-    if (ph === "u") { var d = L.uDraft || {}; pageQ = wholeOpen(s) ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
+    /* دورِ ۲۳ (Q3، A23-35/B·D5): فهم را در گفت‌وگو تمام کرد (کل + مجهول + داده/شرط، یا طرح/نتیجه — سنجیدهٔ coach_state، a45) ⇒ پرسش‌های فرمِ فهم پرسشِ نوبت نیستند؛
+       فرم با «از گفت‌وگو: … درست است؟» روی صفحه می‌ماند (دوباره پرسیده نمی‌شود) */
+    var storyAhead23 = false; try { storyAhead23 = ph === "u" && !!(A.liveStoryAhead && A.liveStoryAhead(r.p.id)); } catch (e) { }
+    if (ph === "u" && storyAhead23) pageQ = "";
+    else if (ph === "u") { var d = L.uDraft || {}; pageQ = wholeOpen(s) ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
     else if (ph === "p" && Q.length) { var P = tut.plan || [], qi0 = tut.qi && tut.qi.lplan != null ? +tut.qi.lplan : 0;
       for (var k = 0; k < Q.length; k++) { var j = (qi0 + k) % Q.length; if (qOk(s, Q[j]) && !P.some(function (e) { return e && e.src === "live" && e.q === Q[j] && (e.text || e.skip); })) { pageQ = Q[j]; break; } } }
     else if (ph === "c") { var o0 = openStep(s); if (o0 && chatOut(o0)) pageQ = "";   // RN2a (دورِ ۱۹): نتیجه‌اش را در گفت‌وگو گفت و ثبت شد — دوباره پرسیده نمی‌شود
@@ -4526,7 +4533,7 @@
   A.liveMaskQ = maskQ;
   function isNumTok(w) { return !!w && (numOccs(w).length > 0) && !ctoks(String(w).replace(/[0-9۰-۹٠-٩.٫#]+/g, " ")).filter(function (x) { return !UCAN[ftoks(x)[0]]; }).length; }
   function occX(t) {
-    var T0 = String(t == null ? "" : t), T = maskQ(T0), O = numOccs(T), P = tokPos(T), HARD = /[.!؟?؛;\n]/, SOFT = /[،,]/, FW = FUNC_W.concat(["بر", "و", "هر", "حدود", "حدوداً", "تقریباً"]);
+    var T0 = String(t == null ? "" : t), T = maskQ(T0), O = numOccs(T), P = tokPos(T), HARD = /[.!؟?؛;\n]/, SOFT = /[،,]/, FW = FUNC_W.concat(["بر", "و", "هر", "حدود", "حدوداً", "حدودا", "تقریباً", "تقریبا", "تقریبن"]);
     O.forEach(function (o) { o.mask = T.charAt(o.s - 1) === "#" || T.charAt(o.e) === "#"; if (o.mask && !o.u) { var u2 = unitAt(T, o.e + (T.charAt(o.e) === "#" ? 1 : 0)); if (u2) o.u = u2.u; }
       var k0 = -1, k1 = -1; P.forEach(function (x, k) { if (x.s < o.e && o.s < x.e) { if (k0 < 0) k0 = k; k1 = k; } }); o.k0 = k0; o.k1 = k1; });
     /* فهرست: «۴، ۹، ۱۳ سانت» / «۲، ۴، ۶، ۸ و ۱۰ ساعت» ⇒ هر عضو واحدِ پایانی را می‌گیرد */
@@ -4535,13 +4542,15 @@
     for (var j = 0; j + 1 < O.length; j++) { var g2 = T.slice(O[j].e, O[j + 1].s), bef = T.slice(Math.max(0, O[j].s - 12), O[j].s);
       if (/^\s*(?:تا|-|–|الی)\s*$/.test(g2) || (/^\s+و\s+$/.test(g2) && /بین[ِ]?\s*$/.test(bef))) { O[j].range = true; O[j + 1].range = true; if (!O[j].u && O[j + 1].u) O[j].u = O[j + 1].u; } }
     var gapStop = function (a, b) { var gp = T.slice(P[a].e, P[b].s); if (HARD.test(gp)) return true; return SOFT.test(gp) && !(isNumTok(P[a].t) && isNumTok(P[b].t)); };
-    var canon = function (w) { var c = ftoks(w)[0] || ""; return c && !UCAN[c] && FW.indexOf(c) < 0 && c.length >= 2 && !/^\d/.test(c) && !/^#/.test(c) ? c : ""; };
+    var MAG = ["هزار", "میلیون", "میلیار", "میلیارد", "صد"];   // دورِ ۲۳ (Q4، R20 #12): بزرگیِ عدد بخشی از خودِ عدد است، نه همسایهٔ گواه
+    var canon = function (w) { var c = ftoks(w)[0] || ""; return c && !UCAN[c] && FW.indexOf(c) < 0 && MAG.indexOf(c) < 0 && c.length >= 2 && !/^\d/.test(c) && !/^#/.test(c) ? c : ""; };
     O.forEach(function (o) { if (o.k0 < 0) { o.w = []; o.n = []; return; } var w = [], n = [], L = "", R = "";
       for (var k = o.k0 - 1, st = 0; k >= 0 && st < 3; k--) { if (gapStop(k, k + 1)) break; var x = P[k], nv = numOccs(x.t); if (nv.length && isNumTok(x.t)) { n.push(nv[0].v); break; } var c = canon(x.t); if (c) { if (!L) L = c; w.push(c); st++; } }
       for (var k2 = o.k1 + 1, st2 = 0; k2 < P.length && st2 < 3; k2++) { if (gapStop(k2 - 1, k2)) break; var y = P[k2], nv2 = numOccs(y.t); if (nv2.length && isNumTok(y.t)) { n.push(nv2[0].v); break; } var c2 = canon(y.t); if (c2) { if (!R) R = c2; w.push(c2); st2++; } }
       /* نامِ شمرده‌شده: واژهٔ پس از عدد (یا پس از «تا») */
       var nx = P[o.k1 + 1], cn = ""; if (nx && !gapStop(o.k1, o.k1 + 1)) { var t1 = nz(nx.t); if (/^(?:هزار|میلیون|میلیارد|صد)/.test(t1)) cn = "";   // دورِ ۲۳ (Q4، R20 #12): «میلیارد» بزرگیِ عدد است، نه نامِ شمرده‌شده
         else if (/^تا(?:ی|ست)?$/.test(t1)) { var nx2 = P[o.k1 + 2]; if (nx2 && !gapStop(o.k1 + 1, o.k1 + 2) && !isNumTok(nx2.t)) cn = canon(nx2.t); } else if (!isNumTok(nx.t)) cn = canon(nx.t); }
+      var mg = nx && !gapStop(o.k1, o.k1 + 1) ? (ftoks(nx.t)[0] || "") : ""; o.mag = MAG.indexOf(mg) >= 0 ? mg.replace(/د$/, "") : "";
       o.w = w; o.n = n; o.L = L; o.R = R; o.cn = cn; });
     O.forEach(function (o) { O.forEach(function (o2) { if (o2 !== o && o2.k0 >= 0 && o2.k0 === o.k0) o.n.push(o2.v); }); });   // «۲۵×۳۵»: عددِ هم‌واژه همسایه است
     return O;
@@ -4552,7 +4561,10 @@
   function nbrOK(c, oc, herW) {
     if (oc && c.n.some(function (a) { return oc.n.some(function (b) { return veq(a, b); }); })) return true;
     if (oc && c.cn && c.cn === oc.cn) return true;
-    var cw = uniq(c.w), hw = oc ? uniq(oc.w) : uniq(herW || []), sh = cw.filter(function (w) { return hw.indexOf(w) >= 0; }).length;
+    if (oc && c.mag && c.mag === oc.mag && !uniq(c.w).length) return true;   // دورِ ۲۳ (Q4، R20 A·A2): «۸ میلیارد» ِ تنها با همان بزرگی همان مقدار است (نسخه واژهٔ دیگری ندارد که خلافش بگوید)
+    /* هم‌ریشه با پسوندِ کوتاه («حقوقم» = «حقوق») همان واژه است — ریشهٔ کوتاه نه («وزنم» ≠ «وزن» ِ «وزن بابام»، R22 #99) */
+    var same = function (a, b) { return a === b || (Math.min(a.length, b.length) >= 4 && Math.abs(a.length - b.length) <= 2 && (a.indexOf(b) === 0 || b.indexOf(a) === 0)); };
+    var cw = uniq(c.w), hw = oc ? uniq(oc.w) : uniq(herW || []), sh = cw.filter(function (w) { return hw.some(function (y) { return same(w, y); }); }).length;
     if (!oc) return sh >= 1 && sh * 2 > cw.length;
     return sh >= 1 && (sh * 2 > cw.length || sh * 2 >= hw.length);
   }
@@ -4708,6 +4720,7 @@
     if (/^b\./.test(path) && s.b && s.b[1]) return { owner: s.b[1], obj: s.b[1], key: path.slice(2) };
     var am = /^aux(b)?:(\d+)$/.exec(path); if (am && (L.aux || [])[+am[2]]) { var ax = L.aux[+am[2]]; return { owner: ax, obj: ax, key: am[1] ? "bridge" : "t" }; }
     if (path === "g.guess" && s.g && s.g[1]) return { owner: s.g[1], obj: s.g[1], key: "guess" };   // دورِ ۲۳ (Q4، D23-9)
+    if (path === "planDraft" && txt(L.planDraft)) return { owner: L, obj: L, key: "planDraft" };   // دورِ ۲۳ (Q4، بانکِ R23 #83)
     return null;
   }
   /* پاسخِ او به «این‌جا هم عوض شود؟»: yes ⇒ با تاریخچه عوض می‌شود؛ no ⇒ همان می‌ماند و دیگر پرسیده نمی‌شود (هر دو در پرونده) */
@@ -4760,6 +4773,20 @@
   }
   /* دورِ ۲۲ (P3، D s38): پرسشِ «این‌جا هم عوض شود؟» با متنِ کاملِ تازه برای رکوردی که جایگزینیِ درجا خرابش می‌کرد (مربی) */
   A.liveAskCopy = function (sid, pid, c, ctx) { var se = S.get(sid); if (!se || !c || !c.path) return []; var out = askCopies(se, [Object.assign({ pid: pid, field: c.path, named: true, d: null }, c)], ctx || {}); S.put(se); return out; };
+  /* دورِ ۲۳ (Q4، بانکِ R23 #83 «تقسیم بر ۰٫۱۶» ِ تایپ‌شده ‖ گفت‌وگو «تقسیم بر ۰٫۲»): طرحی که در گفت‌وگو با عددِ دیگری برای همان گام گفت، نسخهٔ تایپ‌شدهٔ او را بی‌صدا
+     عوض نمی‌کند (سهمِ story) و «این‌جا هم عوض شود؟» پرسیده می‌شود — فقط وقتی همان عدد با همسایهٔ مشترک (همان گام) عوض شده است */
+  function storyNum(typed, chat) { var TX = occX(typed), CX = occX(chat), reps = [];
+    TX.forEach(function (t) { if (CX.some(function (c) { return veq(c.v, t.v); })) return; var c = CX.filter(function (c0) { return !TX.some(function (t0) { return veq(t0.v, c0.v); }) && !!t.u === !!c0.u && (!t.u || ufam(t.u) === ufam(c0.u)) && uniq(t.w).some(function (w) { return c0.w.indexOf(w) >= 0; }); })[0];
+      if (c) reps.push({ s: t.s, e: t.e, r: String(chat).slice(c.s, c.e) }); });
+    if (!reps.length) return null; reps.sort(function (a, b) { return b.s - a.s; }); var out = String(typed); reps.forEach(function (r) { out = out.slice(0, r.s) + r.r + out.slice(r.e); }); return nz(out) !== nz(typed) ? out : null; }
+  A.liveStoryNum = storyNum;
+  setTimeout(function () { if (!A.ASSIST || !A.ASSIST.afterTurnHooks) return; A.ASSIST.afterTurnHooks.push(function (s) { try {
+    var ST = (s && s.coach && s.coach.story) || {}, dirty = false;
+    Object.keys(ST).forEach(function (key) { if (!/^L:/.test(key)) return; var pid = key.slice(2); if (!rec(pid)) return; var L = live(solOf(pgOf(pid)));
+      var ty = L.plan && txt(L.plan.t) && (!L.plan.src || L.plan.src.edited) ? { path: "plan", v: L.plan.t } : txt(L.planDraft) && !L.planChat ? { path: "planDraft", v: L.planDraft } : null; if (!ty) return;
+      ((ST[key] || {}).items || []).forEach(function (it) { if (!it || it.k !== "plan" || it.cp23) return; it.cp23 = 1; dirty = true; var nv = storyNum(ty.v, it.t); if (nv == null) return;
+        askCopies(s, [{ pid: pid, path: ty.path, field: ty.path, sig: "lpPlan", label: "طرح", old: ty.v, new: nv, named: false, d: null }], { mid: it.mid || "", frag: ty.v, fix: it.t }); }); });
+    if (dirty) S.put(s); } catch (e) { console.warn(e); } }); }, 0);
   A.liveCopyAsks = function (sid) { var se = S.get(sid); return ((se && se.copyAsk) || []).filter(function (q) { return q.state === "open"; }); };
   /* دورِ ۲۳ (Q4، C23-22 oC1 p18 «بله، دادهٔ ۲ رو هم عوض کن»؛ بانکِ R23 #104/#105/#121): پاسخِ گفت‌وگو به «این‌جا هم عوض شود؟» همان زدنِ دکمه است —
      فقط با نشانهٔ روشن: نامِ همان فیلد، یا «عوض کن/اصلاح کن» وقتی تنها یک پرسش باز است («همه رو» ⇒ همه)؛ «بله» ِ تنها پاسخِ پرسشِ دیگری هم می‌تواند باشد ⇒ هیچ */

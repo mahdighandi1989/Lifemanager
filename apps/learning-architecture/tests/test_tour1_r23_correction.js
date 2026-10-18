@@ -243,6 +243,17 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
     const c0 = (x.res.changed || []).filter(c => c.rec === 'صورتِ مسئلهٔ گفت‌وگو')[0];
     return { ok: !!c0 && c0.old !== c0.new && /۱۵/.test(c0.old) && /۱۲/.test(c0.new) && !!c0.why && x.res.changed.every(c => c.old !== c.new && c.why) && x.part.every(t => !/«([^»]+)» ⇐ «\1»/.test(t)) && !/«([^»]{10,})» ⇐ «\1»/.test(x.sys.join(' ')), got: x }; });
 
+  // بانکِ R23 #83 (نیمهٔ Q4، به سپردهٔ هماهنگ‌کننده): «[page] she typed plan step «تقسیم بر ۰٫۱۶» ‖ U (chat): تقسیم بر ۰٫۲» — «page form not overwritten silently; asked «این‌جا هم عوض شود؟»»
+  await T('R23 #83 her typed plan «تقسیم بر ۰٫۱۶» stays; the chat «تقسیم بر ۰٫۲» asks «این‌جا هم عوض شود؟»', async () => { await ev(() => { __wipe(); __fresh(); });
+    await turn('اتاقم ۴ در ۶ متره و کاشی‌ها ۴۰ در ۴۰ سانتی‌متر؛ چند تا کاشی لازمه؟', 'کل را بگو.');
+    const pid = await ev(() => { const s = __cur(); const pid = __live('کاشیِ اتاق', 'اتاقم ۴ در ۶ متره و کاشی‌ها ۴۰ در ۴۰ سانتی‌متر؛ چند تا کاشی لازمه؟', { by: 'assistant', sess: s.id }); APP.liveBindSession(pid, s); APP.liveStampSess(APP.S.get(s.id));
+      __set(pid, (so, L) => { L.planDraft = 'تقسیم بر ۰٫۱۶'; }); return pid; });
+    await turn('اول تقسیم بر ۰٫۲ می‌کنم بعد گرد می‌کنم', 'خوب.', [cs({ ph: 'p', said: ['plan'] })]);
+    const x = await ev((pid) => ({ pd: APP.S.get('eprog_' + pid).solve.live.planDraft, q: __asks(), st: (__cur().coach || {}).story }), pid), q = x.q.filter(a => a.path === 'planDraft')[0];
+    if (q) await ev((id) => APP.liveCopyAnswer(__cur().id, id, true), q.id);
+    const pd2 = await ev((pid) => APP.S.get('eprog_' + pid).solve.live.planDraft, pid);
+    return { ok: x.pd === 'تقسیم بر ۰٫۱۶' && !!q && q.new === 'تقسیم بر ۰٫۲' && pd2 === 'تقسیم بر ۰٫۲', got: { x, pd2 } }; });
+
   /* ================= (۲) بانکِ مستقل VARIANTS_R23 — هر ورودیِ Q4 ================= */
   const bank = BANKF && fs.existsSync(BANKF) ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : null;
   info.bank.file = BANKF || '(missing)';
