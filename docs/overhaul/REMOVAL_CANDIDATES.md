@@ -311,3 +311,9 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R22 P3 (same fact by meaning, never a lone digit; substitution once over the minimal span; the clause is judged; s25 regression).
 - **Status:** reachable, not called: `APP.LIVE_R21_QUARANTINE_P3.fzReNoDecimal`, `.sameFactNoNeighbour`, `.srcPartFirst`; `APP.ASSIST.R21_QUARANTINE_P3.questionByEnd`, `.srcLatestFuzzy`.
   Delete only with the owner's approval.
+## 2026-10-18 — R21 running-list view (learning-architecture, Pólya round 22, practice + lists: P7)
+- **File:** `apps/learning-architecture/src/app/a41_practice.js`.
+- **What it did:** the running-list page offered only «افزودن» and «مرور کردم»: items could not be resolved/refuted/closed, an ambiguity held one probability,
+  «باربر» and Pareto shares could not be set, and items carried no problem/session link.
+- **Why replaced:** DECISIONS_R22 P7 (lifecycle, hypotheses with probabilities, load-bearing, shares, verdict re-check, links). The new `listView` keeps both old controls.
+- **Status:** reachable, not called: `APP.PR.listViewR21`. Delete only with the owner's approval.
