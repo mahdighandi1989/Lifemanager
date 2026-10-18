@@ -43,3 +43,9 @@ solved or its prerequisite taught; registries / «🗺 قلمروِ سامانه
 sheet filed per the AGENTS.md contract (differential diagnosis, second opinion, abstract/missing/where/how, evidence from her words and the
 step), the waiting sub-problem marked, the final summary showing it. The loop «built ⇒ system notices ⇒ checks it answers the step ⇒ resumes»
 does not exist yet: record its absence as S2 with what the person would have needed.
+ADDENDUM 3 (owner 2026-10-18, roadmap §20 — the hardest user): each group adds one scenario with the "owner-like" persona — very curious,
+full of ideas, asks a question behind every answer («این هم هست؟ وصل است؟ یادت نمی‌ماند؟»), changes direction mid-way and comes back,
+corrects earlier messages, rejects generic answers, wants depth and honesty, returns over days. Use docs/tours/owner-question-bank.md: the
+persona asks at least five of its questions in natural words inside a real problem. Judge whether the system answers each one with evidence
+(«هست، این‌جا، این‌طور»), or honestly says it is missing and files the sheet. Never accept a show. Every findings.md also ends with
+«## ایده‌ها»: what such a person would want next that the system lacks, with a two-need-map judgement for each.
