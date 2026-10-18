@@ -107,7 +107,9 @@
     var r = s.rev[ph] || (s.rev[ph] = { iv: 0, due: A.today(), hist: [] }), d = A.today();
     (r.hist = r.hist || []).push({ at: nowISO(), d: d, self: self });
     if (r.hist.length > 40) r.hist = r.hist.slice(-40);
-    r.iv = nextIv(r.iv || LADDER[0], self === 2); r.due = A.addDays(d, r.iv);   // رکوردِ پیشینِ iv: 0 هم پلهٔ نخست شمرده می‌شود (L5)
+    /* دورِ ۲۰ (RO7، A «ارتقای لازم» ۳): بازیابیِ دیرِ درست فاصلهٔ بلندتر می‌گیرد — پلهٔ بعدِ نردبان پس از فاصله‌ای که واقعاً ازسر گذشت، نه پس از فاصلهٔ برنامه */
+    var el = r.due && r.iv ? A.daysBetween(A.addDays(r.due, -r.iv), d) : 0;
+    r.iv = nextIv(self === 2 ? Math.max(r.iv || LADDER[0], el) : (r.iv || LADDER[0]), self === 2); r.due = A.addDays(d, r.iv);   // رکوردِ پیشینِ iv: 0 هم پلهٔ نخست شمرده می‌شود (L5)
   }
   A.solveGrade = grade;
   function duePh(s, pg) { var t = A.today(); return Object.keys(PH).filter(function (k) { return s.rev[k] && s.rev[k].due && s.rev[k].due <= t && (k !== "t" || !pg || hasT(pg)) && (k !== "m" || (s.mot || []).length) && (k !== "h" || !!(s.live && s.live.plan && (s.live.plan.heur || []).length)); }); }

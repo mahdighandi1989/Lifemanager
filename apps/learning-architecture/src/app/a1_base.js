@@ -366,6 +366,9 @@ var APP = window.APP = {};
     return S.put(card);
   };
   A.dueCards = function () { var t = A.today(); return S.all("card", function (c) { return !c.susp && (c.due || "") <= t; }); };
+  /* دورِ ۲۰ (RO7، B·D16): کارتِ نمونهٔ ساختهٔ سامانه (روالِ آماده‌ای که خودش شروع نکرده) تا نخستین مرورِ خودش در «امروز» و یادآور نمی‌آید؛
+     پروندهٔ تمرین (a41) کارتِ مسئله‌ای را که پرونده‌اش صاحبِ زمان‌بندی است هم بیرون می‌گذارد (یک سطر برای یک کار) */
+  A.cardInToday = function (c) { return !!c && !(c.sample && !(c.hist || []).length); };
 
   /* ---------- آمار و کالیبراسیون ---------- */
   A.rubricPct = function (ex) {

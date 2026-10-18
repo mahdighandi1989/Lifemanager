@@ -263,16 +263,28 @@
   function q(x, n) { x = String(x == null ? "" : x).replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
   function reg(kind, label, list, more) { var s = { kind: kind, label: label, list: list, legacy: true }; for (var k in (more || {})) s[k] = more[k]; SC.register(s); }
   reg("card", "کارتِ مرور (T42، SM-2)", function () {
-    return S.all("card", function (c) { return !c.susp && c.due; }).map(function (c) { return { id: c.id, due: c.due, label: q(c.q, 60), remindKey: "cards:review", policy: "T42" }; });
+    return S.all("card", function (c) { return !c.susp && c.due && (!A.cardInToday || A.cardInToday(c)); }).map(function (c) { return { id: c.id, due: c.due, label: q(c.q, 60), remindKey: "cards:review", policy: "T42" }; });
   });
   reg("sched", "برگهٔ سفید ۱-۳-۷ (P3)", function () {
-    return S.all("sched", function (s) { return !s.done && s.due; }).map(function (s) { return { id: s.id, due: s.due, label: "برگه سفید " + (s.label || ""), policy: "T41" }; });
+    return S.all("sched", function (s) { return !s.done && !s.hold && s.due; }).map(function (s) { return { id: s.id, due: s.due, label: "برگه سفید " + (s.label || ""), policy: "T41" }; });
+  });
+  /* دورِ ۲۰ (RO7، B·D16): روالِ آماده «شروع‌شده» است وقتی کاربر یک بار آن را باز/اجرا کرد — نشانی ماندگار در تنظیمات (پاک‌شدنِ اجرا آن را برنمی‌گرداند) */
+  var ROUT = ["P2", "P4", "P5", "P9"];
+  A.routineStarted = function (pid) {
+    if (S.all("pr", function (y) { return y.pid === pid; }).length) return true;
+    try { return !!(((S.settings() || {}).routinesStarted || {})[pid]); } catch (e) { return false; }
+  };
+  S.listeners.push(function (r, op) {
+    if (op && op !== "put") return;
+    if (!r || r.type !== "pr" || ROUT.indexOf(r.pid) < 0 || r.sample) return;
+    try { var st = S.settings() || {}; st.routinesStarted = st.routinesStarted || {}; if (!st.routinesStarted[r.pid]) { st.routinesStarted[r.pid] = A.today(); S.saveSettings(st); } } catch (e) { }
   });
   reg("proto", "روال‌های دوره‌ای (P2 روزانه، P4/P5 هفتگی، P9 ماهانه)", function (day) {
     return [["P2", 1], ["P4", 7], ["P5", 7], ["P9", 30]].map(function (x) {
       var r = S.all("pr", function (y) { return y.pid === x[0] && y.status === "done"; })[0], l = r ? A.localDay(r.created) : null;
+      if (!l && !A.routineStarted(x[0])) return null;   // دورِ ۲۰: روالِ آماده‌ای که هرگز شروع نشده موعدی ندارد
       return { id: x[0], due: l ? A.addDays(l, x[1]) : day, label: A.pn ? A.pn(x[0]) : x[0] };
-    });
+    }).filter(Boolean);
   });
   reg("course", "گرم‌کردنِ دوره (نردبانِ سامانه)", function () {
     var c = S.get("course"); if (!c || !c.topic || !c.done) return [];

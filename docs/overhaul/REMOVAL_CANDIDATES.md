@@ -277,3 +277,8 @@ how to revive it.
 ## 2026-10-17 — `A.masteryCountOnly` (learning-architecture, round-19c practice)
 The count-only mastery rule (six same-day attempts counted as «fluent») is replaced by a distinct-days rule (DECISIONS_R19c LT3).
 The old function is kept reachable as `A.masteryCountOnly` in `a1_base.js`; nothing calls it. Delete only with the owner's approval.
+
+## 2026-10-18 — practice keyword consent and keyword prompt gate (learning-architecture, round-20 practice)
+`start_practice` consent is now the model's validated report (`consent {quote, kind}`, DECISIONS_R20 RO7) and the practice prompt block depends only on an open case.
+The replaced paths are kept reachable in `a41_practice.js`: `APP.PR.consentKwR19c` (keyword detector) and `APP.PR.R19C_QUARANTINE.promptHook` (keyword-gated block). Nothing calls them.
+Also unchanged but now unused for display: P3 records closed by a practice case keep `done` with `closedBy:"practice"` (never deleted). Delete only with the owner's approval.

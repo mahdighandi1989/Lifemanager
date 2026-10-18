@@ -4620,3 +4620,12 @@ dated stability, mind-card feed) under way.
 - Finding: the longitudinal audit's «standalone forecasts/worry chains never reach Today» was wrong (a31 showed them since 2026-10-14);
   what was missing (overdue date, reminder, cancel on outcome) is now built. Test: `tests/test_tour1_r19c_sched.js`; bank R19c LT1/LT8 37/37.
   Docs: lla WORKLOG (77), PROGRESS 93, handoff `docs/overhaul/handoff-notes/_pending_tour1_R19c_sched_2026-10-17.md`.
+
+### 2026-10-18 — CHANGE — learning-architecture: Pólya round 20, practice + sched fixer (RO7, RO9)
+- One act, one record, one Today line: the practice case owns the schedule of its linked P3 cycle (one visible step, later steps held, passed ones closed with a reason),
+  of the 🔭 review phases and reconstruction cards of the same live problem, and of its T24 predictions (each a dated 🎯 when written; reflections after outcomes; next turn
+  from the open criterion). Late failed retrieval re-anchors; late successful retrieval earns a longer interval (also in the a36 review ladder). Chat plan ⇄ live step ⇄ 🌱
+  linked by a one-click «همان برنامه؟» (content overlap only), one state. Guess status from the problem's own guess records. Built-in routines only after first use.
+  Assistant: `start_practice` consent from the model's validated report, new `practice_log`, prompt block only with an open case (`APP.PR.promptBlock`). Clock badge no longer
+  covers «↩ برگرد». Test `apps/learning-architecture/tests/test_tour1_r20_practice.js` (bank R20 RO7 18/18 + RO9 3/3; red on base). Docs: lla WORKLOG (82), PROGRESS 98,
+  handoff `docs/overhaul/handoff-notes/_pending_tour1_R20_practice_2026-10-18.md`; quarantine recorded in REMOVAL_CANDIDATES.
