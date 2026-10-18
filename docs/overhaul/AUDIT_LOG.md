@@ -4838,3 +4838,14 @@ dated stability, mind-card feed) under way.
   turn-question fit, post-check fixes. WORKLOG (94), PROGRESS 109. Old paths quarantined (REMOVAL_CANDIDATES 2026-10-19).
 - **DECISION** The R23 bank's Jalali dates are right; a hand check «1 Farvardin 1338 = 1959-03-21» was a day early (equinox after Tehran noon ⇒ 22 March).
 - **CHANGE** Test `apps/learning-architecture/tests/test_tour1_r23_ageclass.js` (red on base, green after): runners' sentences + VARIANTS_R23 Q1 38/38, Q5 21/21.
+
+## 2026-10-18 — Pólya round-23 fixes merged to main
+- **CHANGE** Merged five fixers (DECISIONS_R23): correction Q4 (a38/a27 copies, number roles, multi-pair ✏️), story Q3 (new a45_story.js:
+  chat ⇄ forms/stage, route map for chat problems), prereq Q2+Q6 (stack refinements, cause = system, territory waiting loop
+  `APP.PRE.sys*` — notice, verify, «ابزارِ لازم آمد», resume), today Q7 (one Today line per act, promises, dossier lines, dossierSess
+  split), ageclass Q1+Q5 (Jalali/Gregorian birth dates checked against ICU 1940–2030, register for page lines, `A.SELF_FACTS`, intro
+  stripping, classification/turn-question/post-check). WORKLOG 94–98, PROGRESS 109–113.
+- **FINDING→FIX** Integration found one regression: the ageclass «خودِ سامانه» facts lengthened the system map, and the prompt budget cut
+  the last page field (test_fixes_1015b #12). Fixed at the cause — `AS.cutManifest` compresses the self-facts and registry lines before
+  any page field; the test was not changed.
+- **FINDING** gate31: fail=0 (pytest 2137, 126 page tests, build, host e2e).
