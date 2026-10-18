@@ -103,11 +103,11 @@ const HELPERS = () => {
     for (const n of [1, 2, 4]) { await day(n); await reload(); quiet.push(await E(() => __today().filter(t => /جلسهٔ نخست|کالیبراسیون|پیش‌بینی/.test(t)))); }
     await day(5); await reload();
     const d5 = await E(() => __today().filter(t => /پیش‌بینی/.test(t)));
-    const refl = await E((x) => { APP.S.all('fcast').filter(f => f.due).forEach((f, i) => { f.outcome = i === 1 ? 'نشد' : 'شد'; f.outcomeAt = new Date().toISOString(); APP.S.put(f); }); const ex = APP.S.get(x); const sh = (k) => APP.wsShown(APP.TM[24].ws.filter(f => f.k === k)[0], ex.data); return { outs: ex.data.preds.map(r => r.out || ''), refl: [sh('pattern'), sh('rule')], c: __one(24) }; }, exId);
+    const refl = await E((x) => { APP.S.all('fcast').filter(f => f.due).forEach((f) => { f.outcome = /فروشنده/.test(f.q) ? 'نشد' : 'شد'; f.outcomeAt = new Date().toISOString(); APP.S.put(f); }); const ex = APP.S.get(x); const sh = (k) => APP.wsShown(APP.TM[24].ws.filter(f => f.k === k)[0], ex.data); return { outs: ex.data.preds.map(r => r.out || ''), refl: [sh('pattern'), sh('rule')], c: __one(24) }; }, exId);
     await day(6); await reload();
     const d6 = await E(() => ({ t: __today().filter(t => /کالیبراسیون/.test(t)), c: __one(24) }));
     T(123, d0.n === 3 && d0.due.every(d => d === ymd(5)) && d0.cr.every(d => d === ymd(0)) && d0.refl.every(x => x === false) && d0.c && d0.c.sessions.length === 0 && quiet.every(q => q.length === 0) && d5.length === 1 &&
-      refl.outs.slice(0, 3).join() === 'درست,نادرست,درست' && refl.refl.every(Boolean) && d6.t.length === 1 && d6.c.due === ymd(6) && /روزِ جدا/.test(d6.c.reason) && !/موعدی ندارد/.test(d6.c.dueText), { d0, quiet, d5, refl, d6 });
+      refl.outs.slice(0, 3).join() === 'درست,نادرست,درست' && refl.refl.every(Boolean) && d6.t.length === 1 && d6.c.due === ymd(6) && /روزِ جدا/.test(d6.c.reason) && !/موعدی ندارد/.test(d6.c.dueText), { d0: [d0.n, d0.due, d0.cr, d0.refl, d0.c && d0.c.sessions.length], quiet, d5, outs: refl.outs, refl: refl.refl, d6t: d6.t, d6due: d6.c.due, d6r: d6.c.reason.slice(0, 60) });
     T(138, d0.n === 3 && d0.nd.join() === '3' && d0.ask, { n: d0.n, nd: d0.nd, ask: d0.ask });
   });
 
