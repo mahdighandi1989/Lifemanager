@@ -44,7 +44,7 @@ def scen(d):
     else:
         verdict = ''
     v = verdict
-    ok = bool(v) and 'PASS' in v and not re.search(r'FAIL|PARTIAL', v) and (
+    ok = bool(v) and 'PASS' in v and not re.search(r'FAIL|PARTIAL|ایراد\s*نیست|not zero.?defect', v, re.I) and (
         bool(re.search(r'zero.?defect|no defect|بی.?ایراد|صفر.?ایراد', v, re.I)) or not re.search(r'\bS[123]\b|defect|ایراد', v, re.I))
     STAT.append((sid, meta.get('domain_fa', ''), ok, bool(v)))
     prev, seen, cards = [], set(), []
