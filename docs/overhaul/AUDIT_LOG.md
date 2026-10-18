@@ -4677,3 +4677,18 @@ dated stability, mind-card feed) under way.
   - The old paths are quarantined under `APP.ASSIST.R21_QUARANTINE`.
 - **CHANGE** New `tests/test_tour1_r21_coach.js`: red on the base build, green now; bank VARIANTS_R21 90/90 judged entries pass, 35 assigned to other fixers with a reason. Four old live tests
   (r13–r16) and the r18/r20 coach tests were adapted only where R21 replaces a rule (mock repeats a multi-question reply for the R7 rewrite; R3g re-book), each commented.
+## 2026-10-18 — Pólya tour batch 1, round 21: live + dossier fixer (R3 page side, R4, R6 page side, R9, ADDENDUM items)
+- **FINDING** Corrections did not reach every copy of the same fact: composed records had one source, page copies matched only by identical
+  wording, 🌱/step outcome/look-back copies were never candidates, dependent verdicts/guesses/«حل شد» survived (also after «بله»), deadlines used
+  their title as span, multi-number ✏️ was one fragment. The session dossier was thin and showed raw keys. The turn question after a step
+  outcome fell back to a step that no longer exists (regression of round-20 #142). Records made under the dev clock vanished (A21-21).
+- **CHANGE** a38: one result shape `{changed:[{rec,old,new,why}], ask:[{field,label,old,new}], note}` for every retract path; one source span per
+  message (`src.parts`); same fact by meaning (units, colloquial/written, field keys `field:<id>`); new copy candidates; recorded dependencies
+  (`uses`) set aside with a reason on correction or copy-yes; Persian-date and clause-span deadlines; one fragment per changed number; measure
+  records (`mlog`, `m.pts`) feeding the plot; one `chat_invent` gate (live_new on «ثبتش کن» about the current problem, look-back new problems
+  kept in `b.newProbs`); a one-time rewrite when the reply claims a refused action; reread loop stopped. a40: session dossier from the event
+  log (guesses, plans, all corrections, practice, 🎯, Persian labels, live-problem title/link), chat work of chat-closed problems, plans scoped
+  to their problem. a33: plain deadline refusal line. a39: plot from records. a1: dev-clock records stay visible in dev mode.
+- **CHANGE** Tests: new `apps/learning-architecture/tests/test_tour1_r21_live.js` + `tests/variants/VARIANTS_R21.json`; red on the base build
+  (49 bank entries, 17/17 runner quotes), green after. `test_tour1_r20_live` MT1 #17 expectation replaced (comment «دورِ ۲۱»); `test_graph.js`
+  lists `mlog` as non-graph. Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R21_live_2026-10-18.md`.

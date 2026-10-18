@@ -3083,7 +3083,7 @@
   var STATE_X = "# گزارشِ وضع (همهٔ نوبت‌ها)\n" + CTX17 + "در actions یک {\"do\":\"coach_state\",…} با این فیلدها بده — هر کدام **فقط** وقتی در آخرین پیامِ کاربر هست، و متن را عیناً از حرفِ خودش نقل کن (صفحه با پیامش می‌سنجد؛ نقلِ ساختگی رد می‌شود): " +
     "plan {\"text\":\"…\",\"when\":\"YYYY-MM-DD\"} = کاری که خودش از این پس قصد دارد بکند با زمانش (نه گلایه از عادت، نه موعدی که زیرش است، نه گفتهٔ دیگری)؛ قولِ بی‌تاریخ به خودش («دیگه … نمی‌کنم»، «از این به بعد …») ⇒ \"when\":\"next-session\"؛ اگر همان برنامهٔ پیشین را دوباره گفت ⇒ \"same\":\"plN\"؛ اگر آن کار بر حدسی تکیه دارد که هنوز نیازموده ⇒ \"on_guess\":true؛ اگر همان گامی از مسئلهٔ زنده‌اش است ⇒ \"step\":\"شمارهٔ ۱‌پایهٔ گام\"؛ plan_done {\"id\":\"plN\",\"done\":true|false} = وقتی خودش گفت برنامه‌اش را انجام داد یا نداد؛ defer {\"what\":\"…\"} = آنچه خودش از تو خواست و تو در همین پاسخ عقب انداختی (نه پرسشِ خودت، نه آنچه همین حالا دادی)؛ " +
     "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن؛ step {\"step\":\"شمارهٔ ۱‌پایه یا متنِ گام\",\"done\":\"yes|part|no\",\"what\":\"…\",\"match\":\"yes|part|no\"} = وقتی گفت گامی از مسئلهٔ زنده‌اش را انجام داد، تاحدی، یا نداد (نه قصدِ آینده)؛ result \"…\" = همراهِ said:[\"result\"]، عینِ نتیجه‌ای که در همین پیامش گفت (نتیجه‌ای که در پیامش نیست رد می‌شود)؛ guess_res {\"id\":\"gN\",\"res\":\"refuted|confirmed\"} = وقتی همین پیامش نتیجهٔ آزمودنِ حدسی را می‌گوید که پیش‌تر گفته بود؛ " +
-    "retract {\"msg\":\"همان جمله/عبارتِ عینی از پیامِ پیشینِ خودش که اصلاح می‌کند\",\"key\":\"کدام واقعیت (guess:gN|plan:plN|datum:نام|step:N|ans|lesson)\",\"what\":\"guess|plan|step|ans|said|fact|form|lesson\",\"fix\":\"عینِ مقدارِ درست از همین پیامش\",\"old\":\"(اختیاری) همان بخشِ نادرست درونِ msg\"} = فقط وقتی خودش حرفِ پیشینِ خودش را اصلاح می‌کند («اشتباه گفتم/نوشتم»، «منظورم … بود»، «نه، … درسته»، «پس جوابم غلط بود»، «اون … رو اصلاح کن») — نه کارِ بیرونی که اشتباه کرد، نه ایده یا تصمیمِ تازه، نه اشتباهِ دیگری یا تو؛ صفحه می‌سنجد و فقط همان بخش (همان کلید) را عوض می‌کند (پیشین در تاریخچه می‌ماند) و نتیجه را در نوبتِ بعد در «# اصلاحی که صفحه انجام داد/نپذیرفت» می‌گوید — تا آن نیامده نگو «عوض شد/درست شد».";
+    "retract {\"msg\":\"همان جمله/عبارتِ عینی از پیامِ پیشینِ خودش که اصلاح می‌کند\",\"key\":\"کدام واقعیت (guess:gN|plan:plN|datum:نام|step:N|ans|lesson|deadline:dN|field:شناسهٔ فیلدِ صفحه)\",\"what\":\"guess|plan|step|ans|said|fact|form|lesson\",\"fix\":\"عینِ مقدارِ درست از همین پیامش\",\"old\":\"(اختیاری) همان بخشِ نادرست درونِ msg\"} = فقط وقتی خودش حرفِ پیشینِ خودش را اصلاح می‌کند («اشتباه گفتم/نوشتم»، «منظورم … بود»، «نه، … درسته»، «پس جوابم غلط بود»، «اون … رو اصلاح کن») — نه کارِ بیرونی که اشتباه کرد، نه ایده یا تصمیمِ تازه، نه اشتباهِ دیگری یا تو؛ صفحه می‌سنجد و فقط همان بخش (همان کلید) را عوض می‌کند (پیشین در تاریخچه می‌ماند) و نتیجه را در نوبتِ بعد در «# اصلاحی که صفحه انجام داد/نپذیرفت» می‌گوید — تا آن نیامده نگو «عوض شد/درست شد».";
   AS.COACH_STATE_X = STATE_X;
   AS.promptFilters.push(function (outs, s, msg) {
     var out = outs.slice(), mt = String(msg || "").trim(), auto = /^\[سامانه/.test(mt);
@@ -3561,7 +3561,7 @@
      هست + نشانهٔ کوتاهِ «نادرست ⇐ درست» در همین پیام («… بود»، «نه، …»، «غلط/اشتباه …»، «X رو Y کن») — نه فهرستِ بستهٔ عبارت‌ها (مدل‌ها ردهٔ ۴: «پس جوابم
      غلط بود!»)؛ «اشتباه کردم» ِ تنها (کارِ بیرونی) و پرسش («جوابم غلط بود؟») اصلاح نیستند؛ نوبتِ ✏️ («[اصلاحِ پیامِ قبلی] …») خودش اصلاح است. */
   var WHAT19b = /^(?:guess|plan|step|ans|said|fact|form)$/;
-  var WHAT20 = { guess: "guess", plan: "plan", step: "step", ans: "ans", said: "said", fact: "fact", form: "form", lesson: "lesson", datum: "fact", data: "fact", result: "ans", answer: "ans", verdict: "ans", deadline: "plan", reminder: "plan", promise: "plan" };
+  var WHAT20 = { guess: "guess", plan: "plan", step: "step", ans: "ans", said: "said", fact: "fact", form: "form", lesson: "lesson", datum: "fact", data: "fact", result: "ans", answer: "ans", verdict: "ans", deadline: "plan", reminder: "plan", promise: "plan", field: "fact" };
   function whatOf20(x) { var w = String(x.what || "").trim().toLowerCase(), kc = String(x.key || "").trim().toLowerCase().split(":")[0]; return WHAT20[w] || WHAT20[kc] || ""; }
   var EDIT20 = /^\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]/;
   AS.EDIT_RE = EDIT20;
@@ -3684,6 +3684,11 @@
     var c0 = cl[ci], at = use.indexOf(c0); return at < 0 ? null : use.slice(0, at) + fx + use.slice(at + c0.length);
   }
   AS.lessonSub20 = lessonSub20;
+  /* R3 (دورِ ۲۱، C21-5): پیش‌نویسِ کهنه و جای‌نگه‌دار نامزدِ اصلاح نیست — برچسبِ شناسه‌مانند («lpNewS»)، متنِ نمونه («مثلاً …»)، یا فیلدی که مقدارش دیگر همان نیست */
+  function fillOk21(f) { var lb = String((f && f.label) || ""); if (!lb || /^[A-Za-z0-9_\-]+$/.test(lb) || /^مثلاً|^مثلا|…$/.test(lb)) return false;
+    try { var st = A.state || {}; if (st.view === f.view && String(st.arg) === String(f.arg)) { var x = fieldBySig(f.sig); if (x && String(x.value) !== String(f.val) && String(x.value) !== String(f.pending || "")) return false; } } catch (e) { }
+    return true; }
+  AS.fillOk21 = fillOk21;
   function retractApply(s, R) {
     var C = s.coach = s.coach || {}, ch = [], pend = [], chS = [], askS = [], notes = [], ctx = { by: R.curId, from: R.srcId, what: R.what }, cu = String(R.cur.text || ""), srcT = String(R.src.text || "");
     var put = function (rec, o, n, why, line) { chS.push({ rec: rec, old: clip(plainTx(o == null ? "" : String(o)), 160), "new": clip(plainTx(n == null ? "" : String(n)), 160), why: why || "" }); ch.push(line || chLine20(rec, o, n)); };
@@ -3723,7 +3728,9 @@
     if (C.guess && fromMsg(C.guess, R) && !(C.guesses || []).some(function (g) { return qNorm(g.text) === qNorm(C.guess.text); }) && aff("guess", C.guess.text, [])) { var gv = sub(C.guess.text, R.what === "guess"); if (gv != null && gv !== C.guess.text) { corrPush(C.guess, C.guess.text, gv, ctx); put("حدس", C.guess.text, gv); C.guess.text = clip(gv, 300); } }
     /* C20-4: حدسی که «تأیید/رد» اش از همان پیامِ اصلاح‌شده آمد، یا خودِ متنش اصلاح شد ⇒ سرانجامش دیگر برقرار نیست (نیازِ وارسیِ دوباره؛ پیشین در تاریخچه) */
     (C.guesses || []).forEach(function (g) { if (!g || !g.res) return; var byMsg = g.resKey && g.resKey === mkey(R.src.text), byText = g.rebook20 === R.curId;
-      if (!byMsg && !byText) return; corrPush(g, g.res, "", Object.assign({ field: "res" }, ctx)); var oR = g.res; g.res = ""; g.resRecheck = { at: nowIso(), was: oR, by: R.curId };
+      /* R3d سمتِ مربی (دورِ ۲۱، بانک #۶۲): آزمونی که دادهٔ اصلاح‌شده را به کار برد — مقدارِ نادرست در پیامِ نتیجهٔ آزمون یا در خودِ حدس آمده بود */
+      var oldV = D21 && D21.o ? D21.o : R.frag, byData = /^(?:fact|ans|said)$/.test(R.what) && !!oldV && (hasTok20(String(g.resKey || ""), oldV) || hasTok20(String(g.text || ""), oldV) || hasTok20(String(g.test || ""), oldV));
+      if (!byMsg && !byText && !byData) return; corrPush(g, g.res, "", Object.assign({ field: "res" }, ctx)); var oR = g.res; g.res = ""; g.resRecheck = { at: nowIso(), was: oR, by: R.curId };
       put("سرانجامِ حدسِ «" + clip(plainTx(g.text), 40) + "»", oR === "confirmed" ? "تأیید شد" : "رد شد", "نیازِ آزمونِ دوباره", "داده‌ای که آزمون به کارش برد عوض شد", "سرانجامِ حدسِ «" + clip(plainTx(g.text), 40) + "» («" + (oR === "confirmed" ? "تأیید شد" : "رد شد") + "») دیگر برقرار نیست — با مقدارِ درست دوباره آزموده شود"); });
     /* برنامه‌ها (+ موعد و یادآورِ پیگیری‌اش) */
     var pS = (s.plans || []).filter(function (q) { return fromMsg(q, R); }).map(function (q) { return { k: "plan:" + q.id, span: q.text }; });
@@ -3778,7 +3785,7 @@
       b.chkSup = { at: nowIso(), by: R.curId, from: R.srcId, verdictPrev: b.verdict, note: "اصلاح شد ⇐ حکمِ «وارسی شد» روی داده‌ای بود که خودش اصلاح کرد («" + clip(R.frag, 60) + "» ⇐ «" + clip(R.fix, 60) + "»)" }; b.verdict = "unverified"; b.chkBy = "superseded"; S.put(x.pg);
       verdictMoved.push(x.r.p.id); put("حکمِ وارسیِ «" + clip(x.r.p.title, 40) + "»", "وارسی شد", "نیازِ وارسیِ دوباره", "داده‌ای که به کارش رفت عوض شد", "حکمِ وارسیِ «" + clip(x.r.p.title, 40) + "» دیگر «وارسی شد» نیست — داده‌ای که به کارش رفت عوض شد؛ با مقدارِ درست دوباره وارسی شود"); }); } catch (e) { console.warn(e); }
     /* فرم‌هایی که کنشِ دستیار در آن نوبت پر کرد */
-    (s.fills || []).forEach(function (f) { if (!fromMsg(f, R)) return; if (!(R.what === "form" || over(f.val) === true || (over(f.val) == null && rel19b(f.val, R.frag)))) return; var v = sub(f.val, R.what === "form"); if (v == null || v === f.val) return;
+    (s.fills || []).forEach(function (f) { if (!fromMsg(f, R) || !fillOk21(f)) return; if (!(R.what === "form" || over(f.val) === true || (over(f.val) == null && rel19b(f.val, R.frag)))) return; var v = sub(f.val, R.what === "form"); if (v == null || v === f.val) return;
       var st = A.state || {}, here = st.view === f.view && String(st.arg) === String(f.arg), x = here ? fieldBySig(f.sig) : null, o = f.val;
       corrPush(f, o, v, ctx);
       if (x && String(x.value) === o) { setField19b(x, v); f.val = v; delete f.pending; put("فیلدِ «" + clip(f.label, 40) + "»", o, v); }
@@ -3959,7 +3966,7 @@
     (C.guesses || []).forEach(function (g) { out.push({ at: g.at, t: "حدسِ " + g.id + " «" + clip(plainTx(g.text), 60).replace(/[«»]/g, "") + "»" }); });
     (s.plans || []).forEach(function (q) { if (planOpen(q)) out.push({ at: q.at, t: "برنامهٔ " + q.id + " «" + clip(plainTx(q.text), 60).replace(/[«»]/g, "") + "»" }); });
     /* RO1 (C20-8): برچسبِ خام (شناسهٔ فیلد مثلِ «lpNewS») یا متنِ نمونه («مثلاً …») نامزد نیست — فقط فیلدی با برچسبِ خوانا */
-    (s.fills || []).forEach(function (f) { var lb = String(f.label || ""); if (!lb || /^[A-Za-z0-9_\-]+$/.test(lb) || /^مثلاً|^مثلا|…$/.test(lb)) return; out.push({ at: f.at, t: "فیلدِ «" + clip(lb, 30).replace(/[«»]/g, "") + "» = «" + clip(f.val, 40).replace(/[«»]/g, "") + "»" }); });
+    (s.fills || []).forEach(function (f) { var lb = String(f.label || ""); if (!fillOk21(f) || !lb || /^[A-Za-z0-9_\-]+$/.test(lb) || /^مثلاً|^مثلا|…$/.test(lb)) return; out.push({ at: f.at, t: "فیلدِ «" + clip(lb, 30).replace(/[«»]/g, "") + "» = «" + clip(f.val, 40).replace(/[«»]/g, "") + "»" }); });
     try { chatClosed().forEach(function (x) { if (x.b && x.b.use && (x.L.chat || {}).sess === s.id) out.push({ at: String(x.b.at || ""), t: "درسِ بازنگری «" + clip(plainTx(x.b.use), 50).replace(/[«»]/g, "") + "»" }); }); } catch (e) { }
     if (C.stmt && !AS.notProblem(C.stmt)) out.push({ at: "", t: "صورتِ مسئلهٔ گفت‌وگو «" + clip(plainTx(C.stmt), 50).replace(/[«»]/g, "") + "»" });
     try { var pid = sessPid(s); if (pid) lsteps(pid).forEach(function (st, i) { var o = st && (st.chatRep || (st.out && st.out.from === "chat" ? st.out : null)); if (o) out.push({ at: String(o.at || ""), t: "نتیجهٔ گامِ " + fa(i + 1) + " «" + clip(plainTx(st.text), 40).replace(/[«»]/g, "") + "»" }); }); } catch (e) { }
@@ -3992,7 +3999,7 @@
     var own = ownText(mt);
     /* ۲) همین پیام شاید حرفِ خودش را اصلاح می‌کند ⇒ راهِ گزارش (مدل داوری می‌کند؛ صفحه پیش از گزارش چیزی برنمی‌گرداند و نتیجه را نوبتِ بعد می‌گوید) */
     if (!edit && corrAsk20(mt)) { var cc = corrCands(s);
-      out.push("# اصلاحِ پیامِ پیشین (شاید)\n" + CTX18 + "این پیام شاید حرفِ پیشینِ خودش را اصلاح می‌کند. اگر چنین است و روشن است کدام، {\"do\":\"coach_state\",\"retract\":{\"msg\":\"تکهٔ عینیِ پیامِ پیشینش (همان جمله/عبارت)\",\"key\":\"کدام واقعیت: guess:gN|plan:plN|datum:نام|step:N|ans|lesson\",\"what\":\"guess|plan|step|ans|said|fact|form|lesson\",\"fix\":\"عینِ مقدارِ درست از همین پیام\"}} بده — صفحه می‌سنجد و فقط همان بخش را عوض می‌کند و نتیجه را در نوبتِ بعد به تو می‌گوید؛ تا آن نتیجه نیامده نگو «عوض شد/درست شد» (فقط بگو اصلاح را فرستادی). " +
+      out.push("# اصلاحِ پیامِ پیشین (شاید)\n" + CTX18 + "این پیام شاید حرفِ پیشینِ خودش را اصلاح می‌کند. اگر چنین است و روشن است کدام، {\"do\":\"coach_state\",\"retract\":{\"msg\":\"تکهٔ عینیِ پیامِ پیشینش (همان جمله/عبارت)\",\"key\":\"کدام واقعیت: guess:gN|plan:plN|datum:نام|step:N|ans|lesson|deadline:dN|field:شناسهٔ فیلد\",\"what\":\"guess|plan|step|ans|said|fact|form|lesson\",\"fix\":\"عینِ مقدارِ درست از همین پیام\"}} بده — صفحه می‌سنجد و فقط همان بخش را عوض می‌کند و نتیجه را در نوبتِ بعد به تو می‌گوید؛ تا آن نتیجه نیامده نگو «عوض شد/درست شد» (فقط بگو اصلاح را فرستادی). " +
         "اگر روشن نیست کدام یا مقدارِ درست را نگفته، فقط با پرسشِ «کدام را اصلاح کنم؟»" + (cc.length ? " این نامزدها را پیش بگذار: " + cc.join("، ") : " همان را جویا شو") + " و retract نده؛ اگر دربارهٔ کارِ بیرونی، ایدهٔ تازه یا اشتباهِ تو یا دیگری است، retract نده."); }
     /* ۳) پشتیبان: پیامِ پیشینش نشانهٔ اصلاح داشت و پاسخِ آن گزارشِ وضع نداشت ⇒ فقط پرسش (هرگز برگرداندن) */
     try { var pp = pairPrev(s, mt); if (!edit && pp && !EDIT20.test(String(pp.u.text || "")) && corrAsk20(pp.u.text) && (pp.rep.actions || []).indexOf("coach_state") < 0 && !corrAsk20(mt)) { var c2 = corrCands(s);

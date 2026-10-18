@@ -249,6 +249,14 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
       for (let i = 0; i < 80 && (__calls.length === n0 || APP.ASSIST.busy()); i++) await new Promise(r => setTimeout(r, 100)); await new Promise(r => setTimeout(r, 300)); return (__calls.slice(n0)[0] || {}).user || ''; });
     const blE = blockOf(x, /^# اصلاحی که صفحه/);
     chk(!blE || !/"changed":\[\]/.test(blE) || !/اصلاح شد|حدس/.test(blockOf(x, /^# اصلاحِ پیامِ قبلی — صفحه/)), 'A21-20: the ✏️ result block does not say «nothing changed» while the page lines of the same prompt list changes ' + JSON.stringify({ res: blE.slice(0, 400), page: blockOf(x, /^# اصلاحِ پیامِ قبلی — صفحه/).slice(0, 300) }));
+    // live handoff: حدسِ گفت‌وگو که آزمونش دادهٔ اصلاح‌شده را به کار برد کنار می‌رود (#۶۲ سمتِ مربی)؛ کلیدهای deadline و field در فهرستِ کلید
+    await wipe(); await fresh(); await turn('یه مسئله دارم که می‌خوام حلش کنم: رسید قسط.', 'بگو.');
+    await turn('رسیدش ۱۲ مهر بود؛ مبلغ ۳ میلیون؛ امضای معاون داشت', 'حدست؟');
+    await turn('حدسم اینه که قبل از مهلت رسیده', 'چطور می‌آزمایی؟', [cs({ guess: { text: 'قبل از مهلت رسیده' } })]);
+    await turn('مهلت ۱۵ مهر بود و رسید ۱۲ مهر، پس حدسم درست بود', 'خوب.', [cs({ guess_res: { id: 'g1', res: 'confirmed' } })]);
+    u = await turn('تاریخش ۱۴ مهر بود نه ۱۲', 'فرستادم.', RT({ msg: 'رسیدش ۱۲ مهر بود', what: 'fact', fix: '۱۴ مهر' })); s = await st();
+    chk(s.guesses[0] && s.guesses[0].res === '' && (s.ret.changes || []).some(t => /سرانجامِ حدس/.test(t)), 'live handoff/#62 coach side: a chat guess whose test used the corrected date is set aside with its reason ' + JSON.stringify({ g: s.guesses, ch: s.ret && s.ret.changes }));
+    chk(/deadline:dN\|field:/.test(head(u.user)) || /deadline:dN\|field:/.test(u.sys), 'live handoff: the retract key list names deadline and field:<id> ' + (head(u.user).match(/کدام واقعیت[^"]{0,120}/) || [''])[0]);
     for (const i of [55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 68, 74, 76, 78, 79, 80, 81, 82, 84, 85, 86, 87, 88, 89, 90, 92])
       NC(i, 'R3 b/c/d/e/f-✏️/h-bubble/copy-ask (same-fact, candidates, dependencies, deadlines, plot, ✏️ multi-span): live+dossier fixer (a38/a40/a33) — the coach passes key/frag/fix to APP.liveRetract and reads its {changed, ask, note} verbatim (checked in #72, A21-20)');
   });

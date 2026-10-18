@@ -55,3 +55,4 @@ problem/related solved/after failure), or a practice block that lists a case; ot
 - Whole page suite 113 tests green (r2_live flaked once under 8-way load, green alone); `python -m pytest tests/ -q` without the browser file 1981 passed.
 - Old tests adapted only where R21 replaces a rule: r20 coach #6 (R3g), r18 coach + r13/r14/r15_live/r16_live mocks repeat a multi-question reply for the R7 rewrite.
 - Request (live): export `A.liveKnownQs(pid)` (a38 `knownQs`) so the R7 two-question check can recognise every page question; the coach now keeps a session list of the page's two-sentence questions seen in prompts.
+- After merging live+dossier (ab796165): done the items it left — retract key list names `deadline:dN|field:<id>` (`field` ⇒ fact), chat guesses whose test used the corrected datum are set aside, stale/placeholder fills are never candidates (`AS.fillOk21`); result re-book and «از کجا؟» were already in. Whole page suite after the merge: 114/114 green.
