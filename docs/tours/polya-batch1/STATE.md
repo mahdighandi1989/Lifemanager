@@ -35,7 +35,7 @@
    - classify (R4 + R6)
    - age (R5)
    - today (R7)
-   برگهٔ کار `runners/FIX24.md` را به سبکِ FIX23 بنویس.
+   برگهٔ کار `runners/FIX24.md` را به سبکِ FIX23 بنویس. در آن بگو: پیوندِ `frontend/node_modules` (یا هر پیوندِ ابزار) هرگز کامیت نشود؛ پیش از کامیت `git status` را برای حالتِ 120000 ببین (AUDIT_LOG 2026-10-19).
 4. ادغام به ترتیبِ correction ⇐ story ⇐ loop ⇐ classify ⇐ age ⇐ today. سپس `gate_wt.sh`. فقط با fail=0 ⇒ main.
 5. دورِ ۲۵: RUNNER25 بر پایهٔ RUNNER24. اول شاخهٔ منفیِ حلقه و R2.
 
