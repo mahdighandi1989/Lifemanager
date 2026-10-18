@@ -36969,12 +36969,18 @@ APP.goFromURL = function (q) {
   /* به ترتیبِ جای خودش در مرحله (هم‌جا‌ترین اول)، نه با شمارِ پیام؛ تکراری نه */
   /* دورِ ۱۱ (K7): ضرب‌المثلی که متنش همین حالا در همین بلوک آمده (قارچ‌ها در سطرِ بازنگری، «جایی که اراده‌ای هست…» در «گامِ کوچک») دوباره نمی‌آید */
   function provNorm(t) { return String(t || "").replace(/[\s‌«»"'.،,؛:!…—\-()]+/g, ""); }
+  /* نوبت = همان پیامِ کاربر (شناسه‌اش، وگرنه متنش)؛ before = C.prov پیش از این نوبت؛ picks = ضرب‌المثلِ هر مرحله در همین نوبت (بلوکِ مربی و بلوکِ تور جدا) */
+  function provKey(s, mt) { var um = lastUserMsg(s), mid = um && String(um.text || "").trim() === String(mt || "").trim() ? msgId19b(um) : ""; return mid || mkey(mt); }
+  function provTurn(s, mt) { var T = s && s.coach && s.coach.provTurn; return T && T.k === provKey(s, mt) && T.picks ? T : null; }
+  function provUsed(T, ph) { return T.before.concat(Object.keys(T.picks).filter(function (k) { return k !== ph; }).map(function (k) { return T.picks[k]; })); }
   function pickProverb(ph, s, cls, mt, avoid) {
     var av = provNorm(avoid), seenIn = function (x) { return [x.q, x.id ? provText(x.id) : ""].some(function (t) { var k = provNorm(t).slice(0, 18); return k.length >= 8 && av.indexOf(k) >= 0; }); };
     var pv = proverbs(ph, provKeys(ph, cls, mt)).filter(function (x) { return !av || !seenIn(x); }); if (!pv.length) return null;
     /* دورِ ۱۲ (L6، s25 p6، s26 p4): ضدِ ضرب‌المثل (PROV_OPP) هم نباید نقلی باشد که همین حالا در بلوک آمده — آن‌گاه ضرب‌المثل بی ضد می‌آید */
     var oppIn = function (x) { var o = x.id && PROV_OPP[x.id]; if (!o || !av) return false; var k = provNorm(provText(o)).slice(0, 18); return k.length >= 8 && av.indexOf(k) >= 0; };
-    var used = (s && s.coach && s.coach.prov) || [], fresh = pv.filter(function (x) { return used.indexOf(x.id || x.q) < 0; }), pool = fresh.length ? fresh : pv;
+    /* دورِ ۲۱ (پسرفتِ H3-proverb): هم‌توان در ساختِ چندبارهٔ پرامپتِ همان نوبت (AS.prompt ⇒ userPrompt تا ۴ بار وقتی صفحه بلند است) — پیش‌تر ساختِ نخست
+       ضرب‌المثلِ مرحله (C151) را در C.prov «مصرف» می‌کرد و پرامپتِ نهایی ضرب‌المثلِ دیگری (C152) می‌گرفت؛ حالا «تکراری» فقط نسبت به نوبت‌های پیشین سنجیده می‌شود */
+    var T0 = provTurn(s, mt), used = T0 ? provUsed(T0, ph) : (s && s.coach && s.coach.prov) || [], fresh = pv.filter(function (x) { return used.indexOf(x.id || x.q) < 0; }), pool = fresh.length ? fresh : pv;
     var pick = pool[0];   // ضرب‌المثلِ لحظه (مثلاً ته‌نشینی پس از گیر — B14) عوض نمی‌شود؛ فقط ضدِ تکراری‌اش نمی‌آید
     return oppIn(pick) ? Object.assign({}, pick, { noOpp: true }) : pick;
   }
@@ -37246,7 +37252,8 @@ APP.goFromURL = function (q) {
       var opp = !pv.noOpp && PROV_OPP[pv.id] && provText(PROV_OPP[pv.id]);
       /* دورِ ۱۰ (J1): ضرب‌المثل هرگز «⇐ همان پرسش» ندارد — پرسشِ نوبت فقط یکی است */
       L.push("- ضرب‌المثلِ همین مرحله (پولیا، «حکمتِ ضرب‌المثل‌ها»): «" + clip(pv.q, 140) + "»" + (pv.n ? " — " + clip(pv.n, 60) : "") + ". فقط اگر به حالِ همین لحظه می‌خورد، یک بار و کوتاه، کنارِ همان پرسشِ نوبت (نه پرسشی تازه)؛ هر ضرب‌المثلی ضدی هم دارد" + (opp ? " («" + clip(opp, 90) + "»)" : "") + " و ضرب‌المثل‌ها قاعدهٔ خطاناپذیر نیستند (C150).");
-      if (s && !o.dry) { var C0 = s.coach = s.coach || {}; C0.prov = (C0.prov || []).concat([pv.id || pv.q]).slice(-30); }
+      if (s && !o.dry) { var C0 = s.coach = s.coach || {}, T1 = provTurn(s, mt) || { k: provKey(s, mt), before: (C0.prov || []).slice(), picks: {} };
+        T1.picks[ph] = pv.id || pv.q; C0.provTurn = T1; C0.prov = provUsed(T1, "").slice(-30); }
     }
     if (o.closed) L.push("- مسئلهٔ «" + clip(o.closed, 60) + "» بسته شده است؛ حدس یا ادعای تازه‌اش مسئلهٔ تازه است: همین مربی، از «فهم» — اثبات یا رد؛ اگر می‌خواهد نگهش دارد {\"do\":\"chat_invent\",\"statement\":\"عینِ حرفش\",\"kind\":\"find|prove|pod\"}.");
     if (o.mid) L.push(o.mid);
