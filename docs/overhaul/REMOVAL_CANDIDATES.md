@@ -292,3 +292,7 @@ The old function is kept reachable as `A.masteryCountOnly` in `a1_base.js`; noth
 - **چرا:** DECISIONS_R20 RO6 — یک دفترِ رویداد (`A.EVLOG`) به ترتیبِ زمانِ کنش، یک منبعِ وضع، رندرِ نوع‌دار، همان نشانه‌های کارنامه، پرونده برای گفت‌وگوی بی مسئله.
 - **وضع:** در همان پرونده مانده و از `APP.LIVE_R20_QUARANTINE.dossier` در دسترس است، ولی صدا زده نمی‌شود.
 - **حذفِ واقعی:** فقط با تأییدِ صریحِ مالک.
+## 2026-10-18 — practice keyword consent and keyword prompt gate (learning-architecture, round-20 practice)
+`start_practice` consent is now the model's validated report (`consent {quote, kind}`, DECISIONS_R20 RO7) and the practice prompt block depends only on an open case.
+The replaced paths are kept reachable in `a41_practice.js`: `APP.PR.consentKwR19c` (keyword detector) and `APP.PR.R19C_QUARANTINE.promptHook` (keyword-gated block). Nothing calls them.
+Also unchanged but now unused for display: P3 records closed by a practice case keep `done` with `closedBy:"practice"` (never deleted). Delete only with the owner's approval.

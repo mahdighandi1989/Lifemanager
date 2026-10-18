@@ -1173,6 +1173,10 @@ button, .btn, .nav, .chip, select, input { overflow-wrap: normal; }
 
 /* ساعتِ آزمایشی (دورِ ۱۹c، LT8): فقط در حالتِ توسعه با جابه‌جاییِ روز دیده می‌شود */
 .clock-flag{position:fixed;bottom:8px;left:8px;z-index:9999;background:#7a1f1f;color:#fff;padding:4px 10px;border-radius:8px;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+/* دورِ ۲۰ (RO9، C20-14): نشانِ ساعتِ آزمایشی هرگز روی «↩ برگرد» نمی‌افتد — نشان کلیک نمی‌گیرد و دکمهٔ شناور بالاتر از آن می‌نشیند */
+.clock-flag{pointer-events:none;max-width:calc(100vw - 16px)}
+html:has(#llaClockFlag) .backfab{bottom:46px}
+@media (max-width:860px){html:has(#llaClockFlag) .backfab{bottom:44px}}
 tr.card-retired td{opacity:.6}
 
 /* دورِ ۲۰ (RO5): ویرایشگرِ «✏️ اصلاح» درونِ حبابِ سبزِ کاربر — متن در هر دو پوسته خوانا (پیش‌تر سفید روی سفید) */

@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T12:00:00Z"
 created_at: "2026-10-17T12:00:00Z"
-updated_at: "2026-10-17T12:00:00Z"
+updated_at: "2026-10-18T12:00:00Z"
 merged_from: []
 ---
 
@@ -59,3 +59,16 @@ sched.register({ kind: "fcast", today: true, remind: true, types: ["fcast"],
 
 ## 🔗 References
 - مرتبط: two-sided-needs-judging-for-scenario-tours
+
+## Update 2026-10-18
+**One act, one owner of its schedule.** A single scheduler is not enough when the *same act* is stored by several features (a practice case, a fixed 1-3-7 cycle
+of three separate dated records, a spaced review of the same problem, a reconstruction card, a chat plan and a "small step" card). Each kept its own dates, so a
+session logged in one never closed the others: stale "day 1 / day 3" lines stayed on Today for weeks and the owning record said "no due date".
+- Pick ONE owner per act (here: the practice case) and make every linked record *derived state*: on every save, recompute the owner's plan and write the linked records from it
+  (exactly one visible current step, later steps "held", passed/superseded ones closed with a reason — never deleted).
+- Keep the cross-check function (the owner's own due list) independent of de-duplication: mark the owner's entry `dupOf` the visible record instead of dropping it.
+- Late success is evidence too: a recall that succeeds *after* its window passed every shorter step and earns the next rung above the interval actually survived;
+  only a late *failure* restarts the cycle.
+- Two-stage forms: a prediction must become its dated record the moment it is written (draft included), and questions that only make sense after outcomes must be
+  hidden until an outcome exists — otherwise records are dated after their own result.
+- Link "same act" across features only by content overlap with a one-click confirm (identical text = automatic); never auto-link unrelated items.

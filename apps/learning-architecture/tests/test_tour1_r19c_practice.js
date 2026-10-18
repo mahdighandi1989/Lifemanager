@@ -26,7 +26,7 @@ const HELPERS = () => {
   window.__ex = (tid, data, o) => { o = o || {}; const ex = APP.newEx(tid, o.topic || ''); Object.assign(ex, o.f || {}); ex.data = Object.assign(ex.data || {}, data || {}); ex.rubric = o.rubric || ex.rubric || []; if (o.draft) { S.put(ex); return ex.id; } ex.status = 'done'; S.put(ex); APP.onExDone(ex); return ex.id; };
   window.__finish = (exId, data, o) => { const ex = S.get(exId); Object.assign(ex.data, data || {}); if (o && o.rubric) ex.rubric = o.rubric; ex.status = 'done'; S.put(ex); APP.onExDone(ex); return ex.prc; };
   window.__case = (id) => { const c = S.get(id); if (!c) return null; const R = PR.eval(c); return { id: c.id, tid: c.tid, subj: c.subj, state: c.state, due: c.due, until: c.until, reason: c.reason, src: c.src, next: R.next || null,
-    sessions: (c.sessions || []).map(s => ({ d: s.d, ok: s.ok, role: (c.roles || {})[s.d], late: (c.late || {})[s.d], meas: s.meas, ex: s.ex, what: s.what })), stable: c.stable, withdrawn: c.withdrawn || [], hist: (c.hist || []).map(e => ({ d: e.d, ev: e.ev, from: e.from, to: e.to, why: e.why })),
+    sessions: (c.sessions || []).map(s => ({ d: s.d, ok: s.ok, role: (c.roles || {})[s.d], late: (c.late || {})[s.d], meas: s.meas, ex: s.ex, what: s.what })), stable: c.stable, withdrawn: c.stableOff || c.withdrawn || [], hist: (c.hist || []).map(e => ({ d: e.d, ev: e.ev, from: e.from, to: e.to, why: e.why })),
     claim: c.claim || null, links: c.links || {}, sample: !!c.sample, crit: R.crit, calib: R.calib || null, verdict: R.verdict || null, suggest: R.suggest || null, occ: c.occ || [] }; };
   window.__one = (tid) => PR.cases({ tid })[0] ? __case(PR.cases({ tid })[0].id) : null;
   window.__due = (day) => PR.due(day).map(e => ({ id: e.id, due: e.due, reason: e.reason }));
@@ -161,7 +161,7 @@ const HELPERS = () => {
     await fresh(); await E(() => __freshChat());
     await E(() => __say('بیا برای قضیهٔ فیثاغورس یه برنامهٔ بازیابی بچینیم', 'یک چرخهٔ بازیابیِ ۱، ۳ و ۷ روزه برای «فیثاغورس» شروع کنم؟', []));
     const n1 = await E(() => APP.PR.cases({ tid: 41 }).length);
-    await E(() => __say('آره', 'شروع شد.', [{ do: 'start_practice', tid: 41, topic: 'فیثاغورس' }]));
+    await E(() => __say('آره', 'شروع شد.', [{ do: 'start_practice', tid: 41, topic: 'فیثاغورس', consent: { quote: 'آره', kind: 'yes' } }]));
     await day(1);
     r = await E(() => ({ c: __one(41), n: APP.PR.cases({ tid: 41 }).length, today: APP.dueList().map(d => d.txt) }));
     T(4, n1 === 0 && r.n === 1 && r.c.src === 'assistant' && r.c.subj.k === 'topic' && /فیثاغورس/.test(r.c.subj.t) && r.today.some(t => /برگه سفید روز ۱/.test(t) && /فیثاغورس/.test(t)), { n1, r });
@@ -219,7 +219,7 @@ const HELPERS = () => {
     const pid11 = await E(() => __live('به چند طریق از ۲۰ پله؟'));
     await E((pid) => { const c = APP.PR.startFrom(21, APP.PR.subj('live', pid), 'live', false); }, pid11);
     await day(2); await E(() => __freshChat());
-    await E((pid) => __say('یه آزمون برای حدسِ فیبوناچی بذار', 'باشه.', [{ do: 'start_practice', tid: 21, pid }]), pid11);
+    await E((pid) => __say('یه آزمون برای حدسِ فیبوناچی بذار', 'باشه.', [{ do: 'start_practice', tid: 21, pid, consent: { quote: 'یه آزمون برای حدسِ فیبوناچی بذار', kind: 'request' } }]), pid11);
     r = await E(() => ({ n: APP.PR.cases({ tid: 21 }).length, note: APP.ASSIST._prcNote || '', prcs: (APP.ASSIST.cur() || {}).prcs || [], id: APP.PR.cases({ tid: 21 })[0].id }));
     T(11, r.n === 1 && /ادامه یافت/.test(r.note) && r.prcs.includes(r.id), r);
     // 12 — Pouya: viewing a closed case adds no session and does not reopen it

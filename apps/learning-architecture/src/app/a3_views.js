@@ -126,17 +126,19 @@
   /* ---------- خانه ---------- */
   A.dueList = function () {
     var t = A.today(), items = [];
-    var cards = A.dueCards();
+    var cards = A.dueCards().filter(function (c) { return !A.cardInToday || A.cardInToday(c); });   // دورِ ۲۰: نمونهٔ شروع‌نشده و کارتِ پرونده‌دار نه
     var cod = cards.map(function (c) { return c.due || t; }).sort()[0];   // دورِ ۱۹c: کارتِ عقب‌افتاده «عقب‌افتاده از …» می‌گوید
     if (cards.length) items.push({ k: "review", txt: fa(cards.length) + " کارت مرور موعد امروز", sub: "بازیابی پیش از نگاه به پاسخ" + (cod < t ? " · عقب‌افتاده از " + A.fdate(cod) : ""), go: function () { A.go("review"); } });
-    S.all("sched", function (s) { return !s.done && s.due <= t; }).forEach(function (s) {
+    S.all("sched", function (s) { return !s.done && !s.hold && s.due <= t; })   /* دورِ ۲۰: پلهٔ بعدیِ چرخه‌ای که پرونده‌اش گامِ جاری را دارد (hold) سطر نمی‌گیرد */.forEach(function (s) {
       var tp = S.get(s.topic);
-      items.push({ k: "sched", txt: "برگه سفید " + s.label + (tp ? " — " + tp.title : s.title ? " — " + s.title : ""), sub: "چرخه ۱-۳-۷ · موعد " + A.fdate(s.due), go: function () { A.startProto("P3", { sched: s.id, topic: s.topic, preset: { topic: s.title || (tp && tp.title) || "" } }); } });
+      items.push({ k: "sched", sid: s.id, sprc: s.prc || "", txt: "برگه سفید " + s.label + (tp ? " — " + tp.title : s.title ? " — " + s.title : ""), sub: "چرخه ۱-۳-۷ · موعد " + A.fdate(s.due), go: function () { A.startProto("P3", { sched: s.id, topic: s.topic, preset: { topic: s.title || (tp && tp.title) || "" } }); } });
     });
     function lastRun(pid) { var r = S.all("pr", function (x) { return x.pid === pid && x.status === "done"; })[0]; return r ? A.localDay(r.created) : null; }
-    var p2 = lastRun("P2"); if (p2 !== t) items.push({ k: "p", txt: "قرائت ۱۰ دقیقه‌ای امروز", sub: "یک رخداد امروز از پشت یک عینک علمی", go: function () { A.startProto("P2"); } });
+    /* دورِ ۲۰ (RO7، B·D16): روال‌های آمادهٔ سامانه فقط پس از نخستین اجرای خودش در «امروز» می‌آیند — نه برای هر کاربرِ تازه */
+    var started = function (pid) { return A.routineStarted ? A.routineStarted(pid) : true; };
+    var p2 = lastRun("P2"); if (started("P2") && p2 !== t) items.push({ k: "p", txt: "قرائت ۱۰ دقیقه‌ای امروز", sub: "یک رخداد امروز از پشت یک عینک علمی", go: function () { A.startProto("P2"); } });
     [["P4", 7, "جلسه هفتگی برگه سفید"], ["P5", 7, "تولید هفتگی بازی کارآگاهی"], ["P9", 30, "ممیزی دوحلقه‌ای ماهانه"]].forEach(function (x) {
-      var l = lastRun(x[0]); if (!l || A.daysBetween(l, t) >= x[1]) items.push({ k: "p", txt: x[2], sub: l ? "آخرین اجرا " + A.fdate(l) : "هنوز اجرا نشده", go: function () { A.startProto(x[0]); } });
+      var l = lastRun(x[0]); if (started(x[0]) && (!l || A.daysBetween(l, t) >= x[1])) items.push({ k: "p", txt: x[2], sub: l ? "آخرین اجرا " + A.fdate(l) : "هنوز اجرا نشده", go: function () { A.startProto(x[0]); } });
     });
     var act = S.all("srcq", function (s) { return s.status === "active"; }).length;
     var nn = A.nurseryNew ? A.nurseryNew().length : 0;

@@ -155,7 +155,7 @@
       box.appendChild(ctl);
       if (hint && ["text", "area", "list", "chain", "tree"].indexOf(f.t) < 0) box.appendChild(h("div", { class: "fhint" }, hint));
       // فیلدِ شرطی (when/unless): فقط وقتی دیده و «الزامی» است که شرطش برقرار باشد — مثلاً حالتِ «مسئله» ِ «بیان دیگر» (P11)
-      if (f.when || f.unless) { var vis = function () { box.style.display = A.wsShown(f, data) ? "" : "none"; }; vis(); updaters.push(vis); }
+      if (f.when || f.unless || f.whenFn) { var vis = function () { box.style.display = A.wsShown(f, data) ? "" : "none"; }; vis(); updaters.push(vis); }
       root.appendChild(box);
     });
     root._validate = function () {
@@ -190,7 +190,8 @@
   /* شرطِ نمایشِ فیلد: when = {k, re} (فیلدِ k با الگو بخواند) و unless (نخواند). بی شرط ⇒ همیشه. */
   A.wsShown = function (f, d) {
     function m(c) { var v = (d || {})[c.k]; try { return new RegExp(c.re).test(String(v == null ? "" : v)); } catch (e) { return false; } }
-    return !(f.when && !m(f.when)) && !(f.unless && m(f.unless));
+    var fnOk = true; if (typeof f.whenFn === "function") { try { fnOk = !!f.whenFn(d || {}); } catch (e) { fnOk = true; } }   /* دورِ ۲۰: شرطِ تابعی (مثلاً تأملِ T24 پس از نتیجه) */
+    return fnOk && !(f.when && !m(f.when)) && !(f.unless && m(f.unless));
   };
   var FIELD = {};
   /* فیلدِ محاسبه‌ای: f.calc(data) ⇒ گرهٔ DOM یا متن، با هر تغییرِ همین کاربرگ تازه می‌شود (بازخوردِ قطعی، نه نمره) */
