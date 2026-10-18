@@ -988,12 +988,12 @@
    "file": "frontend/src/pages/LearningArchitecturePage.jsx",
    "parametric": false,
    "alias_of": "",
-   "lines": 226,
-   "buttons": 7,
+   "lines": 260,
+   "buttons": 8,
    "inputs": 0,
    "forms": 0,
    "links": 0,
-   "api_calls": 14,
+   "api_calls": 22,
    "testids": 1,
    "tabs": [],
    "subpages": [],
@@ -1207,13 +1207,13 @@
    "file": "frontend/src/pages/AISettings.jsx",
    "parametric": false,
    "alias_of": "",
-   "lines": 477,
+   "lines": 486,
    "buttons": 9,
    "inputs": 10,
    "forms": 0,
    "links": 0,
    "api_calls": 0,
-   "testids": 20,
+   "testids": 21,
    "tabs": [],
    "subpages": [],
    "reports": {}
@@ -1746,6 +1746,12 @@
     "path": "/api/app-records/{app}/reminders/{key}",
     "methods": [
      "DELETE"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/report-email",
+    "methods": [
+     "POST"
     ]
    },
    {
@@ -3960,7 +3966,9 @@
    "ai_ingestion_service",
    "ai_service",
    "app_mirror_service",
+   "app_reading",
    "app_reminder_service",
+   "app_report_mail",
    "asset_scan_service",
    "asset_to_task_linker",
    "assistant_chat_service",
@@ -4159,13 +4167,13 @@
  "totals": {
   "pages": 44,
   "subpages": 29,
-  "buttons": 180,
+  "buttons": 181,
   "inputs": 87,
   "forms": 15,
   "links": 59,
-  "api_calls": 94,
-  "api_routes": 428,
-  "services": 156,
+  "api_calls": 102,
+  "api_routes": 429,
+  "services": 158,
   "models": 69
  },
  "errors": [],

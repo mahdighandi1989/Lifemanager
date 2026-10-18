@@ -8,13 +8,13 @@
 |---|---|
 | صفحه‌ها | 44 |
 | زیرصفحه‌ها (تب‌ها) | 29 |
-| دکمه‌ها | 180 |
+| دکمه‌ها | 181 |
 | ورودی‌ها | 87 |
 | فرم‌ها | 15 |
 | لینک‌ها | 59 |
-| فراخوانی‌های API در صفحه‌ها | 94 |
-| مسیرهای API | 428 |
-| سرویس‌ها | 156 |
+| فراخوانی‌های API در صفحه‌ها | 102 |
+| مسیرهای API | 429 |
+| سرویس‌ها | 158 |
 | مدل‌ها | 69 |
 
 ## صفحه‌ها و زیرصفحه‌ها
@@ -54,7 +54,7 @@
 | `/import` | داده (ایمپورت و ادغام) | tools | `?tab=import`، `?tab=files`، `?tab=merge` | 1 | 0 | 0 |
 | `/drive-files` | فایل‌های درایو | tools | درِ دیگرِ `/import` | 1 | 0 | 0 |
 | `/merge` | ادغام | tools | درِ دیگرِ `/import` | 1 | 0 | 0 |
-| `/apps/learning-architecture` | معماری یادگیری عمیق | tools | — | 7 | 0 | 14 |
+| `/apps/learning-architecture` | معماری یادگیری عمیق | tools | — | 8 | 0 | 22 |
 | `/apps/:slug` | صفحهٔ افزوده | tools | — | 1 | 0 | 0 |
 | `/settings` | تنظیمات | tools | `?tab=ai`، `?tab=notifications`، `?tab=drive`، `?tab=dev`، `?tab=attention`، `?tab=safety` | 1 | 0 | 0 |
 | `/settings/notifications` | تنظیمات اعلان | tools | درِ دیگرِ `/settings` | 1 | 0 | 0 |
@@ -135,6 +135,7 @@
 | GET | `/api/app-records/{app}/reminders` |
 | POST | `/api/app-records/{app}/reminders` |
 | DELETE | `/api/app-records/{app}/reminders/{key}` |
+| POST | `/api/app-records/{app}/report-email` |
 | GET | `/api/app-records/{app}/usage` |
 | DELETE | `/api/app-records/{app}/{rec_id}` |
 | GET | `/api/assets` |

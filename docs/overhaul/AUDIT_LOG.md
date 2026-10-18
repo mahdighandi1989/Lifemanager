@@ -4620,3 +4620,6 @@ dated stability, mind-card feed) under way.
 - Finding: the longitudinal audit's «standalone forecasts/worry chains never reach Today» was wrong (a31 showed them since 2026-10-14);
   what was missing (overdue date, reminder, cancel on outcome) is now built. Test: `tests/test_tour1_r19c_sched.js`; bank R19c LT1/LT8 37/37.
   Docs: lla WORKLOG (77), PROGRESS 93, handoff `docs/overhaul/handoff-notes/_pending_tour1_R19c_sched_2026-10-17.md`.
+
+## 2026-10-18 — FINDING (supervisor, general)
+- دورِ کاملِ ناظر روی `6c1e625`: pytest/build سبز، inventory بدونِ کاهش. دو آزمونِ `test_learning_architecture_graph_browser` (r11/r12 coach) بدونِ `playwright` در `apps/learning-architecture/node_modules` قرمز می‌شوند (prompt_tap.js `require` بی‌شرط) و با `npm i` سبز؛ مشکلِ محیط، نه کد. شش دست‌به‌دستِ `did` بسته شد (verified). RUNLOG ۲۰۲۶-۱۰-۱۸.

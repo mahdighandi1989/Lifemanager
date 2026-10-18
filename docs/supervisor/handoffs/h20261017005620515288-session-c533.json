@@ -12,5 +12,11 @@
  "what": "تورِ پولیا دورِ ۱۲ (L7): cues_fa برای pr_statistical در territory/maps/s_problem.json (فقط روی صورت/مجهولِ خودِ مسئله)؛ قاعدهٔ E6 بی‌تغییر",
  "procedure": "AGENTS.md: قلمرو از registry",
  "commit": "2214f93",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "general",
+  "at": "2026-10-18T02:29:07Z",
+  "note": "دورِ ۲۰۲۶-۱۰-۱۸: گیتِ کامل روی main (6c1e625) — pytest 2081 سبز (دو آزمونِ مرورگر پس از نصبِ playwright سبز)، build سبز؛ تغییر در سر main همان‌طور که ثبت شده کار می‌کند",
+  "commit": ""
+ }
 }

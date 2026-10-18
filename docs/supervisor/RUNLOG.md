@@ -50,3 +50,15 @@
 - **فوری ۲۰۲۶-۱۰-۱۶:** صف خالی. سه دست‌به‌دستِ `did` در قلمروِ lla-page/sys-territory (۱۷۳b5e5، ۷۱fd0a4) بسنجیده و `verified` شد (build.py بی‌تغییر؛ آزمون‌های mind_report/graph/tour1 همه NO ERRORS). `origin/main` بازنویسی/فورس‌شده بود (تاریخچهٔ نامرتبط با main محلی)؛ main محلی به origin/main بازهم‌تراز شد (پشتیبان: شاخهٔ محلیِ backup/pre-rewrite-main). `supervisor-pending/run-2026-10-11` با main تاریخچهٔ مشترک ندارد ⇒ ریبیس شدنی نیست؛ دست نخورد و حذف نشد.
 
 ناظرِ خودکار (Claude Code routine)
+
+## 2026-10-18 — کامل
+
+- **کارتابل:** ۰ برگهٔ بی‌پاسخ، ۰ فایل، ۰ نیمه‌کاره، ۰ تیک‌خورده. `whoami` ok (درایو وصل، db_bytes=0).
+- **دست‌به‌دست:** ۶ مورد `did` در صندوقِ general (psy-norms، lla-sources، sys-territory، supervisor، app) با گیتِ کاملِ main بسنجیده و `verified` بسته شد. کهنه‌هایی که مالکشان روتینِ دیگر است (backtest/epi-rules) دست نخورد.
+- **اجرا:** pytest ‏2079 سبز/۱ skip/۲ قرمز ⇒ هر دو (`test_tour1_r11_coach.js`، `test_tour1_r12_coach.js`) فقط به‌خاطر نبودِ `playwright` در `apps/learning-architecture/node_modules` بودند؛ پس از `npm i` در همان پوشه هر دو سبز (محیطی، نه کد) · `npm run build` سبز · inventory: ۴۴ صفحه، ۲۹ زیرصفحه، ۱۸۱ دکمه، ۸۷ ورودی، ۱۵ فرم، ۵۹ لینک، ۱۰۲ API، ۴۲۹ مسیر، ۱۵۸ سرویس، ۶۹ مدل، بدونِ alarm/error · page_map ‏۵۴ اندازه‌گیری، ۱ نشد، ۵ رد، ۴٬۰۶۷ کنترل. vitest در این دور اجرا نشد.
+- **production:** `/api/health` = healthy، `/api/version` = `6c1e625` = `origin/main`. جز سلامت، نسخه و کارتابل سنجیده نشد.
+- **یافته:** صفر. نکتهٔ محیط: کلونِ این نشست shallow بود و `main` محلی با `origin/main` تاریخچهٔ نامرتبط داشت ⇒ `git reset --hard origin/main` (شاخهٔ محلیِ بی‌کارِ یکتا).
+- **پارک‌شده‌ها:** هفت شاخهٔ `supervisor-pending/*` هنوز در remote هست؛ مرجِ آن‌ها با روتینِ فوری است و در این دور دست نخورد.
+- **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار؛ دروازهٔ مرورگرِ lla وابسته به نصبِ playwright است ⇒ اگر نصب نباشد، دو آزمونِ پرامپت‌تپ قرمز می‌شوند نه skip (شکافِ کوچک: هشدارِ «نصب نیست» به‌جای شکست بهتر است).
+
+ناظرِ خودکار (Claude Code routine)
