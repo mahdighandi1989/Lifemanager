@@ -12,5 +12,11 @@
  "what": "Pólya R20 MT2: AI task route lla_coach (catalog tier=balanced: reasoning preferred, top tier Opus/Pro ordered after balanced in manager._auto_order only for tier=balanced tasks; model_discovery.TOP_TIERS/model_tier; app_records._AI_TASKS) + tests/test_lla_coach_route.py — other routes unchanged",
  "procedure": "CLAUDE.md#Non-negotiable rules",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-18T03:55:27Z",
+  "note": "tests/test_lla_coach_route.py: 9 passed on current main; route lla_coach present, other routes unchanged",
+  "commit": ""
+ }
 }
