@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go('sterr');await w(1200);window.scrollTo(0,0);return APP.state.view+' :: '+document.getElementById('main').innerText.slice(0,800)})()"}

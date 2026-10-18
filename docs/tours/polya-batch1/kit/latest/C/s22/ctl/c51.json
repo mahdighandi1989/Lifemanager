@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval":"(()=>{const out=[];const all=APP.S.all?APP.S.all():null;const ks=Object.keys(localStorage);for(const k of ks){const v=localStorage.getItem(k);if(v&&v.indexOf('سرایدار')>=0)out.push(k+' len='+v.length);}let cases=[];try{const recs=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');for(const id in recs){const r=recs[id];if(r&&r.type==='case')cases.push(id+' | '+r.title+' | status='+r.status+' | verdict='+JSON.stringify(r.verdict||r.final||null).slice(0,200));}}catch(e){cases.push('ERR '+e)}return out.join(' ; ')+' ## '+cases.join(' ;; ');})()"}

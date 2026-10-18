@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqltmt82o\");return APP.state.sub+\" | \"+MT(\"❔\",400)+\"\\n\"+BL().split(\" | \").filter(x=>/lp-/.test(x)).join(\" | \")})()"}
+{"eval": "[...document.getElementById(\"lpBRes\").options].map(o=>o.value+\"=\"+o.textContent).join(\" | \")+\" VAL=\"+document.getElementById(\"lpBRes\").value+\" | \"+FL(\"lpBDef|lpBRet|lpBTo\")"}

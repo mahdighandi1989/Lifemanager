@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.PR.cases().map(c=>({id:c.id,tid:c.tid,subj:c.subj,state:c.state,due:c.due,reason:c.reason,start:c.start,src:c.src})))+' | msgs: '+APP.ASSIST.cur().msgs.slice(-2).map(m=>m.role+': '+m.text.slice(0,200)).join(' || ')\n"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"}

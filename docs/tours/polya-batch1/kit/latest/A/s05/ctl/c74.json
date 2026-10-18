@@ -1,1 +1,1 @@
-{"eval": "(()=>{return JSON.stringify({prc:APP.PR.all().map(c=>({id:c.id,tid:c.tid,due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas,s.src&&s.src.kind])})),fc:APP.S.all('fcast',x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,40),x.p,x.due,x.out||x.res||x.o||'',x.judgedBy||''])})})()"}
+{"shot": {"name": "corr_6_today_thu", "full": true}}

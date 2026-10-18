@@ -1,1 +1,1 @@
-{"eval": "(()=>{const t=__fx.main(90000);const i=t.indexOf(\"ثبتِ فهم\");return t.slice(i-1500,i+1500)})()"}
+{"eval": "(()=>{return __fx.fields().filter(f=>!/lpGK|lpBk|lpAsk|lpClaim/.test(f)).join(\"\\n\")})()"}

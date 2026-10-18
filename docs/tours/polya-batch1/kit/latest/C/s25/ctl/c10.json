@@ -1,1 +1,1 @@
-{"say":"طرحمو نوشتم ولی گیر کردم: وقتی از n به n+1 میرم نمی‌دونم دقیقاً چی رو باید نشون بدم."}
+{"eval":"(async()=>{const pid=APP.state.arg;P('lpPU_a_d1',/حالا به کارش/);F('lpPU_w_d1','استقرا روی همین n طبیعی است');await W(300);B(/ثبتِ طرح/);await W(1200);return 'phase='+APP.livePhase(pid)+' q='+APP.liveCoach(pid).q;})()"}

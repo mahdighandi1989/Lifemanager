@@ -1,1 +1,1 @@
-{"eval": "(()=>document.querySelector('#main').innerText.slice(0,8000))()"}
+{"shot": {"name": "part_dossier_s29b", "js": "(()=>{const p=APP.liveAll().find(r=>/چهارضلعی|باغچه/.test(r.p.title)).p.id;APP.go('dossier',p);return p})()", "full": true}}

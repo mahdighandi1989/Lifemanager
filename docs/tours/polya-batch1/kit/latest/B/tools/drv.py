@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""drv.py <sid> [src_sid] : replay round21B/<src>/ctl (via <sid>/seq.json if present) on a running harness5 in round22B/<sid>;
+"""drv.py <sid> [src_sid] : replay round22B/<src>/ctl (via <sid>/seq.json if present) on a running harness5 in round23B/<sid>;
 answer AI calls: akey (manual, by turn key) > rewrite? stop > round20 match by turn key (apatch/aovr/stop flags) > stop.
 exit 0 END, 3 needs manual answer, 1 timeout."""
 import json, os, sys, time, re, hashlib
 B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
 sid = sys.argv[1]; src = sys.argv[2] if len(sys.argv) > 2 else os.environ.get('SRCS', sid)
-D = f'{B}/round22B/{sid}'; S = f'{B}/round21B/{src}'
+D = f'{B}/round23B/{sid}'; S = f'{B}/round22B/{src}'
 for d in ('ctl', 'akey', 'apatch', 'aovr', 'diff'): os.makedirs(f'{D}/{d}', exist_ok=True)
 IDRE = re.compile(r'\b(?:pb_[a-z]_[a-z0-9]{6,}|prc_[a-z0-9]{6,}|prl_[a-z0-9]{6,}|achat_[a-z0-9]{6,}|dl_[a-z0-9]{6,})\b')
 RW = '[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ'

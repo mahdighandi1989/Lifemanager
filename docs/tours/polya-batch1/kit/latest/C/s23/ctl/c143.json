@@ -1,1 +1,1 @@
-{"shot": {"name": "n5_after_panel", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector(\".as-panel\");if(!pn||pn.hidden)APP.ASSIST.toggle(true);const b=document.querySelector(\".as-body,.as-msgs\");if(b)b.scrollTop=b.scrollHeight;return 1})()"}}
+{"eval": "(()=>{const L=APP.liveAll().map(r=>({t:r.p.title,st:r.p.statement,d:JSON.stringify(((APP.S.get('eprog_'+r.p.id)||{}).solve||{}).u||{}).slice(0,600)}));return JSON.stringify(L).slice(0,2500)})()"}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','pb_l_mvaqlzvmzjc');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}
+{"clock": "2026-10-31", "eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"}

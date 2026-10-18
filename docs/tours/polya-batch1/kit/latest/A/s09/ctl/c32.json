@@ -1,1 +1,1 @@
-{"reload": true}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

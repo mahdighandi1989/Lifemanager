@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}
+{"eval": "(()=>{F('lpPrVague','«قد» یعنی ارتفاعِ ساقه از خاک');F('lpPrLine','نوعِ خاک و آب را یکسان فرض می‌کنم و اندازه نمی‌گیرم');F('lpPrApprox','دقتِ یک سانتی‌متر');F('lpPrPrior','می‌دانم گیاه بدون نور رشد نمی‌کند');\nC('.lp-usave');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join('');const a=st();C('.sv-g2');return a+' SUB:'+APP.state.sub+'\\n'+MT('حالتِ حدی',300)})()\n"}

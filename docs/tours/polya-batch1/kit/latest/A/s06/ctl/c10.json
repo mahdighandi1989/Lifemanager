@@ -1,1 +1,1 @@
-{"eval": "(()=>{0;APP.go('lprob','pb_l_mvaqlyxc81e','plan');document.getElementById('lpBkDead_1').click();const f=FL('lpBk');const t=MT('بن‌بست',1200);return f+'\\n####\\n'+t})()\n", "clock": "2026-10-17"}
+{"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.value='1997-04-22';document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()})()"}

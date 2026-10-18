@@ -1,1 +1,1 @@
-{"eval":"(()=>{const pid=window.__PID||APP.state.arg;const r=APP.liveRec(pid).p;const lp=APP.livePlausible?APP.livePlausible(r):null;return JSON.stringify({g:(r.solve&&r.solve.g)||null,guess:r.guess,refG:lp&&lp.refutedG,outs:(r.outcomes||r.outs||[]).slice(-2)}).slice(0,3000);})()"}
+{"say":"نتیجه رو ثبت کردم و حدس تازه رو هم نوشتم. حالا چیکار کنم؟"}

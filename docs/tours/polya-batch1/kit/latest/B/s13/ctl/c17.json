@@ -1,1 +1,1 @@
-{"eval": "(()=>{const o=JSON.parse(localStorage.getItem('mla.records.v1'));const r=o['eprob_pb_l_mvf4mwh25b8'];return JSON.stringify({nat:r.p.nat,kind:r.p.kind,ty:r.p.ty,keys:Object.keys(r.p),live:Object.keys(r.live||{})}).slice(0,800)+' sel='+document.querySelector('#lpNat').value})()\n"}
+{"say":"یه گزینه پیدا کردم: مستقیم باهاش حرف بزنم و یه مهلت بدم که جبران کنه. مطمئنی این درسته؟ صفحه داره «قوی‌ترین شاهد خلاف» می‌خواد."}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=[...document.querySelectorAll('.as-panel .as-askyes')];b.forEach(x=>x.click());return b.length+' '+TT()})()"}
+{"shot": {"name": "corr_0_before_lprob", "full": true}}

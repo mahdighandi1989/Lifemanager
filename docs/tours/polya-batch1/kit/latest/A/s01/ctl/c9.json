@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.ASSIST.coachLedger?APP.ASSIST.coachLedger():null)"}
+{"eval0": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,APP.liveKindInfo(r.p.id)]))", "say": "خب معلومه دیگه، بهترین تصمیم مالی. همینو می‌خوام. بخرم یا نه؟"}

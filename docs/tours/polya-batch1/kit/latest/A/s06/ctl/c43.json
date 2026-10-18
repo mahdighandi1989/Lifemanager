@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");const j=t.indexOf(\"⚫ نقطه\");return t.slice(i,j+400)})()"}
+{"eval": "(()=>{APP.go('dossier','pb_l_mvp10jmayj5');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"}

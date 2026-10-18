@@ -1,1 +1,1 @@
-{"say": "این که وات رو باید کیلووات کنم و قیمت برای کیلووات‌ساعته رو تازه فهمیدم. یه جایی هست که بمونه و یادم نره؟"}
+{"eval": "(async()=>{const pid=window.__PID||APP.state.arg;F('lpBApprox','±۱۰ هزار تومان بس بود؛ قبضِ واقعی هم همین حدود را نشان داد');await W(300);let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1500);let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,12).join(' ¦ '); return 'phase='+APP.livePhase(pid)+' NEW: '+diff})()"}

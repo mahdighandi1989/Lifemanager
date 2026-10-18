@@ -1,1 +1,1 @@
-{"shot":{"name":"corrN5_before_lprob","full":true}}
+{"eval": "(async()=>{const d=document.createElement(\"div\");document.body.appendChild(d);await new Promise(r=>setTimeout(r,300));const ms=[...document.querySelectorAll(\".as-msg\")];return \"mxv=\"+ms.filter(m=>m.getAttribute(\"data-mxv\")).length+\" svgs=\"+document.querySelectorAll(\".as-panel svg\").length+\" mxScan=\"+(typeof (window.APP&&APP.MATH))})()"}

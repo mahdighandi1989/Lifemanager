@@ -1,1 +1,1 @@
-{"eval": "APP.today()"}
+{"eval": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll('.as-msg')];const m=ms.find(x=>/۸۰۰ هزار/.test(x.textContent)&&x.classList.contains('user'));if(m)m.scrollIntoView({block:'start'});return Object.keys(APP.MATH).join(',')+' ## '+(m?[...m.querySelectorAll('[data-src]')].map(x=>x.getAttribute('data-src')).join(' | '):'none')})()"}

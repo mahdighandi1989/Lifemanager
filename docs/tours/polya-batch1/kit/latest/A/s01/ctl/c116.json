@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','achat_mw3bemfuxaydu');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}
+{"eval": "(()=>{APP.go('dossier','pb_l_mvjb8uj29l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}

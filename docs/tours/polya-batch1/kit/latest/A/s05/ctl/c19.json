@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,g:(s.coach||{}).guess&&s.coach.guess.text,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>m.guess)})))"}
+{"eval": "APP.go(\"lprob\",\"pb_l_mvaqmt77nuy\",\"plan\");MT(\"۲) طرح\",1200)"}

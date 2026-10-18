@@ -1,1 +1,1 @@
-{"eval": "(()=>{const pid=APP.state.arg;window.__PID=pid;return JSON.stringify(APP.liveKindInfo(pid))+' stmt='+APP.liveRec(pid).p.statement.slice(0,200)+' typeGuess='+(APP.liveTypeGuess?JSON.stringify(APP.liveTypeGuess(APP.liveRec(pid).p.statement)):'na');})()\n"}
+{"say":"خب ۱۰ تا چک کردم، دیگه اثباته! ولی باشه، ثبتش کن ببینیم."}

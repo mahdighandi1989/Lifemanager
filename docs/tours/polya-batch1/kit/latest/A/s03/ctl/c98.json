@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.PR.all().map(c=>({id:c.id,tid:c.tid,subj:c.subj,state:c.state,due:c.due,sessions:c.sessions,stable:c.stable,hist:c.hist})))"}
+{"reload": true}

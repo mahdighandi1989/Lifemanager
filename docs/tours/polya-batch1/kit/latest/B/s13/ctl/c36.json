@@ -1,1 +1,1 @@
-{"say": "سلام، یه هفته گذشت. از کارشناس منابع انسانی پرسیدم: طبق آیین‌نامه، کسی که می‌دونه و نمیگه شریکِ جرم نیست ولی تذکرِ انضباطی می‌گیره؛ و برای بار اول اخراج نمی‌کنن، فقط بازپرداخت و تذکر کتبی. پس اون فرضم غلط بود و ابهامم هم حل شد."}
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const c=APP.PR.list('ambiguities');APP.go('practice',c.id);await w(900);const before=__fx.main(2500);const b=__fx.btns();return 'BTNS: '+b.join(' | ')+' ## '+before})()"}

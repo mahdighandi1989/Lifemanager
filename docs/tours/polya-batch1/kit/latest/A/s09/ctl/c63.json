@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','pb_l_mvaqlz93ywo');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}
+{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return r.p.statement})()"}

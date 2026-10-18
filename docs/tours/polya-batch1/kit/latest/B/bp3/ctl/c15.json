@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"prereq\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}
+{"say": "۵ × ۵ = ۲۵، ۳ × ۳ = ۹. دیوار یکی از اون دو ضلعه، پس ۲۵ منهای ۹ = ۱۶، جذرش ۴. دیوار ۴ متره! همون جواب کتاب. حالا مساحت مثلث: ۳ × ۴ = ۱۲ متر مربع؟"}

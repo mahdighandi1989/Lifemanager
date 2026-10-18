@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveClosure(r.p.id).label,APP.liveClosure(r.p.id).verdict,r.origin,APP.liveKindInfo(r.p.id).kind,r.p.from||r.p.parent||\"\"]))\n"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const b=((pg.solve||{}).b||[])[1]||{};return [r.p.title,b.done,b.from,b.bestQ,b.bestKind,b.taste,b.lesson||b.use,APP.chatLookMissing?APP.chatLookMissing(r.p.id):null]}))"}

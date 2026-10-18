@@ -1,1 +1,1 @@
-{"eval": "(()=>{const p=window.__PID||APP.state.arg;if(p)localStorage.setItem('__PID',p);return (APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'))+' pid='+p})()"}
+{"eval": "(()=>{const c=APP.liveCoach(window.__PID);return c.src+' | q='+c.q+' | card='+c.card;})()\n"}

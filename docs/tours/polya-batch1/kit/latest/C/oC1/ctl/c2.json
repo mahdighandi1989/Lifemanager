@@ -1,0 +1,1 @@
+{"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='1988-03-08';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()"}

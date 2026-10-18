@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].find(b=>/قدمِ بعد/.test(b.textContent));b.click();return TT()+\" | \"+MT(\"آیا\",600)})()"}
+{"shot":{"name":"part_route_pA1_inside_1","full":true}}

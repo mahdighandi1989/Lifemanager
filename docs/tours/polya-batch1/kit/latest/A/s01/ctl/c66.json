@@ -1,1 +1,1 @@
-{"shot": {"name": "dossier_full_1", "full": true}}
+{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({g:(s.coach||{}).guesses,gr:(s.coach||{}).guessRes,plans:s.plans})))"}

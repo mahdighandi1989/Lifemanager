@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"}
+{"eval": "(()=>{APP.go('dossier','achat_mvaqltftthu6w');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}

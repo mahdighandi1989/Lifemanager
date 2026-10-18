@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"}

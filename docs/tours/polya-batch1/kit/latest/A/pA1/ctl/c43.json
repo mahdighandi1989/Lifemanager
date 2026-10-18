@@ -1,1 +1,1 @@
-{"eval": "FL().split(\"\\n\").filter(x=>/^lp/.test(x)&&!/GK/.test(x)).join(\"\\n\").slice(0,1800)+\"\\nBTN:\"+BL().split(\" | \").filter(x=>/^lp/.test(x)).join(\" | \")"}
+{"eval": "(()=>{S(\"lpBEquiv\",\"eq\");F(\"lpBDef\",\"«بخش‌پذیر بر ۲۴» یعنی ۲۴ عاملِ آن است؛ از ۸ × ۳ و اول بودنِ ۸ و ۳ نسبت به هم استفاده کردم\");const b=document.querySelector(\".lp-lbsave\");b.click();return TT()+\" | \"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm3fjybe\").label)})()"}

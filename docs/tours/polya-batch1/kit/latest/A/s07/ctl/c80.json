@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,n:s.msgs.length,m:s.msgs.slice(0,3).map(m=>[APP.ASSIST.msgId(m),m.role,m.text.slice(0,60),!!m.pts])})))"}
+{"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.p])})),fc:APP.S.all(\"fcast\",x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,25),x.p,x.outcome||\"\",x.outcomeAt||\"\"])})"}

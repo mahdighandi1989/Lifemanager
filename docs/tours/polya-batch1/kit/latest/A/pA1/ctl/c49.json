@@ -1,1 +1,1 @@
-{"eval": "(()=>{F(\"lpBDef\",\"\");const b=document.querySelector(\".lp-lbsave\");b.click();return TT()+\" | \"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqltmt82o\").label)})()"}
+{"eval": "(()=>{APP.go(\"prereq\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"تجزیهٔ تفاضل\");return t.slice(Math.max(0,i-600),i+900)})()"}

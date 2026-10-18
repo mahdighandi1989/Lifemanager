@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const pid=window.__PID||APP.state.arg;return 'phase='+APP.livePhase(pid)+' IDS '+IDS()+' || BTNS '+BTNS().slice(0,800)+' || '+T('۳)',1500)})()"}
+{"say": "نه، اسم فیثاغورس رو شنیدم ولی نمی‌دونم چی میگه."}

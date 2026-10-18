@@ -1,1 +1,1 @@
-{"shot": {"name": "pc_dossier", "full": true, "js": "(()=>{const p=window.__PID||localStorage.getItem(\"__PID\")||APP.liveAll()[0].p.id;APP.go(\"dossier\",p);return p})()"}}
+{"shot": {"name": "pc_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll(\"details\").forEach(d=>d.open=true);return 1})()"}}

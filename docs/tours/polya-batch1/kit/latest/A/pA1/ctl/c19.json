@@ -1,1 +1,1 @@
-{"eval": "(()=>{document.getElementById(\"knBase_2\").click();document.getElementById(\"knBetter_2\").click();F(\"knCrit\",\"یه اثباتِ کامل که برای همهٔ اول‌های بزرگ‌تر از ۳ کار کنه؛ معلم تعیین کرده\");document.getElementById(\"knVerdict_1\").click();const b=[...document.querySelectorAll(\"#main button\")].find(b=>/قدمِ بعد/.test(b.textContent));b.click();return TT()+\" | \"+MT(\"فرضیه\",1500)})()"}
+{"say": "x² − 9؟ نه… شاید (x−3)^2؟ نه، اون می‌شه x² − 6x + 9. نمی‌دونم، این رو بلد نیستم."}

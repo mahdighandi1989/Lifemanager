@@ -1,1 +1,1 @@
-{"shot":{"name":"dossier22_full_2","full":true}}
+{"eval": "JSON.stringify(APP.liveClosure(APP.liveAll().find(r=>/چیدمان/.test(r.p.title)).p.id))"}

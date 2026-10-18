@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);__adv(2);APP.go('today');await w(1200);window.scrollTo(0,0);return APP.today()+' :: '+document.getElementById('main').innerText.split('\\n').filter(l=>/فیثاغورس|جذر|بازیابی|🧪|نردبان|🧩/.test(l)).join(' ¦ ')})()"}

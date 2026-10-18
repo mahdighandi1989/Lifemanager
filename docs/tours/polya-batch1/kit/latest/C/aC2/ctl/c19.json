@@ -1,0 +1,1 @@
+{"eval": "(()=>[...document.querySelectorAll('#main input,#main select,#main textarea')].filter(e=>/^lpB/.test(e.id)).map(e=>e.id+'['+e.type+']:'+(e.getAttribute('aria-label')||'').slice(0,90)+'='+(e.type==='checkbox'?e.checked:String(e.value).slice(0,40))+(e.options?' {'+[...e.options].map(o=>o.text.slice(0,30)).join('/')+'}':'')).join(' | '))()"}

@@ -19,5 +19,15 @@ def shot(view, sub=None, scroll=None, open_from=None):
     return ev(js)
 def openas(): return ev("(()=>{APP.ASSIST.toggle(true);return 1})()")
 def write(sid, L):
-    B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22B'
+    B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23B'
     os.makedirs(f'{B}/{sid}', exist_ok=True); json.dump(L, open(f'{B}/{sid}/seq.json', 'w'), ensure_ascii=False, indent=0); print(sid, len(L), 'entries')
+def route(sel='.rt-pt.rt-now', tag=''):
+    # open «🧭» for the session's live problem (else the chat session), hover one point, return model summary + tip
+    js = ("(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}"
+          "APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(%s)||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');"
+          "if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}"
+          "return %s+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()") % (json.dumps(sel), json.dumps(tag))
+    return ev(js)
+def prer():
+    js = "(()=>{const s=APP.ASSIST.cur();let o={};try{const sc=APP.PRE.scope(s);o.stack=APP.PRE.all(sc);o.rec=APP.PRE.rec(sc)}catch(e){o.err=String(e)}try{o.causes=APP.MIND.phases().causes;o.pre=APP.MIND.phases().prereq}catch(e){o.merr=String(e)}return JSON.stringify(o).slice(0,4000)})()"
+    return ev(js)

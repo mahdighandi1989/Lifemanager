@@ -1,1 +1,1 @@
-{"say":"خب ۱۰ تا چک کردم، دیگه اثباته! ولی باشه، ثبتش کن ببینیم."}
+{"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='1965-01-15';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='\u062b\u0628\u062a').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()"}

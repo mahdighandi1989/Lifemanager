@@ -2,7 +2,7 @@
 # kill1.py sid — kill only my replay/harness processes for that scenario (never the caller's shell)
 import os,sys,signal
 s=sys.argv[1]; me={os.getpid(),os.getppid()}
-R='tour1_polya/round22D'
+R='tour1_polya/round23D'
 for p in os.listdir('/proc'):
     if not p.isdigit() or int(p) in me: continue
     try: a=open(f'/proc/{p}/cmdline','rb').read().split(b'\0')

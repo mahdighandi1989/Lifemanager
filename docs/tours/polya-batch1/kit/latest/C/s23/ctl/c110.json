@@ -1,1 +1,1 @@
-{"shot": {"name": "c3_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}
+{"shot": {"name": "c3_today", "view": ["today"], "full": true}}

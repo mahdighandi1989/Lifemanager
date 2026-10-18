@@ -1,1 +1,1 @@
-{"eval": "(()=>{return __fx.fields().filter(f=>!/lpGK|lpBk|lpAsk|lpClaim/.test(f)).join(\"\\n\")})()"}
+{"eval": "(()=>{const R=JSON.parse(localStorage.getItem(\"mla.records.v1\")||\"{}\");const pid=APP.state.arg;const k=Object.keys(R).filter(k=>k.indexOf(pid)>=0);const r=R[\"eprob_\"+pid];return k.join(\",\")+\" ## \"+JSON.stringify(r).slice(0,1800)+\" ## SUB=\"+APP.state.sub+\" \"+__fx.main(800)})()"}

@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify({sc:sc&&{k:sc.k||sc.kind,pk:sc.pk},all:APP.PRE.all(sc),rec:APP.PRE.rec&&APP.PRE.rec(sc)&&APP.PRE.rec(sc).id})})()"}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=document.querySelector(\".lp-stuck\");if(!b)return \"NOBTN\";b.click();return APP.state.view+\" \"+APP.state.arg+\" | \"+MT(\"\",900)})()"}
+{"say": "p^2 − 1 یعنی یه عدد ضربدر خودش منهای یک. مثلاً ۲۵ − ۱ = ۲۴ و ۴۹ − ۱ = ۴۸. ولی نمی‌دونم چطوری اینو یه جور دیگه بنویسم که بخش‌پذیریش معلوم بشه. هیچی به ذهنم نمی‌رسه."}

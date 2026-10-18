@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const pid=APP.state.arg;window.__PID=pid;localStorage.setItem('__PID',pid);return 'pid='+pid+' phase='+APP.livePhase(pid)+' IDS '+IDS()+' || BTNS '+BTNS().slice(0,900)})()"}

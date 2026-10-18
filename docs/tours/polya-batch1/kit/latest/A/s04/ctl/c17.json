@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveCoach(\"pb_l_mvaqlzvmzjc\").q)\n"}
+{"eval": "JSON.stringify(APP.liveClosure(\"pb_l_mvaqmtua2is\").aux)+JSON.stringify((APP.liveAll().find(r=>r.p.id==\"pb_l_mvaqmtua2is\").live||{}).aux||null).slice(0,400)"}

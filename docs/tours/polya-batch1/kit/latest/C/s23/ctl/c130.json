@@ -1,1 +1,1 @@
-{"eval": "(()=>{try{return JSON.stringify(APP.MIND.techWork()).slice(0,2500)}catch(e){return 'ERR '+e.message}})()"}
+{"shot": {"name": "part_mind_s23_tech", "view": ["mind"], "full": true, "js": "(()=>{const h=[...document.querySelectorAll('#main h2,#main h3,#main summary')].find(x=>/کارِ تکنیک‌ها/.test(x.innerText));if(h){const d=h.closest('details');if(d)d.open=true;h.scrollIntoView();}return h?h.innerText:'none'})()"}}

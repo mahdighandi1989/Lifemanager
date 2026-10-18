@@ -1,1 +1,1 @@
-{"say": "خب ۲۵٪ اضافه کردم، ۲۵٪ هم کم می‌کنم، پس برمی‌گرده همون یک میلیون دیگه. خرید هم شده ۷۰۰ به‌علاوهٔ ۲۵٪ … یعنی ۷۲۵؟ نه… راستش وقتی دو تا درصد پشتِ سرِ هم میاد گیج میشم. سودم چقدر میشه؟"}
+{"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.value='1981-03-05';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()})()"}

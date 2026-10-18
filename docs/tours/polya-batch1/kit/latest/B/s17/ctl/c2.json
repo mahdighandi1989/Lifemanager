@@ -1,1 +1,1 @@
-{"say":"اول اندازه. چون تا ندونم چقدر آب جمع می‌شه نمی‌دونم پلاستیکی اونقدر بزرگ پیدا می‌شه یا نه، جاشم بستگی به اندازه‌ش داره. اینو قدم به قدم حل کنیم."}
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await w(700);const b=[...document.querySelectorAll('.age-ask button')].find(b=>b.textContent.trim()==='بعداً');if(!b)return 'NOCARD';b.scrollIntoView({block:'center'});await w(200);b.click();await w(500);return 'later age='+APP.AGE.age()})()"}

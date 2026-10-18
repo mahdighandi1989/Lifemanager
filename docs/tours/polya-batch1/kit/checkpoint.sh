@@ -26,4 +26,5 @@ echo "$last" > "$D"/kit/latest/ROUND
 cp "$SP"/harness5.js "$SP"/storyboard.py "$SP"/storyboard.css "$SP"/savehb.py "$SP"/gate_wt.sh "$SP"/resolve_bundle.sh "$SP"/checkpoint.sh "$SP"/pack_sb.py "$D"/kit/
 # never commit the owner's address
 grep -rlI "<owner-email>" "$D" | xargs -r sed -i 's/mohamad\.mahdi1988@gmail\.com/<owner-email>/g'
+python3 "${1:-/home/user/Lifemanager}"/scripts/tours/collect_dataset.py --src "$T" --out "${1:-/home/user/Lifemanager}"/docs/tours/dataset --quiet || echo "WARN: tour dataset collector failed"   # tour dataset for a local model (docs/decisions/2026-10-18-tour-dataset-for-local-model.md)
 du -sh "$D"

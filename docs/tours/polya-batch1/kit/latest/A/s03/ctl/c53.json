@@ -1,1 +1,1 @@
-{"eval": "(()=>{0;APP.go(\"home\");const d=DUE();APP.go(\"lprob\",\"pb_l_mvc67kqpr85\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/شروع می‌کنم/.test(b.textContent));if(b)b.click();return d+\"\\n###\\n\"+FL(\"lpType|lpNat\")+\"\\n\"+MT(\"نوعِ مسئله\",500)})()", "clock": "2026-10-20"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

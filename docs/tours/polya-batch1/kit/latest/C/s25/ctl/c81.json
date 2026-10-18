@@ -1,1 +1,1 @@
-{"eval": "(()=>{const t=document.querySelector('#main').innerText;return t.slice(0,8000)})()"}
+{"shot": {"name": "part_dossier_s25a", "js": "(()=>{const p=APP.liveAll()[0].p.id;APP.go('dossier',p);return p})()", "full": true}}

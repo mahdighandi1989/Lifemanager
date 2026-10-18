@@ -1,1 +1,1 @@
-{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"}
+{"eval": "(()=>{APP.go('dossier','achat_mvaqlv7je1sd5');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}

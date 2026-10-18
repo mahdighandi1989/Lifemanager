@@ -1,1 +1,1 @@
-{"say": "یعنی می‌خوام مساحتِ چهار تا مثلثِ دیواره رو پیدا کنم. هر دیواره یه مثلثه که قاعده‌ش ۲ متره. ولی مساحتِ مثلث رو یادم نیست… قاعده ضربدر ارتفاع بود؟ یا ضلع ضربدر ضلع؟"}
+{"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.value='1988-06-21';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()})()"}

@@ -1,0 +1,1 @@
+{"reply": "هزینهٔ هر کیک را هم داری. اگر بخواهی قیمتِ ماهِ بعد را قدم‌به‌قدم پیدا کنی، می‌شود آن را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت کرد. شرط چیست — کدام قیدها واقعی‌اند؟", "status": "related", "next": false, "outside": "", "know": [], "actions": [{"do": "coach_state", "ph": "u", "said": ["d"], "ans": ["u2"], "stuck": false, "fail": false, "role": "self", "nat": "practical"}]}

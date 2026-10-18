@@ -1,1 +1,1 @@
-{"eval": "'skip c64 (round-21 workaround: relative due dates instead of Persian dates)'"}
+{"eval": "JSON.stringify({nd:APP.PR.t24NoDate(APP.S.get('ex_mvqgpqzz2kkle')),warn:(document.querySelector('.prc-t24')||{}).innerText||'none'})"}

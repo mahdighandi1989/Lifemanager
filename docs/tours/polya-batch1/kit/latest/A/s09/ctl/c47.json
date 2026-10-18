@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return JSON.stringify((r.src||r.p.src).parts.map(p=>[p.mid,p.vc]))})()"}
+{"say": "کلش اینه: قیمتِ ماهِ بعد رو طوری بذارم که سودِ ماهانه به ۲۰ میلیون نزدیک بشه. قیمتِ فعلیم ۸۰۰ هزاره و این ماه ۳۵ تا فروختم."}

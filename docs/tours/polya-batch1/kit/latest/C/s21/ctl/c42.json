@@ -1,1 +1,1 @@
-{"exit": true}
+{"eval": "(()=>{const i=document.querySelector('textarea.as-in');i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));return 'cleared'})()"}

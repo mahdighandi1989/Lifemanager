@@ -1,1 +1,1 @@
-{"say": "ببخشید، اشتباه گفتم: جلسه رو شنبه می‌ذارم، نه پنجشنبه — پنجشنبه برادرم سرِ کاره."}
+{"eval": "(()=>{const s=APP.ASSIST.cur();const c=s.coach||{};const pick=o=>JSON.stringify(o,null,0);return pick({own:c.ownLog,ans:c.ansLog,keys:Object.keys(c),seR:s.retracts,live:(APP.S.get(\"eprog_pb_l_mvaqmtua2is\").solve.live||{}).retracts})})()"}

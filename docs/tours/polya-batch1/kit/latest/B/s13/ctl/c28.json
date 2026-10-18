@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go('practice');await w(900);const t=__fx.main(30000);const i=t.indexOf('فهرست‌های جاری');const el=[...document.querySelectorAll('#main h2')].find(h=>/فهرست‌های جاری/.test(h.textContent));if(el)el.scrollIntoView({block:'start'});await w(300);return t.slice(i,i+900)})()"}
+{"say": "یه چیز: «شریکِ جرم» برام هنوز مبهمه، و یه فرضی هم دارم که مطمئن نیستم درسته: «اگه گزارش بدم حتماً اخراج میشه». اینا رو یه جا نگه دار که یادم نره، هفته‌ی بعد از کارشناس منابع انسانی بپرسم."}

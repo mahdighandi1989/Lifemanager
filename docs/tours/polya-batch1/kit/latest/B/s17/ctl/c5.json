@@ -1,1 +1,1 @@
-{"eval": "Object.keys(JSON.parse(localStorage.getItem(\"mla.records.v1\"))).filter(k=>/pb_l_/.test(k)).join(\",\")+\" | \"+APP.view\n"}
+{"eval": "(()=>'age='+APP.AGE.age()+' birth='+APP.AGE.birth()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id))()"}

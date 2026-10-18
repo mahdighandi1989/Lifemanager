@@ -1,1 +1,1 @@
-{"say": "یه اصلاح مهم: روز اول گفتم قالبم ۲۵ در ۳۵ه — اشتباه گفتم، دوباره متر کردم، ۲۵ در ۳۰ه."}
+{"shot": {"name": "c2z_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}

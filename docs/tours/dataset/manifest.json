@@ -81,6 +81,12 @@
    "path": "blocks/round22.jsonl.gz",
    "records": 1422,
    "sha256": "e4f1f11ec62d3ebb1e09ff3f5cf5bb830bb1b061f779fd955cbf0483f4c20982"
+  },
+  {
+   "bytes": 1260755,
+   "path": "blocks/round23.jsonl.gz",
+   "records": 1565,
+   "sha256": "c5afba5d9e8b514dfbbbefb9469d9b4e04ac8dc9e4fa711e5fa862303bafae75"
   }
  ],
  "build_commits": {
@@ -324,6 +330,22 @@
    "commit": "b70c1fe8",
    "source": "reports/round22D_handback.md"
   },
+  "round23A": {
+   "commit": null,
+   "source": null
+  },
+  "round23B": {
+   "commit": "574f4a30",
+   "source": "reports/round23B_handback.md"
+  },
+  "round23C": {
+   "commit": "574f4a30",
+   "source": "round23C/NOTES.txt"
+  },
+  "round23D": {
+   "commit": "574f4a30",
+   "source": "reports/round23D_handback.md"
+  },
   "round3A": {
    "commit": null,
    "source": null
@@ -455,8 +477,8 @@
  },
  "counts": {
   "bank_cases": 1429,
-  "blocks": 5297,
-  "exchanges_total": 3636,
+  "blocks": 6862,
+  "exchanges_total": 4211,
   "per_round": {
    "models20": {
     "by_author": {
@@ -596,6 +618,15 @@
     "with_page_outcome": 562,
     "with_turn_verdict": 440
    },
+   "round23": {
+    "by_author": {
+     "runner-simulated": 575
+    },
+    "exchanges": 575,
+    "with_full_request": 575,
+    "with_page_outcome": 575,
+    "with_turn_verdict": 303
+   },
    "round3": {
     "by_author": {
      "no-reply": 40,
@@ -668,10 +699,10 @@
  },
  "generator": "scripts/tours/collect_dataset.py",
  "scenarios": {
-  "bytes": 953626,
+  "bytes": 1007269,
   "path": "scenarios.jsonl.gz",
   "records": 50,
-  "sha256": "88349262cff1cd129b94e1c6c39f70a1ff8afd5ee1aa6f8577403afae0080422"
+  "sha256": "f0829febb4f3dcd5828f245fb8d982aac72669c4aed88874686431df651122d4"
  },
  "schema_version": 1,
  "shards": [
@@ -955,6 +986,19 @@
     "round22B",
     "round22C",
     "round22D"
+   ]
+  },
+  {
+   "bytes": 404834,
+   "path": "exchanges/round23.jsonl.gz",
+   "preserved": false,
+   "records": 575,
+   "sha256": "388d6520dd77a7f7a3b1584f143f6af21f4a252a665329be0e727e10b8d3a00d",
+   "sources": [
+    "round23A",
+    "round23B",
+    "round23C",
+    "round23D"
    ]
   }
  ],
@@ -1314,8 +1358,8 @@
   },
   "eval_fraction": 0.2,
   "exchanges": {
-   "eval": 812,
-   "train": 2824
+   "eval": 924,
+   "train": 3287
   },
   "per_stratum": {
    "age_band": {
@@ -1390,39 +1434,39 @@
   "system/d776d525fc331fee4faa359f.txt.gz",
   "system/eb1b24760d1655b2f07510c1.txt.gz"
  ],
- "total_bytes": 7816844,
+ "total_bytes": 9536076,
  "verdict_linking": {
   "by_kind": {
    "criterion": {
-    "items": 3113,
-    "linked": 793,
-    "with_turn_ref": 1278
+    "items": 3335,
+    "linked": 930,
+    "with_turn_ref": 1415
    },
    "defect": {
-    "items": 1514,
-    "linked": 228,
-    "with_turn_ref": 441
+    "items": 1599,
+    "linked": 256,
+    "with_turn_ref": 469
    },
    "need": {
-    "items": 906,
-    "linked": 71,
-    "with_turn_ref": 71
+    "items": 1066,
+    "linked": 118,
+    "with_turn_ref": 118
    },
    "turn_note": {
-    "items": 544,
-    "linked": 140,
-    "with_turn_ref": 145
+    "items": 619,
+    "linked": 145,
+    "with_turn_ref": 150
    },
    "turn_row": {
-    "items": 981,
-    "linked": 963,
-    "with_turn_ref": 980
+    "items": 1130,
+    "linked": 1112,
+    "with_turn_ref": 1129
    }
   },
-  "items": 7058,
-  "linked": 2195,
-  "ratio_linked": 0.311,
-  "scenario_level": 4863,
-  "with_turn_ref": 2915
+  "items": 7749,
+  "linked": 2561,
+  "ratio_linked": 0.3305,
+  "scenario_level": 5188,
+  "with_turn_ref": 3281
  }
 }

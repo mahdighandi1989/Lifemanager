@@ -1,1 +1,1 @@
-{"eval":"(()=>{const pid=window.__PID||APP.state.arg;const pl=APP.livePlausible(pid);const so=(APP.S.get('eprog_'+pid)||{}).solve||{};return pid+' ## '+JSON.stringify({refutedG:pl&&pl.refutedG,refuted:pl&&pl.refuted,g1:so.g&&so.g[1]}).slice(0,3000);})()"}
+{"eval":"(()=>{const pid=window.__PID||APP.state.arg;const r=APP.liveRec(pid).p;const L=r.live||{};const o={};for(const k in L){const v=JSON.stringify(L[k]);if(/حدس|guess|refut|رد/.test(v)||/g|guess/.test(k))o[k]=v.slice(0,700);}return Object.keys(L).join(',')+' ### '+JSON.stringify(o);})()"}

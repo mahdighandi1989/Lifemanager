@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.ASSIST.toggle(true);const P=document.querySelector('.as-panel');const bs=[...P.querySelectorAll('button')].filter(b=>b.getClientRects().length);const box=[...P.querySelectorAll('*')].filter(e=>/این‌جا هم عوض شود/.test(e.textContent)&&e.children.length<12).pop();return 'BOX: '+(box?box.innerText.slice(0,600):'NONE')+' ## BTNS: '+bs.map(b=>b.textContent.trim().slice(0,40)).filter(t=>t).slice(-12).join(' | ')})()"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"}

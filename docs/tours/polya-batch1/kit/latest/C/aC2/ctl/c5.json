@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const pid=window.__PID||APP.state.arg;F('lpOne','می‌خواهم ثابت کنم که مجموعِ n عددِ فردِ اول همیشه n² است، و بعد برهانم را بازنگری کنم.');F('lpWhy','معلم گفته بازنگری کن و می‌خواهم یاد بگیرم بازنگری یعنی چه.');await W(300);B(/ثبتِ کل/);await W(1000);return 'phase='+APP.livePhase(pid)+' IDS '+IDS()+' || BTNS '+BTNS().slice(0,600)})()"}

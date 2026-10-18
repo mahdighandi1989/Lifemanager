@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.S.all(\"fcast\",x=>x.src&&x.src.ex).map(x=>({q:x.q.slice(0,30),keys:Object.keys(x),res:x.res,out:x.out,ok:x.ok,state:x.state})))"}
+{"shot": {"name": "part_mind21_from", "full": true}}

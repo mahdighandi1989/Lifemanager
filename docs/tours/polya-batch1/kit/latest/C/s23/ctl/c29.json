@@ -1,1 +1,1 @@
-{"say": "ببخشید، یه چیزو اشتباه گفتم: تخم‌مرغ ۹ تا زدم، نه ۸ — همون ۹ تا کافی بود."}
+{"shot": {"name": "c0_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}

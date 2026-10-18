@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"practice\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}
+{"say": "کشیدم. قطر مستطیل رو دقیقاً نصف می‌کنه! پس مثلث نصف مستطیله: ۱۲ تقسیم بر ۲ میشه ۶. پس مساحت مثلث نصف قاعده ضرب در ارتفاعه؟ برای یه مثلث ۸ و ۵ هم میشه ۲۰."}

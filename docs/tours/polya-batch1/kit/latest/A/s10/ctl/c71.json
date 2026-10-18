@@ -1,1 +1,1 @@
-{"clock": "2026-10-29", "eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"}
+{"shot": {"name": "corr_4_edit_open", "fold": false}}

@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({g:(s.coach||{}).guesses,gr:(s.coach||{}).guessRes,plans:s.plans})))"}
+{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,reg:(s.coach||{}).reg,g:(s.coach||{}).guess,plans:s.plans,prom:s.promises,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>m.guess)})))"}

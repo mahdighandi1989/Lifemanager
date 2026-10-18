@@ -1,1 +1,1 @@
-{"eval": "(()=>{S('lpSat','no');S('lpSuff','متناقض است');F('lpSuffW','«نفروختن» با «نقدِ امسالِ برادر» و «پس‌اندازِ صفرِ خواهر» با هم نمی‌خوانند');S('lpRestate','eq');F('lpRestateW','فقط فهمیدم شرط متناقض است؛ خودِ مسئله همان است');\nC('.lp-usave');C('.sv-g2');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn st()+'\\nSUB:'+APP.state.sub+'\\n'+FL('lpCx|lpRelax|lpImp|lpPartC|lpCon')+'\\n'+MT('۲) طرح',1500)})()\n"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

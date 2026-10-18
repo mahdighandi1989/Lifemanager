@@ -1,0 +1,1 @@
+{"eval": "(()=>{const m=document.getElementById(\"main\");return m.innerText.slice(-1500)})()"}

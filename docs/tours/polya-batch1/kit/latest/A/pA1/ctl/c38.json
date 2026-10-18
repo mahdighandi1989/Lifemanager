@@ -1,1 +1,1 @@
-{"say": "x × x = x^2، بعد x × 1 = x، بعد −1 × x = −x، بعد −1 × 1 = −1. x و −x همدیگه رو خنثی می‌کنن. پس (x − 1)(x + 1) = x^2 − 1! آهان، پس p^2 − 1 = (p − 1)(p + 1)."}
+{"eval": "[...document.getElementById(\"lpBBest\").options].map(o=>o.value+\"=\"+o.textContent.slice(0,110)).join(\"\\n\")"}

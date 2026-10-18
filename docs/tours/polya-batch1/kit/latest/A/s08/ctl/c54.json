@@ -1,1 +1,1 @@
-{"shot": {"name": "part_mind21_from", "full": true}}
+{"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"}

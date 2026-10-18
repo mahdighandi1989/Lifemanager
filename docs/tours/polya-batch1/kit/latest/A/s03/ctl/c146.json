@@ -1,1 +1,1 @@
-{"shot": {"name": "dossier21_full_1", "full": true}}
+{"clock": "2026-11-19", "eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()"}

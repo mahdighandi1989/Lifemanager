@@ -1,1 +1,1 @@
-{"say": "فرض‌ها رو نوشتم. یه چیز دیگه: از هزینه‌های هر کیک، کره و شکلات حدودِ ۷۰ درصدشه. اینو هم کجا نگه دارم که ماهانه ببینم عوض میشه یا نه؟"}
+{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return JSON.stringify((r.src||r.p.src).parts.map(p=>[p.mid,p.vc]))})()"}

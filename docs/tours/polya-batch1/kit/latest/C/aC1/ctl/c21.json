@@ -1,0 +1,1 @@
+{"shot": {"name": "age_mind_after_puzzle", "view": ["mind"], "full": false, "js": "(()=>{const e=[...document.querySelectorAll(\"#main *\")].find(x=>/^سن: /.test(x.textContent||\"\"));if(e)e.scrollIntoView({block:\"start\"});return 1})()"}}

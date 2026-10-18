@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"}
+{"eval": "(()=>{APP.go('dossier','pb_l_mvaqme5bmwx');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}

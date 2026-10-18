@@ -1,1 +1,1 @@
-{"eval": "(()=>{const id=APP.liveAll().find(r=>/خرید یا اجاره/.test(r.p.title)).p.id;APP.go('lprob',id,'back');const e=document.getElementById('lpBBest');return e?[...e.options].map(o=>o.value+'='+o.textContent).join(' || '):'NONE '+APP.state.view+' '+APP.state.sub})()"}
+{"eval": "[...document.querySelectorAll('#lpBBest option')].map(o=>o.value+' = '+o.textContent).join('\\n')\n"}

@@ -1,1 +1,1 @@
-{"eval":"(async()=>{const t=document.querySelector('#main').innerText;return 'map shown on child page: '+(t.indexOf('خانه‌های نوار')>=0)+' | '+(t.indexOf('هم‌ریخت')>=0);})()"}
+{"say": "جلسه دوم. این مسئله‌ی کاشی‌کاری دقیقاً همون مسئله‌ی پله‌هاست! هر پله یه خونه‌ی نوار، هر گام یه کاشی. پس جوابش همون رابطه‌ست: a_n = a_(n−1) + a_(n−2) + a_(n−3) با a_1 = 1، a_2 = 2، a_3 = 4."}

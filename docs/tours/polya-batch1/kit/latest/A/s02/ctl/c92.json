@@ -1,1 +1,1 @@
-{"shot":{"name":"corrN1_recheck_chat","fold":false}}
+{"eval": "JSON.stringify((APP.S.get(\"eprog_pb_l_mvaqmsr1vpb\").solve.u||{}).data||(APP.S.get(\"eprog_pb_l_mvaqmsr1vpb\").solve.u||{}).d||Object.keys(APP.S.get(\"eprog_pb_l_mvaqmsr1vpb\").solve.u||{}))"}

@@ -1,1 +1,1 @@
-{"say": "دفتر نگهبانی رو امروز دیدم: سرایدار ساعت ۶ عصر رفته."}
+{"shot": {"name": "part_list_ambiguities_s22", "full": true, "js": "(()=>{const c=APP.PR.list('ambiguities');APP.go('practice',c.id);return 1})()"}}

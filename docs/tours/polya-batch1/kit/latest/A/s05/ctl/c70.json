@@ -1,1 +1,1 @@
-{"shot": {"name": "corr_6_today_thu", "full": true}}
+{"eval": "(()=>{APP.go('today');const d=(APP.dueList()||[]).map(x=>x.txt).join(' || ');APP.go('tech','24','ws:ex_mvqgpqzz2kkle');return d})()"}

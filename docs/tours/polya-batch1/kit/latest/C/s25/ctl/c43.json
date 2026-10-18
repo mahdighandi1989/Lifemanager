@@ -1,1 +1,1 @@
-{"say": "ببخشید، اشتباه تایپ کردم: جملهٔ دومِ الگو ۱/(2·3·4) بود، نه ۱/(2·3·5)."}
+{"shot": {"name": "c0_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details.mind-from,details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}

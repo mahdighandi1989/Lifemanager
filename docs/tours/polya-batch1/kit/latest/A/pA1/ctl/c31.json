@@ -1,1 +1,1 @@
-{"eval": "TT()+\" | \"+MT(\"پلهٔ ۴\",600)"}
+{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.className+\"|\"+b.innerText.slice(0,40)).filter(x=>/حل شد|اثبات|بازنگری/.test(x));return b.join(\" ;; \")})()"}

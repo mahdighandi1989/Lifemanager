@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveAll().find(r=>r.p.id==\"pb_l_mvaqo5vgbtb\");const L=r.live||(r.solve||{}).live||{};return JSON.stringify({planKeys:Object.keys(L).filter(k=>/plan/i.test(k)),plan:L.plan,pa:L.planAt,st:(L.steps||[]).map(s=>[s.at,s.created])}).slice(0,1500)})()"}
+{"eval": "JSON.stringify({live:APP.liveAll().map(r=>[r.p.id,r.p.title,(APP.liveClosure(r.p.id)||{}).state])})"}

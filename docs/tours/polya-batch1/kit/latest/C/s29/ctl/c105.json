@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval": "(()=>{const S=APP.S;const cards=S.all('card').map(c=>({id:c.id,q:String(c.q||c.front||'').slice(0,60),due:c.due,sample:!!c.sample,src:c.src||c.from||c.pid||c.prob||'',prc:c.prc||'',hist:(c.hist||[]).length,inToday:APP.cardInToday?APP.cardInToday(c):null}));const sch=(APP.SCHED&&APP.SCHED.all)?APP.SCHED.all(APP.today()).map(e=>(e.due||'')+' '+(e.src||e.kind||'')+' '+String(e.txt||e.title||'').slice(0,80)+(e.late?' LATE':'')+(e.dupOf?' dup='+e.dupOf:'')):'nosched';return JSON.stringify({today:APP.today(),cards,sched:sch}).slice(0,5000)})()\n"}

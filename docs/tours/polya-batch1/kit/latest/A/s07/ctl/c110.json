@@ -1,1 +1,1 @@
-{"shot":{"name":"part_today_lists_2026-12-01","full":true}}
+{"eval": "(()=>{APP.go(\"practice\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/قفسهٔ مدل/.test(b.textContent));b.click();return MT(\"باز (\",500)})()"}

@@ -1,1 +1,1 @@
-{"shot": {"name": "part_today_late", "full": true}}
+{"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({id:c.id,tid:c.tid,subj:c.subj,state:c.state,due:c.due,src:c.src})),fc:APP.S.all('fcast',x=>1).map(x=>[x.q,x.p,x.due,x.src])})"}

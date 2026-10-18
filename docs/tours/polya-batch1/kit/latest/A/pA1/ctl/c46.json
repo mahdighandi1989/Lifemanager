@@ -1,1 +1,1 @@
-{"eval": "[...document.getElementById(\"lpBBest\").options].map(o=>o.value+\"=\"+o.textContent.slice(0,110)).join(\"\\n\")"}
+{"eval": "[...document.getElementById(\"lpBBest\").options].map(o=>o.value+\"=\"+o.textContent.slice(0,160)).join(\"\\n\")+\"\\nUSE=\"+document.getElementById(\"lpBUse\").value.slice(0,60)+\"\\nTASTE=\"+document.getElementById(\"lpBTaste\").value.slice(0,60)+\"\\nNEW=\"+document.getElementById(\"lpBNew\").value.slice(0,60)"}

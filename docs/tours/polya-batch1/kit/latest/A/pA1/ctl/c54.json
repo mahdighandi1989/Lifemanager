@@ -1,1 +1,1 @@
-{"eval": "(()=>{const pq=APP.S.all(\"prereq\",x=>1).length;const kc=APP.S.all(\"kcase\",x=>1).map(k=>[k.title,k.stage||k.step,k.status||k.state,(k.ev||[]).length]);APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return \"prereq=\"+pq+\" kcase=\"+JSON.stringify(kc)+\"\\n\"+t.slice(i,i+2600)})()"}
+{"eval": "(()=>{APP.go('dossier','pb_l_mvaqm3fjybe');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}

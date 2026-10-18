@@ -1,1 +1,1 @@
-{"eval": "[...document.querySelectorAll(\"button\")].filter(b=>/بله|عوض شود|نه، همان/.test(b.textContent)).map(b=>b.className+\":\"+b.textContent.trim().slice(0,60)+\" @\"+(b.closest(\".as-root\")?\"panel\":\"main\")).join(\" | \")"}
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqmsr1vpb\");return MT(\"داده‌ها\",900)})()"}

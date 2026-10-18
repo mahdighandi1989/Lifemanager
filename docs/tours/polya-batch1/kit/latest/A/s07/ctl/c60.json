@@ -1,1 +1,1 @@
-{"say": "می‌خوام عادت کنم قبل از هر اندازه‌گیری پیش‌بینیِ عددی با درصدِ اطمینان بنویسم و بعد ببینم چقدر درست بوده — برای آزمایش‌های بعدیِ لوبیا یه تمرین برام راه بنداز."}
+{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");const j=t.indexOf(\"⚫ نقطه\");return t.slice(i,j+400)})()"}

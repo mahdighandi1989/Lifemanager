@@ -1,1 +1,1 @@
-{"clock": "2026-11-10", "eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"}
+{"eval": "(()=>{const sel=document.querySelector('.prc-tsel');sel.value='41';sel.dispatchEvent(new Event('change',{bubbles:true}));const b=document.querySelector('.prc-start');b.click();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+' | '+FL().slice(0,900)})()"}

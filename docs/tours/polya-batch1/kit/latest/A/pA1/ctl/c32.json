@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=[...document.querySelectorAll(\"#main button\")].find(b=>/ذخیرهٔ پله‌ها/.test(b.textContent));s.click();let t=TT();const b=[...document.querySelectorAll(\"#main button\")].find(b=>/باز نشد ⇐ پلهٔ بعد/.test(b.textContent));if(b)b.click();return t+\" | \"+MT(\"پلهٔ ۴\",500)})()"}
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm3fjybe\");return APP.state.sub+\" | \"+MT(\"❔\",400)+\"\\n\"+BL().split(\" | \").filter(x=>/lp-/.test(x)).join(\" | \")})()"}

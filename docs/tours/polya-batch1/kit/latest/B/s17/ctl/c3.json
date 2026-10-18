@@ -1,1 +1,1 @@
-{"eval":"(()=>{const o=JSON.parse(localStorage.getItem(\"mla.records.v1\"));return APP.state.view+\" \"+Object.values(o).filter(r=>r&&r.type===\"eprob\"&&r.live).map(r=>r.id).join(\";\")})()"}
+{"say":"اول اندازه. چون تا ندونم چقدر آب جمع می‌شه نمی‌دونم پلاستیکی اونقدر بزرگ پیدا می‌شه یا نه، جاشم بستگی به اندازه‌ش داره. اینو قدم به قدم حل کنیم."}

@@ -1,1 +1,1 @@
-{"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

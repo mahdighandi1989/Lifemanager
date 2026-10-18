@@ -1,0 +1,1 @@
+{"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='بعداً').click();return 'later; age='+APP.AGE.age()})()"}

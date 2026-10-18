@@ -1,1 +1,1 @@
-{"eval": "[...document.querySelectorAll(\"#main .bad,#main .lp-umiss,#main [class*=soft]\")].map(e=>e.className+\": \"+e.textContent.trim()).filter(x=>x.length>12).join(\"\\n\")+\"\\nSUB:\"+APP.state.sub+\" PH:\"+APP.livePhase(\"pb_l_mvaqm28hcuh\")+\"\\n\"+FL(\"Soft|soft|lpPr\")+\"\\nTT:\"+TT()"}
+{"eval": "JSON.stringify({ans:APP.ASSIST.cur().coach.ansBy||APP.ASSIST.cur().coach.ans, ph:APP.ASSIST.cur().coach.ph})+\"\\n\"+JSON.stringify(APP.liveCoach(\"pb_l_mvaqm37mtgx\"))"}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return r.p.statement})()"}
+{"say": "یه اصلاح: اولش گفتم «تا ۱۵ آذر» باید قیمت رو اعلام کنم — اشتباه گفتم، تا ۲۰ آذره."}

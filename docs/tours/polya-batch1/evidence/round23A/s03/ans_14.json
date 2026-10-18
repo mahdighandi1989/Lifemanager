@@ -1,0 +1,1 @@
+{"reply": "فرض را جدا کردی و لانهٔ کبوتری را هم دیدی. یک قدم دقیق‌تر: شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟", "status": "related", "next": false, "outside": "", "know": [], "actions": [{"do": "coach_state", "ph": "u", "said": ["d", "plan"], "ans": ["u2"], "stuck": false, "fail": false, "role": "self", "nat": "objective"}]}

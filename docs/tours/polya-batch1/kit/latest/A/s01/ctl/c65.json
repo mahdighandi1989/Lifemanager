@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm28hcuh\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/پروندهٔ کامل/.test(b.textContent));if(b)b.click();return APP.state.view+\" \"+APP.state.arg+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,6000)})()"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>{const L=r.p.live||{};return {k:Object.keys(L),steps:(L.steps||[]).map(s=>({t:(s.text||s.t||'').slice(0,60),done:s.done,from:s.from,auto:s.auto,what:(s.what||s.out||'').slice(0,60),chat:s.chat}))}}))"}

@@ -1,1 +1,1 @@
-{"exit": true}
+{"eval": "(()=>document.querySelector('#main').innerText.slice(0,9000))()"}

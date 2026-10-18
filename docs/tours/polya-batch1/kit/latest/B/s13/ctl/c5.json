@@ -1,1 +1,1 @@
-{"eval":"(()=>{const o=JSON.parse(localStorage.getItem(\"mla.records.v1\"));return Object.values(o).filter(r=>r&&r.type===\"eprob\"&&r.live).map(r=>r.id).join(\";\")})()"}
+{"eval0":"__adv(1);1","say":"دیشب فکر کردم. سؤالم اشتباه بود. سؤال واقعیم اینه: چطور جلوی ادامه‌ش رو بگیرم بی‌آنکه دوستم رو نابود کنم؟ می‌خوام اینو مسئله‌ی حل‌نشده‌ی خودم کنم."}

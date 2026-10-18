@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0j1vok\");return MT(\"داده\",50)+\"\\n\"+FL(\"lpD_|lpOne|lpUnk\").slice(0,800)})()"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);return document.querySelectorAll(\".as-panel svg\").length+\" svgs; mx-plot=\"+document.querySelectorAll(\".as-panel .mx-plot\").length+\"; ptsAt=\"+APP.ASSIST.cur().msgs[0].ptsAt+\"; plotAdd=\"+JSON.stringify(APP.ASSIST.cur().msgs[0].plotAdd)})()"}

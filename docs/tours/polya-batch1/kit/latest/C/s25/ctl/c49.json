@@ -1,1 +1,1 @@
-{"shot": {"name": "c1_panel", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const b=document.querySelector('.as-body,.as-msgs');if(b)b.scrollTop=b.scrollHeight;return 'panel'})()"}}
+{"shot": {"name": "c1_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 'opened'})()"}}

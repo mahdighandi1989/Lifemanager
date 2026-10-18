@@ -1,1 +1,1 @@
-{"shot": {"name": "dossier21_full_2", "full": true}}
+{"eval": "(()=>{APP.go('lprob','pb_l_mvaqqcuk5hw');const e=document.querySelector('.prc-sec');if(e)e.scrollIntoView({block:'center'});return e?e.innerText.slice(0,900):'NOSEC'})()"}

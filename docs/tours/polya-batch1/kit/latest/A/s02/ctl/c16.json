@@ -1,1 +1,1 @@
-{"say": "اگه جا شده باشه، یه سرش کف بار تو یه گوشه‌ست و سر دیگه‌ش بالا، گوشهٔ روبه‌رو! پس ارتفاع رو استفاده نکردم. قطر کف با ارتفاع یه مثلث قائم دیگه می‌سازه: sqrt(3.67^2 + 1.6^2) ≈ 4.005. جا میشه! حلش کردم دیگه، حل شد!"}
+{"eval": "(()=>{const c=APP.liveCoach(\"pb_l_mvaqmsr1vpb\");return JSON.stringify({src:c.src,stuckN:c.stuckN,unused:c.unused,rung:c.rung})})()"}

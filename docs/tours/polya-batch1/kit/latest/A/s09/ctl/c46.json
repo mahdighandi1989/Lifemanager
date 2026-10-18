@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return JSON.stringify({st:r.p.statement,src:r.src||r.p.src})})()"}
+{"eval": "JSON.stringify(APP.S.all(\"deadline\",x=>1).map(x=>[x.id,x.what,x.date,x.src&&x.src.span]))"}

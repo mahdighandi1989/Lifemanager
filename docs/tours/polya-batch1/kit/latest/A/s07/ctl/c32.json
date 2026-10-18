@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,r.p.created||r.created,r.sess,APP.liveChatQs(r.p.id)]))"}
+{"eval": "MT(\"غافلگیر\",900)+\"\\n###\\n\"+MT(\"مثالِ نقض\",400)+\"\\n###\"+MT(\"دامنه\",400)"}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"}
+{"eval": "(()=>{APP.go('dossier','pb_l_mvc6bw3zzzi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"}

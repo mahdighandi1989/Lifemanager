@@ -1,1 +1,1 @@
-{"eval": "(()=>{window.__PID=window.__PID2;return window.__PID;})()\n"}
+{"eval": "(()=>{window.__PID2=APP.state.arg;return APP.state.arg+' '+JSON.stringify(APP.liveKindInfo(APP.state.arg));})()\n"}

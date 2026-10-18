@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('today');const d=(APP.dueList()||[]).map(x=>x.txt).join(' || ');APP.go('tech','24','ws:ex_mvqgpqzz2kkle');return d})()"}
+{"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({id:c.id,tid:c.tid,subj:c.subj,state:c.state,due:c.due})),ex:APP.S.all('ex',e=>e.tid===24).map(e=>({id:e.id,st:e.status,prc:e.prc,rows:((e.data||{}).preds||[]).map(r=>[r.st,r.conf,r.due,r.fc])})),fc:APP.S.all('fcast',x=>1).map(x=>[x.q||x.text,x.p||x.conf,x.due||x.when])})"}
