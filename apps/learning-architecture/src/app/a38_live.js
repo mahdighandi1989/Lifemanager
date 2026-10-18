@@ -3661,7 +3661,7 @@
 
   /* ---------- «امروز»: یک سطر برای هر نوع ---------- */
   A.liveDue = function () {
-    var t = A.today(), steps = [], back = [], incub = [], coach = [], checkin = [];
+    var t = A.today(), steps = [], back = [], incub = [], coach = [], checkin = [], kept = [];
     lives().forEach(function (r) {
       if (r.dormant && r.dormant <= t && !r.woke) back.push(r);
       var pg = S.get("eprog_" + r.p.id); if (!pg || !pg.solve || !pg.solve.live) return;
@@ -3669,9 +3669,11 @@
       var L = live(s);
       if (ph !== "done" && L.incub && !L.incub.back && L.incub.due <= t) incub.push(r);   // «کنار بگذار تا فردا» ⇒ فردا: چه به ذهنت رسید؟
       if (r.coach && L.coach && L.coach.due && L.coach.due <= t && L.coach.last && !L.coach.last.back) coach.push(r);   // پیگیریِ فاصله‌دارِ مربیگری
-      if (!(o && o.due <= t && ph === "c") && !(r.dormant && r.dormant > t && !r.woke) && checkDue(r, s)) checkin.push(r);   // مرورِ میانهٔ راه روی نردبانِ خودِ مسئله (روزی که گامی موعد دارد، همان سطرِ گام بس است — کارت در صفحه هست)
+      if (!(o && o.due <= t && ph === "c") && !(r.dormant && r.dormant > t && !r.woke) && checkDue(r, s)) checkin.push(r);
+      /* دورِ ۲۲ (P8، بانکِ R22 #174): مسئلهٔ تازه‌ای که در بازنگری نگه داشته شد (b.newProbs، بی مسئلهٔ زنده) هم روی همان پلهٔ دومِ نردبان در «امروز» برمی‌گردد — تا خودش «باز کن» بزند */
+      var bb = s.b && s.b[1]; ((bb && bb.newProbs) || []).forEach(function (x) { if (!x || x.pid || x.dismissed) return; var due = x.due || A.addDays(String(x.at || t).slice(0, 10), LADDER[1]); if (due <= t) kept.push({ r: r, x: x }); });   // مرورِ میانهٔ راه روی نردبانِ خودِ مسئله (روزی که گامی موعد دارد، همان سطرِ گام بس است — کارت در صفحه هست)
     });
-    return { steps: steps, back: back, incub: incub, coach: coach, checkin: checkin };
+    return { steps: steps, back: back, incub: incub, coach: coach, checkin: checkin, kept: kept };
   };
   function backFrom(r) {
     var o = r.origin || {}, pr = o.type === "lprob" ? rec(o.id) : null;
@@ -3694,6 +3696,7 @@
         else if (D.back.length > 1) items.push({ k: "knot", live: D.back.length, txt: "🧩 " + fa(D.back.length) + " مسئلهٔ تازه‌ای که خودت ساختی برگشت", sub: D.back.slice(0, 3).map(function (y) { return "«" + clip(y.p.title, 40) + "»"; }).join(" · ") + (D.back.length > 3 ? " و " + fa(D.back.length - 3) + " تای دیگر" : ""), go: function () { A.go("lprob", D.back[0].p.id, "u"); } });
         D.incub.forEach(function (y) { var ic = live(solOf(pgOf(y.p.id))).incub || {}, d0 = ic.d || String(ic.at || "").slice(0, 10), n = d0 && A.daysBetween ? A.daysBetween(d0, A.today()) : 1;
           items.push({ k: "knot", live: 1, txt: "😴 " + (n > 1 ? fa(n) + " روز پیش" : "دیروز") + " «" + clip(y.p.title, 60) + "» را کنار گذاشتی — چه چیزی به ذهنت رسید؟", sub: "پس از تلاشِ جدی؛ همان را بنویس، حتی «هیچ»", go: function () { A.go("lprob", y.p.id); } }); });
+        (D.kept || []).forEach(function (y) { items.push({ k: "knot", live: 1, txt: "🧩 مسئلهٔ تازه‌ای که در بازنگری ساختی برگشت: «" + clip(y.x.title || y.x.t, 70) + "»", sub: "از بازنگریِ «" + clip(y.r.p.title, 40) + "» — حالا حلش می‌کنی؟ («باز کن» در پروندهٔ همان مسئله)", go: function () { A.go("dossier", y.r.p.id); } }); });
         D.checkin.forEach(function (y) { items.push({ k: "knot", live: 1, txt: "🔭 میانهٔ راهِ «" + clip(y.p.title, 60) + "»: چه آموختی؟", sub: "دربارهٔ مسئله و دربارهٔ خودت — هنوز همان را می‌خواهی؟", go: function () { A.go("lprob", y.p.id); } }); });
         D.coach.forEach(function (y) { items.push({ k: "knot", live: 1, txt: "🧑‍🏫 پیگیریِ مربیگری: «" + clip((y.coach && y.coach.who) || "", 30) + "» — «" + clip(y.p.title, 50) + "»", sub: "این بار بی همان پرسش (یا با پرسشی کلی‌تر) می‌رسد؟", go: function () { A.go("lprob", y.p.id); } }); });
       } catch (e) { console.warn(e); }

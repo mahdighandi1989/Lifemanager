@@ -40693,7 +40693,7 @@ APP.goFromURL = function (q) {
         fa: "گامِ «" + String(st.text || "").slice(0, 50) + "»" + (o.what ? " — «" + String(o.what).slice(0, 40) + "»" : "") + (o.from === "chat" ? " (از گفت‌وگو)" : "") + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }); });
       /* بازنگری‌ای که دستیار از گفت‌وگو ثبت کرد (chat_solved) فقط وقتی شمرده می‌شود که درسش به قلمِ خودِ کاربر باشد (b.own) — R7 */
       /* تورِ پولیا (RM1a): وارسیِ سنجیده از پیام‌های خودِ کاربر (chkBy: msgs) هم بازنگریِ اوست، حتی اگر درس را دستیار نوشت */
-      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own && b.chkBy !== "msgs") return; var la = { id: "lb:" + pid + ":" + lv, at: b.at || b.doneAt || "", pid: pid, fa: "بازنگری" + (b.chkRes ? " — " + String(b.chkRes).slice(0, 40) : "") + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }; if (b.skipped) add("back", "lb", false, la); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم", la); });
+      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own && b.chkBy !== "msgs") return; if (b.superseded && b.verdict === "unverified" && b.chkBy === "superseded") return;   /* دورِ ۲۲ (P8، B·D21، بانکِ R22 #179): حکمی که با اصلاحِ داده کنار رفت دیگر «بازنگری — نتیجه سالم ماند» ِ موفق نیست (تا دوباره وارسی شود) */ var la = { id: "lb:" + pid + ":" + lv, at: b.at || b.doneAt || "", pid: pid, fa: "بازنگری" + (b.chkRes ? " — " + String(b.chkRes).slice(0, 40) : "") + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }; if (b.skipped) add("back", "lb", false, la); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم", la); });
       /* تورِ پولیا (RM1b): تونلِ زنده هم شاهدِ طرح است — هر طرحِ ثبت‌شده (کنونی و پیشین‌ها) یک موفقیت؛ مسئلهٔ کمکی که پلش زده شد موفقیت و آن‌که به کار
          نیامد شکست؛ داده‌ای که تا آن گام بی‌کار بود و در گامی به کار رفت (برد «datum») موفقیت. هیچ وزنی نیست؛ همان رکوردهای a38. */
       var L18 = sv.live || {};
@@ -48278,7 +48278,7 @@ APP.goFromURL = function (q) {
 
   /* ---------- «امروز»: یک سطر برای هر نوع ---------- */
   A.liveDue = function () {
-    var t = A.today(), steps = [], back = [], incub = [], coach = [], checkin = [];
+    var t = A.today(), steps = [], back = [], incub = [], coach = [], checkin = [], kept = [];
     lives().forEach(function (r) {
       if (r.dormant && r.dormant <= t && !r.woke) back.push(r);
       var pg = S.get("eprog_" + r.p.id); if (!pg || !pg.solve || !pg.solve.live) return;
@@ -48286,9 +48286,11 @@ APP.goFromURL = function (q) {
       var L = live(s);
       if (ph !== "done" && L.incub && !L.incub.back && L.incub.due <= t) incub.push(r);   // «کنار بگذار تا فردا» ⇒ فردا: چه به ذهنت رسید؟
       if (r.coach && L.coach && L.coach.due && L.coach.due <= t && L.coach.last && !L.coach.last.back) coach.push(r);   // پیگیریِ فاصله‌دارِ مربیگری
-      if (!(o && o.due <= t && ph === "c") && !(r.dormant && r.dormant > t && !r.woke) && checkDue(r, s)) checkin.push(r);   // مرورِ میانهٔ راه روی نردبانِ خودِ مسئله (روزی که گامی موعد دارد، همان سطرِ گام بس است — کارت در صفحه هست)
+      if (!(o && o.due <= t && ph === "c") && !(r.dormant && r.dormant > t && !r.woke) && checkDue(r, s)) checkin.push(r);
+      /* دورِ ۲۲ (P8، بانکِ R22 #174): مسئلهٔ تازه‌ای که در بازنگری نگه داشته شد (b.newProbs، بی مسئلهٔ زنده) هم روی همان پلهٔ دومِ نردبان در «امروز» برمی‌گردد — تا خودش «باز کن» بزند */
+      var bb = s.b && s.b[1]; ((bb && bb.newProbs) || []).forEach(function (x) { if (!x || x.pid || x.dismissed) return; var due = x.due || A.addDays(String(x.at || t).slice(0, 10), LADDER[1]); if (due <= t) kept.push({ r: r, x: x }); });   // مرورِ میانهٔ راه روی نردبانِ خودِ مسئله (روزی که گامی موعد دارد، همان سطرِ گام بس است — کارت در صفحه هست)
     });
-    return { steps: steps, back: back, incub: incub, coach: coach, checkin: checkin };
+    return { steps: steps, back: back, incub: incub, coach: coach, checkin: checkin, kept: kept };
   };
   function backFrom(r) {
     var o = r.origin || {}, pr = o.type === "lprob" ? rec(o.id) : null;
@@ -48311,6 +48313,7 @@ APP.goFromURL = function (q) {
         else if (D.back.length > 1) items.push({ k: "knot", live: D.back.length, txt: "🧩 " + fa(D.back.length) + " مسئلهٔ تازه‌ای که خودت ساختی برگشت", sub: D.back.slice(0, 3).map(function (y) { return "«" + clip(y.p.title, 40) + "»"; }).join(" · ") + (D.back.length > 3 ? " و " + fa(D.back.length - 3) + " تای دیگر" : ""), go: function () { A.go("lprob", D.back[0].p.id, "u"); } });
         D.incub.forEach(function (y) { var ic = live(solOf(pgOf(y.p.id))).incub || {}, d0 = ic.d || String(ic.at || "").slice(0, 10), n = d0 && A.daysBetween ? A.daysBetween(d0, A.today()) : 1;
           items.push({ k: "knot", live: 1, txt: "😴 " + (n > 1 ? fa(n) + " روز پیش" : "دیروز") + " «" + clip(y.p.title, 60) + "» را کنار گذاشتی — چه چیزی به ذهنت رسید؟", sub: "پس از تلاشِ جدی؛ همان را بنویس، حتی «هیچ»", go: function () { A.go("lprob", y.p.id); } }); });
+        (D.kept || []).forEach(function (y) { items.push({ k: "knot", live: 1, txt: "🧩 مسئلهٔ تازه‌ای که در بازنگری ساختی برگشت: «" + clip(y.x.title || y.x.t, 70) + "»", sub: "از بازنگریِ «" + clip(y.r.p.title, 40) + "» — حالا حلش می‌کنی؟ («باز کن» در پروندهٔ همان مسئله)", go: function () { A.go("dossier", y.r.p.id); } }); });
         D.checkin.forEach(function (y) { items.push({ k: "knot", live: 1, txt: "🔭 میانهٔ راهِ «" + clip(y.p.title, 60) + "»: چه آموختی؟", sub: "دربارهٔ مسئله و دربارهٔ خودت — هنوز همان را می‌خواهی؟", go: function () { A.go("lprob", y.p.id); } }); });
         D.coach.forEach(function (y) { items.push({ k: "knot", live: 1, txt: "🧑‍🏫 پیگیریِ مربیگری: «" + clip((y.coach && y.coach.who) || "", 30) + "» — «" + clip(y.p.title, 50) + "»", sub: "این بار بی همان پرسش (یا با پرسشی کلی‌تر) می‌رسد؟", go: function () { A.go("lprob", y.p.id); } }); });
       } catch (e) { console.warn(e); }
@@ -50375,10 +50378,13 @@ APP.goFromURL = function (q) {
     if (msg.classList.contains("as-typing")) return;
     var tx = msg.querySelector(".as-tx"); if (!tx) return;
     var t = msgSrc(tx), f = fenOf(t);
-    try { if (f) tx.insertAdjacentElement("afterend", board(f)); } catch (e) { }
+    try { if (f && !msg.querySelector(".mx-board")) tx.insertAdjacentElement("afterend", board(f)); } catch (e) { }
     try {
       /* دورِ ۲۱ (R9/R3h، B·s19): اندازه‌هایی که صفحه از پیامِ او رکورد کرد (m.pts) منبعِ نمودارند — اصلاحِ گفت‌وگو رکورد را عوض می‌کند و نمودار از نو کشیده می‌شود */
       var rec0 = msgRec(msg), P0 = rec0 && rec0.m && rec0.m.pts && rec0.m.pts.length >= 2 ? rec0.m.pts : null;
+      /* دورِ ۲۲ (P8، A22-16، بانکِ R22 #180): پس از بارگذاریِ دوباره پیام پیش از سشن (یا پیش از همهٔ پیام‌ها) کشیده می‌شود ⇒ رکوردش هنوز پیدا نیست؛
+         نشانِ «دیده شد» برداشته و یک بار دیگر (کمی بعد) وارسی می‌شود، نه این‌که تا تغییرِ بعدیِ DOM بی نمودار بماند */
+      if (!rec0 && msg.classList.contains("user") && !msg.querySelector(".mx-plot") && !(+msg.getAttribute("data-mxr") >= 5)) { msg.setAttribute("data-mxr", String((+msg.getAttribute("data-mxr") || 0) + 1)); setTimeout(function () { if (!msg.querySelector(".mx-plot") && msg.isConnected) { msg.removeAttribute("data-mxv"); scan(); } }, 300); }
       var d = P0 ? { xl: null, yl: P0.map(function (p) { return String(p.y); }), xn: "", yn: "", rec: true } : !f && series(t); if (!d || (!d.rec && seenBefore(msg, d))) return;
       var rec = rec0, extra = (rec && rec.m.plotAdd) || [], pl;
       var draw = function () {
@@ -50389,6 +50395,7 @@ APP.goFromURL = function (q) {
           var x1 = pl && pl.querySelector(".mx-add-tog"); if (x1) x1.focus();
         });
         if (!nw) return;
+        if (!pl) { var old0 = msg.querySelector(".mx-plot"); if (old0) pl = old0; }
         if (pl && pl.parentNode) pl.parentNode.replaceChild(nw, pl); else msg.appendChild(nw);
         pl = nw;
       };

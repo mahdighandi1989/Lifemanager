@@ -740,10 +740,13 @@
     if (msg.classList.contains("as-typing")) return;
     var tx = msg.querySelector(".as-tx"); if (!tx) return;
     var t = msgSrc(tx), f = fenOf(t);
-    try { if (f) tx.insertAdjacentElement("afterend", board(f)); } catch (e) { }
+    try { if (f && !msg.querySelector(".mx-board")) tx.insertAdjacentElement("afterend", board(f)); } catch (e) { }
     try {
       /* دورِ ۲۱ (R9/R3h، B·s19): اندازه‌هایی که صفحه از پیامِ او رکورد کرد (m.pts) منبعِ نمودارند — اصلاحِ گفت‌وگو رکورد را عوض می‌کند و نمودار از نو کشیده می‌شود */
       var rec0 = msgRec(msg), P0 = rec0 && rec0.m && rec0.m.pts && rec0.m.pts.length >= 2 ? rec0.m.pts : null;
+      /* دورِ ۲۲ (P8، A22-16، بانکِ R22 #180): پس از بارگذاریِ دوباره پیام پیش از سشن (یا پیش از همهٔ پیام‌ها) کشیده می‌شود ⇒ رکوردش هنوز پیدا نیست؛
+         نشانِ «دیده شد» برداشته و یک بار دیگر (کمی بعد) وارسی می‌شود، نه این‌که تا تغییرِ بعدیِ DOM بی نمودار بماند */
+      if (!rec0 && msg.classList.contains("user") && !msg.querySelector(".mx-plot") && !(+msg.getAttribute("data-mxr") >= 5)) { msg.setAttribute("data-mxr", String((+msg.getAttribute("data-mxr") || 0) + 1)); setTimeout(function () { if (!msg.querySelector(".mx-plot") && msg.isConnected) { msg.removeAttribute("data-mxv"); scan(); } }, 300); }
       var d = P0 ? { xl: null, yl: P0.map(function (p) { return String(p.y); }), xn: "", yn: "", rec: true } : !f && series(t); if (!d || (!d.rec && seenBefore(msg, d))) return;
       var rec = rec0, extra = (rec && rec.m.plotAdd) || [], pl;
       var draw = function () {
@@ -754,6 +757,7 @@
           var x1 = pl && pl.querySelector(".mx-add-tog"); if (x1) x1.focus();
         });
         if (!nw) return;
+        if (!pl) { var old0 = msg.querySelector(".mx-plot"); if (old0) pl = old0; }
         if (pl && pl.parentNode) pl.parentNode.replaceChild(nw, pl); else msg.appendChild(nw);
         pl = nw;
       };

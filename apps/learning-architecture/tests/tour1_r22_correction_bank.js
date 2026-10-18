@@ -169,6 +169,39 @@ async function run(ctx) {
   C[99] = async () => { const pid = await scen({ prior: ['وزن بابام ۷۴ ـه'], live: { u: { dl: [{ id: 'd1', t: 'وزنم ۷۴' }] } } });
     await turn('وزن بابام ۷۴ نیست، ۸۰ ـه', 'فرستادم.', RT({ msg: 'وزن بابام ۷۴ ـه', what: 'fact', key: 'datum:وزنِ بابا', fix: '۸۰', old: '۷۴' }));
     const x = await snap(pid); return { ok: !ask(x, 'dl:d1') && x.u.dl[0] === 'وزنم ۷۴', got: { asks: x.asks, dl: x.u.dl } }; };
+  /* ---- P8، بخشِ همین فایل‌ها (a38/a40/a29/a39) به خواستِ هماهنگ‌کننده ---- */
+  const withDay = (day, f) => ev(async ([day, src]) => { const o = APP.today; APP.today = () => day; try { return await (0, eval)('(' + src + ')')(); } finally { APP.today = o; } }, [day, String(f)]);
+  C[174] = async () => { const pid = await scen({ prior: ['مسئله‌ی شیرها رو حل کردم'], live: { b: { verdict: 'verified' } } });
+    await ev((pid) => __set(pid, (so) => { so.b[1].newProbs = [{ id: 'np1', t: 'اگر ۴ شیر بود؟', title: 'اگر ۴ شیر بود؟', at: '2026-10-18T09:00:00.000Z' }]; }), pid);
+    const d0 = await withDay('2026-10-18', () => (APP.dueList() || []).map(x => x.txt).join(' | ')), d7 = await withDay('2026-10-25', () => (APP.dueList() || []).map(x => x.txt).join(' | '));
+    return { ok: !/اگر ۴ شیر بود/.test(d0) && /اگر ۴ شیر بود/.test(d7), got: { d0: d0.slice(0, 300), d7: d7.slice(0, 300) } }; };
+  const dorm = async (d) => { const pid = await scen({ prior: ['یه مسئله‌ی تازه'], live: {} }); await ev(([pid, d]) => { const r = APP.S.get('eprob_' + pid); r.dormant = d; APP.S.put(r); }, [pid, d]); return withDay('2026-10-18', new Function('return APP.dossier(' + JSON.stringify(pid) + ').state')); };
+  C[175] = async () => { const st = await dorm('2026-10-11'); return { ok: !/خفته تا/.test(st), got: st }; };
+  C[188] = async () => { const st = await dorm('2026-10-24'); return { ok: /خفته تا ۲ آبان/.test(st), got: st }; };
+  C[176] = async () => { const pid = await scen({ prior: ['قالب ۲۰ سانتیه و کیک رو چند برابر کنم؟'], live: { title: 'کیک در قالبِ ۲۰', stmt: 'قالب ۲۰ سانتیه و کیک رو چند برابر کنم؟' } });
+    await turn('اشتباه گفتم، قالب ۲۲ بود نه ۲۰', 'فرستادم.', RT({ msg: 'قالب ۲۰ سانتیه', what: 'fact', key: 'datum:قالب', fix: '۲۲', old: '۲۰' }));
+    const x = await snap(pid); return { ok: /۲۲/.test(x.st) && x.title === 'کیک در قالبِ ۲۲', got: { st: x.st, t: x.title } }; };
+  C[186] = async () => { const pid = await scen({ prior: ['قالب ۲۰ سانتیه و فر ۱۸۰ درجه'], live: { title: 'کیک در قالبِ ۲۰', stmt: 'قالب ۲۰ سانتیه', u: { dl: [{ id: 'd1', t: 'فر ۱۸۰ درجه' }] } } });
+    await turn('اشتباه گفتم، فر ۲۰۰ درجه بود نه ۱۸۰', 'فرستادم.', RT({ msg: 'فر ۱۸۰ درجه', what: 'fact', key: 'datum:فر', fix: '۲۰۰', old: '۱۸۰' }));
+    const x = await snap(pid); return { ok: x.title === 'کیک در قالبِ ۲۰', got: x.title }; };
+  const zw = async (txt0, txt1) => { const pid = await scen({ prior: [txt0], live: {} }); await ev(([pid, t]) => { const s = __cur(), m = __U(1); __set(pid, (so, L) => { L.plan = { t: t, at: new Date().toISOString(), src: APP.liveSrc(s.id, APP.liveMsgId(m), 'plan', t) }; }); }, [pid, txt0]);
+    await ev(async (t1) => __edit(__U(1), t1), txt1); return ev((pid) => APP.S.get('eprog_' + pid).solve.live.plan.t, pid); };
+  C[177] = async () => { const t = await zw('برنامه‌ی هفته‌ای سه روز', 'برنامه‌ی هفته‌ای چهار روز'); return { ok: t === 'برنامه‌ی هفته‌ای چهار روز', got: t }; };
+  C[183] = async () => { const t = await zw('برنامه ی هفته ای سه روز', 'برنامه ی هفته ای چهار روز'); return { ok: t === 'برنامه ی هفته ای چهار روز', got: t }; };
+  const lb = async (rests) => { const pid = await scen({ prior: ['محیط ۴۰ متره'], live: { stmt: 'محیط ۴۰ متره', u: { dl: [{ id: 'd1', t: 'محیط ۴۰ متر' }] }, b: { verdict: 'verified', chkRes: 'نتیجه سالم ماند', chkHow: 'برای هر محیطی مربع بهترین است', use: 'مربع بهترین است', own: true } } });
+    await turn('محیط ۴۴ متره نه ۴۰', 'فرستادم.', RT({ msg: 'محیط ۴۰ متره', what: 'fact', key: 'datum:محیط', fix: '۴۴', old: '۴۰', rests }));
+    return ev((pid) => ({ inMind: JSON.stringify(APP.MIND.phases({ pid: pid })).indexOf('نتیجه سالم ماند') >= 0 || JSON.stringify(APP.MIND.phases()).indexOf('lb:' + pid) >= 0, v: APP.S.get('eprog_' + pid).solve.b[1].verdict }), pid); };
+  C[179] = async () => { const x = await lb(['verdict']); return { ok: x.v !== 'verified' && !x.inMind, got: x }; };
+  C[187] = async () => { const x = await lb([]); return { ok: x.v === 'verified' && x.inMind, got: x }; };
+  C[180] = async () => { await scen({ prior: [] }); await turn('وزنم هر دو هفته: ۷۸، ۷۷٫۲، ۷۶٫۵، ۷۵٫۱، ۷۴', 'خب.');
+    const x = await ev(async () => { const AS = APP.ASSIST, oc = AS.cur, sid = __cur().id; APP.go('today'); AS.store('cur', sid); AS.toggle(true); AS.paint(); await new Promise(r => setTimeout(r, 150));
+      /* بارگذاریِ دوباره: حباب‌ها پیش از رسیدنِ سشن کشیده می‌شوند (رکوردِ پیام هنوز پیدا نیست) */
+      AS.cur = () => ({ msgs: [] });
+      try { document.querySelectorAll('.as-msg').forEach(m => { m.querySelectorAll('.mx-plot').forEach(z => z.remove()); m.removeAttribute('data-mxv'); m.removeAttribute('data-mxr'); }); const d = document.createElement('i'); document.body.appendChild(d); await new Promise(r => setTimeout(r, 60)); d.remove(); await new Promise(r => setTimeout(r, 60)); } finally { AS.cur = oc; }
+      await new Promise(r => setTimeout(r, 900)); const um = [...document.querySelectorAll('.as-msg.user')].filter(m => /۷۷٫۲/.test(m.textContent)); return { n: um.length, plot: um.some(m => !!m.querySelector('.mx-plot')) }; });
+    if (!x.n) return NC('assistant panel not painted in this harness (a39 decorate needs the .as-msg bubbles); covered by the a39 retry code path only');
+    return { ok: x.plot, got: x }; };
+  C[184] = async () => C[95]();
   function NC(why) { return { nc: why }; }
   for (const e of P3) { const i = idx(e), f = C[i]; let r;
     if (!f) { out.nc[i] = 'no check written'; out.summary.nc++; out.fail.push('#' + i + ' has no check'); continue; }

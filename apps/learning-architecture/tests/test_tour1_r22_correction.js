@@ -242,7 +242,9 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
   info.bank.file = BANKF || '(missing)';
   if (!bank) errors.push('bank: VARIANTS_R22 not found (tests/variants/VARIANTS_R22.json)');
   else {
-    const P3 = bank.filter(e => /^P3\b|P3[.:]/.test(String(e.mech || e.rc || e.mechanism || '')));
+    /* P3 همه + بخشِ P8 که به این فایل‌ها (a38/a40/a29/a39) سپرده شد (هماهنگ‌کننده، ۲۰۲۶-۱۰-۱۸) */
+    const MINE8 = [174, 175, 176, 177, 179, 180, 183, 184, 186, 187, 188];
+    const P3 = bank.filter((e, i) => /^P3\b|P3[.:]/.test(String(e.mech || e.rc || e.mechanism || '')) || MINE8.indexOf(i) >= 0);
     info.bank.n = bank.length; info.bank.p3 = P3.length;
     const BH = require('./tour1_r22_correction_bank.js');
     const out = await BH.run({ p, ev, turn, blockOf, head, bank, P3 });

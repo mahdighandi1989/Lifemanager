@@ -56,9 +56,18 @@ AUDIT_LOG, REMOVAL_CANDIDATES, experience update.
 - 39 pass. 1 not covered (#96: withdrawing mind-card step successes by basis belongs to a29; the contract is `rests`/`uses` above).
 - On the base build (e3fcb898), 21 of the 39 checks fail. All 18 runner sentences fail there too.
 
+## P8 items given to this fixer (coordinator, same day)
+
+- #174: invented look-back problems (`b.newProbs`) come back in Today on rung 2 of the ladder (`APP.liveDue().kept`). The Today line opens that problem's dossier,
+  where «باز کن» is.
+- #179/#187: `a29` skips the «بازنگری — نتیجه سالم ماند» success while the verdict is set aside (`b.superseded` with `chkBy:"superseded"`). It comes back once she re-verifies.
+- #180: `a39` decorate retries up to 5 times when the message record is not found yet (after a reload).
+- #175/#188, #176/#186, #177/#183, #184 were already right after the P3 work (`dossier.state` guards; title by meaning; ZWNJ kept; `dedupRet22`). They are now covered by tests.
+- Bank result: 11/11 pass (4 of them are red on the base build).
+
 ## Not done (with reason)
 
 - #96 mind-card step successes by basis: a29 (prereq+route fixer).
 - Editing the proposed lesson text inside the ask box before «بله»: §12 row 53.
 - A22-30 (s09 «۳۵ تا فروختم» dropped from `src.parts`): the bank twin #79 passes after the `partOf` fix. The exact s09 record could not be replayed here.
-- P8 items «نتیجه سالم ماند» (B·D21, a29) and «ZWNJ kept» (B·D19, the plan text after ✏️) were not touched; they belong to their file owners.
+- `#180` passes on the base build too in this harness: the simulated "reload" triggers a DOM mutation. The retry path is new, but this test cannot show that it was red before.
