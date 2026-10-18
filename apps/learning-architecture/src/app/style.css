@@ -1184,3 +1184,27 @@ tr.card-retired td{opacity:.6}
 .as-msg.user .as-edit label,.as-msg.user .as-corr{color:inherit;opacity:.95}
 .as-copyask{margin:6px 0;padding:8px 10px}
 .as-copyask p{margin:4px 0;line-height:1.9}
+/* دورِ ۲۲ (P2): «🧭 نقشهٔ مسیرِ مسئله» — رنگ‌ها فقط از توکن‌ها (هر دو پوسته)؛ شکلِ عمودی تا در پهنای گوشی هم بی اسکرولِ افقی خوانا باشد */
+.rt-wrap{position:relative;max-width:560px;margin:0 auto}
+.rt-svg{display:block;width:100%;height:auto;overflow:visible}
+.rt-spine{stroke:var(--accent);stroke-width:3;stroke-linecap:round}
+.rt-spine.rt-rest{stroke:var(--ink-2);stroke-dasharray:2 6;stroke-width:2}
+.rt-spine.rt-rest.rt-done{stroke:var(--good);stroke-dasharray:none;stroke-width:3}
+.rt-det{fill:none;stroke:var(--p0);stroke-width:2.2;stroke-dasharray:3 5;stroke-linecap:round}
+.rt-det-aux{stroke:var(--p2)}.rt-det-guess{stroke:var(--warn)}.rt-det.rt-open{stroke-width:2.8}
+.rt-backjump{fill:none;stroke:var(--bad);stroke-width:2;stroke-dasharray:6 4}
+.rt-arrhead{fill:var(--bad)}
+.rt-pt{cursor:pointer;outline:none}
+.rt-pt circle{fill:var(--surface);stroke:var(--accent);stroke-width:2.5}
+.rt-pt.rt-p-det circle{stroke:var(--p0)}.rt-pt.rt-p-aux circle{stroke:var(--p2)}.rt-pt.rt-p-guess circle{stroke:var(--warn)}
+.rt-pt.rt-p-back circle{stroke:var(--bad);fill:var(--bad-soft)}
+.rt-pt.rt-end circle{fill:var(--accent-soft)}.rt-pt.rt-reached circle{fill:var(--good-soft);stroke:var(--good)}
+.rt-pt:hover circle,.rt-pt:focus circle{stroke-width:4}
+.rt-pt:focus-visible circle{stroke:var(--ink)}
+.rt-lab{fill:var(--ink);font-size:11.5px;font-family:var(--f-body)}
+.rt-nowring{fill:none;stroke:var(--accent);stroke-width:2;opacity:.6}
+.rt-tip{position:absolute;z-index:3;padding:8px 10px;max-width:none;box-shadow:var(--shadow)}
+.rt-tip ul{margin:4px 0;padding-inline-start:18px}
+.rt-geo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--accent-soft);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:4px 10px;margin-bottom:8px}
+.lp-precard ul{margin:4px 0}
+.mind-causes{margin-top:8px}.mind-causes ul{margin:4px 0}
