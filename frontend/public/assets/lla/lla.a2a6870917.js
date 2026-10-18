@@ -52134,7 +52134,7 @@ APP.goFromURL = function (q) {
   A.SUB_VIEWS = A.SUB_VIEWS || {}; A.SUB_VIEWS.practice = "lib";
 })(window.APP);
 /* ===== سن: یک تاریخِ تولد، گروهِ سنیِ رشدی، و بلوکِ «# مخاطب» (مالک ۲۰۲۶-۱۰-۱۸؛ docs/decisions/2026-10-18-age-and-user-scope.md بندهای ۳ تا ۵) =====
-   - **یک تاریخِ تولد.** در Lifemanager از پلِ میزبان (A.HOST.birth/setBirth ⇒ فیلدِ «تاریخ تولد» ِ «من که هستم»، /api/identity-profile/date_of_birth)؛
+   - **یک تاریخِ تولد.** در Lifemanager از پلِ میزبان (A.HOST.birth/setBirth ⇒ /api/me/date-of-birth، فضای خودِ کاربرِ واردشده؛ همان فیلدِ «تاریخ تولد» ِ «من که هستم»؛ سرورِ قدیمی ⇒ /api/identity-profile)؛
      پشتیبان همان settings.profile.birth ِ خودِ صفحه. همگام‌سازیِ خودکار فقط «پرکردنِ خالی» در هر دو سو است: هیچ‌کدام مقدارِ موجودِ دیگری را بی‌صدا
      نمی‌نویسد؛ اگر هر دو هستند و ناهم‌خوان، مقدارِ میزبان (حسابِ کاربر) خوانده می‌شود. ثبتِ صریحِ کاربر در صفحه (کارنامه، دستیار، کارت) به هر دو می‌رود.
      نسخهٔ مستقل و Apps Script فقط settings.profile.birth دارند.

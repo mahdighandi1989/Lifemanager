@@ -1602,3 +1602,9 @@
 - **[CHANGE] میزبان:** `LearningArchitecturePage.jsx` ⇒ `birth()` (GET `/api/identity-profile/date_of_birth`؛ ۴۰۴/۴۰۵ ⇒ فهرستِ کاملِ فیلدها) و `setBirth(d)` (PUT همان فیلد، قفلِ مالک).
 - آزمون: `tests/test_age_audience.js`، `tests/test_age_norms.js`، `tests/test_age_sync.js` — هر سه روی ساختِ پایه قرمز (کدِ خروجِ ۱)، پس از اصلاح سبز؛ `test_psy.js` و `test_psy_v2.js` بی‌تغییر سبز.
 > **امضا:** `Claude Code (بستهٔ سن، بخشِ ۲)` · 2026-10-18 · سه آزمونِ تازه قرمز روی ساختِ پایه و سبز پس از اصلاح؛ build.py + کلِ آزمون‌های صفحه؛ pytest ِ دفترچه و مالکیت
+
+## 2026-10-18 (89) — بستهٔ سن: پلِ میزبان روی نقطهٔ هر-کاربرِ /api/me/date-of-birth
+- **[CHANGE] میزبان:** پس از ادغامِ بخشِ ۱ (`GET/PUT /api/me/date-of-birth`، `get_signed_in_user_id` ⇒ همیشه فضای خودِ کاربرِ واردشده)، `birth()` از `date_of_birth` ِ همین نقطه می‌خواند و
+  `setBirth(d)` با `{date_of_birth}` می‌نویسد. `/api/identity-profile` فقط پشتیبانِ ۴۰۴/۴۰۵ (سرورِ قدیمی) است — PUT ِ آن بی توکن می‌توانست در فضای ۰ بنشیند. سرآغازِ `a43_age.js` هم‌سو شد.
+- آزمون: `tests/test_age_sync.js` — پل باید نقطهٔ تازه را بخواند/بنویسد و `identity-profile` فقط پس از آن و فقط در شاخهٔ ۴۰۴/۴۰۵ بیاید.
+> **امضا:** `Claude Code (بستهٔ سن، بخشِ ۲)` · 2026-10-18 · test_age_sync سبز؛ کلِ آزمون‌های صفحه؛ pytest ِ سن و دفترچه و مالکیت؛ npm run build

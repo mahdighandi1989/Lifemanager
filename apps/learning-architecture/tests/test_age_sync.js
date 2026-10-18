@@ -1,4 +1,4 @@
-// بستهٔ سن، بخشِ ۲ (بندِ ۳): یک تاریخِ تولد. در میزبان از پلِ میزبان (A.HOST.birth / setBirth ⇒ /api/identity-profile/date_of_birth)
+// بستهٔ سن، بخشِ ۲ (بندِ ۳): یک تاریخِ تولد. در میزبان از پلِ میزبان (A.HOST.birth / setBirth ⇒ /api/me/date-of-birth، فضای خودِ کاربر؛ پشتیبانِ ۴۰۴/۴۰۵: /api/identity-profile)
 // خوانده می‌شود؛ پشتیبان settings.profile.birth ِ خودِ صفحه؛ پرکردنِ خالی در هر دو سو (هیچ‌کدام مقدارِ موجودِ دیگری را بی‌صدا نمی‌نویسد)؛
 // ثبتِ صریحِ کاربر در صفحه به هر دو می‌رود؛ نسخهٔ مستقل/GAS همان settings.profile.birth.
 const { chromium } = require('playwright');
@@ -57,7 +57,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // (the pytest runner copies tests/ into a sandbox and symlinks src/ ⇒ the repo root is found from the real path of src/)
   const repo = path.join(fs.realpathSync(path.join(__dirname, '..', 'src')), '..', '..', '..');
   const jsx = fs.readFileSync(path.join(repo, 'frontend', 'src', 'pages', 'LearningArchitecturePage.jsx'), 'utf8');
-  chk(/birth:\s*\(\)\s*=>/.test(jsx) && /setBirth:\s*\(/.test(jsx) && /identity-profile\/date_of_birth/.test(jsx), 'host bridge exposes birth()/setBirth() over /api/identity-profile/date_of_birth');
+  const bridge = (jsx.match(/birth: \(\) =>[\s\S]*?remindStatus:/) || [''])[0];
+  chk(/birth:\s*\(\)\s*=>\s*api\.get\('\/me\/date-of-birth'\)/.test(bridge) && /setBirth:\s*\(d\)\s*=>\s*api\.put\('\/me\/date-of-birth',\s*\{\s*date_of_birth:\s*d\s*\}\)/.test(bridge) && /r\.data\.date_of_birth/.test(bridge),
+    'host bridge reads/writes the per-user /api/me/date-of-birth (date_of_birth field)');
+  chk(/st !== 404 && st !== 405/.test(bridge) && /'\/identity-profile'/.test(bridge) && bridge.indexOf("'/me/date-of-birth'") < bridge.indexOf("'/identity-profile'"),
+    'identity-profile is only the 404/405 fallback, after /api/me/date-of-birth');
   await b.close();
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
 })().catch(e => { console.error(e); process.exit(1); });
