@@ -5,7 +5,7 @@
    ساختار — چت فقط «لایهٔ جلو» است؛ خودِ صفحه «پشتِ صحنه» می‌ماند و بی‌چت هم کامل کار می‌کند:
      • اشراف از خودِ ثبت‌گاه‌ها ساخته می‌شود، نه دستی: A.V (همهٔ نماها) + A.VIEW_META + منوها + سه مسیرِ کاری + واژه‌نامه + تکنیک‌ها،
        ایستگاه‌ها، خانواده‌های گره، حرکت‌ها + دادهٔ خودِ کاربر + فیلدهای همین لحظهٔ صفحه (پویشِ DOM). نمای تازه = اشرافِ تازه (آزمون: test_assist.js).
-     • هوشِ چت (کارِ «lla_assistant»: سریع، ارزان، بینا) فقط راه می‌نماید، فرم پر می‌کند، فایل را کوتاه می‌خواند و پیوست می‌کند؛
+     • هوشِ چت (کارِ «lla_assistant»: سریع، ارزان، بینا؛ نوبت‌های مربی‌گری «lla_coach» — AS.chatTask، دورِ ۲۰) فقط راه می‌نماید، فرم پر می‌کند، فایل را کوتاه می‌خواند و پیوست می‌کند؛
        کارِ عمیق با همان دکمه‌های هوشِ خودِ بخش‌هاست. حکم و نمره کارِ صفحه و خودِ کاربر است (هوش هرگز داوری نمی‌کند).
      • هر اثر از راهِ خودِ فرم‌های صفحه است (مقدار + رویدادِ input/change) ⇒ همان ذخیره‌ای که دستی رخ می‌دهد.
      • سشن = رکوردِ «achat»؛ پیوست‌ها به فولدرِ همان سشن در درایو (…/دستیار — گفت‌وگوها/<نام · شناسه>/پیوست‌ها/) و آینه
@@ -520,10 +520,10 @@
   /* پاسخِ غیرِ JSON دو بار پشتِ هم ⇒ همان متن به‌عنوانِ پاسخ (بی کار روی صفحه)، نه خطا */
   function ask(sys, user, opts) {
     var o2 = Object.assign({}, opts, { withMeta: true });
-    return A.callAI(sys, user, o2).then(function (r1) {
+    return callTask(sys, user, o2).then(function (r1) {
       r1 = unwrap(r1);
       try { var o = parse(r1.text); o._files = r1.files; return o; } catch (e) {
-        return A.callAI(sys, user, o2).then(function (r2) {
+        return callTask(sys, user, Object.assign({}, o2, { task: r1._task || o2.task })).then(function (r2) {
           r2 = unwrap(r2);
           try { var o3 = parse(r2.text); o3._files = r2.files; return o3; } catch (e2) {
             var t = String(r2.text || r1.text || "").replace(/```[a-z]*|```/g, "").trim();
@@ -533,6 +533,41 @@
       }
     });
   }
+
+  /* ---------- کدام «کار» (task route) برای این نوبتِ گفت‌وگو — تورِ پولیا دورِ ۲۰، تصمیمِ MT2 (۲۰۲۶-۱۰-۱۸) ----------
+     شاهد (models20): همان پرامپت‌ها روی ردهٔ سریع ۴ از ۸ سناریو شکست، روی ردهٔ میانه ۰ از ۸ — فرق در داوریِ نوبتِ سرنوشت‌ساز و دیدنِ پاسخِ اوست.
+     پس نوبتی که لایهٔ مربی در آن فعال است ⇒ «lla_coach» (ردهٔ میانهٔ استدلالی، نه گران‌ترین؛ گزینشِ مدل با سرور)، و نوبتِ فقط-عمل و پیگیریِ
+     خودکار ⇒ «lla_assistant» ِ سریع. «فعال» از خودِ پرامپتِ ساخته‌شده خوانده می‌شود (بلوک‌های صفحه، نه حدسِ تازه): مسئلهٔ زندهٔ در کانون، معلمِ تور،
+     بازنگری، اصلاحِ حرفِ خودش، مسئلهٔ واقعیِ حل‌نشده (قاعدهٔ کامل، نه «قاعدهٔ کوتاه» ِ همیشگی)، مسئلهٔ حل‌شدهٔ مرتبط، پس از شکست؛ بلوکِ عامِ «مربیِ حل» (که بر هر نوبتِ نه-سلام می‌آید)
+     فقط با نشانهٔ مسئله/زندگی در پیامِ خودش یا وقتی نوبتِ پیشینِ کاربر هم مربی بود. پیگیریِ خودکاری که پاسخِ همان پیام را می‌نویسد
+     (دانسته‌های قلمرو، بازخوانیِ پیوست) همان ردهٔ نوبتِ کاربر را نگه می‌دارد (inherit). بی نامِ مدل؛ تابعِ خالص (آزمون: test_tour1_r20_routing.js). */
+  var COACH_HEAD = /^# (?:مسئلهٔ زندهٔ این سشن|معلمِ حلِ مسئله|پاسخ به پرسشِ بازنگری|سلیقه برای بازنگریِ|اصلاحِ پیامِ|اصلاحی که صفحه|مسئلهٔ واقعیِ حل‌نشده|مسئلهٔ حل‌شدهٔ مرتبط|پس از شکست)/m;
+  var COACH_BLOCK = /^# مربیِ حل/m;
+  var LIFE_HINT = /عادت|سلامت|رژیم|ورزش|تصمیم|زندگی/;
+  var ACT_ONLY = /(?:^|\s)(?:ثبت(?:ش)?\s*کن|بنویس(?:ش)?|برو\s*(?:به|تو)|باز(?:ش)?\s*کن|پر(?:ش)?\s*کن|ذخیره[‌\s]?(?:ش)?\s*کن|اضافه[‌\s]?(?:ش)?\s*کن|پاک(?:ش)?\s*کن)(?=[\s.!،]|$)/;
+  AS.chatTask = function (o) {
+    o = o || {}; var msg = String(o.msg || "").replace(/[‏‎]/g, "").trim(), p = String(o.prompt || "");
+    if (o.off) return "lla_assistant";   // سرورِ قدیمی «lla_coach» را رد کرد ⇒ تا بارِ بعدِ صفحه همان دستیار
+    if (/^\[سامانه/.test(msg)) return o.inherit && o.prev === "lla_coach" ? "lla_coach" : "lla_assistant";
+    /* ✏️ (a40): صفحه اصلاح را خودش و بی مدل نشانده؛ این نوبت فقط تأییدِ نتیجه است ⇒ سریع. اصلاحی که در گفت‌وگو گفته شود («پس جوابم غلط بود»)
+       را مدل باید بشناسد و گزارش کند ⇒ همان بلوکِ «# اصلاحِ پیامِ …» ⇒ مربی. */
+    if (/^\[اصلاحِ پیامِ قبلی\]/.test(msg)) return "lla_assistant";
+    var sig = [AS.CHAT_PROB, AS.LIVE_RE2, AS.LIVE_ASK, AS.LIVE_STUCK, AS.FAIL_ME, LIFE_HINT].some(function (re) { return re && re.test(msg); });
+    if (!sig && msg.length <= 120 && !/[؟?]/.test(msg) && ACT_ONLY.test(msg)) return "lla_assistant";   // فرمانِ فقط-عمل (ثبت کن، برو به، بنویس)
+    if (COACH_HEAD.test(p)) return "lla_coach";
+    if (COACH_BLOCK.test(p) && (sig || o.prev === "lla_coach")) return "lla_coach";
+    return "lla_assistant";
+  };
+  /* پشتیبان در زمانِ استقرار: «lla_coach» رد شد (سرورِ قدیمی ⇒ ۴۲۲) یا مدلی برایش جواب نداد ⇒ یک بار همان درخواست با «lla_assistant» —
+     هیچ نوبتی نمی‌شکند و نامِ مدلی به کاربر گفته نمی‌شود. ۴۲۲ ⇒ تا بارِ بعدِ صفحه دیگر «lla_coach» فرستاده نمی‌شود. */
+  function callTask(sys, user, o2) {
+    return A.callAI(sys, user, o2).catch(function (e) {
+      if (!o2 || o2.task !== "lla_coach") throw e;
+      if (e && e.response && e.response.status === 422) AS._coachOff = true;
+      return A.callAI(sys, user, Object.assign({}, o2, { task: "lla_assistant" })).then(function (r) { if (r && typeof r === "object") r._task = "lla_assistant"; return r; });
+    });
+  }
+  AS.callTask = callTask;
 
   /* ---------- کمبود ⇒ برگهٔ فوری در «نظارت و سرکشی» ---------- */
   function norm(t) { return String(t || "").replace(/[\s‌«»"'.,،:؛!?؟()\-]+/g, "").slice(0, 60); }
@@ -685,12 +720,15 @@
       });
     });
     var auto = 0, nextX = 0;
-    function turn(msg, extra, ids, first) {
+    function turn(msg, extra, ids, first, inherit) {
       // تور پیش از ساختنِ پرامپت هم هم‌گام می‌شود: کاری که کاربر بیرون از گفت‌وگو تمام کرد (مثلاً ایستگاهِ پایانی) همین نوبت دیده شود —
       // وگرنه مدل روی وضعِ کهنه جواب می‌داد (تورِ زندهٔ ۲۰۲۶-۱۰-۱۴)
       if (AS.tourAfterTurn && s.tour) { try { AS.tourAfterTurn(s); } catch (e) { console.error(e); } }
       var sc = AS.scan();
-      return AS.openSheets().then(function (l) { AS._sheets = l; AS._turnSession = s; return ask(AS.SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
+      return AS.openSheets().then(function (l) { AS._sheets = l; AS._turnSession = s; var up = AS.prompt(s, msg, sc, extra, first), task = AS.chatTask({ msg: msg, prompt: up, prev: s.aiTask || "", inherit: !!inherit, off: !!AS._coachOff });
+        if (!/^\[سامانه/.test(String(msg || "").trim())) s.aiTask = task;   // ردهٔ نوبتِ کاربر (پیگیریِ پاسخ‌نویس همان را می‌گیرد)
+        AS._lastTask = task;
+        return ask(AS.SYS, up, { task: task, fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
         if (o._files && o._files.length) { s.msgs.push({ role: "sys", at: now(), text: manifestNote(o._files) }); }
         // نامِ سشن: اگر پیامِ اول نامربوط بود (مثلاً «دستورِ پخت»)، با نخستین خواستهٔ مربوط دوباره ساخته می‌شود (کارزارِ آزمون)
         if (o.title && (!s.title || (s.titleUnrelated && o.status !== "unrelated"))) { s.title = clip(o.title, 80); s.titleUnrelated = o.status === "unrelated"; }
@@ -750,9 +788,9 @@
           var marked = !!document.querySelector("#main .as-hl, #main .as-filled");
           // know: حوزه‌هایی که مدل خواست ⇒ در سشن می‌ماند و همین حالا یک نوبت با «# دانسته‌های قلمرو»
           var know = (Array.isArray(o.know) ? o.know : []).map(String).filter(function (id) { return A.SYST && A.SYST.byId && A.SYST.byId(id) && (s.know || []).indexOf(id) < 0; }).slice(0, 4);
-          if (know.length) { s.know = (s.know || []).concat(know).slice(-6); S.put(s); if (auto < MAX_AUTO) { auto++; return turn("[سامانه: گزاره‌های حوزه‌هایی که خواستی در «# دانسته‌های قلمرو» آمد؛ حالا پاسخ بده.]"); } }
+          if (know.length) { s.know = (s.know || []).concat(know).slice(-6); S.put(s); if (auto < MAX_AUTO) { auto++; return turn("[سامانه: گزاره‌های حوزه‌هایی که خواستی در «# دانسته‌های قلمرو» آمد؛ حالا پاسخ بده.]", "", null, false, true); } }
           var reread = (Array.isArray(o.reread) ? o.reread : []).filter(function (id) { return s.files.some(function (f) { return f.id === id; }); }).slice(0, MAX_FILES);
-          if (auto < MAX_AUTO && reread.length) { auto++; return turn("[سامانه: محتوای کاملِ پیوست‌هایی که خواستی دوباره همراه است؛ ادامه بده.]", "", reread); }
+          if (auto < MAX_AUTO && reread.length) { auto++; return turn("[سامانه: محتوای کاملِ پیوست‌هایی که خواستی دوباره همراه است؛ ادامه بده.]", "", reread, false, true); }
           // «next»: مدل گفته کارِ بعدی را در همین رشته انجام می‌دهد (مثلاً پس از «ثبتِ کارت»، دکمهٔ «ساختِ نمونه‌ها») —
           // بی آن، قولِ «بعدش می‌زنم» تا پیامِ بعدیِ کاربر معطل می‌ماند (یافتهٔ تورِ زنده)
           // کاری که مدل «انجام‌شده» گفت ولی نشد (کلید پیدا نشد، تصمیمِ مالک، جوابِ تمرین، …) ⇒ یک نوبتِ اصلاح تا پاسخ دروغ نماند

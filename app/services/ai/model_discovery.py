@@ -100,6 +100,19 @@ def classify(provider_key: str, info: Dict[str, Any]) -> Optional[Dict[str, Any]
 # capability a task needs). Cheapest capable first: Flash / Sonnet for
 # reasoning, Flash-Lite / Haiku for fast work, Pro / Opus only on explicit pin.
 _TIER_PRIORITY = {"flash": 2, "sonnet": 2, "flash-lite": 3, "haiku": 3, "pro": 4, "opus": 4, "other": 6}
+# The top tier, derived from the table above (the named tiers with the highest priority number: «only on explicit
+# pin»). A task with ``tier: "balanced"`` (catalog.task_tier) orders these after the balanced models (2026-10-18).
+TOP_TIERS = frozenset(k for k, v in _TIER_PRIORITY.items()
+                      if k != "other" and v == max(p for t, p in _TIER_PRIORITY.items() if t != "other"))
+
+
+def model_tier(provider_key: str, api_id: str) -> str:
+    """The tier name of one model id by the same parser as the live refresh ("other" when unknown)."""
+    try:
+        c = classify(provider_key, {"id": api_id or "", "methods": ["generateContent"]})
+    except Exception:  # noqa: BLE001 — a tier is an ordering hint, never a failure
+        return "other"
+    return (c or {}).get("tier") or "other"
 
 
 def assign_priorities(entries: List[Dict[str, Any]]) -> None:

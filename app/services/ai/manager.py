@@ -184,7 +184,7 @@ class AIManager:
         """Automatic pick order for ``task`` (no pin): enabled models on configured providers;
         models with every REQUIRED capability of the task (if any exists) ⇒ then those with the
         PREFERRED capability first ⇒ then priority ⇒ newest. ``need`` (a file's capability) is a hard filter."""
-        from app.services.ai.catalog import task_required_capabilities
+        from app.services.ai.catalog import task_required_capabilities, task_tier
 
         if providers is None:
             providers = await self._provider_map(db)
@@ -213,6 +213,13 @@ class AIManager:
                 return ordered
         preferred = self._sort([m for m in pool if pref and pref in (m.capabilities or [])])
         rest = self._sort([m for m in pool if m not in preferred])
+        if task_tier(task) == "balanced":
+            # (2026-10-18, «lla_coach»): the catalog's top tier (Opus/Pro — «only on explicit pin») goes after the
+            # balanced models with the preferred capability; kept as the last preferred choice, never dropped
+            from app.services.ai.model_discovery import TOP_TIERS, model_tier
+
+            top = [m for m in preferred if model_tier(m.provider_key, m.api_id) in TOP_TIERS]
+            preferred = [m for m in preferred if m not in top] + top
         return preferred + rest
 
     async def candidates(self, db: AsyncSession, task: str = "general", need: Optional[str] = None,

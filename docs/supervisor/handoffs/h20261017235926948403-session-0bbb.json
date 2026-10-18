@@ -1,0 +1,16 @@
+{
+ "id": "h20261017235926948403-session-0bbb",
+ "at": "2026-10-17T23:59:26Z",
+ "by": "session",
+ "area": "app",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "Pólya R20 MT2: AI task route lla_coach (catalog tier=balanced: reasoning preferred, top tier Opus/Pro ordered after balanced in manager._auto_order only for tier=balanced tasks; model_discovery.TOP_TIERS/model_tier; app_records._AI_TASKS) + tests/test_lla_coach_route.py — other routes unchanged",
+ "procedure": "CLAUDE.md#Non-negotiable rules",
+ "commit": "",
+ "status": "open"
+}
