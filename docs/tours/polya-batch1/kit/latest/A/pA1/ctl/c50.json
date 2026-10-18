@@ -1,0 +1,1 @@
+{"eval": "[\"lpBEquiv\",\"lpBHyp\",\"lpBConcl\"].map(id=>id+\": \"+[...document.getElementById(id).options].map(o=>o.value+\"=\"+o.textContent).join(\" | \")).join(\"\\n\")"}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=[F('ex_preds_0_due','۱۰ روز دیگر'),F('ex_preds_1_due','۴ روز دیگر'),F('ex_preds_2_due','۲۵ روز دیگر')];return r.join(',')+' TT:'+TT()})()"}
+{"eval": "(()=>{APP.go(APP.state.view,APP.state.arg,APP.state.sub);return (document.querySelector('.prc-t24')||{}).innerText||'none'})()"}

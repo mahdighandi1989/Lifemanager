@@ -1,1 +1,1 @@
-{"eval": "\"clock->2026-10-27\"", "clock": "2026-10-27"}
+{"eval": "(()=>{APP.go('dossier','pb_l_mwlw4wygvx9');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"}

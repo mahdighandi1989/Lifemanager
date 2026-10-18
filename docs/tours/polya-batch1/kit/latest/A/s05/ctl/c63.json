@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('today');const d=(APP.dueList()||[]).map(x=>x.txt).join(' || ');APP.go('tech','24','ws:ex_mvqgpqzz2kkle');return d})()"}
+{"eval": "JSON.stringify({nd:APP.PR.t24NoDate(APP.S.get('ex_mvqgpqzz2kkle')),warn:(document.querySelector('.prc-t24')||{}).innerText||'none'})"}

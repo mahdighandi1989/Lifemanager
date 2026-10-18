@@ -1,5 +1,5 @@
 import json,sys,re,glob,os
-s=sys.argv[1]; A='../round20D/'+s; B=s
+s=sys.argv[1]; A='../round21D/'+s; B=s
 N=len(glob.glob(A+'/ctl/c*.json'))
 norm=lambda t:re.sub(r'(pb_l_|achat_|lp_|case_|prc_|dl_|ex_|fc_)[a-z0-9]+','ID',re.sub(r'\d{4}-\d{2}-\d{2}T[\d:.]+Z','T',str(t)))
 for k in range(1,N+1):

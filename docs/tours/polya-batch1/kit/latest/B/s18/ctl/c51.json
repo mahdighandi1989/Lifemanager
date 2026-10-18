@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);__adv(23);APP.go('today');await w(1200);window.scrollTo(0,0);return APP.today()+' :: '+__fx.main(30000).split('\\n').filter(l=>/اشتباه|مدل|🧪|قیف|پوشه/.test(l)).join(' ¦ ')})()"}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const t=[...document.querySelectorAll(\".as-edtx\")];return t.length+\" | \"+t.map(x=>x.id+\"=\"+x.value.slice(0,80)+\" h=\"+x.clientHeight+\" color=\"+getComputedStyle(x).color+\" bg=\"+getComputedStyle(x).backgroundColor).join(\" || \")})()"}
+{"shot": {"name": "corr_6_edit_open", "fold": false}}

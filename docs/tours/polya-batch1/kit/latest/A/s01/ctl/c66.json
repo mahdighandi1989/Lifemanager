@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,lp:s.lprob,log:s.lprobLog,t:s.title})))"}
+{"shot": {"name": "dossier_full_1", "full": true}}

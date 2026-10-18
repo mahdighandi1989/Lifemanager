@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify(APP.S.all(\"deadline\",x=>1).map(x=>[x.what,x.date,x.fixHist]))"}

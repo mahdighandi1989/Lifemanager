@@ -1,1 +1,1 @@
-{"shot": {"name": "dossier_full_1", "full": true}}
+{"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqo5vgbtb\");return document.getElementById(\"main\").innerText.slice(900,7000)})()"}

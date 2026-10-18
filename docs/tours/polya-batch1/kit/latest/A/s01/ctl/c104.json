@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.S.all('card',c=>1).map(c=>({id:c.id,q:(c.q||c.front||'').slice(0,80),due:c.due||c.next,src:c.src,pid:c.pid||c.prob,kind:c.kind||c.k,tags:c.tags})).slice(0,6))"}
+{"shot": {"name": "part_today_checkin", "full": true}}

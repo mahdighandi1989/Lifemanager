@@ -1,1 +1,1 @@
-{"clock":"2026-11-22","eval":"(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"}
+{"shot": {"name": "part_fcast_wrong90", "full": true}}

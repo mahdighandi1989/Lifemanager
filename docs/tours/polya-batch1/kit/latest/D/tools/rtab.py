@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # rtab.py sid [override json: {"pN":"kind"}] -> markdown routing table
 import sys,json,glob,re,os
-D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21D/'+sys.argv[1]
+D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22D/'+sys.argv[1]
 ov=json.loads(sys.argv[2]) if len(sys.argv)>2 else {}
 fs=sorted(glob.glob(D+'/ai/p*.json'),key=lambda f:int(re.findall(r'\d+',os.path.basename(f))[0]))
 print('| نوبت | پیام (کوتاه) | نوع | task | درست؟ |'); print('|---|---|---|---|---|')

@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"practice\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}
+{"eval":"(async()=>{APP.go('today');await new Promise(r=>setTimeout(r,900));return APP.today()+' :: '+__fx.main(30000).split('\\n').filter(l=>/باشگاه|📌|برنامهٔ خودت/.test(l)).join(' ¦ ')})()"}

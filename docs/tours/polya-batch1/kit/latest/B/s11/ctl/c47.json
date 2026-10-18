@@ -1,1 +1,1 @@
-{"eval": "(()=>{const o=JSON.parse(localStorage.getItem(\"mla.records.v1\"));return Object.values(o).filter(r=>r&&r.type===\"eprob\"&&r.live).map(r=>r.id+\" | \"+r.title+\" | \"+JSON.stringify(r.live.p||{}).slice(0,200)).join(\"\\n\")})()\n"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"}

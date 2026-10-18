@@ -1,1 +1,1 @@
-{"eval": "(()=>{const sel=document.querySelector('.prc-tsel');sel.value='41';sel.dispatchEvent(new Event('change',{bubbles:true}));const b=document.querySelector('.prc-start');b.click();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+' | '+FL().slice(0,900)})()"}
+{"say": "می‌خوام این روشِ «اول مجهول و شرط، بعد فقط داده‌هایی که شرط رو عوض می‌کنن» واقعاً تو ذهنم بمونه؛ یه تمرینِ یادآوری برام بذار که هر چند وقت یه بار از حافظه بنویسمش."}

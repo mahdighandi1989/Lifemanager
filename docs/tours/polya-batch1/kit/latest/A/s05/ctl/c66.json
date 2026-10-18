@@ -1,1 +1,1 @@
-{"clock":"2026-10-29","eval":"(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"}
+{"eval": "(()=>{APP.go('today');const d=(APP.dueList()||[]).map(x=>x.txt).join(' || ');APP.go('tech','24','ws:ex_mvqgpqzz2kkle');return d})()"}

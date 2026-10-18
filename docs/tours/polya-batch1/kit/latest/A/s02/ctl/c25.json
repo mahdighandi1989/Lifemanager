@@ -1,1 +1,1 @@
-{"eval": "[...document.querySelectorAll(\"#main .lp-bapproxm,#main .lp-softgate,#main .bad\")].map(e=>e.className+\": \"+e.textContent.trim().slice(0,300)).join(\"\\n\")+\"\\nCLOS:\"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqlyil2en\"))"}
+{"eval": "[...document.querySelectorAll(\"#main .lp-bapproxm,#main .lp-softgate,#main .bad\")].map(e=>e.className+\": \"+e.textContent.trim().slice(0,300)).join(\"\\n\")+\"\\nCLOS:\"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqo5vgbtb\"))"}

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""drv.py <sid> [src_sid] : replay round20B/<src>/ctl (via <sid>/seq.json if present) on a running harness5 in round21B/<sid>;
+"""drv.py <sid> [src_sid] : replay round21B/<src>/ctl (via <sid>/seq.json if present) on a running harness5 in round22B/<sid>;
 answer AI calls: akey (manual, by turn key) > rewrite? stop > round20 match by turn key (apatch/aovr/stop flags) > stop.
 exit 0 END, 3 needs manual answer, 1 timeout."""
 import json, os, sys, time, re, hashlib
 B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
 sid = sys.argv[1]; src = sys.argv[2] if len(sys.argv) > 2 else os.environ.get('SRCS', sid)
-D = f'{B}/round21B/{sid}'; S = f'{B}/round20B/{src}'
+D = f'{B}/round22B/{sid}'; S = f'{B}/round21B/{src}'
 for d in ('ctl', 'akey', 'apatch', 'aovr', 'diff'): os.makedirs(f'{D}/{d}', exist_ok=True)
 IDRE = re.compile(r'\b(?:pb_[a-z]_[a-z0-9]{6,}|prc_[a-z0-9]{6,}|prl_[a-z0-9]{6,}|achat_[a-z0-9]{6,}|dl_[a-z0-9]{6,})\b')
 RW = '[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ'
@@ -48,6 +48,7 @@ def addmap(a, b):
     if a != b and a not in m and a.startswith('pb_'): open(f'{D}/map.txt', 'a').write(f'{a} {b}\n')
 def src_calls():
     a = f'{S}/ai'; out = []
+    if not os.path.isdir(a): return out
     for n in sorted(int(f[1:-5]) for f in os.listdir(a) if re.match(r'p\d+\.json$', f)):
         if os.path.exists(f'{a}/r{n}.txt'):
             u = jl(f'{a}/p{n}.json')['user']; out.append((n, turnkey(u)[0], u))
@@ -78,15 +79,29 @@ def answer(n):
     if os.path.exists(f):
         t = open(f).read()
         for i, x in enumerate(cur): t = t.replace(f'__I{i}__', x)
+        lp = [x for x in cur if x.startswith('pb_l_')]
+        for x in set(re.findall(r'pb_l_[a-z0-9]{8,}', t)):
+            if x not in cur and lp: t = t.replace(x, lp[0]); log(f'AKEY-MAP {x} -> {lp[0]}')
+        pc = [x for x in cur if x.startswith('prc_')]
+        for x in set(re.findall(r'prc_[a-z0-9]{6,}', t)):
+            if x not in cur and pc: t = t.replace(x, pc[0]); log(f'AKEY-MAP {x} -> {pc[0]}')
         write_ans(n, t, f'akey {h}'); return True
     if rw:
+        am = amap(); used = set(am.values())
+        for (m, k2, u2) in src_calls():
+            if m in used or k2 != k or turnkey(u2)[1] != rw: continue
+            am[str(n)] = m; json.dump(am, open(AM, 'w'))
+            if os.path.exists(f'{D}/stop_{m}'): log(f'STOP p{n} (=r21 rw p{m}) flagged'); return False
+            old = ids(u2); t = open(f'{D}/aovr/r{m}.txt').read() if os.path.exists(f'{D}/aovr/r{m}.txt') else open(f'{S}/ai/r{m}.txt').read()
+            for a, b in zip(old, cur): t = t.replace(a, b)
+            write_ans(n, t, f'reuse r21 rewrite p{m}'); return True
         log(f'STOP p{n} REWRITE h={h} :: {rw[:300]}'); return False
     am = amap(); used = set(am.values())
     for (m, k2, u2) in src_calls():
         if m in used or k2 != k: continue
         am[str(n)] = m; json.dump(am, open(AM, 'w'))
         if os.path.exists(f'{D}/stop_{m}'):
-            log(f'STOP p{n} (=r20 p{m}) flagged h={h}'); return False
+            log(f'STOP p{n} (=r21 p{m}) flagged h={h}'); return False
         old = ids(u2)
         for a, b in zip(old, cur): addmap(a, b)
         if os.path.exists(f'{D}/aovr/r{m}.txt'):
@@ -94,7 +109,7 @@ def answer(n):
         else:
             t = open(f'{S}/ai/r{m}.txt').read()
         for a, b in zip(old, cur): t = t.replace(a, b)
-        how = f'reuse r20 p{m}'
+        how = f'reuse r21 p{m}'
         if os.path.exists(f'{D}/apatch/p{m}.json'):
             P = jl(f'{D}/apatch/p{m}.json'); dd = json.loads(t) if 'new' not in P else P['new']
             for a_, b_ in P.get('rep', []): dd['reply'] = dd['reply'].replace(a_, b_)

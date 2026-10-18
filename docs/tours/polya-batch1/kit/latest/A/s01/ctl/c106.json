@@ -1,1 +1,1 @@
-{"shot":{"name":"part_practicecase_checkin","full":true}}
+{"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/وارسیِ ماندگاری/.test(x.sub||''));if(!x)return 'NODUE';x.go();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+'\\n'+FL().slice(0,700)+'\\n'+BL().slice(-500)})()"}

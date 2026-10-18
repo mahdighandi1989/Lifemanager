@@ -1,0 +1,6 @@
+# la.py sid list "item1|item2" [date] shotname -> append page ctl: open running list, add items, return list text; then shot
+import json,sys,subprocess
+sid,name,items,dt,shot=sys.argv[1],sys.argv[2],sys.argv[3].split('|'),sys.argv[4],sys.argv[5]
+js=("(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const c=APP.PR.list('%s');APP.go('practice',c.id);await W(1200);const out=[];for(const it of %s){const inp=[...document.querySelectorAll('#main input[type=text]')].find(e=>/مورد تازه|ادعا|نامِ مدل/.test(e.getAttribute('aria-label')||''));if(!inp){out.push('NOINP');break;}inp.value=it;inp.dispatchEvent(new Event('input',{bubbles:true}));const d=document.querySelector('#main input[type=date]');if(d&&%s){d.value=%s;d.dispatchEvent(new Event('change',{bubbles:true}));}[...document.querySelectorAll('#main button')].find(b=>/^افزودن$/.test(b.textContent.trim())).click();await W(700);out.push('added');}return out.join(',')+' || '+document.querySelector('#main').innerText.slice(0,1500)})()")%(name,json.dumps(items,ensure_ascii=False),json.dumps(bool(dt)),json.dumps(dt))
+subprocess.run(['python3','tools/nc.py',sid,'eval',js])
+subprocess.run(['python3','tools/nc.py',sid,'raw',json.dumps({"shot":{"name":shot,"full":True}})])

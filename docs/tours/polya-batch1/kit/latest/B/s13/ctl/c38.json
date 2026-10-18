@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const r=__fx.btn(/مرور کردم/);await w(900);window.scrollTo(0,0);return r+' ## '+__fx.main(2500)})()"}

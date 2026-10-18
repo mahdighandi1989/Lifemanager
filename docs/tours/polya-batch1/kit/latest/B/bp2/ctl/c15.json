@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const r=__fx.btn(/^۲ کامل/);await w(1500);const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const g=R['eprog_'+APP.state.arg]||{};return r+' sub='+APP.state.sub+' ## u='+JSON.stringify((g.solve||{}).u).slice(0,900)})()"}

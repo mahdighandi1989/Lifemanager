@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"}
+{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return JSON.stringify((r.src||r.p.src).parts.map(p=>[p.mid,p.vc]))})()"}

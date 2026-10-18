@@ -1,1 +1,1 @@
-{"say": "راستش اشتباه کردم که دیروز سرِ برادرم داد زدم؛ امروز زنگ زدم و ازش عذرخواهی کردم."}
+{"eval": "JSON.stringify({r:(APP.ASSIST.cur().coach||{}).retracts,last:APP.ASSIST.cur().msgs.slice(-3).map(m=>m.role+\": \"+m.text.slice(0,200))})"}

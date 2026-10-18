@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""show.py <sid> [n] [src] : show pending (or n) prompt: key, task, new/removed lines vs the matching round-20 prompt, conversation tail, r20 answer"""
+"""show.py <sid> [n] [src] : show pending (or n) prompt: key, task, new/removed lines vs the matching round-20 prompt, conversation tail, r21 answer"""
 import json, os, sys, re
 sys.path.insert(0, os.path.dirname(__file__))
 B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid = sys.argv[1]; D = f'{B}/round21B/{sid}'
-src = sys.argv[3] if len(sys.argv) > 3 else os.environ.get('SRCS', sid); S = f'{B}/round20B/{src}'
+sid = sys.argv[1]; D = f'{B}/round22B/{sid}'
+src = sys.argv[3] if len(sys.argv) > 3 else os.environ.get('SRCS', sid); S = f'{B}/round21B/{src}'
 import importlib.util
 def pend():
     a = f'{D}/ai'; ps = sorted(int(f[1:-5]) for f in os.listdir(a) if re.match(r'p\d+\.json$', f))
@@ -39,14 +39,14 @@ i = u.rfind('# نوبتِ تازه'); print('TURN:', u[i + 13:][:1500])
 W = int(os.environ.get('W', '600'))
 if m:
     a = L(json.load(open(f'{S}/ai/p{m}.json'))['user']); b = L(u); A = set(a); Bs = set(b)
-    print(f'--- vs r20 p{m}: + new / - gone')
+    print(f'--- vs r21 p{m}: + new / - gone')
     for l in b:
         if l not in A: print('+ ' + l[:W])
     for l in a:
         if l not in Bs: print('- ' + l[:W])
-    print(f'--- r20 r{m}:'); print(open(f'{S}/ai/r{m}.txt').read()[:int(os.environ.get('RL', '2500'))])
+    print(f'--- r21 r{m}:'); print(open(f'{S}/ai/r{m}.txt').read()[:int(os.environ.get('RL', '2500'))])
 else:
-    print('--- NO r20 MATCH; full prompt blocks (no map/terr/page):')
+    print('--- NO r21 MATCH; full prompt blocks (no map/terr/page):')
     for l in L(u): print('  ' + l[:W])
 if os.environ.get('CONV'):
     j = u.find('# گفت‌وگو تا این لحظه'); print(u[j:i][-int(os.environ['CONV']):])

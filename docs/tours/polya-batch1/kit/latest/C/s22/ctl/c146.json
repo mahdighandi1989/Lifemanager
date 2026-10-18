@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1500);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3000)})()"}

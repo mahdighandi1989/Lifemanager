@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).join(' || ')})()"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"}

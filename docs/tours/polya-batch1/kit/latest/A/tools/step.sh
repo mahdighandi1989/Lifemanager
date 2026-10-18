@@ -1,6 +1,6 @@
 #!/bin/bash
 # step.sh SID N [M] : answer pending pN with old rM (+ over_N.json), then run auto3 until next stop; print compact stop info
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21A
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22A
 X="{}"; [ -f $R/$1/over_$2.json ] && X=$(cat $R/$1/over_$2.json)
 python3 $R/tools/rx.py $1 $2 ${3:-$2} "$X" > $R/$1/_rx.txt 2>&1 || { tail -5 $R/$1/_rx.txt; exit 1; }
 L=$(wc -l < $R/$1/auto.log)

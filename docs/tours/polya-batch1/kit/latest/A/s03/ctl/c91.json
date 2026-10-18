@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"}
+{"eval": "\"clock->2026-10-22\"", "clock": "2026-10-22"}

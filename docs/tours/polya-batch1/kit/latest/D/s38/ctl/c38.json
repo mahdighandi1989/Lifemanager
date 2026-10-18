@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const e=document.querySelector('textarea.as-in');const v=e?e.value:null;if(e&&e.value){e.value='';e.dispatchEvent(new Event('input',{bubbles:true}))}return 'leftover:'+JSON.stringify(v)})()"}
+{"eval": "(()=>{const ps=APP.liveAll();APP.go('dossier',ps[ps.length-1].p.id);return ps.map(r=>r.p.title).join(' | ')+' :: '+document.getElementById('main').innerText.slice(0,3000)})()"}

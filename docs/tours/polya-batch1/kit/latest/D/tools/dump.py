@@ -1,15 +1,18 @@
-#!/usr/bin/env python3
-# dump.py SRCDIR — per AI call: user turn (after «# نوبتِ تازه») + old reply's coach_state / actions names
-import sys,json,glob,re,os
-D=sys.argv[1]
-fs=sorted(glob.glob(D+'/ai/p*.json'),key=lambda x:int(re.findall(r'\d+',os.path.basename(x))[0]))
-for f in fs:
-    k=re.findall(r'\d+',os.path.basename(f))[0]; p=json.load(open(f)); u=p['user']
-    if not p['sys'].startswith('تو «دستیار»'): print(f'--- p{k} NON-ASSIST {p.get("task")}'); continue
-    t=u.split('# نوبتِ تازه')[-1].strip()
-    try: r=json.loads(open(f'{D}/ai/r{k}.txt').read())
-    except Exception as e: r={'reply':'?? '+str(e)}
-    acts=r.get('actions',[]); cs=[a for a in acts if a.get('do')=='coach_state']
-    print(f'--- p{k} USER: {t[:600]}')
-    print(f'    REPLY: {r.get("reply","")[:300]}')
-    print(f'    ACTS: {[a.get("do") for a in acts]}  CS: {json.dumps(cs,ensure_ascii=False)[:400]}')
+# dump.py sid [tagfilter] — per plan item: tag + eval summary + new msgs since previous item
+import json,sys,re,os
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22D/'
+s=sys.argv[1]; flt=sys.argv[2] if len(sys.argv)>2 else None
+P=json.load(open(R+s+'.plan.json')); prev=[]
+for i,x in enumerate(P,1):
+    f=f'{R}{s}/out/s{i}.json'
+    if not os.path.exists(f): break
+    r=json.load(open(f)); m=r.get('state',{}).get('msgs',[])
+    tag=x.get('tag') or ('src%d'%x['src'] if 'src' in x else 'EXIT')
+    new=[y for y in m if y not in prev][-6:]; prev=m
+    if flt and not re.search(flt,tag): continue
+    e=str(r.get('eval') or '')
+    if e.startswith('{"today"'):
+        o=json.loads(e); e='REC today=%s dl=%s prc=%s lists=%s mind=%s'%(o.get('today'),o.get('dl'),[ (c.get('tid'),c.get('state'),c.get('due'),c.get('sess'),c.get('stable')) if isinstance(c,dict) else c for c in (o.get('prc') or [])],o.get('lists'),o.get('mind'))
+    print(f'[{i}] {tag}: {e[:int(os.environ.get("EL","600"))]}')
+    for y in new:
+        if not y.startswith('user:') or os.environ.get('U'): print('    ',y[:int(os.environ.get("ML","400"))])

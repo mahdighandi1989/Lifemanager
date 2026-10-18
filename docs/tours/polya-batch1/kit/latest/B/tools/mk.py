@@ -19,5 +19,5 @@ def shot(view, sub=None, scroll=None, open_from=None):
     return ev(js)
 def openas(): return ev("(()=>{APP.ASSIST.toggle(true);return 1})()")
 def write(sid, L):
-    B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21B'
+    B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22B'
     os.makedirs(f'{B}/{sid}', exist_ok=True); json.dump(L, open(f'{B}/{sid}/seq.json', 'w'), ensure_ascii=False, indent=0); print(sid, len(L), 'entries')

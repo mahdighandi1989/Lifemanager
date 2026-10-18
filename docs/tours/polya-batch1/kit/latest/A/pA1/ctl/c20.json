@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].find(b=>/قدمِ بعد/.test(b.textContent));b.click();return TT()+\" | \"+MT(\"آزمون\",3000)})()"}

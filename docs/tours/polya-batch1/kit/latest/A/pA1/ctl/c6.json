@@ -1,0 +1,1 @@
+{"eval": "(()=>{const sw=document.getElementById(\"lpSoftWhy\");if(sw&&!sw.value){F(\"lpSoftWhy\",\"«بر ۲۴ بخش‌پذیره» فقط حکمِ مسئله است که نوشتم، نه دلیل؛ دلیلش رو هنوز ندارم\");return C(\".lp-usave\")+\" \"+TT()}return \"nosoft\"})()"}

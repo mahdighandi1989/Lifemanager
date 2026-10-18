@@ -1,1 +1,1 @@
-{"eval": "(()=>{S(\"lpNat\",\"practical\");F(\"lpOne\",\"می‌خوام تصمیم بگیرم کجا زندگی کنیم که بچه‌م تا هفت سال امن و ثابت باشه و قسطش کمرمونو نشکنه.\");F(\"lpWhy\",\"چون سه ماهه گیر کردم و هر روز فقط ستون اضافه می‌کنم؛ آرامش خانواده و ثبات پسرم برام مهم‌ترینه.\");C(\".lp-onesave\");return MT(\"از صورتت\",200)})()"}
+{"eval": "JSON.stringify({ans:APP.ASSIST.cur().coach.ansBy||APP.ASSIST.cur().coach.ans, ph:APP.ASSIST.cur().coach.ph})+\"\\n\"+JSON.stringify(APP.liveCoach(\"pb_l_mvaqm28hcuh\"))"}

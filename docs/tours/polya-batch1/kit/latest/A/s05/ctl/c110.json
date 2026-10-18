@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify(APP.S.all(\"fcast\",x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,30),x.outcome,x.outcomeAt]))+\" | \"+JSON.stringify(APP.PR.all().map(c=>(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.p,s.src])))"}

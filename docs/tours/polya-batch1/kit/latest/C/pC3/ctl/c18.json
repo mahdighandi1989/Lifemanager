@@ -1,0 +1,1 @@
+{"eval": "(()=>[...document.querySelectorAll('select')].map(s=>s.id+':'+(s.getAttribute('aria-label')||'')+'=['+[...s.options].map(o=>o.text).join('/')+']').join(' | ').slice(0,3000))()"}

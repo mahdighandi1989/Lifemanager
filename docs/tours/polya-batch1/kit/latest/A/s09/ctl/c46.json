@@ -1,1 +1,1 @@
-{"shot":{"name":"part_mind21_from","full":true}}
+{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return JSON.stringify({st:r.p.statement,src:r.src||r.p.src})})()"}

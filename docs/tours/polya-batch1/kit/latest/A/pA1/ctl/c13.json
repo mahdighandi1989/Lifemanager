@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=document.querySelector(\".lp-stuck\");if(!b)return \"NOBTN\";b.click();return APP.state.view+\" \"+APP.state.arg+\" | \"+MT(\"\",900)})()"}

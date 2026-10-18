@@ -1,1 +1,1 @@
-{"reload": true}
+{"eval": "(()=>{localStorage.setItem(\"lla.dev\",\"1\");APP.clock.dev=true;return 0})()", "clock": "2026-10-29"}

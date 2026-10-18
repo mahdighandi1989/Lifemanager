@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll(\".as-msg\")];return ms.slice(0,4).map((m,i)=>i+\":\"+m.querySelectorAll(\"svg\").length+\" \"+m.innerText.slice(0,50)).join(\" | \")})()"}

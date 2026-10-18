@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const pid=APP.state.arg||window.__PID;APP.go('lprob',pid);await W(1200);return 'phase='+APP.livePhase(pid)+' IDS '+IDS()+' || BTNS '+BTNS()})()"}

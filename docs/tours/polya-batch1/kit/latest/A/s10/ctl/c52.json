@@ -1,1 +1,1 @@
-{"shot":{"name":"corr_0_before_lprob","full":true}}
+{"eval": "APP.today()+' '+APP.ASSIST.cur().id+' '+APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>r.p.id+':'+r.p.title+':'+(APP.liveClosure(r.p.id)||{}).label).join(' | ')"}

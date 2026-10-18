@@ -1,0 +1,1 @@
+(()=>{const L=APP.liveAll().map(r=>({t:r.p.title,stmt:r.p.statement,src:r.p.src,fix:r.p.fixHist}));const s=APP.ASSIST.cur();return JSON.stringify({L,retr:(s.retracts||[]).slice(-3)}).slice(0,3000)})()

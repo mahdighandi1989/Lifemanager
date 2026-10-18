@@ -1,0 +1,1 @@
+{"eval": "(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\").slice(0,80)).join(\"\\n\")"}

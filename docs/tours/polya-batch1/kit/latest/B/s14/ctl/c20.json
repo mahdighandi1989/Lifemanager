@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const r=__fx.btn(/^۴۱ تمرین بازیابی فعال/);await w(1200);let s2=\"\";if(__fx.btns().some(b=>/^شروع تمرین/.test(b))){s2=__fx.btn(/^شروع تمرین/);await w(1200)}return r+\" / \"+s2+\" ## \"+APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\" ## \"+__fx.btns().slice(-8).join(\" | \")+\" ## \"+__fx.fields().join(\" ; \")})()"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"}

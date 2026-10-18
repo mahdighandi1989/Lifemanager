@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','achat_mvaqlthu3paus');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}
+{"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.p])})),fc:APP.S.all(\"fcast\",x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,25),x.p,x.outcome||\"\"])})"}

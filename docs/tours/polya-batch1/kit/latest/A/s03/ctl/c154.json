@@ -1,1 +1,1 @@
-{"shot":{"name":"part_mind21_from","full":true}}
+{"eval": "(()=>{APP.go('dossier','achat_mvaqlthyl4bin');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}

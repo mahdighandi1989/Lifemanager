@@ -1,6 +1,6 @@
 # pin.py sid date -> insert [set clock date, exit] before c1 of src/<sid>/ctl (idempotent via marker file)
 import json,sys,glob,os
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21C'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22C'
 sid,d=sys.argv[1],sys.argv[2]; D=f'{T}/src/{sid}/ctl'
 if os.path.exists(D+'/.pinned'): print('already'); sys.exit()
 fs=sorted(glob.glob(D+'/c*.json'),key=lambda x:int(x.split('/c')[-1][:-5]))

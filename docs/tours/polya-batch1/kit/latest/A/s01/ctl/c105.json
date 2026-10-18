@@ -1,1 +1,1 @@
-{"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/وارسیِ ماندگاری/.test(x.sub||''));if(!x)return 'NODUE';x.go();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+'\\n'+FL().slice(0,700)+'\\n'+BL().slice(-500)})()"}
+{"eval": "JSON.stringify(APP.S.all('card',c=>1).map(c=>({id:c.id,q:(c.q||c.front||'').slice(0,80),due:c.due||c.next,src:c.src,pid:c.pid||c.prob,kind:c.kind||c.k,tags:c.tags})).slice(0,6))"}

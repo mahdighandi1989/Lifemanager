@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].find(b=>/باز نشد ⇐ پلهٔ بعد/.test(b.textContent));if(!b)return \"NOBTN\";b.click();const t=MT(\"پلهٔ ۳\",700);return TT()+\" | \"+t})()"}

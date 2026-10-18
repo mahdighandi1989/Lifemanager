@@ -1,0 +1,1 @@
+{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return r.p.statement})()"}

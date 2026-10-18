@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({t:APP.today(),v:APP.state.view,a:APP.state.arg,cur:APP.ASSIST.cur().id,sess:APP.ASSIST.sessions().map(s=>({id:s.id,t:s.title,n:(s.msgs||[]).length,first:((s.msgs||[])[0]||{}).text})),live:APP.liveAll().map(r=>[r.p.id,r.p.title,JSON.stringify(APP.liveClosure(r.p.id))])})"}

@@ -1,1 +1,1 @@
-{"say": "باشه. تصمیم گرفتم پنجشنبه یه جلسهٔ کوتاه با خواهر و برادرم بذارم، این بار فقط دربارهٔ زمانِ پرداختِ سهمِ برادرم."}
+{"eval": "(()=>{const s=APP.ASSIST.cur();const c=s.coach||{};const pick=o=>JSON.stringify(o,null,0);return pick({own:c.ownLog,ans:c.ansLog,keys:Object.keys(c),seR:s.retracts,live:(APP.S.get(\"eprog_pb_l_mvaqlzvmzjc\").solve.live||{}).retracts})})()"}

@@ -1,1 +1,1 @@
-{"eval":"APP.go(\"lprob\",\"pb_l_mvaqlxu5mk1\")"}
+{"clock": "2026-11-22", "eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"}

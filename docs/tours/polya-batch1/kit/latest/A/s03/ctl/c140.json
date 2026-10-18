@@ -1,1 +1,1 @@
-{"shot":{"name":"part_practice_on_problem21","sel":".prc-sec"}}
+{"clock": "2026-11-19", "eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()"}

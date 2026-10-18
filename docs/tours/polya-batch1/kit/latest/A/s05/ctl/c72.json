@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=[...document.querySelectorAll('#main select')].find(e=>/جلسهٔ هفتگیِ شنبه/.test(e.getAttribute('aria-label')||e.title||(e.closest('label,li,div')||{}).textContent||''));if(!s)return 'NOSEL';s.value='شد';s.dispatchEvent(new Event('change',{bubbles:true}));return 'set '+TT()})()"}
+{"shot": {"name": "part_today_late", "full": true}}

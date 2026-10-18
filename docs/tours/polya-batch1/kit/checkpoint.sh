@@ -23,7 +23,7 @@ for g in A B C D; do src="$T/round${last}$g"; [ -d "$src" ] || continue
 for r in "$T"/round*/; do rn=$(basename "$r"); for sd in "$r"s[0-9][0-9]*/; do [ -d "$sd" ] || continue; ls "$sd"ans_*.json >/dev/null 2>&1 || continue
   mkdir -p "$D/evidence/$rn/$(basename "$sd")"; cp "$sd"ans_*.json "$D/evidence/$rn/$(basename "$sd")/" 2>/dev/null; done; done
 echo "$last" > "$D"/kit/latest/ROUND
-cp "$SP"/harness5.js "$SP"/storyboard.py "$SP"/storyboard.css "$SP"/savehb.py "$SP"/gate_wt.sh "$SP"/resolve_bundle.sh "$SP"/checkpoint.sh "$D"/kit/
+cp "$SP"/harness5.js "$SP"/storyboard.py "$SP"/storyboard.css "$SP"/savehb.py "$SP"/gate_wt.sh "$SP"/resolve_bundle.sh "$SP"/checkpoint.sh "$SP"/pack_sb.py "$D"/kit/
 # never commit the owner's address
 grep -rlI "<owner-email>" "$D" | xargs -r sed -i 's/mohamad\.mahdi1988@gmail\.com/<owner-email>/g'
 du -sh "$D"

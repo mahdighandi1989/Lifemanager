@@ -12,8 +12,8 @@ def tq(f):
             mm=re.search(r'پیشنهادِ این نوبت: «[^»]*(?:«[^»]*»[^»]*)*»',l)
             L.append(mm.group(0) if mm else l[:400])
     return turn,L
-a=f'{T}/round21C/{sid}/ai/p{n}.json'; b=f'{T}/round20C/{sid}/ai/p{n}.json'
-if not os.path.exists(b) or not os.path.exists(f'{T}/round20C/{sid}/ai/r{n}.txt'): print('NO R12 counterpart'); sys.exit(2)
+a=f'{T}/round22C/{sid}/ai/p{n}.json'; b=f'{T}/round21C/{sid}/ai/p{n}.json'
+if not os.path.exists(b) or not os.path.exists(f'{T}/round21C/{sid}/ai/r{n}.txt'): print('NO R12 counterpart'); sys.exit(2)
 ta,La=tq(a); tb,Lb=tq(b)
 if ta!=tb: print('TURN DIFFERS\n 13:',ta[:200],'\n 12:',tb[:200]); sys.exit(1)
 if La==Lb: sys.exit(0)

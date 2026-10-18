@@ -1,6 +1,6 @@
 # rt.py sid -> routing/turn table: pN | task | kind guess | turn (short) | Q line | reply (short) | acts
 import json,re,glob,sys
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round21C'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round22C'
 sid=sys.argv[1]; full='full' in sys.argv
 for f in sorted(glob.glob(f'{T}/{sid}/ai/p*.json'),key=lambda x:int(x.split('/p')[-1][:-5])):
     n=int(f.split('/p')[-1][:-5]); j=json.load(open(f)); u=j['user']

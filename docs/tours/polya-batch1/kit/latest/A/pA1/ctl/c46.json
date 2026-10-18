@@ -1,0 +1,1 @@
+{"eval": "[...document.getElementById(\"lpBBest\").options].map(o=>o.value+\"=\"+o.textContent.slice(0,110)).join(\"\\n\")"}

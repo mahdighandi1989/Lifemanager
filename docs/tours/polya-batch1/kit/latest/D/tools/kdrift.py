@@ -8,11 +8,11 @@ def keys(pf):
     return d
 for m in re.finditer(r'answered p(\d+) \[[^\]]*\] \(OLD r(\d+)',run):
     n,o=m.group(1),m.group(2)
-    try: rep=json.loads(open(f'../round20D/{s}/ai/r{o}.txt').read())
+    try: rep=json.loads(open(f'../round21D/{s}/ai/r{o}.txt').read())
     except Exception: continue
     acts=[a for a in rep.get('actions',[]) if isinstance(a,dict) and a.get('k')]
     if not acts: continue
-    try: ka=keys(f'../round20D/{s}/ai/p{o}.json'); kb=keys(f'{s}/ai/p{n}.json')
+    try: ka=keys(f'../round21D/{s}/ai/p{o}.json'); kb=keys(f'{s}/ai/p{n}.json')
     except Exception as e: print('err',e); continue
     for a in acts:
         k=a['k']
