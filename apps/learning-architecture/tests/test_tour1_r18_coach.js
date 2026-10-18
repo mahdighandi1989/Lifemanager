@@ -75,7 +75,9 @@ function devScan(sys, user) {
     };
     window.R = (o) => Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, o);
     window.__turn = async (text, reply, actions) => {
+      // DECISIONS_R21 R7: پاسخِ دوپرسشی یک بار بازنویسی خواسته می‌شود — مدلِ ساختگی همان پاسخ را دوباره می‌دهد (آزمونِ لنگرِ حدس به پرسش، نه آزمونِ بازنویسی)
       const n0 = __calls.length; __q.push(R({ reply: reply || 'باشه.', actions: actions || [] }));
+      if (APP.ASSIST.replyTwoQ && APP.ASSIST.replyTwoQ(reply || '')) __q.push(R({ reply: reply || 'باشه.', actions: actions || [] }));
       await APP.ASSIST.send(text); __q.length = 0;
       const c = __calls.slice(n0).filter(x => !/^\[سامانه/.test(String((x.user.split('# نوبتِ تازه\n')[1] || '')).trim()))[0] || {};
       return { sys: c.sys || '', user: c.user || '' };

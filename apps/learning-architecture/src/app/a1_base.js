@@ -278,7 +278,8 @@ var APP = window.APP = {};
   S.get = function (id) { return S.recs[id]; };
   S.all = function (type, pred) {
     var out = [];
-    for (var id in S.recs) { var r = S.recs[id]; if (r.simClock && !CLK.off) continue; if ((!type || r.type === type) && (!pred || pred(r))) out.push(r); }
+    /* دورِ ۲۱ (A21-21، DECISIONS_R21 ADDENDUM): ساختهٔ ساعتِ آزمایشی در حالتِ توسعه پس از برگشتِ جابه‌جایی به صفر دیده می‌ماند (آزمون‌ها به ناپدید شدن وابسته نیستند)؛ بیرون از حالتِ توسعه همان پنهان‌سازیِ LT8 */
+    for (var id in S.recs) { var r = S.recs[id]; if (r.simClock && !CLK.off && !CLK.dev) continue; if ((!type || r.type === type) && (!pred || pred(r))) out.push(r); }
     return out.sort(function (a, b) { return (b.updated || "").localeCompare(a.updated || ""); });
   };
   S.settings = function () { return S.recs.settings || { id: "settings", type: "set", ai: { provider: "gemini", model: "gemini-2.5-flash" }, jargon: [] }; };

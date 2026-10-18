@@ -522,7 +522,7 @@
      کاری که صفحه هنوز نکرده، ضمیر) — اگر ایرادی بود، **یک** درخواستِ بازنویسی؛ فقط متنِ reply عوض می‌شود و کنش‌ها همان کنش‌های پاسخِ نخست می‌مانند */
   function post(sys, user, o2, opts, o) {
     try { if (AS.replyFix) AS.replyFix(o); } catch (e) { }
-    var why = ""; try { why = AS.replyCheck ? AS.replyCheck(o, opts) : ""; } catch (e) { why = ""; }
+    var why = ""; try { why = AS.replyCheck ? AS.replyCheck(o, Object.assign({}, opts, { prompt: user })) : ""; } catch (e) { why = ""; }   // دورِ ۲۱ (R7): پرامپت برای شناختنِ پرسشِ دوجمله‌ایِ خودِ صفحه
     if (!why) return o;
     return callTask(sys, user + "\n\n" + why, o2).then(function (r) {
       r = unwrap(r); try { var x = parse(r.text); if (x.reply && String(x.reply).trim()) { o._rewrite = { why: why, first: o.reply }; o.reply = x.reply; } } catch (e) { }
@@ -553,10 +553,51 @@
      بازنگری، اصلاحِ حرفِ خودش، مسئلهٔ واقعیِ حل‌نشده (قاعدهٔ کامل، نه «قاعدهٔ کوتاه» ِ همیشگی)، مسئلهٔ حل‌شدهٔ مرتبط، پس از شکست؛ بلوکِ عامِ «مربیِ حل» (که بر هر نوبتِ نه-سلام می‌آید)
      فقط با نشانهٔ مسئله/زندگی در پیامِ خودش یا وقتی نوبتِ پیشینِ کاربر هم مربی بود. پیگیریِ خودکاری که پاسخِ همان پیام را می‌نویسد
      (دانسته‌های قلمرو، بازخوانیِ پیوست) همان ردهٔ نوبتِ کاربر را نگه می‌دارد (inherit). بی نامِ مدل؛ تابعِ خالص (آزمون: test_tour1_r20_routing.js). */
+  /* تورِ پولیا (R1، دورِ ۲۱ — DECISIONS_R21): مسیریابی از **ردبندیِ خودِ صفحه**، نه واژه‌های پیام. شاهد: ۱۲ از ۵۱ (prod)، ۱۹ نوبت در B، ۲۳ در D —
+     نوبت‌های گشایشِ سرنوشت‌ساز به «lla_assistant» رفتند چون صفحه خودش «مسئلهٔ گفت‌وگو … مرحله» را نشان می‌داد ولی دروازهٔ sig فقط چند واژه را می‌شناخت.
+     لایهٔ مربی برای همین نوبت روشن است اگر پرامپتِ ساخته‌شده یکی از این‌ها را دارد: مسئلهٔ گفت‌وگوی در کانون (همان شرطی که «مسئلهٔ گفت‌وگو» را در «# وضعِ کنونی»
+     می‌نویسد — AS.chatFocus ِ a27)، مسئلهٔ زندهٔ باز، سرتیترهای مربی (معلمِ تور، بازنگری، اصلاحِ حرفِ خودش، مسئلهٔ واقعیِ حل‌نشده، مسئلهٔ حل‌شدهٔ مرتبط، پس از شکست)،
+     پروندهٔ تمرینِ بازی که رویش کار می‌شود؛ یا خودِ پیامش مسئله/تصمیم را بیان می‌کند (آشکارسازِ خودِ صفحه AS.statesProblem — همان که نوعِ مسئله را حدس می‌زند).
+     «فقط-عمل» فقط برای پیامی که **چیزی جز فرمان** نیست (هر بند یا فرمانِ صفحه است یا «آره/لطفاً»)؛ «…ثبتش کن» ِ آمیخته با محتوا مربی می‌ماند و
+     فرمانِ «باز کن» پس از سرتیترِ مسئلهٔ زنده سنجیده نمی‌شود مگر پیام فقط فرمان باشد. ✏️ و «[سامانه …]» همان پیشین. */
   var COACH_HEAD = /^# (?:مسئلهٔ زندهٔ این سشن|معلمِ حلِ مسئله|پاسخ به پرسشِ بازنگری|سلیقه برای بازنگریِ|اصلاحِ پیامِ|اصلاحی که صفحه|مسئلهٔ واقعیِ حل‌نشده|مسئلهٔ حل‌شدهٔ مرتبط|پس از شکست)/m;
   var COACH_BLOCK = /^# مربیِ حل/m;
-  var LIFE_HINT = /عادت|سلامت|رژیم|ورزش|تصمیم|زندگی/;
-  var ACT_ONLY = /(?:^|\s)(?:ثبت(?:ش)?\s*کن|بنویس(?:ش)?|برو\s*(?:به|تو)|باز(?:ش)?\s*کن|پر(?:ش)?\s*کن|ذخیره[‌\s]?(?:ش)?\s*کن|اضافه[‌\s]?(?:ش)?\s*کن|پاک(?:ش)?\s*کن)(?=[\s.!،]|$)/;
+  var PRAC_CASE = /^# پرونده‌های تمرینِ باز[^\n]*\n- (?!اگر|پروندهٔ تازه|برای)/m;
+  function nowBlock(p) { var bl = String(p || "").split(/\n(?=# )/).filter(function (x) { return /^\s*# وضعِ کنونی/.test(x); })[0] || ""; return bl; }
+  function focusIn(p) { var bl = nowBlock(p); return /مسئلهٔ گفت‌وگو «/.test(bl) || (/مسئلهٔ زنده «/.test(bl) && !/مسئلهٔ زنده «[^»]*» \(بسته شد\)/.test(bl)); }
+  AS.routeFocus = focusIn;
+  var LIFE_HINT = /عادت|سلامت|رژیم|ورزش|تصمیم|زندگی/;   // فقط پشتیبان وقتی آشکارسازِ a27 بار نشده (آزمونِ تابعِ خالص بی صفحه)
+  /* «فرمانِ صفحه» در یک بند: کارِ روی صفحه/رکورد (ثبت، نوشتن، رفتن، باز/پر/پاک کردن، گذاشتنِ یادآور، نشان دادن، جابه‌جا کردن، فرستادن) — نه «ثابت کن/حل کن/بگو» */
+  var CMD_VERB = /(?:^|[\s‌])(?:(?:ثبت|پر|ذخیره|اضافه|پاک|باز|حذف|یادداشت|کم|زیاد|عوض)(?:[\s‌]?ش)?[\s‌]*(?:کن|کنید|بکن|بکنید)|بنویس(?:ش|ید|یدش)?|برو(?:یم|ید)?[\s‌]+(?:به|تو)|ببر(?:ش|ید)?|بذار(?:ش|ید)?|بزار(?:ش|ید)?|بگذار(?:ش|ید)?|(?:نشون|نشان)(?:[\s‌]?(?:م|ش))?[\s‌]*بد(?:ه|ید|هید)|بنداز(?:ش|ید)?|بفرست(?:ش|ید)?)(?=[\s.!،,؛]|$)/;
+  var ACT_ONLY = CMD_VERB;   // نامِ پیشین (قرنطینه نه حذف: هم‌معنا با فرمانِ یک بند)
+  var FILL_W = /^(?:آره|اره|آری|بله|باشه|اوکی|ok|okay|خب|خوب|لطفاً|لطفا|پس|حالا|همین|همینو|اینو|اینم|ممنون|مرسی|ممنونم|دستت\s*درد\s*نکنه|فعلاً|فعلا)$/i;
+  function pureCommand(msg) {
+    var t = String(msg || "").replace(/[‏‎]/g, "").trim(); if (!t || t.length > 160 || /[؟?]/.test(t)) return false;
+    var parts = t.split(/[.!؛\n،,]+|\s+و\s+(?=(?:بعد|بعدش|هم)\s)/).map(function (x) { return x.trim(); }).filter(Boolean), cmd = 0;
+    for (var i = 0; i < parts.length; i++) {
+      var c = parts[i], words = c.split(/\s+/).filter(Boolean);
+      if (words.every(function (w) { return FILL_W.test(w.replace(/[!.]+$/, "")); })) continue;
+      if (!CMD_VERB.test(c)) return false;   // بندی که فرمان نیست ⇒ محتوا ⇒ آمیخته
+      var st = AS.statesProblem ? AS.statesProblem(c, { cmd: true }) : false;
+      if (st || (AS.FAIL_ME && AS.FAIL_ME.test(c)) || /حدس|جواب(?:م|ش)?|نتیجه|گیر|نمی[‌\s]?دونم|درسم/.test(c)) return false;
+      cmd++;
+    }
+    return cmd > 0;
+  }
+  AS.pureCommand = pureCommand;
+  /* قرنطینه (دورِ ۲۱، REMOVAL_CANDIDATES): مسیریابیِ واژه‌محورِ دورِ ۲۰ (دروازهٔ sig و ACT_ONLY ِ پیش از سرتیترِ زنده) — دست‌یافتنی با AS.R21_QUARANTINE.chatTask20 */
+  var ACT_ONLY20 = /(?:^|\s)(?:ثبت(?:ش)?\s*کن|بنویس(?:ش)?|برو\s*(?:به|تو)|باز(?:ش)?\s*کن|پر(?:ش)?\s*کن|ذخیره[‌\s]?(?:ش)?\s*کن|اضافه[‌\s]?(?:ش)?\s*کن|پاک(?:ش)?\s*کن)(?=[\s.!،]|$)/;
+  AS.R21_QUARANTINE = Object.assign(AS.R21_QUARANTINE || {}, { chatTask20: function (o) {
+    o = o || {}; var msg = String(o.msg || "").replace(/[‏‎]/g, "").trim(), p = String(o.prompt || "");
+    if (o.off) return "lla_assistant";
+    if (/^\[سامانه/.test(msg)) return o.inherit && o.prev === "lla_coach" ? "lla_coach" : "lla_assistant";
+    if (/^\[اصلاحِ پیامِ قبلی\]/.test(msg)) return "lla_assistant";
+    var sig = [AS.CHAT_PROB, AS.LIVE_RE2, AS.LIVE_ASK, AS.LIVE_STUCK, AS.FAIL_ME, LIFE_HINT].some(function (re) { return re && re.test(msg); });
+    if (!sig && msg.length <= 120 && !/[؟?]/.test(msg) && ACT_ONLY20.test(msg)) return "lla_assistant";
+    if (COACH_HEAD.test(p)) return "lla_coach";
+    if (COACH_BLOCK.test(p) && (sig || o.prev === "lla_coach")) return "lla_coach";
+    return "lla_assistant";
+  } });
   AS.chatTask = function (o) {
     o = o || {}; var msg = String(o.msg || "").replace(/[‏‎]/g, "").trim(), p = String(o.prompt || "");
     if (o.off) return "lla_assistant";   // سرورِ قدیمی «lla_coach» را رد کرد ⇒ تا بارِ بعدِ صفحه همان دستیار
@@ -564,9 +605,10 @@
     /* ✏️ (a40): صفحه اصلاح را خودش و بی مدل نشانده؛ این نوبت فقط تأییدِ نتیجه است ⇒ سریع. اصلاحی که در گفت‌وگو گفته شود («پس جوابم غلط بود»)
        را مدل باید بشناسد و گزارش کند ⇒ همان بلوکِ «# اصلاحِ پیامِ …» ⇒ مربی. */
     if (/^\[اصلاحِ پیامِ قبلی\]/.test(msg)) return "lla_assistant";
-    var sig = [AS.CHAT_PROB, AS.LIVE_RE2, AS.LIVE_ASK, AS.LIVE_STUCK, AS.FAIL_ME, LIFE_HINT].some(function (re) { return re && re.test(msg); });
-    if (!sig && msg.length <= 120 && !/[؟?]/.test(msg) && ACT_ONLY.test(msg)) return "lla_assistant";   // فرمانِ فقط-عمل (ثبت کن، برو به، بنویس)
-    if (COACH_HEAD.test(p)) return "lla_coach";
+    if (!msg) return "lla_assistant";
+    if (pureCommand(msg)) return "lla_assistant";   // چیزی جز فرمان نیست (حتی درونِ مسئلهٔ در کانون)
+    if (COACH_HEAD.test(p) || focusIn(p) || PRAC_CASE.test(p)) return "lla_coach";
+    var sig = AS.statesProblem ? AS.statesProblem(msg) : [AS.CHAT_PROB, AS.LIVE_RE2, AS.LIVE_ASK, AS.LIVE_STUCK, AS.FAIL_ME, LIFE_HINT].some(function (re) { return re && re.test(msg); });
     if (COACH_BLOCK.test(p) && (sig || o.prev === "lla_coach")) return "lla_coach";
     return "lla_assistant";
   };
@@ -786,6 +828,8 @@
         }
         return gap.then(function () { return AS.run(acts); }).then(function (res) {
           if (AS.tourAfterTurn) { try { AS.tourAfterTurn(s); S.put(s); paint(); } catch (e) { console.error(e); } }
+          /* دورِ ۲۱ (R6): پس از اجرای همهٔ کنش‌های پاسخ — صفحه وضع را می‌سنجد (بستنِ جاافتاده، گزارشِ گامِ بی‌شماره)؛ AS.afterTurnHooks.push(fn(s, o, acts, msg)) */
+          if (!/^\[سامانه/.test(String(msg || "").trim())) (AS.afterTurnHooks || []).forEach(function (fn) { try { fn(s, o, acts, msg); } catch (e) { console.error(e); } });
           if ((res.infos || []).length) { s.msgs.push({ role: "sys", at: now(), text: res.infos.join(" · ") }); S.put(s); paint(); }
           if (res.notes.length) { s.msgs.push({ role: "sys", at: now(), text: res.notes.join(" · ") }); S.put(s); paint(); }
           // پنجره‌ای (تأییدِ فرستادن به هوش مصنوعی، پرسشِ ایمنی، …) باز شد: تصمیمِ خودِ کاربر است — دستیار کنار می‌رود و صریح می‌گوید
@@ -979,6 +1023,8 @@
     if (ui.view === "list") { P.appendChild(listView()); return; }
     if (s && s.pinned) P.appendChild(h("div", { class: "as-pin", title: "خواستهٔ اصلیِ این سشن" }, "📌 ", s.pinned));
     if (s && AS.sessTools) { var stx = AS.sessTools(s); if (stx) P.appendChild(stx); }   // INF16 (a40): «📜 پروندهٔ کامل» ِ مسئلهٔ این سشن
+    /* دورِ ۲۱ (R6): پرسش‌های دکمه‌دارِ صفحه برای خودش («حل شد؟»، «نتیجهٔ گامِ N؟») — هر بخش با AS.paintHooks.push(fn(s) ⇒ عنصر|null) */
+    if (s) (AS.paintHooks || []).forEach(function (fn) { try { var el = fn(s); if (el) P.appendChild(el); } catch (e) { console.error(e); } });
     if (s && s.tour && AS.tourDrawer) P.appendChild(AS.tourDrawer(s));
     else if (s && s.steps && s.steps.length) {
       var done = s.steps.filter(function (x) { return x.s === "done"; }).length;

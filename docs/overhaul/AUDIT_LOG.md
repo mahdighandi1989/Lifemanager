@@ -4664,6 +4664,34 @@ dated stability, mind-card feed) under way.
   opening turns of problems stated in chat).
 - **DECISION** Recorded R1–R9 in `docs/tours/polya-batch1/decisions/DECISIONS_R21.md`; the independent bank is `VARIANTS_R21`.
 
+## 2026-10-18 — Pólya tour batch 1, round 21: route+coach fixer (learning-architecture)
+- **FINDING** 12 of 51 coaching turns were routed by keyword to the fast tier, although the page itself showed a chat problem in focus. The live side's
+  `{changed, ask, note}` result was flattened to text, and anything starting «چیزی…» was dropped, so no-ops and copy asks never reached the model or her.
+  A lesson fix replaced the whole lesson. Group A additions: false «شما» from «باید/بیشترین»; the turn question falling back to e1 of a step that is gone; garbled coach-side replacement; an overdue plan dropped on her answering turn.
+- **CHANGE** One page detector (`AS.statesProblem`) feeds the chat focus, the problem statement and `AS.chatTask`. Pure commands are recognised by structure.
+  The correction result is one structure, given verbatim to the model and as one plain line to her.
+  - The lesson is fixed by clause. Results and lessons are re-booked. The change line is a word diff. Coach-side substitution uses the live side's minimal diff.
+  - «حل شد؟» and «نتیجهٔ گامِ N؟» are asked with buttons. Formula-equivalent quotes are accepted (safe evaluator). `err_stage` comes from her words.
+  - Two independent questions trigger a rewrite. Claim, register and «پرونده» false positives are removed. One turn question after a correction.
+  - The next-item question follows a step outcome. A refuted guess is re-judged after a verified close. An overdue plan stays open one turn.
+  - The old paths are quarantined under `APP.ASSIST.R21_QUARANTINE`.
+- **CHANGE** New `tests/test_tour1_r21_coach.js`: red on the base build, green now; bank VARIANTS_R21 90/90 judged entries pass, 35 assigned to other fixers with a reason. Four old live tests
+  (r13–r16) and the r18/r20 coach tests were adapted only where R21 replaces a rule (mock repeats a multi-question reply for the R7 rewrite; R3g re-book), each commented.
+## 2026-10-18 — Pólya tour batch 1, round 21: live + dossier fixer (R3 page side, R4, R6 page side, R9, ADDENDUM items)
+- **FINDING** Corrections did not reach every copy of the same fact: composed records had one source, page copies matched only by identical
+  wording, 🌱/step outcome/look-back copies were never candidates, dependent verdicts/guesses/«حل شد» survived (also after «بله»), deadlines used
+  their title as span, multi-number ✏️ was one fragment. The session dossier was thin and showed raw keys. The turn question after a step
+  outcome fell back to a step that no longer exists (regression of round-20 #142). Records made under the dev clock vanished (A21-21).
+- **CHANGE** a38: one result shape `{changed:[{rec,old,new,why}], ask:[{field,label,old,new}], note}` for every retract path; one source span per
+  message (`src.parts`); same fact by meaning (units, colloquial/written, field keys `field:<id>`); new copy candidates; recorded dependencies
+  (`uses`) set aside with a reason on correction or copy-yes; Persian-date and clause-span deadlines; one fragment per changed number; measure
+  records (`mlog`, `m.pts`) feeding the plot; one `chat_invent` gate (live_new on «ثبتش کن» about the current problem, look-back new problems
+  kept in `b.newProbs`); a one-time rewrite when the reply claims a refused action; reread loop stopped. a40: session dossier from the event
+  log (guesses, plans, all corrections, practice, 🎯, Persian labels, live-problem title/link), chat work of chat-closed problems, plans scoped
+  to their problem. a33: plain deadline refusal line. a39: plot from records. a1: dev-clock records stay visible in dev mode.
+- **CHANGE** Tests: new `apps/learning-architecture/tests/test_tour1_r21_live.js` + `tests/variants/VARIANTS_R21.json`; red on the base build
+  (49 bank entries, 17/17 runner quotes), green after. `test_tour1_r20_live` MT1 #17 expectation replaced (comment «دورِ ۲۱»); `test_graph.js`
+  lists `mlog` as non-graph. Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R21_live_2026-10-18.md`.
 ### 2026-10-18 — Pólya tour round 21, practice fixer (R2, R5, R5+ of the group-A addendum)
 - **FINDING** Practice could not start from chat (the prompt block was empty without an open case; the technique list was clipped to 1–25); a late success after a
   regression counted as all skipped steps, so «stable» came after one success; an early failure was labelled «early» and ignored; T23 got a NaN due; «continue with the

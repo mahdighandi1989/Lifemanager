@@ -1028,6 +1028,13 @@
         });
         /* دورِ ۲۰ (RO6/RO7، A11): جلسه‌ها و گذارها با زمانِ خودِ رویداد (روزِ جلسه، زیرِ ساعتِ صفحه) — همان PR.events */
         PR.events(PR.subj("live", pid)).filter(function (e) { return e.kind !== "prc:start"; }).forEach(function (e) { e.i = D.events.length; D.events.push(e); });
+        /* دورِ ۲۱ (bank #98 #105): ردیفِ T24 همان 🎯 است ⇒ هر پیش‌بینیِ پروندهٔ کالیبراسیونِ این مسئله یک رویداد (داوری با تاریخش، از کاربرگ یا گفت‌وگو — یک بار) */
+        PR.cases({ subj: PR.subj("live", pid) }).filter(function (c) { return (P[c.tid] || {}).shape === "calib"; }).forEach(function (c) {
+          PR.linkedFcasts(c).forEach(function (f) { var j = f.judgedBy || {};
+            D.events.push({ k: "practice", kind: "prc:fcast", i: D.events.length, at: f.outcomeAt || f.created || "", d: f.outcomeAt ? A.localDay(f.outcomeAt) : "", title: "🎯 پیش‌بینیِ کاربرگِ ۲۴" + (f.outcome ? " — داوری شد" : ""),
+              lines: [f.q].concat(f.p != null ? ["اطمینان: " + fa(f.p) + "٪"] : []).concat(f.due ? ["موعدِ داوری: " + fdate(f.due)] : []).concat(j.kind === "chat" && j.quote ? ["از گفت‌وگو: «" + j.quote + "»"] : j.kind === "plan" ? ["از همان برنامه"] : []),
+              out: f.outcome === "شد" ? "شد" : f.outcome === "نشد" ? "نشد" : f.outcome || "هنوز داوری نشده", prc: c.id, fc: f.id, src: { kind: "practice", id: c.id } }); });
+        });
         D.events.sort(function (a, b2) { var x = String(a.at || "9999"), y = String(b2.at || "9999"); return x < y ? -1 : x > y ? 1 : a.i - b2.i; });   /* همان ترتیبِ خودِ a40 */
       } catch (e) { console.warn(e); }
       return D;
@@ -1313,16 +1320,22 @@
     if (subj && typeof subj === "object" && subj.msgs) { msg = s; s = subj; subj = null; }
     if (typeof subj === "string") subj = PR.subj("live", subj);
     var L = subj ? PR.cases({ subj: subj }).filter(function (c) { return c.state !== "closed"; }) : [];
-    PR.sessCases(s).forEach(function (c) { if (L.indexOf(c) < 0) L.push(c); });
-    if (!subj && !s) L = [];
+    /* دورِ ۲۱ (هماهنگی با routing، HANDBOOK §12 ردیفِ ۵۰): فقط پرونده‌های موضوعِ همین سشن (مسئلهٔ سشن، پروندهٔ ساخته/ثبت‌شده در همین سشن) زیرِ
+       سرِ «# پرونده‌های تمرینِ باز» می‌آیند — همان نشانهٔ مربی‌گریِ AS.chatTask؛ پروندهٔ «سررسیده» ِ جای دیگر فقط شناسه‌اش را برای گزارشِ خودش می‌دهد،
+       پس از سطرِ «- اگر …» (نشانه نیست؛ جایش سطرِ «امروز» است) */
+    var own = function (c) { return !!s && ((c.sess && c.sess === s.id) || (s.prcs || []).indexOf(c.id) >= 0 || (c.subj && c.subj.k === "live" && sessPids(s).indexOf(c.subj.id) >= 0)); };
+    var O = [];
+    PR.sessCases(s).forEach(function (c) { if (L.indexOf(c) >= 0) return; if (own(c)) L.push(c); else O.push(c); });
+    if (!subj && !s) { L = []; O = []; }
     var SB = s ? PR.sessSubject(s, msg) : { any: !!subj, pids: [], chat: "", techs: [], moves: [] };
     if (subj && subj.k === "live" && SB.pids.indexOf(subj.id) < 0) { SB.pids.push(subj.id); SB.any = true; }
-    if (!L.length && !SB.any) return "";
-    var out = [L.length ? "# پرونده‌های تمرینِ باز (یک پرونده برای هر تکنیک × موضوع)" : "# پروندهٔ تمرین (هنوز پرونده‌ای باز نیست؛ یک پرونده برای هر تکنیک × موضوع)"];
-    if (L.length) out.push(L.slice(0, 6).map(function (c) {
-      var lst = lastSess(c);
-      return "- " + c.id + ": تکنیکِ " + c.tid + " «" + (A.TM[c.tid] || {}).fa + "» روی «" + PR.subjTitle(c.subj) + "» · " + ST_FA[c.state] + " · " + fa((c.sessions || []).filter(function (x) { return !x.draft; }).length) + " جلسه" + (lst ? " (آخرین " + lst.d + (lst.meas && lst.meas.pct != null ? "، " + lst.meas.pct + "٪" : "") + ")" : "") + (c.due ? " · موعد " + c.due + (c.due < today() ? " (گذشته)" : "") : "") + (c.urhythm ? " · آهنگِ خودش: هر " + fa(c.urhythm.every) + " روز" : "");
-    }).join("\n") + "\n- اگر گفت جلسهٔ یکی را انجام داد (مثلاً نتیجهٔ بازیابی‌اش را گفت): {\"do\":\"practice_log\",\"prc\":\"شناسه\",\"what\":\"چه کرد\",\"pct\":عدد اگر گفت,\"ok\":true|false اگر گفت,\"quote\":\"عینِ حرفش\"} — روزِ جلسه را صفحه از حرفش می‌خواند («دیروز» ⇒ دیروز)؛ «فردا می‌کنم» جلسه نیست؛ در کالیبراسیون (۲۴) همان پیش‌بینی را داوری می‌کند و درصد اطمینان است؛ موعد را صفحه از متنِ تکنیک می‌چیند؛ تا نتیجهٔ صفحه نیامده نگو «ثبت شد».\n" +
+    if (!L.length && !O.length && !SB.any) return "";
+    var line = function (c) { var lst = lastSess(c);
+      return "- " + c.id + ": تکنیکِ " + c.tid + " «" + (A.TM[c.tid] || {}).fa + "» روی «" + PR.subjTitle(c.subj) + "» · " + ST_FA[c.state] + " · " + fa((c.sessions || []).filter(function (x) { return !x.draft; }).length) + " جلسه" + (lst ? " (آخرین " + lst.d + (lst.meas && lst.meas.pct != null ? "، " + lst.meas.pct + "٪" : "") + ")" : "") + (c.due ? " · موعد " + c.due + (c.due < today() ? " (گذشته)" : "") : "") + (c.urhythm ? " · آهنگِ خودش: هر " + fa(c.urhythm.every) + " روز" : ""); };
+    var out = [L.length || O.length ? "# پرونده‌های تمرینِ باز (یک پرونده برای هر تکنیک × موضوع)" : "# پرونده‌های تمرینِ باز: هنوز هیچ (یک پرونده برای هر تکنیک × موضوع؛ سرِ یکسان تا لایهٔ مربی دوباره نیاوردش — سطرِ بعد «پروندهٔ تازه» است، نه پرونده)"];
+    if (L.length) out.push(L.slice(0, 6).map(line).join("\n"));
+    if (O.length) out.push("- اگر خودش گزارشِ جلسهٔ یکی از این پرونده‌های سررسیده (موضوعِ سشن‌های دیگر، نه این گفت‌وگو) را داد، با همان شناسه ثبت کن؛ وگرنه پیششان نکش:\n" + O.slice(0, 6).map(line).join("\n"));
+    if (L.length || O.length) out.push("- اگر گفت جلسهٔ یکی را انجام داد (مثلاً نتیجهٔ بازیابی‌اش را گفت): {\"do\":\"practice_log\",\"prc\":\"شناسه\",\"what\":\"چه کرد\",\"pct\":عدد اگر گفت,\"ok\":true|false اگر گفت,\"quote\":\"عینِ حرفش\"} — روزِ جلسه را صفحه از حرفش می‌خواند («دیروز» ⇒ دیروز)؛ «فردا می‌کنم» جلسه نیست؛ در کالیبراسیون (۲۴) همان پیش‌بینی را داوری می‌کند و درصد اطمینان است؛ موعد را صفحه از متنِ تکنیک می‌چیند؛ تا نتیجهٔ صفحه نیامده نگو «ثبت شد».\n" +
       "- اگر آهنگِ خودش را گفت («هر دو هفته یه بار»): {\"do\":\"practice_rhythm\",\"prc\":\"شناسه\",\"quote\":\"عینِ حرفش\"} — فاصله را صفحه از همان حرف می‌خواند، فقط برای همان پرونده.");
     var subjTxt = [].concat(SB.pids.map(function (p) { return "مسئلهٔ زنده «" + PR.subjTitle(PR.subj("live", p)) + "» (pid " + p + ")"; }), SB.chat ? ["مسئلهٔ گفت‌وگو «" + SB.chat + "» (topic: همان عنوان)"] : [],
       (SB.techs || []).map(function (t) { return "تکنیکِ " + t + " «" + A.TM[t].fa + "»"; }), (SB.moves || []).map(function (m) { return "حرکتِ «" + m.fa + "»" + (m.tech.length ? " — در تکنیک‌های " + m.tech.join("، ") : ""); }), SB.view ? ["صفحهٔ بازِ تکنیکِ " + SB.view] : []).join("؛ ");
@@ -1359,7 +1372,7 @@
         var t = e.ev === "state" ? "پروندهٔ تمرین: " + (ST_FA[e.from] || e.from || "") + " ← " + (ST_FA[e.to] || e.to || "") : EVFA[e.ev]; if (!t) return;
         out.push({ k: "practice", kind: "prc:" + e.ev, at: evAt(e.d, e.at), d: e.d, title: "🧪 " + t + " — " + nm, lines: e.why ? [e.why] : [], prc: c.id, src: { kind: "practice", id: c.id } });
       });
-      (c.sessions || []).filter(function (x) { return !x.draft; }).forEach(function (x) {
+      (c.sessions || []).filter(function (x) { return !x.draft && !(x.meas && x.meas.fc && x.src === "assistant"); }).forEach(function (x) {   /* دورِ ۲۱ (bank #105): داوریِ 🎯 از گفت‌وگو خودِ همان 🎯 است — یک سطر (سطرِ 🎯)، نه دو */
         var m = x.meas || {}, r = (c.roles || {})[x.d], lt = (c.late || {})[x.d];
         out.push({ k: "practice", kind: "prc:session", at: evAt(x.d, x.at), d: x.d, title: "🧪 جلسهٔ تمرین (" + nm + ")", lines: [x.what || "جلسه"].concat(m.pct != null ? ["بازیابیِ سنجیده: " + fa(m.pct) + "٪"] : []).concat(r === "late" || r === "lateok" ? [fa(lt || 0) + " روز دیرتر از موعد"] : []).concat(x.chat ? ["از گفت‌وگو: «" + x.chat.quote + "»"] : []),
           out: x.ok === true ? "شد" : x.ok === false ? "نشد" : "", prc: c.id, src: x.chat ? { kind: "practice", id: c.id, sess: x.chat.sess } : { kind: "practice", id: c.id } });

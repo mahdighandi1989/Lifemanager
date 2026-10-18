@@ -381,7 +381,8 @@
          مسئلهٔ زنده است کنار می‌رود (پیامد همان‌جا شمرده می‌شود)، و دو رویدادِ گفت‌وگو با یک شناسه و یک مرحله یکی‌اند */
       (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok") || e.pend || e.wd) return;
         if (e.act) { if (liveActs[e.act]) return; var ak = e.act + "|" + e.ph + "|" + (e.ok ? 1 : 0); if (seenAct[ak]) return; seenAct[ak] = 1; }
-        var q0 = String(e.key || "").split("|").pop(), how = { selfcorr: "خودش حرفِ پیشینش را اصلاح کرد (بازنگری)", plan_done: "برنامه‌اش را انجام داد", solved: "«حل شد» در گفت‌وگو", own: "بازگوییِ خودش", res: "نتیجه‌ای که گفت", plan: "طرحی که گفت", ans: "پاسخ به پرسشِ مرحله", pass: "گذر از مرحله" }[e.how] || "";
+        /* تورِ پولیا (R3g، دورِ ۲۱، B·D9/D·11): کلیدِ کارِ دوباره‌ثبت‌شده «…|rebook:u6» است — «از کجا؟» نقلِ حرفِ خودش را نشان می‌دهد، نه شناسهٔ خام */
+        var kp = String(e.key || "").split("|").filter(function (x) { return x && !/^rebook:|^sc$/.test(x); }), q0 = e.rebook && e.src20 && e.src20.span ? String(e.src20.span) : (kp.pop() || ""), how = { selfcorr: "خودش حرفِ پیشینش را اصلاح کرد (بازنگری)", plan_done: "برنامه‌اش را انجام داد", solved: "«حل شد» در گفت‌وگو", own: "بازگوییِ خودش", res: "نتیجه‌ای که گفت", lesson: "درسی که گفت", plan: "طرحی که گفت", ans: "پاسخ به پرسشِ مرحله", pass: "گذر از مرحله" }[e.how] || "";
         add(byPh[e.ph], e.src, !!e.ok, { id: e.act || ("ev:" + s.id + ":" + (e.msg || "") + ":" + e.key), at: e.at, pid: e.pid || (/^l:/.test(String(e.pk || "")) ? String(e.pk).slice(2) : "") || (/^lstep:([^:]+):/.exec(String(e.act || "")) || [])[1] || "", sess: s.id, ref: e.msg || "",
           fa: (how || PH_SRC[e.src] || e.src) + (e.src === "knot" ? " " + q0.split(":")[0] : q0 ? " — «" + q0.slice(0, 50) + "»" : "") }); }); });
     S.all("eprog").forEach(function (pg) {

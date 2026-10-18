@@ -34,9 +34,11 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     APP.HOST = { report: async () => ({ id: 'sh1', number: 1 }), sheets: async () => [], sheet: async () => null, note: async () => ({ ok: true }),
       remind: async () => ({ ok: true }), unremind: async () => ({ ok: true }), mail: async () => ({ status: 'sent' }) };
     APP.callAI = async (sys, user, opts) => {
+      // DECISIONS_R21 R7: پاسخِ چندپرسشی یک بار بازنویسی خواسته می‌شود — مدلِ ساختگی همان پاسخ را تکرار می‌کند (این آزمون گزینه‌سازیِ پرسش‌هاست، نه بازنویسی)
+      if (/وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن/.test(String(user || '')) && window.__lastText != null) { const tx = window.__lastText; return opts && opts.withMeta ? { text: tx, files: [] } : tx; }
       __calls.push({ sys, user, opts }); let r = __q.shift(); if (typeof r === 'function') r = r(String(user || ''));
       const t = r === undefined ? { reply: 'باشه.', status: 'related', memory: 'm', actions: [] } : r;
-      const text = typeof t === 'string' ? t : JSON.stringify(t);
+      const text = typeof t === 'string' ? t : JSON.stringify(t); window.__lastText = text;
       return opts && opts.withMeta ? { text, files: [] } : text;
     };
     window.R = (o) => Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, o);

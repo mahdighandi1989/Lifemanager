@@ -378,7 +378,8 @@ const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARI
     9: NC(MTC), 10: NC(MTC), 11: NC(MTC), 12: NC(MTC), 13: NC(MTC), 14: NC(MTC), 15: NC(MTC), 16: NC(MTC),
     17: async () => { const x = await setup({ chat: 'U: سلام ‖ A: سلام.' }); await p.evaluate((sid) => { const se = APP.S.get(sid); se.lprob = ''; APP.S.put(se); }, x.sid);
       const r = await actTurn(x.sid, 'این مسئله رو خودم ساختم: مجموع زاویه‌های یک پنج‌ضلعی چند است؟', [{ do: 'chat_invent', title: 'پنج‌ضلعی', statement: 'مجموع زاویه‌های یک پنج‌ضلعی چند است؟' }]);
-      const n = await p.evaluate((sid) => APP.liveAll().filter(y => y.sess === sid).length, x.sid); return { ok: n === 0 && r.notes.some(t => /پیشنهاد/.test(t)), got: { n, r } }; },
+      const n = await p.evaluate((sid) => APP.liveAll().filter(y => y.sess === sid).length, x.sid); /* دورِ ۲۱ (DECISIONS_R21 R6، N4/C21-8): او فقط یک سطرِ ساده می‌بیند (نه «کاربر نخواسته… فقط پیشنهاد بده»)؛ یادداشتِ مدل در بازنویسیِ یک‌باره می‌رود */
+      return { ok: n === 0 && r.notes.concat(r.infos).some(t => /ثبت نکردم/.test(t)) && !r.notes.concat(r.infos).some(t => /کاربر نخواسته|پیشنهاد بده/.test(t)), got: { n, r } }; },
     18: async () => { const x = await setup({ chat: 'U: سلام ‖ A: سلام.' }); await p.evaluate((sid) => { const se = APP.S.get(sid); se.lprob = ''; APP.S.put(se); APP.go('today'); }, x.sid);
       await actTurn(x.sid, 'یه مسئله باز کن برای خرید ماشین ولی فقط ببینم چیه، فعلاً نمی‌خوام کار کنم', [{ do: 'live_new', title: 'خرید ماشین', statement: 'نمی‌دانم ماشین بخرم یا نه؛ پولم کم است' }]);
       const v = await p.evaluate(() => APP.state.view); return { ok: v !== 'lprob', got: v }; },

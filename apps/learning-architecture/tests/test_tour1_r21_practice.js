@@ -158,6 +158,16 @@ const HELPERS = () => {
     T(54, r2.n === 1 && r2.c.sessions.some(s => s.d === ymd(0) && s.meas.pct === 70), r2);
   });
 
+  // هماهنگی با routing (HANDBOOK §12 ردیفِ ۵۰): پروندهٔ سررسیدهٔ سشنِ دیگر نشانهٔ مربی‌گری نیست — زیرِ سرِ بلوک فقط پس از سطرِ «- اگر …»؛ نوبتِ بی‌ربط lla_assistant می‌ماند
+  await section('r2g', async () => {
+    await fresh();
+    const id = await E(() => { const tp = __topic('فرمول‌های آمار').id; __ex(41, { topic: 'فرمول‌های آمار', actual: '80' }, { topic: tp }); return APP.PR.cases({ tid: 41 })[0].id; });
+    await day(2); await reload();
+    const r = await E(async (id) => { const sid = __freshChat(); const blk = APP.PR.promptBlock(null, APP.S.get(sid), 'ساعت چنده؟'); const caseLine = /^# پرونده‌های تمرینِ باز[^\n]*\n- (?!اگر|پروندهٔ تازه|برای)/m.test(blk);
+      const task = APP.ASSIST.chatTask ? APP.ASSIST.chatTask({ msg: 'ساعت چنده؟', prompt: blk }) : null; return { has: blk.indexOf(id) >= 0, caseLine, task }; }, id);
+    X('due case of another session listed only after «- اگر …» (no coaching signal)', r.has && !r.caseLine && r.task !== 'lla_coach', r);
+  });
+
   /* ===================== R5 — قاعده‌های زمان ===================== */
   // #110 #111 — پسرفت دنباله را از نو می‌چیند؛ «تثبیت شد» فقط با دنبالهٔ خودِ T41 پس از ۲۲ اکتبر (۲۳، ۲۵، ۱ نوامبر)
   await section('r5a', async () => {

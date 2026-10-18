@@ -26,12 +26,18 @@
   }
   AS.parseTime = parseTime;
   /* {"do":"deadline","what":"…","date":"YYYY-MM-DD" (میلادی),"time":"HH:MM" (اگر کاربر ساعت گفت)} — فقط از حرفِ خودِ کاربر */
+  /* دورِ ۲۱ (R6، N4، bank #138): دلیلِ ردِ موعد یک جا — برای مدل (پیش‌سنجیِ پاسخ در a38، بازنویسیِ یک‌باره) و برای او یک سطرِ ساده، بی «YYYY-MM-DD»/«HH:MM» */
+  AS.deadlineRefusal = function (a) {
+    var what = clip(a && a.what, 120), date = String((a && a.date) || "").trim();
+    if (!what || !RE_DATE.test(date)) return "تاریخ یا کارِ یادآور روشن نبود";
+    if (date < A.today()) return "تاریخِ " + A.fdate(date) + " گذشته است";
+    if (a && a.time != null && String(a.time).trim() && !parseTime(a.time)) return "ساعتِ «" + clip(a.time, 20) + "» خوانا نیست";
+    return "";
+  };
   AS.DO.deadline = function (a) {
     var s = AS._turnSession, what = clip(a && a.what, 120), date = String((a && a.date) || "").trim();
-    if (!what || !RE_DATE.test(date)) return "موعد ثبت نشد: «what» و «date» (YYYY-MM-DD میلادی) لازم است";
-    if (date < A.today()) return "موعد ثبت نشد: " + date + " گذشته است — از کاربر بپرس تاریخِ درست چیست";
+    var why0 = AS.deadlineRefusal(a); if (why0) return "یادآور ثبت نشد: " + why0 + " — تاریخ (و اگر خواستی ساعتِ) درست را بگو تا ثبتش کنم.";
     var tm = a && a.time != null && String(a.time).trim() ? parseTime(a.time) : "";
-    if (a && a.time != null && String(a.time).trim() && !tm) return "موعد ثبت نشد: ساعتِ «" + clip(a.time, 20) + "» خوانا نیست — HH:MM بده";
     var same = S.all("deadline", function (x) { return !x.done && x.what === what; })[0];
     var r = same || { id: A.uid("dl"), type: "deadline", what: what, done: false };
     r.date = date; if (tm) r.time = tm; r.sess = r.sess || (s && s.id) || ""; S.put(r); sync(r);

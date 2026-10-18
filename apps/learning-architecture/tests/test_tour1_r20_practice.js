@@ -199,7 +199,7 @@ const HELPERS = () => {
   // #131 — بی پروندهٔ باز: «ذهنم داره می‌چرخه» / «بیا تمرین کنیم» بلوکِ پرونده نمی‌آورد
   await section('b130', async () => {
     await fresh(); await E(() => __freshChat());
-    const neg = await E(async () => { const a = await __say('ذهنم داره می‌چرخه', 'باشه.', []); const b2 = await __say('بیا تمرین کنیم', 'باشه.', []); return [/# پرونده‌های تمرینِ باز/.test(a), /# پرونده‌های تمرینِ باز/.test(b2)]; });
+    const neg = await E(async () => { const a = await __say('ذهنم داره می‌چرخه', 'باشه.', []); const b2 = await __say('بیا تمرین کنیم', 'باشه.', []); const CASE = /^# پرونده‌های تمرینِ باز[^\n]*\n- (?!اگر|پروندهٔ تازه|برای)/m; return [CASE.test(a), CASE.test(b2)]; });   /* دورِ ۲۱ (DECISIONS_R21 R2): سرِ «هنوز هیچ» + «پروندهٔ تازه» حالا می‌آید تا از گفت‌وگو شروع شود؛ آن‌چه نباید بیاید سطرِ یک پروندهٔ باز است (همان نشانهٔ AS.chatTask) */
     T(131, neg.every(x => !x), neg);
     const id = await E(() => { const tp = __topic('فرمول‌های مثلثات').id; __ex(41, { topic: 'فرمول‌های مثلثات', actual: '80' }, { topic: tp }); return APP.PR.cases({ tid: 41 })[0].id; });
     await day(7); await reload(); await E(() => __freshChat());

@@ -8,14 +8,15 @@ Base: `claude/life-program-flow-diagram-q37jvr` (round-21 reports merged). Not t
   «🧪» start box, card ownership, recall trend, plan ⇄ 🎯, habit-block filter).
 - `a36_solve.js` (one-night 🌱 expiry: `A.willExpire`, `A.willOneNight`), `a42_sched.js` (🎯 `dupOf` via `A.PR.fcDup`), `a3_views.js` (late label on the current P3 line).
 - Tests: new `tests/test_tour1_r21_practice.js`; byte copy of the bank `tests/variants/VARIANTS_R21.json`. No old assertion changed.
-- Docs: WORKLOG (87), PROGRESS 102, HANDBOOK §4 (practice bullet), §10 row, §12 row 50. **Numbering gate:** (85)/100 and (86)/101 belong to the sibling fixers; this branch alone
-  fails the docs-numbering check until they are merged — merge them first, then this branch, run `python apps/learning-architecture/build.py` once and commit the bundle.
+- Docs: WORKLOG (87), PROGRESS 102, HANDBOOK §4 (practice bullet), §10 row, §12 row 51. Route+coach (85)/100 and live (86)/101 are merged into this branch (da9d10e0); numbering is continuous.
 
 ## Contracts for the other fixers
 - **route/coach (a26/a27):**
   - `APP.PR.promptBlock(subject, session, msg)` — `msg` is new (third arg; the hook already passes it). With a session «subject» (live pid of the session, `s.coach.stmt`, a technique or
     move named in her words — `APP.PR.namedIn(text)`, the open tech page) it returns the start_practice description + the complete list of 45 techniques, even with no case open;
-    with no subject and no case it returns "". Header without cases: «# پروندهٔ تمرین (هنوز پرونده‌ای باز نیست…)»; with cases: «# پرونده‌های تمرینِ باز …» (unchanged).
+    with no subject and no case it returns "". Only cases of THIS session's subject (session problem, `c.sess === s.id`, `s.prcs`) are listed right under
+    «# پرونده‌های تمرینِ باز» (the coaching signal of `AS.chatTask`); cases merely due elsewhere follow a «- اگر خودش گزارشِ جلسهٔ … را داد» line, so `PRAC_CASE` does not fire
+    on them. Without cases the header is «# پرونده‌های تمرینِ باز: هنوز هیچ …» followed by «- پروندهٔ تازه …» (also not a case line; keeps the a27 fallback from adding a second block).
   - `APP.PR.sessSubject(s, msg)` → `{pids, chat, techs, moves, view, back, any}` — `back` = look-back (`s.coach.ph === "b"`, `closedPid`, or a solved session problem). The look-back
     offer line appears once per session per subject (`s.prcOffer`).
   - Routing (R1): an open practice case being worked ⇒ `APP.PR.sessCases(s)` (unchanged); a practice report needs no keyword.
@@ -28,7 +29,7 @@ Base: `claude/life-program-flow-diagram-q37jvr` (round-21 reports merged). Not t
   Case history gains `ev: "rhythm"` (`APP.PR.events` → `kind: "prc:rhythm"`). `APP.PR.cardPid(card)` names the live problem a card belongs to (pb, `tutor:back:<pid>`, `chat:solved:<pid>`,
   `lprob:practical` via `u[n].pracCard`). Assistant-started cases carry `c.sess`.
 - **mind (a29, A21-11):** calibration sessions now have measured values `{p, ok}` (readable by `measOf` as kind "cal"). A worksheet session holds only the latest judgement of that day;
-  showing all judged 🎯 of a case in one row is a29's (HANDBOOK §12 row 50).
+  showing all judged 🎯 of a case in one row is a29's (HANDBOOK §12 row 51).
 
 ## Behaviour notes
 - Stability (steps shape): `cnt` = successes after the last failure; «تثبیت شد» needs `cnt ≥ steps.length`. Late success still earns the longer interval (round 20) but counts once.

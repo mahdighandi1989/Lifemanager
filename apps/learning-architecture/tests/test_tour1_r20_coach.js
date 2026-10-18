@@ -227,7 +227,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     await play(E[6].text, { 1: [cs({ ph: 'b', said: ['result'], result: 'جوابم ۴۲' })], 3: [{ do: 'chat_solved', title: 'جایگذاری ۴۲', statement: 'معادله را حل کن: x² − 40x − 84 = 0', kind: 'find', lesson: 'جایگذاری مهمه', check: 'با جایگذاری چک کردم درست درمیاد', checkMsgs: ['جوابم ۴۲ ـه، با جایگذاری چک کردم درست درمیاد'] }] }, RT({ msg: 'جوابم ۴۲ ـه', key: 'ans', what: 'ans', fix: '۴۸' }));
     x = await p.evaluate(() => { const r = APP.liveAll().filter(r => r.p.title === 'جایگذاری ۴۲')[0]; const b1 = APP.S.get('eprog_' + r.p.id).solve.b[1]; return { verdict: b1.verdict, sup: !!b1.chkSup, prev: b1.chkSup && b1.chkSup.verdictPrev, use: b1.use }; });
     s = await st();
-    T(6, s.ret.ok && (x.prev === 'verified' ? x.verdict === 'unverified' && x.sup : true) && x.use === 'جایگذاری مهمه' && s.ev.filter(e => e.how === 'res').every(e => e.wd), { x, ret: s.ret, ev: s.ev });
+    // DECISIONS_R21 R3g جای این بند را گرفت: نتیجهٔ درست‌شده از پیامِ کنونی دوباره ثبت می‌شود (rebook) — رویدادِ نتیجهٔ پیامِ منبع پس گرفته می‌ماند
+    T(6, s.ret.ok && (x.prev === 'verified' ? x.verdict === 'unverified' && x.sup : true) && x.use === 'جایگذاری مهمه' && s.ev.filter(e => e.how === 'res' && !e.rebook).every(e => e.wd), { x, ret: s.ret, ev: s.ev });
     await go();
     await play(E[7].text, { 1: [cs({ guess: { text: '۱۲' } })] }, RT({ msg: 'امروز خیلی خسته‌ام', what: 'said', fix: 'حوصله نداشتم' }));
     s = await st(); u = await turn('باشه.'); x = blockOf(u.user, /^# اصلاحی که صفحه/);
