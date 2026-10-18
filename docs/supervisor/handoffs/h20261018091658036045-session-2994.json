@@ -1,0 +1,16 @@
+{
+ "id": "h20261018091658036045-session-2994",
+ "at": "2026-10-18T09:16:58Z",
+ "by": "session",
+ "area": "app",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "Age package part 1 (decision 2026-10-18 items 1-2): non-owner approved Google accounts get their own users.id scope (owner stays 0 via OWNER_EMAIL/ADMIN_EMAILS/first-admin fallback; flag PER_USER_OAUTH_SCOPE); optional date_of_birth at register + /api/me/date-of-birth + profile validation. Note: docs/overhaul/handoff-notes/_pending_age_scope_2026-10-18.md",
+ "procedure": "CLAUDE.md#Non-negotiable rules",
+ "commit": "49af3a6e",
+ "status": "open"
+}

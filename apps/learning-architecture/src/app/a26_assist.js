@@ -1044,6 +1044,8 @@
         m.files && m.files.length ? h("div", { class: "as-fl" }, m.files.map(function (f) { return f.link ? h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name) : h("span", { class: f.err ? "bad" : "" }, "📄 " + f.name); })) : null,
         csvNodes(m), AS.msgTools ? AS.msgTools(s, m) : null));   // INF15 (a40): «✏️ اصلاح» فقط روی حبابِ خودِ کاربر
     });
+    /* کارت‌های صفحه درونِ ناحیهٔ پیمایشِ گفت‌وگو (نه بالای آن): پنجره بلندتر از سقفش نمی‌شود و سرتیتر/پایین جابه‌جا نمی‌شوند — AS.logHooks.push(fn(s) ⇒ عنصر|null) (بستهٔ سن: کارتِ تاریخِ تولد) */
+    if (s) (AS.logHooks || []).forEach(function (fn) { try { var el = fn(s); if (el) log.appendChild(el); } catch (e) { console.error(e); } });
     if (busy) log.appendChild(h("div", { class: "as-msg ai as-typing" }, h("div", { class: "as-tx" }, "…")));
     P.appendChild(log);
     var chips = h("div", { class: "as-chips" }, pend.map(function (f, i) { return h("span", { class: "chip" }, "📎 " + clip(f.name, 24), h("button", { class: "linkish", type: "button", "aria-label": "برداشتنِ " + f.name, onclick: function () { pend.splice(i, 1); paint(); } }, "✕")); }));

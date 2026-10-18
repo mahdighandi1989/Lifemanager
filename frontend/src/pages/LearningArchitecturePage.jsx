@@ -159,6 +159,26 @@ export default function LearningArchitecturePage() {
       unremind: (key) => api.delete(`/app-records/${APP}/reminders/${encodeURIComponent(key)}`).then((r) => r.data),
       // «📧 گزارشِ تور»: گزارشِ HTML با نمودارهای PNG به ایمیلِ مالک (Gmail ِ متصل یا SMTP) — وضعِ صادقانه برمی‌گردد
       mail: (payload) => api.post(`/app-records/${APP}/report-email`, payload, { timeout: 60000 }).then((r) => r.data),
+      // «سن» (بستهٔ سن ۲۰۲۶-۱۰-۱۸): یک تاریخِ تولد برای هر کاربرِ واردشده — GET/PUT /api/me/date-of-birth
+      // (get_signed_in_user_id ⇒ همیشه فضای خودِ همین کاربر؛ پاسخ {date_of_birth: 'YYYY-MM-DD'|null, raw, owner_locked, source}).
+      // فقط اگر سرورِ قدیمی آن را ندارد (۴۰۴/۴۰۵): پشتیبانِ «من که هستم» (/api/identity-profile). صفحه خودش «پرکردنِ خالی» در دو سو را انجام می‌دهد (a43_age.js).
+      birth: () => api.get('/me/date-of-birth')
+        .then((r) => (r.data && r.data.date_of_birth) || '')
+        .catch((e) => {
+          const st = e && e.response && e.response.status;
+          if (st !== 404 && st !== 405) throw e;
+          return api.get('/identity-profile').then((r) => {
+            const f = ((r.data && r.data.fields) || []).find((x) => x.field === 'date_of_birth');
+            return (f && f.value) || '';
+          });
+        }),
+      setBirth: (d) => api.put('/me/date-of-birth', { date_of_birth: d })
+        .then((r) => r.data)
+        .catch((e) => {
+          const st = e && e.response && e.response.status;
+          if (st !== 404 && st !== 405) throw e;
+          return api.put('/identity-profile/date_of_birth', { value: d, lock: true }).then((r) => r.data);
+        }),
       remindStatus: () => api.get(`/app-records/${APP}/reminders`).then((r) => ({ ...(r.data.channels || {}), items: r.data.items || [] })),
     };
     loadBundle()

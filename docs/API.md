@@ -52,6 +52,21 @@ The mechanism (`app/services/user_data_migration.py`) discovers every table with
 a `user_id` column from SQLAlchemy metadata, so new user-scoped tables are
 migrated automatically. The only manual input is the target account id.
 
+### Google accounts: whose data scope? (2026-10-18)
+
+A Google-OAuth token (`typ: "oauth"`) maps to a data scope in
+`_resolve_data_scope_user_id`:
+
+| Google account | Scope |
+|---|---|
+| **no owner configured** (`OWNER_EMAIL` and `ADMIN_EMAILS` both empty) | every account `0` (old behaviour) + one warning «per-user scope inactive: set OWNER_EMAIL» — the owner is never guessed |
+| the **owner** (`OWNER_EMAIL`, else the `ADMIN_EMAILS` super-admins) | `0` — unchanged, his data |
+| any other **approved** account, `PER_USER_OAUTH_SCOPE=true` (default) | its own `users.id` — a non-loginable row `oauth-<hash>@oauth-scope.invalid`, created on first use |
+| pending / rejected / unknown | `0` as before (same as anonymous); `get_signed_in_user_id` refuses them with 403 |
+| any account with `PER_USER_OAUTH_SCOPE=false` | `0` (the pre-2026-10-18 behaviour) |
+
+Local password accounts keep their own `users.id`; anonymous callers keep scope 0.
+
 ### Mutation-path ownership coverage (audit task f17880d0)
 
 Resolving `user_id` is only half the contract — a route also has to *act* on
@@ -155,7 +170,8 @@ not in `app.include_router`.
 | Method | Path | Notes |
 |---|---|---|
 | GET | `/auth/` | Liveness probe |
-| POST | `/auth/register` | 201 with `TokenResponse`, 409 if email taken |
+| POST | `/auth/register` | 201 with `TokenResponse`, 409 if email taken. Optional `date_of_birth` (`YYYY-MM-DD`, real past date, year ≥ 1900, else 422) is stored as this user's `owner_identity_fields.date_of_birth` (locked) |
+| GET / PUT | `/api/me/date-of-birth` | Signed-in user's own birth date (`get_signed_in_user_id`: 401 without token, 403 pending/rejected). GET → `{ok, success, date_of_birth: "YYYY-MM-DD"\|null, raw, owner_locked, source}`; PUT `{date_of_birth: "YYYY-MM-DD"}` (empty clears + unlocks) → same shape, 422 on an invalid date. Only the date travels — never an age |
 | POST | `/auth/login` | 200 with `TokenResponse`, 401 on bad creds, 429 on rate-limit |
 
 ### AI (`/ai`)
