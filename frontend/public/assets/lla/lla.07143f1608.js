@@ -18656,6 +18656,14 @@ var APP = window.APP = {};
   /* ---------- ذخیره‌سازی (محلی یا گوگل اپس‌اسکریپت) ---------- */
   var LSKEY = "mla.records.v1";
   var S = A.S = { recs: {}, mode: "local", status: "", listeners: [] };
+  /* دورِ ۲۳ (Q1، A23-28/A23-38): ثبت‌گاهِ «دانسته‌های سامانه دربارهٔ خودش» — هر بخش دادهٔ خودش را با «به چه کار می‌آید / کجا ذخیره می‌شود / آفلاین /
+     مستقل از مدل» ثبت می‌کند و «# نقشهٔ سامانه» ِ دستیار از همین می‌سازد (نه فهرستِ دستی در پرامپت). f(field) تابع هم می‌تواند باشد (حالتِ ذخیره در لحظه). */
+  A.SELF_FACTS = A.SELF_FACTS || [];
+  A.SELF_FACTS.push({ id: "store", fa: "ذخیرهٔ داده‌های این صفحه",
+    use: "هر رکوردِ این صفحه (مسئله‌ها، گفت‌وگوها، فهرست‌ها، کارنامه، تنظیمات)",
+    where: function () { return S.mode === "host" ? "در Lifemanager روی سرور، در فضای حسابِ خودِ کاربر (دیگر کاربران نمی‌بینند)" : S.mode === "gas" ? "در Google Apps Script ِ خودِ کاربر (برگه‌های Drive ِ خودش)" : "فقط در همین مرورگر (localStorage)"; },
+    offline: function () { return S.mode === "host" ? "پس از بارگذاری، کار روی صفحه بی شبکه هم ادامه دارد؛ تغییرِ فرستاده‌نشده نگه داشته می‌شود و با برگشتِ شبکه فرستاده می‌شود" : "بله — بی شبکه کار می‌کند"; },
+    model: "داده‌ها مالِ صفحه‌اند، نه مدل؛ عوض کردنِ مدلِ هوش مصنوعی چیزی از آن‌ها را عوض یا پاک نمی‌کند — فقط گفت‌وگو با دستیار به اتصال به یک مدل نیاز دارد" });
   S.isGAS = function () { return typeof google !== "undefined" && google.script && google.script.run; };
   S.setStatus = function (s) { S.status = s; var el = document.getElementById("syncState"); if (el) { el.textContent = s; el.dataset.s = s; } };
   S.init = function (cb) {
@@ -34563,6 +34571,10 @@ APP.goFromURL = function (q) {
   function names(arr, k, f) { return (arr || []).map(function (x) { return x[k] + "=" + clip(x[f], 40); }).join("، "); }
   AS.manifest = function () {
     var L = [];
+    /* دورِ ۲۳ (Q1): دانسته‌های سامانه دربارهٔ خودش از ثبت‌گاهِ A.SELF_FACTS — اول، تا بریدنِ نقشه (از ته) هرگز آن را نیندازد */
+    var SF = A.SELF_FACTS || [], fv = function (x) { try { return typeof x === "function" ? x() : x; } catch (e) { return ""; } };
+    if (SF.length) { L.push("## خودِ سامانه: هر داده به چه کار می‌آید، کجا ذخیره می‌شود، آفلاین، مستقل از مدل (پرسشِ «کجا نگهش می‌داری؟» را از همین جواب بده)");
+      SF.forEach(function (f) { L.push("- " + f.fa + " — کاربرد: " + fv(f.use) + " — جا: " + fv(f.where) + " — آفلاین: " + fv(f.offline) + " — مدل: " + fv(f.model)); }); }
     L.push("## نماها (view — نام — کدام کار — چیست — به چه کار می‌آید)");
     AS.views().forEach(function (v) { L.push("- " + v.id + " — " + v.label + (v.job ? " — " + (JOB_FA[v.job] || v.job) : "") + (v.what ? " — " + v.what : "") + (v.why ? " — " + v.why : "")); });
     var F = A.ORIENT_FLOWS || {};
@@ -34962,7 +34974,7 @@ APP.goFromURL = function (q) {
     var out = [], used = 0, all = skipLast ? s.msgs.slice(0, -1) : s.msgs, cap = budget == null ? HIST_CHARS : budget;
     for (var i = all.length - 1; i >= 0; i--) {
       var m = all[i];
-      var line = (m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + String(m.text || "").slice(0, 4000) +
+      var line = (m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + String(m.role === "sys" && AS.regSys ? AS.regSys(s, m.text) : (m.text || "")).slice(0, 4000) +   // دورِ ۲۳ (Q1): سطرِ صفحه به ضمیرِ گفت‌وگو
         (m.files && m.files.length ? " [پیوست: " + m.files.map(function (f) { return (f.id != null ? f.id + "=" : "") + f.name; }).join("، ") + "]" : "");
       if (used + line.length > cap && (out.length || cap < 200)) { out.unshift("(" + fa(i + 1) + " پیامِ قدیمی‌تر در «حافظهٔ سشن» خلاصه شده است)"); break; }
       out.unshift(line); used += line.length;
@@ -35540,7 +35552,10 @@ APP.goFromURL = function (q) {
     if (s && s.pinned) P.appendChild(h("div", { class: "as-pin", title: "خواستهٔ اصلیِ این سشن" }, "📌 ", s.pinned));
     if (s && AS.sessTools) { var stx = AS.sessTools(s); if (stx) P.appendChild(stx); }   // INF16 (a40): «📜 پروندهٔ کامل» ِ مسئلهٔ این سشن
     /* دورِ ۲۱ (R6): پرسش‌های دکمه‌دارِ صفحه برای خودش («حل شد؟»، «نتیجهٔ گامِ N؟») — هر بخش با AS.paintHooks.push(fn(s) ⇒ عنصر|null) */
-    if (s) (AS.paintHooks || []).forEach(function (fn) { try { var el = fn(s); if (el) P.appendChild(el); } catch (e) { console.error(e); } });
+    /* دورِ ۲۳ (Q1، A23-14): پرسش‌ها و کارت‌های خودِ صفحه هم به ضمیرِ گفت‌وگو (متنِ گره‌ها، بیرون از «…»؛ فیلدها دست نمی‌خورند) */
+    var regNode = function (el) { if (!el || !AS.regSys || !s) return el; try { var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, L = []; while ((n = w.nextNode())) L.push(n);
+      L.forEach(function (x) { var v = AS.regSys(s, x.nodeValue); if (v !== x.nodeValue) x.nodeValue = v; }); } catch (e) { } return el; };
+    if (s) (AS.paintHooks || []).forEach(function (fn) { try { var el = fn(s); if (el) P.appendChild(regNode(el)); } catch (e) { console.error(e); } });
     if (s && s.tour && AS.tourDrawer) P.appendChild(AS.tourDrawer(s));
     else if (s && s.steps && s.steps.length) {
       var done = s.steps.filter(function (x) { return x.s === "done"; }).length;
@@ -35556,7 +35571,8 @@ APP.goFromURL = function (q) {
       h("p", {}, "سلام. بگو چه می‌خواهی — یک موضوع برای فهمیدن، ادعایی برای سنجیدن، یا جایی که گیر کرده‌ای."),
       h("p", { class: "small muted" }, "می‌برمت به جای درست، فرم را از حرف‌هایت پر می‌کنم و باقی را نشانت می‌دهم. عکس و فایل هم می‌خوانم (بچسبان یا 📎).")));
     (s ? s.msgs : []).forEach(function (m) {
-      log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx", dir: "rtl" }, richNodes(m)),
+      var mv = m.role === "sys" && AS.regSys ? Object.assign({}, m, { text: AS.regSys(s, m.text) }) : m;   // دورِ ۲۳ (Q1، A23-14): سطرِ خودِ صفحه به ضمیرِ گفت‌وگو
+      log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx", dir: "rtl" }, richNodes(mv)),
         m.files && m.files.length ? h("div", { class: "as-fl" }, m.files.map(function (f) { return f.link ? h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name) : h("span", { class: f.err ? "bad" : "" }, "📄 " + f.name); })) : null,
         csvNodes(m), AS.msgTools ? AS.msgTools(s, m) : null));   // INF15 (a40): «✏️ اصلاح» فقط روی حبابِ خودِ کاربر
     });
@@ -36795,7 +36811,7 @@ APP.goFromURL = function (q) {
   /* دورِ ۶ (G3): «اول کل را ببین» (A191) فقط پیامی که مسئله را **معرفی** می‌کند و هنوز کل را ندیده: نه گشایشِ نتیجه («حلش کردم!»)، نه دلسردی/رها کردن،
      نه بازگشت («سلام دوباره»، «چند روز نبودم»)، نه درخواستِ چک‌لیست/چارچوب/جزوه، نه پیامی که مجهول را خودش نام برده («اول مجهول: …»)، و نه گشایشی که
      حدس یا تلاشِ خودش را دارد («فکر کنم خطیه»، «۷+۷=۱۴ …») — آن‌جا پرسشِ دیگری لحظهٔ اوست. یک بار برای هر مسئله (C.whole[pk]). */
-  var RETURN_RE = /سلام\s*دوباره|دوباره\s*(?:سلام|اومدم|برگشتم)|برگشتم|چند\s*(?:روز|هفته|وقت)\s*(?:نبودم|پیش|گذشت)|یادته|(?:دو|سه|چند)\s*(?:شب|روز|هفته)\s*گذشت/;
+  var RETURN_RE = /سلام\s*دوباره|دوباره\s*(?:سلام|اومدم|برگشتم)|برگشتم|چند\s*(?:روز|هفته|وقت)\s*(?:نبودم|پیش|گذشت)|یادته|(?:یه|یک|دو|سه|چند|[0-9۰-۹]+)\s*(?:شب|روز|هفته|ماه)\s*(?:گذشت|گذشته)/;   // دورِ ۲۳ (D23-19): «یه هفته گذشت»
   var META_RE = /چک[‌\s]?لیست|چارچوب|جزوه|خلاصه(?:‌ی|ی)?\s*(?:فرمول|درس|نکات)|(?:یه|یک)\s*(?:روش|قاعده|فرمول)(?:‌ی|ی)?\s*(?:کلی|عمومی|همیشگی)/;
   var OWNGUESS_RE = /(?:فکر\s*کنم|فکر\s*می[‌\s]?کنم|به\s*نظرم|حدسم|حدس\s*می[‌\s]?زنم|معلومه)(?!\s*(?:باید|بهتره|لازمه))/;
   var TRIED_RE = /امتحان\s*(?:کردم|کردیم)|دارم\s*(?:امتحان|حساب)|حساب\s*کردم|جمع\s*(?:زدم|کردم)/;
@@ -37368,6 +37384,7 @@ APP.goFromURL = function (q) {
     var t = String(msg || "").replace(/[‏‎]/g, "").trim(); if (!t || /^\[سامانه/.test(t)) return true;
     if (/^\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]/.test(t)) return true;   // RO5 (دورِ ۲۰): نوبتِ ✏️ سامانه‌ای است — مسئله، مرحله یا شاهد نیست
     if (NOT_PROB[0].test(t)) return true;
+    if (stripIntro23(t, true).replace(/[\s.!،,؟?؛:]+/g, "") === "") return true;   // دورِ ۲۳ (Q5، بانکِ R23 #142): فقط سلام/احوال‌پرسی/معرفی («سلام، خوبی؟»، «سلام من کیانم»)
     return NOT_PROB[1].test(t) && !PROB_HINT.test(t);
   };
   /* ---------- تورِ پولیا (R1، دورِ ۲۱): «این پیام مسئله/تصمیمی را بیان می‌کند» — آشکارسازِ خودِ صفحه (همان‌ها که نوعِ مسئله را حدس می‌زنند:
@@ -37378,7 +37395,7 @@ APP.goFromURL = function (q) {
   var SOUGHT21 = /می[‌\s]?خوا(?:م|یم)[\s‌]*(?:بفهمم|بدونم|بدانم|بفهمیم|ببینم\s*(?:چرا|چطور|چی))|نمی[‌\s]?(?:دونم|دانم)\s*(?:چی\s*کار|چه\s*کار|چطور|کدوم|کدام)|(?:چی|چه)\s*کار\s*کنم|تکلیفم\s*چیه/;
   /* دورِ ۲۲ (P5، B·D1 s12/bp2، A22-14 s07، D s35): گشایشِ بی «؟» که هدف یا گیرِ خودش را می‌گوید، و پرسشِ خودش دربارهٔ داده‌هایی که آورد — همان آشکارساز */
   var STUCK22 = /(?:ساعت|دقیقه|روز|هفته|ماه)(?:ه|ست|است)?[\s‌]*(?:که[\s‌]*)?(?:موندم|مونده‌?ام|ماندم|مانده‌?ام|گیرم|درگیرم)(?![آ-ی])|(?:سرش|روش|رویش|توش)[\s‌]*(?:موندم|ماندم)(?![آ-ی])|(?:^|[\s‌،.])سرِ?[\s‌]+[^.؟?!\n]{1,40}?[\s‌](?:موندم|ماندم)(?![آ-ی])/;
-  var GOAL22 = /(?:می[‌\s]?خوا(?:م|یم|هم)|قصد[\s‌]*دار(?:م|یم)|برنامه[\s‌]*دار(?:م|یم))[\s‌]+[^.؟?!\n]{3,80}?(?:کنم|کنیم|بسازم|بسازیم|بخرم|برسم|بذارم|بفروشم|بچینم|بگیرم|ببرم|بکارم|بزنم)(?![آ-ی])/;
+  var GOAL22 = /(?:می[‌\s]?خوا(?:م|یم|هم)|قصد[\s‌]*دار(?:م|یم)|برنامه[\s‌]*دار(?:م|یم))[\s‌]+[^.؟?!\n]{3,80}?(?:کنم|کنیم|بسازم|بسازیم|بخرم|برسم|بذارم|بفروشم|بچینم|بگیرم|ببرم|بکارم|بزنم|برم|بروم|بریم)(?![آ-ی])/;   // دورِ ۲۳ (بانکِ R23 #147): «می‌خوام عید سفر برم با بودجه ۲۰ میلیون»
   var ASKD22 = /(?:چیه|چیست|چنده|چقدره|چقدر[\s‌]*(?:است|ه)|کدومه|کدام[\s‌]*است|چند[\s‌]*(?:تاست|است|ه))[\s‌]*[؟?]/;
   var WHATDO22 = /(?:چه|چی)[\s‌]*(?:کار[\s‌]*)?کن(?:م|یم)(?![آ-ی])|چیکار[\s‌]*کن(?:م|یم)/;
   function OPEN22(t, x) { var o = ownText(t); return STUCK22.test(o) || WHATDO22.test(o) || (GOAL22.test(o) && (/[0-9]/.test(x) || /(?:^|[\s‌])(?:برای|تا)(?![آ-ی])/.test(o))) || (ASKD22.test(o) && /[0-9]/.test(x)); }
@@ -37386,8 +37403,15 @@ APP.goFromURL = function (q) {
   function statesProblem(t, o) {
     t = String(t || "").replace(/[‏‎]/g, "").trim(); if (!t || AS.notProblem(t)) return false;
     if (metaMsg22(t)) return false;   // دورِ ۲۲ (P5): درخواستِ تمرین/نگه‌داشتن، خودسنجی، اصلاح، موعد ⇒ مسئلهٔ تازه نیست
+    /* دورِ ۲۳ (Q5، A23-2، C23-19، D23-2): گشایشِ پشتِ سلام/معرفی — آشکارساز روی خودِ مسئله، نه «من کیانم» (اول‌شخصِ معرفی قاعدهٔ سوم‌شخصِ کتاب را می‌شکست) */
+    var t0 = t; t = stripIntro23(t); if (t !== t0 && (!t || AS.notProblem(t) || metaMsg22(t))) return false;
     var x = faDigits(t);
     if (OPEN22(t, x)) return true;
+    /* دورِ ۲۳ (Q5، aA1/aA3): پرسشِ خودش با چند عدد از داده‌هایش («به هر کدوممون چندتا رسید؟»، «ساعت‌ها را چطور بچینم؟») مسئله را بیان می‌کند؛ و رابطهٔ «… = n²» */
+    var oq = ownText(t);
+    if ((x.match(/\d+(?:[.٫]\d+)?/g) || []).length >= 2 && (/(?:^|[\s‌])(?:چند|چندتا|چقدر|چه[\s‌]*قدر|چطور|چطوری|چجوری|چه[\s‌]*جوری|چگونه|کدوم|کدام|کی|کجا)(?![آ-ی])[^.!؟?\n]{0,60}[؟?]/.test(oq) || /(?:^|[\s‌])(?:چطور|چطوری|چجوری|چه[\s‌]*جوری|چگونه)(?![آ-ی])/.test(oq))) return true;
+    if (/[0-9a-zA-Z)²³]\s*[=<>≤≥]\s*[0-9a-zA-Z(]/.test(x) && /[؟?]|ثابت|اثبات|برهان|بازنگری/.test(oq)) return true;
+    if (/(?:چه|چی)[\s‌]*کار[\s‌]*(?:باید[\s‌]*)?(?:ب)?کن(?:م|یم)(?![آ-ی])/.test(oq)) return true;
     if (CHAT_PROB.test(t) || PROVE_RE.test(t) || LIVE_ASK.test(t) || LIVE_STUCK.test(x) || LIVE_RE2.test(t) || FAIL_ME.test(t) || SOUGHT21.test(t) || (typeof HABIT20 !== "undefined" && HABIT20 && HABIT20.test(t)) || EN_PROB.test(t)) return true;
     try { if (A.liveNatGuess && A.liveNatGuess(x)) return true; if (A.liveTypeGuess && A.liveTypeGuess(t)) return true; } catch (e) { }
     return !(o && o.cmd) && NAMED_PROB.test(t) && !/^(?:این|اون|آن)\s*(?:صفحه|دکمه)/.test(t);
@@ -37743,12 +37767,12 @@ APP.goFromURL = function (q) {
     if (b && b.done && C.closedPid !== b.pid) { C.closedPid = b.pid; C.ph = ""; C.st = {}; C.stmt = ""; C.gen = (C.gen || 0) + 1; }   // مسئله بسته شد ⇒ حرفِ تازه از «فهم» (حدسِ تازه = مسئلهٔ تازه)
     /* دورِ ۵ (F1، s29): «X تموم شد. حالا Y…» ⇒ مسئلهٔ تازهٔ Y از «فهم»، با دفترِ پاسخِ خودش (F3) — نه بازنگریِ X */
     var nw = C.stmt || (b && b.done) ? NEWPROB_RE.exec(mt) : null, mk2 = nw ? null : MADEPROB_RE.exec(mt);   // دورِ ۷ (H1، s29): پس از بستنِ مسئلهٔ زنده هم
-    if ((nw && !AS.notProblem(nw[1])) || mk2) { C.gen = (C.gen || 0) + 1; C.pk = "c:" + C.gen; C.ph = "u"; C.st = {}; C.stmt = clip((nw || mk2)[1], 400); C.inh = C.inh || "new";
+    if ((nw && !AS.notProblem(nw[1])) || mk2) { C.gen = (C.gen || 0) + 1; C.pk = "c:" + C.gen; C.ph = "u"; C.st = {}; C.stmt = clip(stripIntro23((nw || mk2)[1]), 400); C.inh = C.inh || "new";
       C.prev = { key: mkey(mt), ph0: "u", st0: {}, pasted: true, intro: !mk2, made: !!mk2, pk: C.pk }; return "u"; }
     /* دورِ ۱۱ (K9، s30 p2): «یه مسئلهٔ واقعی/تازه/دیگه دارم: Y» پس از پیامِ نخستِ دیگری (درخواستِ چک‌لیست، پرسشِ کلی…) معرفیِ مسئلهٔ تازه است —
        Y از «فهم» با دفترِ خودش و لحظهٔ «اول کل را ببین» (A191)؛ پیش‌تر پیامِ نخست صورتِ مسئله ثبت شده بود و این پیام «معرفی» شمرده نمی‌شد */
     var ni = C.stmt && !(b && !b.done) ? NEWINTRO_RE.exec(mt) : null;
-    if (ni && !AS.notProblem(ni[1]) && !sameStmt(C.stmt, ni[1])) { C.gen = (C.gen || 0) + 1; C.pk = "c:" + C.gen; C.ph = "u"; C.st = {}; C.stmt = clip(ni[1], 400); C.inh = C.inh || "new";
+    if (ni && !AS.notProblem(ni[1]) && !sameStmt(C.stmt, ni[1])) { C.gen = (C.gen || 0) + 1; C.pk = "c:" + C.gen; C.ph = "u"; C.st = {}; C.stmt = clip(stripIntro23(ni[1]), 400); C.inh = C.inh || "new";
       C.prev = { key: mkey(mt), ph0: "u", st0: {}, pasted: true, intro: true, pk: C.pk }; return "u"; }
     /* تورِ پولیا (RM6f، D·D4 s31 p13): پس از بستنِ مسئله در گفت‌وگو و بی مسئلهٔ بازی در کار، پیامِ کوتاهِ بعدی (پاسخِ بازنگری، «بعدی؟»، تشکر) مسئلهٔ تازه
        نیست — صورتِ مسئله از آن ساخته نمی‌شود و کارتِ مرحله‌ای («فهم»: «مجهول … چیست؟») پیشنهاد نمی‌شود (C.prev.noPh). مسئلهٔ تازه (صورتِ چندجمله‌ای، پرسش،
@@ -37763,12 +37787,18 @@ APP.goFromURL = function (q) {
       C.prev = { key: mkey(mt), ph0: "b", st0: {}, pk: C.pk, look20: true }; return "b"; }
     /* R1/R8 (دورِ ۲۱): صورتِ نگه‌داشته خودش مسئله نبود (پرسشِ تاریخ، فرمان، سلامِ بلند) و این پیام مسئله‌ای بیان می‌کند ⇒ همین پیام صورتِ مسئلهٔ گفت‌وگوست
        (همان راهِ «مسئلهٔ تازه»، با «اول کل را ببین») — نه این‌که مسئلهٔ واقعی بی صورت بماند */
-    if (C.stmt && !(b && !b.done) && !stmtIsProb(C) && statesProblem(mt) && !closureOnly(mt)) { C.gen = (C.gen || 0) + 1; C.pk = "c:" + C.gen; C.ph = "u"; C.st = {}; C.stmtHist = (C.stmtHist || []).concat([{ at: nowIso(), old: C.stmt, note: "صورتِ پیشین مسئله نبود" }]); C.stmt = clip(mt, 400); C.inh = C.inh || "new";
+    if (C.stmt && !(b && !b.done) && !stmtIsProb(C) && statesProblem(mt) && !closureOnly(mt)) { C.gen = (C.gen || 0) + 1; C.pk = "c:" + C.gen; C.ph = "u"; C.st = {}; C.stmtHist = (C.stmtHist || []).concat([{ at: nowIso(), old: C.stmt, note: "صورتِ پیشین مسئله نبود" }]); C.stmt = clip(stripIntro23(mt), 400); C.inh = C.inh || "new";
       C.prev = { key: mkey(mt), ph0: "u", st0: {}, pasted: true, intro: true, pk: C.pk }; return "u"; }
     if (!C.ph && !C.inh && !(b && b.done)) { var x0 = inheritPhase(s, mt); if (x0) { C.ph = x0.coach.ph; C.st = Object.assign({}, x0.coach.st || {}); C.cls = x0.coach.cls; C.inh = x0.id; } }
     var ph0 = C.ph || "", st0 = Object.assign({}, C.st || {}), teach = teachMode(s, mt);
     /* دورِ ۵ (F1، s31، s37): پیامِ نخستی که نتیجهٔ خودش را می‌گوید («حلش کردم! … ۵×۵=۲۵») صورتِ چسبانده نیست — said:result ِ آن می‌ماند */
-    var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt);
+    /* دورِ ۲۳ (Q5، D23-19، C23-1): پس از بستنِ مسئلهٔ همین سشن، پیامی معرفیِ مسئلهٔ تازه است که خودش مسئله‌ای بیان کند (آشکارساز) — گزارشِ نتیجه،
+       پاسخِ بازنگری یا کاربستِ درس پس از یک هفته («همین روش رو برای … هم زدم») صورتِ تازه و لحظهٔ «اول کل» نیست */
+    var closedHere23 = !!(b && b.done); if (!closedHere23 && !C.stmt) { try { closedHere23 = chatClosed().some(function (x) { return (x.L.chat || {}).sess === s.id; }); } catch (e) { } }
+    /* پس از بستن، آشکارسازِ مسئله بس نیست — گزارشِ نتیجه دربارهٔ همان مسئله («مثلث…»، عددها) هم آن را روشن می‌کند؛ مسئلهٔ تازه پرسشی از خودش دارد
+       («…کجا برم؟»، «چطور…») یا گشایشِ هدف/گیر (OPEN22)، و گزارشِ نتیجه نیست */
+    var afterClose23 = closedHere23 && !((/[؟?]/.test(ownText(mt)) || AS.open22(mt)) && statesProblem(mt) && !solvedSaid(mt));
+    var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23;
     /* تورِ پولیا (RM6c، B·D1 s11): «پس X = n» ِ الگو (RESULT_WEAK) به‌تنهایی مرحله را به بازنگری نمی‌برد — فرمول/عدد درونِ ادعا یا هنگامِ گفتنِ
        صورت نتیجه نیست؛ مرحله فقط با گزارشِ مدل (said:result) یا نتیجهٔ ثبت‌شده؛ الگو فقط پیشنهاد می‌کند (C.prev.weakRes ⇒ سطرِ زمینه) */
     var said = solvedSaid(mt, { intro: true }) && !OTHER18_RE.test(mt) && !guessNow(mt, teach) && !(teach && SELF_SOLVED_RE.test(mt)), uns = unsolvedNow(mt, ph0), stuck = STUCK_RE.test(mt) || NOTKNOW_RE.test(mt);
@@ -37778,8 +37808,13 @@ APP.goFromURL = function (q) {
     if (sp.u) st.u = 1; if (sp.d) st.d = 1; if (sp.c) st.c = 1;
     /* پرسشِ فهمی که پرسیده شد و جوابِ واقعی گرفت (دفتر یا پشتیبان) هم «گفته‌شده» است */
     var asked = askedInChat(s); phaseQs("u", C.cls || "any").forEach(function (q) { if (qParts(q).length && answeredQ(s, q, asked)) qParts(q).forEach(function (x) { st[x] = 1; }); });
-    if (!C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt)) C.stmt = clip(mt, 400);   // دورِ ۲۲ (P5، A22-5/C22-4)
-    if (said && !uns) ph = "b";
+    if (!C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23) C.stmt = clip(stripIntro23(mt), 400);   // دورِ ۲۳ (Q1): بی سلام/معرفی   // دورِ ۲۲ (P5، A22-5/C22-4)
+    /* دورِ ۲۳ (Q5، A23-3/A22-12): «ثابتش کردم، ولی می‌خوام بفهمم چرا / دوباره نگاه کنم» ⇒ بازنگری («در یک نگاه می‌بینی‌اش؟»)، نه طرح‌ریزی؛
+       «امتحان کردم … درمیاد ولی نمی‌دونم چطور ثابتش کنم» ⇒ هنوز حل نشده (آزمودنِ نمونه‌ها برهان نیست) */
+    if (PROVE_ASK23.test(ownText(mt))) said = false;
+    var why23 = PROVED_WHY23.test(ownText(mt)) && LOOKWHY23.test(ownText(mt)) && !PROVE_ASK23.test(ownText(mt));
+    if (why23) { ph = "b"; C.lookWhy23 = { key: mkey(mt), at: nowIso() }; }
+    else if (said && !uns) ph = "b";
     else if (LOOK_RE.test(mt) && (ph === "c" || ph === "b" || ph === "p")) ph = "b";
     else if (uns && (ph === "b" || ph === "c")) ph = "c";
     else if (varEq(mt) && ph !== "b" && !intro) ph = "c";   // دورِ ۷ (H1، s18): رابطهٔ تازه با متغیرها همان‌دم اجراست — حتی اگر در ادامه «r رو نمی‌دونم» بگوید
@@ -38381,6 +38416,7 @@ APP.goFromURL = function (q) {
   /* RN6c: بی گزارشِ مدل، پشتیبان فقط صورت‌های خودِ کاربر را می‌خواند (همان شاهدهای ساختِ واژهٔ regSigns: «نگو»، «بپرس»، «صبر کن»، «باورت»، «بفرمایید»)؛
      حرفِ دستیار هرگز شاهد نیست. برابر یا بی‌شاهد ⇒ «» (همان که جاری است). */
   function regIn(se) {
+    var ax = regAsk23(se); if (ax) { try { var st23 = S.settings(); st23.profile = st23.profile || {}; if (st23.profile.reg !== ax) { st23.profile.reg = ax; S.saveSettings(st23); } } catch (e) { } return ax; }
     var M = (se && se.msgs) || [], cr = se && se.coach && se.coach.reg; if (cr === "shoma" || cr === "to") return cr;
     /* گفتهٔ نقل‌شده به دیگران («به بچه‌ها گفتم شما برید») شاهدِ ضمیرِ او با دستیار نیست — تا پایانِ همان جمله کنار می‌رود */
     var sh = 0, to = 0; M.forEach(function (m) { if (!isUser(m)) return; var g = fbSigns(m.text); if (g === "shoma") sh++; else if (g === "to") to++; });
@@ -38390,16 +38426,18 @@ APP.goFromURL = function (q) {
   function regOfR16(s, mt) { return mt && REG_SH_U.test(ownText(mt)) ? "shoma" : ""; }   // قرنطینه (دورِ ۱۷): «شما» ِ تنها در پیامِ کاربر ⇒ «شما»
   function regOf(s, mt, pids) {
     var r0 = regIn(s); if (r0) return r0;
-    pids = pids || []; if (!pids.length) return "";
+    pids = pids || []; if (!pids.length) return regProf23();
     var last = function (x) { var M = x.msgs || []; return String((M[M.length - 1] || {}).at || x.at || ""); };
     var lsess = {}; pids.forEach(function (pid) { var r = A.liveRec && A.liveRec(pid); if (r && r.sess) lsess[r.sess] = 1; var L0 = ((S.get("eprog_" + pid) || {}).solve || {}).live || {}; if (L0.chat && L0.chat.sess) lsess[L0.chat.sess] = 1; });
     var prev = S.all("achat", function (x) { return x && (!s || x.id !== s.id) && (x.msgs || []).length && (lsess[x.id] || pids.indexOf(x.lprob) >= 0 || (x.lprobLog || []).some(function (e) { return e && pids.indexOf(e.p) >= 0; })); }).sort(function (a, b) { return last(b).localeCompare(last(a)); });
     for (var i = 0; i < prev.length; i++) { var r1 = regIn(prev[i]); if (r1) return r1; }
-    return "";
+    return regProf23();
   }
+  function regProf23() { try { var pr = (S.settings().profile || {}).reg; return pr === "shoma" || pr === "to" ? pr : ""; } catch (e) { return ""; } }
   AS.convRegister = regOf;
   var SH_IMP = { "بسنج": "بسنجید", "بگو": "بگویید", "بنویس": "بنویسید", "ببین": "ببینید", "بیازما": "بیازمایید", "بکش": "بکشید", "بخوان": "بخوانید", "بشمار": "بشمارید", "بساز": "بسازید", "برگرد": "برگردید", "بده": "بدهید", "بیندیش": "بیندیشید", "بپرس": "بپرسید", "کن": "کنید", "بکن": "بکنید" };
-  var SH_POS = { "خودت": "خودتان", "یادت": "یادتان", "راهت": "راهتان", "حدست": "حدستان", "جوابت": "جوابتان", "طرحت": "طرحتان", "بازت": "بازتان", "حلت": "حلتان", "ذهنت": "ذهنتان", "برایت": "برایتان", "تو": "شما", "داری": "دارید", "هستی": "هستید", "نیستی": "نیستید", "کنی": "کنید" };
+  var SH_POS = { "خودت": "خودتان", "یادت": "یادتان", "راهت": "راهتان", "حدست": "حدستان", "جوابت": "جوابتان", "طرحت": "طرحتان", "بازت": "بازتان", "حلت": "حلتان", "ذهنت": "ذهنتان", "برایت": "برایتان", "تو": "شما", "داری": "دارید", "هستی": "هستید", "نیستی": "نیستید", "کنی": "کنید",
+    /* دورِ ۲۳ (Q1، A23-14 «می‌کنید … مطمئنی»، B·D9 «تولدت») */ "مطمئنی": "مطمئنید", "تولدت": "تولدتان", "پیامت": "پیامتان", "حرفت": "حرفتان", "سنت": "سنتان", "دادی": "دادید", "بودی": "بودید", "موافقی": "موافقید", "آماده‌ای": "آماده‌اید" };
   /* دورِ ۱۷ (B·D5): ستاک‌های حالِ فعل — یک فهرست برای التزامی («بزنی» ⇒ «بزنید») و امری («بزن» ⇒ «بزنید»، «نزن»، «بزنش») — نه واژه‌به‌واژه */
   var STEMS = "زن|کن|گو|گوی|بین|دان|نویس|سنج|یاب|یازما|یازمای|پرس|شمار|ساز|گیر|خواه|کش|بر|ده|آور|یاور|رس|خوان|گرد|یندیش|گذار|ذار|فرست|یاموز|کوش|گشا|شنو|پوش|ریز|پذیر|ران|بند|چین|یفزا|توان|رو|خور|شو|یا|ینداز|نشان|سپار|بخش|پرداز|شناس";
   var SUBJ = STEMS;
@@ -38413,11 +38451,29 @@ APP.goFromURL = function (q) {
     [new RegExp(B0 + "([بن])(" + SUBJ + ")ی" + E0, "g"), "$1$2ید"],
     [new RegExp(B0 + "([بن])(" + STEMS + ")(ش)?" + E0, "g"), impSh],
     [new RegExp("([آ-ی])‌ات" + E0, "g"), "$1‌تان"],
+    [new RegExp("([آ-ی])‌هایت" + E0, "g"), "$1‌هایتان"],   // دورِ ۲۳ (Q1): «هم‌سن‌هایت»
     [new RegExp(B0 + "(" + Object.keys(SH_POS).join("|") + ")" + E0, "g"), function (w) { return SH_POS[w]; }],
     [new RegExp(B0 + "(" + Object.keys(SH_IMP).join("|") + ")" + E0, "g"), function (w) { return SH_IMP[w]; }]
   ];
   function toShoma(t) { var x = String(t || ""); SH_RX.forEach(function (p) { x = x.replace(p[0], p[1]); }); return x; }
   AS.toShoma = toShoma;
+  /* دورِ ۲۳ (Q1، A23-14، B·D9، D23-17): سطرهای خودِ صفحه (پیام‌های «سامانه»، کارتِ تولد، پرسش‌های دکمه‌دار) به ضمیرِ همین گفت‌وگو — «شما» ⇒ صورت‌های «شما»
+     بیرون از «…» (حرفِ خودش و عنوان‌ها دست نمی‌خورند). ضمیرِ گفت‌وگو همان regOf است؛ درخواستِ صریحِ خودش («تو صدام کن»، «شما خطابم کن») بر همه مقدم است و
+     در نمایه می‌ماند (سشن‌های بعد). */
+  var REG_ASK_TO23 = /(?:«?تو»?[\s‌]*(?:صدا|صد)م[\s‌]*کن|منو[\s‌]*«?تو»?[\s‌]*(?:خطاب|صدا)[\s‌]*کن|با[\s‌]*من[\s‌]*(?:راحت|خودمونی|خودمانی)[\s‌]*باش|لازم[\s‌]*نیست[\s‌]*«?شما»?[\s‌]*(?:بگی|بگید|بگویید))/;
+  var REG_ASK_SH23 = /«?شما»?[\s‌]*(?:خطابم|صدام)[\s‌]*(?:کن|کنید)|(?:با[\s‌]*من[\s‌]*)?رسمی[\s‌]*(?:حرف[\s‌]*بزن|صحبت[\s‌]*کن)/;
+  function regAsk23(se) { var M = (se && se.msgs) || [];
+    for (var i = M.length - 1; i >= 0; i--) { var m = M[i]; if (!isUser(m)) continue; var t = String(m.text || ""); if (REG_ASK_TO23.test(t)) return "to"; if (REG_ASK_SH23.test(t)) return "shoma"; }
+    return ""; }
+  function outMap23(l, fn) { var out = "", d = 0, buf = ""; l = String(l || "");
+    for (var i = 0; i < l.length; i++) { var ch = l.charAt(i);
+      if (ch === "«") { if (d === 0) { out += fn(buf); buf = ""; } d++; out += ch; continue; }
+      if (ch === "»" && d > 0) { d--; out += ch; continue; }
+      if (d === 0) buf += ch; else out += ch; }
+    return out + fn(buf); }
+  /* سطرِ صفحه بیرون از گفت‌وگو («امروز»): ضمیرِ تازه‌ترین سشنِ او (یا درخواستِ صریحش در نمایه) */
+  AS.regPage = function (t) { var last = null, lt = ""; try { S.all("achat").forEach(function (x) { var M = (x && x.msgs) || [], a = String((M[M.length - 1] || {}).at || x.at || ""); if (M.some(isUser) && a >= lt) { lt = a; last = x; } }); } catch (e) { } return AS.regSys(last, t); };
+  AS.regSys = function (se, t) { var rg = ""; try { rg = AS.convRegister(se, "", []); } catch (e) { } return rg === "shoma" ? outMap23(t, toShoma) : String(t == null ? "" : t); };
   /* فقط متنِ گیومهٔ سطحِ اول (پرسشِ صفحه)؛ گیومهٔ درونی (حرفِ خودِ کاربر، عنوانِ مسئله‌اش) دست نمی‌خورد */
   function quoteMap(l, fn) {
     var out = "", d = 0, buf = "";
@@ -39068,7 +39124,12 @@ APP.goFromURL = function (q) {
   /* اشتباهِ دستیار یا دیگری («تو اشتباه گفتی»، «دوستم گفت اشتباه گفتی») اصلاحِ حرفِ خودش نیست */
   var OTHER_ERR19b = /(?:^|[\s،])(?:تو|شما)[\s‌]+اشتباه|اشتباه[\s‌]*(?:گفتی|نوشتی|کردی|خوندی|فهمیدی|گفتید|نوشتید|کردید|خوندید)(?![آ-ی])|(?:گفت|نوشت|نوشته\s*بود)(?![آ-یم])[^.!؟?\n]{0,12}اشتباه/;
   /* دورِ ۲۲ (P3، بانکِ R22 #60/#61/#73): «X نیست، Y» و نشانهٔ انگلیسیِ «not/actually» هم نشانهٔ اصلاحِ حرفِ خودش است (گزارشِ مدل + تکهٔ پیشینِ خودش همچنان لازم است) */
-  CORR19b = new RegExp(CORR19b.source + "|[^\\s،,.!؟?]+[\\s‌]+نیست[\\s‌]*[،,][\\s‌]*[^\\s]|\\bnot\\s+\\S|\\bactually\\b|\\bI\\s+meant\\b", "i");
+  /* قرنطینه (دورِ ۲۳، A23-4/A23-17 — REMOVAL_CANDIDATES): «X نیست، …» با هر ادامه‌ای («ممکن نیست، چرا…»، «خطی نیست، کند میشه») اصلاح خوانده می‌شد */
+  var CORR19b_R22 = new RegExp(CORR19b.source + "|[^\\s،,.!؟?]+[\\s‌]+نیست[\\s‌]*[،,][\\s‌]*[^\\s]|\\bnot\\s+\\S|\\bactually\\b|\\bI\\s+meant\\b", "i");
+  /* دورِ ۲۳ (بانکِ R23 #144): «سقف ۱۲ بود نه ۱۰» — عدد + «بود/ـه» + «نه» + عدد */
+  CORR19b = new RegExp(CORR19b.source + "|[0-9۰-۹]+(?:[.٫][0-9۰-۹]+)?[\\s‌]*(?:بود|است|ه|ـه)[\\s‌]+نه[\\s‌]+[0-9۰-۹]");
+  /* دورِ ۲۳ (Q5): «X نیست، Y» فقط با جانشین — عدد («۸ نیست، ۹») یا مقدارِ کوتاهِ خبری تا چهار واژه («شصت متر مربعه»، «شنبه‌ست») که فعلِ «می‌…» نیست («کند میشه» نه) */
+  CORR19b = new RegExp(CORR19b.source + "|[^\\s،,.!؟?]+[\\s‌]+نیست[\\s‌]*[،,][\\s‌]*(?:[0-9۰-۹]|بلکه|درستش|(?:[^\\s،,.!؟?]+[\\s‌]+){0,3}(?!(?:می|نمی))[^\\s،,.!؟?]{1,20}(?:ه|است|ست|بود)(?=[\\s.!،,]|$))|\\bnot\\s+\\S|\\bactually\\b|\\bI\\s+meant\\b", "i");
   AS.CORR_RE = CORR19b;
   /* بانکِ R19b (INF15 #15، #16): «اشتباه کردم» ِ تنها (کلید را جا گذاشتم، سرِ امتحان علامت را انداختم) اغلب کارِ بیرونی است، نه شکستِ مرحلهٔ همین حل —
      الگو آن را فقط «در انتظار» (pend) نگه می‌دارد تا گزارشِ مدل داوری کند (نامتقارن: شکستِ دروغ گران‌تر است)؛ «حل نشد/غلط بود» ِ دیگر مثلِ پیش */
@@ -39725,7 +39786,7 @@ APP.goFromURL = function (q) {
   /* دورِ ۲۲ (P3، بانکِ R22 #90/#91): گزارشِ یادآوری/تمرین («فقط ۴۰ درصدشو یادم بود»، «جوابی که تو تمرین گفتم غلطه») داوری بر یادِ خودش است، نه اصلاحِ یک داده */
   var RECALL22 = /(?:تو|توی|در)[\s‌]*(?:تمرین|جلسه[\s‌]*ی?[\s‌]*تمرین|مرور)|یادم[\s‌]*(?:بود|نبود|موند|نموند|رفت)|درصد(?:ش|شو|شه)?[\s‌]*(?:رو|را)?[\s‌]*یادم/;
   AS.RECALL22 = RECALL22;
-  function corrAsk20(mt) { var own = ownText(mt); if (EDIT20.test(String(mt || "").trim()) || OTHER_ERR19b.test(own) || RECALL22.test(own)) return false; if (!CORR19b.test(own)) return false;
+  function corrAsk20(mt) { var own = ownText(mt); if (EDIT20.test(String(mt || "").trim()) || OTHER_ERR19b.test(own) || RECALL22.test(own) || MP_REC23.test(own)) return false;   // دورِ ۲۳ (B·D14): خطای یادآوریِ برگهٔ سفید اصلاحِ حرفِ پیشین نیست if (!CORR19b.test(own)) return false;
     var m = own.replace(/(?:نوشتم|گفتم)(?![آ-ی])[^.!؟?\n]{1,30}[،,]?[\s‌]*(?:ولی|اما)(?![آ-ی])[^.!؟?\n]*/g, function (x) { return /بود(?![آ-ی])|درست|منظورم|غلط|اشتباه/.test(x) ? x : " "; }); return CORR19b.test(m); }
   AS.corrAsk = corrAsk20;
   /* R8 (دورِ ۲۱، B·D12): نوبتِ اصلاحِ داده — نشانهٔ اصلاح، یا «X نه Y» که Y در پیامِ پیشینِ خودش هست — پرسشِ سلیقه/بازنگریِ باقی‌مانده نمی‌گیرد */
@@ -39853,18 +39914,24 @@ APP.goFromURL = function (q) {
      («- مجهول چیست؟» ِ چند سطرِ گلوله‌ای) پرسشی از او نیست. قاعدهٔ دورِ ۲۱ در R22_QUARANTINE.twoQ21. */
   function tk22(x) { return faDigits(String(x || "")).replace(/[ً-ٰٟ]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/‌/g, " ").toLowerCase().split(/[^0-9a-zآ-ی]+/).filter(function (w) { return w.length >= 2; }); }
   function hit22(w, T) { return T.some(function (v) { return v === w || (Math.min(v.length, w.length) >= 3 && (v.indexOf(w) === 0 || w.indexOf(v) === 0)); }); }
-  function inPage22(seg, PT) { var a = tk22(seg); if (!a.length) return -1; for (var j = 0; j < PT.length; j++) { var n = a.filter(function (w) { return hit22(w, PT[j]); }).length; if (n * 2 > a.length) return j; } return -1; }
+  function inPage22R22(seg, PT) { var a = tk22(seg); if (!a.length) return -1; for (var j = 0; j < PT.length; j++) { var n = a.filter(function (w) { return hit22(w, PT[j]); }).length; if (n * 2 > a.length) return j; } return -1; }   // قرنطینه (دورِ ۲۳)
+  /* دورِ ۲۳ (Q5، A23-20/A22-1): پرسشِ صفحه که مدل با دادهٔ خودِ او مشخص‌ترش کرد («کدام ستون می‌تواند ردش کند — ستونی که …؟» ⇐ «کدام حالتِ خاص یا شاهد
+     می‌تواند ردش کند؟») هنوز همان پرسش است: اکثریتِ واژه‌ها، یا دست‌کم سه واژهٔ معنادارِ همان پرسشِ صفحه (نه «می/را/که/است…») */
+  var PSTOP23 = " می نمی را رو که این آن اون چه چی است هست بود کند کنی کنید کن شد شده یا هم به از با در برای تا تو شما خودت خودتان همین همان یک یه ";
+  function inPage22(seg, PT) { var a = tk22(seg); if (!a.length) return -1; for (var j = 0; j < PT.length; j++) { var H = a.filter(function (w) { return hit22(w, PT[j]); }), n = H.length;
+      if (n * 2 > a.length) return j; if (H.filter(function (w) { return w.length >= 3 && PSTOP23.indexOf(" " + w + " ") < 0; }).length >= 3) return j; } return -1; }
   function unquote22(x) { return ownText(String(x || "")).replace(/\$[^$]*\$/g, " ").replace(/«[^»]*»|"[^"\n]*"|‹[^›]*›|“[^”]*”/g, " "); }
   function twoQ20(t, pageQs) {
     var raw = String(t || ""), lines = raw.split("\n"), BUL = /^\s*(?:[-•*▪]|[0-9۰-۹]+[.)])\s+/;
-    if (lines.filter(function (l) { return BUL.test(l) && /[؟?]/.test(l); }).length >= 2) raw = lines.filter(function (l) { return !BUL.test(l); }).join("\n");
+    /* دورِ ۲۳ (B·D20): فهرستِ گلوله‌ایِ یادداشت (≥۲ سطر) — هر سطرِ «؟»‌دارش بندِ چک‌لیست است، نه پرسش از او (پیش‌تر فقط وقتی دو سطرش «؟» داشت) */
+    if (lines.filter(function (l) { return BUL.test(l) && /[؟?]/.test(l); }).length >= 2 || (lines.filter(function (l) { return BUL.test(l); }).length >= 3 && lines.some(function (l) { return BUL.test(l) && /[؟?]/.test(l); }))) raw = lines.filter(function (l) { return !BUL.test(l); }).join("\n");
     var o = unquote22(raw);
     var qs = o.split(/(?<=[؟?])/).map(function (x) { return x.trim(); }).filter(function (x) { return /[؟?]$/.test(x); });
     qs = qs.filter(function (x, i) { return !(i > 0 && /^(?:یا|ویا)(?![آ-ی‌])/.test(x.replace(/^[\s.!،,…]+/, ""))); });
     for (var e = qs.length - 1; e > 0; e--) { var lead = qs[e].replace(/^[\s.!،,…:]+/, "");
       if (/^(?:مثلاً|مثلا|مثل|یعنی|به[\s‌]*عبارتِ?[\s‌]*دیگر|منظورم)(?![آ-ی‌])/.test(lead) || tk22(qs[e - 1].split(/[.!؛\n]/).pop()).length <= 1) qs.splice(e - 1, 2, qs[e - 1] + " " + qs[e]); }
     var PQ = (pageQs || []).map(function (q) { return tk22(unquote22(q)); }).filter(function (x) { return x.length >= 3; });
-    if (PQ.length) for (var k = qs.length - 1; k > 0; k--) { var j1 = inPage22(qs[k - 1].split(/[.!؛\n]/).pop() || qs[k - 1], PQ), j2 = inPage22(qs[k], PQ);
+    if (PQ.length) for (var k = qs.length - 1; k > 0; k--) { var j1 = inPage22(qs[k - 1].split(/[.!؛:\n—]/).pop() || qs[k - 1], PQ)   /* دورِ ۲۳: پیش‌درآمدِ «یک قدم دقیق‌تر:» جزءِ پرسش نیست */, j2 = inPage22(qs[k], PQ);
       if (j1 >= 0 && j1 === j2) qs.splice(k - 1, 2, qs[k - 1] + " " + qs[k]); }
     return qs.filter(function (x) { return x.replace(/[؟?\s.!،,…]/g, "").length >= 2; }).length >= 2;
   }
@@ -39881,7 +39948,11 @@ APP.goFromURL = function (q) {
     return o; }
   var TQL22 = /\*\*پرسشِ این نوبت همین است:?\*\*|^- در این نوبت فقط \*\*یک\*\* پرسش/;
   /* پرسش‌های نوبتِ صفحه در پرامپت (سطرهای پرسشِ نوبت؛ هر «…» ِ ردهٔ بالا که پرسش دارد) — برای شمارشِ پاسخ */
-  function pageTQs22(prompt) { var o = []; String(prompt || "").split("# نوبتِ تازه")[0].split("\n").forEach(function (l) { if (!TQL22.test(l) && !/^- زمینه \(نه پرسشِ دوم؛ پرسشِ این نوبت|پرسشِ صفحه برای پس از آن/.test(l)) return; topQuotes22(l).forEach(function (x) { if (/[؟?]/.test(x)) { o.push(x); var j = oneQ22(x); if (j !== x) o.push(j); } }); }); return o; }
+  function pageTQs22(prompt) { var o = []; String(prompt || "").split("# نوبتِ تازه")[0].split("\n").forEach(function (l) {
+      /* دورِ ۲۳ (Q5، A23-20 s03 p1/p14): پرسش‌های فهرستِ مرحلهٔ خودِ صفحه («u3) شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟») و «پیشنهادِ این نوبت: «…»» هم پرسشِ صفحه‌اند */
+      if (/^- پرسش‌های «/.test(l)) { l.split(/\s(?=[upcbe][0-9]{1,2}\)\s)/).forEach(function (it) { var x = it.replace(/^[upcbe][0-9]{1,2}\)\s*/, "").replace(/\s*·\s*پیشنهادِ این نوبت:.*$/, "").trim(); if ((x.match(/[؟?]/g) || []).length >= 1 && !/^- پرسش‌های/.test(x)) o.push(x); }); }
+      if (/پیشنهادِ این نوبت: «/.test(l)) { var pm = /پیشنهادِ این نوبت: «([^»]*[؟?][^»]*)»/.exec(l); if (pm) o.push(pm[1]); }
+      if (!TQL22.test(l) && !/^- زمینه \(نه پرسشِ دوم؛ پرسشِ این نوبت|پرسشِ صفحه برای پس از آن/.test(l)) return; topQuotes22(l).forEach(function (x) { if (/[؟?]/.test(x)) { o.push(x); var j = oneQ22(x); if (j !== x) o.push(j); } }); }); return o; }
   AS.pageTQs22 = pageTQs22;
   AS.replyTwoQ = twoQ20;
   /* R7: آنچه ادعای کارِ انجام‌شده نیست — گزارشِ صفحه («صفحه می‌گوید/نشان می‌دهد چه چیزی عوض شد»)، پرسشِ غیرمستقیم («کجاها/چه چیزی عوض شد»)، «فرستادم» */
@@ -39905,13 +39976,19 @@ APP.goFromURL = function (q) {
     /* پرسشی که صفحه در نوبتی پیشنهاد کرد و مدل در نوبتِ بعد بازگفت، همان پرسشِ صفحه است — دفترِ کوتاهِ پرسش‌های دوجمله‌ایِ صفحه در همین سشن */
     try { C.pQs21 = (C.pQs21 || []).concat(pQs.filter(function (x) { return (C.pQs21 || []).indexOf(x) < 0; })).slice(-30); pQs = C.pQs21.slice(); } catch (e) { }
     if (coachOn && !edit && twoQ20(rp, pQs)) why.push("دو پرسش پرسیدی — در هر نوبت فقط یک پرسش (همان پرسشِ نوبت)");
+    /* دورِ ۲۳ (Q5، C23-21): نقلِ «…» ِ بلند در متنِ پاسخ یا حرفِ خودِ اوست (در پیام‌هایش) یا متنِ صفحه (در پرامپت)؛ وگرنه حرفی به او نسبت داده شده که نگفته */
+    try { var bad23 = quotesNotHers23(rp, s, String((opts && opts.prompt) || "")); if (bad23.length) why.push("نقلِ «" + clip(bad23[0], 60) + "» نه در پیام‌های اوست نه در صفحه — حرفی را که نگفته در گیومه به او نسبت نده (عینِ حرفش را بیاور یا بی گیومه بگو)"); } catch (e) { }
     var closing = acts.some(function (x) { return x && /^(?:chat_solved|chat_lookback)$/.test(x.do); });
     var bl = null; try { bl = AS.boundLive(s); } catch (e) { }
     if (coachOn && !closing && !(bl && bl.done) && SOLVED_CONF20.test(own) && !/(?:هنوز|نه)[\s‌]*(?:حل[\s‌]*نشد|حل[\s‌]*نشده)|حل[\s‌]*نشد/.test(own) && !/«حل شد» را/.test(rp)) why.push("«حل شد/درسته» را تو تأیید نکن — «حل شد» فقط پس از وارسیِ خودش و بستنِ صفحه می‌آید");
     var hasRet = acts.some(function (x) { return x && ((x.do === "coach_state" && (x.retract || x.guess_res)) || x.do === "retract"); }), hasPrac = acts.some(function (x) { return x && x.do === "start_practice"; });
     var sameNote = C.retNote && C.retNote.same && C.retNote.key === mkey(um.text);
     var ownC = claimText21(own);
-    if (!edit && !sameNote && hasRet && (CLAIM20.test(ownC) || /(?:^|[\s،])[^\s.!؟?]+[\s‌]+(?:شد|کردم|گذاشتم)[\s.!]*$/.test(ownC.trim()))) why.push("صفحه هنوز اصلاح را انجام نداده — نگو «عوض شد/درست شد»؛ بگو اصلاح را فرستادی و صفحه در نوبتِ بعد نتیجه را می‌گوید");
+    /* دورِ ۲۳ (Q5، C23-6): ادعای «اصلاح/ثبت انجام شد» فقط وقتی کنشی (retract/guess_res) در کار است و نه در جملهٔ شرطی/آینده
+       («وقتی آن ساخته شد…»، «اگر نبود، برگه ثبت می‌شود»). قاعدهٔ پیشین: AS.R23_QUARANTINE.claimRet22 */
+    var hasRetC = hasRet;   // داوریِ حدسِ ردشده هم ادعای «ثبت کردم» را می‌سنجد (بانکِ R20 #61) — ریشهٔ C23-6 جملهٔ شرطی بود
+    var ownC23 = ownC.split(/(?<=[.!؟?؛\n،,])/).filter(function (x) { return !/(?:^|[\s‌])(?:وقتی|وقتیکه|اگر|اگه|هر[\s‌]*وقت|تا[\s‌]+وقتی|پس[\s‌]*از[\s‌]*این‌?که|بعد[\s‌]*از[\s‌]*این‌?که|به[\s‌]*محضِ?)(?![آ-ی])/.test(x); }).join(" ");
+    if (!edit && !sameNote && hasRetC && (CLAIM20.test(ownC23) || /(?:^|[\s،])[^\s.!؟?]+[\s‌]+(?:شد|کردم|گذاشتم)[\s.!]*$/.test(ownC23.trim()))) why.push("صفحه هنوز اصلاح را انجام نداده — نگو «عوض شد/درست شد»؛ بگو اصلاح را فرستادی و صفحه در نوبتِ بعد نتیجه را می‌گوید");
     /* R7 (D·s32): «پرونده» ِ کارخانه/ادعا پروندهٔ تمرین نیست — فقط «پروندهٔ تمرین(ی/ت)» یا «پرونده(‌ات)» ِ بی وصفِ دیگر */
     if (!hasPrac && /پرونده(?:‌ی|ی|ٔ)?(?:‌ات|ت|ش)?[\s‌]*(?:تمرین(?:ی|ت|ش)?[\s‌]*)?(?:(?:را|رو)[\s‌]*)?(?:(?:برای|روی)[\s‌][^.!؟?]{0,20})?(?:(?:را|رو)[\s‌]*)?(?:باز|ساخته)[\s‌]*(?:شد|کردم)/.test(ownC)) why.push("پروندهٔ تمرینی باز نشده — بی کنشِ start_practice نگو «باز کردم»");
     else if (hasPrac && /(?:باز|ساخته)[\s‌]*(?:شد|کردم)/.test(own)) why.push("پرونده هنوز باز نشده — صفحه پس از سنجشِ رضایتش باز می‌کند؛ بگو «دارم بازش می‌کنم»");
@@ -40129,29 +40206,106 @@ APP.goFromURL = function (q) {
       out.forEach(function (x, i) { var blk = ""; String(x || "").split("\n").forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (!SKIP22.test(blk) && !CTXL22.test(l) && TQL22.test(l)) at.push({ i: i, j: j, blk: blk, ex: /\*\*پرسشِ این نوبت همین است/.test(l), live: /^# مسئلهٔ زندهٔ این سشن/.test(blk), pre: /^# پیش‌نیاز \(/.test(blk) }); }); });
       var keep = at.filter(function (a) { return a.pre; })[0] || at.filter(function (a) { return a.ex; })[0] ||   /* پشتهٔ پیش‌نیاز (a44، P1) همیشه اول */ at.filter(function (a) { return a.live; })[0] || at[0];
       var L = out.map(function (x) { return String(x || "").split("\n"); });
+      /* دورِ ۲۳ (Q5، C23-17/C23-23/D23-18/A23-6/B·D12): پرسشِ نوبتی که همین پیامش جوابش را داد یا با درخواستش بی‌ربط است کنار می‌رود و نامزدِ بعدی (اگر هست)
+         پرسشِ نوبت می‌شود — پشتهٔ پیش‌نیاز (P1) هرگز */
+      var hc = AS._hookCtx || {}, um23 = String(hc.msg || ""), why23 = "", dropped23 = [];
+      if (um23 && !/^\[سامانه/.test(um23.trim())) { var tries = 0;
+        while (keep && !keep.pre && tries++ < 6) { var kq = (topQuotes22(L[keep.i][keep.j]).filter(function (x) { return /[؟?]/.test(x); })[0]) || L[keep.i][keep.j];
+          var u = unfit23(kq, um23, hc.s); if (!u) break; why23 = u; dropped23.push({ a: keep, q: kq });
+          var rest = at.filter(function (a) { return dropped23.every(function (d) { return d.a !== a; }); });
+          keep = rest.filter(function (a) { return a.pre; })[0] || rest.filter(function (a) { return a.ex; })[0] || rest.filter(function (a) { return a.live; })[0] || rest[0] || null; } }
       at.forEach(function (a) { if (a !== keep) L[a.i][a.j] = demote22(L[a.i][a.j]); });
+      if (dropped23.length) { var dq = dropped23.map(function (d) { return "«" + clip(String(d.q).replace(/[«»]/g, ""), 120) + "»"; }).join("، ");
+        L[dropped23[0].a.i].push("- زمینه (نه پرسشِ دوم): پرسشِ پیشنهادیِ صفحه " + dq + " این نوبت پرسیده نمی‌شود — " + why23 + (keep ? "؛ پرسشِ این نوبت همان یکیِ دیگر است." : "؛ پرسشِ تازه‌ای نساز: به خودِ حرفش پاسخ بده و اگر پرسشی لازم است، فقط یکی و دربارهٔ همان.")); }
       /* پرسشِ نوبتِ نگه‌داشته عیناً متنِ صفحه می‌ماند (شناسهٔ پرسش برای دفترِ پاسخ‌ها، «کدام پرسش کمک کرد؟» و هم‌گامیِ صفحه) — بازنویسیِ «X؟ Y؟» به یک جمله
          (oneQ22) این شناسه را می‌شکست (test_fixes_1015c، test_tour1_assist #6)؛ B·D10 از سوی پس‌سنجی بسته است: پرسشِ صفحه، دوجمله‌ای هم، یک پرسش شمرده می‌شود */
       /* پیشنهادِ پرسشیِ بی‌نشان کنارِ پرسشِ نوبت («… پیشنهاد بده («می‌خواهی تمرینش کنیم؟»)») ⇒ زمینه */
       L.forEach(function (ls) { var blk = ""; ls.forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (SKIP22.test(blk) || TQL22.test(l) || !/^- /.test(l) || /^- پرسش‌های/.test(l) || /^- داورِ این مسئله هنوز انتخاب نشده/.test(l) || /^- همهٔ پرسش‌های این مرحله/.test(l)) return;
         if (!CTXL22.test(l) && /پیشنهاد[\s‌]*(?:بده|کن)\s*\(«[^»]*[؟?]»\)/.test(l)) ls[j] = "- زمینه (نه پرسشِ دوم): " + l.replace(/^-\s*/, "");
         /* «… بپرس» بیرون از سطرِ پرسشِ نوبت (حتی در سطرِ زمینهٔ شرطی، مثلِ قاعدهٔ پیش‌نیاز) فعلِ دستوریِ دومِ پرسیدن است ⇒ «پرسشِ همین پاسخ کن» (بیرونِ «…») */
-        ls[j] = ls[j].replace(/«[^»]*»|((?:^|[^آ-ی‌]))بپرس(?![آ-ی‌])/g, function (m, pre) { return pre === undefined ? m : pre + "پرسشِ همین پاسخ کن"; }); }); });
+        /* دورِ ۲۳ (Q1، A23-9): جایگزین جمله را نشکند — «X را بپرس» ⇒ «X را (در همان یک پرسشِ این پاسخ) جویا شو»، نه «X را پرسشِ همین پاسخ کن» */
+        ls[j] = ls[j].replace(/«[^»]*»|((?:^|[^آ-ی‌]))بپرس(?![آ-ی‌])/g, function (m, pre) { return pre === undefined ? m : pre + "(در همان یک پرسشِ این پاسخ) جویا شو"; }); }); });
       return L.map(function (ls) { return ls.join("\n"); }); } catch (e) { return outs; }
   };
   /* P5 — ردبندیِ پیام (C22-4، A22-5، B·D17): درخواستِ تمرین، «این را نگه دار/بمونه تا مرور کنم»، خودسنجی («فکر کنم خوب گفتم»، «شاید ۴۰٪»)، پیامِ اصلاح و
      پیامِ موعد هرگز «مسئلهٔ گفت‌وگو» ِ تازه یا حدس نیستند — یک ردبند برای سه جا (statesProblem، notGuessMsg، صورتِ گفت‌وگو) */
   var MP_PRAC22 = /(?:برام|برایم|واسم|به[\s‌]*من)?[\s‌]*(?:یه|یک)?[\s‌]*تمرین(?:[\s‌]*(?:ی|ِ))?[^.؟?!\n]{0,30}(?:بذار|بگذار|بساز|بده|باز[\s‌]*کن|بچین|می[\s‌]?خوام)|(?:یادم|تو[\s‌]*ذهنم|توی[\s‌]*ذهنم|در[\s‌]*ذهنم)[\s‌]*(?:بمونه|بماند|بمونن|بمانند)|(?:جایی|جای)[\s‌]*(?:هست|هس|دارید|داری)?[^.؟?!\n]{0,30}(?:بمونه|بماند|بمونن|بمانند|نگه[\s‌]*دار)|(?:مرورش|مرورشون|مرور)[\s‌]*(?:کنم|بکنم)|(?:آموختم|آموخته‌?ام|یاد[\s‌]*گرفتم)[^.؟?!\n]{0,40}(?:نگه[\s‌]*(?:دار|داری|دارید)|ذخیره|بمونه|بماند)|پرونده(?:‌ی|ی|ٔ)?[\s‌]*تمرین[^.؟?!\n]{0,20}(?:باز|بساز)/;
   var MP_RATE22 = /(?:^|[.!؛\n]\s*)(?:شاید|حدود|حدوداً|تقریباً|فکر[\s‌]*کنم)?[\s‌]*[0-9۰-۹]{1,3}[\s‌]*(?:٪|%|درصد)[\s.!،]*$|فکر[\s‌]*(?:کنم|می[\s‌]?کنم)[\s‌]*(?:خوب|بد|درست|کامل|نصفه|ناقص)[\s‌]*(?:گفتم|نوشتم|یادم[\s‌]*بود|بود|شد)|(?:نصفش|همه‌?اش|بیشترش|کمش)[\s‌]*یادم[\s‌]*(?:بود|رفت|اومد)/;
-  var MP_CORR22 = /^(?:یه|یک)[\s‌]*اصلاح(?:یه)?\s*[:：،]|(?:^|[\s‌،.])اشتباه[\s‌]*گفتم(?![آ-ی])|(?:^|[\s‌])(?:نه|نخیر)[\s‌،]+[^.؟?!\n]{1,40}(?:بود|است|ه)[\s.!]*$|[^.؟?!\n]{1,40}\s+نه\s+[^.؟?!\n]{1,30}(?:بود|است)\s*$/;
+  /* دورِ ۲۳ (Q5، D23-1): «بگو نه دیگه» (خواهشِ تأیید) و «نه دیگه/نه بابا» اصلاح نیستند — «نه» ِ اصلاح جانشینی دارد («نه، ۸ بود») */
+  var MP_CORR22 = /^(?:یه|یک)[\s‌]*اصلاح(?:یه)?\s*[:：،]|(?:^|[\s‌،.])اشتباه[\s‌]*گفتم(?![آ-ی])|(?:^|[\s‌])(?<!(?:بگو|بگید|بگین|بگی|بگم|میگی|میگه|می‌گی|می‌گه|بگویید)[\s‌]+)(?:نه|نخیر)[\s‌،]+(?!(?:دیگه|دیگر|بابا|اصلاً|اصلا|که|خب|والا)[\s.!]*$)[^.؟?!\n]{1,40}(?:بود|است|ه)[\s.!]*$|[^.؟?!\n]{1,40}\s+نه\s+[^.؟?!\n]{1,30}(?:بود|است)\s*$/;
   var MP_DUE22 = /(?:یادم[\s‌]*(?:بنداز|بیار|بینداز)|یادآور(?:ی)?[\s‌]*(?:کن|بذار|بگذار|ثبت)|موعد(?:ش|م)?|ددلاین|مهلت(?:ش|م)?)(?![آ-ی])|^(?:تحویل|ارائه|امتحان|جلسه)(?:ش|م)?[\s‌]+(?:[^.؟?!\n]{0,20}[\s‌])?(?:شنبه|یکشنبه|دوشنبه|سه[\s‌]*شنبه|چهارشنبه|پنجشنبه|جمعه|فردا|پس[\s‌]*فردا|[0-9۰-۹]{1,2}[\s‌]*(?:ام|م)?[\s‌]*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند))/;
+  var MP_KEEP23 = /(?:به|تو|توی)[\s‌]*(?:لیست|فهرست|قفسه|پوشه)[^.؟?!\n]{0,30}(?:اضافه|بذار|بگذار|ثبت|نگه)|(?:یه|یک)?[\s‌]*جا(?:یی)?[\s‌]*(?:نگه[\s‌]*(?:دار(?:م|ی|ید|ه)|می[\s‌]?دار)|ذخیره[\s‌]*کن)|جایی[\s‌]*(?:برای|واسه)[^.؟?!\n]{0,30}(?:هست|داری|دارید|داره)/;
+  var PROVED_WHY23 = /(?:ثابت|اثبات)[\s‌]*(?:ش|اش)?[\s‌]*(?:کردم|کرده‌?ام|کردیم)(?![آ-ی])|(?:اثبات|برهان)(?:ش)?[\s‌]*(?:رو|را)?[\s‌]*(?:دارم|نوشتم)(?![آ-ی])/;
+  var LOOKWHY23 = /چرا|نفهمیدم|نمی[‌\s]?(?:بینم|بینمش|فهمم)|بازنگری|دوباره[\s‌]*(?:بهش[\s‌]*)?نگاه|بفهمم/;
+  var PROVE_ASK23 = /(?:نمی[‌\s]?دونم|نمی[‌\s]?دانم|بلد[\s‌]*نیستم)[\s‌]*(?:چطور|چطوری|چگونه|چجوری)[\s‌]*(?:ثابت|اثبات)/;
+  var MP_REC23 = /(?:بی[\s‌]*نگاه|بدون[\s‌]*نگاه|از[\s‌]*حافظه|از[\s‌]*بر|برگه(?:‌ی|ی|ٔ)?[\s‌]*(?:ی[\s‌]*)?سفید)[^.؟?!\n]{0,60}(?:نوشتم|نوشتمش|توضیح[\s‌]*دادم|گفتم|کشیدم|حل[\s‌]*کردم)|(?:[0-9۰-۹]{1,3}[\s‌]*(?:٪|%|درصد)|کامل|کاملاً|همه‌?ش|نصفش|بیشترش|کمش|تقریباً|بخشیش)[^.؟?!\n]{0,30}?یادم[\s‌]*(?:بود|رفت|اومد|موند|ماند)|(?:تمرین(?:و|رو|ش)?|کارت(?:‌ها|ها)?(?:و|رو)?)[^.؟?!\n]{0,20}یادم[\s‌]*(?:بود|رفت|اومد|موند)/;
+  var MP_USE23 = /با[\s‌]*(?:مدلِ?|روشِ?|ترفندِ?|قاعدهٔ?|الگوی?)[\s‌]*(?:«[^»]*»|[^.؟?!\n]{1,30}?)[^.؟?!\n]{0,40}(?:حل[\s‌]*کردم|به[\s‌]*کار[\s‌]*بردم|جواب[\s‌]*داد|درومد|درآمد)|(?:همون|همان|همین)[\s‌]*(?:روش|راه|مدل|ترفند|فرمول|کار|تکنیک)[^.؟?!\n]{0,60}(?:زدم|کردم|بردم|پیاده[\s‌]*کردم|امتحان[\s‌]*کردم)(?![آ-ی])|(?:همون|همان|همین)[^.؟?!\n]{0,40}(?:رو|را)?[\s‌]*(?:به[\s‌]*کار[\s‌]*(?:بردم|گرفتم|بستم)|استفاده[\s‌]*کردم)|به[\s‌]*کار[\s‌]*(?:بردم|گرفتم|بستم)[^.؟?!\n]{0,80}(?:درومد|درآمد|دراومد|جواب[\s‌]*داد)/;
   function metaMsg22(t) { var o = ownText(String(t || "")).replace(/[‏‎]/g, "").trim(); if (!o) return "";
     if (MP_CORR22.test(o)) return "correction";
     if (MP_PRAC22.test(o) && !/[=<>≤≥]/.test(o)) return /تمرین|پرونده/.test(o) ? "practice" : "keep";
+    if (MP_KEEP23.test(o) && !/[=<>≤≥]/.test(o)) return "keep";   // دورِ ۲۳ (C23-23): «دو تا چیز می‌خوام یه جا نگه دارم … جایی برای این‌ها هست؟»
     if (MP_RATE22.test(o)) return "rating";
+    /* دورِ ۲۳ (Q5، C23-1، A23-13، B·D13): گزارشِ تمرینِ بی‌نگاه («برگهٔ سفید را از حافظه نوشتم … کامل/۸۰٪ یادم بود») خودسنجی است؛ گزارشِ کاربستِ مدل
+       («همون تلسکوپی رو به کار بردم … درومد») کاربست است — هیچ‌کدام مسئلهٔ تازه یا لحظهٔ «اول کل» نیستند (مگر پرسشی تازه بیاورد) */
+    if (!/[؟?]/.test(o) && MP_REC23.test(o)) return "rating";
+    if (!/[؟?]/.test(o) && MP_USE23.test(o)) return "use";
     if (MP_DUE22.test(o) && !/[؟?]/.test(o)) return "deadline";
     return ""; }
   AS.metaMsg22 = metaMsg22;
+  /* ================= دورِ ۲۳ ِ تورِ پولیا (سهمِ «ageclass»، DECISIONS_R23 Q1 و Q5) =================
+     Q1 — سلام و معرفیِ خود جزءِ مسئله نیست (A23-7، C23-12، D23-28، B·D10، B·D13): از آغازِ پیام فقط بندهایی کنار می‌روند که سلام/احوال‌پرسی، معرفیِ خود
+     («من کیانم کلاس سومم»، «بنده رضایی هستم»، «۱۵ سالمه»)، حرف از خودِ برنامه («نوه‌ام این برنامه را نصب کرده») یا پیش‌درآمدِ «یه سؤال دارم/این سؤال رو نمی‌فهمم:»اند؛
+     بندی که عدد، پرسش یا مسئله دارد می‌ماند. «سلام» ِ درونِ مسئله («هر کی به همه سلام کرد») و نامِ شخصیت‌های مسئله («علی ۳ سیب داره») دست نمی‌خورند. پیامِ کاملِ او
+     در گفت‌وگو و پرونده همان است که نوشت. همین متنِ پیراسته صورتِ مسئلهٔ گفت‌وگو، عنوانِ 🧩/پشته و ورودیِ آشکارسازِ مسئله است (Q5 ⇐ نوبتِ گشایشِ پشتِ سلام). */
+  var GREET23 = /^(?:با[\s‌]*سلام(?:[\s‌]*و[\s‌]*(?:احترام|ادب|عرضِ?[\s‌]*ادب))?|سل+ا+م+(?:[\s‌]*(?:علیکم|عرض[\s‌]*شد|خدمتِ?[\s‌]*شما|دوباره))?|درود|hi|hello|صبح[\s‌]*(?:بخیر|به[\s‌]*خیر)|عصر[\s‌]*(?:بخیر|به[\s‌]*خیر)|شب[\s‌]*(?:بخیر|به[\s‌]*خیر)|روز[\s‌]*(?:بخیر|به[\s‌]*خیر)|وقت(?:تون|تان|ت|ِ?[\s‌]*شما)?[\s‌]*(?:بخیر|به[\s‌]*خیر)|خسته[\s‌]*نباشید|ببخشید[\s‌]*مزاحم[\s‌]*(?:شدم|می[\s‌]?شم)|مرسی|ممنون(?:م)?|خوبی\s*[؟?]|خوبید\s*[؟?])(?![آ-ی‌])[\s!.،,؛:]*/i;
+  var INTRO23 = /^(?:من|بنده|اینجانب)[\s‌]+[^0-9۰-۹؟?]{1,60}$|^(?:اسمم|اسمِ?[\s‌]*من|نامم)[\s‌]/;
+  var INTROP23 = /^(?:من|بنده)[\s‌]+(?:[آ-ی‌]{2,20}(?:م|ام|هستم)|[آ-ی‌]{2,20}[\s‌]+(?:[آ-ی‌]{2,20}[\s‌]+)?هستم)(?:[\s،,]+(?:[0-9۰-۹]{1,3}[\s‌]*(?:سالمه|ساله‌?ام|سالم|سال[\s‌]*دارم)|کلاس[\s‌]*[آ-ی0-9۰-۹‌]{1,10}?(?:م|ام)?|پایهٔ?[\s‌]*[آ-ی0-9۰-۹‌]{1,10}))*(?=[\s،,.!]|$)/;
+  var APPMETA23 = /(?:برنامه|اپ|اپلیکیشن|سامانه|نرم[\s‌]?افزار)[^.؟?!\n]{0,30}(?:نصب|راه[\s‌]*انداخت)|(?:نصب|راه[\s‌]*انداخت)[^.؟?!\n]{0,30}(?:برنامه|اپ|سامانه)/;
+  var LEADIN23 = /^(?:(?:یه|یک)[\s‌]*(?:چیز|مسئله|مسئلهٔ|سؤال|سوال)[\s‌]*(?:جدید|تازه|دیگه|دیگر)[\s‌]*[:：]|(?:یه|یک)?[\s‌]*(?:سوال|سؤال|مسئله|تمرین|پرسش)(?:[\s‌]+(?:از|توی?|در)[\s‌]+[^.؟?!\n:]{1,30})?[\s‌]*[:：]|(?:یه|یک)[\s‌]*(?:سوال|سؤال|مسئله|تمرین|پرسش)[^.؟?!\n:]{0,40}(?:دارم|داریم|داره)|[^.؟?!\n:]{0,50}(?:سوال|سؤال|سواله|مسئله|تمرین)[^.؟?!\n:]{0,30}(?:داده|دادن|نمی[\s‌]?فهمم|بلد[\s‌]*نیستم|حل[\s‌]*کنم)|(?:می[\s‌]?خواستم|می[\s‌]?خوام)[\s‌]*(?:بپرسم|بدونم|ببینم)(?:[\s‌]*که)?)[\s‌]*[:：]?[\s‌]*/;
+  function stripIntro23(t, raw) {
+    var x = String(t == null ? "" : t), prev = null, guard = 0;
+    while (prev !== x && guard++ < 8) { prev = x; x = x.replace(/^(?:[\s‏‎!.،,]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF\uFE0F])+/, "");
+      var g = GREET23.exec(x); if (g && g[0].trim()) { x = x.slice(g[0].length); continue; }
+      var cut = /^[^.!؟?\n؛]*[.!؟?\n؛]+/.exec(x), first = (cut ? cut[0] : x).trim(), body = first.replace(/[.!؟?\n؛،,\s]+$/, "");
+      var bodyNA = body.replace(/[0-9۰-۹]{1,3}[\s‌]*(?:سالمه|ساله‌?ام|ساله[\s‌]*هستم|سالم|سال[\s‌]*دارم)|(?:کلاس|پایهٔ?)[\s‌]*[0-9۰-۹]{1,2}/g, "سن");
+      if (body && !/[؟?]/.test(first) && (INTRO23.test(bodyNA) || APPMETA23.test(body)) && !/[0-9۰-۹]/.test(bodyNA) && (cut || raw)) { x = cut ? x.slice(cut[0].length) : ""; continue; }
+      var ip = INTROP23.exec(x); if (ip && ip[0].trim() && (x.length > ip[0].length + 8 || (raw && !x.slice(ip[0].length).replace(/[\s.!،,]+/g, "")))) { x = x.slice(ip[0].length).replace(/^[\s،,.!]+/, ""); continue; }
+      var li = LEADIN23.exec(x); if (li && li[0].trim() && x.length > li[0].length + 8 && (/[:：]\s*$/.test(li[0]) || /^(?:یه|یک)/.test(li[0]) && cut && first.length <= li[0].length + 2 || /بپرسم|بدونم|ببینم/.test(li[0]))) { x = x.slice(li[0].length).replace(/^[\s.،,:]+/, ""); continue; }
+    }
+    x = x.trim(); return raw ? x : x.length >= 4 ? x : String(t == null ? "" : t).trim();
+  }
+  AS.stripIntro23 = stripIntro23;
+  /* Q5 — پرسشِ نوبت با همین پیام: جواب‌گرفته یا بی‌جا؟ (یک منبع؛ متنِ پرسشِ صفحه + پیامِ خودش + سشن). خروجی: دلیلِ کوتاه یا "" */
+  var CHECKED23 = /جور[\s‌]*(?:در[\s‌]*)?(?:میاد|می[‌\s]?آید|درومد|درآمد|دراومد)|(?:با|به)[^.؟?!\n]{1,30}(?:خوند|می[‌\s]?خونه|می[‌\s]?خواند|جور\s*بود)|درست[\s‌]*(?:درومد|درآمد|دراومد|بود)|چک[\s‌]*کردم|وارسی(?:[\s‌]*(?:کردم|شد))?[\s‌]*[:：]|سنجیدم|آزمودم|امتحانش[\s‌]*کردم|با[\s‌]*(?:n|ن)[\s‌]*=|(?:بریدم|اندازه[\s‌]*گرفتم|شمردم)[^.؟?!\n]{0,60}(?:شد|شدن|درومد)/i;
+  var STEPOK23 = /(?:رفتم|زنگ[\s‌]*زدم)[\s‌،]*(?:و[\s‌]*)?(?:پرسیدم|فهمیدم)|معلوم[\s‌]*شد|فهمیدم[\s‌]*(?:که|چرا)|پیدا[\s‌]*کردم|انجامش[\s‌]*دادم|جواب[\s‌]*(?:داد|گرفتم)(?![آ-ی])/;
+  var STEPFAIL23 = /خراب[\s‌]*شد|دعوا|جواب[\s‌]*نداد|نتونستم|نتوانستم|موفق[\s‌]*نشدم|نگرفت(?![آ-ی])|بی[\s‌]*نتیجه|فایده(?:‌ای|ای)?[\s‌]*نداشت|(?:گام|کار|راه|روش)[^.؟?!\n]{0,20}نشد(?![آ-ی])|(?:^|[\s‌،])نشد(?![آ-ی])/;
+  function unfit23(q, m, se) {
+    q = String(q || ""); var o = ownText(String(m || "")), mk = metaMsg22(m);
+    if (mk === "keep" || mk === "use") return "پیامش درخواستِ نگه‌داشتن/گزارشِ کاربست است، نه کار روی گامِ مسئله — پرسشِ گامِ مسئله بی‌ربط است";
+    if (/سنجیدی|وارسی[\s‌]*(?:کن|کنی|اش)|از[\s‌]*راهِ?[\s‌]*دیگری|با[\s‌]*واقعیت/.test(q) && CHECKED23.test(o)) return "همین پیام وارسی‌اش را گزارش کرد — دوباره نپرس";
+    if (/همهٔ?[\s‌]*(?:فرض|داده)/.test(q) && /همه(?:‌ی|ی|ٔ)?[\s‌]*(?:فرض|داده)(?:‌ها|ها)?[\s‌]*(?:رو|را)?[\s‌]*به[\s‌]*کار[\s‌]*(?:رفت|بردم|رفتن)/.test(o)) return "همین پیام گفت همهٔ فرض/داده به کار رفت — دوباره نپرس";
+    if (/^(?:[^«»]*)مجهول[\s‌]*(?:\([^)]*\)[\s‌]*)?چیست/.test(q) && !/[0-9a-z]\s*=/.test(q) && (/مجهول(?:ش|مون)?[\s‌]+(?:همون|همان|اینه|این[\s‌]*است)|دنبالِ?[\s‌]*(?:اینم|این‌ام|این\s*هستم)|می[‌\s]?خوا(?:م|هم)[\s‌]*(?:بدونم|بدانم|ببینم)|سوال(?:ش)?[\s‌]*(?:اینه|این\s*است)/.test(o) || /(?:چیکار|چی[\s‌]*کار|چه[\s‌]*کار)[\s‌]*کن(?:م|یم)[\s‌]*[؟?]|(?:چند|چقدر|کدوم|کدام)[^.!؟?\n]{0,60}[؟?]/.test(o))) return "مجهول را خودش در همین پیام گفت (پرسشِ خودش) — «مجهول چیست؟» کهنه است";
+    if (/این[\s‌]*گام[\s‌]*جواب[\s‌]*نداد/.test(q) && !STEPFAIL23.test(o) && STEPOK23.test(o)) return "پیامش گامی را گزارش می‌کند که انجام شد و چیزی روشن کرد، نه شکستِ گام — «این گام جواب نداد؟» بی‌جاست";
+    if (/آنچه[\s‌]*شد[\s‌]*با[\s‌]*پیش[\s‌‌]?بینی/.test(q) && (corrAsk20(m) || mk === "correction" || mk === "deadline")) return "پیامش اصلاح/موعد است و هنوز چیزی نشده — پرسشِ فاصله با پیش‌بینی بی‌جاست";
+    if (/فکر[\s‌]*می[\s‌‌]?کنی[\s‌]*چه[\s‌]*می[\s‌‌]?شود|چقدر[\s‌]*مطمئنی/.test(q)) { var M = ((se && se.msgs) || []).filter(isUser).slice(-2).map(function (x) { return ownText(String(x.text || "")); }).concat([o]).join(" \n ");
+      if (/[0-9۰-۹]{1,3}[\s‌]*(?:٪|%|درصد)|مطمئنم|احتمال(?:ش)?[\s‌]*(?:زیاده|کمه|[0-9۰-۹])|از[\s‌]*[0-9۰-۹]+[\s‌]*تا[^.!؟?\n]{0,20}[0-9۰-۹]/.test(M)) return "پیش‌بینی و اطمینانش را همین حالا گفت — دوباره نپرس"; }
+    if (/پیش‌?[\s‌]*تر[^؟?]{0,60}دیده‌?ای|مسئلهٔ[\s‌]*مرتبط/.test(q) && solvedSaid(m)) return "به نتیجه رسید — پرسشِ «پیش‌تر دیده‌ای؟» ِ طرح‌ریزی کهنه است";
+    return ""; }
+  AS.unfit23 = unfit23;
+  function quotesNotHers23(rp, se, prompt) {
+    var Q = topQuotes22(String(rp || "")).filter(function (q) { return tk22(q).length >= 5 && !/[؟?]\s*$/.test(q.trim()); }); if (!Q.length) return [];
+    var U = ((se && se.msgs) || []).filter(function (m) { return m && (m.role === "user" || m.role === "ai"); }).map(function (m) { return String(m.text || ""); }), pn = qNorm(prompt);
+    return Q.filter(function (q) { var qn = qNorm(q); if (qn.length >= 6 && pn.indexOf(qn) >= 0) return false;
+      /* بازگفتِ نزدیک («هر دو خانهٔ ناهم‌رنگ کافی است» ⇐ «هر دو خونه‌ای که رنگشون فرق داره کافیه») رواست؛ فقط نقلی که تقریباً هیچ واژه‌اش در گفت‌وگو نیست (کمتر از یک‌سوم) */
+      if (U.some(function (u) { return quoteIn(q, u); })) return false; var a = tk22(q).filter(function (w) { return w.length >= 3 && PSTOP23.indexOf(" " + w + " ") < 0; }), B = []; if (a.length < 3) return false; U.forEach(function (u) { B = B.concat(tk22(u)); });
+      return a.filter(function (w) { return hit22(w, B); }).length * 3 < a.length; }); }
+  AS.quotesNotHers23 = quotesNotHers23;
+  /* قرنطینهٔ دورِ ۲۳ (REMOVAL_CANDIDATES): قاعده‌های پیشین، دست‌یافتنی برای مقایسه */
+  AS.R23_QUARANTINE = Object.assign(AS.R23_QUARANTINE || {}, {
+    corr19b22: function (t) { return CORR19b_R22.test(String(t || "")); },
+    inPage22: function (seg, PT) { return inPage22R22(seg, PT); },
+    claimRet22: function (acts) { return (acts || []).some(function (x) { return x && ((x.do === "coach_state" && (x.retract || x.guess_res)) || x.do === "retract"); }); },
+    pass22Ask: "پرسشِ همین پاسخ کن" });
   /* گزارشِ سرانجامِ پیش‌بینی/حدسِ خودش («پیش‌بینیِ … کرده بودم … امروز حساب کردم، درست بود») کارِ مربی است (کالیبراسیون) — D s31 p17 */
   var OWNOUT22 = /(?:پیش[‌\s]?بینی|حدس)(?:م|ِ?[\s‌]*من|ی)?[^.؟?!\n]{0,160}?(?:درست|غلط|اشتباه|رد)[\s‌]*(?:بود|درومد|درآمد|دراومد|شد|از[\s‌]*آب[\s‌]*درومد)(?![آ-ی])/;
   AS.ownOutcome22 = function (t) { return OWNOUT22.test(ownText(String(t || ""))); };
@@ -42678,9 +42832,9 @@ APP.goFromURL = function (q) {
     sec.appendChild(h("h2", {}, "📐 سنجشِ استاندارد"));
     sec.appendChild(h("p", { class: "small muted" }, "سازه‌ها از مدل‌های جهانیِ روان‌سنجی: CHC برای هوش، و مدلِ عقلانیتِ استانوویچ. «هوش‌های چندگانه» پشتوانهٔ تجربیِ کافی ندارد و به کار نمی‌رود. هر عدد یک احتمال است: «پاسخِ بعدی» = (درست+۱)/(کل+۲)، که از اصلِ بی‌مرجح درمی‌آید؛ «پیشرفت» = احتمالِ اینکه درستیِ ماهِ آخر از ماهِ نخست بیشتر باشد."));
     /* سن: از تاریخِ تولدی که خودت ثبت می‌کنی (یا به دستیار می‌گویی) */
-    var bIn = h("input", { type: "date", class: "inp sm", "data-own": "1", "aria-label": "تاریخِ تولد (میلادی)", value: P.birth() });
+    var bIn = h("input", { type: "text", class: "inp sm", dir: "rtl", "data-own": "1", "aria-label": "تاریخِ تولد (شمسی یا میلادی)", placeholder: "مثلاً ۲۰ تیر ۱۳۸۵", value: P.birth() && A.AGE && A.AGE.g2j ? A.AGE.faJal(A.AGE.g2j(P.birth())) : P.birth() });   // دورِ ۲۳ (Q1): شمسی هم
     sec.appendChild(h("div", { class: "row gap wrap small psy-age" }, h("span", {}, age == null ? "پیش از مقایسه با هم‌سن‌ها، تاریخِ دقیقِ تولدت را بگو — " + (A.AGE ? A.AGE.WHY : "مقایسه فقط با هم‌سن‌ها معتبر است.") : "سن: " + fa(age) + " سال (از تاریخِ تولدِ ثبت‌شده)."), bIn,
-      h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { var e = P.setBirth(bIn.value); if (e) { A.toast("تاریخ درست نیست."); return; } A.render(); } }, "ثبت")));
+      h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { var e = P.setBirth(bIn.value); if (e) { A.toast(e.replace(/^تاریخِ تولد ثبت نشد: /, "")); return; } A.render(); } }, "ثبت")));
     sec.appendChild(h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small psy-table" },
       h("thead", {}, h("tr", {}, ["سازه", "از کجا سنجیده می‌شود", "احتمالِ درستیِ پاسخِ بعدی", "احتمالِ پیشرفت", "نسبت به مردم"].map(function (x) { return h("th", {}, x); }))),
       h("tbody", {}, md.map(function (c) {
@@ -42751,7 +42905,9 @@ APP.goFromURL = function (q) {
     return n;
   };
   /* روزی یکی (M2): امروز جواب نداده‌ای و معمایی مانده — یا معمایی باز و بی‌پاسخ است (ادامهٔ همان) */
-  P.canOpenToday = function () { P.sweep(); return P.openItems().length > 0 || (P.pending().length > 0 && !P.answeredToday()); };
+  /* دورِ ۲۳ (Q1، D23-27): معمایی که هنجارش فقط برای بزرگسال است به کم‌سال پیشنهاد نمی‌شود — هنجاری برای سنش نیست و مقایسه بی‌معناست؛ معمای بازِ پیشین ادامه دارد */
+  P.ageBlocked = function () { var age = P.age(); if (age == null || !(A.AGE && A.AGE.minor(age))) return false; return !P.pending().some(function (it) { return it && inAges(P.srcAges(it.src), age); }); };
+  P.canOpenToday = function () { P.sweep(); return P.openItems().length > 0 || (P.pending().length > 0 && !P.answeredToday() && !P.ageBlocked()); };
   /* پاسخِ آزاد ⇒ رقم‌های فارسی/عربی، جداکنندهٔ هزارگان و ممیزِ فارسی، ی/ک ِ عربی، نیم‌فاصله؛ و فقط وقتی کلیدِ گویه عددی است
      عددهای نوشته‌شده با حروف (صفر تا بیست؛ «نه» نه، چون «نه» ِ منفی هم هست) — H2 */
   var NUMW = { "صفر": 0, "یک": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "هفت": 7, "هشت": 8, "ده": 10, "یازده": 11, "دوازده": 12, "سیزده": 13, "چهارده": 14, "پانزده": 15, "پونزده": 15, "شانزده": 16, "شونزده": 16, "هفده": 17, "هجده": 18, "هیجده": 18, "نوزده": 19, "بیست": 20 };
@@ -42837,14 +42993,17 @@ APP.goFromURL = function (q) {
   /* دستیار: تاریخِ تولد از حرفِ خودِ کاربر؛ هرگز جوابِ معما را نمی‌دهد */
   var AS = A.ASSIST;
   if (AS && AS.DO) {
+    /* دورِ ۲۳ (Q1، B·D6/D23-25): تاریخ همان‌طور که خودش گفت (شمسی یا میلادی، با نامِ ماه، یا روز + سنی که گفت) — صفحه تبدیل و وارسی می‌کند و تبدیل را نشان می‌دهد */
     AS.DO.birth = function (a) {
-      var d = String((a && a.date) || "").trim();
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= A.today() || d < "1900-01-01") return "تاریخِ تولد ثبت نشد: YYYY-MM-DD میلادی لازم است";
-      return P.setBirth(d) ? "تاریخِ تولد ثبت نشد: YYYY-MM-DD میلادی لازم است" : "";
+      var d = String((a && (a.date || a.text)) || "").trim(), ag = a && a.age != null && +a.age >= 1 ? +a.age : null;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d) && d >= "1900-01-01" && d < A.today()) return P.setBirth(d) ? "تاریخِ تولد ثبت نشد: " + d + " در تقویم نیست" : "";
+      if (!A.AGE || !A.AGE.setBirthInfo) return "تاریخِ تولد ثبت نشد: YYYY-MM-DD میلادی لازم است";
+      var r = A.AGE.setBirthInfo(d, { age: ag });
+      return r.iso ? "✓ تاریخِ تولد ثبت شد: " + A.AGE.faBoth(r.iso) : "تاریخِ تولد ثبت نشد: " + r.err;
     };
     var RULES = [
       "# سنجشِ استاندارد",
-      "- اگر کاربر تاریخِ تولدش را گفت، با {\"do\":\"birth\",\"date\":\"YYYY-MM-DD\"} (میلادی) ثبت کن — فقط از حرفِ خودش.",
+      "- اگر کاربر تاریخِ تولدِ خودش را گفت، با {\"do\":\"birth\",\"date\":\"همان‌طور که گفت\"} ثبت کن (شمسی یا میلادی، مثلاً «۲۰ اردیبهشت ۱۳۳۸»؛ روز بی سال + سنی که گفت ⇒ \"age\":عدد) — خودت تبدیل نکن؛ صفحه تبدیل می‌کند و نتیجه را نشان می‌دهد. فقط از حرفِ خودش، نه تولدِ دیگری.",
       "- اگر «🧩 معمای امروز» مانده و کاربر آرام است (نه وسطِ پریشانی یا کارِ فوری)، روزی یک بار با یک جمله پیشنهادش کن («یک معمای کوتاه برای امروز هست»)؛ آن را «آزمونِ هوش» نخوان و نتیجه‌اش را پیش‌بینی نکن.",
       "- «🧩 معمای امروز» را هرگز حل نکن، راهنمایی نکن و جوابش را نگو؛ اگر کاربر پرسید، بگو این یکی باید با فکرِ خودش باشد تا مقایسه منصفانه بماند.",
       "- دربارهٔ «هوش» فقط همان سازه‌ها و احتمال‌هایی را بگو که کارنامه نشان می‌دهد؛ «ضریبِ هوشیِ کل» یا رتبه‌ای را که کارنامه نمی‌دهد نساز."
@@ -44740,7 +44899,7 @@ APP.goFromURL = function (q) {
            کمبود و جای دقیقِ هر کدام فقط برای موردهایی که پیام از آن‌ها می‌پرسد (پایین) — بودجهٔ پیامِ کاربر. */
         ["ندارد", "سطحی"].forEach(function (vd) {
           var xs = (src.items || []).filter(function (it) { return (V[it.id] || {}).verdict === vd; });
-          if (xs.length) L.push("  " + (vd === "ندارد" ? "نبوده‌ها" : "سطحی‌ها") + " (" + xs.length + "؛ شناسه نام — برای جزئیات و جا، شناسه را بپرس): " + xs.map(function (it) { return it.id + " " + clipT(it.name_fa, 28); }).join(" · "));
+          if (xs.length) L.push("  " + (vd === "ندارد" ? "نبوده‌ها" : "سطحی‌ها") + " (" + xs.length + "؛ شناسه نام — جزئیات و جای هر مورد وقتی می‌آید که پیامِ کاربر نام یا شناسه‌اش را بیاورد): " + xs.map(function (it) { return it.id + " " + clipT(it.name_fa, 28); }).join(" · "));
         });
       });
       /* موردهایی که همین پیام از آن‌ها می‌پرسد: هر کدام در کدام تونل زندگی می‌کند */
@@ -46320,7 +46479,8 @@ APP.goFromURL = function (q) {
   /* G2 (دورِ ۶، s02/s11): «همهٔ داده‌ها؟» در آغازِ طرح‌ریزی (هنوز طرحی نیست و گیر نیست) نه؛ ولی گیر در ساختنِ طرح دقیقاً لحظهٔ همین پرسشِ پولیاست */
   function qOk(s, q, stuck) { var x = norm(q), o = openStep(s); if (B3_RE.test(x) && !planExists(s) && !stuck) return false; if (o && txt(o.pred) && PRED_Q.test(x)) return false; if (o && txt(o.when) && WHEN_Q.test(x)) return false; return true; }
   function resultQ(r, s) { var ty = typeOf(r, s), nat = natOf(s, r);
-    return nat !== "objective" ? "نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟ کدام پیش‌بینی درست درآمد و کدام نه، و از راهِ دیگری هم به همین می‌رسیدی؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
+    /* دورِ ۲۳ (Q5، B·D12 s13 p7): یک پرسش، نه سه («سنجیدی؟ کدام…؟ و از راهِ دیگری…؟») — «راهِ دیگر» پرسشِ بازنگریِ پس از آن است */
+    return nat !== "objective" ? "نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش: کدام پیش‌بینی درست درآمد و کدام نه؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
       : ty === "prove" || ty === "pod" ? "برهانی گفتی — از راهِ دیگری هم به همین حکم می‌رسی؟ وارسی‌اش کن: هر بخشِ فرض کجا به کار رفت و نتیجه دقیقاً همان حکم است؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
         : "نتیجه‌ای گفتی — از راهِ دیگری هم به همین می‌رسی؟ نتیجه را وارسی کن: در شرط بگذار یا با حالتی خاص بسنج. (بعد در صفحه «✅ حل شد» و بازنگری)"; }
   function presupBroken(s) { var lc = lastClosed(s), lo = lc && lc.out, u1 = uOf(s) || {}; if (openStep(s) || !lo || !u1.presup || !txt(u1.suffCirc)) return ""; var failed = lo.done === "no" || lo.prog === "نه" || lo.match === "no"; return failed || partNegated(lo.what, u1.suffCirc) ? u1.suffCirc : ""; }
@@ -53118,32 +53278,115 @@ APP.goFromURL = function (q) {
   G.minor = function (age) { var b = G.band(age); return !!b && (b.id === "early" || b.id === "child" || b.id === "teen"); };
 
   /* ---------- یک تاریخِ تولد ---------- */
-  /* رقمِ فارسی/عربی و جداکنندهٔ «/» یا «.» پذیرفته می‌شود (میلادی) */
-  function norm(d) {
-    var t = String(d == null ? "" : d).trim().replace(/[۰-۹]/g, function (c) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(c)); }).replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 0x660); });
+  /* دورِ ۲۳ (Q1، A23-1، B·D6، C23-8، D23-25): تاریخ همان‌طور که شخص می‌داند — شمسی یا میلادی، رقمِ فارسی/عربی/لاتین، «/ - .»، نامِ ماهِ شمسی
+     («۲۰ اردیبهشت ۱۳۳۸»، «اردی‌بهشت ماهِ»، سالِ دورقمیِ «۸۹»)، نامِ ماهِ میلادی («16 March 1959»، «مارس»). سالِ کمتر از ۱۷۰۰ ⇒ شمسی. تبدیل با الگوریتمِ
+     جاافتادهٔ jalaali-js (Borkowski؛ آزمون با جفت‌های شناخته: ۱ فروردین ۱۴۰۵ = 2026-03-21) و درستیِ روز با رفت‌وبرگشت (۳۱ مهر، ۳۰ اسفندِ ناکبیسه ⇒ رد).
+     خطا جملهٔ انسانی است، نه «YYYY-MM-DD». قرنطینهٔ مسیرِ پیشین (فقط میلادی): G.R23_QUARANTINE.norm22. */
+  var JM = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+  var GM = [["january", "jan", "ژانویه", "ژانویهٔ"], ["february", "feb", "فوریه", "فوریهٔ"], ["march", "mar", "مارس"], ["april", "apr", "آوریل"], ["may", "مه", "مهٔ", "می"], ["june", "jun", "ژوئن"],
+    ["july", "jul", "ژوئیه", "ژوئیهٔ", "جولای"], ["august", "aug", "اوت", "آگوست"], ["september", "sep", "sept", "سپتامبر"], ["october", "oct", "اکتبر"], ["november", "nov", "نوامبر"], ["december", "dec", "دسامبر"]];
+  function digits(t) { return String(t == null ? "" : t).replace(/[۰-۹]/g, function (c) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(c)); }).replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 0x660); }); }
+  function div(a, b) { return ~~(a / b); }
+  /* jalaali-js (jalCal / j2d / d2g / g2d / d2j) */
+  var BREAKS = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
+  function jalCal(jy) { var bl = BREAKS.length, gy = jy + 621, leapJ = -14, jp = BREAKS[0], jm, jump = 0, leap, n, i;
+    if (jy < jp || jy >= BREAKS[bl - 1]) return null;
+    for (i = 1; i < bl; i += 1) { jm = BREAKS[i]; jump = jm - jp; if (jy < jm) break; leapJ = leapJ + div(jump, 33) * 8 + div(jump % 33, 4); jp = jm; }
+    n = jy - jp; leapJ = leapJ + div(n, 33) * 8 + div((n % 33) + 3, 4); if ((jump % 33) === 4 && jump - n === 4) leapJ += 1;
+    var leapG = div(gy, 4) - div((div(gy, 100) + 1) * 3, 4) - 150, march = 20 + leapJ - leapG;
+    if (jump - n < 6) n = n - jump + div(jump + 4, 33) * 33;
+    leap = ((((n + 1) % 33) - 1) % 4); if (leap === -1) leap = 4;
+    return { leap: leap, gy: gy, march: march }; }
+  function g2d(gy, gm, gd) { var d = div((gy + div(gm - 8, 6) + 100100) * 1461, 4) + div(153 * ((gm + 9) % 12) + 2, 5) + gd - 34840408; return d - div(div(gy + 100100 + div(gm - 8, 6), 100) * 3, 4) + 752; }
+  function d2g(jdn) { var j = 4 * jdn + 139361631; j = j + div(div(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908; var i = div((j % 1461), 4) * 5 + 308, gd = div((i % 153), 5) + 1, gm = ((div(i, 153)) % 12) + 1, gy = div(j, 1461) - 100100 + div(8 - gm, 6); return [gy, gm, gd]; }
+  function j2d(jy, jm, jd) { var r = jalCal(jy); return g2d(r.gy, 3, r.march) + (jm - 1) * 31 - div(jm, 7) * (jm - 7) + jd - 1; }
+  function d2j(jdn) { var gy = d2g(jdn)[0], jy = gy - 621, r = jalCal(jy), jdn1f = g2d(gy, 3, r.march), jd, jm, k = jdn - jdn1f;
+    if (k >= 0) { if (k <= 185) { jm = 1 + div(k, 31); jd = (k % 31) + 1; return [jy, jm, jd]; } else k -= 186; } else { jy -= 1; k += 179; if (r.leap === 1) k += 1; }
+    jm = 7 + div(k, 30); jd = (k % 30) + 1; return [jy, jm, jd]; }
+  function pad(n) { return ("0" + n).slice(-2); }
+  function iso3(g) { return g[0] + "-" + pad(g[1]) + "-" + pad(g[2]); }
+  G.j2g = function (jy, jm, jd) { if (!jalCal(jy)) return null; return iso3(d2g(j2d(jy, jm, jd))); };
+  G.g2j = function (iso) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || "")); if (!m) return null; return d2j(g2d(+m[1], +m[2], +m[3])); };
+  function jalMonthLen(jy, jm) { if (jm <= 6) return 31; if (jm <= 11) return 30; var r = jalCal(jy); return r && r.leap === 0 ? 30 : 29; }
+  G.faJal = function (j) { return j ? fa(j[2]) + " " + JM[j[1] - 1] + " " + fa(j[0]) : ""; };
+  G.faBoth = function (isoD) { var j = G.g2j(isoD); return j ? G.faJal(j) + " (" + isoD + " میلادی)" : isoD; };
+  function todayJ() { return G.g2j(A.today()); }
+  var JMRE = "(" + JM.join("|") + ")";
+  function normTx(t) { return digits(t).replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/اردی[\s‌]*بهشت/g, "اردیبهشت").replace(/امرداد/g, "مرداد").replace(/[ًٌٍَُِّْ]/g, "").replace(/\s+/g, " ").trim(); }
+  function yy(y, jal) { y = +y; if (String(y).length > 2) return y; var t = todayJ(), c = t ? t[0] % 100 : 5; return jal ? (y <= c ? 1400 + y : 1300 + y) : (y <= (+A.today().slice(2, 4)) ? 2000 + y : 1900 + y); }
+  /* سنی که خودش در همین متن گفت («۶۷ سالمه»، «۹ سالم شد»، «۱۵ ساله‌ام») */
+  var AGE_SAID = /(?:^|[^\d])(\d{1,3})[\s‌]*(?:سالمه|سالم[\s‌]*(?:شد|است|هست)|ساله[\s‌]*(?:ام|هستم|شدم)|ساله‌ام|سالم(?![آ-ی])|سال[\s‌]*دارم|سالمه)(?![آ-ی])/;
+  G.ageSaid = function (t) { var m = AGE_SAID.exec(normTx(t)); var n = m ? +m[1] : NaN; return n >= 1 && n <= 120 ? n : null; };
+  /* parse(text, {age}) ⇒ {iso, j, cal} | {need:"year", jm, jd} | {err} | null (تاریخی نیست) */
+  G.parse = function (text, o) {
+    o = o || {}; var x = normTx(text), m, cal = "", y = null, mo = null, d = null, rel = null;
+    if (!x) return null;
+    if ((m = /(\d{4})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{1,2})/.exec(x))) { y = +m[1]; mo = +m[2]; d = +m[3]; cal = y < 1700 ? "j" : "g"; }
+    else if ((m = /(?:^|[^\d])(\d{1,2})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{4})(?!\d)/.exec(x))) { y = +m[3]; mo = +m[2]; d = +m[1]; cal = y < 1700 ? "j" : "g"; }
+    else if ((m = new RegExp("(?:^|[^\\d])(\\d{1,2})\\s*(?:ام|م|ِ)?\\s*" + JMRE + "(?:ه|ست|‌ست|است|م|ام|ِ)?(?![آ-ی])(?:\\s*(?:ماهِ|ماه))?(?:\\s*(?:سالِ|سال)?\\s*(\\d{4}|\\d{2})(?!\\d))?").exec(x))) { d = +m[1]; mo = JM.indexOf(m[2]) + 1; y = m[3] ? yy(m[3], true) : null; cal = "j"; }
+    else { var lx = x.toLowerCase(); GM.some(function (g, i) { var re = new RegExp("(?:(\\d{1,2})\\s*(?:" + g.join("|") + ")|(?:" + g.join("|") + ")\\s*(\\d{1,2}))(?![a-zآ-ی])(?:\\s*,?\\s*(\\d{4}))?"), mm = re.exec(lx);
+        if (!mm || (!mm[3] && g[0] === "may")) return false; d = +(mm[1] || mm[2]); mo = i + 1; y = mm[3] ? +mm[3] : null; cal = "g"; return true; }); }
+    if (!cal) {
+      if (/امروز[\s‌]*(?:تولدمه|تولدم[\s‌]*(?:است|هست|ه))|تولدم[\s‌]*امروز(?:ه|ست|است)/.test(x)) rel = 0;
+      else if (/فردا[\s‌]*(?:تولدمه|تولدم[\s‌]*(?:است|هست|ه))|تولدم[\s‌]*فردا(?:ست|است|ه)/.test(x)) rel = 1;
+      else if (/دیروز[\s‌]*تولدم[\s‌]*بود|تولدم[\s‌]*دیروز[\s‌]*بود/.test(x)) rel = -1;
+      if (rel == null) return null;
+      var tj = G.g2j(A.addDays(A.today(), rel)); cal = "j"; mo = tj[1]; d = tj[2]; y = null;
+    }
+    if (mo < 1 || mo > 12) return { err: "ماهِ «" + fa(mo) + "» در تقویم نیست — ماه عددی بینِ ۱ تا ۱۲ است؛ دوباره ببین." };
+    if (cal === "g") {
+      if (y == null) return { err: "سالِ تولد را هم بنویس." };
+      var dt = new Date(Date.UTC(y, mo - 1, d)); if (d < 1 || dt.getUTCMonth() !== mo - 1) return { err: "این روز در آن ماه نیست — روز را دوباره ببین." };
+      return fin(iso3([y, mo, d]), "g");
+    }
+    var age = o.age != null ? o.age : G.ageSaid(text);
+    if (y == null) {
+      if (age == null) return { need: "year", jm: mo, jd: d };
+      var t = todayJ(), passed = (t[1] > mo) || (t[1] === mo && t[2] >= d); y = t[0] - age - (passed ? 0 : 1);
+    }
+    if (!jalCal(y)) return { err: "سالِ «" + fa(y) + "» درست به نظر نمی‌رسد — سالِ تولد را دوباره ببین." };
+    var ml = jalMonthLen(y, mo);
+    if (d < 1 || d > ml) return { err: mo === 12 && d === 30 ? "اسفندِ " + fa(y) + " ۲۹ روز دارد (آن سال کبیسه نبود) — روز را دوباره ببین." : "«" + JM[mo - 1] + "» " + fa(ml) + " روز دارد — روز را دوباره ببین." };
+    return fin(G.j2g(y, mo, d), "j");
+    function fin(v, c) {
+      if (v < "1900-01-01") return { err: "این سال خیلی دور است — سالِ تولد را دوباره ببین." };
+      if (v >= A.today()) return { err: "این تاریخ هنوز نیامده — سالِ تولد را دوباره ببین." };
+      return { iso: v, j: G.g2j(v), cal: c };
+    }
+  };
+  /* مسیرِ پیشین (فقط میلادی، رقمِ فارسی) — قرنطینه، نه حذف */
+  function norm22(d) {
+    var t = digits(d).trim();
     var m = /^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/.exec(t); if (!m) return t.slice(0, 10);
     var y = +m[1], mo = +m[2], da = +m[3], dt = new Date(Date.UTC(y, mo - 1, da));
     if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== da) return "";
     return m[1] + "-" + ("0" + mo).slice(-2) + "-" + ("0" + da).slice(-2);
   }
-  function valid(d) { d = norm(d); return RE.test(d) && d >= "1900-01-01" && d < A.today() ? d : ""; }
+  G.R23_QUARANTINE = { norm22: norm22 };
+  function valid(d) { var r = G.parse(d); return r && r.iso && RE.test(r.iso) ? r.iso : ""; }
   G.valid = valid;
   function localBirth() { var p = (S.settings().profile) || {}; return valid(p.birth); }
   function hasHost() { return !!(A.HOST && typeof A.HOST.birth === "function"); }
   G._host = "";   // آخرین مقدارِ معتبرِ میزبان (فقط در حافظه)
   G.birth = function () { return (hasHost() && G._host) || localBirth(); };
+  /* سن از تاریخ؛ بی تاریخ، سنی که خودش گفت («۱۵ سالمه»، روزش نگه داشته می‌شود) فقط برای گروهِ سنی — تاریخ همچنان پرسیده می‌شود (بانکِ R23 #20) */
   G.age = function (on) {
-    var b = G.birth(); if (!b) return null;
-    var t = on || A.today(), y = +t.slice(0, 4) - +b.slice(0, 4); if (t.slice(5, 10) < b.slice(5, 10)) y--; return y;
+    var b = G.birth(), t = on || A.today();
+    if (!b) { var p = (S.settings().profile) || {}, a = p.ageSaid; if (!a || !(a.age >= 1) || !/^\d{4}-\d{2}-\d{2}$/.test(a.on || "")) return null; var k = +t.slice(0, 4) - +a.on.slice(0, 4); if (t.slice(5, 10) < a.on.slice(5, 10)) k--; return a.age + Math.max(0, k); }
+    var y = +t.slice(0, 4) - +b.slice(0, 4); if (t.slice(5, 10) < b.slice(5, 10)) y--; return y;
   };
-  function saveLocal(d) { var st = S.settings(); st.profile = st.profile || {}; st.profile.birth = d; S.saveSettings(st); }
-  /* ثبتِ صریحِ کاربر ⇒ صفحه + میزبان. خروجی: "" یا متنِ خطا */
-  G.setBirth = function (d) {
-    var v = valid(d); if (!v) return "تاریخِ تولد ثبت نشد: تاریخِ میلادیِ درست (YYYY-MM-DD) و پیش از امروز لازم است";
-    saveLocal(v);
+  function saveLocal(d) { var st = S.settings(); st.profile = st.profile || {}; st.profile.birth = d; delete st.profile.birthMD; S.saveSettings(st); }
+  /* ثبتِ صریحِ کاربر ⇒ صفحه + میزبان. setBirthInfo ⇒ {iso, j, cal} | {err} | {need}؛ setBirth ⇒ "" یا جملهٔ خطا (انسانی، بی «YYYY-MM-DD») */
+  G.setBirthInfo = function (d, o) {
+    var r = G.parse(d, o);
+    if (!r) return { err: "تاریخ را نشناختم — مثلاً «۲۰ اردیبهشت ۱۳۳۸» یا «۱۳۳۸/۰۲/۲۰» (شمسی) یا «1959-05-10» (میلادی) بنویس." };
+    if (r.need) return { need: r.need, jm: r.jm, jd: r.jd, err: "روزِ تولد (" + fa(r.jd) + " " + JM[r.jm - 1] + ") را گفتی — سالش را هم بنویس." };
+    if (r.err) return r;
+    var v = r.iso; saveLocal(v);
     if (hasHost()) { G._host = v; if (typeof A.HOST.setBirth === "function") { try { Promise.resolve(A.HOST.setBirth(v)).catch(function (e) { console.warn("setBirth", e); }); } catch (e) { console.warn(e); } } }
-    return "";
+    return r;
   };
+  G.setBirth = function (d) { var r = G.setBirthInfo(d); return r.iso ? "" : "تاریخِ تولد ثبت نشد: " + r.err; };
   /* همگام‌سازی پس از بارِ داده: پرکردنِ خالی در هر دو سو */
   G.syncHost = function () {
     if (!hasHost()) { G._host = ""; return Promise.resolve(G.birth()); }
@@ -53161,6 +53404,13 @@ APP.goFromURL = function (q) {
     S.init = function (cb) { return rawInit.call(S, function () { var r = cb && cb.apply(this, arguments); try { G.syncHost().then(function () { if (A.state && /^(mind|psy_item)$/.test(A.state.view)) A.render(); }); } catch (e) { } return r; }); };
     S.init._age = true;
   }
+
+  /* دانستهٔ سامانه دربارهٔ سن (Q1، A23-28/A23-38، بانکِ R23 #17/#37) — برای بزرگسال هم در «# نقشهٔ سامانه» (a26 از A.SELF_FACTS) */
+  (A.SELF_FACTS = A.SELF_FACTS || []).push({ id: "age", fa: "سن و تاریخِ تولد",
+    use: "فقط دو کار: (۱) شیوهٔ گفتن در گفت‌وگو — بلوکِ «# مخاطب» برای کودک، نوجوان و سالمند (زبان، اندازهٔ گام، ایمنیِ کم‌سال؛ منطقِ حل همان است؛ بزرگسال بی بلوک)؛ (۲) در «📐 سنجشِ استاندارد» ِ کارنامه مقایسه فقط با هم‌سن‌ها، و اگر برای گروهِ سنی‌اش هنجارِ معتبر نیست همین را صادقانه می‌گوید. گروه‌ها از مرزهای رشدیِ مستند (دبستان، CRC، WHO)",
+    where: function () { return "فقط تاریخِ تولد نگه داشته می‌شود (هرگز عددِ سن؛ سن هر بار از تاریخ حساب می‌شود) — " + (A.HOST && typeof A.HOST.birth === "function" ? "در حسابِ خودِ کاربر در Lifemanager (همان فیلدِ «تاریخ تولد» ِ «من که هستم») و تنظیماتِ همین صفحه" : "در تنظیماتِ همین صفحه"); },
+    offline: "حسابِ سن و گروه و بلوکِ «# مخاطب» کارِ کدِ خودِ صفحه است و بی شبکه انجام می‌شود (فقط خودِ گفت‌وگو مدل می‌خواهد)",
+    model: "مستقل از مدل: صفحه گروه را حساب می‌کند و قاعده‌ها را به هر مدلی که وصل است می‌دهد؛ با عوض شدنِ مدل همان می‌ماند" });
 
   /* ---------- «# مخاطب» — فقط شیوهٔ گفتن ---------- */
   var COMMON = "- منطقِ حل، پرسش‌های پولیا، تونل‌ها و قاعده‌های بالا همان است؛ فقط شیوهٔ گفتن عوض می‌شود. این دربارهٔ خودِ کاربر است — اگر مسئلهٔ کسِ دیگری را آورده (معلم/والد)، قابِ معلم برقرار است.";
@@ -53191,7 +53441,8 @@ APP.goFromURL = function (q) {
     if (b.id === "teen") return ["# مخاطب", head, COMMON,
       "- زبان: روزمره و روشن، نه کودکانه و نه رسمی؛ ایدهٔ انتزاعی را با یک مثالِ ملموس کنارش بگو؛ جمله‌ها متوسط.",
       "- مثال از دنیای نوجوان: مدرسه و امتحان، دوست‌ها، ورزش، بازی و گوشی، سرگرمی‌هایش.",
-      "- گام‌ها: بگذار خودش جلو برود؛ گامِ بعد را او پیشنهاد کند و تو فقط بپرس؛ نصیحت و موعظه نه.",
+      /* دورِ ۲۳ (Q1، A23-9/B·D8/D23-26): بی فعلِ «بپرس» — گذرِ یک‌پرسشی (a27 oneTurnQ22) آن را دستورِ پرسشِ دوم می‌خواند و جمله را می‌شکست */
+      "- گام‌ها: بگذار خودش جلو برود؛ گامِ بعد را خودش پیشنهاد کند — سهمِ تو پرسیدن است، نه گفتنِ گام؛ نصیحت و موعظه نه.",
       "- تشویق بی چاپلوسی: کارِ درستِ مشخص را نام ببر؛ تعریفِ کلی و اغراق نه.",
       "- ضمیر: همان قاعدهٔ ضمیرِ گفت‌وگو."].concat(SAFE_MINOR).join("\n");
     /* سالمند */
@@ -53207,18 +53458,53 @@ APP.goFromURL = function (q) {
   /* ---------- قلاب‌های دستیار ---------- */
   var AS = A.ASSIST;
   if (AS) {
+    /* سطرهای خودِ صفحه به ضمیرِ گفت‌وگو (Q1، A23-14، B·D9): AS.regSys ِ a27 — «شما» ⇒ «تولدتان»، «بنویسید» */
+    var say = function (s, t) { try { return AS.regSys ? AS.regSys(s, t) : t; } catch (e) { return t; } };
+    G.say = say;
+    /* تاریخِ تولدِ خودش در گفت‌وگو (Q1، بانکِ R23 #2/#7/#8/#10/#12): فقط جمله‌ای که تولدِ خودِ او را می‌گوید («تولدم …»، «متولدِ … ام»، «… به دنیا اومدم»،
+       «امروز تولدمه»)؛ تولدِ دیگری («تولدِ مامانم»)، موعد یا رویدادِ گذشته نه. صفحه خودش تبدیل و ثبت می‌کند (بی نیاز به گزارشِ مدل)؛ روز بی سال و بی سن ⇒
+       فقط کارت سال را می‌پرسد. «X سالمه» ِ تنها ⇒ گروهِ سنی تا تاریخ داده شود. */
+    var OWN_BIRTH = /تولدم(?![آ-ی‌]*\s*(?:رو|را)\s*(?:جشن|گرفت))|متولدِ?[\s‌][^.؟?!\n]{1,30}?(?:ام|هستم|م)(?![آ-ی])|(?:به|ب)[\s‌]*دنیا[\s‌]*(?:اومدم|آمدم)/;
+    G.fromChat = function (s, msg) {
+      var t = String(msg || "").trim(); if (!t || /^\[/.test(t)) return null;
+      var x = normTx(t), age = G.ageSaid(t), st = S.settings(), pr = st.profile = st.profile || {}, out = null;
+      if (OWN_BIRTH.test(x)) {
+        var r = G.parse(t, { age: age });
+        if (r && r.iso) { var w = G.setBirthInfo(t, { age: age }); if (w.iso) out = { saved: w.iso }; }
+        else if (r && r.need && !G.birth()) { pr.birthMD = { jm: r.jm, jd: r.jd, at: A.today() }; S.saveSettings(st); out = { need: true }; }
+      }
+      if (!out && age != null && !G.birth()) {
+        var md = pr.birthMD; if (md && md.jm) { var w2 = G.setBirthInfo(fa(md.jd) + " " + JM[md.jm - 1], { age: age }); if (w2.iso) out = { saved: w2.iso }; }
+        if (!out) { pr.ageSaid = { age: age, on: A.today() }; S.saveSettings(st); out = { age: age }; }
+      }
+      if (out && out.saved && s && !(s.msgs || []).some(function (m) { return m.role === "sys" && m.birth === out.saved; })) {
+        s.msgs = s.msgs || []; s.msgs.push({ role: "sys", at: new Date().toISOString(), birth: out.saved, text: "✓ تاریخِ تولدت ثبت شد: " + G.faBoth(out.saved) + " — سن هر بار از همین تاریخ حساب می‌شود." }); s.ageAsk = "given"; try { S.put(s); } catch (e) { } }
+      return out;
+    };
     AS.promptHooks = AS.promptHooks || [];
-    AS.promptHooks.push(function () { try { return G.audience(); } catch (e) { return ""; } });
+    AS.promptHooks.push(function (s, msg) { try { G.fromChat(s, msg); } catch (e) { } try { return G.audience(); } catch (e) { return ""; } });
     /* کارتِ پرسشِ تاریخِ تولد: نخستین نوبتِ سشن (پس از نخستین پیامِ کاربر)، یک بار در سشن تا داده شود */
     G.askNode = function (s, onDone) {
       /* متنی، نه type=date: پنجرهٔ بومیِ تاریخ در پنجرهٔ شناورِ دستیار رویدادهای اشاره‌گر را می‌بلعید (کشیدنِ سرتیتر در test_tour از کار می‌افتاد) */
-      var inp = h("input", { type: "text", inputmode: "numeric", class: "inp sm age-in", dir: "ltr", "data-own": "1", "aria-label": "تاریخِ دقیقِ تولد (میلادی)", placeholder: "YYYY-MM-DD" }), msg = h("span", { class: "small bad" });
+      var md = ((S.settings().profile) || {}).birthMD, mdTx = md && md.jm ? fa(md.jd) + " " + JM[md.jm - 1] : "";
+      var inp = h("input", { type: "text", class: "inp sm age-in", dir: "rtl", "data-own": "1", "aria-label": mdTx ? "سالِ تولد" : "تاریخِ دقیقِ تولد (شمسی یا میلادی)", placeholder: mdTx ? "مثلاً ۱۳۸۵" : "مثلاً ۲۰ تیر ۱۳۸۵ یا ۱۳۸۵/۰۴/۲۰" }), msg = h("p", { class: "small bad age-err", role: "alert" });
+      var go = function () {
+        var v = String(inp.value || "").trim(); if (mdTx && /^[0-9۰-۹٠-٩]{2,4}$/.test(v)) v = mdTx + " " + v;
+        var r = G.setBirthInfo(v); if (!r.iso) { msg.textContent = say(s, r.err); return; }
+        if (s) { s.ageAsk = "given"; s.msgs = s.msgs || []; s.msgs.push({ role: "sys", at: new Date().toISOString(), birth: r.iso, text: "✓ تاریخِ تولدت ثبت شد: " + G.faBoth(r.iso) + "." }); S.put(s); }
+        if (onDone) onDone(); };
+      inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
       return h("div", { class: "card soft age-ask", dir: "rtl", role: "group", "aria-label": "تاریخِ دقیقِ تولد" },
-        h("p", { class: "small" }, h("b", {}, "تاریخِ دقیقِ تولدت را بگو؟ "), h("span", { class: "age-why" }, G.WHY)),
+        h("p", { class: "small" }, h("b", {}, say(s, mdTx ? "روزِ تولدت را گفتی (" + mdTx + ") — سالش را هم بنویس؟ " : "تاریخِ دقیقِ تولدت را بنویس؟ (شمسی یا میلادی) ")), h("span", { class: "age-why" }, say(s, G.WHY))),
         h("div", { class: "row gap wrap" }, inp,
-          h("button", { class: "btn sm", type: "button", "data-own": "1", onclick: function () { var e = G.setBirth(inp.value); if (e) { msg.textContent = e; return; } if (s) { s.ageAsk = "given"; S.put(s); } if (onDone) onDone(); } }, "ثبت"),
-          h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { if (s) { s.ageAsk = "later"; S.put(s); } if (onDone) onDone(); } }, "بعداً"), msg));
+          h("button", { class: "btn sm", type: "button", "data-own": "1", onclick: go }, "ثبت"),
+          h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { if (s) { s.ageAsk = "later"; S.put(s); } if (onDone) onDone(); } }, "بعداً")), msg);
     };
+    /* «امروز» به ضمیرِ او (بانکِ R23 #14): هر سطرِ متنیِ «امروز» از AS.regPage می‌گذرد — آخرین پوشش، پس از همهٔ بخش‌ها */
+    if (typeof A.dueList === "function" && !A.dueList._reg23) { var rawDue = A.dueList;
+      A.dueList = function () { var it = rawDue.apply(this, arguments) || []; if (!AS.regPage) return it;
+        try { return it.map(function (x) { if (!x || typeof x !== "object") return x; var y = Object.assign({}, x); ["txt", "sub", "act"].forEach(function (k) { if (typeof y[k] === "string") y[k] = AS.regPage(y[k]); }); return y; }); } catch (e) { return it; } };
+      A.dueList._reg23 = true; }
     AS.logHooks = AS.logHooks || [];
     AS.logHooks.push(function (s) {
       if (!s || s.ageAsk || G.birth()) return null;

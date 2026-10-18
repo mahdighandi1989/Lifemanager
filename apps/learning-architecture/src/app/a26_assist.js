@@ -54,6 +54,10 @@
   function names(arr, k, f) { return (arr || []).map(function (x) { return x[k] + "=" + clip(x[f], 40); }).join("، "); }
   AS.manifest = function () {
     var L = [];
+    /* دورِ ۲۳ (Q1): دانسته‌های سامانه دربارهٔ خودش از ثبت‌گاهِ A.SELF_FACTS — اول، تا بریدنِ نقشه (از ته) هرگز آن را نیندازد */
+    var SF = A.SELF_FACTS || [], fv = function (x) { try { return typeof x === "function" ? x() : x; } catch (e) { return ""; } };
+    if (SF.length) { L.push("## خودِ سامانه: هر داده به چه کار می‌آید، کجا ذخیره می‌شود، آفلاین، مستقل از مدل (پرسشِ «کجا نگهش می‌داری؟» را از همین جواب بده)");
+      SF.forEach(function (f) { L.push("- " + f.fa + " — کاربرد: " + fv(f.use) + " — جا: " + fv(f.where) + " — آفلاین: " + fv(f.offline) + " — مدل: " + fv(f.model)); }); }
     L.push("## نماها (view — نام — کدام کار — چیست — به چه کار می‌آید)");
     AS.views().forEach(function (v) { L.push("- " + v.id + " — " + v.label + (v.job ? " — " + (JOB_FA[v.job] || v.job) : "") + (v.what ? " — " + v.what : "") + (v.why ? " — " + v.why : "")); });
     var F = A.ORIENT_FLOWS || {};
@@ -453,7 +457,7 @@
     var out = [], used = 0, all = skipLast ? s.msgs.slice(0, -1) : s.msgs, cap = budget == null ? HIST_CHARS : budget;
     for (var i = all.length - 1; i >= 0; i--) {
       var m = all[i];
-      var line = (m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + String(m.text || "").slice(0, 4000) +
+      var line = (m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + String(m.role === "sys" && AS.regSys ? AS.regSys(s, m.text) : (m.text || "")).slice(0, 4000) +   // دورِ ۲۳ (Q1): سطرِ صفحه به ضمیرِ گفت‌وگو
         (m.files && m.files.length ? " [پیوست: " + m.files.map(function (f) { return (f.id != null ? f.id + "=" : "") + f.name; }).join("، ") + "]" : "");
       if (used + line.length > cap && (out.length || cap < 200)) { out.unshift("(" + fa(i + 1) + " پیامِ قدیمی‌تر در «حافظهٔ سشن» خلاصه شده است)"); break; }
       out.unshift(line); used += line.length;
@@ -1031,7 +1035,10 @@
     if (s && s.pinned) P.appendChild(h("div", { class: "as-pin", title: "خواستهٔ اصلیِ این سشن" }, "📌 ", s.pinned));
     if (s && AS.sessTools) { var stx = AS.sessTools(s); if (stx) P.appendChild(stx); }   // INF16 (a40): «📜 پروندهٔ کامل» ِ مسئلهٔ این سشن
     /* دورِ ۲۱ (R6): پرسش‌های دکمه‌دارِ صفحه برای خودش («حل شد؟»، «نتیجهٔ گامِ N؟») — هر بخش با AS.paintHooks.push(fn(s) ⇒ عنصر|null) */
-    if (s) (AS.paintHooks || []).forEach(function (fn) { try { var el = fn(s); if (el) P.appendChild(el); } catch (e) { console.error(e); } });
+    /* دورِ ۲۳ (Q1، A23-14): پرسش‌ها و کارت‌های خودِ صفحه هم به ضمیرِ گفت‌وگو (متنِ گره‌ها، بیرون از «…»؛ فیلدها دست نمی‌خورند) */
+    var regNode = function (el) { if (!el || !AS.regSys || !s) return el; try { var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, L = []; while ((n = w.nextNode())) L.push(n);
+      L.forEach(function (x) { var v = AS.regSys(s, x.nodeValue); if (v !== x.nodeValue) x.nodeValue = v; }); } catch (e) { } return el; };
+    if (s) (AS.paintHooks || []).forEach(function (fn) { try { var el = fn(s); if (el) P.appendChild(regNode(el)); } catch (e) { console.error(e); } });
     if (s && s.tour && AS.tourDrawer) P.appendChild(AS.tourDrawer(s));
     else if (s && s.steps && s.steps.length) {
       var done = s.steps.filter(function (x) { return x.s === "done"; }).length;
@@ -1047,7 +1054,8 @@
       h("p", {}, "سلام. بگو چه می‌خواهی — یک موضوع برای فهمیدن، ادعایی برای سنجیدن، یا جایی که گیر کرده‌ای."),
       h("p", { class: "small muted" }, "می‌برمت به جای درست، فرم را از حرف‌هایت پر می‌کنم و باقی را نشانت می‌دهم. عکس و فایل هم می‌خوانم (بچسبان یا 📎).")));
     (s ? s.msgs : []).forEach(function (m) {
-      log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx", dir: "rtl" }, richNodes(m)),
+      var mv = m.role === "sys" && AS.regSys ? Object.assign({}, m, { text: AS.regSys(s, m.text) }) : m;   // دورِ ۲۳ (Q1، A23-14): سطرِ خودِ صفحه به ضمیرِ گفت‌وگو
+      log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx", dir: "rtl" }, richNodes(mv)),
         m.files && m.files.length ? h("div", { class: "as-fl" }, m.files.map(function (f) { return f.link ? h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name) : h("span", { class: f.err ? "bad" : "" }, "📄 " + f.name); })) : null,
         csvNodes(m), AS.msgTools ? AS.msgTools(s, m) : null));   // INF15 (a40): «✏️ اصلاح» فقط روی حبابِ خودِ کاربر
     });

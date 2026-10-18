@@ -1,0 +1,1506 @@
+[
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: ۲۰ اردیبهشت ۱۳۳۸",
+  "expect": "accepted on the page (no model round-trip needed); converted to 1959-05-11 and shown back with both forms («۲۰ اردیبهشت ۱۳۳۸ ـ 1959-05-11»); age 67, band elder; «# مخاطب» elder block in the next prompt; mind card «سن: ۶۷»",
+  "context": "elder 67, «شما»"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: ۱۳۳۸/۰۳/۱۲",
+  "expect": "accepted; 1338/03/12 = 1959-06-03; age 67; no «تاریخ نامعتبر / YYYY-MM-DD» error; card line in «شما» («تاریخِ تولدتان ثبت شد»)",
+  "context": "elder 67, «شما» (round-23 s12 form)"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۶۷ سالمه، تولدم ۱۲ خرداده",
+  "expect": "page itself resolves the year: ۱۲ خرداد has already passed in ۱۴۰۵ ⇒ born ۱۴۰۵−۶۷ = ۱۳۳۸ ⇒ 1338/03/12 = 1959-06-03, age 67; stored even if the model sends no birth action; card shows the stored date",
+  "context": "elder, chat only, no card used yet"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: 1338/2/20",
+  "expect": "read as Jalali (year < 1700) ⇒ 1959-05-11, age 67 — same result as «۲۰ اردیبهشت ۱۳۳۸»",
+  "context": "elder, Latin digits, no zero padding"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: ۲۰ اردی‌بهشت ماهِ ۱۳۳۸",
+  "expect": "month name normalised (اردی‌بهشت ≡ اردیبهشت, «ماه/ماهِ» ignored) ⇒ 1959-05-11",
+  "context": "elder; month written with ZWNJ and «ماهِ»"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: ۱۳۳۸/03/۱۲",
+  "expect": "digits normalised ⇒ 1959-06-03, age 67",
+  "context": "mixed Persian and Latin digits in one string"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: ۵ فروردین ۱۳۹۶",
+  "expect": "1396/01/05 = 2017-03-25, age 9, band child; child block (safety lines) in the prompt; card line in «تو» and simple words",
+  "context": "child 9, «تو»"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: امروز تولدمه!! ۹ سالم شد 🎂",
+  "expect": "birth date = today's month/day ⇒ 1396/07/27 = 2017-10-19, age 9 exactly (birthday counted as passed); child band",
+  "context": "child; today = Mon 2026-10-19 = ۲۷ مهر ۱۴۰۵"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۸ سالمه، تولدم فرداست",
+  "expect": "birthday not yet passed ⇒ born ۱۴۰۵−۸−۱ = ۱۳۹۶ ⇒ 1396/07/28 = 2017-10-20, age 8 (not 9)",
+  "context": "child; tomorrow = ۲۸ مهر"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: ۱۳۸۸/۱۱/۲۲",
+  "expect": "1388/11/22 = 2010-02-11, age 16, teen block with minors' safety lines",
+  "context": "teen 16"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: متولد ۳۱ شهریور ۸۹ ام",
+  "expect": "two-digit year expanded to ۱۳۸۹ ⇒ 1389/06/31 = 2010-09-22, age 16; ۳۱ شهریور valid (first-half months have 31 days)",
+  "context": "teen, two-digit year, colloquial «ام»"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: 1340-09-10",
+  "expect": "year 1340 < 1700 ⇒ Jalali (not rejected as a malformed Gregorian) ⇒ 1961-12-01, age 64",
+  "context": "elder, Latin digits with dashes"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۷ دی ۴۲ به دنیا اومدم، الان بازنشسته‌ام",
+  "expect": "⇒ 1342/10/07 = 1963-12-28, age 62; band elder",
+  "context": "elder, two-digit year"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] birth card: ۳۰ اسفند ۱۳۹۵",
+  "expect": "valid ⇒ 2017-03-20, age 9 (leap-day case accepted, not refused)",
+  "context": "child; 1395 is a leap year"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U (elder): سلام وقتتون بخیر، بنده می‌خواستم بدونم… ‖ [page] card saved, turn question, Today line, copy ask",
+  "expect": "every page-written line (card confirmation, turn question, Today lines, copy asks, prerequisite return line) uses «شما» forms: «ثبت شد؛ گامِ بعدیِ شما…»; no «تو / تولدت / بگو / دادی؟»",
+  "context": "«شما» register throughout her messages"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U (elder 67): لطفاً با من راحت باش، «تو» صدام کن",
+  "expect": "from this turn page lines switch to «تو»; the switch is remembered for later sessions; earlier lines are not rewritten",
+  "context": "she explicitly switches register"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[prompt] teen 14, any turn",
+  "expect": "the teen «# مخاطب» line reads as a grammatical sentence after the one-question pass; the string «فقط پرسشِ همین پاسخ کن» never appears; the strict scan still counts exactly one question directive",
+  "context": "teen block + one-question pass"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U (owner-like adult): سنِ منو برای چی می‌خوای؟ کجا نگهش می‌داری؟ آفلاین هم کار می‌کنه؟ اگه مدل رو عوض کنم چی میشه؟",
+  "expect": "the prompt's system map carries an age/self-knowledge line even for adults: what age is used for (tone/safety block, same-band comparison or «هنجارِ معتبر نیست»), where it is stored, whether it works offline, that the logic is model-independent; the reply answers all four from that line, not invented",
+  "context": "adult band (no audience block)"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سلام من کیانم کلاس سومم. ۱۲ تا مداد رو باید بین ۳ نفر تقسیم کنیم هر کی چند تا میگیره",
+  "expect": "problem title, chat statement and 🧩 title = the problem only (≈ «۱۲ مداد بینِ ۳ نفر: هر نفر چند تا؟»); no «سلام», no «کیان», no «کلاس سوم»; the restatement to her does not quote her greeting; route = lla_coach",
+  "context": "child 9"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: با سلام و احترام؛ بنده رضایی هستم. می‌خواستم بپرسم اگر وام ۲۰۰ میلیونی با سود ۲۳٪ بگیرم قسط ماهانه چقدر می‌شود؟",
+  "expect": "title/statement start at «اگر وام ۲۰۰ میلیونی…»; «با سلام و احترام» and «بنده رضایی هستم» stripped; her full message kept as typed in the dossier",
+  "context": "adult formal «شما», ZWNJ mixed"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سلاااام 😅 من سارام ۱۵ سالمه این سواله رو نمیفهمم: دو تا عدد جمعشون ۲۰ ضربشون ۹۶",
+  "expect": "title = «دو عدد با جمعِ ۲۰ و ضربِ ۹۶»; name and age stripped from the title; teen band applied from «۱۵ سالمه»; no birth day/month invented from age alone (card still asks for the date)",
+  "context": "teen, no ZWNJ, emoji"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] Today for a 9-year-old",
+  "expect": "the adult-normed daily puzzle is not offered (no puzzle line/button); the mind card has no adult-norm comparison for her",
+  "context": "child band"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] birth card: ۳۱ مهر ۱۳۹۶",
+  "expect": "refused with a human Persian message («مهر ۳۰ روز دارد؛ روز را دوباره ببین») in her register; nothing saved; no regex/technical/«YYYY-MM-DD» text",
+  "context": "child; Mehr has 30 days"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] birth card: ۳۰ اسفند ۱۳۹۶",
+  "expect": "refused with a human message; nothing saved",
+  "context": "1396 is not a leap year"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] birth card: ۱۴۰۶/۰۲/۰۱",
+  "expect": "refused: «این تاریخ هنوز نیامده»; nothing saved",
+  "context": "future date"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] birth card: ۱۳۳۸/۱۳/۰۵",
+  "expect": "refused with a human message naming the month part; not silently clamped to Esfand",
+  "context": "month 13"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] birth card: 1959-05-11",
+  "expect": "accepted as Gregorian (not reinterpreted as Jalali year 1959) ⇒ age 67; card may show «۲۰ اردیبهشت ۱۳۳۸» beside it",
+  "context": "Gregorian still allowed"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] birth card: 2017/03/25",
+  "expect": "year > 1700 ⇒ Gregorian ⇒ age 9 (not refused, not read as Jalali)",
+  "context": "Gregorian with slashes"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: تولد مامانم ۲۰ اردیبهشته، چی براش بخرم که خوشش بیاد؟",
+  "expect": "NOT her birth date: no birth action accepted, card unchanged, age stays 39",
+  "context": "adult 39"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: قرارداد اجاره ۱۴۰۵/۰۸/۱۵ تموم میشه، تا اون موقع باید خونه پیدا کنم",
+  "expect": "a deadline date (۱۴۰۵/۰۸/۱۵ = 2026-11-06), never a birth date",
+  "context": "adult"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۶۷ کیلومتر تا روستا راهه، با ۴۰ تا سرعت چقدر طول میکشه",
+  "expect": "«۶۷» is a distance, not an age; band unchanged",
+  "context": "adult 39"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: تولدم ۱۲ خرداده",
+  "expect": "the page asks for the year in one short question; no year guessed, nothing saved yet",
+  "context": "no age known, no year"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: پارسال ۱۲ خرداد رفتیم شمال",
+  "expect": "a past event date, not a birth date",
+  "context": "adult"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "U (teen 16): بگو ببینم این درسته یا نه",
+  "expect": "page lines stay «تو»; no forced «شما» because of a respectful elder default",
+  "context": "«تو» register"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: توی یه مهمونی هر کی به همه سلام کرد، ۴۵ تا سلام شد. چند نفر بودن؟",
+  "expect": "«سلام» kept in the title and statement (it is content, not a greeting)",
+  "context": "adult; «سلام» is part of the problem"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U (child کیان, 8): علی ۳ تا سیب داره، مریم ۲ تا بیشتر. روی هم چند تا؟",
+  "expect": "«علی» and «مریم» stay in the title (problem characters); nothing stripped",
+  "context": "a character's name inside the problem"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] Today for a 39-year-old",
+  "expect": "the daily puzzle IS offered (adult-normed is right for him)",
+  "context": "adult"
+ },
+ {
+  "rc": "Q1.age_identity",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[prompt] adult 39, no audience block",
+  "expect": "no «# مخاطب» block (correct) — but the system-map age/storage/offline/model line is still present",
+  "context": "adult band"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U (first message): مستطیلو بلدم، طول ضربدر عرض… ولی این مثلثه، مساحتشو نمیدونم چجوری",
+  "expect": "the turn-1 prompt already carries the «# پیش‌نیاز» block; a valid coach_state.prereq {concept:«مساحتِ مثلث»} is accepted on turn 1; diagnostic question follows",
+  "context": "teen 13, opening turn, no chatFocus yet"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: (during the √ teaching turn) نفهمیدم اصلاً",
+  "expect": "stuck booked cause = «پیش‌نیاز: جذر» in the mind card AND the dossier; «طرح‌ریزی» percent unchanged; never «ضعیف‌ترین»",
+  "context": "adult, stack [main s3 ← فیثاغورس ← جذر] open"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "events",
+  "text": "U (turn 3): گیر کردم ‖ … ‖ (turn 5: diagnosis lands: prereq «تجزیهٔ اتحاد»)",
+  "expect": "the turn-3 stuck, booked «نامعلوم» before, is re-attributed to cause = prerequisite in both mind card and dossier once the diagnosis lands",
+  "context": "teen, same step s2"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: می‌خوام نمودار سه‌بعدی‌شو ببینم ولی اینجا هیچ ابزاری نداره، گیر کردم",
+  "expect": "stuck booked cause = «سامانه» (missing tool), not her «فهم» weakness; no percent drop on her side",
+  "context": "adult; no 3-D plot tool in the system"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "chat",
+  "text": "A: (inner √ re-check) √۸۱؟ ‖ U: ۹",
+  "expect": "stack pops ONE level: return to «فیثاغورس» (the nearest open waiting step), restated; the main step is not reopened yet; parent not marked mastered before this",
+  "context": "nested stack, inner child just mastered"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: آهان پس فیثاغورس اینه، فهمیدم. ولی حالا این ۱۴۴ رو چطوری رادیکال بگیرم؟",
+  "expect": "turn question = only the new diagnostic for جذر; no second mastery question beside it (one question)",
+  "context": "teen; mastery «yes» for فیثاغورس and a NEW prereq «جذر» in the same turn"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "chat",
+  "text": "A: [return to step s3] ‖ U: خب پس ارتفاع ۱۲ میشه، مساحت ۶۰",
+  "expect": "no forced «اول بگو کجا بودیم» restatement; the step is booked done; next turn question moves forward",
+  "context": "adult; she took the waiting step herself"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[problem closed via chat_solved] ‖ U: من کلاً خنگم، این چیزا تو کتم نمیره",
+  "expect": "the ability rule still fires after closure: page line names the gap («کمبود قضیهٔ فیثاغورس بود، نه توانِ تو»); no bare reassurance",
+  "context": "teen; the problem had prereq «فیثاغورس»"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: مغزم دیگه نمی‌کشه",
+  "expect": "counted as a self-label: the gap-naming line appears; mind card books no ability cause",
+  "context": "adult during an open prerequisite"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: بنده کلاً استعداد ریاضی ندارم",
+  "expect": "self-label recognised; the gap is named in «شما» («آنچه کم بود …، نه استعدادِ شما»)",
+  "context": "elder 64, «شما»"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] chat problem with 🧩 «فیثاغورس» ‖ [page] «🎯 مسئلهٔ زنده بساز» from that chat",
+  "expect": "the 🧩 record now carries the live problem's pid (visible from its page), not only the chat session id",
+  "context": "chat ⇒ live"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: نمی‌دونم کدوم دانشگاه رو انتخاب کنم",
+  "expect": "not a prerequisite; no cause = prerequisite booked",
+  "context": "adult; decision, no stack open"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "neg",
+  "role": "events",
+  "text": "[stack closed, step resumed] ‖ U: اینجا گیر کردم",
+  "expect": "booked normally (knot/skill per evidence), not prerequisite",
+  "context": "after the return"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "neg",
+  "role": "events",
+  "text": "U (turn 2, step s1): نمی‌دونم ‖ … (prereq diagnosed on step s3)",
+  "expect": "the s1 «نامعلوم» stuck stays «نامعلوم»; only same-step stucks are re-attributed",
+  "context": "different step"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: نمودارشو کشیدم ولی نمی‌فهمم چرا اینجوریه",
+  "expect": "not cause = system; booked by the usual rules",
+  "context": "the plot tool exists and worked"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: وای مغزم کار کرد!! حل شد",
+  "expect": "no ability line; no gap-naming",
+  "context": "joy, not a self-label"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: داداشم خنگه، هیچی بلد نیست",
+  "expect": "not her self-label; no ability line about her",
+  "context": "about someone else"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "neg",
+  "role": "chat",
+  "text": "A: √۸۱؟ ‖ U: ۴۰٫۵",
+  "expect": "no pop, waiting step not marked done; one more teaching move at the same level",
+  "context": "mastery re-check failed"
+ },
+ {
+  "rc": "Q2.prereq_refinements",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[inner child closed, parent re-check passed]",
+  "expect": "parent may now be marked mastered and the main step resumes — closing is allowed here",
+  "context": "both levels done"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: می‌خوام کف اتاق ۴ در ۶ رو کاشی کنم، کاشی‌ها ۴۰ در ۴۰ ان. چند تا بخرم؟ ‖ [page] open u-form",
+  "expect": "statement field shows «از گفت‌وگو: «کفِ اتاقِ ۴×۶ با کاشیِ ۴۰×۴۰؛ چند کاشی؟» درست است؟» with confirm/edit; the u-form does NOT ask «مسئله را بنویس» again",
+  "context": "adult chat problem"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: اول مساحت کفو حساب میکنم، بعد تقسیم بر مساحت یه کاشی، آخرشم ۱۰ درصد اضافه برای شکستگی",
+  "expect": "plan form prefilled as «از گفت‌وگو» with three steps; route map main line shows three points in her order: مساحتِ کف ⇐ تقسیم ⇐ ۱۰٪ اضافه",
+  "context": "same problem, plan in chat (no ZWNJ)"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "[page] 🧭 route map of that chat problem",
+  "expect": "origin = her statement (not «پروندهٔ این گفت‌وگو (بی مسئلهٔ زنده)»); destination = the unknown «تعدادِ کاشی‌ها»",
+  "context": "chat problem, no live problem"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: ولی خب ۲۴ تقسیم بر ۰٫۱۶ چرا اینقدر زیاد میشه؟ ‖ [page] 🧭",
+  "expect": "destination stays «تعدادِ کاشی‌ها»; her side sentence is never taken as the destination",
+  "context": "side sentence after the statement"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: حدسم حدود ۲۰۰ تاست ‖ … ‖ U: نه ۱۵۰ شد، پس حدسم غلط بود",
+  "expect": "guess point on the map and dossier line show «رد شد» (not «آزموده نشده»); hover tip says what refuted it",
+  "context": "guess then her own test"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: خب مساحت کف شد ۲۴ متر مربع",
+  "expect": "live stage advances to «اجرا» from coach_state; geo strip «اکنون: اجرا»",
+  "context": "stage was «طرح»; coach_state step report"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: کل مسئله اینه که بفهمم با ۵ میلیون کدوم یکی از سه تا لپ‌تاپ به کارم میاد",
+  "expect": "the whole-first question «کلِ مسئله را در یک جمله…» is never asked afterwards in this problem (not on turn 2, not after a reload)",
+  "context": "whole stated in chat, turn 1"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[9 chat turns: statement, plan, two step reports] ‖ [page] «🎯 مسئلهٔ زنده بساز»",
+  "expect": "the new live problem imports statement, plan and step reports; stage starts at the current stage (e.g. «اجرا»), not «فهمِ مسئله»; u0 whole-first not re-asked; lines in «شما»",
+  "context": "elder 67, «شما»"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "time",
+  "text": "D0: plan in chat ‖ D2 (Wed 2026-10-21): her review day, open Today/strip",
+  "expect": "strip shows the chat plan and current step, never «طرح هنوز نیست»",
+  "context": "multi-day"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "[problem with nested prereq فیثاغورس ← جذر closed via chat_solved] ‖ [page] 🧭",
+  "expect": "after closure the map still shows both detours with their nesting depth and both rejoins; concepts kept; not flattened",
+  "context": "teen"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "[problem 1 guess + correction] ‖ U: حالا یه مسئله‌ی دیگه: … ‖ [page] 🧭 of problem 2",
+  "expect": "problem 2's map and dossier show only problem 2 events; problem 1's guess/correction stay on problem 1",
+  "context": "two chat problems in one session"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "[page] hover on a prerequisite point",
+  "expect": "label shows «قضیهٔ فیثاغورس» unclipped (not «پیش‌نیاز پیش…»); «پیش‌نیاز» once; hover tip non-empty (concept + her quote + outcome)",
+  "context": "detour «قضیهٔ فیثاغورس»"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "[problem solved] ‖ [page] geo strip",
+  "expect": "strip «حل شد» / «بازنگری», never stale «اکنون: فهمِ مسئله»",
+  "context": "after a solve"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: نقشه‌ی مسیر همون مسئله‌ی کاشی رو نشونم بده",
+  "expect": "the model has a session id / route action in its prompt and opens that problem's route; no «باید از پنل باز کنی»",
+  "context": "chat problem, no live pid"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: آره با نسبت هم میشه حلش کرد، سریع‌تره",
+  "expect": "look-back form shows it «از گفت‌وگو: … درست است؟», not re-asked",
+  "context": "look-back answer in chat"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: اول می‌شمارم بعد تقسیم می‌کنم",
+  "expect": "plan form prefilled with her words; confirm line in simple «تو» words",
+  "context": "child 9, plan in chat"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: فرض کنید زمینی ۳۰۰ متری داریم و شرط این است که نصفش فضای سبز باشد",
+  "expect": "u-form data row «۳۰۰ متر» and condition «نصف فضای سبز» prefilled «از گفت‌وگو» in «شما»; not re-asked",
+  "context": "elder «شما», u-answers (data, condition)"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: جوابش ۶۰ شد، واحدشم چک کردم درسته",
+  "expect": "stage advances to «بازنگری»; turn question does not re-ask the check she reported",
+  "context": "result + check"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: ببخشید، ۴ در ۶ نبود، ۵ در ۶ بود",
+  "expect": "back-jump arc on THIS problem's map at the statement point; dossier one correction event",
+  "context": "correction in a chat problem"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] «از گفت‌وگو: «۳۰۰ متر» درست است؟» ‖ [page] she clicks «درست است»",
+  "expect": "value saved to the form; one event booked (no duplicate «ثبت شد» lines)",
+  "context": "confirmation"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "A: (suggests) شاید بهتر باشه اول محیط رو حساب کنی ‖ U: نه، همون مساحت",
+  "expect": "the assistant's suggestion is NOT fed into the plan form",
+  "context": "assistant suggestion she rejected"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "[problem 1 plan in chat] ‖ [page] problem 2 plan form",
+  "expect": "problem 1's plan does not appear in problem 2's form",
+  "context": "two problems"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] «از گفت‌وگو: … درست است؟» ‖ [page] she clicks «ویرایش» and types another value",
+  "expect": "her typed value is saved; the chat value is not; no silent overwrite later",
+  "context": "rejected prefill"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "U: یه دونه عدد بهم دادن، ۲۴",
+  "expect": "whole-first question may still be asked (once) — not dropped",
+  "context": "only a datum, no whole"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "A: حل شد! ‖ (no coach_state step report, she said nothing)",
+  "expect": "stage does not advance on the model's claim",
+  "context": "model claim only"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "[coach_state step report quoting a sentence she never wrote]",
+  "expect": "rejected; stage unchanged; not fed to forms",
+  "context": "invalid quote"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page] she typed plan step «تقسیم بر ۰٫۱۶» ‖ U (chat): تقسیم بر ۰٫۲",
+  "expect": "page form not overwritten silently; asked «این‌جا هم عوض شود؟»",
+  "context": "her typed copy exists"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "route",
+  "text": "[live problem with page-typed plan] ‖ [page] 🧭",
+  "expect": "map from the page plan; no duplicate points from chat echoes",
+  "context": "live problem"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: امروز ۸۰٪ کارت‌ها یادم بود",
+  "expect": "not a step report; stage unchanged; no form prefill",
+  "context": "practice self-report"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "route",
+  "text": "[problem still open at «طرح»] ‖ [page] geo strip",
+  "expect": "strip «اکنون: طرح» (not «حل شد»)",
+  "context": "open problem"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: حدسم ۲۰۰ تاست (never tested) ‖ [page] hover",
+  "expect": "«آزموده نشده» is correct here",
+  "context": "untested guess"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "route",
+  "text": "[page] point label «مساحت»",
+  "expect": "shown as is, no ellipsis",
+  "context": "short label"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "route",
+  "text": "[earlier session's problem P3 events] ‖ [page] today's problem P5 🧭",
+  "expect": "P3 events not shown on P5",
+  "context": "other session"
+ },
+ {
+  "rc": "Q3.chat_page_story",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: (in problem 2) مجهولِ اون یکی سرعت بود",
+  "expect": "not taken as problem 2's destination",
+  "context": "talking about the other problem"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ببخشید مهمونا ۱۰ نفر نیستن، ۱۲ نفرن",
+  "expect": "statement fixed; copy ask for the pinned goal «۱۰ نفر ⇒ ۱۲ نفر؟»; result «۴۵» marked as depending on 10 (set aside or asked), shown as the full result line, not a fragment",
+  "context": "adult; pinned goal «هدف: غذای ۱۰ نفر»; result line «۴۵ پرس» computed from 10"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: قیمت ۸۰۰ نبود، ۷۵۰ بود",
+  "expect": "copy ask on that typed row «این‌جا هم عوض شود؟» (round-22 behaviour restored); row stays ۸۰۰ until she answers",
+  "context": "she typed data row «قیمت: ۸۰۰ تومان» in the u-form herself"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۸۰۰ رو اشتباه گفتم، ۷۵۰ه",
+  "expect": "number word «هشتصد» matched ⇒ copy asked",
+  "context": "typed row says «هشتصد تومان» in words"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۸۰ متره نه ۲۰۰",
+  "expect": "both copies asked (Latin digits + unit «m^2» ≡ «مترمربع»)",
+  "context": "data line «۲۰۰ مترمربع»; her first message «200 m^2»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "edit",
+  "text": "[✏️] «۲۰ لیتر» ⇒ «۳۰ لیتر»",
+  "expect": "live statement copy and the typed plan row both asked",
+  "context": "live statement, plan row «۲۰ لیتر رو تقسیم بر ۴»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۲ کارتن نبود، ۱۵ تا بود",
+  "expect": "count words (کارتن/تا) count: plan row asked; «۱۲ تا کارتن» ≡ «۱۲ کارتن»",
+  "context": "plan row she typed: «۱۲ تا کارتن × ۲۴»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: عدد ؟۴۸۷؟ بود نه ؟۴۵۷؟",
+  "expect": "applied: statement «؟۴۸۷؟»; dependent guess and verdict set aside/asked; never «چیزی ثبت نشد»; no spurious ask on the plan",
+  "context": "masked-digit puzzle (s37 form); guess «۱۴۵۷۰» and verdict reference «؟۴۵۷؟»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "edit",
+  "text": "[✏️] شکر ۱ ⇒ ۱٫۵ پیمانه، کره ۱۰۰ ⇒ ۱۲۰ گرم",
+  "expect": "both pairs applied (changed has two entries); change line shows both differing parts; copies of each asked separately",
+  "context": "two pairs in one edit"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: مهلت رو باید به شهرداری منطقه بدم نه شورایاری",
+  "expect": "deadline what-part changed to «شهرداریِ منطقه»; date unchanged; old kept as «اصلاح شد ⇐»",
+  "context": "deadline «تحویلِ طرح به شورایاری» (s35 form)"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: عروسی برادرم ۱۸ اسفنده نه ۱۵",
+  "expect": "statement reads «عروسی برادرم ۱۸ اسفنده، ۵ ماه مونده» — no garble, word order kept",
+  "context": "statement «عروسی برادرم ۱۵ اسفنده، ۵ ماه مونده»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: اشتباه تایپ کردم، ۷۶ نه ۶۷",
+  "expect": "treated as «I misstated» ⇒ datum rewritten with history",
+  "context": "a misstated datum"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: هر قرص ۵۰۰ نیست، ۲۵۰ میلی‌گرمه",
+  "expect": "becomes «هر قرص ۲۵۰ میلی‌گرم، روزی ۳ بار»; «هر قرص» and «روزی ۳ بار» kept",
+  "context": "datum «هر قرص ۵۰۰ میلی‌گرم، روزی ۳ بار»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: ضلع ۱۰ نبود، ۸ بود (no `rests` reported)",
+  "expect": "only the verdict consuming 10 is set aside; the general proof is kept with reason",
+  "context": "verdicts: «برهانِ کلی برای هر n» (does not use 10), «مساحت = ۱۰۰» (uses 10)"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "A: [copy ask open: «دادهٔ ۲: ۱۲۰؟»] ‖ U: آره عوض کن",
+  "expect": "applied exactly as pressing «بله»; the ask closes",
+  "context": "chat answer"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "A: [ask on دادهٔ ۲] ‖ U: بله، دادهٔ ۲ رو هم عوض کن",
+  "expect": "«دادهٔ ۲» changed; no other copy touched",
+  "context": "explicit target"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page] change line after «۱۵ ⇒ ۱۲»",
+  "expect": "change line shows the differing part «۱۵ ⇒ ۱۲» with a non-empty reason (her quote); never old == new",
+  "context": "clip test"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: مخزن ۳۰ لیتره نه ۲۰",
+  "expect": "dependent guess set aside/asked; not left «درست»",
+  "context": "guess «حدود ۱۰ لیتر — درست» derived from 20"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: قالب ۲۲ سانتی‌ه نه ۲۰",
+  "expect": "title follows: «کیک برای قالبِ ۲۲»",
+  "context": "title «کیک برای قالبِ ۲۰»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ببخشید، عرض کردم ۱۵۰ ولی درستش ۱۲۰ است",
+  "expect": "applied; copy asks and change line in «شما»",
+  "context": "elder «شما»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: نه نه ۷ تا بود نه ۶ تا",
+  "expect": "statement «۷ تا بادکنک»; her typed answer row asked",
+  "context": "child 9, statement «۶ تا بادکنک»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: 7 بود نه ۸",
+  "expect": "«۸» copies matched across digit systems; stored in her own spelling",
+  "context": "Latin new, Persian old"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: هدفم ۵ کیلو نیست، ۳ کیلوئه",
+  "expect": "pinned goal asked/updated; Today goal line follows after «بله»",
+  "context": "pinned goal «۵ کیلو کم کنم تا عید»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "edit",
+  "text": "[✏️] مخزن ۲۰ ⇒ ۱۷ مترمکعب",
+  "expect": "the range bound «۲۰» is NOT a copy candidate; no ask; her approximation unchanged",
+  "context": "her approximation «بین ۱۰ تا ۲۰ مترمکعب» elsewhere"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۸ نفر نبودیم، ۹ نفر",
+  "expect": "range «۵ تا ۸» not offered",
+  "context": "her line «۵ تا ۸ نفر جا داره»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: جوابم ۶۱٫۵ بود ولی تست کردم رد شد",
+  "expect": "not rewritten; outcome «رد شد» kept; no correction event",
+  "context": "refuted own result"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۶۷ ماه اشتباه بود",
+  "expect": "read as «my result was refuted», not a misstatement: guess text stays ۶۷ with «رد شد»; never rewritten to ۶۱٫۵",
+  "context": "aD3: her own guess ۶۷ refuted by her check"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: ۱۲ نفر بودن نه ۱۰ ‖ (she never answers the ask)",
+  "expect": "her typed row stays ۱۰ (never changed silently)",
+  "context": "typed copy"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: مهمونا ۲۰ نفرن نه ۱۸",
+  "expect": "«۲۰ دقیقه» not offered (different unit/role)",
+  "context": "her line «۲۰ دقیقه پیاده تا تالار»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۲ نفر نه ۱۰",
+  "expect": "«۱۰ متری» not offered",
+  "context": "her row «اتاق ۱۰ متری»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: عدد ؟۴۸۷؟ بود",
+  "expect": "«۱۴۸۷۰» not matched as a copy of the masked pattern",
+  "context": "another number «۱۴۸۷۰» in the plan"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: بله",
+  "expect": "nothing applied as a copy answer",
+  "context": "no copy ask open"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "edit",
+  "text": "[✏️] شکر ۱ ⇒ ۱٫۵، نمک ۲ ⇒ ۳",
+  "expect": "sugar applied; the unmatched pair reported plainly; not «changed: []» for all",
+  "context": "«نمک» not in her texts"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: مهلت سه‌شنبه نیست، چهارشنبه است",
+  "expect": "what-part unchanged; date ⇒ Wed 2026-10-21",
+  "context": "deadline date-only"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۰۰ درصد مطمئنم که درسته",
+  "expect": "no copy candidates; nothing rewritten",
+  "context": "not a correction"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۵ نفر نه ۴ نفر",
+  "expect": "«۱۴۰۵» not touched",
+  "context": "statement contains «سال ۱۴۰۵»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: یه کارتن دیگه هم اضافه کن",
+  "expect": "not a correction of «۱»",
+  "context": "indefinite «یه», not a fix"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U (in problem 2): ۱۲ نه ۱۰",
+  "expect": "problem 1 copies untouched",
+  "context": "problem 1 also has «۱۰»"
+ },
+ {
+  "rc": "Q4.corrections",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اشتباه کردم امروز اومدم سرکار",
+  "expect": "no correction, no copy ask",
+  "context": "no number fact"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: امروز تمرینو کامل یادم بود",
+  "expect": "booked as a practice result; NOT the «مسئلهٔ گفت‌وگو» subject; no A191 «کلِ مسئله را در یک جمله…»",
+  "context": "adult, practice case due today"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: ۸۰٪ کارت‌ها رو یادم بود، ۲ تاشو نه",
+  "expect": "practice result 80% booked; no new problem; turn question about the two missed cards, not the whole-first",
+  "context": "teen, practice report, Persian digits + «٪»"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: دیروز با مدلِ «کار از آخر» یه مشکلِ کاری‌مو حل کردم",
+  "expect": "booked as a use day of that model; no new problem; no A191",
+  "context": "model-use report"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: سلام من کیانم کلاس سومم. ۱۲ تا مداد رو چجوری بین ۳ نفر تقسیم کنیم",
+  "expect": "route = lla_coach (not lla_assistant); problem created without greeting/name",
+  "context": "child 9, opening turn"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: سلام وقتتون بخیر. بنده ۶۷ سالمه. می‌خواستم ببینم با این حقوق بازنشستگی می‌تونم قسط ۸ میلیونی بدم یا نه",
+  "expect": "route = lla_coach; age line parsed separately; problem = the instalment question",
+  "context": "elder «شما», opening hidden behind greeting + self-introduction"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: همسایه‌مون ماشینشو جلوی در ما پارک کرده، حق داره؟ بگو نه دیگه.",
+  "expect": "not a correction; route lla_coach; no correction backup block; no «(شاید) اصلاح» line",
+  "context": "s33 form"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[page turn question: «اول ببین داده‌ها چه می‌گویند. مجهول دقیقاً چیست؟»] + model reply contains it verbatim",
+  "expect": "post-check counts ONE question in every path (live, chat, prerequisite, look-back); no «بیش از یک پرسش» flag",
+  "context": "two sentences, ONE «؟»"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "A: باشه، ثبت شد؛ فردا یادآوری می‌کنم",
+  "expect": "post-check does not raise «صفحه هنوز اصلاح را انجام نداده»",
+  "context": "no correction in play"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: خودم الان چک کردم، با واحدا هم جور درمیاد",
+  "expect": "turn question does not re-ask «آیا نتیجه را آزموده‌ای؟»; moves to look-back",
+  "context": "she just reported her check"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: این رو به لیستِ فرض‌هام اضافه کن: قیمت‌ها تا عید ثابت می‌مونه",
+  "expect": "turn question (if any) concerns that assumption (e.g. when to recheck it), not an unrelated step",
+  "context": "list request"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: مجهول همون تعداد کاشی‌هاست دیگه",
+  "expect": "next turn question is not «مجهول چیست؟»",
+  "context": "she has just stated the unknown"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: ثابتش کردم، ولی آخه چرا درسته؟",
+  "expect": "stage = look-back (not «طرح‌ریزی»); turn question about why / what else the proof shows",
+  "context": "aA2 form, teen 16"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "A: …تو گفتی «من هیچ‌وقت هندسه نخوندم»… (she never wrote it)",
+  "expect": "post-check flags the quote as not found in her messages",
+  "context": "invented quote inside the reply text"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "U: سلام، خوبی؟",
+  "expect": "no problem/title created; no A191; a short greeting reply is fine",
+  "context": "greeting only, no problem yet"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "U: غلطه، یادم رفته بود فرمولش چی بود",
+  "expect": "no correction hint or backup block",
+  "context": "about her own recall"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "U: سقف ۱۲ بود نه ۱۰",
+  "expect": "backup block may fire here (correct)",
+  "context": "real correction"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[page turn question] + model adds its own extra «این را چطور بررسی می‌کنی؟»",
+  "expect": "post-check counts two (the flag is right)",
+  "context": "two real questions"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "A: «۷۵۰» ثبت شد",
+  "expect": "the claim is checked against changed[] (not exempted)",
+  "context": "a correction IS in play"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "U: یه چیز جدید: می‌خوام عید سفر برم با بودجه ۲۰ میلیون، کجا برم؟",
+  "expect": "new problem created; A191 allowed once",
+  "context": "real new problem after a practice report"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "A: (cheat-sheet: list of 6 formulas, no question)",
+  "expect": "post-check raises no false positive",
+  "context": "B·D20 form"
+ },
+ {
+  "rc": "Q5.classification_turnq",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "U: الان کجا بودیم؟",
+  "expect": "turn question restates the place; may ask the next step — one question, never three",
+  "context": "neutral"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "page",
+  "text": "[gap sheet #101 filed for sub-problem «شبیه‌سازیِ جریانِ آب در لوله»]",
+  "expect": "🔭 shows the sub-problem «منتظرِ برگهٔ #101»; the route map point reads «منتظر #101»; the dossier line names #101 and the date",
+  "context": "adult owner-like, D0 = Mon 2026-10-19"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "time",
+  "text": "D0 sheet #101 ‖ D3 (Thu 2026-10-22): the registry gains the matching tool",
+  "expect": "page notices on load, verifies the new tool answers the waiting step, adds Today «ابزارِ لازم آمد: …» on D3, and resumes the step",
+  "context": "registry change"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "time",
+  "text": "D0 sheet #102 ‖ D2: sheet closed with «پاسخ به برگهٔ دستیار #102»",
+  "expect": "verify ⇒ Today line ⇒ resume, same as a registry change",
+  "context": "sheet closed by reply"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[the turn where the gap decision is made]",
+  "expect": "the full territory/system list is present (including s_comm and s_self), not truncated before the decision",
+  "context": "prompt content"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: اون ابزاری که منتظرش بودیم بالاخره اومد؟",
+  "expect": "answer from the waiting record: «هنوز نه — برگهٔ #101 باز است»",
+  "context": "owner-like, D1"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "page",
+  "text": "[two waiting sub-problems: #101 and #103] ‖ D4: #103 resolved",
+  "expect": "each marked with its own id; only #103's step resumes; #101 stays waiting",
+  "context": "two sheets"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "time",
+  "text": "D5: tool built ‖ she opens the problem",
+  "expect": "turn question resumes exactly at the waiting step with the place restated",
+  "context": "resume moment"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "events",
+  "text": "[waiting D0–D5, then resume]",
+  "expect": "the waiting time is never booked as her stuck or weakness (cause = system if anything)",
+  "context": "mind card"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: کی میشه ادامه‌شو بریم؟",
+  "expect": "honest line in «تو»: «منتظرِ برگهٔ #101 است؛ وقتی ساخته شد خودم خبرت می‌کنم»",
+  "context": "teen 15, waiting"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "pos",
+  "role": "page",
+  "text": "[dossier after resume]",
+  "expect": "dossier shows «منتظرِ #101 (D0) ⇐ ابزار آمد (D3) ⇐ ادامه» — nothing deleted",
+  "context": "history"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "neg",
+  "role": "page",
+  "text": "[ordinary stuck, no sheet filed]",
+  "expect": "no waiting marker anywhere",
+  "context": ""
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "neg",
+  "role": "time",
+  "text": "D3: registry change for an unrelated tool",
+  "expect": "no «ابزارِ لازم آمد»; #101 still waiting",
+  "context": "different tool"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "neg",
+  "role": "time",
+  "text": "D2: sheet #101 closed as «ساخته نمی‌شود»",
+  "expect": "no resume; an honest Today/dossier line; step stays open for another way",
+  "context": "closed without build"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "neg",
+  "role": "time",
+  "text": "D3: tool built but its check against the step fails",
+  "expect": "not resumed; the mismatch recorded",
+  "context": "verification fails"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: پاسخ به برگه‌ی دستیار #999",
+  "expect": "nothing resumed; plain reply that no such waiting step exists",
+  "context": "unknown sheet id"
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "neg",
+  "role": "page",
+  "text": "[she solves the sub-problem another way before the tool arrives]",
+  "expect": "marker closed with history; no later duplicate resume",
+  "context": ""
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "neg",
+  "role": "time",
+  "text": "D6: tool arrives for an already-closed problem",
+  "expect": "the closed problem is not reopened",
+  "context": ""
+ },
+ {
+  "rc": "Q6.territory_loop",
+  "kind": "neg",
+  "role": "page",
+  "text": "[gap sheet filed for an idea, no sub-problem in a live problem]",
+  "expect": "no route-map waiting point invented; the sheet stays on its own record",
+  "context": ""
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "time",
+  "text": "[plan «پنجشنبه برم بانک» + its follow-up + forecast «فکر کنم ۱ ساعت طول بکشه»] ‖ Thu 2026-10-22",
+  "expect": "ONE Today line on Thu that links plan, follow-up and forecast",
+  "context": "one act"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "time",
+  "text": "D0 look-back invented «اگر ۴ شیر بود؟» ‖ D3 (Thu 2026-10-22)",
+  "expect": "the invented problem appears in Today",
+  "context": "look-back family"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: امتحانو دیروز دادم",
+  "expect": "deadline_done booked; Today no longer asks «تحویل دادی؟»",
+  "context": "deadline exam Sun 2026-10-18"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "page",
+  "text": "[Today and plan view]",
+  "expect": "no raw ids such as «(pl1)» or «dl_3»",
+  "context": ""
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "page",
+  "text": "[session dossier]",
+  "expect": "outcomes in Persian («رد شد / تأیید شد»), never raw «refuted / confirmed»",
+  "context": ""
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: حدسم ۱۲ ـه ‖ … ‖ U: نه، امتحان کردم ۱۵ شد",
+  "expect": "dossier line «حدس ۱۲ — رد شد»",
+  "context": "chat guess tested by her"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "events",
+  "text": "[one ✏️ correction ۸۰۰ ⇒ ۷۵۰]",
+  "expect": "exactly one correction line and one result line in the dossier",
+  "context": ""
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: فردا یادم بنداز اینو با هم حساب کنیم",
+  "expect": "stored as a promise; returns in Today on Tue 2026-10-20 (۲۸ مهر)",
+  "context": "deferred request"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: فرضم اینه که ‖ U: قیمتا تا عید ثابت می‌مونه ‖ A: list_add(assumptions, quote = both)",
+  "expect": "list_add accepts the composed quote «فرضم اینه که قیمتا تا عید ثابت می‌مونه»",
+  "context": "two consecutive messages"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: امروز مدلِ «کار از آخر» رو استفاده کردم",
+  "expect": "no duplicate item; a use day added to the existing one",
+  "context": "model already on the shelf"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "page",
+  "text": "[practice case view, Today line, mind card]",
+  "expect": "the same practice window (e.g. «۳ روز دیگر») everywhere",
+  "context": ""
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پیش‌بینی می‌کنم تا جمعه تموم شه",
+  "expect": "booked as a prediction due Fri 2026-10-23; never re-read later as a new guess",
+  "context": "prediction"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "neg",
+  "role": "time",
+  "text": "[two different acts on Thu]",
+  "expect": "two Today lines (correct)",
+  "context": ""
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "neg",
+  "role": "time",
+  "text": "deadline Tue 2026-10-20 (tomorrow)",
+  "expect": "no «تحویل دادی؟» yet",
+  "context": "future"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: هنوز امتحانو ندادم، هفته‌ی بعده",
+  "expect": "no deadline_done",
+  "context": ""
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: حدسم ۱۲ (never tested)",
+  "expect": "«آزموده نشده» is right",
+  "context": ""
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: فرضم اینه ‖ U: راستی ناهار چی بخورم ‖ U: قیمتا ثابت",
+  "expect": "not composed silently; ask or take one message",
+  "context": "non-consecutive"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: یه مدل جدید ساختم به اسم «سه قدم»",
+  "expect": "a new item (correct)",
+  "context": "new model"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: حدس می‌زنم جواب ۱۲ باشه",
+  "expect": "booked as a guess, not a prediction",
+  "context": "a guess"
+ },
+ {
+  "rc": "Q7.today_dossier_lists",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: شاید یه روز بعداً",
+  "expect": "no promise invented",
+  "context": "vague"
+ }
+]

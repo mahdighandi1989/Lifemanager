@@ -4796,3 +4796,15 @@ dated stability, mind-card feed) under way.
 - **FINDING→FIX** The integration showed 2 page regressions from turnq: the page's own question text had been rewritten, which broke
   exact-text lookups. Fixed by keeping the exact text.
 - **FINDING** gate30: fail=0 (pytest 2126, 121 page tests, build, host e2e).
+
+## 2026-10-19 — Pólya round 23, fixer «ageclass» (Q1 age and identity, Q5 classification/routing/turn question/post-check)
+- **FINDING** Birth dates were Gregorian-only (card, birth action); page lines ignored the «شما» register; the one-question pass garbled the teen audience
+  line; the system map had no facts about age; the adult-normed daily puzzle was offered to children; greetings and a child's name became problem titles.
+- **FINDING** The problem detector ran on the raw message, so a self-introduction («من کیانم») hid the opening problem (routed to the fast tier); «بگو نه دیگه»
+  and «X نیست، …» were read as corrections; practice self-reports/model-use reports became new problems; the post-check counted a concrete version of the
+  page's own question, or a phase-list question, as two; turn questions re-asked what the same message had just answered.
+- **CHANGE** a43/a34/a1/a26/a27 (+ one wording each in a37, a38): Jalali parser (jalaali-js, checked against ICU 1940–2030), chat birth sentence, register
+  converter at paint time, `A.SELF_FACTS` registry first in the system map, puzzle age gate, intro stripping, `metaMsg22` rating/use/keep, `unfit23`
+  turn-question fit, post-check fixes. WORKLOG (94), PROGRESS 109. Old paths quarantined (REMOVAL_CANDIDATES 2026-10-19).
+- **DECISION** The R23 bank's Jalali dates are right; a hand check «1 Farvardin 1338 = 1959-03-21» was a day early (equinox after Tehran noon ⇒ 22 March).
+- **CHANGE** Test `apps/learning-architecture/tests/test_tour1_r23_ageclass.js` (red on base, green after): runners' sentences + VARIANTS_R23 Q1 38/38, Q5 21/21.

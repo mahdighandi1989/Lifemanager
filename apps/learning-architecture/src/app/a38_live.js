@@ -1567,7 +1567,8 @@
   /* G2 (دورِ ۶، s02/s11): «همهٔ داده‌ها؟» در آغازِ طرح‌ریزی (هنوز طرحی نیست و گیر نیست) نه؛ ولی گیر در ساختنِ طرح دقیقاً لحظهٔ همین پرسشِ پولیاست */
   function qOk(s, q, stuck) { var x = norm(q), o = openStep(s); if (B3_RE.test(x) && !planExists(s) && !stuck) return false; if (o && txt(o.pred) && PRED_Q.test(x)) return false; if (o && txt(o.when) && WHEN_Q.test(x)) return false; return true; }
   function resultQ(r, s) { var ty = typeOf(r, s), nat = natOf(s, r);
-    return nat !== "objective" ? "نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟ کدام پیش‌بینی درست درآمد و کدام نه، و از راهِ دیگری هم به همین می‌رسیدی؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
+    /* دورِ ۲۳ (Q5، B·D12 s13 p7): یک پرسش، نه سه («سنجیدی؟ کدام…؟ و از راهِ دیگری…؟») — «راهِ دیگر» پرسشِ بازنگریِ پس از آن است */
+    return nat !== "objective" ? "نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش: کدام پیش‌بینی درست درآمد و کدام نه؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
       : ty === "prove" || ty === "pod" ? "برهانی گفتی — از راهِ دیگری هم به همین حکم می‌رسی؟ وارسی‌اش کن: هر بخشِ فرض کجا به کار رفت و نتیجه دقیقاً همان حکم است؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
         : "نتیجه‌ای گفتی — از راهِ دیگری هم به همین می‌رسی؟ نتیجه را وارسی کن: در شرط بگذار یا با حالتی خاص بسنج. (بعد در صفحه «✅ حل شد» و بازنگری)"; }
   function presupBroken(s) { var lc = lastClosed(s), lo = lc && lc.out, u1 = uOf(s) || {}; if (openStep(s) || !lo || !u1.presup || !txt(u1.suffCirc)) return ""; var failed = lo.done === "no" || lo.prog === "نه" || lo.match === "no"; return failed || partNegated(lo.what, u1.suffCirc) ? u1.suffCirc : ""; }

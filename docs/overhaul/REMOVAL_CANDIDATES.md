@@ -317,3 +317,13 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   «باربر» and Pareto shares could not be set, and items carried no problem/session link.
 - **Why replaced:** DECISIONS_R22 P7 (lifecycle, hypotheses with probabilities, load-bearing, shares, verdict re-check, links). The new `listView` keeps both old controls.
 - **Status:** reachable, not called: `APP.PR.listViewR21`. Delete only with the owner's approval.
+
+## 2026-10-19 — Gregorian-only birth parser, broad «X نیست، …» correction sign, majority-only page-question match (learning-architecture, Pólya round 23, ageclass: Q1/Q5)
+- **Files:** `apps/learning-architecture/src/app/a43_age.js`, `a27_tour.js`.
+- **What they did:** `norm` accepted only a Gregorian `YYYY-MM-DD` date (Jalali dates from children and older adults were refused with a format string);
+  the round-22 sign «X نیست، Y» treated any continuation as a correction («ممکن نیست، چرا…», «خطی نیست، کند میشه»); `inPage22` matched a reply question to the
+  page question only by a word majority (a page question the model made concrete counted as a second question); the claim check treated a `guess_res` turn
+  with a conditional sentence as a claim.
+- **Why replaced:** DECISIONS_R23 Q1 (Jalali dates everywhere) and Q5 (no correction block on a non-correction; the page's own question is one question in every path).
+- **Status:** reachable, not called: `APP.AGE.R23_QUARANTINE.norm22`, `APP.ASSIST.R23_QUARANTINE.corr19b22`, `.inPage22`, `.claimRet22`, `.pass22Ask` (old replacement text).
+  Delete only with the owner's approval.

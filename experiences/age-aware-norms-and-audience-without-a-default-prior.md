@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-18T09:30:00Z"
 created_at: "2026-10-18T09:30:00Z"
-updated_at: "2026-10-18T09:30:00Z"
+updated_at: "2026-10-19T09:00:00Z"
 merged_from: []
 ---
 
@@ -77,3 +77,30 @@ async function syncBirth(host, local) {
 
 ## 🔗 References
 - Related: `grounding-confidence-numbers-in-axioms`, `write-gate-next-to-optional-identity`, `tests-that-cannot-fail-the-red-baseline`
+
+## Update 2026-10-19
+Round-23 tour of the same page (children and older adults with Iranian Jalali birth dates) found five more silent failures; the fixes generalise:
+- **Accept the date in the calendar the person actually knows.** A Gregorian-only birth field (`YYYY-MM-DD`) refused every child and older adult; the
+  model had to convert in its head (and was off by a day once). Parse Jalali and Gregorian, native and Latin digits, month names, two-digit years, and
+  "I'm 67, my birthday is 12 Khordad" (year from the stated age and whether the day has passed). Errors are human sentences naming the wrong part
+  ("Mehr has 30 days"), never a format string.
+- **Verify a calendar converter against two independent sources, not a hand count.** A reviewer's hand check ("year 1338 starts on 21 March") was wrong:
+  Nowruz falls on 22 March when the equinox is after Tehran noon (1959). The jalaali-js algorithm and ICU's `persian` calendar agree; the test now compares
+  the page's converter with `Intl.DateTimeFormat('…-u-ca-persian')` over 90 years. When a test bank and a hand check disagree, compute, don't vote.
+- **The person's own sentence is the source; someone else's date is not.** Read "my birthday…", "born on…", "I was born…" deterministically; ignore
+  "my mother's birthday", deadlines and past events. Age alone sets a band, never an invented date.
+- **Every line the page writes follows the conversation's register** (formal/informal "you"): system lines, cards, button questions and Today lines
+  pass through one converter at paint time; an explicit request ("call me تو") wins and is remembered.
+- **Self-knowledge is a registry, not prompt prose.** "What is my age used for, where is it stored, does it work offline, does changing the model
+  change it?" is answered from facts each module registers; the assistant's system map prints them first so truncation never drops them.
+- **A rewrite pass must not break style text.** A one-question pass that neutralised every "ask" verb turned the teen style line into nonsense; style
+  rules are written without imperative "ask" verbs, and the neutraliser's replacement is grammatical.
+- **Do not offer an adult-normed task to a child** when no norm covers the age (the comparison would be meaningless).
+- **Greetings and self-introductions are not the problem.** Strip them (and the child's name) from titles and statements; keep the message itself.
+
+### How to Apply Elsewhere (additions)
+- [ ] Find every date input; accept the user's calendar; test against an independent calendar implementation, not hand counts.
+- [ ] Route every user-visible system line through one register/locale converter at render time.
+- [ ] Keep "what data, why, where, offline, model-independent" as module-registered facts and surface them first.
+- [ ] Gate age-normed activities by norm coverage, not only the comparison.
+
