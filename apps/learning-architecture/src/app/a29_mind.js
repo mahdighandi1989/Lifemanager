@@ -848,7 +848,7 @@
       if (c.none) { L.push("- " + c.fa + ": سنجیده نمی‌شود — " + c.none); return; }
       var e = c.self, p = c.pop || { n: 0 };
       L.push("- " + c.fa + ": پاسخِ بعدی " + (e.n ? pc(e.next) + " (" + e.k + "/" + e.n + ")" : "—") + (e.progress ? " · احتمالِ پیشرفت " + pc(e.progress.p) + " (" + e.progress.from + "→" + e.progress.to + ")" : "") +
-        (c.id === "META" && e.calN ? " · احتمالِ بیش‌اطمینانی به پاسخ‌ها " + pc(e.pOver) : "") + (c.id === "META" && c.fc && c.fc.dirN ? " · پیش‌بینیِ رویدادها (جدا): " + c.fc.hit + "/" + c.fc.dirN + " طرفِ محتمل‌تر رخ داد، احتمالِ بیش‌اطمینانی در پیش‌بینی " + pc(c.fc.pOver) : "") + (p.n ? " · بالاتر از میانهٔ " + p.peers + ": " + pc(p.pAbove) : " · مقایسه با مردم: هنوز معمای لنگرداری جواب داده نشده"));
+        (c.id === "META" && e.calN ? " · احتمالِ بیش‌اطمینانی به پاسخ‌ها " + pc(e.pOver) : "") + (c.id === "META" && c.fc && c.fc.dirN ? " · پیش‌بینیِ رویدادها (جدا): " + c.fc.hit + "/" + c.fc.dirN + " طرفِ محتمل‌تر رخ داد، احتمالِ بیش‌اطمینانی در پیش‌بینی " + pc(c.fc.pOver) : "") + (p.n ? " · مقایسه با مردم: " + (p.scales || [p]).map(function (q) { return A.PSY.popFa(q); }).join(" | ") : " · مقایسه با مردم: هنوز معمای لنگرداری جواب داده نشده"));
     });
     L.push("## حوزه‌های زندگی");
     M.dims.forEach(function (d) { var E = d.est || { n: 0 };

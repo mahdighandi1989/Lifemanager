@@ -159,6 +159,20 @@ export default function LearningArchitecturePage() {
       unremind: (key) => api.delete(`/app-records/${APP}/reminders/${encodeURIComponent(key)}`).then((r) => r.data),
       // «📧 گزارشِ تور»: گزارشِ HTML با نمودارهای PNG به ایمیلِ مالک (Gmail ِ متصل یا SMTP) — وضعِ صادقانه برمی‌گردد
       mail: (payload) => api.post(`/app-records/${APP}/report-email`, payload, { timeout: 60000 }).then((r) => r.data),
+      // «سن» (بستهٔ سن ۲۰۲۶-۱۰-۱۸): یک تاریخِ تولد برای هر کاربر — همان فیلدِ «تاریخ تولد» ِ «من که هستم».
+      // birth() ⇒ 'YYYY-MM-DD' | '' (نقطهٔ کوچکِ GET /api/identity-profile/date_of_birth؛ اگر هنوز نیست، از فهرستِ کاملِ فیلدها)؛
+      // setBirth(d) ⇒ PUT همان فیلد (قفلِ مالک). صفحه خودش «پرکردنِ خالی» در دو سو را انجام می‌دهد (a43_age.js).
+      birth: () => api.get('/identity-profile/date_of_birth')
+        .then((r) => (r.data && (r.data.value ?? (r.data.field && r.data.field.value))) || '')
+        .catch((e) => {
+          const st = e && e.response && e.response.status;
+          if (st !== 404 && st !== 405) throw e;
+          return api.get('/identity-profile').then((r) => {
+            const f = ((r.data && r.data.fields) || []).find((x) => x.field === 'date_of_birth');
+            return (f && f.value) || '';
+          });
+        }),
+      setBirth: (d) => api.put('/identity-profile/date_of_birth', { value: d, lock: true }).then((r) => r.data),
       remindStatus: () => api.get(`/app-records/${APP}/reminders`).then((r) => ({ ...(r.data.channels || {}), items: r.data.items || [] })),
     };
     loadBundle()

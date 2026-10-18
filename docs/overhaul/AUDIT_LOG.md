@@ -4704,3 +4704,9 @@ dated stability, mind-card feed) under way.
 - **DECISION** Bank entry #111 («3 successes at 2→7→14 days») was the bank writer's assumption; T41's own rule («day 1, 3 and 7» from the last failure) is used.
 - Verified: new `tests/test_tour1_r21_practice.js` (bank R2 17/17, R5 21/21, runner sequences s29/s23/s31, A21 items; 29 red on the base build), whole page suite.
 
+
+### 2026-10-18 — Age package part 2 on /apps/learning-architecture (decision 2026-10-18-age-and-user-scope items 3–5)
+- **FINDING** The page read age only from its own settings; missing age gave the mind card an N(0,1) prior with a wrong «no age data in the source» label; under-18 and 50+ fell into the same default; the assistant never adapted to age. The MaRs-IB 50–74 cell (n 69) is 51 people aged 50–59 and 18 aged 60–74, median 54 (checked from the open calibration data).
+- **CHANGE** New `a43_age.js` (`A.AGE`): one birth date (host bridge `birth()/setBirth()` over the identity-profile `date_of_birth` field, fill-empty both ways, settings fallback), age from the date, documented age bands, «# مخاطب» prompt block (child/teen/elderly; adults none), once-per-session birth-date card. `a34_psy.js`: own-band comparison only, `none: birth|age` instead of N(0,1), `P.popFa` used by the card, assistant text and report. `norms.json`: `sources[].ages`, 50–74 `valid:false`, `age_research` (handoff recorded, area psy-norms). Host bridge in `LearningArchitecturePage.jsx`.
+- **DECISION** Chierchia et al. 2019 adolescent MaRs-IB data rejected (method mismatch); no same-method child/adolescent norms found for any registry instrument.
+- Verified: new `tests/test_age_audience.js`, `test_age_norms.js`, `test_age_sync.js` (red on the base build, green after); whole page suite; handbook + ownership pytest. WORKLOG (88), PROGRESS 103.

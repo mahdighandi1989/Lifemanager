@@ -182,17 +182,31 @@
   function cOf(it) { return it.c != null ? +it.c : (it.options && it.options.length ? 1 / it.options.length : 0); }
   function prc(th, it) { var c = cOf(it); return c + (1 - c) * sig(th - bOf(it)); }
   /* سن از تاریخِ تولدِ ثبت‌شده در تنظیمات (خودِ کاربر یا دستیار از حرفِ کاربر) */
-  P.birth = function () { var p = (S.settings().profile) || {}; return /^\d{4}-\d{2}-\d{2}$/.test(p.birth || "") ? p.birth : ""; };
-  P.age = function () { var b = P.birth(); if (!b) return null; var t = A.today(), y = +t.slice(0, 4) - +b.slice(0, 4); if (t.slice(5) < b.slice(5)) y--; return y; };
+  /* بستهٔ سن (۲۰۲۶-۱۰-۱۸): یک تاریخِ تولد — میزبان (حسابِ کاربر) یا تنظیماتِ صفحه — از A.AGE (a43_age.js)؛ سن همیشه از تاریخ */
+  P.birth = function () { if (A.AGE) return A.AGE.birth(); var p = (S.settings().profile) || {}; return /^\d{4}-\d{2}-\d{2}$/.test(p.birth || "") ? p.birth : ""; };
+  P.age = function () { if (A.AGE) return A.AGE.age(); var b = P.birth(); if (!b) return null; var t = A.today(), y = +t.slice(0, 4) - +b.slice(0, 4); if (t.slice(5) < b.slice(5)) y--; return y; };
+  P.setBirth = function (d) { if (A.AGE) return A.AGE.setBirth(d); if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= A.today() || d < "1900-01-01") return "تاریخِ تولد ثبت نشد"; var st = S.settings(); st.profile = st.profile || {}; st.profile.birth = d; S.saveSettings(st); return ""; };
+  P.NO_NORM = "برای این سن هنجارِ معتبر در دست نیست";
+  P.NEED_BIRTH = "برای مقایسه با هم‌سن‌ها تاریخِ دقیقِ تولدت لازم است";
+  /* پوششِ سنیِ منبع (sources[].ages)؛ بی آن، همهٔ منبع‌های این فهرست نمونهٔ بزرگسال‌اند (۱۸+؛ CRC مادهٔ ۱) — هرگز به کم‌سال تعمیم داده نمی‌شوند */
+  P.srcAges = function (srcId) { var s = (P.norms().sources || []).filter(function (x) { return x.id === srcId; })[0]; return (s && s.ages) || { lo: 18, hi: null }; };
+  function inAges(g, age) { return age >= g.lo && (g.hi == null || age <= g.hi); }
   /* گروهِ مرجع روی مقیاسِ همان منبع: بازهٔ سنیِ شامل ِ سنِ تو؛ نبود ⇒ کلِ نمونهٔ همان مقیاس با اعلامِ صریح (نسخهٔ ۱: age.bands روی گویه) */
+  /* بستهٔ سن (۲۰۲۶-۱۰-۱۸، بندِ ۵): فقط گروهِ سنیِ خودِ کاربر در همان منبع. بی تاریخِ تولد ⇒ {none:"birth"} (پرسیدن، نه N(0,1) با برچسبِ غلط ِ پیشین)؛
+     سنِ بیرون از بازه‌های منبع، یا خانه‌ای که منبع‌پژوه نامعتبر علامت زده (valid:false، مثلاً ۵۰ تا ۷۴ ِ کم‌جمعیت) ⇒ {none:"age"} — بی عدد.
+     «کلِ نمونه» (all) فقط وقتی منبع سن‌به‌سن ندارد و سنِ کاربر در پوششِ سنیِ آن منبع است، با اعلامِ صریح. */
   function peers(scaleOrItem, age) {
     var bands = (scaleOrItem && (scaleOrItem.bands || (scaleOrItem.age && scaleOrItem.age.bands))) || [];
-    var b = age == null ? null : bands.filter(function (x) { return age >= x.lo && age <= x.hi && x.mu != null; })[0];
-    if (b) return { mu: +b.mu, sd: +(b.sd || 1), label: b.label || "هم‌سن‌ها (" + fa(b.lo) + " تا " + fa(b.hi) + " سال) در همان منبع", aged: true };
+    if (age == null) return { none: "birth", label: P.NEED_BIRTH, aged: false };
+    var hit = bands.filter(function (x) { return x.lo != null && age >= x.lo && (x.hi == null || age <= x.hi); })[0];
+    if (hit && hit.valid !== false && hit.mu != null) return { mu: +hit.mu, sd: +(hit.sd || 1), label: hit.label || "هم‌سن‌ها (" + fa(hit.lo) + " تا " + fa(hit.hi) + " سال) در همان منبع", aged: true };
+    if (hit) return { none: "age", label: P.NO_NORM, why: hit.invalid_why || "", aged: false };
     var all = bands.filter(function (x) { return x.all && x.mu != null; })[0];
-    return all ? { mu: +all.mu, sd: +(all.sd || 1), label: (all.label || "کلِ نمونهٔ همان منبع") + (age == null ? " (سنت ثبت نشده)" : " (برای سنِ تو بازه‌ای در منبع نیست)"), aged: false } :
-      { mu: 0, sd: 1, label: "کلِ نمونهٔ همان منبع (سن‌به‌سن در منبع نیست" + (age == null ? "؛ سنت هم ثبت نشده" : "") + ")", aged: false };
+    var src = scaleOrItem && scaleOrItem.src, g = all && (all.lo != null ? { lo: all.lo, hi: all.hi == null ? null : all.hi } : P.srcAges(src));
+    if (all && inAges(g, age)) return { mu: +all.mu, sd: +(all.sd || 1), label: (all.label || "کلِ نمونهٔ همان منبع") + " (سن‌به‌سن در منبع نیست)", aged: false };
+    return { none: "age", label: P.NO_NORM, aged: false };
   }
+  P.peers = peers;
   /* پسینِ θ روی شبکه (هر مقیاس جدا؛ مقیاس‌های دو منبع هرگز روی هم ریخته نمی‌شوند) */
   function posterior(ans, pe) {
     var post = [], sum = 0;
@@ -210,6 +224,8 @@
   P.scaleEst = function (sid, extra) {
     var age = P.age(), sc = P.scale(sid), ans = S.all("psyans").filter(function (a) { var it = P.item(a.item); return usable(a) && (it.scale || "_" + it.construct) === sid; }).concat(extra || []);
     var first = ans[0] && P.item(ans[0].item), pe = peers(sc || first, age);
+    var srcs0 = {}; ans.forEach(function (a) { var it = P.item(a.item); if (it && it.src) srcs0[it.src] = 1; });
+    if (pe.none) return { scale: sid, n: ans.length, k: ans.filter(function (a) { return okv(a.ok); }).length, none: pe.none, why: pe.why || "", peers: pe.label, aged: false, theta: null, srcs: Object.keys(srcs0) };
     var post = posterior(ans, pe), above = 0, pct = 0, mean = 0, v = 0;
     post.forEach(function (q) { if (q[0] > pe.mu) above += q[1]; mean += q[0] * q[1]; pct += q[1] * 0.5 * (1 + erf((q[0] - pe.mu) / pe.sd / Math.SQRT2)); });
     post.forEach(function (q) { v += q[1] * (q[0] - mean) * (q[0] - mean); });
@@ -255,6 +271,17 @@
     return hit;
   };
   P.pctFa = function (p) { return fa(Math.round(100 * p)) + "٪"; };
+  /* متنِ «نسبت به مردم» ِ یک مقیاس — کارنامه، گزارش و دستیار همه همین را می‌گویند (بی عدد وقتی هنجار نیست؛ بی تشویق) */
+  P.popFa = function (q) {
+    if (!q) return "";
+    if (q.none === "birth") return P.NEED_BIRTH + "؛ تا آن وقت فقط روندِ خودت (" + fa(q.k) + " از " + fa(q.n) + " معمای لنگردار).";
+    if (q.none) { var sc = P.scale(q.scale), src = sc && (P.norms().sources || []).filter(function (x) { return x.id === sc.src; })[0];
+      var cov = sc ? (sc.bands || []).filter(function (b) { return b.valid !== false && b.mu != null; }).map(function (b) { return fa(b.lo) + (b.hi == null ? "+" : "–" + fa(b.hi)); }).join("، ") : "";
+      return P.NO_NORM + (src ? " (منبع: " + String(src.cite || src.id).split(".")[0] + (cov ? "؛ گروه‌های سنیِ معتبرش: " + cov + " سال" : "") + ")" : "") + "؛ فقط روندِ خودت: " + fa(q.k) + " از " + fa(q.n) + " معمای لنگردار."; }
+    return "احتمالِ بالاتر بودن از میانهٔ " + q.peers + ": " + P.pctFa(q.pAbove) + " · صدکِ مورد انتظار: " + fa(Math.round(100 * q.pct)) + " (" + fa(q.k) + " از " + fa(q.n) + " معمای لنگردار)";
+  };
+  /* گویهٔ توصیفی: درصدِ گروه فقط اگر سنِ کاربر در پوششِ سنیِ منبعِ همان گویه است */
+  P.descNorm = function (it, age) { if (age == null) return "birth"; return inAges(P.srcAges(it && it.src), age) ? "" : "age"; };
 
   /* بخشِ «📐 سنجشِ استاندارد» در کارنامه */
   P.section = function () {
@@ -263,8 +290,8 @@
     sec.appendChild(h("p", { class: "small muted" }, "سازه‌ها از مدل‌های جهانیِ روان‌سنجی: CHC برای هوش، و مدلِ عقلانیتِ استانوویچ. «هوش‌های چندگانه» پشتوانهٔ تجربیِ کافی ندارد و به کار نمی‌رود. هر عدد یک احتمال است: «پاسخِ بعدی» = (درست+۱)/(کل+۲)، که از اصلِ بی‌مرجح درمی‌آید؛ «پیشرفت» = احتمالِ اینکه درستیِ ماهِ آخر از ماهِ نخست بیشتر باشد."));
     /* سن: از تاریخِ تولدی که خودت ثبت می‌کنی (یا به دستیار می‌گویی) */
     var bIn = h("input", { type: "date", class: "inp sm", "data-own": "1", "aria-label": "تاریخِ تولد (میلادی)", value: P.birth() });
-    sec.appendChild(h("div", { class: "row gap wrap small psy-age" }, h("span", {}, age == null ? "سنت هنوز ثبت نشده؛ مقایسه با هم‌سن‌ها به آن نیاز دارد:" : "سن: " + fa(age) + " سال (از تاریخِ تولدِ ثبت‌شده)."), bIn,
-      h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { var d = bIn.value; if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= A.today()) { A.toast("تاریخ درست نیست."); return; } var st = S.settings(); st.profile = st.profile || {}; st.profile.birth = d; S.saveSettings(st); A.render(); } }, "ثبت")));
+    sec.appendChild(h("div", { class: "row gap wrap small psy-age" }, h("span", {}, age == null ? "پیش از مقایسه با هم‌سن‌ها، تاریخِ دقیقِ تولدت را بگو — " + (A.AGE ? A.AGE.WHY : "مقایسه فقط با هم‌سن‌ها معتبر است.") : "سن: " + fa(age) + " سال (از تاریخِ تولدِ ثبت‌شده)."), bIn,
+      h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { var e = P.setBirth(bIn.value); if (e) { A.toast("تاریخ درست نیست."); return; } A.render(); } }, "ثبت")));
     sec.appendChild(h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small psy-table" },
       h("thead", {}, h("tr", {}, ["سازه", "از کجا سنجیده می‌شود", "احتمالِ درستیِ پاسخِ بعدی", "احتمالِ پیشرفت", "نسبت به مردم"].map(function (x) { return h("th", {}, x); }))),
       h("tbody", {}, md.map(function (c) {
@@ -276,11 +303,14 @@
         return h("tr", { "data-c": c.id }, h("td", { title: c.en }, c.fa), h("td", { class: "small" }, c.from),
           h("td", {}, e.n ? P.pctFa(e.next) + " (" + fa(e.k) + " از " + fa(e.n) + ")" + meta : "— (هنوز پاسخی نیست)", extra),
           h("td", {}, e.progress ? P.pctFa(e.progress.p) + " (" + fa(e.progress.from) + " ← " + fa(e.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"),
-          h("td", { class: "small" }, p.n ? (p.scales || [p]).map(function (q) { return "احتمالِ بالاتر بودن از میانهٔ " + q.peers + ": " + P.pctFa(q.pAbove) + " · صدکِ مورد انتظار: " + fa(Math.round(100 * q.pct)) + " (" + fa(q.k) + " از " + fa(q.n) + " معمای لنگردار)"; }).join(" | ") :
+          h("td", { class: "small" }, p.n ? (p.scales || [p]).map(P.popFa).join(" | ") :
             (N.items || []).some(function (it) { return it.construct === c.id && P.isAnchor(it); }) ? "هنوز معمای لنگرداری در این سازه جواب نداده‌ای" :
             (N.items || []).some(function (it) { return it.construct === c.id; }) ? (function () {
               /* فقط گویهٔ توصیفی (کلامی/مشهور؛ ترجمه دشواری را جابه‌جا می‌کند) ⇒ بی برآوردِ مقایسه‌ای؛ فقط درستیِ تو کنارِ درصدِ گروه */
               var da = S.all("psyans").filter(function (a) { var it = P.item(a.item); return it && it.construct === c.id && it.kind === "descriptive" && !a.familiar; });
+              /* بستهٔ سن: بی تاریخ ⇒ پرسیدن؛ بیرون از پوششِ سنیِ منبع ⇒ جملهٔ صادقانه، بی درصدِ گروهِ دیگر */
+              var dn = da.length ? P.descNorm(P.item(da[0].item), age) : "";
+              if (dn) return "فقط معماهای توصیفی (کلامی یا مشهور) هست. تو " + fa(da.filter(function (a) { return okv(a.ok); }).length) + " از " + fa(da.length) + " را درست گفتی. " + (dn === "birth" ? P.NEED_BIRTH + "." : P.NO_NORM + "؛ فقط روندِ خودت.");
               /* درصدِ گروهِ هم‌سن هر جا منبع آن را داده (p_band)؛ وگرنه کلِ نمونه (M9) */
               var nb = 0, avg = da.length ? da.reduce(function (s, a) { var it = P.item(a.item), bp = P.bandP(it, age); if (bp) nb++; return s + (bp ? bp.p : (+it.p || 0)); }, 0) / da.length : null;
               var grp = !da.length ? "" : nb === da.length ? "در گروهِ هم‌سنِ تو در همان منبع‌ها" : nb ? "در گروهِ منبع (هم‌سن‌هایت هر جا منبع بازهٔ سنی داشت)" : "در گروهِ منبع";
@@ -382,8 +412,8 @@
       clearOpen(it.id);
       var msg = timeout ? "وقت تمام شد." : ok ? "درست." : "نادرست.";
       if (it.kind === "descriptive" && it.p != null) {
-        var bp = P.bandP(it, P.age()), sc = P.scale(it.scale), grp = (it.group || (sc && sc.bands && sc.bands[0] && sc.bands[0].label) || "نمونهٔ منبع");
-        msg += bp ? " " + fa(Math.round(100 * bp.p)) + "٪ ِ " + bp.label + " (هم‌سن‌هایت) درست جواب دادند؛ در کلِ نمونه " + fa(Math.round(100 * it.p)) + "٪." : " " + fa(Math.round(100 * it.p)) + "٪ ِ " + grp + " درست جواب دادند.";
+        var bp = P.bandP(it, P.age()), sc = P.scale(it.scale), grp = (it.group || (sc && sc.bands && sc.bands[0] && sc.bands[0].label) || "نمونهٔ منبع"), dn = P.descNorm(it, P.age());
+        msg += dn === "birth" ? " " + P.NEED_BIRTH + " (در کارنامه)." : dn ? " " + P.NO_NORM + "." : bp ? " " + fa(Math.round(100 * bp.p)) + "٪ ِ " + bp.label + " (هم‌سن‌هایت) درست جواب دادند؛ در کلِ نمونه " + fa(Math.round(100 * it.p)) + "٪." : " " + fa(Math.round(100 * it.p)) + "٪ ِ " + grp + " درست جواب دادند.";
       }
       A.toast(msg); A.go("mind");
     }
@@ -421,7 +451,7 @@
     AS.DO.birth = function (a) {
       var d = String((a && a.date) || "").trim();
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= A.today() || d < "1900-01-01") return "تاریخِ تولد ثبت نشد: YYYY-MM-DD میلادی لازم است";
-      var st = S.settings(); st.profile = st.profile || {}; st.profile.birth = d; S.saveSettings(st); return "";
+      return P.setBirth(d) ? "تاریخِ تولد ثبت نشد: YYYY-MM-DD میلادی لازم است" : "";
     };
     var RULES = [
       "# سنجشِ استاندارد",
