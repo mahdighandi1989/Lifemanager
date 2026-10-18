@@ -23,10 +23,11 @@ merged_from: []
 
 ## 💡 راه‌حل / Solution
 
-1. **مالک را با پیکربندیِ موجود بشناس، نه با کد:** فهرستِ «مالک» (یک env تازه) ⇐ اگر خالی، فهرستِ
-   سوپرادمین‌های bootstrap ⇐ اگر آن هم خالی، «اولین حسابِ ادمین» ⇐ «اولین حسابِ تأییدشده» (همان کسی
-   که تا امروز از scope 0 استفاده می‌کرد). زنجیرهٔ fallback تضمین می‌کند مالک با پیکربندیِ ناقص هم
-   از داده‌اش جدا نشود.
+1. **مالک را فقط با پیکربندیِ صریح بشناس، نه با کد و نه با حدس:** فهرستِ «مالک» (یک env تازه) ⇐ اگر
+   خالی، فهرستِ سوپرادمین‌های bootstrap. **اگر هر دو خالی‌اند، جداسازی خاموش می‌ماند** (همه scope ِ
+   مشترک، رفتارِ قدیم) و یک هشدارِ روشن «set OWNER_EMAIL» لاگ می‌شود. حدسِ «اولین حسابِ ادمین/تأییدشده»
+   فقط در همان هشدار به‌عنوانِ راهنما چاپ می‌شود و هرگز جداسازی را روشن نمی‌کند — یک env ِ جاافتاده
+   نباید بتواند مالک را از داده‌اش بیرون ببرد.
 2. **هر هویتِ دیگرِ تأییدشده ⇒ یک ردیفِ سایه در جدولِ کاربرانِ اصلی** (همان که FKها به آن اشاره
    دارند)، get-or-create در لحظهٔ resolve. کلید: hash ِ e-mail ِ هویت در یک **دامنهٔ رزرو** (TLD
    ِ `.invalid`) که اعتبارسنجِ e-mail ِ ثبت‌نام/ورود ردش می‌کند، با رمزِ غیرقابلِ‌تطبیق (`!`). نتیجه:
@@ -51,7 +52,10 @@ async def resolve_scope(token, db):
     ident = await get_identity(db, int(p["sub"]))
     if ident is None or ident.status != "approved":
         return SHARED_SCOPE                      # unchanged; strict gate 403s these
-    if await is_owner(db, ident):                # config list → bootstrap admins → first admin → first approved
+    if not settings.owner_emails:                # nobody named ⇒ inactive, warn once, never guess
+        warn_once("per-user scope inactive: set OWNER_EMAIL")
+        return SHARED_SCOPE
+    if ident.email.lower() in settings.owner_emails:   # owner list → else bootstrap admins
         return SHARED_SCOPE
     email = f"idp-{sha256(ident.email)[:24]}@scope.invalid"   # reserved, unregistrable
     return await get_or_create_user(db, email=email, password_hash="!")
@@ -61,7 +65,9 @@ async def resolve_scope(token, db):
 
 - **هرگز با e-mail ِ واقعیِ هویت به ردیفِ محلیِ موجود وصل نکن** — کسی که پیشاپیش با همان e-mail
   حسابِ محلی ساخته (بدونِ تأییدِ e-mail) دادهٔ قربانی را می‌گیرد.
-- fallback ِ «اولین حساب» را بنویس؛ اگر فهرستِ مالک در تولید خالی باشد، بی آن مالک ناگهان دادهٔ خالی می‌بیند.
+- **جداسازی را به حدس وصل نکن.** «اولین حسابِ ادمین» در تولید ممکن است کسِ دیگری باشد (حسابِ تست، ادمینِ دوم)؛
+  اگر فهرستِ مالک خالی باشد و حدس اشتباه، مالک ناگهان دادهٔ خالی می‌بیند. خالی ⇒ رفتارِ قدیم + هشدار (بازبینیِ
+  هماهنگ‌کننده ۲۰۲۶-۱۰-۱۸).
 - مسیرهای پس‌زمینه (اعلان، همگام‌سازیِ ایمیل، تلگرام) معمولاً به scope ِ مشترک سخت‌کد شده‌اند — کاربرِ دوم
   آن‌ها را ندارد؛ فهرستشان کن و صادقانه بگو، نه اینکه وانمود کنی چندکاربره شده.
 - helperهای «scope 0 ردیف‌های NULL ِ قدیمی را هم می‌بیند» درست می‌مانند چون فقط برای 0 فعال‌اند.

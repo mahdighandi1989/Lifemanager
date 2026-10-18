@@ -116,8 +116,9 @@ class Settings(BaseSettings):
     PER_USER_OAUTH_SCOPE: bool = True
     # Who «the owner» is for that scope (comma-separated, case-insensitive). The
     # same OWNER_EMAIL env var app/services/brain_service.py already reads. Empty
-    # ⇒ the ADMIN_EMAILS super-admins are the owner; both empty ⇒ the first
-    # (lowest-id) Google account with the admin role, else the first approved one.
+    # ⇒ the ADMIN_EMAILS super-admins are the owner; both empty ⇒ per-user scope
+    # is INACTIVE (every Google account → 0, the old behaviour) and one warning
+    # «per-user scope inactive: set OWNER_EMAIL» is logged. The owner is never guessed.
     OWNER_EMAIL: str = ""
 
     # Google Maps key — used by the (future) /api/location/search

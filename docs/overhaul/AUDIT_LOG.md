@@ -4721,3 +4721,8 @@ dated stability, mind-card feed) under way.
 - Tests: new `tests/test_age_and_user_scope.py` (20). Full pytest and `npm run build` are green. Handoff:
   `docs/overhaul/handoff-notes/_pending_age_scope_2026-10-18.md`, which lists every place that relies on scope 0 and the learning-page contract.
   Experience: `experiences/split-shared-tenant-scope-per-identity.md`.
+- **CHANGE** (coordinator safety review, same day) Per-user Google scope now takes effect only when the owner is named explicitly in `OWNER_EMAIL`
+  or `ADMIN_EMAILS`. If both are empty, every approved Google account resolves to 0 (old behaviour) and one warning is logged per process:
+  «per-user scope inactive: set OWNER_EMAIL». The "lowest-id admin/approved account" fallback no longer activates anything; it is only named in
+  that warning as a hint. Reason: a missing env var in production must never move the owner out of scope 0. Tests: no-owner → everyone 0 +
+  exactly one warning + no scope row created; `ADMIN_EMAILS` alone activates.

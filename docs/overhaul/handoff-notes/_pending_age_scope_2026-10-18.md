@@ -11,7 +11,9 @@
   - `PER_USER_OAUTH_SCOPE=false` → everyone 0 (the old behaviour).
 - **How the owner is identified** (`_is_scope_owner`): `settings.owner_emails_list` is `OWNER_EMAIL` (comma list; the same env var
   `brain_service._known_owner_emails` already reads), or else `ADMIN_EMAILS` (the bootstrap super-admins, protected in `google_auth`). If both
-  are empty: the lowest-id Google account with `role=admin`, or else the lowest-id approved one. No e-mail is written in code.
+  are empty, **per-user scope is inactive**: every approved Google account resolves to 0 (old behaviour) and one warning is logged per
+  process: «per-user scope inactive: set OWNER_EMAIL». That warning names the lowest-id admin/approved account as a hint only; the hint
+  never turns per-user scope on (coordinator safety review). No e-mail is written in code.
   - Production check: `ADMIN_EMAILS` must hold the owner's Google address. It already must, for `_owner_channels` / admin. If it holds more
     than one address, every listed super-admin keeps scope 0. Set `OWNER_EMAIL` to narrow this to the owner alone.
 - **Own scope** = a non-loginable `users` row (`_oauth_scope_user_id`):

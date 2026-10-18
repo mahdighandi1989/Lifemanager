@@ -59,7 +59,8 @@ A Google-OAuth token (`typ: "oauth"`) maps to a data scope in
 
 | Google account | Scope |
 |---|---|
-| the **owner** (`OWNER_EMAIL`, else the `ADMIN_EMAILS` super-admins; neither set ⇒ first Google admin, else first approved account) | `0` — unchanged, his data |
+| **no owner configured** (`OWNER_EMAIL` and `ADMIN_EMAILS` both empty) | every account `0` (old behaviour) + one warning «per-user scope inactive: set OWNER_EMAIL» — the owner is never guessed |
+| the **owner** (`OWNER_EMAIL`, else the `ADMIN_EMAILS` super-admins) | `0` — unchanged, his data |
 | any other **approved** account, `PER_USER_OAUTH_SCOPE=true` (default) | its own `users.id` — a non-loginable row `oauth-<hash>@oauth-scope.invalid`, created on first use |
 | pending / rejected / unknown | `0` as before (same as anonymous); `get_signed_in_user_id` refuses them with 403 |
 | any account with `PER_USER_OAUTH_SCOPE=false` | `0` (the pre-2026-10-18 behaviour) |

@@ -34,6 +34,10 @@ from app.models.user_oauth import OAuthUser, UserRole, UserPermission
 from app.core.config import settings
 
 
+import logging
+
+_log = logging.getLogger(__name__)
+
 AuthContext = Union[User, OAuthUser]
 
 security = HTTPBearer()
@@ -116,28 +120,43 @@ def oauth_scope_email(email: str) -> str:
     return f"oauth-{_oauth_scope_key(email)}@{OAUTH_SCOPE_EMAIL_DOMAIN}"
 
 
-async def _is_scope_owner(db: AsyncSession, oauth_user: OAuthUser) -> bool:
+def _is_scope_owner(oauth_user: OAuthUser) -> bool:
     """Is this Google account THE owner (who keeps the shared scope 0)?
 
-    The owner is named by configuration, never by a literal in code:
-    ``OWNER_EMAIL`` (the env var brain_service already reads), else the
-    ``ADMIN_EMAILS`` super-admins (see ``settings.owner_emails_list``). When
-    neither is configured, the first (lowest-id) Google account holding the admin
-    role is the owner, else the first approved one — the account that has been
-    using scope 0 since sign-in went live."""
+    The owner is named ONLY by explicit configuration, never by a literal in
+    code or a guess: ``OWNER_EMAIL`` (the env var brain_service already reads),
+    else the ``ADMIN_EMAILS`` super-admins (see ``settings.owner_emails_list``).
+    Callers must check that list is non-empty first — with no owner configured
+    per-user scope is inactive (see :func:`_resolve_data_scope_user_id`)."""
     email = (getattr(oauth_user, "email", None) or "").strip().lower()
-    owners = settings.owner_emails_list
-    if owners:
-        return bool(email) and email in owners
-    first_admin = (await db.execute(
-        select(OAuthUser.id).where(OAuthUser.role == UserRole.ADMIN).order_by(OAuthUser.id).limit(1)
-    )).scalar_one_or_none()
-    if first_admin is not None:
-        return first_admin == oauth_user.id
-    first_approved = (await db.execute(
-        select(OAuthUser.id).where(OAuthUser.status == "approved").order_by(OAuthUser.id).limit(1)
-    )).scalar_one_or_none()
-    return first_approved == oauth_user.id
+    return bool(email) and email in settings.owner_emails_list
+
+
+_scope_inactive_warned = False
+
+
+async def _warn_scope_inactive(db: AsyncSession) -> None:
+    """One warning per process when per-user scope is inactive because no owner
+    is configured. The lowest-id admin/approved account is logged as a hint only
+    — it NEVER activates per-user scope (a missing env var must not be able to
+    move the owner out of scope 0)."""
+    global _scope_inactive_warned
+    if _scope_inactive_warned:
+        return
+    _scope_inactive_warned = True
+    hint = None
+    try:
+        hint = (await db.execute(
+            select(OAuthUser.id).where(OAuthUser.role == UserRole.ADMIN).order_by(OAuthUser.id).limit(1)
+        )).scalar_one_or_none()
+        if hint is None:
+            hint = (await db.execute(
+                select(OAuthUser.id).where(OAuthUser.status == "approved").order_by(OAuthUser.id).limit(1)
+            )).scalar_one_or_none()
+    except Exception:
+        pass
+    _log.warning("per-user scope inactive: set OWNER_EMAIL (or ADMIN_EMAILS); every approved Google account "
+                 "shares scope 0. Diagnostic only — likely owner: oauth_users.id=%s", hint)
 
 
 async def _oauth_scope_user_id(db: AsyncSession, oauth_user: OAuthUser) -> int:
@@ -189,6 +208,8 @@ async def _resolve_data_scope_user_id(token: str, db: AsyncSession) -> Optional[
         on (default) → its own ``users.id`` (a non-loginable shadow row, see
         :func:`_oauth_scope_user_id`). Before 2026-10-18 it got scope 0 too, so
         a second Google user read the owner's data; the flag off restores that.
+      * No owner configured (both e-mail settings empty) → every OAuth token gets
+        ``DEFAULT_ANON_USER_ID`` (old behaviour) plus one logged warning.
       * OAuth token, pending/rejected/unknown account → ``DEFAULT_ANON_USER_ID``
         (unchanged: same as an anonymous caller; :func:`get_signed_in_user_id`
         refuses those with 403 before any data is touched).
@@ -201,6 +222,11 @@ async def _resolve_data_scope_user_id(token: str, db: AsyncSession) -> Optional[
     if payload.get("typ") == "oauth":
         if not settings.PER_USER_OAUTH_SCOPE:
             return DEFAULT_ANON_USER_ID
+        if not settings.owner_emails_list:
+            # No explicitly named owner ⇒ old behaviour (everyone → 0). Never guess
+            # the owner: a missing env var must not move him out of his data.
+            await _warn_scope_inactive(db)
+            return DEFAULT_ANON_USER_ID
         try:
             oid = int(payload["sub"])
         except (KeyError, TypeError, ValueError):
@@ -208,7 +234,7 @@ async def _resolve_data_scope_user_id(token: str, db: AsyncSession) -> Optional[
         oauth_user = await get_oauth_user_by_id(db, oid)
         if oauth_user is None or getattr(oauth_user, "status", None) != "approved":
             return DEFAULT_ANON_USER_ID
-        if await _is_scope_owner(db, oauth_user):
+        if _is_scope_owner(oauth_user):
             return DEFAULT_ANON_USER_ID
         return await _oauth_scope_user_id(db, oauth_user)
     try:

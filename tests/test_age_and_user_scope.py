@@ -123,10 +123,28 @@ async def test_flag_off_restores_shared_scope(env, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_owner_fallback_without_configured_emails(env, monkeypatch):
+async def test_no_owner_configured_keeps_old_shared_scope_and_warns(env, monkeypatch, caplog):
+    import logging
+
+    import app.dependencies.auth as auth_mod
+
     monkeypatch.setattr(settings, "ADMIN_EMAILS", "")
     monkeypatch.setattr(settings, "OWNER_EMAIL", "")
-    # first Google account holding the admin role = the owner
+    monkeypatch.setattr(auth_mod, "_scope_inactive_warned", False)
+    with caplog.at_level(logging.WARNING, logger="app.dependencies.auth"):
+        # nobody is guessed as owner: every approved Google account → 0 (old behaviour)
+        assert await _scope(env["factory"], env["oauth"][1]) == 0
+        assert await _scope(env["factory"], env["oauth"][2]) == 0
+    warnings = [r.getMessage() for r in caplog.records if "per-user scope inactive: set OWNER_EMAIL" in r.getMessage()]
+    assert len(warnings) == 1  # one clear warning, not one per request
+    async with env["factory"]() as s:  # no shadow scope row was created
+        assert (await s.execute(select(User).where(User.email.like("%oauth-scope.invalid")))).scalars().all() == []
+
+
+@pytest.mark.asyncio
+async def test_owner_named_only_by_admin_emails_activates_scope(env, monkeypatch):
+    monkeypatch.setattr(settings, "OWNER_EMAIL", "")
+    monkeypatch.setattr(settings, "ADMIN_EMAILS", OWNER)
     assert await _scope(env["factory"], env["oauth"][1]) == 0
     assert await _scope(env["factory"], env["oauth"][2]) not in (0, None)
 
