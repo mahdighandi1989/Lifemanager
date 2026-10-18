@@ -12,5 +12,11 @@
  "what": "Age package part 1 (decision 2026-10-18 items 1-2): non-owner approved Google accounts get their own users.id scope (owner stays 0 via OWNER_EMAIL/ADMIN_EMAILS/first-admin fallback; flag PER_USER_OAUTH_SCOPE); optional date_of_birth at register + /api/me/date-of-birth + profile validation. Note: docs/overhaul/handoff-notes/_pending_age_scope_2026-10-18.md",
  "procedure": "CLAUDE.md#Non-negotiable rules",
  "commit": "49af3a6e",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-18T18:56:00Z",
+  "note": "بازبینی: منطقِ _resolve_data_scope_user_id امن است (مالک ۰؛ بدونِ OWNER_EMAIL/ADMIN_EMAILS ⇒ رفتارِ قدیم؛ پرچمِ PER_USER_OAUTH_SCOPE برگشت‌پذیر)؛ ۷۵ تستِ مرتبط با auth/scope سبز",
+  "commit": ""
+ }
 }
