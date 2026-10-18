@@ -12,5 +12,11 @@
  "what": "handoff.py audit: shallow-clone boundary commit skipped (it read as touching every area ⇒ routines saw main's gate red); test_supervisor_handoff_guard shallow test",
  "procedure": "docs/supervisor/README.md#چطور دستورِ ناظر را عوض کنم؟",
  "commit": "4d8d18f2",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "general",
+  "at": "2026-10-18T02:29:07Z",
+  "note": "دورِ ۲۰۲۶-۱۰-۱۸: گیتِ کامل روی main (6c1e625) — pytest 2081 سبز (دو آزمونِ مرورگر پس از نصبِ playwright سبز)، build سبز؛ تغییر در سر main همان‌طور که ثبت شده کار می‌کند",
+  "commit": ""
+ }
 }

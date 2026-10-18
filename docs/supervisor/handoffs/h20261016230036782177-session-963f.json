@@ -12,5 +12,11 @@
  "what": "تورِ پولیا دورِ ۱۱ (K8): پیوندِ صریحِ لحظه ⇐ قلمرو در coverage.json (terr: — B231/C107 ⇒ pr_hypothesis_testing؛ C145/B162/B169/B170 ⇒ a_induction؛ B107 ⇒ md_cognitive_biases، a_confirmation)",
  "procedure": "AGENTS.md: ثبتِ registry، گراف مشتق",
  "commit": "10cd5a1",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "general",
+  "at": "2026-10-18T02:29:07Z",
+  "note": "دورِ ۲۰۲۶-۱۰-۱۸: گیتِ کامل روی main (6c1e625) — pytest 2081 سبز (دو آزمونِ مرورگر پس از نصبِ playwright سبز)، build سبز؛ تغییر در سر main همان‌طور که ثبت شده کار می‌کند",
+  "commit": ""
+ }
 }

@@ -4648,3 +4648,5 @@ dated stability, mind-card feed) under way.
   `tests/variants/VARIANTS_R20.json` (MT2.routing 19/19: 13 on the page, 6 delegated by name to the pytest file). Handoff (area app,
   owners urgent/general) recorded with `scripts/supervisor/handoff.py add --by session`. Docs: lla WORKLOG (83), PROGRESS 99, HANDBOOK §10,
   note `docs/overhaul/handoff-notes/_pending_tour1_R20_routing_2026-10-18.md`.
+## 2026-10-18 — FINDING (supervisor, general)
+- دورِ کاملِ ناظر روی `6c1e625`: pytest/build سبز، inventory بدونِ کاهش. دو آزمونِ `test_learning_architecture_graph_browser` (r11/r12 coach) بدونِ `playwright` در `apps/learning-architecture/node_modules` قرمز می‌شوند (prompt_tap.js `require` بی‌شرط) و با `npm i` سبز؛ مشکلِ محیط، نه کد. شش دست‌به‌دستِ `did` بسته شد (verified). RUNLOG ۲۰۲۶-۱۰-۱۸.

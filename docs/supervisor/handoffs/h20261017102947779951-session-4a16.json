@@ -12,5 +12,11 @@
  "what": "REMOVAL_CANDIDATES.md: quarantine entry for the round-16 keyword storing paths in a27 (dupLinkR16, promScanR16, regOfR16, verdictR16 — kept, reachable via ASSIST.R16_QUARANTINE; replaced by model-reported coach_state fields)",
  "procedure": "CLAUDE.md#Non-negotiable rules",
  "commit": "57d714f5",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "general",
+  "at": "2026-10-18T02:29:07Z",
+  "note": "دورِ ۲۰۲۶-۱۰-۱۸: گیتِ کامل روی main (6c1e625) — pytest 2081 سبز (دو آزمونِ مرورگر پس از نصبِ playwright سبز)، build سبز؛ تغییر در سر main همان‌طور که ثبت شده کار می‌کند",
+  "commit": ""
+ }
 }
