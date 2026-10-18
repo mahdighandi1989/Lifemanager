@@ -1,0 +1,1545 @@
+[
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: فردا ساعت ۱۰ با خواهرم حرف می‌زنم؛ قیمت خونه‌ی بابا حدوداً ۸ میلیارده؛ حدسم اینه که مامان راضی نمی‌شه ‖ A: قبل از حرف زدن چه چیزی را می‌خواهی روشن کنی؟ ‖ U: قیمتو اشتباه گفتم، ۱۱ میلیارد بود",
+  "expect": "retract {span:«قیمت خونه‌ی بابا حدوداً ۸ میلیارده», key:datum:price, fix:«۱۱ میلیارد»}; ONLY datum:price changes ۸→۱۱; old value kept as history «اصلاح شد ⇐»; nothing deleted; plan pl1 (2026-10-19 10:00, «با خواهرم حرف می‌زنم») unchanged and its planning mind event stays; guess g1 «مامان راضی نمی‌شه» unchanged and its event stays; the corrected datum is re-booked as a new act with src {msg: current, key: datum:price}; one self-correction look-back event; nothing else withdrawn",
+  "context": "corrected message is 1 user turn back; one message produced plan + datum + guess; life decision"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حدسم n(n−1)/2 ـه؛ برای n=۴ شمردم و شد ۶ تا ‖ A: n=۵ را هم می‌شماری؟ ‖ U: هنوز نه ‖ A: باشد. ‖ U: شکل رو کشیدم ‖ A: خب؟ ‖ U: حدسمو بد نوشتم، منظورم n(n+1)/2 بود",
+  "expect": "retract key guess:g1 → g1 becomes «n(n+1)/2» with history; the datum record «n=۴ → ۶ تا» (key datum:count) stays with its event; the guess test that used g1 at n=۴ is re-evaluated against the corrected guess (۱۰ ≠ ۶ ⇒ marked «نیاز به وارسیِ دوباره»/refuted, NOT left «تأیید شد»); the counted datum is not withdrawn",
+  "context": "corrected message is 3 user turns back; verdict depends on the changed guess only; math"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: گام ۱ رو انجام دادم و جواب داد؛ برنامه‌م اینه که چهارشنبه گام ۲ رو برم ‖ A: گام ۲ دقیقاً چیست؟ ‖ U: زنگ زدن به بانک ‖ A: ساعتش؟ ‖ U: صبح ‖ A: باشد. ‖ U: منظورم سه‌شنبه بود نه چهارشنبه",
+  "expect": "only plan pl (key plan:pl1) moves 2026-10-21 (Wed) → 2026-10-20 (Tue); old value kept as history «اصلاح شد ⇐»; nothing deleted; step 1 outcome «done» and its «اجرا +» mind event stay; the plan's planning event is not withdrawn (re-linked to the corrected text); Today shows the plan on Tue 20, not on Wed 21",
+  "context": "corrected message is 3 user turns back; Today = Sun 2026-10-18"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: درسی که گرفتم: اول حالت خاص رو امتحان کنم. با n=۱ و n=۲ هم چک کردم، درست بود. ‖ A: این درس را کجا دوباره به کار می‌بری؟ ‖ U: تو هندسه ‖ A: خوب است. ‖ U: اون درسی که گفتم رو این‌جوری درست کن: اول شکل بکشم",
+  "expect": "ONLY the lesson changes (look-back lesson / lessons[] / its card) to «اول شکل بکشم» with history; the check verdict «وارسی شد» stays (its data n=۱, n=۲ were not touched); «حل شد» stays; no ans record rewritten; the corrected lesson is re-booked from the current message",
+  "context": "corrected message is 2 user turns back; lesson + check in one message"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حقوق ماهانه‌ام ۴۰ میلیون تومان است، اجاره ۱۵ میلیون و قسط وام ۸ میلیون. ‖ A: چه مقدار پس‌انداز در نظر دارید؟ ‖ U: تصحیح می‌کنم: اجاره ۱۸ میلیون تومان است، نه ۱۵.",
+  "expect": "only datum:rent ۱۵→۱۸ with history; datum:salary ۴۰ and datum:loan ۸ (same message) stay with their events; any computed remainder that used rent is recomputed (۱۷ → ۱۴); reply in «شما»",
+  "context": "1 user turn back; formal register; three facts, one corrected"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "edit",
+  "text": "✏️ on her bubble «با استقرا ثابت می‌کنم؛ پایه n=۱ درسته، فرض رو برای k گرفتم» → edited to «با استقرا ثابت می‌کنم؛ پایه n=۰ درسته، فرض رو برای k گرفتم»",
+  "expect": "only the span «پایه n=۱ درسته» (key step:base) changes to n=۰ with history; the plan:induction record and its planning mind event stay; the assumption step stays; one self-correction look-back event; no «اصلاح شاید» block on the ✏️ turn",
+  "context": "✏️ path; 2 user turns back; same engine as chat"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: جوابم ۴۲ ـه، با جایگذاری چک کردم درست درمیاد ‖ A: ✓ ‖ U: حالا بازنگری ‖ A: چه چیزی آموختی؟ ‖ U: که جایگذاری مهمه ‖ A: باشد. ‖ U: صبر کن جواب ۴۸ بود نه ۴۲",
+  "expect": "ans 42→48 with history; the check verdict that USED ans=42 is downgraded to «نیاز به وارسیِ دوباره» (a datum it used changed); «حل شد» is reopened/withdrawn as a consequence of that verdict only; the look-back lesson «جایگذاری مهمه» (different message) stays",
+  "context": "corrected message is 3 user turns back; contrast with the lesson entry: verdict changes because its datum changed"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: امروز خیلی خسته‌ام، ولی حدسم ۱۲ ـه ‖ A: چرا ۱۲؟ ‖ U: خسته نبودم راستش، فقط حوصله نداشتم",
+  "expect": "the clause «امروز خیلی خسته‌ام» produced no record ⇒ no record changes; guess g1 «۱۲» and its event stay; page result to the model: changes=[] with reason «از آن تکه رکوردی ساخته نشده بود»; the assistant does NOT say anything was changed; at most the bubble text history",
+  "context": "1 user turn back; corrected clause has no derived record"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: طرحم اینه که از آخر به اول برم ‖ A: از کجا شروع می‌کنی؟ ‖ U: از حالت n ‖ A: بعد؟ ‖ U: n−۱ ‖ A: ادامه بده. ‖ U: صبر کن ‖ A: بله؟ ‖ U: نه، طرحم این بود که مسئله رو به دو حالت زوج و فرد تقسیم کنم",
+  "expect": "plan pl1 text → «دو حالت زوج و فرد» with history; the old planning event is marked withdrawn (not deleted) AND a new planning event is booked with src {msg: current, key: plan:pl1}; mind card planning count unchanged (never «۰ از N»); the intermediate turns' step records stay",
+  "context": "corrected message is 4 user turns back; corrected content re-booked"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: دو تا حدس دارم: یا ۱۰ ـه یا ۲۰ ‖ A: کدام را اول می‌آزمایی؟ ‖ U: دومی رو اشتباه گفتم، ۲۵ بود",
+  "expect": "only g2 20→25 with history; g1 «۱۰» untouched with its event; one message, two guess keys (guess:g1, guess:g2) kept separate",
+  "context": "1 user turn back; two guesses in one message"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یادم بنداز پنجشنبه ساعت ۸ صبح فرم رو بفرستم؛ فرمش ۳ صفحه‌ست ‖ A: باشد. ‖ U: … (۸ پیامِ دیگر) … ‖ U: ساعت فرم ۱۰ صبحه نه ۸",
+  "expect": "reminder 2026-10-22 08:00 → 2026-10-22 10:00 (date unchanged) with history; datum «۳ صفحه» untouched; page result lists the reminder change; the sys line shows «پنجشنبه ۳۰ مهر، ساعت ۱۰» (Persian, no raw id, no ISO)",
+  "context": "corrected message is 9 user turns back; deadline from her message"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: آب با نرخ ۵ لیتر در دقیقه وارد می‌شه و مخزن ۲ ساعته پر می‌شه ‖ A: حجم مخزن؟ ‖ U: عددشو اشتباه گفتم، ۶ بود",
+  "expect": "span ambiguous («عدد») ⇒ page uses the model's reported key datum:rate: rate ۵→۶ with history; datum:time «۲ ساعت» stays; if the model reports no key, the page asks once «کدام: نرخ ۵ یا زمان ۲؟» instead of guessing",
+  "context": "1 user turn back; key decides when the span is ambiguous"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: هفته‌ی هشتم: وزنم ۷۴ شد، هر روز نیم ساعت پیاده رفتم، فقط یه روز شیرینی خوردم ‖ A: آفرین. ‖ U: ۷۴ و نیم بود",
+  "expect": "only datum:weight(week 8) 74→74.5 with history; the plot point moves to ۷۴٫۵ and the bubble shows «اصلاح شد ⇐»; the week-8 step success (walking) and its «اجرا +» event stay",
+  "context": "1 user turn back; life habit problem with a plot"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "pos",
+  "role": "events",
+  "text": "after any of the corrections above, open «📜 پروندهٔ کامل»",
+  "expect": "the withdrawn record version appears as «نسخهٔ پیشین» once, the corrected version as current, and the correction act itself with its time; withdrawn ≠ deleted; mind card shows the withdrawn event as withdrawn (not as a failure)"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اشتباه کردم، دیروز به‌جای جلسه رفتم سر کار ‖ A: بعدش چه شد؟",
+  "expect": "NO retract — a real-world mistake; no record withdrawn; may be booked as new data"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: معلممون گفت «اشتباه نوشتی، علامتش منفیه» ‖ A: تو چه فکر می‌کنی؟",
+  "expect": "NO retract — quoted speech of someone else; nothing changes"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: یه راه دیگه هم به ذهنم رسید: شاید با استقرا بشه",
+  "expect": "NO retract — new idea; the old plan stays; the new idea may become its own plan/guess"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: قیمت خونه ۸ میلیارده ‖ A: … ‖ U: یه چیز دیگه هم بگم: قسطش ۱۲ ماهه‌ست",
+  "expect": "NO retract — an addition; a new datum is booked; datum:price ۸ and its event stay"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: … ‖ A: پس مساحت ۲۰ است. ‖ U: اون ۲۰ که گفتی غلطه",
+  "expect": "NOT a self-correction — the fragment is only in the assistant's message; none of her records is withdrawn; no self-correction look-back event"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: برنامه‌م سه‌شنبه‌ست ‖ A: … ‖ U: تصمیمم عوض شد، دیگه سه‌شنبه نمی‌رم، بذارش برای شنبه",
+  "expect": "a plan change, not a correction of a mis-typed message: the plan gets a new act (moved to 2026-10-24) and the original planning event is NOT withdrawn (it was true when said); the change is a dated act in the dossier"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: قیمتو اشتباه گفتم، ۱۱ میلیارد بود ‖ A: … ‖ U: آره همون ۱۱ دیگه",
+  "expect": "no second retract, no duplicate record; datum:price stays ۱۱ with one history entry"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: سلام ‖ A: سلام! ‖ U: اون سلامو بی‌خیال",
+  "expect": "no record changed, no mind event withdrawn; page result changes=[]; assistant claims no change"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: جوابم ۲۴ ـه ‖ A: چطور چک می‌کنی؟ ‖ U: جوابم غلط بود؟",
+  "expect": "a question, not a correction: no retract; the page may ask what she means; ans ۲۴ stays"
+ },
+ {
+  "rc": "RO1.by_fact",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: خونه رو با واو ننوشتم، ببخشید (پیامِ قبلی: «خنه‌ی بابا ۸ میلیارده»)",
+  "expect": "spelling-only fix: bubble text may update with history; no derived record value changes (۸ stays); no mind event withdrawn"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه مسئله برای خودم بساز: ۱۰ نقطه روی دایره، چند تا مثلث؟ ‖ A: [chat_invent ثبت شد] ‖ U: … ‖ U: ۱۰ نه، ۸ نقطه",
+  "expect": "the chat_invent problem carries src {msg, span:«۱۰ نقطه», key:datum:points}; its statement → «۸ نقطه روی دایره» with history; no duplicate problem left behind; page reply is not «از آن پیام چیزی در صفحه ثبت نشده بود»",
+  "context": "corrected message is 2 user turns back"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: نرخ خروج ۵ سانتی‌متر مکعب در ثانیه‌ست … (۶ پیام کار در گفت‌وگو، بسته شد «حل شد — وارسی شد») ‖ U: تو پیام اولم اشتباه نوشتم، نرخ ۶ ـه نه ۵",
+  "expect": "chat_solved records (statement, understanding form, check) each carry src of the message they came from — the statement/datum from message 1 (NOT the closing message); statement and form change ۵→۶ with history; the verdict that used ۵ becomes «نیاز به وارسیِ دوباره»; dossier cites «از پیامِ گفت‌وگو: <پیامِ اول>»",
+  "context": "corrected message is 6 user turns back; chat-closed problem"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: مجهول زمانِ کل رفت‌وبرگشته ‖ A: [فرمِ فهم ← مجهول: «زمانِ کل»] ‖ U: … ‖ U: منظورم فقط زمانِ رفت بود",
+  "expect": "the form field filled by the assistant action carries src of her message ⇒ it follows automatically to «زمانِ رفت» with history; no «این‌جا هم عوض شود؟» ask (she did not type it)",
+  "context": "assistant form fill; 2 user turns back"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: درسم اینه که همیشه واحدها رو چک کنم ‖ A: [درس و کارت 🌱 ساخته شد] ‖ U: نه، درسم این بود که اول حالت خاص رو امتحان کنم",
+  "expect": "the look-back lesson AND the card made from it carry src ⇒ both change with history; one look-back self-correction event",
+  "context": "1 user turn back; lesson + card"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: مهلت تحویل پروژه دوشنبه‌ست ‖ A: [مهلت ۲۰۲۶-۱۰-۱۹ ثبت شد] ‖ U: مهلتش سه‌شنبه‌ست نه دوشنبه",
+  "expect": "the deadline record carries src ⇒ moves 2026-10-19 → 2026-10-20; reminder moves with it; Today on Mon shows nothing for it, on Tue shows it",
+  "context": "1 user turn back; deadline"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "page",
+  "text": "she typed «۸ میلیارد» herself into the live problem's data field; in chat earlier «قیمت ۸ میلیارده», later «قیمتو اشتباه گفتم، ۱۱ بود»",
+  "expect": "chat-derived records change automatically; the page-typed data field is NOT silently overwritten — the page asks once «این‌جا هم عوض شود؟» showing «۸ میلیارد» → «۱۱ میلیارد»; on «بله» it changes with history; on «نه» it stays and is not asked again",
+  "context": "page-typed copy, same key/text"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "page",
+  "text": "she typed condition 4 «باید امسال بفروشیم» on the page; later ✏️ on her chat message «امسال باید بفروشیم» → «تا آخرِ سالِ بعد باید بفروشیم»",
+  "expect": "the ✏️ result asks «این‌جا هم عوض شود؟» for condition 4 with both values; after «بله» condition 4 → «تا آخرِ سالِ بعد» and the problem's contradiction flag (which depended on condition 4) is recomputed",
+  "context": "page-typed condition; ✏️ path; 7 turns back"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "page",
+  "text": "the assistant filled the live statement «… قرارداد سه ماهه …» from her first message; she then edited the statement on the page herself (kept «سه ماهه»); 8 turns later in chat: «قرارداد شش ماهه بود نه سه ماهه»",
+  "expect": "since she edited the field herself, the page asks once «این‌جا هم عوض شود؟» («سه ماهه» → «شش ماهه») for the statement; the chat statement changes automatically; dossier shows the change after she answers",
+  "context": "mixed origin field; ask wins over silent overwrite"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "page",
+  "text": "she typed «۸ میلیارد» in BOTH the statement and the understanding card; chat correction ۸→۱۱",
+  "expect": "one grouped ask listing both fields (or one ask per field), each shown once; each field changes only on her yes"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه پرونده‌ی تمرین برای «اثبات با برهان خلف» باز کن ‖ A: [پرونده باز شد · موضوع: برهان خلف] ‖ U: موضوع رو اشتباه گفتم، استقرا",
+  "expect": "the practice case topic carries src ⇒ becomes «استقرا» with history; sessions (none yet) unaffected",
+  "context": "1 user turn back; practice case from chat"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: هر شب ساعت ۱۱ بخوابم — این عادتمه که می‌خوام بسازم ‖ A: [🌱 ساعت ۲۳ ساخته شد] ‖ U: ساعت ۱۱ نه، ۱۰ و نیم",
+  "expect": "🌱 reminder carries src ⇒ 23:00 → 22:30 with history; one Today line at the new time",
+  "context": "1 user turn back; habit card"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "pos",
+  "role": "events",
+  "text": "after a chat correction that touched a chat-derived record and a page-typed copy she declined",
+  "expect": "dossier shows: the correction act, the chat-derived change, and «در صفحه نگه داشته شد (۸ میلیارد)» for the declined copy — nothing silently differs"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "page",
+  "text": "she typed «قیمت آپارتمان خواهرم ۸ میلیارد» in another data row (different fact); chat corrects datum:price ۸→۱۱",
+  "expect": "no ask on that row (different key); untouched"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "page",
+  "text": "page data field «۱۸ میلیارد»; chat corrects «۸ میلیارد» → «۱۱»",
+  "expect": "no ask, untouched — «۸» is only a substring of «۱۸»"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "page",
+  "text": "she answered «نه» to «این‌جا هم عوض شود؟» for the statement; later she corrects an unrelated datum",
+  "expect": "the statement ask is not re-raised; only the new datum's copies are considered"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "page",
+  "text": "an older record with no src (made before stamping existed) holds the corrected value",
+  "expect": "not silently changed; page tells her one plain line «این مورد منبع ندارد؛ اگر می‌خواهید دستی عوض کنید» and tells the model the reason"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: سلام، امروز چیکار کنیم؟ ‖ A: … ‖ U: اون پیامِ اولمو بی‌خیال",
+  "expect": "message produced no record ⇒ nothing to change; page result changes=[]; assistant does not claim a change"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "chat",
+  "text": "A: «… پس قیمت ۸ میلیارد است.» ‖ U: نه، اون ۸ رو تو گفتی، من گفتم ۱۱",
+  "expect": "the assistant's message was wrong, not hers: her records (already ۱۱) unchanged; no self-correction event; no ask"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اشتباه کردم که این مسئله رو انتخاب کردم",
+  "expect": "not a correction of a message: no retract, no ask about page fields"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "page",
+  "text": "the «این‌جا هم عوض شود؟» ask is shown; she ignores it and sends two more messages",
+  "expect": "the field keeps the old value; the ask is not repeated every turn (stays reachable on the field); never silently applied"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "page",
+  "text": "problem B (a different problem) also has «۸ میلیارد» typed by her; she corrects datum:price in problem A's chat",
+  "expect": "no ask in problem B; only records linked to problem A / this session"
+ },
+ {
+  "rc": "RO2.src_everywhere",
+  "kind": "neg",
+  "role": "events",
+  "text": "dossier of a chat-closed problem",
+  "expect": "the understanding form is never attributed to the closing message («مرسی، حل شد»); if no src exists it says «منبع: نامعلوم» rather than inventing one"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "turn N: model sends retract {key:datum:price, fix:«۱۱»}; the page has NOT yet applied it when the reply is shown",
+  "expect": "reply may say only an intent («اگر صفحه بپذیرد، قیمت ۱۱ می‌شود» / «درخواستِ اصلاح را فرستادم»), never «عوض شد/انجام دادم»; the prompt of turn N contains no «صفحه برمی‌گرداند/انجام داد»"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "turn N+1: the prompt carries the page's result block «✓ اصلاح شد: قیمت ۸ → ۱۱ میلیارد»",
+  "expect": "now the reply may say «قیمت را ۱۱ کردم» once; it names exactly the records in the result block, nothing more"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "the page applied the retract BEFORE the reply is shown (same turn) and the result block is in the same turn's context",
+  "expect": "the reply may state the change in the same turn; wording matches the result block"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "chat",
+  "text": "model sends retract {fix:«شنبه»} for a fragment the page cannot find",
+  "expect": "she sees one plain line «این اصلاح انجام نشد: آن تکه در پیام‌های قبلیِ شما پیدا نشد»; the next prompt carries the refusal with its reason; the assistant says it was not changed and asks for the exact words — never «درست شد»"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "result block: changes=[] («از آن پیام رکوردی ساخته نشده بود»)",
+  "expect": "the reply says nothing needed changing (or says nothing about it); never claims a change"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه پرونده‌ی تمرین براش باز کن ‖ model: start_practice; page refuses (consent not validated)",
+  "expect": "she sees «پرونده باز نشد: …» in one line; the reply never says «باز کردم»; next turn the model sees the reason and may ask for confirmation once"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "result: 2 records changed + 1 page-typed copy awaiting «این‌جا هم عوض شود؟»",
+  "expect": "the reply names the 2 changed records and says the page is asking her about the field she typed — it does not claim that field changed"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "model sends live_new; next turn's result says «مسئلهٔ زنده باز شد: …»",
+  "expect": "only on that next turn may the reply say «باز شد»; on the sending turn it may say «دارم بازش می‌کنم»"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "deadline correction accepted: result «یادآوری: پنجشنبه ساعت ۱۰»",
+  "expect": "reply «یادآوری را ساعت ۱۰ کردم» appears only after this result; before it, no claim"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "same turn as the action, page not yet applied, reply: «انجام دادم، تاریخ عوض شد»",
+  "expect": "post-check flags it as a premature claim and requests one rewrite (or the page strips the claim)"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "a result block from two turns ago («✓ اصلاح شد: عرض ۵→۹») and a NEW retract this turn",
+  "expect": "the old block may not be used to claim the new change; no claim until the new result arrives"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "reply «پرونده را باز کردم» with no start_practice action at all",
+  "expect": "flagged; no case exists; she is not told one was opened"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "neg",
+  "role": "chat",
+  "text": "a refusal occurred but nothing is shown to her",
+  "expect": "FAIL condition: every refusal must show one plain line to her; checker expects the line"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "previous turn's result: «✓ اصلاح شد (pl1)»; next prompt text",
+  "expect": "must NOT contain «هیچ رکوردی ثبت نشده بود — نگو که چیزی را عوض کردی» (contradiction)"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "reply: «می‌خواهم این را درست کنم؛ صفحه خبر می‌دهد»",
+  "expect": "allowed (intent, not a claim); post-check does not flag it"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "reply «حدست را ثبت کردم» while the page refused guess_res («خرید بهتره» was never a stored guess)",
+  "expect": "flagged; she sees the refusal line; the reply on the next turn corrects itself"
+ },
+ {
+  "rc": "RO3.claim_after_result",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "reply «باشه، فهمیدم.» after a retract was sent",
+  "expect": "not a claim; not flagged"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پنجشنبه با خواهرم حرف می‌زنم ‖ A: … ‖ U: شنبه بود نه پنجشنبه",
+  "expect": "old token «پنجشنبه», fix «شنبه» matched at word boundaries — accepted (NOT refused because «شنبه» ⊂ «پنجشنبه»); plan 2026-10-22 → 2026-10-24 with history; Today shows it Sat 24, not Thu 22",
+  "context": "1 user turn back; Today = Sun 2026-10-18"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: شنبه می‌رم بانک، پنجشنبه هم دکتر ‖ A: … ‖ U: بانکو اشتباه گفتم، پنجشنبه‌ست",
+  "expect": "only the bank plan «شنبه» → «پنجشنبه» (2026-10-24 → 2026-10-22); the doctor plan «پنجشنبه» untouched; the replacement hits the standalone token «شنبه», not the «شنبه» inside «پنجشنبه»",
+  "context": "1 user turn back; two weekdays in one message"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پنج‌شنبه جلسه دارم ‖ A: … ‖ U: پنجشنبه نه، جمعه",
+  "expect": "ZWNJ difference («پنج‌شنبه» vs «پنجشنبه») normalized ⇒ match; 2026-10-22 → 2026-10-23",
+  "context": "1 user turn back; ZWNJ present in original, missing in fix"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۰ نقطه روی دایره داریم و حداکثر ۱۰۰ خط ‖ A: … ‖ U: … ‖ U: ۱۰ نه، ۱۲ نقطه",
+  "expect": "only «۱۰ نقطه» → «۱۲ نقطه»; «۱۰۰ خط» intact; statement reads «۱۲ نقطه روی دایره داریم و حداکثر ۱۰۰ خط»",
+  "context": "2 user turns back; number substring of another number"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: x = 3 به دست اومد ‖ A: جایگذاری کن. ‖ U: x=۷ درسته، اولی رو اشتباه نوشتم",
+  "expect": "Latin «3» and Persian «۷», spacing «x = » vs «x=» normalized ⇒ match; step result 3 → ۷; minimal span replaced",
+  "context": "1 user turn back; digits + spacing"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "edit",
+  "text": "✏️ original «جمعه می‌رم، اولین شنبه هم استراحت» edited to «جمعه می‌رم اولین یکشنبه هم استراحت»",
+  "expect": "punctuation difference (comma dropped in the edit) does not break matching; the plan follows «شنبه» → «یکشنبه» (2026-10-24 → 2026-10-25); the stored text keeps her comma unless she removed it on purpose (minimal differing span = the weekday)",
+  "context": "✏️ path; punctuation"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حدسم: ارتفاع تقسیم بر ۵ سانتی‌متر مکعب در ثانیه ‖ A: … ‖ U: نرخ ۶ سانتی‌متر مکعب در ثانیه بود",
+  "expect": "minimal differing span = «۵» → «۶»; guess becomes «ارتفاع تقسیم بر ۶ سانتی‌متر مکعب در ثانیه» (no «ثانیه ثانیه», no whole fix phrase pasted in)",
+  "context": "1 user turn back; full-phrase fix"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حدسم اینه که مساحت √3/2 ـه ‖ A: … ‖ U: حدسمو اشتباه نوشتم، مساحت ۱ میشه",
+  "expect": "guess becomes «مساحت ۱» (clean), not a concatenation like «مساحت √3/2 حدسمو … ۱»; history keeps «√3/2»",
+  "context": "1 user turn back; full-sentence guess fix"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پس‌فردا صبح ۲۰ دقیقه پیاده‌روی ‖ A: … ‖ U: پس‌فردا صبح ۳۰ دقیقه منظورم بود",
+  "expect": "plan text «پس‌فردا صبح ۳۰ دقیقه پیاده‌روی» (no «صبح صبح»); date 2026-10-20 unchanged",
+  "context": "1 user turn back; overlapping words in fix"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حجم = ۲ × (۱/۳) × (ab/2) × a ‖ A: … ‖ U: ضریب ۲ نبود، ۴ بود",
+  "expect": "only «۲ ×» at the start → «۴ ×»; parentheses kept; the «2» inside «ab/2» untouched; frag/fix shown with parentheses",
+  "context": "1 user turn back; formula with parentheses"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: جوابم ۲۴ ـه ‖ A: با n=۲ چک کن. ‖ U: شد ۶، نه ۸ ـ پس جوابم غلط بود!",
+  "expect": "the model reports retract {key:ans, msg:«جوابم ۲۴»}; the fragment exists in her earlier message ⇒ validated as self-correction (no closed phrase list needed); ans marked wrong/withdrawn with history; one self-correction look-back event",
+  "context": "1 user turn back; models class 4"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: روزی ۲ كيلو ميوه ‖ A: … ‖ U: ۲ کیلو نه، نیم کیلو",
+  "expect": "Arabic «ك/ي» vs Persian «ک/ی» normalized ⇒ match; step amount → «نیم کیلو»; the step's existing outcome stays",
+  "context": "1 user turn back; Arabic letters"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: تا محل کار ۴۰دقیقه راهه ‖ A: … ‖ U: ۴۰ دقیقه نه، ۴۵",
+  "expect": "spacing «۴۰دقیقه» vs «۴۰ دقیقه» normalized ⇒ match; datum → «۴۵دقیقه»/«۴۵ دقیقه»",
+  "context": "1 user turn back"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یکشنبه‌ها یک ساعت تمرین ‖ A: … ‖ U: یک ساعت نه، دو ساعت",
+  "expect": "only the standalone «یک» before «ساعت» → «دو»; result «یکشنبه‌ها دو ساعت تمرین» (NOT «دوشنبه‌ها …»)",
+  "context": "1 user turn back; number word inside a weekday"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "pos",
+  "role": "edit",
+  "text": "✏️ original «سه‌شنبه ساعت ۹ صبح» edited to «سه شنبه ساعت ۱۰ صبح» (she also replaced ZWNJ with a space)",
+  "expect": "ZWNJ/space difference in an unchanged word is not a change; minimal span = «۹» → «۱۰»; date stays 2026-10-20, time 09:00 → 10:00",
+  "context": "✏️ path; ZWNJ vs space"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: پنجشنبه با خواهرم حرف می‌زنم ‖ A: … ‖ U: اون شنبه رو یکشنبه کن",
+  "expect": "no standalone «شنبه» exists in the earlier message ⇒ not matched into «پنجشنبه»; page asks once «منظورتان پنجشنبه است؟» or refuses with one plain line; no silent change to «پنجیکشنبه»"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: حداکثر ۱۰۰ خط ‖ A: … ‖ U: ۱۰ رو ۱۲ کن",
+  "expect": "no standalone «۱۰» ⇒ «۱۰۰» untouched; page asks/refuses plainly"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اشتباه کردم",
+  "expect": "phrase alone with no model retract report ⇒ no change; at most a question"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "A: «پس ۳۵ است.» ‖ U: ۳۵ نه، ۳۶ (model reports retract on «۳۵»)",
+  "expect": "the fragment exists only in the assistant's message ⇒ refused as self-correction with reason; she sees one plain line; no look-back event"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: نوشتم ۴۰ دقیقه، ولی ۴۵ بود (no earlier message of hers contains «۴۰»)",
+  "expect": "the only «۴۰» is in the current message ⇒ not a target; refused/asked; nothing changed"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: معلم نوشته: «جواب غلط است»",
+  "expect": "quoted «غلط» is not a self-correction signal; no fallback block"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: جوابم غلط بود؟ (no earlier answer of hers exists)",
+  "expect": "no retract; page asks what she means"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: می‌رم کتابخونه ‖ A: … ‖ U: «کتاب» رو «دفتر» کن",
+  "expect": "no partial-word match («کتاب» ⊂ «کتابخونه») ⇒ no «دفترخونه»; asks"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: طرحمو نوشتم ولی گیر کردم",
+  "expect": "no correction signal; no «# اصلاحِ پیامِ پیشین (شاید)» block in the prompt"
+ },
+ {
+  "rc": "RO4.normalized_match",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۲۰ دقیقه طول کشید ‖ A: … ‖ U: ۱۲ رو ۱۵ کن",
+  "expect": "«۱۲» ⊂ «۱۲۰» ⇒ untouched; asks/refuses plainly"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "pos",
+  "role": "edit",
+  "text": "open ✏️ on her bubble in light theme, then dark theme, type a change",
+  "expect": "the textarea shows the message and the typed text legibly in both themes (contrast ≥ 4.5:1); «اصلاح شد ⇐» readable"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "the ✏️ «[اصلاحِ پیامِ قبلی]» system turn",
+  "expect": "its prompt carries NO «# اصلاحِ پیامِ پیشین (شاید)» block and no candidate list"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "the ✏️ turn's coach_state contains «اجرا +» quoting «[اصلاحِ پیامِ قبلی]»",
+  "expect": "page books NO evidence from it (system-origin turn); only the self-correction look-back event is booked"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "pos",
+  "role": "edit",
+  "text": "✏️ fixes a datum",
+  "expect": "exactly one self-correction look-back event is booked (same as a chat correction)"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "pos",
+  "role": "edit",
+  "text": "the same fix done once by chat and once by ✏️ on fresh copies of the same session",
+  "expect": "identical record changes and identical result blocks (one engine)"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "pos",
+  "role": "edit",
+  "text": "✏️ «گام ۲ رو انجام دادم و جواب داد» → «گام ۲ رو انجام دادم و جواب نداد»",
+  "expect": "step 2 outcome done → failed with history; step 1's success event stays; the step outcome prefilled from that message follows (no two contradictory notices)"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "turn after a ✏️ edit that changed pl1",
+  "expect": "prompt says what changed (from the result block); never «هیچ رکوردی ثبت نشده بود»"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "pos",
+  "role": "edit",
+  "text": "✏️ with a page-typed copy of the same fact",
+  "expect": "the «این‌جا هم عوض شود؟» ask appears after the ✏️ result exactly as for chat"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "neg",
+  "role": "edit",
+  "text": "✏️ opened and saved with the same text",
+  "expect": "no system turn sent, nothing booked, no history entry"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "neg",
+  "role": "edit",
+  "text": "assistant's bubble",
+  "expect": "no ✏️ affordance on assistant bubbles"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "neg",
+  "role": "edit",
+  "text": "✏️ opened then cancelled",
+  "expect": "nothing changes; no system turn"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "the ✏️ system turn text (formal wording)",
+  "expect": "not register evidence; the register stays as computed from her own messages"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "neg",
+  "role": "edit",
+  "text": "✏️ fixes a typo in a message that produced no record",
+  "expect": "bubble history only; no records changed; no withdrawals; result changes=[] told plainly"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "the ✏️ system turn",
+  "expect": "never produces a deferred-request candidate"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "the ✏️ system turn after a plan fix",
+  "expect": "the plan is not booked as a second planning success"
+ },
+ {
+  "rc": "RO5.edit_path",
+  "kind": "neg",
+  "role": "chat",
+  "text": "after a ✏️ edit, her next ordinary message «اشتباه کردم که دیر رفتم»",
+  "expect": "no fallback block, no retract"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "chat plan pl1 (Sun 18) → plan_done (Tue 20) → step s1 created from it",
+  "expect": "dossier lists, in event-time order: plan pl1 (۲۶ مهر), its completion (۲۸ مهر), then step s1 — the plan before the step it produced"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "a chat correction (datum ۸→۱۱) and a ✏️ correction (plan date) in one problem",
+  "expect": "both appear in a corrections lane with time, old → new, and «از پیامِ …»; neither is missing"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "a problem worked and closed entirely in chat (chat_solved)",
+  "expect": "a dossier exists for it: statement, her derivation turns, check, ✏️ edits, «حل شد», look-back — each with its source message"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "a session with no live problem (talk about a decision, two chat plans, a check-in)",
+  "expect": "a session dossier exists and lists the plans and check-in"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "«حل شد» at 10:00, look-back saved at 10:20, then the problem re-saved at 11:00 (a typo fixed)",
+  "expect": "order is «حل شد» → look-back; the 11:00 re-save does not move either"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "practice sessions logged under the test clock at +10 days",
+  "expect": "sessions dated on the simulated day (A.now), not the real day"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "set-aside on day 0 with return on D+30, day-30 mid-course check-in, a Today answer",
+  "expect": "all three listed with their event dates; «بازگشت: ۲۶ آبان» rendered as text (never «[object Object]»)"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "problem in execution with an open step",
+  "expect": "one status shown everywhere (e.g. «در جریان — اجرای طرح»); the stage list does not say «هنوز نرسیده» for that stage"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "pos",
+  "role": "events",
+  "text": "a step outcome counted «اجرا +» on the mind card",
+  "expect": "the dossier shows the same sign «+» for that act (one act sign shared by dossier and mind card)"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "neg",
+  "role": "events",
+  "text": "one correction of a plan",
+  "expect": "exactly one «نسخهٔ پیشین» entry, never two identical ones"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "neg",
+  "role": "events",
+  "text": "verdict downgraded after a datum correction",
+  "expect": "never «وارسی نشد» next to «نتیجه سالم ماند» without the «اصلاح شد ⇐» link explaining it"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "neg",
+  "role": "events",
+  "text": "a withdrawn record",
+  "expect": "shown as withdrawn (struck/labelled), not as current, not deleted"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "neg",
+  "role": "events",
+  "text": "acts of problem B",
+  "expect": "not in problem A's dossier"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "neg",
+  "role": "events",
+  "text": "dossier rendering of plan ids and dates",
+  "expect": "no raw ids («pl1», «lpNewS») and no Latin ISO dates shown to her"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "neg",
+  "role": "events",
+  "text": "a guess that was never refuted",
+  "expect": "not labelled «رد شد» and no calibration minus"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "neg",
+  "role": "events",
+  "text": "the page itself re-saves a record during load",
+  "expect": "no new dossier event"
+ },
+ {
+  "rc": "RO6.dossier_log",
+  "kind": "neg",
+  "role": "events",
+  "text": "an assistant message with no act",
+  "expect": "not listed as her act"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "time",
+  "text": "D0 (Sun 18): T41 case started, session 1 = 80% ‖ D1, D3: skipped ‖ D7 (Sun 25): late session 45%",
+  "expect": "the D7 session closes the overdue day-1/day-3 lines (they disappear from Today on D7); the cycle re-anchors from D7 (failed ⇒ next due D8 Mon 26); the case shows that due (never «موعدی ندارد»); D14 Today has no stale «روز ۱/۳» lines; one Today line per act"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "time",
+  "text": "D0: problem closed with 🔭 spaced review due D3 AND a practice case on the same problem with day-3 session",
+  "expect": "D3 Today shows ONE line for that problem (the case owns the schedule); logging the case session also satisfies the review"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "time",
+  "text": "D0: T24 — she writes 3 predictions with outcome date D+5 (Fri 23) ‖ D+5: outcomes known ‖ D+6",
+  "expect": "each prediction becomes a dated 🎯 the moment it is written (dated D0, due D+5); D+1..D+4 Today does not say «جلسهٔ نخست … عقب‌افتاده»; D+5 Today shows the 🎯s; reflections are asked only after outcomes; the case's next turn is computed from the open criterion («۳ روزِ جدا») and appears on Today D+6"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "time",
+  "text": "D0: chat plan «فردا صبح ۲۰ دقیقه پیاده‌روی» ‖ D0: she creates live step «پیاده‌روی ۲۰ دقیقه»",
+  "expect": "a one-click «همان برنامه؟» appears at step creation; after yes, plan ⇄ step ⇄ 🌱 share one state; D1 Today shows ONE line; marking the step done closes the plan and the 🌱 occurrence; chat no longer asks «انجام شد؟»"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "page",
+  "text": "guess g1 refuted in the guess kit; problem then proved impossible",
+  "expect": "the practice box says the guess is «رد شد» (from the problem's guess records), never «هنوز آزموده نشده»"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "time",
+  "text": "T41 case: 7 dated sessions 60/70/80/…, «تثبیت شد», later withdrawn at 40%",
+  "expect": "mind card «🏋 کارِ تکنیک‌ها» shows ONE row for the case with the measured values (80% → 40%) and the withdrawal; never «هنوز کارِ تکنیکیِ کامل‌شده‌ای نیست»"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "time",
+  "text": "new user D0 ‖ D3 she starts the built-in routine «بازیابی پیش از نگاه به پاسخ»",
+  "expect": "D0–D2 Today shows no such routine line; from D3 it appears with its own schedule"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "time",
+  "text": "test clock +10 days; she logs a case session",
+  "expect": "session dated the simulated day; dossier and Today agree"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه پرونده‌ی تمرین براش باز کن ‖ (later) U: آره، بازش کن دیگه",
+  "expect": "start_practice accepted from the model's validated consent report (not a keyword at the start); case opened; reply claims it only after the result"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "pos",
+  "role": "time",
+  "text": "D7 return turn with an open case: U: امروز دوباره امتحان کردم، ۴۰٪ شد",
+  "expect": "the practice block is in the prompt (an open case exists for the subject — no keyword needed); a chat action logs the session (dated D7, 40%); Today line for that due closes"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ذهنم داره می‌چرخه ‖ U: بیا تمرین کنیم (no open case)",
+  "expect": "no practice block triggered by words; the case block depends only on an open case"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "neg",
+  "role": "page",
+  "text": "a practice record saved with withdrawn = []",
+  "expect": "treated as NOT withdrawn; counted on the mind card"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "neg",
+  "role": "time",
+  "text": "case quick-form session logged on D3",
+  "expect": "does not create a second Today line; the linked P3 day-3 item closes"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "neg",
+  "role": "time",
+  "text": "one 80% session",
+  "expect": "no «تثبیت شد» declared"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: نه، فعلاً پرونده نمی‌خوام",
+  "expect": "no start_practice; no case"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "neg",
+  "role": "time",
+  "text": "chat plan «فردا به بانک زنگ بزنم» and an unrelated new step «شکل را بکش»",
+  "expect": "no auto-link; «همان برنامه؟» not forced (at most offered only when content matches)"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "neg",
+  "role": "time",
+  "text": "case closed on D10",
+  "expect": "no Today lines for it after D10"
+ },
+ {
+  "rc": "RO7.one_act_one_record",
+  "kind": "neg",
+  "role": "time",
+  "text": "T24 prediction written with no outcome date",
+  "expect": "no dated 🎯 forged; the page asks for the date"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U (17-year-old, informal elsewhere): سؤال: ثابت کنید که مجموع زوایای مثلث ۱۸۰ درجه است. نمی‌دونم از کجا شروع کنم",
+  "expect": "quoted statement after «سؤال:» is not register evidence ⇒ reply and page questions in «تو» («بنویس»), from «نمی‌دونم از کجا شروع کنم»"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: «اول کل مسئله رو بخون» این جمله‌ی کتابه، ولی من گیج شدم",
+  "expect": "quoted «…» text not register evidence; register from «من گیج شدم»"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: بیا توی سامانه ثبتش کنیم. ‖ A: [go → صفحهٔ مسئله] ثبتش کردیم",
+  "expect": "request already satisfied by the action in the reply ⇒ NOT a deferred-request candidate next turn"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "step failed; she saved a restatement in the form and answered the gap-vs-prediction in the outcome form",
+  "expect": "turn question does not ask e5 (restate) or e4 (gap) again; no alternation; next question moves on"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U (first message, flood of parameters): ارتفاع ۲ متر، شعاع ۳۰ سانت، نرخ ۵ لیتر، شیر دوم ۳ لیتر، زمان ۱ ساعت، ضخامت ۲ میلی…",
+  "expect": "the A191 intro turn question appears («کلِ مسئله را در یک جمله…» / «اول کل را ببین») — not just «مجهول چیست؟»"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "after a datum correction in a solved problem",
+  "expect": "turn question recomputed from the corrected state (e.g. «با ۶ دوباره وارسی کن»), not the whole-first question and not the taste question"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سه هفته‌ست فکر می‌کنم شکست می‌خورم ولی نخوردم",
+  "expect": "not read as a failed step; no «این گام جواب نداد؟»"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "after closure: U: بعدی؟ (an open look-back item exists)",
+  "expect": "header follows the open item's phase («بازنگری») or is omitted; never «فهمِ مسئله» with «مجهول … چیست؟»; no problem created"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: اثبات‌ها اصلاً به چه درد من می‌خوره؟ (not answered in the reply)",
+  "expect": "a real question ⇒ deferred-request candidate kept until answered"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: می‌خوام کل این نظریه‌ی تحلیل رو بندازم دور (previous reply already addressed it)",
+  "expect": "first-person intent, already addressed ⇒ NOT a deferred-request candidate"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: استادم گفت «باید فصل ۳ رو دوباره بخونی»",
+  "expect": "the advisor's quoted words are not her request ⇒ no defer candidate"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: با سلام؛ لطفاً در حل این مسئله راهنمایی بفرمایید.",
+  "expect": "her own formal words ⇒ «شما» is correct (not a register error)"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۶۷ میشه",
+  "expect": "a result, not a request"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "a question she answered via the understanding form (مجهول filled)",
+  "expect": "not re-asked in chat"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: کدام حالتِ خاص حدسم رو ردش کنه؟",
+  "expect": "kept as one question with the guess (not split into a separate option)"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "normal second message with three parameters only",
+  "expect": "A191 intro not forced when the message is not a flood"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "after a correction: U: مرسی",
+  "expect": "no new turn question invented from the correction; no header"
+ },
+ {
+  "rc": "RO8.turn_edges",
+  "kind": "neg",
+  "role": "chat",
+  "text": "quoted textbook line in «شما» inside a «تو» conversation, repeated twice",
+  "expect": "register does not flip at any turn"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: در سال ۱۳۵۲ مقدار y=۲ (۳۵۲) بود",
+  "expect": "formula run ends before the label: renders «y = ۲» then text «(۳۵۲)»; never «y = ۲(۳۵۲)»"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "pos",
+  "role": "page",
+  "text": "two plots in the panel; click «➕ افزودنِ نقطه» on plot 1",
+  "expect": "only plot 1's add form opens"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "pos",
+  "role": "page",
+  "text": "test clock on; narrow screen",
+  "expect": "the «⏱ ساعتِ آزمایشی» badge does not cover «↩ برگرد» (both clickable)"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "pos",
+  "role": "chat",
+  "text": "guess question «کدام حالتِ خاص … ردش کند؟»",
+  "expect": "«ردش» stays inside the guess question (one option)"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: نقطه‌ی (۲، ۵) رو اضافه کن",
+  "expect": "point added to the focused plot only; ticks in Persian digits"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: y = 2x + 1 (خط اول)",
+  "expect": "formula «y = 2x + 1», label «(خط اول)» as text"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "pos",
+  "role": "page",
+  "text": "plot 2's add form opened after plot 1's",
+  "expect": "plot 1's form closes or stays independent; no cross-filling"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "pos",
+  "role": "page",
+  "text": "test clock badge in dark theme",
+  "expect": "readable and not overlapping navigation"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: y=2(x+1)",
+  "expect": "one formula «y = 2(x + 1)» (parenthesis is part of the formula)"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲(۳+۵)=۱۶",
+  "expect": "one formula, multiplication kept"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: f(x) = x² (برای x مثبت)",
+  "expect": "formula «f(x) = x²», «(برای x مثبت)» text"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "neg",
+  "role": "page",
+  "text": "test clock off",
+  "expect": "no badge shown"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "neg",
+  "role": "page",
+  "text": "single plot",
+  "expect": "➕ opens its own form normally"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ردش کن",
+  "expect": "an instruction (reject), not merged into a guess question"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: سال (۱۳۵۲)",
+  "expect": "no formula created"
+ },
+ {
+  "rc": "RO9.small",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: (a+b)² = a² + 2ab + b²",
+  "expect": "one formula across the whole run"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "model output: top-level «retract»: {...} (not inside coach_state)",
+  "expect": "accepted as an alias; same result as the canonical field"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "model output: taste as an object {«q»: …} instead of a string",
+  "expect": "accepted as an alias"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "model output: said:result with no text",
+  "expect": "page asks once (structured) for the result text; nothing booked as a result yet"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "her message «حدسم n(n-1)/2 ـه»; model quotes the guess as «n(n−1)/۲»",
+  "expect": "normalized token / formula matching accepts it (hyphen vs minus, Latin vs Persian digits)"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "her «حدس می‌زنم جواب x به توان ۲ باشه»; model quotes «x^2»",
+  "expect": "formula-notation equivalence accepts (x^2 ≡ x² ≡ «x به توان ۲»)"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "model's guess quote is a faithful paraphrase that still fails matching",
+  "expect": "ONE structured re-ask («عینِ عبارتِ او را بیاور»); after that, drop rather than invent"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "chat",
+  "text": "live step 2 open; U: زنگ زدم، گفتن هفته‌ی بعد",
+  "expect": "prompt carries «آیا این پیام نتیجهٔ گامِ ۲ است؟ (بله/بخشی/نه)»; with yes the outcome is recorded on step 2"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه مسئله‌ی جدید باز کن برای انتخاب رشته",
+  "expect": "live_new created on her request AND the page navigates to it (opened)"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه مسئله شبیه این برام بساز، همین الان روش کار کنیم",
+  "expect": "chat_invent becomes live_new (opened now)"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "reply with two questions («مجهول چیست؟ و داده‌ها؟»)",
+  "expect": "post-check: one rewrite request ⇒ one question per turn"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "reply confirming «حل شد» on its own",
+  "expect": "post-check: one rewrite request; «حل شد» comes only from the page's check"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "any turn",
+  "expect": "a one-line «وضعِ کنونی» (live problem, open step, what she just answered) is at the top of the prompt"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: می‌خوام عادت سحرخیزی بسازم ولی همش شکست می‌خورم",
+  "expect": "in scope of the life tunnel (habit problem), not refused as medical"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه دسته مداد، پاک‌کن و خط‌کش داریم با هم ۲۰ تا؛ … چند تا از هر کدوم؟",
+  "expect": "page hint makes the coach check the plurals: three unknowns, not reduced to «x و ۲۰−x»"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "model labels ph:result for «فکر کنم بشه ۱۲»",
+  "expect": "no result booked from the label alone; stage from her evidence (a guess)"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "model quotes a guess that appears nowhere in her messages",
+  "expect": "rejected even after normalization; no record"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "second failed re-ask on the same quote",
+  "expect": "no third ask; dropped"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: این مسئله رو خودم ساختم: …",
+  "expect": "no unasked chat_invent; at most an offer"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: فقط ببینم چیه، فعلاً نمی‌خوام کار کنم",
+  "expect": "no live_new navigation"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: یه رژیم غذایی دقیق برام بنویس",
+  "expect": "the nutrition prescription stays out of scope (said plainly); the habit/plan part may be offered in the life tunnel"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "stale said:result from an earlier turn resent",
+  "expect": "not booked again"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "reply with one question plus a rhetorical exclamation",
+  "expect": "not flagged as two questions"
+ },
+ {
+  "rc": "MT1.page_compensation",
+  "kind": "neg",
+  "role": "chat",
+  "text": "no live step open; U: زنگ زدم",
+  "expect": "no «نتیجهٔ گامِ N؟» line"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "coaching turn with a live problem in focus (olympiad proof)",
+  "expect": "request uses task route «lla_coach»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "tour coaching turn (life decision, ill-posed)",
+  "expect": "«lla_coach»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "look-back turn after «حل شد»",
+  "expect": "«lla_coach»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "coaching turn with an attached photo of her handwritten work",
+  "expect": "«lla_coach»; the selected model supports vision"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "coaching turn with an attached PDF",
+  "expect": "«lla_coach»; the selected model supports documents"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "catalog listing of task routes",
+  "expect": "«lla_coach» exists, preferred tier = balanced/reasoning (not the top tier), requires vision + documents"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "auto model selection for «lla_coach»",
+  "expect": "picks within the tier from configured providers; no model name hard-coded in page or backend"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "GET of app-records AI tasks list",
+  "expect": "includes «lla_coach» next to «lla_assistant» (both keys present)"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "habit/health-habit problem in the life tunnel, coaching turn",
+  "expect": "«lla_coach»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "pos",
+  "role": "route",
+  "text": "day-N return turn on an open live problem",
+  "expect": "«lla_coach»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: این رو تو امروز ثبت کن (action only, no live problem in focus)",
+  "expect": "«lla_assistant»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "automatic follow-up turn after a page action result",
+  "expect": "«lla_assistant»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: برو به صفحه‌ی امروز",
+  "expect": "«lla_assistant»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "form-fill-only turn («مجهول رو بنویس زمان کل»)",
+  "expect": "«lla_assistant»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "general question with no coach layer active («ساعت جلسه‌م کِیه؟»)",
+  "expect": "«lla_assistant»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "«lla_coach» has no configured model",
+  "expect": "falls back to the assistant route without error; she is not told a model name"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "model selection for «lla_coach»",
+  "expect": "never prefers the top tier"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "✏️ system turn with no coaching needed (result-only)",
+  "expect": "«lla_assistant»"
+ },
+ {
+  "rc": "MT2.routing",
+  "kind": "neg",
+  "role": "route",
+  "text": "the old «lla_assistant» route",
+  "expect": "still exists and works unchanged (dual path kept)"
+ }
+]
