@@ -9,6 +9,7 @@ source:
 created_at: "2026-10-16T12:00:00Z"
 updated_at: "2026-10-18T14:00:00Z"
 updated_at: "2026-10-18T16:00:00Z"
+updated_at: "2026-10-19T12:00:00Z"
 merged_from: []
 ---
 
@@ -122,3 +123,15 @@ the judgement is withdrawn). The same rule picks the record a report refers to: 
 said (her stated confidence must equal the record's, other numbers must appear in its text) and ask "which?" only if more than one still fits —
 never invent a new record because no word matched. For lists the model fills from conversation, require the same consent check as for any other
 write, and accept numbers and dates only if they occur in her own message.
+
+## Update 2026-10-19 (round 23, prereq + territory loop)
+Three reusable lessons. (1) **A truncation budget must cut by priority, not from the end.** The assistant's system map was shortened from its tail when the
+prompt was too long — and the tail was exactly the territory list the model needs for a "this is missing, file a sheet" decision. Split such context into
+sections, mark the decision-critical ones as never-cut, and shorten the rest least-harm-first (drop description columns before names, glossaries before
+registries), always with an explicit note. (2) **When a hook marks records, run it again after the records exist.** The gap sheet is filed before the
+reply's actions run, so the stuck event of that same message did not exist yet when the sheet tried to mark it "cause = system"; the fix marks once at
+filing and again right after the state action. (3) **"Built" is a diff against a snapshot, and "answers the need" is checked deterministically.** Take a
+snapshot of the registry when a capability gap is reported; later, anything new or completed since then (or named in the reply under the sheet) is a
+candidate, and it counts only if it shares enough specific words with the waiting step (ignore words common to most registry entries). That keeps the
+"notice ⇒ verify ⇒ resume" loop model-independent, and a mismatch reopens the request instead of silently resuming. For attributing failures, use the
+last step boundary as the evidence of "same step" when events carry no step name, and let an evidenced cause in the same message override a default.
