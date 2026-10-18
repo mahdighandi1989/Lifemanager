@@ -1,1 +1,1 @@
-{"shot":{"name":"part_chat_math_teen","fold":false}}
+{"eval": "(()=>{APP.go('mind');const m=document.getElementById('main');const i=[...m.querySelectorAll('input')].find(i=>(i.getAttribute('aria-label')||'').includes('تاریخِ تولد'));if(!i)return 'NOFIELD';i.scrollIntoView({block:'center'});i.value='1388/11/19';i.dispatchEvent(new Event('input',{bubbles:true}));i.dispatchEvent(new Event('change',{bubbles:true}));const b=i.parentElement.querySelector('button');if(b)b.click();return 'LATIN birth='+APP.AGE.birth()+' age='+APP.AGE.age()+' val='+i.value})()"}

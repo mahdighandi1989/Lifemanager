@@ -1,7 +1,7 @@
-# recdiff.py sid — compare every eval output (old round22D vs new round23D), aligned by ctl content; normalize ids/times
+# recdiff.py sid — compare every eval output (old round23D vs new round24D), aligned by ctl content; normalize ids/times
 import json,sys,glob,re,difflib
 B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/'
-s=sys.argv[1]; O=B+'round22D/'+s; N=B+'round23D/'+s
+s=sys.argv[1]; O=B+'round23D/'+s; N=B+'round24D/'+s
 def norm(x):
     x=str(x)
     x=re.sub(r'(pb_l_|achat_|case_|lp_|prc_|pq|dl_|fc_|t20)[a-z0-9]{4,}','ID',x)

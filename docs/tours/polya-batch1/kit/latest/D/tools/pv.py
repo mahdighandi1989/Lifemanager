@@ -1,6 +1,6 @@
 # pv.py sid N — key dynamic sections of prompt N + conversation tail + new turn
 import json,sys,re,os
-D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23D/'+sys.argv[1]
+D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24D/'+sys.argv[1]
 p=json.load(open(f'{D}/ai/p{sys.argv[2]}.json')); u=p['user']; print('TASK',p.get('task'))
 secs=re.split(r'\n(?=# )',u)
 want=('# وضعِ کنونی','# مسئلهٔ زنده','# مسئلهٔ حل‌شده','# اصلاحی که صفحه انجام','# اصلاحی که صفحه نپذیرفت','# اصلاحِ پیامِ قبلی','# پرونده‌های تمرینِ باز','# پیام‌های اخیرِ صفحه','# موعدهای کاربر','# مربیِ حل','# مسئلهٔ واقعیِ','# مرحلهٔ خطا','# سلیقه','# برنامه','# قول','# عادت','# 🌱','# تور','# پیش‌نیاز','# وارسیِ','# پس از شکست','# ضمیر','# مخاطب','# فهرست‌های جاری','# سنجشِ استاندارد','# مسئلهٔ بازِ تو')

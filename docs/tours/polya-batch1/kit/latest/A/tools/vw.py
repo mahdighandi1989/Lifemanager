@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # vw.py SID N [all] : compact but complete view of the decision-relevant blocks of pN
 import json,sys,re
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23A'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24A'
 s,n=sys.argv[1],sys.argv[2]; full=len(sys.argv)>3
 p=json.load(open(f'{R}/{s}/ai/p{n}.json')); u=p['user']
 print('=== %s p%s task=%s'%(s,n,p.get('task')))

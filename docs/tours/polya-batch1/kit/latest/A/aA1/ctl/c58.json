@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvb5ub4wvc5\");const t=document.getElementById(\"main\").innerText;return \"N=\"+(t.split(\"از گفت‌وگو\").length-1)+\" | \"+t.slice(t.indexOf(\"🔭\"),t.indexOf(\"🔭\")+2600)})()"}

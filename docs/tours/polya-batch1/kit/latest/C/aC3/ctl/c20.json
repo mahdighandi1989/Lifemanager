@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go(\"today\");await W(1500);return \"TODAY \"+APP.today()+\" || \"+document.querySelector(\"#main\").innerText.slice(0,1800)})()"}
+{"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-26')+' pid='+p})()"}

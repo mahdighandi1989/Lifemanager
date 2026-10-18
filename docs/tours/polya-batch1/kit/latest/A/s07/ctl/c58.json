@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"}
+{"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"}

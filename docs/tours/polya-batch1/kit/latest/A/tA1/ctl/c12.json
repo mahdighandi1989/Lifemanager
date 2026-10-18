@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('route','pb_l_mvb9x3b1adl');return document.getElementById('main').innerText.slice(0,2500)})()"}
+{"eval": "APP.liveAll()[0].p.id"}

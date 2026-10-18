@@ -1,1 +1,1 @@
-{"eval": "'skip c64 (round-21 workaround: relative due dates instead of Persian dates)'"}
+{"eval": "(()=>{APP.go('today');const d=(APP.dueList()||[]).map(x=>x.txt).join(' || ');APP.go('tech','24','ws:ex_mvqgpqzz2kkle');return d})()"}

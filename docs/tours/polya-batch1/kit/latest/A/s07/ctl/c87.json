@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.ASSIST.toggle(true);return document.querySelectorAll(\".as-panel svg\").length+\" svgs; mx-plot=\"+document.querySelectorAll(\".as-panel .mx-plot\").length+\"; ptsAt=\"+APP.ASSIST.cur().msgs[0].ptsAt+\"; plotAdd=\"+JSON.stringify(APP.ASSIST.cur().msgs[0].plotAdd)})()"}
+{"eval": "(()=>{APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll(\".as-msg\")];return ms.slice(0,4).map((m,i)=>i+\":\"+m.querySelectorAll(\"svg\").length+\" \"+m.innerText.slice(0,50)).join(\" | \")})()"}

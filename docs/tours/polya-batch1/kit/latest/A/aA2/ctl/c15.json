@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"practice\",\"prc_mvb7u8p3xx8bz\");const m=document.getElementById(\"main\");return m.innerText.slice(0,2500)+\"\\nINPUTS:\"+[...m.querySelectorAll(\"input,textarea,select,button\")].map(e=>(e.id||\"\")+\"/\"+(e.getAttribute(\"aria-label\")||e.placeholder||e.innerText||\"\").slice(0,40)).join(\" | \")})()"}
+{"shot": {"name": "part_today_d1", "full": true}}

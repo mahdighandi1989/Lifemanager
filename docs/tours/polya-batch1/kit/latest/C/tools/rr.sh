@@ -1,6 +1,6 @@
 #!/bin/bash
 # rr.sh sid... -> loop: pending with zero filtered diff and not in manual_<sid>.txt -> reuse r21; else print review and continue others; exit when all non-auto
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C
 t0=$(date +%s)
 for _once in 1; do
   allblk=1; any=0

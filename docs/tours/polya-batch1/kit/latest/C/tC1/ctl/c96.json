@@ -1,0 +1,1 @@
+{"shot": {"name": "tool_area", "view": ["sterr", "s_decision"], "full": true, "js": "(()=>{const e=[...document.querySelectorAll('#main *')].find(x=>/اعتبارسنجیِ ایده با مشتری/.test(x.textContent||'')&&x.children.length<3);if(e)e.scrollIntoView({block:'center'});return !!e})()"}}

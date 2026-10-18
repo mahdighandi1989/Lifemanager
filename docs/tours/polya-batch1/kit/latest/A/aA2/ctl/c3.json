@@ -1,1 +1,1 @@
-{"eval": "\"AGE \"+APP.AGE.birth()+\" age=\"+APP.AGE.age()"}
+{"shot": {"name": "age_card_teen_invalid", "fold": false}}

@@ -1,1 +1,1 @@
-{"say": "آره، تورم! خرج‌مون هر سال حدود ۳۰ درصد زیاد میشه، ولی حقوقم هر سال فقط حدود ۲۰ درصد. اینو حساب نکرده بودم."}
+{"eval": "(()=>{const s=APP.ASSIST.cur();const st=JSON.parse(localStorage.getItem('mla.settings.v1')||'{}');return 'age='+APP.AGE.age()+' birth='+APP.AGE.birth()+' prof='+JSON.stringify((APP.S.settings()||{}).profile||{})+' sys='+JSON.stringify((s.msgs||[]).filter(m=>m.role==='sys').map(m=>m.text).slice(-4))+' aud='+(APP.AGE.audience?APP.AGE.audience().slice(0,600):'')})()"}

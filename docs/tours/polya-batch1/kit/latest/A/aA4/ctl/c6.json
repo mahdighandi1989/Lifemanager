@@ -1,0 +1,1 @@
+{"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"از گفت\");return \"N=\"+(t.split(\"از گفت‌وگو\").length-1)+\"\\n\"+t.slice(0,3500)})()"}

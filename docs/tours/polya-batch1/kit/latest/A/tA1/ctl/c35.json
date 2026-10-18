@@ -1,1 +1,1 @@
-{"shot":{"name":"part_route23_end_1","full":true}}
+{"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جست‌وجوی سابقه\");return APP.state.view+\" | \"+(i<0?\"NOT SHOWN\":t.slice(Math.max(0,i-100),i+300))})()"}

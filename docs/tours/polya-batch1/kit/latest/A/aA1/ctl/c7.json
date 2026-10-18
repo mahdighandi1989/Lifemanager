@@ -1,1 +1,1 @@
-{"shot":{"name":"age_card_after","fold":false}}
+{"eval": "(()=>{const s=APP.ASSIST.cur();return (s.msgs||[]).slice(-3).map(m=>m.role+': '+m.text).join('\\n')})()"}

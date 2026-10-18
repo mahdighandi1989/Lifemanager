@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('lprob','pb_l_mvaqmt77nuy');const sel=document.querySelector('.prc-tsel');if(sel){sel.value='24';sel.dispatchEvent(new Event('change',{bubbles:true}));}const b=document.querySelector('.prc-start');if(b)b.click();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+' | '+FL().slice(0,900)})()"}
+{"say": "می‌خوام یاد بگیرم این‌قدر «صد در صد» مطمئن حرف نزنم — یه تمرینِ سنجیدنِ اطمینان برام راه بنداز که هر بار پیش‌بینی کنم و بعد ببینم درست درمیاد یا نه."}

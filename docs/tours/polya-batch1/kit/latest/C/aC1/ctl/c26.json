@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go(\"mind\");await W(1800);const t=document.querySelector(\"#main\").innerText;const out=[];let i=-1;for(const m of t.matchAll(/هنجار|هم‌سن|گروه‌های سنی|سن: /g)){if(m.index-i>200){out.push(t.slice(Math.max(0,m.index-200),m.index+300));i=m.index;}}return out.join(\" ⟂ \").slice(0,3000)})()"}
+{"shot": {"name": "post_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.innerText.slice(0,40)))d.open=true});return 1})()"}}

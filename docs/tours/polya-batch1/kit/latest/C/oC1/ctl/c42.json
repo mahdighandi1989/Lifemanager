@@ -1,1 +1,1 @@
-{"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()"}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1200);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2500)})()"}

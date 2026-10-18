@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+900)})()"}
+{"eval": "APP.go(\"whole\")"}

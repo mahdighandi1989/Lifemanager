@@ -1,1 +1,1 @@
-{"shot":{"name":"part_psy_item_child","full":true}}
+{"eval": "(()=>{APP.go(\"psy_item\");const m=document.getElementById(\"main\");return m.innerText.slice(0,1500)+\"\\nBTN:\"+[...m.querySelectorAll(\"button,input\")].map(b=>(b.innerText||b.value||b.type).slice(0,30)).join(\" | \")})()"}

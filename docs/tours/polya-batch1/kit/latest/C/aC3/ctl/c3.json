@@ -1,1 +1,1 @@
-{"say": "می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داشته باشم و خرجِ داروهام هم کم نیاد. راستی متولد ۲۵ اسفند ۱۳۳۷ام، اون کارت تاریخ میلادی می‌خواست، من میلادیشو نمی‌دونم."}
+{"shot": {"name": "age_card_err", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const b=document.querySelector('.as-body,.as-msgs');if(b)b.scrollTop=b.scrollHeight;return 'panel'})()"}}

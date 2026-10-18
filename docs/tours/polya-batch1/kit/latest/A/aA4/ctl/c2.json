@@ -1,0 +1,1 @@
+{"eval": "(()=>{const c=document.querySelector(\".age-ask\");return JSON.stringify({birth:APP.AGE.birth(),age:APP.AGE.age(),said:(APP.S.get(\"settings\")||{}).profile,card:c?c.innerText:\"NOCARD\",msgs:APP.ASSIST.cur().msgs.slice(-3).map(m=>m.role+\": \"+m.text.slice(0,200))})})()"}

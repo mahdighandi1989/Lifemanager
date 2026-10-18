@@ -1,6 +1,6 @@
 # corr.py sid -> every correction result the page reported (turn, changed recs, ask fields, note)
 import json,glob,re,sys
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C'
 sid=sys.argv[1]; seen=set()
 for f in sorted(glob.glob(f'{T}/{sid}/ai/p*.json'),key=lambda x:int(x.split('/p')[-1][:-5])):
     k=int(f.split('/p')[-1][:-5]); u=json.load(open(f))['user']

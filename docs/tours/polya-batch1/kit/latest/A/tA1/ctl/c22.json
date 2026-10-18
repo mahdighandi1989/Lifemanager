@@ -1,1 +1,1 @@
-{"shot":{"name":"tA1_route_hov3","sel":".rt-tip"}}
+{"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,(x.e.checks||[]).map(c=>c.reason).join(\" || \")]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text)})"}

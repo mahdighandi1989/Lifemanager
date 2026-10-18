@@ -115,7 +115,7 @@ def scen(d):
 STAT = []
 def _sk(x):  # sNN first, then the round's extra scenarios (prerequisite, age, territory, owner-like) in name order
     return (0 if re.match(r's\d\d$', x) else 1, x)
-secs = [scen(os.path.join(src, x)) for x in sorted(os.listdir(src), key=_sk) if re.match(r'(s\d\d|[a-z]{1,2}[A-D]?\d{1,2})$', x) and os.path.isdir(os.path.join(src, x)) and os.path.exists(os.path.join(src, x, 'findings.md'))]
+secs = [scen(os.path.join(src, x)) for x in sorted(os.listdir(src), key=_sk) if re.match(r'(s\d\d|[a-z]{1,2}[A-D]?\d{1,2})[a-z]?$', x) and os.path.isdir(os.path.join(src, x)) and os.path.exists(os.path.join(src, x, 'findings.md'))]
 nok = sum(1 for x in STAT if x[2]); 
 GRP = (re.search(r'گروهِ ([ABCD])', title) or [None, ''])[1]
 NAVL = {'A': ('s01–s10', 'https://claude.ai/artifact/91WEMispzw9gyGiD4L1n4c'), 'B': ('s11–s20', 'https://claude.ai/artifact/5vnriuMia1ma8oLZMZfVja'), 'C': ('s21–s29', 'https://claude.ai/artifact/5YqS7HGgerCJwWmjomWJ4f'), 'D': ('s30–s38', 'https://claude.ai/artifact/89Rq3mP3Vs2CYfJqZPZ75L')}

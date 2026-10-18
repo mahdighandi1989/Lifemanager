@@ -1,1 +1,1 @@
-{"say": "چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش کنم که بازم روی هم ۲۴ بشه."}
+{"shot": {"name": "age_card_err", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const b=document.querySelector('.as-body,.as-msgs');if(b)b.scrollTop=b.scrollHeight;return 'panel'})()"}}

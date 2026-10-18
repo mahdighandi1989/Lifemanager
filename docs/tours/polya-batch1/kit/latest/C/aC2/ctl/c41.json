@@ -1,1 +1,1 @@
-{"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()"}
+{"shot": {"name": "post_dossier", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);return p})()"}}

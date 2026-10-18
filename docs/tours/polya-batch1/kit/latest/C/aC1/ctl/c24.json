@@ -1,1 +1,1 @@
-{"shot": {"name": "age_mind_after_puzzle", "view": ["mind"], "full": false, "js": "(()=>{const e=[...document.querySelectorAll(\"#main p, #main div\")].find(x=>/^سن: /.test(x.textContent||\"\"));if(e)e.scrollIntoView({block:\"start\"});return 1})()"}}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('psy_item');await W(1500);return document.querySelector('#main').innerText.slice(0,1500)})()"}

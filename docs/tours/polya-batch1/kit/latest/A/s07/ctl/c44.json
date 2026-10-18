@@ -1,1 +1,1 @@
-{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"}
+{"eval": "(()=>{const ms=[...document.querySelectorAll('.as-msg')];ms[2].scrollIntoView({block:'start'});return ms[3].querySelector('.mx-plot').outerHTML.slice(0,1500)})()"}

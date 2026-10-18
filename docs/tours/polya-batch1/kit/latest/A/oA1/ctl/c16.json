@@ -1,1 +1,1 @@
-{"shot":{"name":"oA1_route_decision","full":true}}
+{"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return APP.state.view+\" \"+APP.state.arg+\"\\n\"+t.slice(i,i+1100)})()"}

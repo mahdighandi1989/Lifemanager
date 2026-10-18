@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"}
+{"eval": "(()=>{const L=APP.PRE.sysAll();const e=L[1].e;const d=APP.PRE.regDiff(e.fp);const now=APP.PRE.regFP();return JSON.stringify(d.map(it=>[it.kind,it.id,it.fa,e.fp.a[it.id],now.a[it.id],JSON.stringify(APP.PRE.sysFits(e,it))]))+\" | e1check=\"+JSON.stringify(L[0].e.checks)+\" | e1tool=\"+JSON.stringify(L[0].e.tool)+\" how=\"+L[0].e.how})()"}

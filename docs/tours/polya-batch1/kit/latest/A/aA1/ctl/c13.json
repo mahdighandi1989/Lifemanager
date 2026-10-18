@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"🧭 نقشهٔ مسیرِ مسئله\"),t.indexOf(\"🧭 نقشهٔ مسیرِ مسئله\")+1500)})()"}
+{"say": "هر کدوم ۳ تا میگیرن، ۳ و ۳ میشه ۶. یکی اضافه میمونه. ولی مگه میشه؟ خانممون گفته تقسیم باید درست دربیاد"}

@@ -1,1 +1,1 @@
-{"shot":{"name":"part_psy_item_child_result","full":true}}
+{"eval": "(()=>{const m=document.getElementById(\"main\");const r=[...m.querySelectorAll(\"input[type=radio]\")];r[1].click();const t=m.querySelector(\"input[type=text],input[type=number]\");if(t){t.value=\"60\";t.dispatchEvent(new Event(\"input\",{bubbles:true}))};const b=[...m.querySelectorAll(\"button\")].find(b=>/ثبتِ پاسخ/.test(b.innerText));b.click();return m.innerText.slice(m.innerText.indexOf(\"🧩 معمای امروز\",200),m.innerText.indexOf(\"🧩 معمای امروز\",200)+900)})()"}

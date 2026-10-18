@@ -1,1 +1,1 @@
-{"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"موعدِ بعد\");return t.slice(i,i+1200)})()"}
+{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"}

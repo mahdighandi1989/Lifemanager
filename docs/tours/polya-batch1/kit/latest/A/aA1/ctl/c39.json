@@ -1,1 +1,1 @@
-{"shot":{"name":"part_mind_psy_child","full":true,"sel":"table"}}
+{"eval": "(()=>{const m=document.getElementById(\"main\");const t=m.innerText;const i=t.indexOf(\"استدلالِ سیال\\tمسئله\");return t.slice(i,i+500)})()"}

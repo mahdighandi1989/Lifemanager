@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('today');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('کارهای موعددار'),t.indexOf('کارهای موعددار')+900)})()"}
+{"eval": "(()=>{APP.go('today');return document.getElementById('main').innerText.slice(0,2500)})()"}

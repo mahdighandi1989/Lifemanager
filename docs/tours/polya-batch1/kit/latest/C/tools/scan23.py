@@ -1,6 +1,6 @@
 # scan23.py sids -> prompts with >1 unmarked question directive (turn lines) or unmarked «بپرس» outside the kept turn line
 import json,glob,re,sys
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C'
 tot=0;bad=[]
 for sid in sys.argv[1:]:
     for f in sorted(glob.glob(f'{T}/{sid}/ai/p*.json'),key=lambda x:int(x.split('/p')[-1][:-5])):

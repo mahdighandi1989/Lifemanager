@@ -1,6 +1,6 @@
 import sys,os,json,re,difflib
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid=sys.argv[1]; R8=T+'/round22A/'+sid; R9=T+'/round23A/'+sid
+sid=sys.argv[1]; R8=T+'/round23A/'+sid; R9=T+'/round24A/'+sid
 mp=json.load(open(R9+'/pidmap.json')) if os.path.exists(R9+'/pidmap.json') else {}
 def norm(s):
     s=re.sub(r'pb_l_[a-z0-9]{8,}','PID',s); s=re.sub(r'achat_[a-z0-9]+','CH',s); s=re.sub(r'20\d\d-\d\d-\d\dT[\d:.]+Z?','TS',s)
@@ -11,7 +11,7 @@ def load(D):
     while os.path.exists(D+'/ctl/c%d.json'%n):
         c=open(D+'/ctl/c%d.json'%n).read()
         for o,nw in mp.items(): c=c.replace(nw,o)
-        c=c.replace('round23A','round22A')
+        c=c.replace('round24A','round23A')
         f=D+'/out/s%d.json'%n
         o=json.load(open(f)) if os.path.exists(f) else {}
         res.setdefault(c.strip(),[]).append(norm(str(o.get('eval') or o.get('eval0') or ''))+' ||MSG '+norm(' '.join((o.get('state') or {}).get('msgs',[])[-1:])))

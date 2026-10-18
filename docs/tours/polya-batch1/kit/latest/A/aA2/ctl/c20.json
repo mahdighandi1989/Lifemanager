@@ -1,1 +1,1 @@
-{"shot":{"name":"part_practice_after_fail","full":true}}
+{"eval": "(()=>{APP.go(\"practice\",\"prc_mvb7vq78lk7fd\");const m=document.getElementById(\"main\");return m.innerText.slice(0,2500)+\"\\nINPUTS:\"+[...m.querySelectorAll(\"input,textarea,select,button\")].map(e=>(e.id||\"\")+\"/\"+(e.getAttribute(\"aria-label\")||e.placeholder||e.innerText||\"\").slice(0,40)).join(\" | \")})()"}

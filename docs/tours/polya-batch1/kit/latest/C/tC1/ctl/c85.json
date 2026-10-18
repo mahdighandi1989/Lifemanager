@@ -1,0 +1,1 @@
+{"eval": "(()=>'page='+location.pathname+' area='+JSON.stringify(!!(APP.SYST&&APP.SYST.find('dc_customer_validation'))))()"}

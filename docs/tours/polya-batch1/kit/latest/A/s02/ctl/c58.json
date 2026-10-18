@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqmsr1vpb\");return document.getElementById(\"main\").innerText.slice(900,7000)})()"}
+{"eval": "JSON.stringify({live:APP.liveAll().map(r=>[r.p.id,r.p.title,(APP.liveClosure(r.p.id)||{}).state])})"}

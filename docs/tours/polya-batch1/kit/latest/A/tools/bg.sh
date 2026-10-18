@@ -1,6 +1,6 @@
 #!/bin/bash
 # bg.sh SID : run loop with STOPS/STOPM from SID/stops.env ; output in SID/drive.out
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23A
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24A
 [ -f $R/$1/stops.env ] && . $R/$1/stops.env
 export STOPS STOPM STOPCTL
 echo "---- $(date +%T)" >> $R/$1/drive.out

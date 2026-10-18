@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"psy_item\");const m=document.getElementById(\"main\");return m.innerText.slice(0,1500)+\"\\nBTN:\"+[...m.querySelectorAll(\"button,input\")].map(b=>(b.innerText||b.value||b.type).slice(0,30)).join(\" | \")})()"}
+{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"سن:\");const j=t.indexOf(\"علتِ\");return t.slice(Math.max(0,i-50),i+900)+\"\\n-----\\n\"+(j>=0?t.slice(j-200,j+900):\"NO CAUSES\")})()"}

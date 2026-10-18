@@ -1,1 +1,1 @@
-{"shot": {"name": "route_nested_hover", "full": false, "js": "(()=>{const L=[...document.querySelectorAll('.rt-pt.rt-p-det')];const g=L.pop()||document.querySelector('.rt-pt');if(!g)return 'NO PT';g.scrollIntoView({block:'center'});g.dispatchEvent(new Event('mouseenter'));const t=document.querySelector('.rt-tip');return g.getAttribute('aria-label')+' || '+(t?t.innerText:'')})()"}}
+{"say": "پس ضلعِ دیگه ۸ متره."}

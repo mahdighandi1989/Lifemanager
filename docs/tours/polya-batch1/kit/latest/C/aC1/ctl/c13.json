@@ -1,1 +1,1 @@
-{"shot": {"name": "age_mind", "view": ["mind"], "full": true, "js": "(()=>{document.querySelectorAll(\"details\").forEach(d=>d.open=true);return 1})()"}}
+{"shot": {"name": "route_b_mid", "full": true, "js": "(()=>{const p=(APP.ASSIST.cur().id);APP.go('route',p);return p})()"}}

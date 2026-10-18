@@ -1,1 +1,1 @@
-{"say": "۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه برابرِ ۱۲ نیست."}
+{"shot": {"name": "route_a_start", "full": true, "js": "(()=>{const p=(APP.ASSIST.cur().id);APP.go('route',p);return p})()"}}

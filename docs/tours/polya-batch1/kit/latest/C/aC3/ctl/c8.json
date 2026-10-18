@@ -1,1 +1,1 @@
-{"say": "اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. پس جا داره."}
+{"shot": {"name": "route_a_start", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('route',p);return p})()"}}

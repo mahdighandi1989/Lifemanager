@@ -1,1 +1,1 @@
-{"shot": {"name": "route_lookback", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('route',p);return p})()"}}
+{"eval": "(()=>[...document.querySelectorAll('#main input,#main select,#main textarea')].filter(e=>/^lpB/.test(e.id)).map(e=>e.id+'['+e.type+']:'+(e.getAttribute('aria-label')||'').slice(0,90)+'='+(e.type==='checkbox'?e.checked:String(e.value).slice(0,40))+(e.options?' {'+[...e.options].map(o=>o.text.slice(0,30)).join('/')+'}':'')).join(' | '))()"}

@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);__adv(185);APP.go('today');await w(1300);window.scrollTo(0,0);return APP.today()+' :: '+document.getElementById('main').innerText.split('\\n').filter(l=>/پس‌انداز|سپرده|برنامه|بازبینی|📌|🔭/.test(l)).join(' ¦ ')})()"}
+{"say": "سالانه بسه، ولی خرج درمان رو جدا می‌نویسم چون یهویی میاد."}

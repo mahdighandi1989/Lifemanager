@@ -1,1 +1,1 @@
-{"shot": {"name": "route_final", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('route',p);return p})()"}}
+{"say": "سلام، امروز «امروز» گفت مسئلهٔ ۱ + ۲ + … + n برگشته. با همون نتیجه حلش کردم: 2 + 4 + … + 2n = 2(1 + 2 + … + n) = n(n + 1)، پس 1 + 2 + … + n = n(n + 1)/2. با n = 4: ۱۰ = 4×5/2. درسته! راستی ۱۶ سالمه، تولدم ۲ بهمنه — اون روز تو کارت درست زدم؟"}

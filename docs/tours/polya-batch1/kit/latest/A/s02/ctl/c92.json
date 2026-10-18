@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify((APP.S.get(\"eprog_pb_l_mvaqmsr1vpb\").solve.u||{}).data||(APP.S.get(\"eprog_pb_l_mvaqmsr1vpb\").solve.u||{}).d||Object.keys(APP.S.get(\"eprog_pb_l_mvaqmsr1vpb\").solve.u||{}))"}
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm4p4843\");return JSON.stringify(APP.liveClosure(\"pb_l_mvaqm4p4843\"))+\"\\n\"+MT(\"داده‌ها\",10)+\"\\n\"+FL(\"lpD_\")})()"}

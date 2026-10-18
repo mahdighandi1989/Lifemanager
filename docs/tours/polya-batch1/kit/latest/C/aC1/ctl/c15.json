@@ -1,1 +1,1 @@
-{"shot": {"name": "sess_dossier", "full": true, "js": "(()=>{const s=APP.ASSIST.cur();APP.go(\"dossier\",s.id);return s.id})()"}}
+{"shot": {"name": "route_b_mid_hover", "full": false, "js": "(()=>{const L=[...document.querySelectorAll('.rt-pt.rt-p-det')];const g=L.pop()||[...document.querySelectorAll('.rt-pt')].pop();if(!g)return 'NO PT';g.scrollIntoView({block:'center'});g.dispatchEvent(new Event('mouseenter'));const t=document.querySelector('.rt-tip');return g.getAttribute('aria-label')+' || '+(t?t.innerText:'')})()"}}

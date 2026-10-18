@@ -1,0 +1,1 @@
+{"eval": "(()=>JSON.stringify((APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({sc:o.sc.pid||o.sc.sess,id:o.e.id,state:o.e.state,how:o.e.how}))))()"}

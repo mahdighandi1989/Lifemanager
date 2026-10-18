@@ -1,6 +1,6 @@
 #!/bin/bash
 # fin.sh sid tag -> append final shots (lprob/dossier/mind/today/panel/session dossier) + exit
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C
 s=$1; t=$2
 P="(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id)"
 python3 tools/nc.py $s raw "{\"shot\":{\"name\":\"${t}_lprob\",\"full\":true,\"js\":\"(()=>{const p=$P;APP.go('lprob',p);return p})()\"}}"

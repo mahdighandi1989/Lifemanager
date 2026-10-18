@@ -2,9 +2,9 @@
 import json,sys,glob,os
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
 sid=sys.argv[1]; spec=json.load(open(sys.argv[2]))
-D=f'{T}/round23C/src/{sid}/ctl'; n=len(glob.glob(D+'/c*.json'))
-REC=open(f'{T}/round23C/tools/rec.js').read()
-HELP=json.load(open(T+'/round22C/s22/ctl/c1.json'))['eval0']
+D=f'{T}/round24C/src/{sid}/ctl'; n=len(glob.glob(D+'/c*.json'))
+REC=open(f'{T}/round24C/tools/rec.js').read()
+HELP=json.load(open(T+'/round23C/s22/ctl/c1.json'))['eval0']
 GOP="(()=>{const p=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;APP.go('lprob',p);return p})()"
 GOD="(()=>{const p=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;APP.go('dossier',p);return p})()"
 out=[]

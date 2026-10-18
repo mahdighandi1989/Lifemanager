@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+300)})()"}
+{"say": "هر کدوم ۳ تا. ۳ تا ۳ تا میشه ۹. یکی باقی‌مانده میشه"}

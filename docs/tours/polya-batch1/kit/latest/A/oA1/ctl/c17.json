@@ -1,1 +1,1 @@
-{"eval": "(()=>{const t=document.getElementById('main').innerText;const i=t.indexOf('🧭 نقشهٔ مسیرِ مسئله');return t.slice(i,i+1500)})()"}
+{"shot":{"name":"oA1_route_job_mixed","full":true}}

@@ -1,1 +1,1 @@
-{"shot":{"name":"oA1_route_hov0","sel":".rt-tip"}}
+{"eval": "(()=>{const t=document.getElementById('main').innerText;const i=t.indexOf('🧭 نقشهٔ مسیرِ مسئله');return t.slice(i,i+1500)})()"}

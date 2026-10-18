@@ -1,1 +1,1 @@
-{"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"}
+{"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvggdb1gapg\");const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"گفت‌وگوهای این مسئله\"))})()"}

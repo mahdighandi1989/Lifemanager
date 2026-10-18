@@ -1,1 +1,1 @@
-{"exit": true}
+{"shot": {"name": "post_sessdossier", "full": true, "js": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return s.id})()"}}

@@ -1,1 +1,1 @@
-{"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()"}
+{"shot": {"name": "post_sessdossier", "full": true, "js": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return s.id})()"}}

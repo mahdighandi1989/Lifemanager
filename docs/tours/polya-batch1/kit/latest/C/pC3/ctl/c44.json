@@ -1,1 +1,1 @@
-{"shot": {"name": "pc_panel", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector(\".as-panel\");if(!pn||pn.hidden)APP.ASSIST.toggle(true);return 1})()"}}
+{"shot": {"name": "post_dossier", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);return p})()"}}

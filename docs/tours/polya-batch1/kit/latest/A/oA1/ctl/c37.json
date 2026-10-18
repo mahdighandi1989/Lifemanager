@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(Object.keys(APP.S.all('eprob',r=>r&&r.live)[0]||{}))"}
+{"eval": "(()=>{APP.go('today');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('کارهای موعددار'),t.indexOf('کارهای موعددار')+900)})()"}

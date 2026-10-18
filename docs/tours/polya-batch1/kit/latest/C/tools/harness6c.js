@@ -19,6 +19,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   });
   await p.exposeFunction('__sheetSave', async (s) => { fs.writeFileSync(path.join(D, 'sheets', s.id + '.json'), JSON.stringify(s, null, 1)); return true; });
   await p.exposeFunction('__sheetLoad', async (id) => { const f = path.join(D, 'sheets', id + '.json'); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null; });
+  await p.exposeFunction('__setPage', async (pg) => { fs.writeFileSync(path.join(D, 'page.path'), String(pg)); return 'page.path=' + pg; });
   await p.exposeFunction('__sheetList', async () => fs.readdirSync(path.join(D, 'sheets')).filter(f => f.endsWith('.json')).map(f => JSON.parse(fs.readFileSync(path.join(D, 'sheets', f), 'utf8'))));
   let mc = fs.readdirSync(path.join(D, 'mail')).length;
   // Drive stub (campaign 3): uploads saved under drive/files/<id>-<name> so the model agent can read attached content; mirror calls logged
@@ -30,7 +31,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await p.exposeFunction('__mirror', async (o) => { fs.appendFileSync(path.join(D, 'drive', 'mirror.jsonl'), JSON.stringify({ at: new Date().toISOString(), n: (o.items || []).length, items: (o.items || []).slice(0, 50), deleted: o.deleted }) + NL); return { ok: true }; });
   await p.exposeFunction('__mail', async (r) => { fs.writeFileSync(path.join(D, 'mail', 'm' + (++mc) + '.json'), JSON.stringify(r)); return { status: 'sent' }; });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
-  await p.goto('file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'); await p.waitForSelector('.nav');
+  const PGF = path.join(D, 'page.path'); const PG = fs.existsSync(PGF) ? fs.readFileSync(PGF, 'utf8').trim() : '/home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'; log.push('page: ' + PG);
+  await p.goto('file://' + PG); await p.waitForSelector('.nav');
   const inj = path.join(D, 'inject.js'); if (fs.existsSync(inj)) await p.evaluate(fs.readFileSync(inj, 'utf8'));
   const num0 = Math.max(100, ...fs.readdirSync(path.join(D, 'sheets')).map(f => +((f.match(/^sh(\d+)/) || [])[1] || 0)));
   await p.evaluate((NUM0) => {

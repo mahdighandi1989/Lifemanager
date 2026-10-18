@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"today\");return (APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"}

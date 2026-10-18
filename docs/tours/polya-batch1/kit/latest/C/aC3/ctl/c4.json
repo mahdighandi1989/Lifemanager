@@ -1,1 +1,1 @@
-{"say": "حقوق و ۶۰ میلیون قطعیه. ۱۰ درصد رو از داروخونه پرسیدم، تقریبیه. پس هر سه ماه داروم ۱۰ درصد بیشتر میشه، یعنی تو ۹ ماه ۳۰ درصد بیشتر. ثبتش کنید."}
+{"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='بعداً').click();return 'later; age='+APP.AGE.age()})()"}

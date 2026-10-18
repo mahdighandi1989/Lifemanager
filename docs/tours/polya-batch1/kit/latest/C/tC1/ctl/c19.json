@@ -1,1 +1,1 @@
-{"shot": {"name": "sheets_view", "full": true, "js": "(()=>{APP.go(\"sheets\");return 1})()"}}
+{"shot": {"name": "route_other101", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('route',p);return p})()"}}

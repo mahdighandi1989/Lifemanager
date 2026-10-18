@@ -1,6 +1,6 @@
 #!/bin/bash
 # post23.sh sid — post22 (dossiers, practice, mind) + route map per live problem + mind text + age prompt check
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23D
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24D
 D=$R/$1; T=$R/tools
 bash $T/post22.sh $1 > /dev/null 2>&1
 grep '^dossier_lp' $D/out/_post.list | while read name id; do

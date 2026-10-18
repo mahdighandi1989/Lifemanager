@@ -1,1 +1,1 @@
-{"shot": {"name": "route_oc_end", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('route',p);return p})()"}}
+{"say": "پیشرفت: ۱۸ صفحه و یه ترتیبِ روشن. آموختم که عددِ «واقعی» رو باید از هفتهٔ واقعی بگیرم نه از امیدم. بله، دادهٔ ۲ رو هم عوض کن."}

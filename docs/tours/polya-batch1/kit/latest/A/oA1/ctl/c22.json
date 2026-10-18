@@ -1,1 +1,1 @@
-{"say": "یه نکته: تو نقشهٔ این تصمیم، حدسِ ۱۰۰ و اصلاحِ ۱۲ نفرِ مهمونی هم اومده — اونا که مالِ این نیستن! دربارهٔ کافی بودن: نه، نمی‌دونم شرکتِ جدید چقدر ثبات داره. یه چیزِ دیگه: کارنامهٔ ذهنم تا الان دربارهٔ من چی می‌گه و هر عددش از کجا اومده؟"}
+{"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[1];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');t&&t.scrollIntoView({block:'center'});return g.length+' pts | '+x.getAttribute('aria-label')+' || TIP: '+(t?t.innerText:'')})()"}

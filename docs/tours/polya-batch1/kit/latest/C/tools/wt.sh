@@ -1,6 +1,6 @@
 #!/bin/bash
 # wt.sh [secs] -> run rr auto pass repeatedly; exit when some scenario BLOCKs or all idle
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C
 S="${SIDS:-s22 s23 s25 s29 pC1 pC2 pC3}"
 t0=$(date +%s); sleep 8
 while [ $(( $(date +%s)-t0 )) -lt ${1:-240} ]; do

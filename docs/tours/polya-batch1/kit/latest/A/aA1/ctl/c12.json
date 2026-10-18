@@ -1,1 +1,1 @@
-{"say": "هر کدوم ۳ تا میگیرن، ۳ و ۳ میشه ۶. یکی اضافه میمونه. ولی مگه میشه؟ خانممون گفته تقسیم باید درست دربیاد"}
+{"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify({sc:sc&&{k:sc.k||sc.kind,pk:sc.pk},all:APP.PRE.all(sc),rec:APP.PRE.rec&&APP.PRE.rec(sc)&&APP.PRE.rec(sc).id})})()"}

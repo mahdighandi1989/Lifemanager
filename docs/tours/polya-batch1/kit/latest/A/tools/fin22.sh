@@ -1,6 +1,6 @@
 #!/bin/bash
 # fin21.sh SID : dossiers (every live problem + every session) text+full shot, mind «از کجا؟» text+shot, Today shot, exit, kill, remove profile
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23A; S=$1
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24A; S=$1
 P=$(bash $R/tools/ev.sh $S 'APP.S.all("eprob",r=>r&&r.live&&r.p).map(r=>r.p.id).join(" ")' | grep EVAL | sed 's/EVAL: //')
 i=0; for p in $P; do i=$((i+1)); bash $R/tools/ev.sh $S "(()=>{APP.go('dossier','$p');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()" eval 30000 | grep -v "^wrote\|^===" > $R/$S/dossier22_$i.txt; echo "{\"shot\":{\"name\":\"dossier22_full_$i\",\"full\":true}}" | bash $R/tools/s.sh $S >/dev/null 2>&1; done
 Q=$(bash $R/tools/ev.sh $S 'APP.S.all("achat",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(" ")' | grep EVAL | sed 's/EVAL: //')

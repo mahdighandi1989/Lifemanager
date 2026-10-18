@@ -1,1 +1,1 @@
-{"eval": "APP.go(\"lprob\",\"pb_l_mvaqmt77nuy\")"}
+{"eval": "(()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('کارِ تکنیک');return i<0?'NO TECH SECTION':t.slice(i-50,i+1500)})()"}

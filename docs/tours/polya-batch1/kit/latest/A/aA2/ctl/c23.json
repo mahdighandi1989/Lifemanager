@@ -1,1 +1,1 @@
-{"say": "بازیابیِ امروز: دوباره بی‌نگاه نوشتم. L یعنی ردیفِ n تایی + ستونِ n تایی + کاشیِ گوشه = 2n+1، و n^2 + 2n+1 = (n+1)^2. این بار درست و کامل."}
+{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].find(b=>/ثبتِ جلسهٔ امروز/.test(b.innerText));b.click();const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جلسه‌ها\");return t.slice(i-500,i+700)})()"}

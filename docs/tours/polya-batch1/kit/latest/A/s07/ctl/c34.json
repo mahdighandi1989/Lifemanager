@@ -1,1 +1,1 @@
-{"eval": "FL('lpB').split('\\n').map(x=>x.slice(0,110)).join('\\n')+'\\n'+JSON.stringify(APP.liveClosure('pb_l_mvaqm3gedkz'))\n"}
+{"eval": "(()=>{C(\".lp-solved\");return APP.state.sub+\"\\n\"+FL(\"lpB(Dom|Lim|Law|Rng)\")+\"\\n\"+MT(\"دامنه\",500)})()"}

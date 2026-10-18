@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"}
+{"eval": "JSON.stringify(APP.S.all('eprob',r=>r&&r.live).map(r=>({id:r.p&&r.p.id,g:(r.guesses||r.p&&r.p.guesses||[]).map(x=>[x.id,x.text,x.res||x.status])})))"}

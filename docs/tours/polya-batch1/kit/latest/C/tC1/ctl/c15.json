@@ -1,1 +1,1 @@
-{"say": "قدمِ اول: تا آخرِ هفتهٔ بعد یه نمونه با سنسورِ ارزون و یه برد کوچیک می‌سازم و یه هفته تو باغِ داییم کنارِ دماسنجِ دقیق می‌ذارم."}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);const t=document.querySelector('#main').innerText;const i=t.search(/منتظر|برگهٔ|ابزارِ لازم|از راهِ دیگری|وارسیِ برگه/);return i>=0?t.slice(Math.max(0,i-400),i+1600):'NO SHEET LINES || '+t.slice(0,800)})()"}

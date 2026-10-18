@@ -1,1 +1,1 @@
-{"say": "۱۳ × ۱۳ = ۱۶۹، ۵ × ۵ = ۲۵، ۱۶۹ − ۲۵ = ۱۴۴، پس ارتفاع ضرب در خودش ۱۴۴ میشه... جذرش ۱۲! ارتفاع ۱۲ متره. پس مستطیل ۱۰ × ۱۲ = ۱۲۰ و مثلث نصفش ۶۰ متر مربع؟"}
+{"shot": {"name": "route_after_return", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('route',p);return p})()"}}

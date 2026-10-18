@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"سن:\");const j=t.indexOf(\"علتِ\");return t.slice(Math.max(0,i-50),i+900)+\"\\n-----\\n\"+(j>=0?t.slice(j-200,j+900):\"NO CAUSES\")})()"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"}

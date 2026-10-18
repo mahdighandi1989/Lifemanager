@@ -1,1 +1,1 @@
-{"shot": {"name": "post_dossier", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('dossier',p);return p})()"}}
+{"say": "اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم."}

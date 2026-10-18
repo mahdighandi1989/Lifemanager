@@ -4849,3 +4849,16 @@ dated stability, mind-card feed) under way.
   the last page field (test_fixes_1015b #12). Fixed at the cause — `AS.cutManifest` compresses the self-facts and registry lines before
   any page field; the test was not changed.
 - **FINDING** gate31: fail=0 (pytest 2137, 126 page tests, build, host e2e).
+
+## 2026-10-19 — Pólya round 24 finished; frozen by the owner's directive
+- **FINDING** Round 24 on main eee4ff0f, 75 scenarios: zero-defect A 0/19 · B 0/19 · C 2/18 · D 0/19. One S1 (D24-1 = A24-4 = C24-14): an
+  unrelated routine reply on a gap sheet is announced «🛎 ابزارِ لازم آمد» because `sysSheet` reads the sheet's own filing text and matches
+  generic words. Better than round 23: routing (A 218/218, B 208/208, C 232/233, D 194/195), Jalali birth dates equal ICU everywhere,
+  territory loop positive and sys_done arms work, chat ⇄ forms import shown and confirmed, most correction trials pass.
+- **DECISION** Root mechanisms R1–R7 and the six-fixer split in `docs/tours/polya-batch1/decisions/DECISIONS_R24.md`. Fixers NOT launched:
+  owner directive 2026-10-19 (stop after round 24 until he says continue). Freeze card: `docs/tours/polya-batch1/STATE.md` «🧊».
+- **CHANGE** Owner question bank: round-24 verdicts for 1–15, new questions 16–30. Dataset refreshed through round 24 (565 exchanges).
+  Storyboards A–D republished on round 24 (scenario dirs with an arm suffix, e.g. oD1n, now included). Experience update on testing the
+  negative arm of waiting loops.
+- **FINDING** E-mails: B and C sent theirs; A's and D's sends were refused by the permission classifier — not sent on their behalf; open
+  question to the owner.

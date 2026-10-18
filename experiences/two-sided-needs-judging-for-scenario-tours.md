@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T07:00:00Z"
 created_at: "2026-10-17T07:00:00Z"
-updated_at: "2026-10-17T19:00:00Z"
+updated_at: "2026-10-19T00:00:00Z"
 merged_from: []
 ---
 
@@ -67,3 +67,17 @@ axes: purpose/philosophy (from its own design doc), function, quality/gaps, both
 «merge with X» / «should appear inside flow Y, not as a separate place» / «unused ⇒ quarantine candidate»). A part judged unused or
 overlapping in two consecutive rounds becomes a merge/quarantine proposal to the owner (never a silent deletion). This is what makes
 the review holistic without the owner having to name parts one by one.
+
+## Update 2026-10-19 — always test the negative arm of a "wait until it is built" loop
+A loop that parks a step until an external party builds a missing capability ("file a gap, wait, notice, verify, resume") passed its
+positive arm in three of four groups on its first full test — and failed the arm nobody had written a criterion for: an unrelated reply
+on the gap ticket was announced as "the tool you needed arrived". Root cause: the verifier read every note on the ticket, including the
+ticket's own filing text, which naturally names the needed capability, and matched on generic shared words; it also took the first
+candidate over a two-word threshold instead of the best one.
+- **Rule:** the verifier reads only the builder's reply, ignores words inside negations and candidates the diagnosis ruled out, scores
+  every candidate and takes the best, and asks the person when the score is not clear.
+- **Tour rule:** every waiting loop is tested with three arms — real build (positive), unrelated reply (must not resume, must say why),
+  and "the person solved it another way" (must close as such). A positive arm alone proves nothing about false arrivals.
+- **Reading the trend:** the round that first tests several mechanisms end to end shows *fewer* zero-defect scenarios while the system
+  is clearly better (routing near perfect, dates exact, the loop built). Report both numbers and say why; never present the drop as a
+  regression or hide it.

@@ -9,7 +9,7 @@ def tq(u):
         if m: out.append('LIVE:'+m.group(1)[:200])
     return out
 for s in sys.argv[1:]:
-    D=f'{B}/round23B/{s}'; src=open(f'{D}/src.txt').read().strip(); S=f'{B}/round22B/{src}'
+    D=f'{B}/round24B/{s}'; src=open(f'{D}/src.txt').read().strip(); S=f'{B}/round23B/{src}'
     am=json.load(open(f'{D}/amap.json')) if os.path.exists(f'{D}/amap.json') else {}
     log=open(f'{D}/drv.log').read()
     for n,m in sorted(am.items(), key=lambda x:int(x[0])):

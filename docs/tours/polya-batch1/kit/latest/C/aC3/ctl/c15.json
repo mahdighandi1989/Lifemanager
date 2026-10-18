@@ -1,1 +1,1 @@
-{"say": "پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها روی هم جمع نمیشن. یه چیزی: تاریخِ تولدم رو درست ثبت کردی؟ اون کارتِ اول دوباره نیومد."}
+{"shot": {"name": "lprob_chatwork", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);return p})()"}}

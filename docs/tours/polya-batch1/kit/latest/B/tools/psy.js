@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'); const D = process.argv[2], O =
 (async () => {
   const ctx = await chromium.launchPersistentContext(path.join(D, 'profile'), { viewport: { width: 1360, height: 900 } });
   const p = ctx.pages()[0] || await ctx.newPage(); await p.route('**/fonts.googleapis.com/**', r => r.abort());
-  await p.goto('file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'); await p.waitForSelector('.nav');
+  await p.goto(process.env.PAGE || 'file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'); await p.waitForSelector('.nav');
   const inj = path.join(D, 'inject.js'); if (fs.existsSync(inj)) await p.evaluate(fs.readFileSync(inj, 'utf8'));
   let toast = '';
   await p.evaluate(() => { APP.S.loaded = true; APP.HOST = APP.HOST || {}; APP.HOST.ai = async () => '{"reply":"(post)","actions":[]}'; const t = APP.toast; APP.toast = function (m) { window.__lastToast = m; return t && t.apply(this, arguments); }; try { APP.ASSIST.toggle(false) } catch (e) { } APP.go('psy_item'); });

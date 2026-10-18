@@ -1,0 +1,1 @@
+{"eval": "APP.S.all(\"prereq\").map(x=>x.title||x.t||x.fa).join(\" | \")"}

@@ -1,1 +1,1 @@
-{"shot": {"name": "route_aC3_end_hover", "full": false, "js": "(()=>{const L=[...document.querySelectorAll('.rt-pt.rt-p-det')];const g=L.pop()||document.querySelector('.rt-pt');if(!g)return 'NO PT';g.scrollIntoView({block:'center'});g.dispatchEvent(new Event('mouseenter'));const t=document.querySelector('.rt-tip');return g.getAttribute('aria-label')+' || '+(t?t.innerText:'')})()"}}
+{"say": "پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها روی هم جمع نمیشن. یه چیزی: تاریخِ تولدم رو درست ثبت کردی؟ تو شناسنامه نوشته 1337/12/25."}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify({sc:sc&&{k:sc.k||sc.kind,pk:sc.pk},all:APP.PRE.all(sc),rec:APP.PRE.rec&&APP.PRE.rec(sc)&&APP.PRE.rec(sc).id})})()"}
+{"say": "اول همه شیرینیا رو میشمارم. ۳ تا ۸ تا میشه ۲۴. بعد ۵ تا رو کم میکنم میشه ۱۹. بعد ۱۹ رو تقسیم بر ۳ میکنم... ولی ۱۹ تقسیم بر ۳ نمیشه! ۳ تا ۶ تا میشه ۱۸ نه ۱۹. گیر کردم"}
