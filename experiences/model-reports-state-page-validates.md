@@ -9,6 +9,7 @@ source:
 created_at: "2026-10-16T12:00:00Z"
 updated_at: "2026-10-18T14:00:00Z"
 updated_at: "2026-10-18T16:00:00Z"
+updated_at: "2026-10-18T21:00:00Z"
 updated_at: "2026-10-18T20:00:00Z"
 merged_from: []
 ---
@@ -124,6 +125,17 @@ said (her stated confidence must equal the record's, other numbers must appear i
 never invent a new record because no word matched. For lists the model fills from conversation, require the same consent check as for any other
 write, and accept numbers and dates only if they occur in her own message.
 
+## Update 2026-10-18 (round 23, prereq + territory loop)
+Three reusable lessons. (1) **A truncation budget must cut by priority, not from the end.** The assistant's system map was shortened from its tail when the
+prompt was too long — and the tail was exactly the territory list the model needs for a "this is missing, file a sheet" decision. Split such context into
+sections, mark the decision-critical ones as never-cut, and shorten the rest least-harm-first (drop description columns before names, glossaries before
+registries), always with an explicit note. (2) **When a hook marks records, run it again after the records exist.** The gap sheet is filed before the
+reply's actions run, so the stuck event of that same message did not exist yet when the sheet tried to mark it "cause = system"; the fix marks once at
+filing and again right after the state action. (3) **"Built" is a diff against a snapshot, and "answers the need" is checked deterministically.** Take a
+snapshot of the registry when a capability gap is reported; later, anything new or completed since then (or named in the reply under the sheet) is a
+candidate, and it counts only if it shares enough specific words with the waiting step (ignore words common to most registry entries). That keeps the
+"notice ⇒ verify ⇒ resume" loop model-independent, and a mismatch reopens the request instead of silently resuming. For attributing failures, use the
+last step boundary as the evidence of "same step" when events carry no step name, and let an evidenced cause in the same message override a default.
 ## Update 2026-10-18 (round 23, story) — a validated report must reach every reader, not just the module that validated it
 The coach's validated reports (said, plan, step, result) were stored only where the chat module kept its own state, while the forms, the stage,
 the dossier and the route map read only the forms. So the system "knew" she had stated the whole and a plan, yet asked for the whole again and
@@ -136,3 +148,12 @@ showed "no plan yet". Lessons:
 - **Every event carries its owner** (which problem, by binding time or the problem's chat window); "the only live problem of the session" is not an owner.
 - **Explicit markers beat inference for summary acts:** a "whole in one sentence" is recognised only from her explicit marker ("in one sentence: …"),
   never from `said:u` alone.
+## Update 2026-10-19 — a correction follows the value's role, never rewrites a computed or refuted result
+- **Same value is not same fact.** Match a copy by the value *in its role*: the members of a list share the list's trailing unit; a range bound («۱۰ تا ۲۰») is not the single value «۲۰»;
+  the counted noun after a number («۸۰۰ کارتن») names it; masked digits («؟۴۸۷؟») match only masked digits; a word window stops at the next number (words after it belong to that number).
+- **Never borrow a unit.** When she said a value without a unit («۱.۶ ارتفاع») and corrects it with a unit («۱۵۰ سانت»), the old unit is unknown — let the copy that wrote the unit
+  («۱.۶ متر») say it, and convert from there.
+- **Derived values become stale, not rewritten.** A result computed from the old datum («۱۰ × ۹ ÷ ۲ = ۴۵») cannot be fixed by number substitution; mark it stale with the reason and let the
+  person recompute. Her own refuted guess/result is evidence of her work — "I misstated" (rewrite) differs from "my result was refuted" (keep «رد شد»).
+- **A bare "yes" is ambiguous.** Apply a chat answer to an open copy question only when it names the field or says "change it" with exactly one question open.
+- **Test the meaning, not a regex the bug can pass.** The round-22 assertion accepted the reordered «عروسی ۱۵ اسفنده برادرم مونده»; write the negative of the exact runner text.

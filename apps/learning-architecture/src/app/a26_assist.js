@@ -493,6 +493,22 @@
   var MAX_USER = 58000;
   /* بودجه: نقشه + سشن + صفحه + پیامِ تازه + متنِ فایل همیشه کامل؛ تاریخچه هرچه جا بماند (بقیه در «حافظهٔ سشن»).
      اگر حتی بی تاریخچه جا نشود (فقط نسخهٔ مستقل با فایلِ متنیِ خیلی بزرگ)، متنِ فایل با **اعلامِ صریح** کوتاه می‌شود — هرگز بی‌صدا. */
+  /* دورِ ۲۳ (Q6، B·D16 / D23-36 — تورِ پولیا): کوتاه‌کردنِ «نقشهٔ سامانه» از ته، همان «قلمروِ سامانه‌ها» (s_comm، s_self…) را پیش از تشخیصِ کمبود می‌انداخت.
+     حالا به ترتیبِ کم‌زیان‌ترین کوتاه می‌شود و قلمروها (سامانه‌ها، معرفت‌شناسی)، «چه کسی مسئولِ چیست»، پیشنهادهای منتظر و دادهٔ خودِ کاربر هرگز بریده نمی‌شوند:
+     ستون‌های توضیحیِ نماها ⇐ واژه‌نامه ⇐ مسیرهای کاری ⇐ سطرهای بلندِ ثبت‌گاه‌ها ⇐ نماها فقط با شناسه و نام. هر کوتاه‌شدن با اعلامِ صریح. */
+  var MAN_KEEP = /^## (?:قلمروِ سامانه‌ها|چه کسی مسئولِ چیست|قلمروِ معرفت‌شناسی|پیشنهادهای منتظرِ|دادهٔ خودِ کاربر)/;
+  AS.cutManifest = function (man, need, hard) {
+    var P = String(man || "").replace(/\n+$/, "").split(/\n(?=## )/), L0 = P.join("\n").length, cols = function (n) { return function (sec) { return sec.split("\n").map(function (l, i) { return i === 0 || /^\(/.test(l) ? l : l.split(" — ").slice(0, n).join(" — "); }).join("\n"); }; };
+    var steps = [[/^## نماها/, function (sec) { return cols(3)(sec) + "\n(ستون‌های «چیست / به چه کار می‌آید» ِ نماها برای جا کوتاه شد — VIEW_META همان است)"; }],
+      [/^## واژه‌نامه/, function () { return "## واژه‌نامه — (برای جا کنار رفت)"; }],
+      [/^## مسیرهای کاریِ/, function () { return "## مسیرهای کاریِ قدم‌به‌قدم — (برای جا کنار رفت)"; }],
+      [/^## ثبت‌گاه‌ها/, function (sec) { return sec.split("\n").map(function (l, i) { return i === 0 ? l : clip(l, 240); }).join("\n"); }],
+      [/^## نماها/, cols(2)]];
+    for (var i = 0; i < steps.length && L0 - P.join("\n").length < need; i++) P = P.map(function (sec) { return !MAN_KEEP.test(sec) && steps[i][0].test(sec) ? steps[i][1](sec) : sec; });
+    var out = P.join("\n");
+    if (hard && L0 - out.length < need) out += "\n[سامانه: نقشهٔ سامانه تا جای ممکن کوتاه شد؛ قلمروها و «چه کسی مسئولِ چیست» کامل ماند]";
+    return out + "\n\n";
+  };
   AS.prompt = function (s, msg, sc, extra, skipLast) {
     var man = "# نقشهٔ سامانه (خودکار از ثبت‌گاه‌ها)\n" + AS.manifest() + "\n\n";
     var parts = userPrompt(s, msg, sc, extra, skipLast, -1, 0), pm = 0;
@@ -502,14 +518,14 @@
     function overOf() { return man.length + parts.head.length + parts.tail.length + 200 + Math.min(HIST_CHARS, 6000) - MAX_USER; }
     var over = overOf();
     while (over > 0 && pm < 3) { pm++; parts = userPrompt(s, msg, sc, extra, skipLast, -1, pm); over = overOf(); }
-    if (over > 0 && man.length > 8000) { var mc = Math.min(over + 300, man.length - 8000); man = man.slice(0, man.length - mc) + "\n[سامانه: بقیهٔ نقشهٔ سامانه جا نشد — فهرستِ کاملِ همین صفحه مقدم بود]\n\n"; over = overOf(); }
+    if (over > 0) { man = AS.cutManifest(man, over + 300); over = overOf(); }
     if (over > 0) {
       var i0 = parts.head.indexOf("# صفحهٔ فعلی"), i1 = parts.head.lastIndexOf("# گفت‌وگو تا این لحظه");
       if (i0 >= 0 && i1 > i0) {
         var pg = parts.head.slice(i0, i1), cut = Math.min(pg.length - 400, over + 300);
         if (cut > 0) { parts.head = parts.head.slice(0, i0) + pg.slice(0, pg.length - cut) + "\n[سامانه: بقیهٔ فهرستِ این صفحه (" + cut + " نویسه) جا نشد — اگر فیلدی را نمی‌بینی، به کاربر بگو و نخستین کلیدهای بالا را به کار ببر]\n\n" + parts.head.slice(i1); over -= cut; }
       }
-      if (over > 0) { man = man.slice(0, Math.max(3000, man.length - over - 200)) + "\n[سامانه: بقیهٔ نقشهٔ سامانه جا نشد]\n\n"; }
+      if (over > 0) { man = AS.cutManifest(man, over + 200, true); }
     }
     var room = MAX_USER - man.length - parts.head.length - parts.tail.length - 200;
     if (room < 0) {

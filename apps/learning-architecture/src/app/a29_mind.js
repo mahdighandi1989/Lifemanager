@@ -366,7 +366,7 @@
       X.acts.push({ id: act.id || (src + ":" + X.acts.length), src: src, ok: !!ok, at: act.at || "", fa: act.fa || PH_SRC[src] || src, pid: act.pid || "", sess: act.sess || "", ref: act.ref || "", cause: act.cause || "", causeWhy: act.causeWhy || "" }); }
     /* دورِ ۲۲ (P1، §۱۵ ِ نقشهٔ راه): هر گیر علت دارد — پیش‌نیاز / گره / مهارت — با شاهدش. گیری که علتش پیش‌نیازِ تشخیص‌داده‌شده است (a44: e.cause = "prereq")
        هرگز مرحله را پایین نمی‌آورد و «ضعیف‌ترین» نمی‌سازد؛ جدا فهرست می‌شود. «مهارت» فقط با شاهد: پیش‌نیاز آزموده شد و بود (causeWhy)، یا مربی در حرفش پیش‌نیازی ندید. */
-    var CZ = { prereq: [], knot: [], skill: [], unk: [] };
+    var CZ = { prereq: [], knot: [], skill: [], unk: [], sys: [] };   // دورِ ۲۳ (Q2، C23-2): sys = گیری که از کمبودِ ابزارِ سامانه بود (برگهٔ کمبود) — ضعفِ او نیست
     /* تورِ پولیا دورِ ۲ (R7): بازگفتِ دستیار (e.by = assistant، متنی که در پیام‌های خودِ کاربر نیست) شاهدِ موفقیتِ او نیست */
     function tutOf(T, c) { if (!T) return; c = c || {}; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e, j) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; if (e.by === "assistant" && e.self === 2) return;
       add(x[0], "ask", e.self === 2, { id: "tut:" + (c.id || "") + ":" + x[0] + ":" + j, at: e.at || "", pid: c.pid || "", fa: "پرسشِ همین لحظه" + (e.q ? " «" + String(e.q).slice(0, 50) + "»" : "") + (c.title ? " — «" + String(c.title).slice(0, 40) + "»" : "") }); }); }); }
@@ -386,6 +386,7 @@
         if (e.act) { if (liveActs[e.act]) return; var ak = e.act + "|" + e.ph + "|" + (e.ok ? 1 : 0); if (seenAct[ak]) return; seenAct[ak] = 1; }
         /* تورِ پولیا (R3g، دورِ ۲۱، B·D9/D·11): کلیدِ کارِ دوباره‌ثبت‌شده «…|rebook:u6» است — «از کجا؟» نقلِ حرفِ خودش را نشان می‌دهد، نه شناسهٔ خام */
         var kp = String(e.key || "").split("|").filter(function (x) { return x && !/^rebook:|^sc$/.test(x); }), q0 = e.rebook && e.src20 && e.src20.span ? String(e.src20.span) : (kp.pop() || ""), how = { selfcorr: "خودش حرفِ پیشینش را اصلاح کرد (بازنگری)", plan_done: "برنامه‌اش را انجام داد", solved: "«حل شد» در گفت‌وگو", own: "بازگوییِ خودش", res: "نتیجه‌ای که گفت", lesson: "درسی که گفت", plan: "طرحی که گفت", ans: "پاسخ به پرسشِ مرحله", pass: "گذر از مرحله" }[e.how] || "";
+        if (!e.ok && e.cause === "sys") { if (!fpid || String(e.pid || "") === fpid) CZ.sys.push({ id: "ev:" + s.id + ":" + (e.msg || "") + ":" + e.key, ph: byPh[e.ph], at: e.at, why: e.causeWhy || "کمبودِ ابزار در سامانه", sheet: e.sheet || "", pid: e.pid || "", sess: s.id }); return; }
         if (!e.ok && e.cause === "prereq") { if (!fpid || String(e.prePid || e.pid || "") === fpid) CZ.prereq.push({ id: "ev:" + s.id + ":" + (e.msg || "") + ":" + e.key, ph: byPh[e.ph], at: e.at, concept: e.preC || "", step: e.preStep || "", quote: e.preQ || "", pid: e.prePid || e.pid || "", sess: s.id, rec: e.preRec || "" }); return; }
         var cz22 = e.ok ? "" : e.src === "knot" ? "knot" : (e.cause === "knot" || e.cause === "skill" ? e.cause : "unk"), czw22 = e.ok ? "" : e.src === "knot" ? "گره‌ای که هنگامِ حل در غربال پیدا شد" : (e.causeWhy || "علت هنوز روشن نیست — پیش‌نیازِ کم‌شده‌ای دیده نشد و گره یا مهارت با شاهد گزارش نشد");
         if (cz22 && (!fpid || String(e.pid || "") === fpid)) CZ[cz22].push({ ph: byPh[e.ph], at: e.at, why: czw22, pid: e.pid || "", sess: s.id });
@@ -453,15 +454,17 @@
     return "چهار مرحلهٔ حل (پولیا؛ (k+1)/(n+2)، بی آستانه): " + Q.rows.map(function (X) { return X.none ? X.fa + " — " + NO_DATA : X.fa + " " + pc(X.p) + " (" + X.k + "/" + X.n + (Q.weakest ? "، احتمالِ ضعیف‌ترین بودن " + pc(X.pWeak) : "") + ")"; }).join(" · ") +
       (Q.n ? (Q.weakest ? " — تنها مرحله‌ای که شکست دارد و از همه پایین‌تر است: " + Q.weakest.fa : Q.ranked >= 2 ? " — " + M.NO_DISTINCT : "") : " — هنوز هیچ داده‌ای نیست؛ هر چهار «نمی‌دانیم» است.") +
       ((Q.causes && Q.causes.prereq.length) ? " · گیرهایی که علتشان پیش‌نیاز بود (در مرحله‌ها شمرده نشدند): " + Q.causes.prereq.length : "") +
+      ((Q.causes && (Q.causes.sys || []).length) ? " · گیرهایی که از کمبودِ ابزارِ سامانه بود (برگهٔ کمبود؛ ضعفِ او نیست، شمرده نشدند): " + Q.causes.sys.length : "") +
       ((Q.prereq && Q.prereq.learned.length) ? " · پیش‌نیازهای آموخته (پیشرفت): " + Q.prereq.learned.map(function (x) { return "«" + x.concept + "»"; }).join("، ") : "");
   };
   /* دورِ ۲۲ (P1): «علتِ هر گیر» و «پیش‌نیازهای آموخته» — زیرِ جدولِ چهار مرحله */
   function causesSection(Q) {
     var C = Q.causes || { prereq: [], knot: [], skill: [] }, P = Q.prereq || { learned: [], open: [] };
-    C.unk = C.unk || []; if (!C.prereq.length && !C.knot.length && !C.skill.length && !C.unk.length && !P.learned.length && !P.open.length) return null;
+    C.unk = C.unk || []; C.sys = C.sys || []; if (!C.prereq.length && !C.knot.length && !C.skill.length && !C.unk.length && !C.sys.length && !P.learned.length && !P.open.length) return null;
     var PHF = {}; PH4.forEach(function (x) { PHF[x[0]] = x[2]; });
     return h("div", { class: "mind-causes small", dir: "rtl" },
-      h("p", {}, h("strong", {}, "علتِ هر گیر: "), "پیش‌نیاز " + fa(C.prereq.length) + " · گره " + fa(C.knot.length) + " · مهارت " + fa(C.skill.length) + (C.unk.length ? " · هنوز نامعلوم " + fa(C.unk.length) : "") + " — گیری که علتش پیش‌نیاز بود ضعفِ مرحله نیست و در جدول شمرده نمی‌شود."),
+      h("p", {}, h("strong", {}, "علتِ هر گیر: "), "پیش‌نیاز " + fa(C.prereq.length) + " · گره " + fa(C.knot.length) + " · مهارت " + fa(C.skill.length) + (C.unk.length ? " · هنوز نامعلوم " + fa(C.unk.length) : "") + (C.sys.length ? " · کمبودِ سامانه " + fa(C.sys.length) : "") + " — گیری که علتش پیش‌نیاز" + (C.sys.length ? " یا کمبودِ ابزارِ سامانه" : "") + " بود ضعفِ مرحله نیست و در جدول شمرده نمی‌شود."),
+      C.sys.length ? h("ul", { class: "mind-cz-sys" }, C.sys.map(function (x) { return h("li", { "data-cause": "sys" }, "گیر در «" + (PHF[x.ph] || "") + "» — علت: " + x.why); })) : null,
       C.prereq.length ? h("ul", { class: "mind-cz-pre" }, C.prereq.map(function (x) { return h("li", { "data-cause": "prereq" }, "گیر در «" + (PHF[x.ph] || "") + "» — علت: نبودِ «" + x.concept + "»" + (x.step ? " در گامِ «" + String(x.step).slice(0, 50) + "»" : "") + (x.quote ? " · شاهد: «" + String(x.quote).slice(0, 70) + "»" : "")); })) : null,
       C.skill.length || C.knot.length || C.unk.length ? h("details", {}, h("summary", {}, "گیرهای گره/مهارت/نامعلوم (" + fa(C.knot.length + C.skill.length + C.unk.length) + ")"), h("ul", {}, C.knot.concat(C.skill, C.unk).map(function (x) { return h("li", { "data-cause": C.knot.indexOf(x) >= 0 ? "knot" : C.skill.indexOf(x) >= 0 ? "skill" : "unk" }, "«" + (PHF[x.ph] || "") + "» — " + x.why); }))) : null,
       P.learned.length ? h("p", { class: "mind-prelearn" }, h("strong", {}, "پیش‌نیازهای آموخته (پیشرفت، نه ضعف): "), P.learned.map(function (x) { return "«" + x.concept + "»" + (x.at ? " (" + A.fdate(String(x.at).slice(0, 10)) + ")" : ""); }).join("، ")) : null,
