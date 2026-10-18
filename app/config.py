@@ -105,6 +105,21 @@ class Settings(BaseSettings):
     # env var. Matching is case-insensitive (see admin_emails_list).
     ADMIN_EMAILS: str = ""
 
+    # --- Per-user data scope for Google accounts (2026-10-18) ---------------
+    # Until 2026-10-18 EVERY approved Google-OAuth account resolved to the shared
+    # data scope 0 (the owner's data) in app/dependencies/auth.py — a second
+    # Google user would have read the owner's settings, birth date and answers.
+    # With PER_USER_OAUTH_SCOPE on (default) only the OWNER keeps scope 0; every
+    # other approved Google account gets its own users.id scope (a non-loginable
+    # shadow row in ``users``, see ``_oauth_scope_user_id``). False = the old
+    # behaviour (everyone → 0), kept as the reversible switch.
+    PER_USER_OAUTH_SCOPE: bool = True
+    # Who «the owner» is for that scope (comma-separated, case-insensitive). The
+    # same OWNER_EMAIL env var app/services/brain_service.py already reads. Empty
+    # ⇒ the ADMIN_EMAILS super-admins are the owner; both empty ⇒ the first
+    # (lowest-id) Google account with the admin role, else the first approved one.
+    OWNER_EMAIL: str = ""
+
     # Google Maps key — used by the (future) /api/location/search
     # geocoding service. Empty by default so a deploy without Maps
     # credentials still boots; the route layer is responsible for
@@ -194,6 +209,15 @@ class Settings(BaseSettings):
         if not raw:
             return []
         return [o.strip() for o in raw.split(",") if o.strip()]
+
+    @property
+    def owner_emails_list(self) -> list[str]:
+        """Lower-cased OWNER_EMAIL list, falling back to ADMIN_EMAILS (the
+        super-admins) — who keeps the shared data scope 0 (app/dependencies/auth.py)."""
+        raw = (self.OWNER_EMAIL or "").strip()
+        if raw:
+            return [e.strip().lower() for e in raw.split(",") if e.strip()]
+        return self.admin_emails_list
 
     @property
     def admin_emails_list(self) -> list[str]:

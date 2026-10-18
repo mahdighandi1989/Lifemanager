@@ -7,11 +7,11 @@
 import logging
 from typing import Any, Dict
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_required_user_id
+from app.dependencies.auth import get_required_user_id, get_signed_in_user_id
 from app.middleware import handle_errors
 from app.services import owner_identity_service as ident
 
@@ -66,7 +66,10 @@ async def edit_identity_field(
     user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """ویرایشِ دستی — حرفِ تو قفل می‌شود و استخراجِ خودکار رویش نمی‌نویسد.
-    مقدارِ خالی یعنی «قفل را بردار و دوباره خودت پیدا کن»."""
+    مقدارِ خالی یعنی «قفل را بردار و دوباره خودت پیدا کن».
+    تاریخ تولد (۲۰۲۶-۱۰-۱۸) اعتبارسنجی می‌شود: تاریخِ واقعی، گذشته، از ۱۹۰۰ (وگرنه ۴۰۰)."""
+    if field == "date_of_birth" and str(payload.get("value") or "").strip():
+        ident.check_date_of_birth(str(payload.get("value")))  # ValueError → 400 (handle_errors)
     return {"ok": True, "success": True,
             **await ident.set_field(db, user_id, field, str(payload.get("value") or ""),
                                     lock=bool(payload.get("lock", True)))}
@@ -81,3 +84,31 @@ async def ask_missing_identity(
 ) -> dict:
     """برای فیلدهای مهمِ خالی، در تلگرام بپرس (با سقف، تا سیل نشود)."""
     return {"ok": True, "success": True, **await ident.ask_missing(db, user_id, limit=limit)}
+
+
+# ── تاریخ تولدِ کاربرِ واردشده (۲۰۲۶-۱۰-۱۸) ─────────────────────────────────
+# قرارداد برای صفحهٔ یادگیری و هر سطحِ دیگری که سن لازم دارد: فقط تاریخِ دقیق
+# رد و بدل می‌شود (ISO «YYYY-MM-DD»)، نه سن. ورود همیشه لازم است و حسابِ گوگلِ
+# تأییدنشده ۴۰۳ می‌گیرد (``get_signed_in_user_id``) — پس هیچ‌کس جز خودِ کاربر
+# تاریخ تولدِ او را نمی‌خواند یا نمی‌نویسد.
+
+
+@router.get("/api/me/date-of-birth", tags=["identity-profile"])
+async def read_my_date_of_birth(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_signed_in_user_id),
+) -> dict:
+    return {"ok": True, "success": True, **await ident.get_date_of_birth(db, user_id)}
+
+
+@router.put("/api/me/date-of-birth", tags=["identity-profile"])
+async def write_my_date_of_birth(
+    payload: Dict[str, Any] = Body(default={}),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_signed_in_user_id),
+) -> dict:
+    try:
+        res = await ident.set_date_of_birth(db, user_id, payload.get("date_of_birth"))
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {"ok": True, "success": True, **res}

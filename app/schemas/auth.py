@@ -18,9 +18,10 @@ fields. A body carrying e.g. ``{"role": "admin"}`` or
 ``{"is_superuser": true}`` now fails validation with 422 instead of being
 silently dropped.
 """
+from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 class UserCreate(BaseModel):
@@ -39,6 +40,25 @@ class UserCreate(BaseModel):
     # Optional invite code — enforced by /register only when the
     # operator sets REGISTER_INVITE_CODE (data-safety phase 0).
     invite_code: Optional[str] = None
+    # Optional exact birth date (2026-10-18). Used for the age-appropriate
+    # conversation and the same-age comparison in the mind card; stored as the
+    # DATE in owner_identity_fields (field date_of_birth, this user's id) —
+    # never as an age number. Real past date, year >= 1900.
+    date_of_birth: Optional[date] = None
+
+    @field_validator("date_of_birth", mode="before")
+    @classmethod
+    def _empty_dob_is_none(cls, v):
+        return None if (v is None or (isinstance(v, str) and not v.strip())) else v
+
+    @field_validator("date_of_birth")
+    @classmethod
+    def _check_dob(cls, v):
+        if v is None:
+            return v
+        from app.services.owner_identity_service import check_date_of_birth
+
+        return check_date_of_birth(v)
 
 
 class UserLogin(BaseModel):

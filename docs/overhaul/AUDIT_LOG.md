@@ -4704,3 +4704,20 @@ dated stability, mind-card feed) under way.
 - **DECISION** Bank entry #111 («3 successes at 2→7→14 days») was the bank writer's assumption; T41's own rule («day 1, 3 and 7» from the last failure) is used.
 - Verified: new `tests/test_tour1_r21_practice.js` (bank R2 17/17, R5 21/21, runner sequences s29/s23/s31, A21 items; 29 red on the base build), whole page suite.
 
+## 2026-10-18 — Age package part 1: per-user Google scope + one birth date per user (decision 2026-10-18 items 1–2)
+- **FINDING** `_resolve_data_scope_user_id` mapped EVERY approved Google account to the shared scope 0, so a second Google user read and wrote the owner's
+  app records, identity fields and birth date. Registration had no birth date. `PUT /api/identity-profile/date_of_birth` accepted any text.
+- **CHANGE** `app/dependencies/auth.py`: the owner keeps scope 0 (unchanged). He is identified by `OWNER_EMAIL`, else the `ADMIN_EMAILS` super-admins,
+  else the first Google admin, else the first approved account. Every other approved Google account gets its own `users.id`: a non-loginable row
+  `oauth-<hash>@oauth-scope.invalid` (password `!`; EmailStr rejects `.invalid`), created race-safe on first use. No schema change.
+  Pending/rejected/local/anon are unchanged. New flag `PER_USER_OAUTH_SCOPE` (default true; false = old behaviour) and new `OWNER_EMAIL` in
+  `app/config.py` / `.env.example`.
+- **CHANGE** Birth date: optional `UserCreate.date_of_birth`, a real past date with year ≥ 1900. It is stored as the DATE (never an age) in the user's
+  `owner_identity_fields.date_of_birth`, locked. New `GET/PUT /api/me/date-of-birth` (signed-in only). The identity-profile PUT validates the date.
+  `Register.jsx` and `IdentityProfile.jsx` got date fields and one plain sentence on why the date is asked. API.md updated.
+- **DECISION** The owner is identified by configuration with a fallback chain, never by an e-mail written in code. Without the fallback, an empty
+  `OWNER_EMAIL`/`ADMIN_EMAILS` in production would cut the owner off from his data. Shadow rows use a reserved e-mail domain: linking by the real
+  Google e-mail to an existing local account would allow pre-registration hijacking.
+- Tests: new `tests/test_age_and_user_scope.py` (20). Full pytest and `npm run build` are green. Handoff:
+  `docs/overhaul/handoff-notes/_pending_age_scope_2026-10-18.md`, which lists every place that relies on scope 0 and the learning-page contract.
+  Experience: `experiences/split-shared-tenant-scope-per-identity.md`.
