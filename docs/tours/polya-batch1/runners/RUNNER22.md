@@ -38,3 +38,8 @@ that needed it (never «جبر بلد نیستی»), check it with a short diagn
 (to mastery if needed), return to the main problem and reach the result; did «🧩 نقشهٔ پیش‌نیازها» connect (not an island); did the mind
 card book the stuck point with its cause (prerequisite / knot / skill) and count the later learning as progress, not weakness. Also re-judge
 every other scenario with this lens: was any stuck point wrongly attributed to a knot or to ability? Section «## پیش‌نیاز» per scenario.
+ADDENDUM 2 (owner 2026-10-18, roadmap §16): in every group at least one scenario where the problem needs SEVERAL prerequisites the person
+lacks (incl. one nested: a prerequisite of a prerequisite). Judge: all detected, ordered by what blocks this solve first, each taught only as
+far as needed and checked again (real mastery), the system keeps the place in the main problem and returns exactly there after each, the
+problem is solved. The «🧭 نقشهٔ مسیرِ مسئله» (origin → now → destination, dotted detours, return to the line, correction back-jumps, hover
+details, geography strip in other views) does not exist yet: record its absence as a gap (S2) with what the person would have needed to see.
