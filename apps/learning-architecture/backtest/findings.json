@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-15",
- "round": 13,
+ "updated": "2026-10-17",
+ "round": 14,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,7 +25,7 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 8,
+    "fresh": 10,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
@@ -35,7 +35,9 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fcic_ratings_2007",
+     "r14_abs_flood_insurer"
     ]
    },
    "kind": "missed",
@@ -75,7 +77,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 21,
+    "fresh": 24,
     "freshOk": 18,
     "ids": [
      "r2_cbs_killian_memos",
@@ -134,7 +136,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 10,
+    "fresh": 13,
     "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
@@ -146,7 +148,9 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fcic_ratings_2007",
+     "r14_kahneman_flight_instructors"
     ]
    },
    "kind": "mislocated",
@@ -175,7 +179,7 @@
    "case": "cs_hrt_observational",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": "s51 دو شرط برای قانون تجربی می‌گذارد: «از راه روش وضع و رفع شروط و عوامل دخیل را می‌آزماید» و «مشروط به عدم دخالت عوامل پنهان»؛ و صریحاً «تکرار داده‌های حسی به تنهایی قادر به تولید حکم کلی و قانون علمی نیست». اینجا هر دو شرط غایب‌اند (vazraf:false و hidden_ctrl:false)، ولی قواعد فقط کمینهٔ ۷۰ می‌دهند (یادداشت r_tajrobe_hidden: «اگر vazraf:false و hidden_ctrl:false هر دو رمز شوند، کمینه ۷۰ است») و conf=80 دقیقاً روی مرز ۷۰+۱۰ می‌نشیند، پس شکست دیده نمی‌شود؛ اصل نگاشت سرصفحهٔ خود قواعد («شرط اعتبار احراز نشده → ۴۵») برای ادعای علّیِ بی‌هر دو شرط پیاده نشده است. — به‌روز (دورِ ۴): پیشنهادِ p_found_vazraf همین را با قضیهٔ T_null (حداکثر ½) بی عددِ قراردادیِ ۴۵ حل می‌کند و جایگزینِ p_tajrobe_none است.",
    "fix": {
@@ -184,8 +188,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 8,
-    "freshOk": 8,
+    "fresh": 11,
+    "freshOk": 10,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -194,7 +198,10 @@
      "r4_abs_survivor_shops",
      "r4_abs_lab_claim_replic",
      "r5_snow_water_1854",
-     "r13_marshall_pylori_1984"
+     "r13_marshall_pylori_1984",
+     "r14_snow_broadstreet_1854",
+     "r14_feynman_oring_1986",
+     "r14_kahneman_flight_instructors"
     ]
    },
    "kind": "missed",
@@ -232,7 +239,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 8,
+    "fresh": 10,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
@@ -242,7 +249,9 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fcic_ratings_2007",
+     "r14_abs_flood_insurer"
     ]
    },
    "kind": "missed",
@@ -278,7 +287,7 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 8,
+    "fresh": 10,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
@@ -288,7 +297,9 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fcic_ratings_2007",
+     "r14_abs_flood_insurer"
     ]
    },
    "kind": "health_alarm",
@@ -323,7 +334,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 17,
+    "fresh": 19,
     "freshOk": 16,
     "ids": [
      "r2_cbs_killian_memos",
@@ -382,7 +393,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 8,
+    "fresh": 10,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
@@ -392,7 +403,9 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fcic_ratings_2007",
+     "r14_abs_flood_insurer"
     ]
    },
    "kind": "health_alarm",
@@ -493,7 +506,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 13
+   "lastSeenRound": 14
   },
   {
    "id": "f_r13_challenger_1986",
@@ -527,7 +540,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 13
+   "lastSeenRound": 14
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -559,7 +572,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 13
+   "lastSeenRound": 14
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -592,7 +605,165 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 13
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_abs_flood_insurer",
+   "case": "r14_abs_flood_insurer",
+   "opened": "2026-10-17",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور «conf» را (طبقِ قاعدهٔ دورِ ۱۳: فقط عدد یا لفظِ صریحِ یقین) ننوشت؛ بی conf موتور هیچ سقفی را در st_istiqra (s50) نمی‌سنجد. قاعده‌ها سالم‌اند؛ علت الگوی تکراریِ نبودنِ conf است (دورِ ۱۳ هم ۳ از ۵). پرونده برای قبول‌شدن دست نخورد؛ پیشنهادِ p_encode_flat_assertion_conf برای مالک.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "بیمه‌گرِ سیل در شهری ساحلی و دادهٔ ۲۵ ساله",
+   "tier": "abstract",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_abs_warehouse_fires",
+   "case": "r14_abs_warehouse_fires",
+   "opened": "2026-10-17",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور «conf» را (طبقِ قاعدهٔ دورِ ۱۳: فقط عدد یا لفظِ صریحِ یقین) ننوشت؛ بی conf موتور هیچ سقفی را در st_expert (s49) نمی‌سنجد. قاعده‌ها سالم‌اند؛ علت الگوی تکراریِ نبودنِ conf است (دورِ ۱۳ هم ۳ از ۵). پرونده برای قبول‌شدن دست نخورد؛ پیشنهادِ p_encode_flat_assertion_conf برای مالک.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "شهادتِ «یک به نود هزار» دربارهٔ دو آتش‌سوزی در انبارِ یک شرکتِ بازرگانی",
+   "tier": "abstract",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_fcic_ratings_2007",
+   "case": "r14_fcic_ratings_2007",
+   "opened": "2026-10-17",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور «conf» را (طبقِ قاعدهٔ دورِ ۱۳: فقط عدد یا لفظِ صریحِ یقین) ننوشت؛ بی conf موتور هیچ سقفی را در st_istiqra (s50) نمی‌سنجد. قاعده‌ها سالم‌اند؛ علت الگوی تکراریِ نبودنِ conf است (دورِ ۱۳ هم ۳ از ۵). پرونده برای قبول‌شدن دست نخورد؛ پیشنهادِ p_encode_flat_assertion_conf برای مالک.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "رتبهٔ AAA برای اوراقِ وام‌های مسکنِ پرریسک و دادهٔ تاریخیِ قیمتِ مسکن (۲۰۰۶–۲۰۰۷)",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_kahneman_flight_instructors",
+   "case": "r14_kahneman_flight_instructors",
+   "opened": "2026-10-17",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور «conf» را (طبقِ قاعدهٔ دورِ ۱۳: فقط عدد یا لفظِ صریحِ یقین) ننوشت؛ بی conf موتور هیچ سقفی را در st_istiqra/st_tajrobe (s50,s51) نمی‌سنجد. قاعده‌ها سالم‌اند؛ علت الگوی تکراریِ نبودنِ conf است (دورِ ۱۳ هم ۳ از ۵). پرونده برای قبول‌شدن دست نخورد؛ پیشنهادِ p_encode_flat_assertion_conf برای مالک. افزون بر آن: رمزگذار راه را «استقراء» (مشاهدهٔ تکرارشده) نوشت نه «تجربه»؛ برچسبِ truth ایستگاهِ st_tajrobe است، پس نخستین نقطهٔ خطا هم‌جا نیست. نکتهٔ جزوه‌ای: «بازگشت به میانگین» (عاملِ پنهانِ آماری) در جزوه ملاکِ مستقل ندارد؛ فقط r_istiqra_hidden / r_tajrobe_hidden از s51 نزدیک‌اند — این خلأ جزوه برای قاعدهٔ تازه نیست مگر با برهان از اصول (مسیر ۲)؛ در این دور پیشنهادی ثبت نشد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "مربیانِ خلبانی و «انتقاد بهتر از تشویق است» (دههٔ ۱۹۶۰)",
+   "tier": "real",
+   "expected": [
+    "st_tajrobe"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_tajrobe_ceiling",
+    "r_tajrobe_no_vazraf",
+    "r_tajrobe_hidden"
+   ],
+   "secs": [
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_sally_clark_1999",
+   "case": "r14_sally_clark_1999",
+   "opened": "2026-10-17",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور «conf» را (طبقِ قاعدهٔ دورِ ۱۳: فقط عدد یا لفظِ صریحِ یقین) ننوشت؛ بی conf موتور هیچ سقفی را در st_expert (s49) نمی‌سنجد. قاعده‌ها سالم‌اند؛ علت الگوی تکراریِ نبودنِ conf است (دورِ ۱۳ هم ۳ از ۵). پرونده برای قبول‌شدن دست نخورد؛ پیشنهادِ p_encode_flat_assertion_conf برای مالک.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "شهادتِ «یک به ۷۳ میلیون» در پروندهٔ سالی کلارک (۱۹۹۹)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 14
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -666,12 +837,14 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 3,
+    "fresh": 5,
     "freshOk": 2,
     "ids": [
      "r5_hitler_diaries_1983",
      "r5_abs_family_letters",
-     "r13_willingham_arson_1991"
+     "r13_willingham_arson_1991",
+     "r14_sally_clark_1999",
+     "r14_abs_warehouse_fires"
     ]
    },
    "kind": "health_alarm",
@@ -705,12 +878,14 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 3,
+    "fresh": 5,
     "freshOk": 0,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fcic_ratings_2007",
+     "r14_abs_flood_insurer"
     ]
    },
    "kind": "mislocated",
@@ -751,12 +926,14 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 3,
+    "fresh": 5,
     "freshOk": 0,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fcic_ratings_2007",
+     "r14_abs_flood_insurer"
     ]
    },
    "kind": "mislocated",
