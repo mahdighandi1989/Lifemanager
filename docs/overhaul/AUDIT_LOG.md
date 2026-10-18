@@ -4741,3 +4741,13 @@ dated stability, mind-card feed) under way.
 - **CHANGE** New `a43_age.js` (`A.AGE`): one birth date (host bridge `birth()/setBirth()` over the identity-profile `date_of_birth` field, fill-empty both ways, settings fallback), age from the date, documented age bands, «# مخاطب» prompt block (child/teen/elderly; adults none), once-per-session birth-date card. `a34_psy.js`: own-band comparison only, `none: birth|age` instead of N(0,1), `P.popFa` used by the card, assistant text and report. `norms.json`: `sources[].ages`, 50–74 `valid:false`, `age_research` (handoff recorded, area psy-norms). Host bridge in `LearningArchitecturePage.jsx`.
 - **DECISION** Chierchia et al. 2019 adolescent MaRs-IB data rejected (method mismatch); no same-method child/adolescent norms found for any registry instrument.
 - Verified: new `tests/test_age_audience.js`, `test_age_norms.js`, `test_age_sync.js` (red on the base build, green after); whole page suite; handbook + ownership pytest. WORKLOG (88), PROGRESS 103.
+
+## 2026-10-18 — Age package merged to main (per-user scope, date of birth, age-aware page)
+- **CHANGE** Per-user data scope for Google accounts. It turns on only when the owner is named explicitly in OWNER_EMAIL or ADMIN_EMAILS;
+  otherwise the old shared scope 0 is kept. Production ADMIN_EMAILS already names the owner.
+- **CHANGE** Optional date of birth at registration and in the profile, with `GET/PUT /api/me/date-of-birth`.
+- **CHANGE** The learning page asks for the birth date and keeps one birth date synced with the host. It adds the «# مخاطب» block by age band,
+  with safety lines for minors.
+- **CHANGE** The mind card compares only within the person's own age band. Missing birth date ⇒ ask. No valid norm for under 18 or for 50+
+  (the MaRs 50–74 band is mostly ages 50–59) ⇒ an honest line. No numbers were added.
+- **FINDING** gate29: fail=0 (pytest 2122, 117 page tests, build, host e2e).
