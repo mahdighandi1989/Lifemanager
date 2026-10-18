@@ -92,6 +92,19 @@ async def register(
             status_code=status.HTTP_409_CONFLICT, detail=str(exc)
         ) from exc
 
+    # Optional birth date (2026-10-18) → this user's own owner-identity row,
+    # locked (it is their own word). Best-effort: the account already exists, so
+    # a storage hiccup must not turn a successful registration into an error.
+    if getattr(payload, "date_of_birth", None):
+        try:
+            from app.services.owner_identity_service import set_date_of_birth
+
+            await set_date_of_birth(db, user.id, payload.date_of_birth.isoformat())
+        except Exception as exc:  # pragma: no cover - defensive
+            import logging
+
+            logging.getLogger(__name__).warning("register: date_of_birth not stored: %r", exc)
+
     token = auth_service.create_access_token(
         data={"sub": str(user.id), "email": user.email}
     )

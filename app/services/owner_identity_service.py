@@ -465,6 +465,52 @@ async def set_field(db: AsyncSession, uid: int, field: str, value: str, *, lock:
     return {"ok": True, "field": field, "value": row.value, "owner_locked": row.owner_locked}
 
 
+# ── تاریخ تولدِ هر کاربر (۲۰۲۶-۱۰-۱۸) ───────────────────────────────────────
+# یک تاریخ تولد برای هر user_id، در همین انبار (فیلدِ ``date_of_birth``). ثبت‌نام،
+# پروفایل و صفحهٔ یادگیری همه همین را می‌خوانند و می‌نویسند. **فقط تاریخِ دقیق**
+# نگه داشته می‌شود؛ سن همیشه از تاریخ حساب می‌شود (ردیفِ مشتقِ «سن» که از قبل بود
+# همچنان از روی همین تاریخ بازحساب می‌شود و هرگز ورودی نیست).
+
+DOB_MIN_YEAR = 1900
+
+
+def check_date_of_birth(value: Any, *, today: Optional[date] = None) -> date:
+    """یک تاریخِ واقعی، در گذشته، از ۱۹۰۰ به بعد — وگرنه ValueError با پیامِ فارسی."""
+    if isinstance(value, datetime):
+        value = value.date()
+    parsed = value if isinstance(value, date) else parse_loose_date(value)
+    if parsed is None:
+        raise ValueError("تاریخ تولد معتبر نیست — به شکلِ روز/ماه/سالِ واقعی وارد کن (مثلاً 1990-05-21)")
+    today = today or datetime.now(timezone.utc).date()
+    if parsed.year < DOB_MIN_YEAR:
+        raise ValueError("تاریخ تولد باید از سالِ ۱۹۰۰ به بعد باشد")
+    if parsed >= today:
+        raise ValueError("تاریخ تولد باید در گذشته باشد")
+    return parsed
+
+
+async def get_date_of_birth(db: AsyncSession, uid: int) -> Dict[str, Any]:
+    """تاریخ تولدِ ثبت‌شدهٔ همین کاربر به شکلِ ISO (یا None). سن برگردانده نمی‌شود."""
+    row = await _row(db, uid, "date_of_birth")
+    raw = row.value if row is not None else None
+    parsed = parse_loose_date(raw) if raw else None
+    return {
+        "date_of_birth": parsed.isoformat() if parsed else None,
+        "raw": raw if (raw and not parsed) else None,
+        "owner_locked": bool(row.owner_locked) if row is not None else False,
+        "source": row.source if row is not None else None,
+    }
+
+
+async def set_date_of_birth(db: AsyncSession, uid: int, value: Any) -> Dict[str, Any]:
+    """نوشتنِ تاریخ تولدِ همین کاربر (اعتبارسنجی‌شده، ISO، قفل چون حرفِ خودش است).
+    مقدارِ خالی یعنی پاک کن و قفل را بردار — همان قراردادِ ``set_field``."""
+    text = "" if value is None else str(value).strip()
+    iso = check_date_of_birth(text).isoformat() if text else ""
+    await set_field(db, uid, "date_of_birth", iso, lock=True)
+    return await get_date_of_birth(db, uid)
+
+
 async def refresh_derived(db: AsyncSession, uid: int = 0) -> None:
     """فیلدهای مشتق (فعلاً «سن») را از روی مقدارِ فعلی بازحساب کن."""
     from app.models.owner_identity import OwnerIdentityField
