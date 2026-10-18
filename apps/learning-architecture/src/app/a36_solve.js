@@ -1295,7 +1295,7 @@
         var rev = D.filter(function (x) { return !x.aside && (x.ph.length || x.pend.length); });
         if (rev.length) {
           var n = rev.reduce(function (a, x) { return a + x.ph.length + x.pend.length; }, 0);
-          items.push({ k: "knot", txt: fa(n) + " مرورِ حلِ مسئله موعد است", sub: rev.slice(0, 3).map(function (x) { return "«" + x.p.title + "»: " + x.ph.map(function (k) { return PH[k]; }).concat(x.pend.map(function (y) { return (y.k === "u" ? "فهمِ" : "بازنگریِ") + " ناتمام"; })).join("، "); }).join(" · "),
+          items.push({ k: "knot", pids: rev.map(function (x) { return x.p.id; }), ptitle: rev.length === 1 ? rev[0].p.title : "", txt: fa(n) + " مرورِ حلِ مسئله موعد است", sub: rev.slice(0, 3).map(function (x) { return "«" + x.p.title + "»: " + x.ph.map(function (k) { return PH[k]; }).concat(x.pend.map(function (y) { return (y.k === "u" ? "فهمِ" : "بازنگریِ") + " ناتمام"; })).join("، "); }).join(" · "),
             go: function () { var x = rev[0], pd = x.pend[0]; if (pd && !x.ph.length) A.simState = { pid: x.p.id, lv: pd.lv, order: "hist", i: pd.k === "u" ? 0 : (x.p.stages || []).length }; A.go("e_prob", x.p.id, "sim"); } });
         }
       } catch (e) { console.warn(e); }

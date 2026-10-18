@@ -139,7 +139,7 @@
       S.all("deadline", function (x) { return !x.done && x.date >= A.today() && A.daysBetween(A.today(), x.date) <= 7; })
         .sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); }).forEach(function (r) {
           var left = A.daysBetween(A.today(), r.date);
-          items.unshift({ k: left <= 1 ? "warn" : "p", txt: "⏰ " + clip(r.what, 60), sub: left === 0 ? "موعد: امروز" : left === 1 ? "موعد: فردا" : "موعد: " + fa(left) + " روز دیگر (" + (A.fdate ? A.fdate(r.date) : r.date) + ")",
+          items.unshift({ k: left <= 1 ? "warn" : "p", dl: r.id, txt: "⏰ " + clip(r.what, 60), sub: left === 0 ? "موعد: امروز" : left === 1 ? "موعد: فردا" : "موعد: " + fa(left) + " روز دیگر (" + (A.fdate ? A.fdate(r.date) : r.date) + ")",
             go: function () { markDone(r); A.toast("«" + clip(r.what, 40) + "» انجام‌شده علامت خورد."); A.render(); }, act: "انجام شد" });
         });
       return items;
