@@ -4862,3 +4862,12 @@ dated stability, mind-card feed) under way.
   negative arm of waiting loops.
 - **FINDING** E-mails: B and C sent theirs; A's and D's sends were refused by the permission classifier — not sent on their behalf; open
   question to the owner.
+
+## 2026-10-19 — FINDING→FIX: a symlink `frontend/node_modules` was committed to main
+- **FINDING** A round-23 fixer worktree linked its `frontend/node_modules` to the main checkout's and the link was committed in merge
+  189f15cd (`.gitignore` had only `node_modules/`, which does not match a symlink file). On main eee4ff0f the tracked link pointed to an
+  absolute container path; checking it out in the main repo turned the real folder into a self-loop, and on a fresh clone (Render) it is a
+  dangling link where `npm install` expects a folder.
+- **CHANGE** `git rm --cached frontend/node_modules`; `.gitignore` gains `node_modules` (no slash) so a link of that name is ignored too.
+  Local deps reinstalled with `npm ci`. Lesson for fixer briefs: never commit tool links inside a worktree; check `git status` for
+  mode-120000 entries before committing.

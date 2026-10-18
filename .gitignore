@@ -157,6 +157,7 @@ cython_debug/
 
 # Node
 node_modules/
+node_modules
 
 # Frontend build artifacts - built during deployment on Render
 frontend/dist/
