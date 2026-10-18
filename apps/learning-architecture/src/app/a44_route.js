@@ -398,7 +398,11 @@
   });
 
   /* =================== P2 — «🧭 نقشهٔ مسیرِ مسئله» =================== */
-  var MAIN_K = { stmt: 1, u: 1, udraft: 1, restate: 1, plan: 1, step: 1, out: 1, ans: 1, verdict: 1, state: 1, back: 1, cplan: 1, cplandone: 1, checkin: 1, incub: 1, incubback: 1, woke: 1, claim: 1, newprobs: 1, deadline: 1, act: 1 };
+  var MAIN_K = { stmt: 1, u: 1, udraft: 1, restate: 1, plan: 1, step: 1, out: 1, ans: 1, verdict: 1, state: 1, back: 1, cplan: 1, cplandone: 1, checkin: 1, incub: 1, incubback: 1, woke: 1, claim: 1, newprobs: 1, deadline: 1, act: 1,
+    /* دورِ ۲۳ (Q3، a45): کارِ سنجیدهٔ گفت‌وگو روی خطِ اصلی — کل، مجهول، داده، شرط، طرح (هر گامش یک نقطه، به ترتیبِ خودش)، گزارشِ گام، نتیجه، پاسخِ بازنگری */
+    cwhole: 1, cunk: 1, ccond: 1, cdata: 1, cplan23: 1, cstep: 1, cres: 1, clb: 1 };
+  /* رویدادِ گفت‌وگویی که همان رکوردِ صفحه را دارد دوبار روی خط نمی‌آید (بانکِ R23 #84): فرمِ فهمِ ثبت‌شده ⇐ کل/مجهول/داده/شرط؛ طرحِ صفحه ⇐ طرحِ گفت‌وگو */
+  var CHAT_COVER = { cwhole: "u", cunk: "u", ccond: "u", cdata: "u", cplan23: "plan" };
   var DET_K = { aux: "aux", guess: "guess", gold: "guess", pre: "pre", prediag: "pre", preok: "pre" };
   var BACK_K = { retract: 1, copyans: 1, stepold: 1, uold: 1, planold: 1 };
   var SKIP_K = { mind: 1, chatwork: 1, copyask: 1, fcast: 1, practice: 1 };
@@ -410,12 +414,18 @@
     if (rid.pid) { var R = store({ pid: rid.pid }); return R ? [R.X] : []; }
     var se = S.get(rid.sess), P = (se && se.coach && se.coach.pre22) || {}; return Object.keys(P).map(function (k) { return P[k]; });
   }
-  function destOf(rid) {
+  /* قرنطینه (دورِ ۲۳، Q3 — REMOVAL_CANDIDATES): مقصدِ دورِ ۲۲ — مسئلهٔ گفت‌وگو «خواستهٔ مسئلهٔ گفت‌وگو» یا هر جملهٔ پرسشیِ پیامش (B·D2 «ولی خب ۵ منهای ۳ چرا نمیشه»)؛
+     جانشین: A.STORY.dest (مجهولِ سنجیده ⇐ جملهٔ پرسشیِ صورت ⇐ مجهولِ به حرفِ خودش فقط اگر به صورت می‌خورد) */
+  function destOfR22(rid) {
     if (rid.pid) { var pg = S.get("eprog_" + rid.pid), so = (pg && pg.solve) || {}, u = (so.u && so.u[1]) || (so.live && so.live.uDraft) || {}; if (txt(u.u)) return clip(u.u, 80); var r = A.liveRec && A.liveRec(rid.pid); return r ? "خواستهٔ «" + clip(r.p.title, 60) + "»" : "خواستهٔ مسئله"; }
     var se = S.get(rid.sess), C = (se && se.coach) || {}; return C.unkBy && C.pk && C.unkBy[C.pk] ? clip(C.unkBy[C.pk], 80) : "خواستهٔ مسئلهٔ گفت‌وگو";
   }
+  function destOf(rid) { try { if (A.STORY && A.STORY.dest) return A.STORY.dest(rid); } catch (e) { } return destOfR22(rid); }
   /* «چقدر مانده» فقط از طرحِ خودش (گام‌های اعلام‌شده در برابرِ گام‌های انجام‌شده) — بی طرح «نامعلوم»، هرگز درصدِ ساختگی */
   function planLeft(rid) {
+    /* دورِ ۲۳ (Q3، C23-11/D23-21، بانکِ R23 #65): بی طرحِ صفحه، طرحِ سنجیدهٔ گفت‌وگو (A.STORY.plan) — «طرح هنوز نیست» فقط وقتی هیچ‌جا طرحی نیست */
+    var cp = null; try { cp = A.STORY && A.STORY.plan ? A.STORY.plan(rid) : null; } catch (e) { cp = null; }
+    if (cp && cp.src === "chat") return { n: cp.pieces.length, done: cp.done, chat: true, cur: cp.cur };
     if (!rid.pid) return null; var pg = S.get("eprog_" + rid.pid), L = (pg && pg.solve && pg.solve.live) || {};
     if (!(L.plan && txt(L.plan.t))) return { none: true };
     var pcs = String(L.plan.t).split(/\n|؛|،?\s(?:سپس|بعد|بعدش|آنگاه|آن‌گاه|و\s*بعد|و\s*سپس)\s|[.]\s|،\s*(?=(?:بعد|سپس|آخر|در\s*آخر))/).map(txt).filter(function (x) { return x.length >= 3; });
@@ -424,14 +434,31 @@
   }
   function fragOf(e) { var m = /«([^»]{2,})»\s*⇐/.exec((e.lines || [])[0] || ""); return m ? m[1] : ""; }
   A.ROUTE = A.ROUTE || {};
+  /* دورِ ۲۳ (Q3، B·D2/D23-20): پیش‌نیازهای یک رویداد از دفترِ همان دامنه — رویدادِ سشن (e.sess) از پشته‌های همان سشن (pk ِ همان لحظه)، رویدادِ مسئله از پشتهٔ مسئله؛
+     پیش‌تر فقط پشتهٔ مسئلهٔ زنده خوانده می‌شد و پس از chat_solved عمقِ تو‌در‌تو، مفهوم و برگشت‌ها گم می‌شد */
+  function entOf(rid, XS, e, eid) {
+    var hitOf = function (X) { return ((X && X.st) || []).filter(function (x) { return x && x.id === eid; }); }, cand = [];
+    if (e.sess) { var se = S.get(e.sess), P = (se && se.coach && se.coach.pre22) || {}, pk0 = A.STORY && A.STORY.pkAt ? A.STORY.pkAt(se, e.at) : "";
+      if (pk0 && P[pk0]) cand = hitOf(P[pk0]); if (!cand.length) Object.keys(P).forEach(function (k) { cand = cand.concat(hitOf(P[k])); }); }
+    if (!cand.length) XS.forEach(function (X) { cand = cand.concat(hitOf(X)); });
+    if (cand.length > 1) { var t = String(e.title || ""), c2 = cand.filter(function (x) { return t.indexOf(clip(x.concept, 60)) >= 0; }); if (c2.length) cand = c2; }
+    return cand[0] || null;
+  }
   A.ROUTE.model = function (id) {
     var rid = routeId(id); if (!rid) return null;
     var D = rid.pid ? (A.dossier ? A.dossier(rid.pid) : null) : (A.dossierSess ? A.dossierSess(rid.sess) : null); if (!D) return null;
     var XS = stores(rid), E = {}; XS.forEach(function (X) { (X.st || []).forEach(function (e) { E[e.id] = e; }); });
+    var se0 = rid.sess ? S.get(rid.sess) : null, C0 = (se0 && se0.coach) || {}, pkNow = String(C0.pk || ""), ST = A.STORY || {};
+    /* دورِ ۲۳ (Q3، A23-32، بانکِ R23 #67/#89): نقشهٔ مسئلهٔ گفت‌وگو فقط رویدادهای همان مسئله (پنجرهٔ pk ِ کنونی) را دارد */
+    var win = rid.sess && ST.pkWindow && pkNow && (C0.pkLog || []).length ? ST.pkWindow(se0, pkNow) : null;
+    var originTx = rid.sess ? (ST.stmtOfSess ? ST.stmtOfSess(se0) : "") || D.statement : D.statement;
+    var pgL = rid.pid ? S.get("eprog_" + rid.pid) : null, soL = (pgL && pgL.solve) || {}, LL = soL.live || {}, cover = { u: !!(soL.u && soL.u[1] && soL.u[1].done && soL.u[1].from !== "chat"), plan: !!(LL.plan && LL.plan.at) };   // فرمی که خودِ گفت‌وگو بست (chat_solved) تکرارِ رویدادهای گفت‌وگو نیست
     var pts = [], dets = [], backs = [], lastMain = -1, preDet = {}, originEv = null;
     function addPt(p) { p.i = pts.length; pts.push(p); return p; }
     (D.events || []).forEach(function (e) {
       if (SKIP_K[e.k] || /^prc:/.test(String(e.kind || ""))) return;
+      if (win && e.k !== "stmt" && e.at && (String(e.at) < String(win.from) || String(e.at) >= String(win.to))) return;
+      if (CHAT_COVER[e.k] && cover[CHAT_COVER[e.k]]) return;
       if (e.k === "stmt") { originEv = { lines: (e.lines || []).slice(0, 4), hist: (e.hist || []).length }; return; }   // مبدأ خودش گره است؛ نقطهٔ دوم نمی‌گیرد
       var base = { k: e.k, at: e.at || "", title: e.title, lines: (e.lines || []).slice(0, 6), out: e.out || "", from: e.from || "" };
       var isBack = BACK_K[e.k] || (e.withdrawn && MAIN_K[e.k]);
@@ -439,11 +466,11 @@
       var mainLike = false;
       if (dk === "guess" && !GUESS_DONE.test(e.out || "")) { base.title = (e.title || "حدس") + " · آزموده نشده"; dk = null; mainLike = true; }   // حدسِ نیازموده حلقهٔ انحراف با نتیجه نیست (بانکِ R22 #55)
       if (dk) {
-        var pe = dk === "pre" ? PRE.evId(e.id) : null, ent = pe ? E[pe.eid] : null, key = dk === "pre" ? "pre:" + (pe ? pe.eid : e.id) : dk + ":" + pts.length;
+        var pe = dk === "pre" ? PRE.evId(e.id) : null, ent = pe ? (entOf(rid, XS, e, pe.eid) || E[pe.eid]) : null, key = dk === "pre" ? "pre:" + (e.sess ? e.sess + "|" : "") + (pe ? pe.eid : e.id) : dk + ":" + pts.length;
         var d = dk === "pre" ? preDet[key] : null;
         if (!d) {
-          var parD = ent && ent.parent ? preDet["pre:" + ent.parent] : null;
-          d = { key: key, kind: dk, fa: DET_FA[dk], from: parD && parD.pts.length ? parD.pts[parD.pts.length - 1] : lastMain, fromDet: parD ? dets.indexOf(parD) : -1, pts: [], rejoin: null, depth: ent ? ent.depth || 0 : 0, open: dk === "pre" ? !!(ent && OPEN[ent.state]) : false, concept: ent ? ent.concept : "", state: ent ? ent.state : "", step: ent ? ent.step : "", parent: parD ? dets.indexOf(parD) : -1 };
+          var parD = ent && ent.parent ? preDet["pre:" + (e.sess ? e.sess + "|" : "") + ent.parent] : null;
+          d = { key: key, kind: dk, fa: DET_FA[dk], from: parD && parD.pts.length ? parD.pts[parD.pts.length - 1] : lastMain, fromDet: parD ? dets.indexOf(parD) : -1, pts: [], rejoin: null, depth: ent ? ent.depth || 0 : 0, open: dk === "pre" ? !!(ent && OPEN[ent.state]) : false, concept: ent ? ent.concept : "", state: ent ? ent.state : "", step: ent ? ent.step : "", quote: ent ? ent.quote || "" : "", parent: parD ? dets.indexOf(parD) : -1, guess: dk === "guess" ? String((e.lines || [])[0] || "") : "" };
           dets.push(d); if (dk === "pre") preDet[key] = d;
         }
         var p = addPt(Object.assign(base, { cls: "det", det: dets.indexOf(d), depth: d.depth })); d.pts.push(p.i);
@@ -457,11 +484,15 @@
         return;
       }
       if (!MAIN_K[e.k] && !isBack && !mainLike) return;
+      /* طرحِ گفت‌وگو ⇒ هر گامش یک نقطه روی خط، به ترتیبِ خودش (بانکِ R23 #58) */
+      if (e.k === "cplan23") { var pcs = (e.lines || []).slice(1).filter(function (l) { return /^گامِ /.test(l); }).map(function (l) { return l.replace(/^گامِ [۰-۹0-9]+:\s*/, ""); });
+        if (pcs.length > 1) { pcs.forEach(function (pc, j) { var q0 = addPt({ k: "cplan23", at: e.at || "", title: "گامِ " + fa(j + 1) + " ِ طرح: " + pc, short: pc, lines: j ? [] : [(e.lines || [])[0] || ""], out: "", from: "از گفت‌وگو", cls: "main" });
+          dets.forEach(function (dd) { if (dd.rejoin == null && !dd.open && dd.kind !== "pre") dd.rejoin = q0.i; }); lastMain = q0.i; }); return; } }
       var q = addPt(Object.assign(base, { cls: isBack ? "back" : (e.k === "stmt" ? "origin" : "main") }));
       if (isBack) {
         var fr = fragOf(e), t = -1;
         if (fr) for (var j = q.i - 1; j >= 0; j--) { var pj = pts[j]; if (pj.cls !== "back" && nk((pj.lines || []).join(" ") + " " + pj.title).indexOf(nk(fr)) >= 0) { t = j; break; } }
-        if (t < 0 && fr && nk(D.statement).indexOf(nk(fr)) >= 0) t = -1.5;   // اصلاحِ صورت ⇒ پرش به مبدأ
+        if (t < 0 && fr && (nk(D.statement).indexOf(nk(fr)) >= 0 || nk(originTx).indexOf(nk(fr)) >= 0 || (originEv && nk((originEv.lines || []).join(" ")).indexOf(nk(fr)) >= 0))) t = -1.5;   // اصلاحِ صورت ⇒ پرش به مبدأ
         if (t === -1) for (var j2 = q.i - 1; j2 >= 0; j2--) if (pts[j2].cls === "main" || pts[j2].cls === "origin") { t = j2; break; }
         if (t === -1.5) t = -1; else if (t < 0) t = null;
         if (t != null) backs.push({ from: q.i, to: t, why: fr ? "«" + clip(fr, 40) + "» اصلاح شد" : q.title });
@@ -471,13 +502,17 @@
       dets.forEach(function (d) { if (d.rejoin == null && !d.open && d.kind !== "pre") d.rejoin = q.i; });
       lastMain = q.i;
     });
-    var solvedNow = /^حل شد/.test(D.state || "") || D.phase === "done";
+    /* مسئلهٔ گفت‌وگویی که همین pk اش مسئلهٔ زنده شد و حل شد ⇒ مقصد رسیده (نه «اکنون: فهمِ مسئله» ِ کهنه — D23-21) */
+    var livedP = rid.sess && ST.livedPk ? ST.livedPk(se0, pkNow) : "", livedPh = livedP && A.livePhase ? A.livePhase(livedP) : "";
+    var solvedNow = /^حل شد/.test(D.state || "") || D.phase === "done" || livedPh === "done" || livedPh === "b";
     var openD = dets.filter(function (d) { return d.open; }), nowI = solvedNow ? -2 : openD.length ? openD[openD.length - 1].pts.slice(-1)[0] : lastMain;
     var st = D.stages || [], left = st.filter(function (x) { return !x.reached; }).length, cur = st.filter(function (x) { return x.now; })[0];
-    var phNow = rid.pid ? D.phase : String(((S.get(rid.sess) || {}).coach || {}).ph || "");
-    var pl = planLeft(rid), planTx = !pl ? "" : pl.none ? "نامعلوم — طرح هنوز نیست" : fa(Math.max(0, pl.n - pl.done)) + " گام از " + fa(pl.n) + " گامِ طرحت";
-    var remain = solvedNow ? "هیچ — به مقصد رسیدی" : [planTx, st.length ? fa(left) + " مرحله از " + fa(st.length) + (cur ? " (اکنون: " + cur.fa.replace(/^[۰-۹0-9]\)\s*/, "") + ")" : "") : PH_FA[phNow] ? "اکنون: " + PH_FA[phNow] : "", openD.length ? fa(openD.length) + " پیش‌نیازِ باز تا برگشت به خط" : ""].filter(Boolean).join(" · ");
-    return { id: id, kind: rid.pid ? "live" : "sess", title: D.title, origin: clip(D.statement, 120), originEv: originEv, dest: solvedNow ? "حل شد ✓" : destOf(rid), reached: solvedNow, now: nowI, nowFa: solvedNow ? "مقصد — حل شد" : openD.length ? "پیش‌نیازِ «" + clip(openD[openD.length - 1].concept, 50) + "»" : (cur ? cur.fa.replace(/^[۰-۹0-9]\)\s*/, "") : PH_FA[phNow] || ""), remain: remain, pts: pts, dets: dets, backs: backs, state: D.state };
+    var phNow = rid.pid ? D.phase : (ST.phaseSess ? ST.phaseSess(se0) : String(C0.ph || ""));
+    var pl = planLeft(rid), planTx = !pl ? "" : pl.none ? "نامعلوم — طرح هنوز نیست" : fa(Math.max(0, pl.n - pl.done)) + " گام از " + fa(pl.n) + " گامِ طرحت" + (pl.chat ? " (از گفت‌وگو" + (pl.cur && pl.done < pl.n ? "؛ گامِ کنونی: «" + clip(pl.cur, 40) + "»" : "") + ")" : "");
+    /* «مانده» فقط آنچه مانده — «اکنون» جای خودش را دارد و در «مانده» تکرار نمی‌شود (A23-8، D23-21) */
+    var remain = solvedNow ? "هیچ — به مقصد رسیدی" : [planTx, st.length ? fa(left) + " مرحله از " + fa(st.length) : "", openD.length ? fa(openD.length) + " پیش‌نیازِ باز تا برگشت به خط" : ""].filter(Boolean).join(" · ");
+    var nowFa = solvedNow ? (livedPh === "b" ? "بازنگری — حل شد" : "مقصد — حل شد") : openD.length ? "پیش‌نیازِ «" + clip(openD[openD.length - 1].concept, 50) + "»" : (cur ? cur.fa.replace(/^[۰-۹0-9]\)\s*/, "") : PH_FA[phNow] || "");
+    return { id: id, kind: rid.pid ? "live" : "sess", title: rid.sess && originTx ? clip(originTx, 70) : D.title, origin: clip(originTx, 160), originEv: originEv, dest: solvedNow ? "حل شد ✓" : destOf(rid), destQ: destOf(rid), reached: solvedNow, now: nowI, nowFa: nowFa, remain: remain, pts: pts, dets: dets, backs: backs, state: D.state, phase: rid.pid ? D.phase : phNow };
   };
   /* شکلِ عمودی: مبدأ بالا، مقصد پایین، خطِ اصلی راست (RTL)، انحراف‌ها نقطه‌چین به چپ و برگشت به خط، پرشِ برگشت قوسِ خط‌چین سمتِ راست */
   var SVGNS = "http://www.w3.org/2000/svg";
@@ -485,7 +520,7 @@
   function hm(at) { var d = new Date(at); if (!at || isNaN(d)) return ""; return fa(String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0")); }
   function when(at) { return at ? A.fdate(String(at).slice(0, 10)) + (hm(at) ? " " + hm(at) : "") : ""; }
   A.ROUTE.svg = function (M, wrap) {
-    var W = 360, X0 = 326, DX = 44, ROW = 40, top = 34, n = M.pts.length, H = top + (n + 1) * ROW + 30;
+    var W = 360, X0 = 326, DX = 44, ROW = 46, top = 34, n = M.pts.length, H = top + (n + 1) * ROW + 30;
     var y = function (i) { return top + (i + 1) * ROW; }, xOf = function (p) { return p.cls === "det" ? X0 - DX * ((p.depth || 0) + 1) : X0; };
     var g = sv("svg", { viewBox: "0 0 " + W + " " + H, width: "100%", class: "rt-svg", role: "img", "aria-label": "نقشهٔ مسیرِ مسئله: از صورت تا " + M.dest, preserveAspectRatio: "xMidYMin meet" });
     g.appendChild(sv("defs", {}, [sv("marker", { id: "rtArr", viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" }, [sv("path", { d: "M0 0 L10 5 L0 10 z", class: "rt-arrhead" })])]));
@@ -502,20 +537,25 @@
     });
     M.backs.forEach(function (b) { var y1 = y(b.from), y2 = y(b.to), bx = Math.min(W - 6, X0 + 18 + Math.min(14, (y1 - y2) / 20));
       g.appendChild(sv("path", { d: "M" + X0 + " " + y1 + " C" + bx + " " + y1 + " " + bx + " " + y2 + " " + (X0 + 4) + " " + y2, class: "rt-backjump", "marker-end": "url(#rtArr)", "data-from": String(b.from), "data-to": String(b.to) }, [sv("title", {}, ["پرشِ برگشت: " + b.why])])); });
+    function wrapLab(t, n) { var W = String(t || "").split(/\s+/), L = [], cur = ""; W.forEach(function (w) { if (cur && (cur + " " + w).length > n) { L.push(cur); cur = w; } else cur = cur ? cur + " " + w : w; }); if (cur) L.push(cur); return L.length ? L : [""]; }
     function node(cls, x, yy, title, data, label) {
       var gg = sv("g", { class: "rt-pt " + cls, tabindex: "0", role: "button", "aria-label": title, "data-k": data.k || "", "data-i": data.i != null ? String(data.i) : "" }, [sv("title", {}, [title])]);
       gg.appendChild(sv("circle", { cx: x, cy: yy, r: cls.indexOf("rt-end") >= 0 ? 9 : cls.indexOf("rt-p-det") >= 0 ? 6 : 7 }));
-      if (label) gg.appendChild(sv("text", { x: x - 13, y: yy + 4, "text-anchor": "start", direction: "rtl", class: "rt-lab" }, [label]));
+      /* دورِ ۲۳ (Q3، A23-8/C23-13): برچسب بریده نمی‌شود — چند سطر (tspan)، هر سطر تا ۲۸ نویسه، بی «…» */
+      if (label) { var LN = wrapLab(label, 28), tx = sv("text", { x: x - 13, y: yy + 4 - (LN.length - 1) * 6, "text-anchor": "start", direction: "rtl", class: "rt-lab", "data-full": label });
+        LN.forEach(function (ln, k) { tx.appendChild(sv("tspan", { x: x - 13, dy: k ? "12" : "0" }, [ln])); }); gg.appendChild(tx); }
       return gg;
     }
-    g.appendChild(node("rt-end rt-origin", X0, top, "مبدأ — صورتِ مسئله: " + M.origin, { k: "origin" }, "مبدأ: " + clip(M.origin, 30)));
+    g.appendChild(node("rt-end rt-origin", X0, top, "مبدأ — صورتِ مسئله: " + M.origin, { k: "origin" }, "مبدأ: " + clip(M.origin, 56)));
     M.pts.forEach(function (p) {
       var d = p.cls === "det" ? M.dets[p.det] : null, cls = "rt-p-" + p.cls + (d ? " rt-p-" + d.kind : "") + (p.k === "rejoin" ? " rt-p-rejoin" : "") + (p.i === M.now ? " rt-now" : "");
-      var lab = (d && p.k !== "rejoin" ? DET_FA[d.kind] + ": " : p.k === "rejoin" ? "↩ " : "") + clip(String(p.title || "").replace(/^🧩\s*/, "").replace(/^برگشت به /, ""), d ? 26 : 32) + (d && d.kind === "guess" && p.out ? " — " + clip(p.out, 14) : "");
+      /* برچسب: پیش‌نیاز ⇐ نامِ مفهوم (یک بار «پیش‌نیاز»)؛ حدس ⇐ متنِ حدس و سرانجامِ واقعی؛ گامِ طرحِ گفت‌وگو ⇐ همان گام */
+      var lab = d && p.k !== "rejoin" ? (d.kind === "pre" && d.concept ? "پیش‌نیاز: " + d.concept : d.kind === "guess" ? "حدس: " + (d.guess || String(p.title || "").replace(/^حدس[^:]*:?\s*/, "")) + (p.out ? " — " + p.out : "") : DET_FA[d.kind] + ": " + String(p.title || "").replace(/^🧩\s*/, ""))
+        : (p.k === "rejoin" ? "↩ " : "") + (p.short || String(p.title || "").replace(/^🧩\s*/, "").replace(/^برگشت به /, ""));
       g.appendChild(node(cls, xOf(p), y(p.i), p.title, p, lab));
       if (p.i === M.now) g.appendChild(sv("circle", { cx: xOf(p), cy: y(p.i), r: 12, class: "rt-nowring" }));
     });
-    g.appendChild(node("rt-end rt-dest" + (M.reached ? " rt-reached rt-now" : ""), X0, H - 22, "مقصد — " + M.dest, { k: "dest" }, "مقصد: " + clip(M.dest, 30)));
+    g.appendChild(node("rt-end rt-dest" + (M.reached ? " rt-reached rt-now" : ""), X0, H - 22, "مقصد — " + M.dest, { k: "dest" }, "مقصد: " + M.dest));
     if (M.reached) g.appendChild(sv("circle", { cx: X0, cy: H - 22, r: 13, class: "rt-nowring" }));
     /* نگه داشتنِ موس / فوکوس ⇒ آن نقطه چه بود و چه شد */
     var tip = wrap.querySelector(".rt-tip");
@@ -523,6 +563,7 @@
       var i = gg.getAttribute("data-i"), k = gg.getAttribute("data-k"), p = i !== "" && i != null ? M.pts[+i] : null; tip.innerHTML = "";
       if (p) { var d = p.cls === "det" ? M.dets[p.det] : null;
         tip.appendChild(h("strong", {}, p.title)); tip.appendChild(h("div", { class: "small muted" }, [when(p.at), d ? "انحراف (" + DET_FA[d.kind] + (d.depth ? "، تو‌در‌تو " + fa(d.depth) : "") + ")" : p.cls === "back" ? "اصلاح / پرشِ برگشت" : p.k === "rejoin" ? "برگشت به خط" : "خطِ اصلی", p.from].filter(Boolean).join(" · ")));
+        if (d && d.kind === "pre" && d.concept) tip.appendChild(h("p", { class: "small rt-tip-c" }, "مفهوم: «" + d.concept + "»" + (d.step ? " — برای گامِ «" + d.step + "»" : "") + (d.quote ? " · از حرفِ خودت: «" + d.quote + "»" : "") + " · " + ({ diag: "پرسشِ تشخیصی", wait: "در نوبت", teach: "در حالِ یاد گرفتن", learned: "آموخته شد ✓", had: "بود (کمبود نبود)" }[d.state] || "")));
         if (p.lines.length) tip.appendChild(h("ul", { class: "small" }, p.lines.map(function (l) { return h("li", {}, l); })));
         if (p.out) tip.appendChild(h("p", { class: "small" }, "سرانجام: " + p.out)); }
       else { tip.appendChild(h("strong", {}, k === "origin" ? "مبدأ — صورتِ مسئله" : "مقصد: " + M.dest + (M.reached ? "" : " — مانده: " + M.remain)));
@@ -574,6 +615,12 @@
   function openRouteId() {
     var s = null; try { s = AS.cur ? AS.cur() : null; } catch (e) { } if (!s) return "";
     try { var b = AS.boundLive ? AS.boundLive(s) : null; if (b && b.pid && !b.done) { var pg = S.get("eprog_" + b.pid), L = pg && pg.solve && pg.solve.live; return L && (L.state === "solved" || L.state === "abandoned") ? "" : b.pid; } } catch (e) { }
+    /* دورِ ۲۳ (Q3، C23-14/D23-21، بانکِ R23 #69): مسئلهٔ گفت‌وگویی که مسئلهٔ زنده شد دیگر نوارِ گفت‌وگو ندارد — نه مرحلهٔ کهنهٔ «فهمِ مسئله» پس از حل
+       (مسئلهٔ زندهٔ حل‌شده نوار ندارد — بانکِ R22 #59) */
+    try { var C2 = s.coach || {}; if (A.STORY && A.STORY.livedPk && A.STORY.livedPk(s, String(C2.pk || ""))) return ""; } catch (e) { }
+    /* مسئلهٔ زندهٔ همین سشن بسته شد و پس از آن مسئلهٔ گفت‌وگوی تازه‌ای آغاز نشد ⇒ نوارِ گفت‌وگو نیست (همان مسئلهٔ بسته‌شده بود) */
+    try { var b3 = AS.boundLive ? AS.boundLive(s) : null; if (b3 && b3.done) { var pg3 = S.get("eprog_" + b3.pid), L3 = (pg3 && pg3.solve && pg3.solve.live) || {}, PL = ((s.coach || {}).pkLog || []), lastPk = PL.length ? String(PL[PL.length - 1].at) : "";
+      if (!lastPk || lastPk <= String(L3.stateAt || "~")) return ""; } } catch (e) { }
     try { if (AS.chatFocus && AS.chatFocus(s) && (s.msgs || []).filter(isUser).length >= 2) return s.id; } catch (e) { }
     return "";
   }
@@ -581,7 +628,7 @@
   A.ROUTE.strip = function (id) {
     var M = A.ROUTE.model(id); if (!M) return null;
     return h("div", { class: "rt-geo small", dir: "rtl", role: "note", "aria-label": "جای تو در مسیرِ مسئله" },
-      h("span", {}, "🧭 «" + clip(M.title, 40) + "» — مبدأ: صورت · اکنون: " + (M.nowFa || "—") + " · مانده: " + (M.remain || "—") + " · مقصد: " + clip(M.dest, 40) + " "),
+      h("span", {}, "🧭 «" + clip(M.title, 40) + "» — مبدأ: صورت · اکنون: " + (M.nowFa || "—") + " · مانده: " + (M.remain || "—") + " · مقصد: " + clip(M.dest, 60) + " "),
       M.kind === "live" ? h("button", { class: "linkish small rt-geo-back", type: "button", onclick: function () { A.go("lprob", id); } }, "🔭 برگرد به مسئله") : null,
       h("button", { class: "linkish small rt-geo-go", type: "button", onclick: function () { A.go("route", id); } }, "نقشهٔ مسیر"));
   };

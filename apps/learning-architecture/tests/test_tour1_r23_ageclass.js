@@ -264,13 +264,17 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
       APP.ASSIST.unfit23('این گام جواب نداد؟ مسئله را به شکلِ دیگری بیان کن', 'رفتم پرسیدم. سیاست جدید بوده: فقط کسایی که دوره آموزشی رفتن ترفیع گرفتن، منم نرفته بودم. خیلی عصبانیم، پس این همه وقت هدر رفت!'),
       APP.ASSIST.unfit23('آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت؟', 'ببخشید، اشتباه گفتم: جلسه رو شنبه می‌ذارم، نه پنجشنبه — پنجشنبه برادرم سرِ کاره.'),
       APP.ASSIST.unfit23('این گام جواب نداد؟ مسئله را به شکلِ دیگری بیان کن', 'جلسه خراب شد، دعوامون شد. عصبانیم، وقتم هدر رفت.'),
-      APP.ASSIST.unfit23('مجهول (یا حکمی که باید ثابت شود) چیست؟', 'مجهول همون تعداد کاشی‌هاست دیگه')]);
-    chk(q1[0] && q1[1] && q1[2] && q1[3] && q1[4] && q1[5] && !q1[6] && q1[7], 'C23-17 pC2 p8 / aC2 p4, C23-23 s25 p16, D23-18 dp1 p2, A23-6 s05 p4 / s04 p8: answered or misplaced turn questions are recognised; a real step failure keeps e4 ' + JSON.stringify(q1));
+      APP.ASSIST.unfit23('مجهول (یا حکمی که باید ثابت شود) چیست؟', 'مجهول همون تعداد کاشی‌هاست دیگه'),
+      APP.ASSIST.unfit23('نتیجه‌ای گفتی — از راهِ دیگری هم به همین می‌رسی؟ نتیجه را وارسی کن: در شرط بگذار یا با حالتی خاص بسنج.', 'جوابش ۶۰ شد، واحدشم چک کردم درسته')]);
+    chk(q1[0] && q1[1] && q1[2] && q1[3] && q1[4] && q1[5] && !q1[6] && q1[7] && q1[8], 'C23-17 / bank #74 (Q5 half) pC2 p8 / aC2 p4, C23-23 s25 p16, D23-18 dp1 p2, A23-6 s05 p4 / s04 p8: answered or misplaced turn questions are recognised; a real step failure keeps e4 ' + JSON.stringify(q1));
     // in a real prompt: the dropped question is context, never the turn question
     await wipe(); await setB('1990-01-01'); await fresh();
     await exec('قبضِ برق', 'practical', { step: 'حسابِ مصرفِ هر وسیله', out: { done: 'yes', match: 'yes', what: '۲۷۰ هزار شد' } });
     const u = await turn('۲۷۰ هزار با قبض ۴۰۰ هزاری جور درمیاد، بقیه‌ش مال یخچال و لامپاست. اشتباهم این بود که وات رو کیلووات نکرده بودم و نمی‌دونستم قیمت برای «کیلووات‌ساعت»ه. درسم اینه که اول واحدها رو یکی کنم. حل شد.', 'خوب.');
     const t = await tq(u); chk(!/با واقعیت سنجیدی/.test(t.q), 'C23-17 pC2 p8: the turn question never re-asks the check she just reported ' + t.q);
+    await wipe(); await setB('1990-01-01'); await fresh(); await exec('مساحتِ باغچه', 'objective', { step: 'حسابِ مساحت' });
+    const u74 = await turn('جوابش ۶۰ شد، واحدشم چک کردم درسته', 'خوب.'); const t74 = await tq(u74);
+    chk(!/وارسی کن|با واقعیت سنجیدی|چک کن/.test(t74.q), 'bank #74 (Q5 half): the turn question never re-asks the check she just reported ' + t74.q);
     // A23-3 aA2 p1: «I proved it, why?» ⇒ look-back stage
     await wipe(); await setB('2010-02-08'); await fresh();
     const u5 = await turn('سلام. امروز سر کلاس با استقرا ثابت کردم که 1+3+5+...+(2n-1) = n^2. معلم گفت درسته. ولی حس می‌کنم نفهمیدم چرا «مربع» درمیاد. اثبات رو دارم ولی چرا رو نه. می‌خوام دوباره بهش نگاه کنم.', 'باشه.');

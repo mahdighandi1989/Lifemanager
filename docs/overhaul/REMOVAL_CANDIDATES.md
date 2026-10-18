@@ -327,3 +327,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R23 Q1 (Jalali dates everywhere) and Q5 (no correction block on a non-correction; the page's own question is one question in every path).
 - **Status:** reachable, not called: `APP.AGE.R23_QUARANTINE.norm22`, `APP.ASSIST.R23_QUARANTINE.corr19b22`, `.inPage22`, `.claimRet22`, `.pass22Ask` (old replacement text).
   Delete only with the owner's approval.
+## 2026-10-18 — R22 route destination for chat problems (learning-architecture, Pólya round 23, story: Q3)
+- **Where:** `apps/learning-architecture/src/app/a44_route.js` → `destOfR22(rid)` (the round-22 `destOf`).
+- **What it did:** the destination of a chat problem's route map was «خواستهٔ مسئلهٔ گفت‌وگو» or `C.unkBy[pk]` — the last question
+  sentence of whichever message carried `said:u` — so a side question («ولی خب، ۵ منهای ۳ چرا نمیشه») became the destination (B23·D2, D23-21).
+- **Why replaced:** DECISIONS_R23 Q3 (destination = the unknown). New `destOf` → `A.STORY.dest` (validated `coach_state.unknown` whose words are in
+  the statement ⇒ the statement's question sentence ⇒ her unknown phrase only when it fits the statement). Live problems keep the u-form first.
+- **Status:** reachable, called only when `A.STORY` is missing. Delete only with the owner's approval.

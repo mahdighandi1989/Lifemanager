@@ -4808,3 +4808,14 @@ dated stability, mind-card feed) under way.
   turn-question fit, post-check fixes. WORKLOG (94), PROGRESS 109. Old paths quarantined (REMOVAL_CANDIDATES 2026-10-19).
 - **DECISION** The R23 bank's Jalali dates are right; a hand check «1 Farvardin 1338 = 1959-03-21» was a day early (equinox after Tehran noon ⇒ 22 March).
 - **CHANGE** Test `apps/learning-architecture/tests/test_tour1_r23_ageclass.js` (red on base, green after): runners' sentences + VARIANTS_R23 Q1 38/38, Q5 21/21.
+## 2026-10-18 — Pólya round 23, fixer «story» (Q3: chat ⇄ page is one story)
+- **FINDING** Root: validated chat work (`coach_state` said/ans/plan/step/result) stayed in `s.coach`; the live problem's forms, stage, dossier,
+  route map and geo strip read only the forms. Symptoms: whole-first asked again after «کلش اینه…» (A23-35 = A22-27), «طرح هنوز نیست» after a
+  chat plan (C23-11), a later live problem restarting at «فهم» (B·D5), chat-problem route origin/destination wrong and nesting lost after
+  chat_solved (B·D2, D23-20), other problems' events on a problem's map/dossier (A23-32), clipped labels, stale strip, no route action (B·D17).
+- **CHANGE** New `a45_story.js`: story ledger → A.EVLOG events + prefill of empty form fields with «از گفت‌وگو … درست است؟»; one stage source
+  `A.liveStoryPhase`; import into a later live problem (`L.chatImp`); event owner `A.STORY.owns`; route action in the prompt. a44 route model
+  (origin, destination, chat plan steps, prerequisite lookup per scope, labels, strip); a40 uses the story stage and the owner rule; minimal hooks
+  in a27 (`C.saidOk`) and a38 (`A.liveDraftDrop`, `A.liveMkSrc`, one `coachCore` condition).
+- **DECISION** Never write `solve.u[1]`/`L.plan` from chat (her confirmation is one click); `A.livePhase` unchanged. Quarantined `destOfR22`.
+- **FINDING** Test: `tests/test_tour1_r23_story.js` red on 574f4a30, green after; bank VARIANTS_R23 Q3 34/34 (#74/#83 second halves belong to Q5/Q4).
