@@ -277,3 +277,11 @@ how to revive it.
 ## 2026-10-17 — `A.masteryCountOnly` (learning-architecture, round-19c practice)
 The count-only mastery rule (six same-day attempts counted as «fluent») is replaced by a distinct-days rule (DECISIONS_R19c LT3).
 The old function is kept reachable as `A.masteryCountOnly` in `a1_base.js`; nothing calls it. Delete only with the owner's approval.
+
+## 2026-10-18 — `retractCheckR19b` / `retractApplyR19b` (learning-architecture, Pólya round 20, coach: RO1/RO4)
+- **File:** `apps/learning-architecture/src/app/a27_tour.js`.
+- **What they did:** the round-19b correction engine — raw substring matching (a weekday «شنبه» found inside «پنجشنبه» and refused as "same value"; «۱۰» inside «۱۰۰»)
+  and reversal by *message*: every coach record and mind-card event derived from the corrected message was withdrawn, whatever part was corrected.
+- **Why replaced:** DECISIONS_R20 RO1 (reverse by fact: span overlap / reported key; re-book the corrected content; verdict only if its data changed) and RO4 (normalized token matching, minimal differing span).
+- **Status:** kept in the same file, reachable as `APP.ASSIST.R19B_QUARANTINE` (`retractCheck`, `retractApply`, `subst`), not called. Delete only with the owner's approval.
+

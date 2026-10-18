@@ -323,7 +323,11 @@ function devScan(sys, user) {
     }
     // s14o (B·D7): همان پرسشِ «اثبات‌ها به چه درد من می‌خوره؟» پس از پاسخِ بی گزارش؛ و با گزارشِ وضع (بی defer) سطری نمی‌آید
     await fresh(); await turn('اصلاً این اثبات‌ها به چه درد من می‌خوره؟', 'اول این تمرین را ببندیم.', [cs({ ph: 'u' })]);
-    const u3 = await turn('باشه.'); chk(!lines(u3.user).some(l => /عقب‌افتاده \(نامزد/.test(l)), 'rm5def: when the model did report coach_state (without defer), the candidate line stays silent (its judgement) ' + head(u3.user).slice(0, 0));
+    /* دورِ ۲۰ (RO8، B·D15 — DECISIONS_R20 جای این بند را گرفت): پرسشِ «به چه درد/چه فایده/چرا باید» که پاسخ به آن نپرداخت، حتی با گزارشِ وضعِ بی defer، نامزد می‌ماند
+       (s14o هنوز گم می‌شد)؛ جملهٔ دیگری با گزارشِ وضع همچنان داوریِ مدل است */
+    const u3 = await turn('باشه.'); chk(/# درخواستِ عقب‌افتاده \(نامزد[^\n]*\n[^\n]*به چه درد/.test(head(u3.user)), 'rm5def (R20 RO8): an unaddressed purpose question stays a candidate even when the reply had coach_state without defer ' + head(u3.user).slice(0, 0));
+    await fresh(); await turn('یه مثال دیگه هم بزن', 'اول این تمرین را ببندیم.', [cs({ ph: 'u' })]);
+    const u4 = await turn('باشه.'); chk(!lines(u4.user).some(l => /عقب‌افتاده \(نامزد/.test(l)), 'rm5def: other requests with coach_state (without defer) stay the model\'s judgement');
   });
 
   // ================= rm6reg =================
