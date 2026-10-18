@@ -8,6 +8,7 @@ source:
   imported_at: "2026-10-16T12:00:00Z"
 created_at: "2026-10-16T12:00:00Z"
 updated_at: "2026-10-18T14:00:00Z"
+updated_at: "2026-10-18T16:00:00Z"
 merged_from: []
 ---
 
@@ -96,6 +97,23 @@ Round 22 showed what still broke after "reach every copy":
   («مربع بهترین است» for any perimeter) stays unless its own evidence text names the old value. A deadline correction touches no verdict or guess.
 - **One structure, updated by every later answer.** The person's «بله» to a copy-ask must update the same result the model reads next turn, or the model says
   "nothing changed" about a change the page already made.
+## Update 2026-10-18 — one turn question per prompt, decided last; "answered" means answered in another turn
+Round 22 showed the turn-question layer drifting in four ways, all from the same root (several modules each choosing "the" question):
+- **Decide the single turn question after every module has written.** Each block (live problem, tutor frame, practice block, correction
+  block) emitted its own "ask exactly this" line, so prompts carried two. A final pass after all hooks/filters keeps one (explicit moment >
+  live-problem line > first) and marks the others as context, without the verb "ask". Any per-module demotion is only a partial fix.
+- **The successor question must never override the user's own act in the same turn.** After a step outcome the page asked "what is your
+  next step?" even when she asked to restate, had just named her next step, asked "is this right?" about her steps, or presented a proof.
+  Read her current turn first; the generic successor is only for a turn that carries none of these, and only once per outcome.
+- **"Already asked" must be keyed by turn, not by call.** The question builder ran twice per turn (two hooks); the second call saw the
+  question it had just chosen as "asked" and moved on. Record the turn key with the mark and treat calls of the same turn as one.
+- **The post-check must recognise the page's own question in every surface form**: nested quotes inside it, a preamble before it, a
+  two-sentence page question, "e.g. …?" elaborations and cheat-sheet bullets. Compare by token majority against the page questions in the
+  prompt (balanced-quote extraction), not by substring. And make the page's own turn question one sentence before it reaches the model.
+- **Classify meta messages before problem detection.** Practice requests, "keep what I learned", self-ratings ("maybe 40%"), corrections
+  and deadline notes were being taken as a new chat problem or as a guess. One classifier, consulted by the problem detector, the guess
+  detector and the statement holder, removes all three symptoms.
+
 ## Update 2026-10-18 (round 22, practice + lists)
 Derive a record's dependent rows from the record itself, never from the path that changed it. A calibration case booked a session only when the
 judgement arrived through the chat action, so a prediction judged on its own page (or in a worksheet row) left the case "stabilising with zero

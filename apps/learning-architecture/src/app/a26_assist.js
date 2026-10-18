@@ -472,7 +472,9 @@
        (مثلاً قلابِ مسئلهٔ زنده) بی ویرایشِ پروندهٔ خودش با دادهٔ صفحه هم‌گام شود و دو قاعدهٔ ناسازگار کنارِ هم نیاید (تورِ پولیا، دستهٔ ۱) */
     var hookOut = []; AS._hookCtx = { s: s, msg: msg };
     try { (AS.promptHooks || []).forEach(function (fn) { try { var x = fn(s, msg); if (x) hookOut.push(x); } catch (e) { } });
-      (AS.promptFilters || []).forEach(function (fn) { try { var y = fn(hookOut, s, msg); if (Array.isArray(y)) hookOut = y; } catch (e) { } }); } finally { AS._hookCtx = null; }
+      (AS.promptFilters || []).forEach(function (fn) { try { var y = fn(hookOut, s, msg); if (Array.isArray(y)) hookOut = y; } catch (e) { } });
+      /* دورِ ۲۲ (P4): پس از همهٔ قلاب‌ها و پالایه‌ها — یک پرسشِ نوبت در کلِ پرامپت، و خودش یک پرسش (a27 AS.oneTurnQ22) */
+      if (typeof AS.oneTurnQ22 === "function") { var y22 = AS.oneTurnQ22(hookOut); if (Array.isArray(y22)) hookOut = y22; } } finally { AS._hookCtx = null; }
     hookOut.forEach(function (x) { if (x) L.push("", x); });
     var rt = AS.recentToasts(); if (rt.length) L.push("", "# پیام‌های اخیرِ صفحه (ردهایی که هنوز رفع نشده‌اند، و پیام‌های ۴ دقیقهٔ گذشته؛ مثلاً پس از دکمه‌ای که خودِ کاربر زد)", rt.map(function (x) { return "- " + x; }).join("\n"));
     L.push("", "# صفحهٔ فعلی", scanText(sc, pageMode), "", "# گفت‌وگو تا این لحظه");
@@ -608,10 +610,15 @@
     if (!msg) return "lla_assistant";
     if (pureCommand(msg)) return "lla_assistant";   // چیزی جز فرمان نیست (حتی درونِ مسئلهٔ در کانون)
     if (COACH_HEAD.test(p) || focusIn(p) || PRAC_CASE.test(p)) return "lla_coach";
+    /* دورِ ۲۲ (P5، D s34 p14/p16): بازگشت در سشنِ تازه دربارهٔ مسئلهٔ بازِ خودش — صفحه خودش گفت «حرفش دربارهٔ همین مسئله است» */
+    if (OPEN_ON22.test(p)) return "lla_coach";
     var sig = AS.statesProblem ? AS.statesProblem(msg) : [AS.CHAT_PROB, AS.LIVE_RE2, AS.LIVE_ASK, AS.LIVE_STUCK, AS.FAIL_ME, LIFE_HINT].some(function (re) { return re && re.test(msg); });
+    /* دورِ ۲۲ (P5، D s31 p17): گزارشِ سرانجامِ پیش‌بینی/حدسِ خودش کارِ مربی است */
+    if (!sig && AS.ownOutcome22 && AS.ownOutcome22(msg)) sig = true;
     if (COACH_BLOCK.test(p) && (sig || o.prev === "lla_coach")) return "lla_coach";
     return "lla_assistant";
   };
+  var OPEN_ON22 = /^# مسئلهٔ بازِ تو[^\n]*\n- [^\n]*حرفش دربارهٔ همین مسئله است/m;
   /* پشتیبان در زمانِ استقرار: «lla_coach» رد شد (سرورِ قدیمی ⇒ ۴۲۲) یا مدلی برایش جواب نداد ⇒ یک بار همان درخواست با «lla_assistant» —
      هیچ نوبتی نمی‌شکند و نامِ مدلی به کاربر گفته نمی‌شود. ۴۲۲ ⇒ تا بارِ بعدِ صفحه دیگر «lla_coach» فرستاده نمی‌شود. */
   function callTask(sys, user, o2) {
