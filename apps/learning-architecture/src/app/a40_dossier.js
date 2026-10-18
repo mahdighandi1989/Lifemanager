@@ -84,13 +84,16 @@
       if (q.done || q.state === "done" || q.state === "notdone") add({ k: "cplandone", at: q.doneAt || "", title: "برنامهٔ خودت — سرانجام", lines: [q.text], out: q.state === "notdone" || q.done === false ? "انجام نشد" : "انجام شد" });
     });
     var seen = {};
-    (se.retracts || []).forEach(function (x) { var key = x.at + "|" + x.mid; seen[key] = 1; var sm = msgRef(se.id, x.mid);
+    (se.retracts || []).forEach(function (x) { if (x && x.copy) return;   // دورِ ۲۲: پاسخِ «بله/نه» رویدادِ «copyans» ِ خودش را دارد
+      var key = x.at + "|" + x.mid; seen[key] = 1; var sm = msgRef(se.id, x.mid);
       if (pid && (x.changed || []).length && !(x.changed || []).some(function (c) { return !c.pid || c.pid === pid; })) return;
       add({ k: "retract", at: x.at, title: "اصلاحِ پیامِ پیشین", lines: ["«" + x.frag + "» ⇐ «" + x.fix + "»"].concat(x.refused ? ["صفحه نپذیرفت: " + (x.err || "")] : x.dup && !(x.changed || []).length ? ["پیش‌تر از همین پیام اصلاح شده بود؛ چیزِ تازه‌ای عوض نشد"] : (x.changed || []).length ? x.changed.map(function (c) { return c.label + (typeof c.old === "string" && (c.old || c.new) ? ": «" + clip(c.old, 80) + "» ⇐ «" + clip(typeof c.new === "string" ? c.new : val(c.new), 80) + "»" : ""); }) : ["از آن تکه رکوردی ساخته نشده بود"]),
         src: sm && sm.text ? sm : null, out: x.by === "user" ? "با ✏️ ِ خودت" : "از گفت‌وگو", rk: x.mid + "|" + x.frag + "|" + x.fix }); });
     /* دورِ ۲۱ (R4، C21-14، bank #96): اصلاح‌های گفت‌وگو همه — هم آن‌ها که چیزی را عوض کردند، هم بی‌اثر و ردشده (با همان سطرِ ساده)؛ یک بار برای هر اصلاح */
     var segot = {}; (se.retracts || []).forEach(function (x) { segot[nzk(x.mid) + "|" + nzk(x.fix)] = 1; segot["r|" + nzk(x.frag) + "|" + nzk(x.fix)] = 1; });
     (((se.coach || {}).retracts) || []).forEach(function (x) { if (!x || !x.at || seen[x.at + "|" + (x.from || x.srcId || "")]) return;
+      /* دورِ ۲۲ (P3، D s30): اصلاحِ مسئلهٔ دیگرِ همان سشن در پروندهٔ این مسئله نمی‌آید — مالکِ اصلاح مسئله‌ای است که رکوردش از همان پیام عوض شد */
+      if (pid && x.src) { var rp = retPids22(x.src); if (rp.length ? rp.indexOf(pid) < 0 : !chatScope(se, pid)) return; }
       var fr = x.frag || (x.x && x.x.msg) || x.msg || "", fx = x.fix || (x.x && x.x.fix) || "", ch = x.changes || x.ch || [];
       if (segot[nzk(x.src) + "|" + nzk(fx)] && !ch.length) return; if (segot["r|" + nzk(fr) + "|" + nzk(fx)] && !ch.length) return;
       add({ k: "retract", at: x.at, title: "اصلاحِ پیامِ پیشین", lines: [fr || fx ? "«" + val(fr) + "» ⇐ «" + val(fx) + "»" : "اصلاح"].concat(x.err ? ["صفحه نپذیرفت: " + val(x.err)] : ch.length ? ch.map(val) : ["چیزی عوض نشد — از آن تکه رکوردی ساخته نشده بود"]), out: x.edit ? "با ✏️ ِ خودت" : "از گفت‌وگو", src: x.src ? msgRef(se.id, x.src) : null }); });
@@ -108,6 +111,21 @@
   function pidAt(se, at) { var L = (se && se.lprobLog) || [], o = ""; L.forEach(function (e) { if (e && e.p && String(e.at || "") <= String(at || "~")) o = e.p; }); return o || (L.length ? "" : (se && se.lprob) || ""); }
   function planPid(se, q) { if (q.pid) return q.pid; var sm = q.src ? msgRef(se.id, typeof q.src === "object" ? q.src.mid || q.src.msg : q.src) : null; return pidAt(se, (sm && sm.at) || q.at || ""); }
   /* حدس‌های گفت‌وگو در پروندهٔ یک مسئله فقط اگر سشن تنها همان مسئله را داشت (وگرنه پروندهٔ گفت‌وگو) */
+  /* دورِ ۲۲ (P3، A22-20 s03، D s30/s34/s38): یک رویداد برای هر اصلاح — همان اصلاح که صفحه (L.retracts/se.retracts) و مربی (coach.retracts) هر دو نوشتند،
+     یا ✏️ که دو بار ثبت شد، یک رویداد است (سطرهایش یکی می‌شوند؛ سطرِ «چیزی عوض نشد» کنارِ تغییرها نمی‌ماند) */
+  function dedupRet22(ev) {
+    var out = [], by = {};
+    ev.forEach(function (e) { if (!e || e.k !== "retract") { out.push(e); return; }
+      var k = nzk(String((e.lines || [])[0] || "")).replace(/[«»"]/g, ""), t = Date.parse(e.at || "") || 0, hit = (by[k] || []).filter(function (x) { return Math.abs((Date.parse(x.at || "") || 0) - t) <= 5 * 60e3; })[0];
+      if (!hit) { (by[k] = by[k] || []).push(e); out.push(e); return; }
+      var nothing = /چیزی عوض نشد|رکوردی ساخته نشده|ثبت نشده بود/, L0 = (hit.lines || []).concat((e.lines || []).slice(1)).filter(function (x, i, X) { return X.indexOf(x) === i; });
+      if (L0.slice(1).some(function (x) { return !nothing.test(x); })) L0 = [L0[0]].concat(L0.slice(1).filter(function (x) { return !nothing.test(x); }));
+      hit.lines = L0; if (!hit.src && e.src) hit.src = e.src; if (e.at && (!hit.at || e.at < hit.at)) hit.at = e.at; });
+    return out;
+  }
+  A.dossierDedupRet = dedupRet22;
+  /* کدام مسئله‌ها اصلاحی از این پیام را در دفترِ خودشان (L.retracts) دارند */
+  function retPids22(mid) { var o = []; S.all("eprog", function (pg) { var L = pg && pg.solve && pg.solve.live; return !!(L && (L.retracts || []).some(function (x) { return x && x.mid === mid; })); }).forEach(function (pg) { o.push(String(pg.id).replace(/^eprog_/, "")); }); return o; }
   function chatScope(se, pid) { var ps = {}; if (se.lprob) ps[se.lprob] = 1; (se.lprobLog || []).forEach(function (e) { if (e && e.p) ps[e.p] = 1; }); var k = Object.keys(ps); return k.length === 1 && k[0] === pid; }
   /* ---------- مدلِ پرونده (یک منبع برای صفحه و برون‌بُرد) ---------- */
   A.dossier = function (pid) {
@@ -185,7 +203,7 @@
     try { var M0 = A.MIND && A.MIND.model ? A.MIND.model() : null, tt = r.p.title;
       ((M0 && M0.events) || []).forEach(function (e) { var mine = e.pid === pid || (e.src && e.src.id === pid) || (tt && String(e.fa || "").indexOf("«" + tt + "»") >= 0); if (!mine) return;
         add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [e.fa], withdrawn: !!e.withdrawn, out: e.withdrawn ? "پس گرفته شد" : "" }); }); } catch (e) { }
-    ev.forEach(cleanEv); sortEv(ev);
+    ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
     var last = ev.reduce(function (m, e) { return e.at && e.at > m ? e.at : m; }, String(r.updated || ""));
     /* دورِ ۲۰ (RO6، B·D7): یک منبعِ وضع — مرحله‌ها از همان A.livePhase که خطِ «وضع» می‌خواند (مرحلهٔ جاری «در جریان» است، نه «هنوز نرسیده») */
     var ORD = ["u", "p", "c", "b"], pi = ph === "done" ? 4 : Math.max(0, ORD.indexOf(ph));
@@ -223,7 +241,7 @@
         PR.events(null).forEach(function (e) { if (e && cs[e.prc]) add(Object.assign({}, e)); });
         S.all("fcast", function (f) { return f && f.prc && cs[f.prc]; }).forEach(function (f) { add({ k: "fcast", at: f.outcomeAt || f.created || "", title: "🎯 پیش‌بینی", lines: [f.q].concat(f.p != null ? ["اطمینان: " + fa(f.p) + "٪"] : []).concat(f.due ? ["موعدِ داوری: " + val(f.due)] : []),
           out: f.outcome === "yes" || f.outcome === "درست" ? "شد" : f.outcome === "no" || f.outcome === "نادرست" ? "نشد" : f.outcome ? val(f.outcome) : "هنوز داوری نشده" }); }); } } catch (e) { console.warn(e); }
-    ev.forEach(cleanEv); sortEv(ev);
+    ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
     var title = se.title || (first ? clip(first.text, 60) : "گفت‌وگو");
     /* دورِ ۲۱ (R4، C21-13، bank #94): سشنی که مسئلهٔ زنده دارد ⇒ عنوانِ درست و پیوند به پروندهٔ همان مسئله */
     var lv = []; [se.lprob].concat((se.lprobLog || []).map(function (e) { return e && e.p; })).forEach(function (p) { var r = p && A.liveRec && A.liveRec(p); if (r && !lv.some(function (x) { return x.pid === p; })) lv.push({ pid: p, title: r.p.title }); });
@@ -458,7 +476,9 @@
       if (!s || !m || m.role !== "user" || sysTurn(m.text)) return null;
       var mid = A.liveMsgId ? A.liveMsgId(m) : "", wrap = h("div", { class: "as-mtools small", dir: "rtl", "data-mid": mid });
       /* دورِ ۲۱ (R3h، B·D13 s19): حبابی که در گفت‌وگو یا با ✏️ اصلاح شد نشان دارد — «پیشین ⇐ درست» */
-      if ((m.corr || []).length) wrap.appendChild(h("span", { class: "muted as-corr" }, (m.corr || []).map(function (x, i) { return [i ? " · " : "", "اصلاح شد ⇐ «", mx(x.frag), "» → «", mx(x.fix), "»", x.chat ? " (از گفت‌وگو)" : ""]; })));
+      /* دورِ ۲۲ (P3، B·D16 s19): نشانِ حباب با نتیجهٔ صفحه یکی است — اصلاحِ گفت‌وگو که هیچ رکوردی را عوض نکرد «اصلاح شد» نمی‌خورد، فقط «گفتی … — رکوردی از آن ثبت نشده بود» */
+      if ((m.corr || []).length) wrap.appendChild(h("span", { class: "muted as-corr" }, (m.corr || []).map(function (x, i) { var none = x.chat && !x.n && !(x.pids || []).length;
+        return [i ? " · " : "", none ? "گفتی «" : "اصلاح شد ⇐ «", mx(x.frag), "» → «", mx(x.fix), "»", none ? " — رکوردی از آن ثبت نشده بود" : x.chat ? " (از گفت‌وگو)" : ""]; })));
       if (ED && ED.sid === s.id && ED.mid === mid) {
         var id = "asEd_" + String(mid).replace(/[^A-Za-z0-9]/g, "");
         var ta = h("textarea", { id: id, class: "as-edtx", rows: 2, dir: "auto", "aria-label": "متنِ درستِ این پیام" }); ta.value = ED.text; ta.addEventListener("input", function () { ED.text = ta.value; });

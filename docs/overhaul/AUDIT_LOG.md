@@ -4741,3 +4741,22 @@ dated stability, mind-card feed) under way.
 - **CHANGE** New `a43_age.js` (`A.AGE`): one birth date (host bridge `birth()/setBirth()` over the identity-profile `date_of_birth` field, fill-empty both ways, settings fallback), age from the date, documented age bands, «# مخاطب» prompt block (child/teen/elderly; adults none), once-per-session birth-date card. `a34_psy.js`: own-band comparison only, `none: birth|age` instead of N(0,1), `P.popFa` used by the card, assistant text and report. `norms.json`: `sources[].ages`, 50–74 `valid:false`, `age_research` (handoff recorded, area psy-norms). Host bridge in `LearningArchitecturePage.jsx`.
 - **DECISION** Chierchia et al. 2019 adolescent MaRs-IB data rejected (method mismatch); no same-method child/adolescent norms found for any registry instrument.
 - Verified: new `tests/test_age_audience.js`, `test_age_norms.js`, `test_age_sync.js` (red on the base build, green after); whole page suite; handbook + ownership pytest. WORKLOG (88), PROGRESS 103.
+
+### 2026-10-18 — Pólya tour round 22, fixer «correction» (P3 correction engine, remaining) on /apps/learning-architecture
+- **FINDING** Root causes: (1) on a ✏️ edit the coach re-sent each bare fragment («۱»⇒«۱.۵», «۴»⇒«۵») to the page engine after the page had already applied the
+  full edit ⇒ chained replacement («۱.۵.۵ پیمونه»), spurious copy-asks («بر ۴⇒۵», «یه تا اسکیس»); (2) the number pattern had no decimal boundary; (3) a model
+  `old` was replaced by the whole `fix` («متر مربعه متر مربعه», «عروسی … تا عروسی»); (4) "same fact" was textual only (no value+unit, number words or unit
+  conversion); (5) the coach picked the latest fuzzy source message and `srcPart` saw only the first clause (s25 regression); (6) dependencies = "all data",
+  and a deadline fix set aside guesses/sufficiency; (7) the datum key never reached deadlines, deadline ids were not in the prompt; (8) session-level records
+  were rolled back after the coach wrote its result ("nothing recorded" beside a marked bubble); (9) «بله» did not update the model's result; (10) the coach
+  only reached the session's bound problem; (11) a trailing «؟» turned a full correction into a "question".
+- **CHANGE** `a38_live.js` (meaning matcher `numCopy`, minimal span, decimal boundary, one application per ✏️, basis-gated set-asides via `retract.rests`,
+  deadline reach, session-level apply before the result, «بله» updates the result, `pidsOf` by record source), `a27_tour.js` (exact source first, cross-session
+  source, clause-judged question, deadline ids, notes agree with changed, lesson ask with full text), `a40_dossier.js` (one event per correction, never in another
+  problem's dossier, honest bubble mark). Replaced rules quarantined: `APP.LIVE_R21_QUARANTINE_P3`, `APP.ASSIST.R21_QUARANTINE_P3` (REMOVAL_CANDIDATES).
+- **DECISION** The basis of a judgement is reported by the model with the correction and checked by the page against the judgement's written evidence; without a
+  report the round-21 rule stays. Rejected: per-scenario synonym lists; auto-rewriting a lesson with a whole sentence.
+- Verified: new `apps/learning-architecture/tests/test_tour1_r22_correction.js` — 18 runner sentences (all red on the base build) + every P3 entry of the
+  independent bank `VARIANTS_R22` (39/40 green, 1 not covered with reason — a29 mind card; 21 of 39 red on base); R17–R21 banks and the whole page suite green;
+  handbook + ownership pytest after merging the sibling branches. WORKLOG (91), PROGRESS 106. Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R22_correction_2026-10-18.md`.
+  Experience: `experiences/model-reports-state-page-validates.md` (update).

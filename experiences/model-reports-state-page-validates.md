@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-16T12:00:00Z"
 created_at: "2026-10-16T12:00:00Z"
-updated_at: "2026-10-18T12:00:00Z"
+updated_at: "2026-10-18T14:00:00Z"
 merged_from: []
 ---
 
@@ -74,3 +74,18 @@ model may name the page field; a different unit is never the same fact; (3) ever
 data it used at the moment it was made, and a changed datum — by correction or by her "yes" to a copy — sets aside only the judgements that
 used it, with the reason. Return one result structure ({changed, ask, note}) from every path, so the model is told exactly what changed,
 what is waiting for her answer, and what was refused.
+## Update 2026-10-18 — apply a correction once, by meaning, from the basis each judgement used
+Round 22 showed what still broke after "reach every copy":
+- **Two engines applying the same correction.** The page applied a ✏️ edit from the full old/new texts. Then the coach re-sent each bare fragment («۱» ⇒ «۱.۵», «۴» ⇒ «۵»)
+  to the same engine, which applied it again on the already-corrected text («۱.۵.۵») or matched an unrelated lone digit («بر ۴»). Rule: one correction is applied
+  once, by the engine that has its full context. Every later path reads that result; it never re-applies the change.
+- **Replace the minimal span, keep the person's wording.** When the model reports `old` plus a longer `fix` («۵۰» ⇒ «۶۰ متر مربعه»), replace only the number
+  if the rest of `fix` is the unit already in the text. A replacement that would duplicate words already next to it («عروسی … تا عروسی») takes in those
+  neighbouring words instead. A whole-sentence fix that would land in the middle of a clause is not applied in place: show the full proposed text and ask.
+- **"Same fact" means value plus unit family, with conversion.** «پنجاه متر مربع» = «۵۰ مترمربع» and «۱۵ سانتی‌متر» = «۱۵۰ میلی‌متر». A lone number with no unit
+  and no shared neighbour (a word or another number) is never the same fact. When a correction moves a number, write the new value in the copy's own
+  unit and digits.
+- **Dependencies come from the basis the model reports; the page checks the written evidence.** A verdict the model says does not rest on the datum
+  («مربع بهترین است» for any perimeter) stays unless its own evidence text names the old value. A deadline correction touches no verdict or guess.
+- **One structure, updated by every later answer.** The person's «بله» to a copy-ask must update the same result the model reads next turn, or the model says
+  "nothing changed" about a change the page already made.
