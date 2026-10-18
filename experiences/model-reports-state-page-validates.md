@@ -74,3 +74,12 @@ model may name the page field; a different unit is never the same fact; (3) ever
 data it used at the moment it was made, and a changed datum — by correction or by her "yes" to a copy — sets aside only the judgements that
 used it, with the reason. Return one result structure ({changed, ask, note}) from every path, so the model is told exactly what changed,
 what is waiting for her answer, and what was refused.
+
+## Update 2026-10-18 (round 22, practice + lists)
+Derive a record's dependent rows from the record itself, never from the path that changed it. A calibration case booked a session only when the
+judgement arrived through the chat action, so a prediction judged on its own page (or in a worksheet row) left the case "stabilising with zero
+sessions" and hid a 90% miss. The fix books the session from every judged linked prediction on save (one per judgement day, removed again when
+the judgement is withdrawn). The same rule picks the record a report refers to: when several candidates share words, use the numbers the person
+said (her stated confidence must equal the record's, other numbers must appear in its text) and ask "which?" only if more than one still fits —
+never invent a new record because no word matched. For lists the model fills from conversation, require the same consent check as for any other
+write, and accept numbers and dates only if they occur in her own message.
