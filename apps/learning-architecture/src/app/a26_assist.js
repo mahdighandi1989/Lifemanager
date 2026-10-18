@@ -56,7 +56,7 @@
     var L = [];
     /* دورِ ۲۳ (Q1): دانسته‌های سامانه دربارهٔ خودش از ثبت‌گاهِ A.SELF_FACTS — اول، تا بریدنِ نقشه (از ته) هرگز آن را نیندازد */
     var SF = A.SELF_FACTS || [], fv = function (x) { try { return typeof x === "function" ? x() : x; } catch (e) { return ""; } };
-    if (SF.length) { L.push("## خودِ سامانه: هر داده به چه کار می‌آید، کجا ذخیره می‌شود، آفلاین، مستقل از مدل (پرسشِ «کجا نگهش می‌داری؟» را از همین جواب بده)");
+    if (SF.length) { L.push("## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)");
       SF.forEach(function (f) { L.push("- " + f.fa + " — کاربرد: " + fv(f.use) + " — جا: " + fv(f.where) + " — آفلاین: " + fv(f.offline) + " — مدل: " + fv(f.model)); }); }
     L.push("## نماها (view — نام — کدام کار — چیست — به چه کار می‌آید)");
     AS.views().forEach(function (v) { L.push("- " + v.id + " — " + v.label + (v.job ? " — " + (JOB_FA[v.job] || v.job) : "") + (v.what ? " — " + v.what : "") + (v.why ? " — " + v.why : "")); });
@@ -503,7 +503,11 @@
       [/^## واژه‌نامه/, function () { return "## واژه‌نامه — (برای جا کنار رفت)"; }],
       [/^## مسیرهای کاریِ/, function () { return "## مسیرهای کاریِ قدم‌به‌قدم — (برای جا کنار رفت)"; }],
       [/^## ثبت‌گاه‌ها/, function (sec) { return sec.split("\n").map(function (l, i) { return i === 0 ? l : clip(l, 240); }).join("\n"); }],
-      [/^## نماها/, cols(2)]];
+      [/^## نماها/, cols(2)],
+      /* دورِ ۲۳ (Q1، ageclass): «خودِ سامانه» و سطرهای ثبت‌گاه هم پیش از فهرستِ فیلدهای صفحه کوتاه می‌شوند — هر فیلد و دکمهٔ صفحه بر توضیحِ نقشه مقدم است
+         (test_fixes_1015b #12)؛ «خودِ سامانه» فقط فشرده می‌شود (کاربرد/جا/آفلاین/مدل هر سطر می‌ماند، هر بخش کوتاه‌تر)، هرگز نمی‌افتد */
+      [/(?:^|\n)## خودِ سامانه/, function (sec) { return sec.split("\n").map(function (l) { return !/^- /.test(l) ? l : l.split(" — ").map(function (c, j) { return j === 0 ? c : clip(c, 70); }).join(" — "); }).join("\n"); }],
+      [/^## ثبت‌گاه‌ها/, function (sec) { return sec.split("\n").map(function (l, i) { return i === 0 ? l : clip(l, 120); }).join("\n"); }]];
     for (var i = 0; i < steps.length && L0 - P.join("\n").length < need; i++) P = P.map(function (sec) { return !MAN_KEEP.test(sec) && steps[i][0].test(sec) ? steps[i][1](sec) : sec; });
     var out = P.join("\n");
     if (hard && L0 - out.length < need) out += "\n[سامانه: نقشهٔ سامانه تا جای ممکن کوتاه شد؛ قلمروها و «چه کسی مسئولِ چیست» کامل ماند]";

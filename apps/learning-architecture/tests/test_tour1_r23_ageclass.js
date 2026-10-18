@@ -149,6 +149,13 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     chk(!blockOf(u.user, /^# مخاطب/) && /# مخاطب/.test(line) && /هم‌سن/.test(line) && /جا:/.test(line) && /آفلاین:/.test(line) && /مستقل از مدل/.test(line), 'A23-28/A23-38 oA1: adult prompt has no audience block but the system map says what age is for, where it is kept, offline, model-independent ' + line.slice(0, 200));
     chk(man.indexOf('سن و تاریخِ تولد') >= 0 && man.indexOf('سن و تاریخِ تولد') < man.indexOf('## نماها'), 'self-knowledge comes first in the map (never cut from the end)');
     chk(/ذخیرهٔ داده‌های این صفحه/.test(man), 'storage line from the registry');
+    /* بودجهٔ پرامپت: «خودِ سامانه» پیش از فیلدهای صفحه فشرده می‌شود (همان test_fixes_1015b #12، این بار با یک دانستهٔ بسیار بلند) */
+    const lp = await ev(() => { const AS = APP.ASSIST, m = document.getElementById('main'), keep = m.innerHTML, n0 = APP.SELF_FACTS.length;
+      APP.SELF_FACTS.push({ id: 'zz', fa: 'آزمونِ بودجه', use: 'ب '.repeat(1500), where: 'ج '.repeat(800), offline: 'د', model: 'ه' });
+      m.innerHTML = '<p>' + 'متنِ توضیحیِ بسیار بلندِ صفحه '.repeat(2500) + '</p>' + Array.from({ length: 140 }, (_, i) => '<label>فیلدِ ' + i + ' <textarea>' + 'پاسخِ بلندِ کاربر '.repeat(60) + '</textarea></label>').join('') + '<button type="button">موضوع بساز</button>';
+      const u = AS.prompt(AS.newSession(), 'پیامِ تازه', AS.scan(), ''); m.innerHTML = keep; APP.SELF_FACTS.length = n0;
+      return { len: u.length, last: u.includes('«فیلدِ 139»'), btn: u.includes('«موضوع بساز»'), cut: /بقیهٔ فهرستِ این صفحه/.test(u), age: /سن و تاریخِ تولد — کاربرد:[^\n]*آفلاین:[^\n]*مدل:/.test(u) }; });
+    chk(lp.len <= 58000 && lp.last && lp.btn && !lp.cut && lp.age, 'budget: a long self-fact is compressed before any page field is cut; every fact keeps use/where/offline/model ' + JSON.stringify(lp));
   });
 
   // ================= Q1 — معمای امروز برای کودک نه (D23-27) =================

@@ -155,10 +155,10 @@ var APP = window.APP = {};
      مستقل از مدل» ثبت می‌کند و «# نقشهٔ سامانه» ِ دستیار از همین می‌سازد (نه فهرستِ دستی در پرامپت). f(field) تابع هم می‌تواند باشد (حالتِ ذخیره در لحظه). */
   A.SELF_FACTS = A.SELF_FACTS || [];
   A.SELF_FACTS.push({ id: "store", fa: "ذخیرهٔ داده‌های این صفحه",
-    use: "هر رکوردِ این صفحه (مسئله‌ها، گفت‌وگوها، فهرست‌ها، کارنامه، تنظیمات)",
-    where: function () { return S.mode === "host" ? "در Lifemanager روی سرور، در فضای حسابِ خودِ کاربر (دیگر کاربران نمی‌بینند)" : S.mode === "gas" ? "در Google Apps Script ِ خودِ کاربر (برگه‌های Drive ِ خودش)" : "فقط در همین مرورگر (localStorage)"; },
-    offline: function () { return S.mode === "host" ? "پس از بارگذاری، کار روی صفحه بی شبکه هم ادامه دارد؛ تغییرِ فرستاده‌نشده نگه داشته می‌شود و با برگشتِ شبکه فرستاده می‌شود" : "بله — بی شبکه کار می‌کند"; },
-    model: "داده‌ها مالِ صفحه‌اند، نه مدل؛ عوض کردنِ مدلِ هوش مصنوعی چیزی از آن‌ها را عوض یا پاک نمی‌کند — فقط گفت‌وگو با دستیار به اتصال به یک مدل نیاز دارد" });
+    use: "همهٔ رکوردهای صفحه",
+    where: function () { return S.mode === "host" ? "سرورِ Lifemanager، در فضای حسابِ خودِ کاربر" : S.mode === "gas" ? "در Google Apps Script ِ خودِ کاربر (برگه‌های Drive ِ خودش)" : "فقط در همین مرورگر (localStorage)"; },
+    offline: function () { return S.mode === "host" ? "پس از بارگذاری کار ادامه دارد؛ تغییرها با برگشتِ شبکه فرستاده می‌شوند" : "بله — بی شبکه کار می‌کند"; },
+    model: "مالِ صفحه‌اند؛ عوض کردنِ مدل چیزی را عوض نمی‌کند (فقط گفت‌وگو مدل می‌خواهد)" });
   S.isGAS = function () { return typeof google !== "undefined" && google.script && google.script.run; };
   S.setStatus = function (s) { S.status = s; var el = document.getElementById("syncState"); if (el) { el.textContent = s; el.dataset.s = s; } };
   S.init = function (cb) {
