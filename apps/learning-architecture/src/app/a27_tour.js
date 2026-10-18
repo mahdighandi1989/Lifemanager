@@ -3952,6 +3952,8 @@
       var pu = prevUserMsg(s), al = (C.ansLog || []).filter(function (e) { return pu && e.key === mkey(pu.text); }).pop(); if (al) pts.push("پیامِ پیشینش پاسخِ «" + clip(al.q, 50).replace(/[«»]/g, "") + "» بود");
       if (edit) pts.push("این نوبت ✏️ است (اصلاحِ پیامِ پیشینش به دستِ خودش در صفحه)");
       out.unshift("# وضعِ کنونی\n" + CTX18 + (pts.length ? pts.join(" · ") : "هنوز مسئله یا کارِ بازی در این سشن نیست") + "."); } catch (e) { }
+    /* RO7 (قراردادِ a41): بلوکِ پرونده‌های تمرینِ باز برای مسئلهٔ زندهٔ همین سشن، اگر قلابِ a41 آن را نیاورد (موضوع = همان مسئله، نه واژه‌ها) */
+    try { if (A.PR && typeof A.PR.promptBlock === "function" && !out.some(function (x) { return /^# پرونده‌های تمرینِ باز/.test(x); })) { var bP = AS.boundLive(s), pb20 = bP && bP.pid ? A.PR.promptBlock(bP.pid, s) : ""; if (pb20) out.push(pb20); } } catch (e) { }
     /* MT1: یک بار پرسشِ ساختاری برای گزارشِ ناتمامِ نوبتِ پیش */
     var Q = C.ask20; if (Q && Q.key !== k && (!Q.shown || Q.shown === k)) { Q.shown = k;
       out.push("# گزارشِ نوبتِ پیش (یک بار)\n" + CTX18 + (Q.k === "result" ? "گزارشِ پیشینت said:[\"result\"] بی متنِ نتیجه بود و صفحه در پیامش نتیجه‌ای نیافت — هیچ نتیجه‌ای ثبت نشد. اگر واقعاً نتیجه گفته بود، در گزارشِ همین نوبت result را با عینِ متنش بده؛ وگرنه result نده."

@@ -39475,6 +39475,8 @@ APP.goFromURL = function (q) {
       var pu = prevUserMsg(s), al = (C.ansLog || []).filter(function (e) { return pu && e.key === mkey(pu.text); }).pop(); if (al) pts.push("پیامِ پیشینش پاسخِ «" + clip(al.q, 50).replace(/[«»]/g, "") + "» بود");
       if (edit) pts.push("این نوبت ✏️ است (اصلاحِ پیامِ پیشینش به دستِ خودش در صفحه)");
       out.unshift("# وضعِ کنونی\n" + CTX18 + (pts.length ? pts.join(" · ") : "هنوز مسئله یا کارِ بازی در این سشن نیست") + "."); } catch (e) { }
+    /* RO7 (قراردادِ a41): بلوکِ پرونده‌های تمرینِ باز برای مسئلهٔ زندهٔ همین سشن، اگر قلابِ a41 آن را نیاورد (موضوع = همان مسئله، نه واژه‌ها) */
+    try { if (A.PR && typeof A.PR.promptBlock === "function" && !out.some(function (x) { return /^# پرونده‌های تمرینِ باز/.test(x); })) { var bP = AS.boundLive(s), pb20 = bP && bP.pid ? A.PR.promptBlock(bP.pid, s) : ""; if (pb20) out.push(pb20); } } catch (e) { }
     /* MT1: یک بار پرسشِ ساختاری برای گزارشِ ناتمامِ نوبتِ پیش */
     var Q = C.ask20; if (Q && Q.key !== k && (!Q.shown || Q.shown === k)) { Q.shown = k;
       out.push("# گزارشِ نوبتِ پیش (یک بار)\n" + CTX18 + (Q.k === "result" ? "گزارشِ پیشینت said:[\"result\"] بی متنِ نتیجه بود و صفحه در پیامش نتیجه‌ای نیافت — هیچ نتیجه‌ای ثبت نشد. اگر واقعاً نتیجه گفته بود، در گزارشِ همین نوبت result را با عینِ متنش بده؛ وگرنه result نده."
@@ -40282,6 +40284,10 @@ APP.goFromURL = function (q) {
         go: A.V && A.V.practice ? ["practice", rec.id] : tid ? ["tech", +tid] : null,
         base: (asst ? "دستیار ← " : "") + "تمرینِ " + tFa(tid) + (sb.fa ? " «" + String(sb.fa).slice(0, 50) + "»" : "") });
       (rec.history || rec.hist || []).forEach(function (x) { var st = x && (x.state || x.to); if (x && (x.d || x.at) && st && x.ev !== "claim") R.ev.push({ at: x.d || x.at, state: st, why: x.why || x.note || "" }); });
+      /* RO7 (دورِ ۲۰، قراردادِ a41): پس‌گرفتنِ «تثبیت شد» در stableOff[] {d, was, why} (رکوردهای کهنه: withdrawn ِ آرایه) — تاریخچهٔ ثبات، نه پس‌گرفتنِ رکورد */
+      R.off = []; (Array.isArray(rec.stableOff) ? rec.stableOff : Array.isArray(rec.withdrawn) ? rec.withdrawn : []).forEach(function (w) { if (!w || !w.d) return;
+        if (w.was && !R.ev.some(function (e) { return /^(stable|تثبیت)/.test(e.state) && day(e.at) === day(w.was); })) R.ev.push({ at: w.was, state: "stable", why: "" });
+        R.off.push({ at: w.d, was: w.was || "", why: w.why || "" }); });
       (rec.sessions || []).map(function (s, j) { return { s: s, j: j }; }).filter(function (x) { return x.s && (x.s.d || x.s.at); }).sort(function (a, b) { return String(a.s.d || a.s.at).localeCompare(String(b.s.d || b.s.at)) || byAt(a.s, b.s); }).forEach(function (x) {
         var s = x.s, j = x.j;
         if (wdx(s) || s.draft || s.status === "draft" || !realRec(s)) return;
@@ -40406,6 +40412,7 @@ APP.goFromURL = function (q) {
       h("tbody", {}, W.rows.map(function (R) {
         return h("tr", { "data-row": R.key, "data-tech": R.tech || "", "data-dim": R.dim || "" },
           h("td", {}, R.base, R.stableAt ? h("div", { class: "small good" }, "تثبیت شد: " + A.fdate(day(R.stableAt))) : null,
+            (R.off || []).map(function (w) { return h("div", { class: "small warnline mind-tech-off", "data-at": day(w.at) }, "«تثبیت شد»" + (w.was ? " (" + A.fdate(day(w.was)) + ")" : "") + " در " + A.fdate(day(w.at)) + " پس گرفته شد" + (w.why ? ": " + w.why : "")); }),
             R.decline ? h("div", { class: "small warnline mind-tech-decline", "data-at": day(R.decline.at) }, "افت در " + A.fdate(day(R.decline.at)) + (R.decline.after ? " (پس از «تثبیت شد» در " + A.fdate(day(R.decline.after)) + ")" : "") + (R.decline.why ? ": " + R.decline.why : "")) : null),
           h("td", {}, fa(R.days) + (R.pending ? " · " + fa(R.pending) + " در انتظار" : "")),
           h("td", {}, R.nm ? (R.nm > 1 ? pf0(R.first) + " ← " + pf0(R.last) + " (" + fa(R.nm) + ")" : pf0(R.last) + " (۱)") : "— (اندازه‌ای نیست)"),

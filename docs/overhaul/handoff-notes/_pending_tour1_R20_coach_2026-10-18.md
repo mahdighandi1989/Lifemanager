@@ -21,7 +21,7 @@ Not touched: a38, a40, a41, a42, a31/a33 (one wrapper of `AS.DO.deadline` lives 
 - **routing (a26 call site):** `ask()` now ends in `post(sys, user, o2, opts, o)`: `AS.replyFix(o)` (top-level `retract`/`coach_state`, taste object) then `AS.replyCheck(o, opts)`;
   if it returns text, ONE extra `A.callAI(sys, user + why, o2)` with the same `opts` (same task), and only `reply` is replaced (actions stay). replyCheck answers only for
   task `lla_assistant`/`lla_coach` (or no task). Keep the hook when the task string changes.
-- **practice (a41):** the mind card reads `practice.withdrawn` arrays as stability history, never as "record withdrawn"; `ex.prc` links a worksheet to its case row.
+- **practice (a41):** the mind card reads `stableOff[] {d, was, why}` (and old `withdrawn` arrays) as withdrawn «تثبیت شد» shown under the case row, never as "record withdrawn"; `ex.prc` links a worksheet to its case row. The coach adds `APP.PR.promptBlock(boundPid, s)` only when a41's own hook did not already add «# پرونده‌های تمرینِ باز» (no `_prcBlockDone` needed).
 
 ## Items
 | Item | What changed |

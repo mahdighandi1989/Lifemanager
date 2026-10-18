@@ -184,6 +184,11 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
       const W = APP.MIND.techWork(); return W.rows.map(R => ({ key: R.key, n: R.acts.length, first: R.first, last: R.last })); });
     chk(x.length === 1 && x[0].key === 'prac:prc_t1' && x[0].first === 60 && x[0].last === 40 && x[0].n === 3, 'B·D9/A9: a practice case with withdrawn=[] is counted — one row per case with its measured values (worksheet linked, not a second row) ' + JSON.stringify(x));
     await p.evaluate(() => { APP.S.del('prc_t1'); APP.S.del('ex_t1'); });
+    // قراردادِ a41 (دورِ ۲۰): پس‌گرفتنِ «تثبیت شد» در stableOff — کارنامه می‌خواندش (و withdrawn ِ کهنه را هم)
+    x = await p.evaluate(() => { const mk = (id, k) => APP.S.put(Object.assign({ id, type: 'practice', tid: 41, kind: 'case', sessions: [{ d: '2026-10-01', at: '2026-10-01T09:00:00Z', meas: { pct: 80 } }, { d: '2026-10-11', at: '2026-10-11T09:00:00Z', meas: { pct: 40 }, ok: false }] }, { [k]: [{ d: '2026-10-11', was: '2026-10-04', why: 'وارسی شکست خورد' }] }));
+      mk('prc_s1', 'stableOff'); mk('prc_s2', 'withdrawn'); const W = APP.MIND.techWork(); const r = ['prc_s1', 'prc_s2'].map(id => { const R = W.rows.filter(R => R.key === 'prac:' + id)[0]; return R ? { off: R.off.length, st: !!R.stableAt, dec: !!R.decline } : null; });
+      APP.S.del('prc_s1'); APP.S.del('prc_s2'); return r; });
+    chk(x.every(r => r && r.off === 1 && r.st && r.dec), 'RO7 contract: the mind card reads stableOff (and old withdrawn arrays) as a withdrawn «تثبیت شد», counting the case ' + JSON.stringify(x));
   });
 
   // ================= bank (VARIANTS_R20 — سازوکارهای همین سهم) =================
