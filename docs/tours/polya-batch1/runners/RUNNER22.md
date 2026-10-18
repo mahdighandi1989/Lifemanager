@@ -29,3 +29,12 @@ DONE, never pkill others, delete profiles. Use Playwright's page.clock for multi
 say which you used).
 Final message: per scenario RESULT + defects (class, severity, repro, file:line) + «ارتقای لازم» + correction-trial table vs round 21 +
 routing table + practice-from-chat verdicts + running-lists verdicts + PARTS.md summary with «نسبت به دورِ ۲۱».
+
+ADDENDUM (owner 2026-10-18, roadmap §15 — binding): MISSING PREREQUISITE ≠ MIND KNOT ≠ LOW ABILITY. In every group at least two scenarios
+(one math, one science/life) are built on a person who lacks ONE specific prerequisite (e.g. factoring a difference of squares; area of a
+triangle; percent of a percent; unit conversion) — the person behaves naturally, does not announce it. Judge: did the system tell the
+missing prerequisite apart from a knot / not-understanding / low ability, without blaming her; did it name the EXACT concept and the step
+that needed it (never «جبر بلد نیستی»), check it with a short diagnostic question, teach it right there only as far as this problem needs
+(to mastery if needed), return to the main problem and reach the result; did «🧩 نقشهٔ پیش‌نیازها» connect (not an island); did the mind
+card book the stuck point with its cause (prerequisite / knot / skill) and count the later learning as progress, not weakness. Also re-judge
+every other scenario with this lens: was any stuck point wrongly attributed to a knot or to ability? Section «## پیش‌نیاز» per scenario.
