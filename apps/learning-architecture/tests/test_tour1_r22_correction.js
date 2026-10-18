@@ -93,7 +93,10 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
         L.suffLog = [{ at: new Date().toISOString(), d: APP.today(), ans: 'کافی است', where: 'u' }]; }); return pid; });
     await turn('اشتباه گفتم، عروسی ۱۵ اسفنده.', 'فرستادم.', RT({ msg: '۱۶ هفته تا عروسی برادرم مونده', key: 'deadline:d1', what: 'fact', fix: 'عروسی ۱۵ اسفنده', old: '۱۶ هفته' }));
     const x = await ev((pid) => { const so = APP.S.get('eprog_' + pid).solve; return { st: APP.S.get('eprob_' + pid).p.statement, g: so.g[1], suff: (so.live.suffLog || []).slice(-1)[0], note: (__cur().coach.retNote || {}).res }; }, pid);
-    return { ok: !GARBLE.test(x.st) && /۱۵ اسفند/.test(x.st) && x.g.hit === 'نادرست بود' && !x.g.outSup && x.suff.ans === 'کافی است', got: x }; });
+    /* DECISIONS_R23 Q4 (B·D4 s19، جایگزینِ این ادعا): جایگزینیِ درجایی که ترتیب را وارونه می‌کرد («عروسی ۱۵ اسفنده برادرم مونده» از همین متن) دیگر انجام نمی‌شود —
+       صورت همان می‌ماند و متنِ کاملِ پیشنهادی با «این‌جا هم عوض شود؟» پرسیده می‌شود؛ هر دو راه بی garble پذیرفته‌اند */
+    const asked = ((x.note || {}).ask || []).some(a => a.field === 'stmt' && /۱۵ اسفند/.test(a.new) && !GARBLE.test(a.new) && !/عروسی ۱۵ اسفنده برادرم/.test(a.new));
+    return { ok: !GARBLE.test(x.st) && !/عروسی ۱۵ اسفنده برادرم/.test(x.st) && (/۱۵ اسفند/.test(x.st) || asked) && x.g.hit === 'نادرست بود' && !x.g.outSup && x.suff.ans === 'کافی است', got: x }; });
 
   // D s34 (S3): «متنِ پیشنهادیِ آن پرسش خراب بود: «یه تا اسکیس از زمین زدم» به‌جای «یه اسکیس و دومی نصفه»»
   await T('D s34 ✏️ «یه اسکیس زدم و دومی رو نصفه ول کردم»: 🌱 ask is not «یه تا اسکیس», keeps her span', async () => { await ev(() => { __wipe(); __fresh(); });

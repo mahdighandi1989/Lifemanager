@@ -122,3 +122,13 @@ the judgement is withdrawn). The same rule picks the record a report refers to: 
 said (her stated confidence must equal the record's, other numbers must appear in its text) and ask "which?" only if more than one still fits —
 never invent a new record because no word matched. For lists the model fills from conversation, require the same consent check as for any other
 write, and accept numbers and dates only if they occur in her own message.
+
+## Update 2026-10-19 — a correction follows the value's role, never rewrites a computed or refuted result
+- **Same value is not same fact.** Match a copy by the value *in its role*: the members of a list share the list's trailing unit; a range bound («۱۰ تا ۲۰») is not the single value «۲۰»;
+  the counted noun after a number («۸۰۰ کارتن») names it; masked digits («؟۴۸۷؟») match only masked digits; a word window stops at the next number (words after it belong to that number).
+- **Never borrow a unit.** When she said a value without a unit («۱.۶ ارتفاع») and corrects it with a unit («۱۵۰ سانت»), the old unit is unknown — let the copy that wrote the unit
+  («۱.۶ متر») say it, and convert from there.
+- **Derived values become stale, not rewritten.** A result computed from the old datum («۱۰ × ۹ ÷ ۲ = ۴۵») cannot be fixed by number substitution; mark it stale with the reason and let the
+  person recompute. Her own refuted guess/result is evidence of her work — "I misstated" (rewrite) differs from "my result was refuted" (keep «رد شد»).
+- **A bare "yes" is ambiguous.** Apply a chat answer to an open copy question only when it names the field or says "change it" with exactly one question open.
+- **Test the meaning, not a regex the bug can pass.** The round-22 assertion accepted the reordered «عروسی ۱۵ اسفنده برادرم مونده»; write the negative of the exact runner text.

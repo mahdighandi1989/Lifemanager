@@ -317,3 +317,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   «باربر» and Pareto shares could not be set, and items carried no problem/session link.
 - **Why replaced:** DECISIONS_R22 P7 (lifecycle, hypotheses with probabilities, load-bearing, shares, verdict re-check, links). The new `listView` keeps both old controls.
 - **Status:** reachable, not called: `APP.PR.listViewR21`. Delete only with the owner's approval.
+
+## 2026-10-19 — R22 copy matcher and "all data" fallback (learning-architecture, Pólya round 23, correction: Q4)
+- **File:** `apps/learning-architecture/src/app/a38_live.js`.
+- **What they did:** `numCopy` (R22) took the old value's unit from the new value, stopped every neighbour window at a comma, let one shared word suffice in a short clause, matched a
+  range bound as the single value and read «؟» of a masked number as a sentence end; `stampUses` tied a verdict that named no datum to every datum including the whole statement.
+- **Why replaced:** DECISIONS_R23 Q4 (number role: list unit, range, counted noun, masked digits; never a borrowed unit; without `rests`, keep verdicts that do not consume the datum).
+- **Status:** reachable, not called: `APP.LIVE_R22_QUARANTINE_Q4.numCopy`, `.pickAll`. Delete only with the owner's approval.

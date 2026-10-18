@@ -451,7 +451,7 @@
       var PT = (res.parts || []).length ? res.parts : [{ frag: c.frag || "", fix: c.fix || "" }];
       var text = "[اصلاحِ پیامِ قبلی] " + PT.map(function (pt) { return "«" + clip(pt.frag, 120) + "» ⇐ «" + clip(pt.fix, 120) + "»"; }).join("، ") + " — متنِ درستِ پیامم: «" + clip(t, 400) + "»";
       var run = function (se) {
-        var ch = []; if (typeof AS.retractApply === "function") PT.forEach(function (pt) { try { var r2 = AS.retractApply(se, { msg: pt.frag, what: res.what || "said", fix: pt.fix }); if (r2 && Array.isArray(r2.ch)) ch = ch.concat(r2.ch); } catch (e) { console.warn(e); } });
+        var ch = []; if (typeof AS.retractApply === "function") PT.forEach(function (pt) { try { var r2 = AS.retractApply(se, { msg: pt.frag, what: res.what || "said", fix: pt.fix, mid: mid }); /* دورِ ۲۳ (Q4، C23-4): همان پیامِ ✏️، نه تازه‌ترین پیامی که تکهٔ کوتاه («۱») را دارد */ if (r2 && Array.isArray(r2.ch)) ch = ch.concat(r2.ch); } catch (e) { console.warn(e); } });
         A.liveEditCommit(s.id, mid, t, { ch: ch }); setTimeout(function () { try { AS.paint(); } catch (e) { } }, 0);
         /* دورِ ۲۰ (RO3/RO5): یک سطرِ راست پس از هر دو سو (صفحه و مربی) — نه پیش از آن */
         var parts = (res.changed || []).map(function (x) { return x.label; }).concat(ch.map(function (x) { return String(x).replace(/\s*\(اصلاح شد.*$/, ""); }));
