@@ -4629,3 +4629,22 @@ dated stability, mind-card feed) under way.
   Assistant: `start_practice` consent from the model's validated report, new `practice_log`, prompt block only with an open case (`APP.PR.promptBlock`). Clock badge no longer
   covers «↩ برگرد». Test `apps/learning-architecture/tests/test_tour1_r20_practice.js` (bank R20 RO7 18/18 + RO9 3/3; red on base). Docs: lla WORKLOG (82), PROGRESS 98,
   handoff `docs/overhaul/handoff-notes/_pending_tour1_R20_practice_2026-10-18.md`; quarantine recorded in REMOVAL_CANDIDATES.
+## 2026-10-18 — CHANGE: round 20 «routing» (MT2) — coaching turns of the /apps/learning-architecture assistant on the balanced AI tier
+- FINDING (models20, same page/prompts, 8 scenarios): fast tier (haiku) PASS/PARTIAL/FAIL 2/2/4, balanced tier (sonnet) 4/4/0; the gap is
+  decisive-turn coaching judgment and state-blindness — the other failure classes occur in both tiers (page work, not tier).
+- DECISION: new AI task route `lla_coach` (`app/services/ai/catalog.py`, next to `lla_assistant`): preferred `reasoning`, new key
+  `tier: "balanced"`, requires vision + documents. The catalog has no explicit balanced tier; its own tier table
+  (`model_discovery._TIER_PRIORITY`: Flash/Sonnet serve reasoning, Pro/Opus only on explicit pin) defines it. `reasoning` alone would
+  have auto-picked Opus (static seed priority 1), so `manager._auto_order` orders the top tier (`model_discovery.TOP_TIERS`, derived
+  from that table) after the balanced models — only for tasks with `tier: "balanced"`; kept as last capable choice; a pin still wins.
+  Every other route's order is unchanged (tests). `app/routes/app_records.py` `_AI_TASKS` accepts it (and its usage/cost rollup includes it).
+- CHANGE (page, a26 only): `AS.chatTask` (pure) picks `lla_coach` when the built prompt shows the coach layer (live problem in focus,
+  tour tutor, look-back, retract said in chat, full unsolved-problem rule, related solved problem, after-failure) or the general coach
+  block plus a problem/decision/life signal in her own message or a preceding coach turn; action-only commands, the ✏️ result turn and
+  automatic `[سامانه: …]` follow-ups stay on `lla_assistant` (answer-writing follow-ups keep the user turn's tier). Deploy fallback: a
+  failed `lla_coach` call (422 from an older backend, or no model) is retried once on `lla_assistant`; 422 switches it off for the page load.
+  No model names in code.
+- Tests: `tests/test_lla_coach_route.py` (9), `apps/learning-architecture/tests/test_tour1_r20_routing.js` with the independent bank
+  `tests/variants/VARIANTS_R20.json` (MT2.routing 19/19: 13 on the page, 6 delegated by name to the pytest file). Handoff (area app,
+  owners urgent/general) recorded with `scripts/supervisor/handoff.py add --by session`. Docs: lla WORKLOG (83), PROGRESS 99, HANDBOOK §10,
+  note `docs/overhaul/handoff-notes/_pending_tour1_R20_routing_2026-10-18.md`.

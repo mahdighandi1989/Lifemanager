@@ -130,11 +130,12 @@ class AIIn(BaseModel):
     # Since 2026-10-14 EVERY format is read in full (app_reading): up to 40 files per call, any type/size the upload
     # allows — Word, Excel, PowerPoint, PDF (scanned pages by a vision model), e-mail, ZIP, audio/video (full transcript)…
     file_ids: List[int] = Field(default_factory=list, max_length=40)
-    # کدام «کار» (task route) — فقط همین دو؛ پیش‌فرض همان رفتارِ قبلی. «lla_assistant» = دستیارِ گفت‌وگوی سریع و ارزان.
+    # کدام «کار» (task route) — فقط همین‌ها؛ پیش‌فرض همان رفتارِ قبلی. «lla_assistant» = دستیارِ گفت‌وگوی سریع و ارزان؛
+    # «lla_coach» = نوبت‌های مربی‌گریِ همان دستیار روی ردهٔ میانهٔ استدلالی (تورِ پولیا دورِ ۲۰، MT2، ۲۰۲۶-۱۰-۱۸).
     task: Optional[str] = Field(None, max_length=40)
 
 
-_AI_TASKS = {"learning_architecture", "lla_assistant"}
+_AI_TASKS = {"learning_architecture", "lla_assistant", "lla_coach"}
 
 
 @router.get("/api/app-records/{app}", tags=["app-records"])

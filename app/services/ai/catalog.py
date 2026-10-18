@@ -56,6 +56,12 @@ TASK_TYPES: List[Dict[str, str]] = [
     # دستیارِ گفت‌وگوی شناور روی همان صفحه (مالک ۲۰۲۶-۱۰-۱۴): سریع و ارزان، با تصویر/PDF؛ کارِ عمیق را بخش‌های خودِ صفحه
     # (task «learning_architecture») انجام می‌دهند. بهترین گزینه: مدلی با vision + documents + fast (مثلاً Gemini Flash).
     {"id": "lla_assistant", "label": "دستیارِ گفت‌وگوی «معماری یادگیری»", "description": "چت‌بات شناورِ صفحه: راهنمایی به بخشِ درست، پرکردنِ فرم‌ها، تحلیلِ مختصرِ فایل‌ها، ثبتِ کمبودِ سامانه در «نظارت و سرکشی».", "preferred": "fast", "requires": ["vision", "documents"]},
+    # مربیِ حلِ مسئلهٔ همان دستیار (تورِ پولیا، دورِ ۲۰، تصمیمِ MT2، ۲۰۲۶-۱۰-۱۸): نوبت‌های مربی‌گری روی مسئلهٔ عمیق، بدتعریف یا زندگی
+    # (مسئلهٔ زندهٔ در کانون، معلمِ تور، بازنگری، اصلاحِ حرفِ خودش) — شاهد: همان پرامپت‌ها روی ردهٔ سریع ۴ از ۸ سناریو شکست، روی ردهٔ میانه ۰ از ۸
+    # (داوریِ نوبتِ سرنوشت‌ساز و نادیده‌گرفتنِ پاسخِ او). نوبت‌های فقط-عمل و پیگیریِ خودکار همان «lla_assistant» ِ سریع می‌مانند.
+    # ردهٔ «balanced»: ردهٔ میانهٔ تعریفِ خودِ کاتالوگ (model_discovery._TIER_PRIORITY: Flash/Sonnet برای استدلال؛ Pro/Opus فقط با سنجاقِ صریح)
+    # — «reasoning» ترجیح است و مدلِ ردهٔ بالا (Opus/Pro) در گزینشِ خودکار پشتِ مدل‌های میانه می‌نشیند (manager._auto_order).
+    {"id": "lla_coach", "label": "مربیِ حلِ مسئلهٔ «معماری یادگیری»", "description": "نوبت‌های مربی‌گریِ دستیارِ شناور روی مسئلهٔ عمیق، بدتعریف یا زندگی (مسئلهٔ زنده، معلمِ تور، بازنگری، اصلاحِ حرفِ خود): ردهٔ میانهٔ استدلالی، نه گران‌ترین؛ کارهای فقط-عمل همان دستیارِ سریع.", "preferred": "reasoning", "tier": "balanced", "requires": ["vision", "documents"]},
 ]
 
 DEFAULT_PROVIDER_KEY = "anthropic"
@@ -180,6 +186,16 @@ def task_preferred_capability(task: str) -> Optional[str]:
     for t in TASK_TYPES:
         if t["id"] == task:
             return t.get("preferred")
+    return None
+
+
+def task_tier(task: str) -> Optional[str]:
+    """Model tier a task asks for in the AUTOMATIC pick (no pin). ``"balanced"`` = the catalog's middle tier
+    (model_discovery._TIER_PRIORITY: Flash/Sonnet serve reasoning; Pro/Opus only on an explicit pin) — the top tier is
+    ordered after the balanced models that qualify, never removed. None = no tier rule (every task before 2026-10-18)."""
+    for t in TASK_TYPES:
+        if t["id"] == task:
+            return t.get("tier")
     return None
 
 

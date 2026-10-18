@@ -3,10 +3,11 @@
 هر کاری که یک روتین در قلمروِ روتینِ دیگری کرد (یا از او خواست) این‌جاست؛ روتینِ مالک در آغازِ هر دور
 `python3 scripts/supervisor/handoff.py inbox --routine <خودش>` را می‌زند، می‌سنجد و می‌بندد. قواعد: `ownership.json`.
 
-**باز: 10** · کل: 53
+**باز: 11** · کل: 54
 
 | # | زمان | از | قلمرو | نوع | برگه | چه | وضع | بستنِ |
 |---|---|---|---|---|---|---|---|---|
+| h20261017235926948403-session-0bbb | 2026-10-17 23:59 | session | بقیهٔ Lifemanager | did | — | Pólya R20 MT2: AI task route lla_coach (catalog tier=balanced: reasoning preferred, top tier Opus/Pro ordered after balanced in manager._auto_order only for tier=balanced tasks; model_discovery.TOP_TIERS/model_tier; app_records._AI_TASKS) + tests/test_lla_coach_route.py — other routes unchanged | open |  |
 | h20261017102947779951-session-4a16 | 2026-10-17 10:29 | session | بقیهٔ Lifemanager | did | — | REMOVAL_CANDIDATES.md: quarantine entry for the round-16 keyword storing paths in a27 (dupLinkR16, promScanR16, regOfR16, verdictR16 — kept, reachable via ASSIST.R16_QUARANTINE; replaced by model-reported coach_state fields) | open |  |
 | h20261017072444489575-session-f425 | 2026-10-17 07:24 | session | دستورهای روتین‌ها و ابزارهای ناظر | did | — | handoff.py audit: shallow-clone boundary commit skipped (it read as touching every area ⇒ routines saw main's gate red); test_supervisor_handoff_guard shallow test | open |  |
 | h20261017005620515288-session-c533 | 2026-10-17 00:56 | session | قلمروِ سامانه‌ها (یادگیری، ذهن، حلِ مسئله، تصمیم، ارتباط، خودشناسی) — نقشه، گام‌ها و کمبودها | did | — | تورِ پولیا دورِ ۱۲ (L7): cues_fa برای pr_statistical در territory/maps/s_problem.json (فقط روی صورت/مجهولِ خودِ مسئله)؛ قاعدهٔ E6 بی‌تغییر | open |  |
