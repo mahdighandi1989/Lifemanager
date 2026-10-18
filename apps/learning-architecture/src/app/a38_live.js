@@ -5027,7 +5027,8 @@
         if (INV_DEPTH > 0 || (a && (a.solved === true || a.solved === "true"))) return rawInvent.apply(this, arguments);
         /* دورِ ۲۱ (R6/R9، models class 7، D·s31، C21-8, bank #133/#134/#139/#140/#180): یک دروازه برای هر دو سو (اجرا و پیش‌سنجیِ پاسخ) */
         var G = inventGate(a, AS._turnSession);
-        if (G.k === "live") { var rl = AS.DO.live_new({ title: a && a.title, statement: a && a.statement, kind: a && a.kind, nat: a && a.nat }); return rl || "✓ مسئله در «🔭 مسئله‌های من» ساخته شد و صفحه‌اش باز شد — همین حالا با هم رویش کار می‌کنیم."; }
+        /* دورِ ۲۳ (Q7، A23-29): live_new خودش سطرِ «🔭 مسئله ثبت شد…» را گذاشت یا در صفِ پس از نوبت (s.lpNew) نهاد ⇒ سطرِ دومِ «✓ … ساخته شد» نه — یک ساختن، یک سطر */
+        if (G.k === "live") { var se23 = AS._turnSession, n23 = se23 ? (se23.msgs || []).length + (se23.lpNew || []).length : 0, rl = AS.DO.live_new({ title: a && a.title, statement: a && a.statement, kind: a && a.kind, nat: a && a.nat }); if (!rl && se23 && (se23.msgs || []).length + (se23.lpNew || []).length > n23) return ""; return rl || "✓ مسئله در «🔭 مسئله‌های من» ساخته شد و صفحه‌اش باز شد — همین حالا با هم رویش کار می‌کنیم."; }
         if (G.k === "keepback") return keepBackNew(G.pid, a, AS._turnSession);
         if (G.k === "refuse") return { info: "🔭 این مسئله را ثبت نکردم، چون نخواسته بودی — اگر می‌خواهی نگهش دارم، بگو «ثبتش کن»." };
         if (G.k === "raw") return rawInvent.apply(this, arguments);
@@ -5041,7 +5042,7 @@
           return !!kin && ti0.length >= 6 && tt.length >= 6 && (ti0 === tt || ti0.indexOf(tt) >= 0 || tt.indexOf(ti0) >= 0); });
         if (st0.length < 10 || dupOf || !ACT) return rawInvent.apply(this, arguments);
         if (!sg.req) return "ثبت نشد: کاربر نخواسته مسئله ثبت شود — ثبتش را فقط پیشنهاد بده (یک جمله) و اگر خودش خواست، در نوبتِ بعد بساز";
-        if (sg.now && AS.DO.live_new) { var r0 = AS.DO.live_new({ title: a && a.title, statement: a && a.statement, kind: a && a.kind, nat: a && a.nat }); return r0 || "✓ مسئله در «🔭 مسئله‌های من» ساخته شد و صفحه‌اش باز شد — همین حالا با هم رویش کار می‌کنیم."; }
+        if (sg.now && AS.DO.live_new) { var n23b = se ? (se.msgs || []).length + (se.lpNew || []).length : 0, r0 = AS.DO.live_new({ title: a && a.title, statement: a && a.statement, kind: a && a.kind, nat: a && a.nat }); if (!r0 && se && (se.msgs || []).length + (se.lpNew || []).length > n23b) return ""; return r0 || "✓ مسئله در «🔭 مسئله‌های من» ساخته شد و صفحه‌اش باز شد — همین حالا با هم رویش کار می‌کنیم."; }
         return rawInvent.apply(this, arguments);
       };
       AS.DO.chat_invent._r20 = true;

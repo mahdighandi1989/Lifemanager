@@ -322,6 +322,8 @@ function devScan(sys, user) {
       const pr = await p.evaluate(() => (__cur().promises || []).length);
       let ok = e.kind === 'pos' ? ln.length === 1 && !pr : !ln.length && !pr;
       if (/assistant asked/.test(e.text)) ok = !lines(u2.user).some(l => /می‌خواهی متن را بنویسم/.test(l) && /اگر هنوز پاسخش نداده‌ای/.test(l)) && !pr;
+      /* DECISIONS_R23 Q7 (D23-33) جایگزینِ «nothing stored» برای خواستهٔ خودش با «بعداً»: خواستهٔ عقب‌افتادهٔ خودِ او قول می‌شود (by: user) و در بلوکِ قول‌ها برمی‌گردد */
+      if (e.kind === 'pos' && /بعداً|بعدا/.test(U) && !/assistant asked/.test(e.text)) { const pp = await p.evaluate(() => (__cur().promises || []).map(x => x.by)); ok = pp.length === 1 && pp[0] === 'user' && lines(u2.user).some(l => /خودش خواست «[^»]*بنویس/.test(l)); }
       r.res.push([i + 1, ok]); chk(ok, 'rm5def bank#' + (i + 1) + ' «' + e.text.slice(0, 80) + '» → ' + e.expect.slice(0, 90) + ' :: ' + JSON.stringify({ ln, pr }).slice(0, 400));
     }
     // s14o (B·D7): همان پرسشِ «اثبات‌ها به چه درد من می‌خوره؟» پس از پاسخِ بی گزارش؛ و با گزارشِ وضع (بی defer) سطری نمی‌آید

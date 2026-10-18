@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T12:00:00Z"
 created_at: "2026-10-17T12:00:00Z"
-updated_at: "2026-10-18T12:00:00Z"
+updated_at: "2026-10-19T12:00:00Z"
 merged_from: []
 ---
 
@@ -84,3 +84,16 @@ one per session, until it reaches the method's own step count. Any failure — e
 - Identity checks across helper calls: a helper that returns fresh wrapper objects (`{p, s}`) makes `a.x === b.x` always false — compare the underlying record (`a.x.p === b.x.p`).
 - "Late" in the daily list must use the same threshold as the judgement of a session (exclusive window end ⇒ expose the last on-time day).
 
+
+## Update 2026-10-19 (round 23)
+**One line per act is a final pass with evidence, not a rule inside each feature.** A daily list assembled by many stacked layers (each feature adds
+its own line) cannot dedupe locally — no layer sees the others. Add one last layer that gives every line an *act identity* and merges lines that are the
+same act; keep the owner line (the one with the person's answer buttons) and fold the rest under it ("same act: …"), never deleting a record.
+- Identity only from evidence: a stored link (plan ⇄ prediction, plan ⇄ case), the same subject for retrieval acts (card, blank sheet, solve review of
+  one problem), or — for commitments (plan, follow-up, prediction, promise) — the same due day plus content overlap (text vs text, or text vs the
+  other record's *source message*; a looser threshold inside the same session). Merging every line of one problem without evidence is wrong:
+  a step, a pause and a promise about one problem are different acts.
+- Answering the owner line answers the folded ones that are the same state (a plan done closes its follow-up), but not ones with different
+  semantics (a plan done is not its prediction's outcome).
+- Give each line a machine id at the source (`dl`, `pids`, `prom`) so the final layer never parses display text.
+- Relative words in a quoted commitment ("tomorrow morning I'll call") need the day they were said next to them when the line is shown later.
