@@ -1667,7 +1667,7 @@
     return cu.length ? "بخشِ «" + clip(cu[0].t, 60) + "» از شرط هنوز در هیچ معادله‌ای نیامده — همین بخش را با نمادها بنویس: کدام کمیت‌ها در آن برابر می‌شوند؟"
       : "کدام مجهول هنوز در هیچ معادله‌ای به بقیه بسته نشده — و کدام بخشِ شرط آن را می‌بندد؟";
   }
-  function gapAnswered(lo) { return !!(lo && !lo.auto && (lo.match || (lo.guess && txt(lo.guess.reflect)))); }
+  function gapAnswered(lo) { return !!(lo && !lo.auto && lo.guess && txt(lo.guess.reflect)); }
   function restatedAfter(L, lo) { var t = String((lo && (lo.at || lo.d)) || ""); return !!t && (L.restates || []).some(function (x) { return x && String(x.at || "") >= t; }); }
   function coachCore(r, pg, s, opts) {
     var L = live(s), ph = phaseOf(s), key = ph === "done" ? "b" : ph, Q = phaseQs(r, s, key), q = "", tut = pg.tut || {}, o = opts || {}, T = o.turn || {};
@@ -1677,7 +1677,7 @@
     if (hm0) T = Object.assign({}, T, { text: hm0 });
     var stuckT = !!(T.stuck || o.stuck), tx = norm(T.text || ""), ok = function (x) { return x && !isAsked(x) && qOk(s, x, stuckT); };
     /* (۴) پرسشِ بازِ کارتِ طرح/اجرا */
-    var pageQ = "";
+    var pageQ = "", c0Mark = false;
     if (ph === "u") { var d = L.uDraft || {}; pageQ = wholeOpen(s) ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
     else if (ph === "p" && Q.length) { var P = tut.plan || [], qi0 = tut.qi && tut.qi.lplan != null ? +tut.qi.lplan : 0;
       for (var k = 0; k < Q.length; k++) { var j = (qi0 + k) % Q.length; if (qOk(s, Q[j]) && !P.some(function (e) { return e && e.src === "live" && e.q === Q[j] && (e.text || e.skip); })) { pageQ = Q[j]; break; } } }
@@ -1688,7 +1688,9 @@
         /* دورِ ۲۰ (RO8 سویِ صفحه، A·A14 s04): پرسشی که فرمِ نتیجه یا فرمِ بیانِ تازه همین حالا جواب داد دوباره پرسشِ نوبت نمی‌شود (رفت‌وآمدِ e4/e5) */
         if (lo && lo.kind !== "proof" && !gapAnswered(lo)) c0 = c0.concat(Q.filter(function (x) { return /فاصله/.test(x); }));
         if (failed0 && !restatedAfter(L, lo)) c0 = c0.concat(Q.filter(function (x) { return /شکلِ?\s*دیگری\s*بیان/.test(x); }));
-        pageQ = c0.filter(ok)[0] || ""; } }
+        /* هر کدام حداکثر یک بار پس از همان نتیجه پرسشِ نوبت می‌شود (پرسشِ بازگفته‌شده با واژهٔ دیگر هم) — دیگر رفت‌وآمد نیست */
+        var C0A = L.c0Asked = L.c0Asked || {}, okey = String((lo && (lo.at || lo.d)) || "");
+        pageQ = c0.filter(function (x) { return ok(x) && C0A[x] !== okey; })[0] || ""; if (pageQ && okey) c0Mark = { A: C0A, k: okey }; } }
     /* کارتِ روی صفحه: کارتِ خاص (بالاتر از کارتِ عام) ⇐ کارتِ طرح/اجرا */
     var SC = specCards(r, pg, s), card = (SC[0] && SC[0].q) || pageQ;
     var src = "", pick = function (x, why) { if (!q && ok(x)) { q = x; src = why; } };
@@ -1764,7 +1766,8 @@
     if (!q) { q = Q.filter(function (x) { return ok(x) && !(ph === "p" && (tut.plan || []).some(function (e) { return e && e.src === "live" && e.q === x && (e.text || e.skip); })); })[0] || ""; if (q) src = "ladder"; }
     var rung = Q.length ? Q.indexOf(q) : 0; if (rung < 0) rung = Q.filter(isAsked).length;
     if (K && R && (stuckT || !R.st)) R.q = q;
-    if (K && JSON.stringify([L.stk || null, L.ckHold || null]) !== R0) { try { S.put(pg); } catch (e) { } }
+    var c0Put = false; if (c0Mark && o.turn && !sysT && q && q === pageQ) { c0Mark.A[q] = c0Mark.k; c0Put = true; }
+    if ((K && JSON.stringify([L.stk || null, L.ckHold || null]) !== R0) || c0Put) { try { S.put(pg); } catch (e) { } }
     return { ph: ph, Q: Q, q: q, src: src, pageQ: pageQ, card: card, cardWhy: SC[0] ? SC[0].why : pageQ ? "page" : "", rung: rung, ladderEnd: !!Q.length && !q, stuckN: stuckN };
   }
   /* دورِ ۱۰ (J1، s38 p1): «فقط جواب رو بگو» بی تلاشِ دیدنی (نه در همین پیام، نه طرح/گامی در صفحه) ⇒ کارِ همین نوبت با بالاترین اولویت (پولیا: پیش از

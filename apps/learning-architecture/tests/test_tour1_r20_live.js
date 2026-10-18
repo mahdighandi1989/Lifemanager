@@ -398,10 +398,10 @@ const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARI
   await runBank('RO8.turn_edges', Object.assign({}, ...Array.from({ length: 18 }, (_, i) => ({ [i]: NC(COACH) })), {
     3: async () => { const x = await setup({ chat: 'U: انجام دادم ولی نشد ‖ A: خب.', rec: { dl: [[0, 'داده']], plan: [null, 'طرح'] } });
       const qs = await p.evaluate((pid) => { const pg = APP.S.get('eprog_' + pid), L = pg.solve.live, t0 = new Date(Date.now() - 3600e3).toISOString();
-        L.steps.push({ id: 'sF', text: 'گامِ اول', pred: 'جواب می‌دهد', conf: 70, at: t0, due: APP.today(), closed: true, out: { at: t0, d: APP.today(), done: 'yes', what: 'جواب نداد', match: 'no', prog: 'نه' } });
+        L.steps.push({ id: 'sF', text: 'گامِ اول', pred: 'جواب می‌دهد', conf: 70, at: t0, due: APP.today(), closed: true, out: { at: t0, d: APP.today(), done: 'yes', what: 'جواب نداد', match: 'no', prog: 'نه', guess: { rel: 'refute', g: 'جواب می‌دهد', reflect: 'پیش‌بینی‌ام خیلی خوش‌بینانه بود؛ فاصله زیاد بود' } } });
         L.restates = [{ rel: 'other', why: 'به شکلِ دیگری گفتم', at: new Date().toISOString() }]; APP.S.put(pg);
         const o = []; ['برنامه‌ی تازه‌ام اینه که از آخر شروع کنم', 'خب', 'بعدش چی؟'].forEach(t => { const c = APP.liveCoach(pid, { turn: { text: t } }); o.push(c && c.q || ''); }); return o; }, x.pid);
-      return { ok: qs.every(q => !/شکلِ?\s*دیگری\s*بیان|فاصله/.test(q)), got: qs }; },
+      return { ok: qs.every(q => !/شکلِ?\s*دیگری\s*بیان|فاصله/.test(q)) && qs.filter(Boolean).every((q, i, X) => X.indexOf(q) === i || !/شکلِ?\s*دیگری|فاصله/.test(q)), got: qs }; },
     13: async () => { const x = await setup({ chat: 'U: شروع ‖ A: خوب.' });
       const q = await p.evaluate((pid) => { const pg = APP.S.get('eprog_' + pid); pg.solve.live.uDraft = { type: 'find', nat: 'practical', one: 'کل', u: 'زمانِ رسیدن', dl: [{ id: 'd1', t: '' }], c: '' }; APP.S.put(pg); const c = APP.liveCoach(pid, { turn: { text: 'خب' } }); return c && c.q || ''; }, x.pid);
       return { ok: !/مجهول|خواسته/.test(q), got: q }; },

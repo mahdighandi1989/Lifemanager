@@ -68,8 +68,8 @@ APP.EVLOG.of({ pid } | { sess })
   never starts. `post()` inside a26 `ask()` is untouched.
 - `APP.liveRetract` accepts the coach's `o.key`; the page's own `ask[]` is the coach's `pending[]` source (see Contract 2).
 - Bank #53: the page writes «مسئلهٔ زنده باز شد: «…»» (or «ثبت شد ولی باز نشد») into the NEXT turn's prompt only (`se.lpOpenNote`, shown once).
-- Bank #142 / #152 / #153: liveCoach does not re-ask the gap question when the outcome form answered it (`match` / guess reflection) nor the restatement when a restatement
-  was saved after the failed step; the understanding draft's filled unknown is not re-asked; «ردش کنه» stays with the guess question.
+- Bank #142 / #152 / #153: liveCoach does not ask the gap question when the outcome form's reflection answered it, nor the restatement when a restatement was saved after
+  the failed step, and each is the turn question at most once per outcome (`L.c0Asked`); the understanding draft's filled unknown is not re-asked; «ردش کنه» stays with the guess question.
 
 ## Other changes worth knowing
 
