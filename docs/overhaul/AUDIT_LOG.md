@@ -4663,3 +4663,19 @@ dated stability, mind-card feed) under way.
   haiku alone 1/5/2 (round 20: haiku 2/2/4, sonnet 4/4/0). The routing decision is confirmed. 12 of 51 coaching turns were misrouted (the
   opening turns of problems stated in chat).
 - **DECISION** Recorded R1–R9 in `docs/tours/polya-batch1/decisions/DECISIONS_R21.md`; the independent bank is `VARIANTS_R21`.
+
+## 2026-10-18 — Pólya tour batch 1, round 21: live + dossier fixer (R3 page side, R4, R6 page side, R9, ADDENDUM items)
+- **FINDING** Corrections did not reach every copy of the same fact: composed records had one source, page copies matched only by identical
+  wording, 🌱/step outcome/look-back copies were never candidates, dependent verdicts/guesses/«حل شد» survived (also after «بله»), deadlines used
+  their title as span, multi-number ✏️ was one fragment. The session dossier was thin and showed raw keys. The turn question after a step
+  outcome fell back to a step that no longer exists (regression of round-20 #142). Records made under the dev clock vanished (A21-21).
+- **CHANGE** a38: one result shape `{changed:[{rec,old,new,why}], ask:[{field,label,old,new}], note}` for every retract path; one source span per
+  message (`src.parts`); same fact by meaning (units, colloquial/written, field keys `field:<id>`); new copy candidates; recorded dependencies
+  (`uses`) set aside with a reason on correction or copy-yes; Persian-date and clause-span deadlines; one fragment per changed number; measure
+  records (`mlog`, `m.pts`) feeding the plot; one `chat_invent` gate (live_new on «ثبتش کن» about the current problem, look-back new problems
+  kept in `b.newProbs`); a one-time rewrite when the reply claims a refused action; reread loop stopped. a40: session dossier from the event
+  log (guesses, plans, all corrections, practice, 🎯, Persian labels, live-problem title/link), chat work of chat-closed problems, plans scoped
+  to their problem. a33: plain deadline refusal line. a39: plot from records. a1: dev-clock records stay visible in dev mode.
+- **CHANGE** Tests: new `apps/learning-architecture/tests/test_tour1_r21_live.js` + `tests/variants/VARIANTS_R21.json`; red on the base build
+  (49 bank entries, 17/17 runner quotes), green after. `test_tour1_r20_live` MT1 #17 expectation replaced (comment «دورِ ۲۱»); `test_graph.js`
+  lists `mlog` as non-graph. Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R21_live_2026-10-18.md`.

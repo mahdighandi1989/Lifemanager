@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-16T12:00:00Z"
 created_at: "2026-10-16T12:00:00Z"
-updated_at: "2026-10-16T12:00:00Z"
+updated_at: "2026-10-18T12:00:00Z"
 merged_from: []
 ---
 
@@ -55,3 +55,13 @@ DO.coach_state = function (a) {
 ## 🔗 References
 - `tests-that-cannot-fail-the-red-baseline.md`
 - `paired-agent-live-campaign-for-an-in-page-ai.md`
+
+## Update 2026-10-18 — a correction must reach every copy of the fact, and what rested on it
+Matching a correction to records by identical words misses most copies: units written differently (۲۰۰ مترمربع / 200 m^2), colloquial vs
+written forms, a record composed from two messages, a field she typed herself. Three rules fixed it at the root: (1) a value composed from
+several messages keeps one source span per message, and a correction changes only the clause that came from the corrected message;
+(2) "same fact" is judged on normalized meaning (units, colloquial forms, function words ignored), never by a hand list per scenario, and the
+model may name the page field; a different unit is never the same fact; (3) every judgement (verdict, guess outcome, "solved") records the
+data it used at the moment it was made, and a changed datum — by correction or by her "yes" to a copy — sets aside only the judgements that
+used it, with the reason. Return one result structure ({changed, ask, note}) from every path, so the model is told exactly what changed,
+what is waiting for her answer, and what was refused.

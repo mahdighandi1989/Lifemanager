@@ -742,8 +742,10 @@
     var t = msgSrc(tx), f = fenOf(t);
     try { if (f) tx.insertAdjacentElement("afterend", board(f)); } catch (e) { }
     try {
-      var d = !f && series(t); if (!d || seenBefore(msg, d)) return;
-      var rec = msgRec(msg), extra = (rec && rec.m.plotAdd) || [], pl;
+      /* دورِ ۲۱ (R9/R3h، B·s19): اندازه‌هایی که صفحه از پیامِ او رکورد کرد (m.pts) منبعِ نمودارند — اصلاحِ گفت‌وگو رکورد را عوض می‌کند و نمودار از نو کشیده می‌شود */
+      var rec0 = msgRec(msg), P0 = rec0 && rec0.m && rec0.m.pts && rec0.m.pts.length >= 2 ? rec0.m.pts : null;
+      var d = P0 ? { xl: null, yl: P0.map(function (p) { return String(p.y); }), xn: "", yn: "", rec: true } : !f && series(t); if (!d || (!d.rec && seenBefore(msg, d))) return;
+      var rec = rec0, extra = (rec && rec.m.plotAdd) || [], pl;
       var draw = function () {
         var nw = plot(d, extra, function (x, y) {
           extra = extra.concat([[x, y]]);
