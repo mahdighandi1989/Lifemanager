@@ -131,7 +131,10 @@
     if (cards.length) items.push({ k: "review", txt: fa(cards.length) + " کارت مرور موعد امروز", sub: "بازیابی پیش از نگاه به پاسخ" + (cod < t ? " · عقب‌افتاده از " + A.fdate(cod) : ""), go: function () { A.go("review"); } });
     S.all("sched", function (s) { return !s.done && !s.hold && s.due <= t; })   /* دورِ ۲۰: پلهٔ بعدیِ چرخه‌ای که پرونده‌اش گامِ جاری را دارد (hold) سطر نمی‌گیرد */.forEach(function (s) {
       var tp = S.get(s.topic);
-      items.push({ k: "sched", sid: s.id, sprc: s.prc || "", txt: "برگه سفید " + s.label + (tp ? " — " + tp.title : s.title ? " — " + s.title : ""), sub: "چرخه ۱-۳-۷ · موعد " + A.fdate(s.due), go: function () { A.startProto("P3", { sched: s.id, topic: s.topic, preset: { topic: s.title || (tp && tp.title) || "" } }); } });
+      /* دورِ ۲۱ (R5، C21-12): برگهٔ گامِ جاریِ پروندهٔ تمرین همان برچسبِ دیرکردِ زمان‌بندِ واحد را می‌گیرد (آخرین روزِ به‌موقع از خودِ پرونده) */
+      var pc = s.prc && S.get(s.prc), lastOk = pc && pc.due === s.due && pc.until ? A.addDays(pc.until, -1) : s.due;
+      var dtx = A.SCHED && A.SCHED.dueText ? A.SCHED.dueText({ due: s.due, until: lastOk > s.due ? lastOk : "" }, t) : "موعد " + A.fdate(s.due);
+      items.push({ k: "sched", sid: s.id, sprc: s.prc || "", txt: "برگه سفید " + s.label + (tp ? " — " + tp.title : s.title ? " — " + s.title : ""), sub: "چرخه ۱-۳-۷ · " + dtx, go: function () { A.startProto("P3", { sched: s.id, topic: s.topic, preset: { topic: s.title || (tp && tp.title) || "" } }); } });
     });
     function lastRun(pid) { var r = S.all("pr", function (x) { return x.pid === pid && x.status === "done"; })[0]; return r ? A.localDay(r.created) : null; }
     /* دورِ ۲۰ (RO7، B·D16): روال‌های آمادهٔ سامانه فقط پس از نخستین اجرای خودش در «امروز» می‌آیند — نه برای هر کاربرِ تازه */

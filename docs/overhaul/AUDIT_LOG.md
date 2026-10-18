@@ -4663,3 +4663,16 @@ dated stability, mind-card feed) under way.
   haiku alone 1/5/2 (round 20: haiku 2/2/4, sonnet 4/4/0). The routing decision is confirmed. 12 of 51 coaching turns were misrouted (the
   opening turns of problems stated in chat).
 - **DECISION** Recorded R1–R9 in `docs/tours/polya-batch1/decisions/DECISIONS_R21.md`; the independent bank is `VARIANTS_R21`.
+
+### 2026-10-18 — Pólya tour round 21, practice fixer (R2, R5, R5+ of the group-A addendum)
+- **FINDING** Practice could not start from chat (the prompt block was empty without an open case; the technique list was clipped to 1–25); a late success after a
+  regression counted as all skipped steps, so «stable» came after one success; an early failure was labelled «early» and ignored; T23 got a NaN due; «continue with the
+  worksheet» opened a blank T24 worksheet, so outcomes never reached the linked prediction; Persian due dates were ignored; lesson/frame cards of a problem stayed beside
+  its practice case; a one-night small step was asked for months; plan auto-linking never fired (`c0.x === x` compared two fresh wrapper objects).
+- **CHANGE** `a41_practice.js`: session subject from the page (live problem, chat problem, technique/move named from the registries, open tech page) ⇒ `start_practice`
+  + full technique list; «🧪» start button; stability = successes after the last failure reaching the technique's own step count; one T24 record (same worksheet, chat
+  judgement, case due advances, one date parser `A.willWhen`); session day/percent from her words; `practice_rhythm`; card ownership by problem; recall trend from cases;
+  plan ⇄ prediction link. `a36_solve.js` one-night step expiry; `a42_sched.js` prediction `dupOf` the linked small step; `a3_views.js` late label on the cycle line.
+- **DECISION** Bank entry #111 («3 successes at 2→7→14 days») was the bank writer's assumption; T41's own rule («day 1, 3 and 7» from the last failure) is used.
+- Verified: new `tests/test_tour1_r21_practice.js` (bank R2 17/17, R5 21/21, runner sequences s29/s23/s31, A21 items; 29 red on the base build), whole page suite.
+

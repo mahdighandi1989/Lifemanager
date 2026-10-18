@@ -340,7 +340,7 @@
     list: function () {
       return S.all("fcast", function (x) { return x.due && !x.outcome; }).map(function (x) {
         return { id: x.id, due: x.due, txt: x.q, label: x.q, title: "پیش‌بینی", body: "🎯 «" + q(x.q, 80) + "» به موعد رسید — شد یا نشد؟", link: "?tab=fcast",
-          dupOf: x.live && x.live.pid ? "live:" + x.live.pid + ":step" : null, today: !(x.live && x.live.pid) };
+          dupOf: x.live && x.live.pid ? "live:" + x.live.pid + ":step" : (A.PR && A.PR.fcDup ? A.PR.fcDup(x) : null), today: !(x.live && x.live.pid) };   /* دورِ ۲۱: 🎯 ⇄ برنامه ⇄ 🌱 — یک سطر */
       }).filter(function (e) { return e.today; });
     },
     line: function (es, day) {

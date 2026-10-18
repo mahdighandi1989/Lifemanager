@@ -1095,7 +1095,7 @@
       h("ol", {}, st.map(function (x) {
         var c = (x.checks || [])[x.checks.length - 1];
         return h("li", {}, "«" + x.step + "» — " + A.fdate(String(x.at).slice(0, 10)) + (x.tests ? " · می‌آزماید: " + (x.tests.t ? "نقدِ «" + clip(x.tests.t, 50) + "»" + (x.tests.target ? " ⇐ " : "") : "") + (x.tests.target ? "فرضِ «" + clip(x.tests.target, 50) + "»" : "") : "") + " · خواستن: " + lab(WILL_DESIRE, x.desire) + " · امید: " + lab(WILL_HOPE, x.hope) +
-          (c ? " ⇒ " + lab(WILL_DONE, c.done) + (c.block ? " (" + lab(WILL_BLOCK, c.block) + ")" : "") + " · " + lab(WILL_IMM, c.imm) + (c.hope ? " · امیدِ پس از آن: " + lab(WILL_HOPE, c.hope) : "") : " ⇒ وارسی: " + A.fdate(x.due)));
+          (c ? " ⇒ " + lab(WILL_DONE, c.done) + (c.block ? " (" + lab(WILL_BLOCK, c.block) + ")" : "") + " · " + lab(WILL_IMM, c.imm) + (c.hope ? " · امیدِ پس از آن: " + lab(WILL_HOPE, c.hope) : "") : x.expired ? " ⇒ " + x.expired.why : " ⇒ وارسی: " + A.fdate(x.due)));
       })));
   };
   /* میزبان‌ها: مسئله (eprog.solve)، ایده (رکوردِ idea)، گره‌گشا (رکوردِ kcase) */
@@ -1106,17 +1106,36 @@
     if (kind === "knot" && r.type === "kcase") return { kind: kind, id: id, title: r.title, box: r, put: function () { S.put(r); }, go: function () { A.go("kcase", id, "s4"); } };
     return null;
   };
+  /* دورِ ۲۱ (R5، B·D15): گامِ «یک‌شبه» — روزِ خودِ کار همان روزِ نوشتن است («امشب شامِ سبک»، «امروز عصر») — فقط روزِ وارسی‌اش (فردا) پرسیده
+     می‌شود؛ پس از آن روز بی‌پاسخ بسته می‌شود (پاک نه: expired با دلیل، در تاریخچهٔ همان 🌱) تا دو ماه بعد «انجامش دادی؟» نپرسد.
+     گامی که روزِ آینده دارد («شنبه») یا بی‌روز (نردبان) همان رفتارِ پیشین را دارد. */
+  function willOneNight(o) {
+    if (!o || o.closed || o.dueFrom !== "when" || !o.at) return false;
+    var base = A.localDay ? A.localDay(o.at) : String(o.at).slice(0, 10), W = base && A.willWhen(o.when, base);
+    return !!(W && W.date && W.date === base);
+  }
+  function willExpire(w, t, put) {
+    var n = 0; (w.steps || []).forEach(function (o) {
+      if (!willOneNight(o) || !(o.due && o.due < t)) return;
+      var at = A.nowISO ? A.nowISO() : new Date().toISOString();
+      o.closed = true; o.expired = { at: at, d: t, why: "روزِ خودش («" + o.when + "») گذشت و پاسخی نیامد — دیگر پرسیده نمی‌شود" };
+      (w.log = w.log || []).push({ at: at, kind: "expire", step: o.id }); n++;
+    });
+    if (n && put) try { put(); } catch (e) { }
+    return n;
+  }
+  A.willExpire = willExpire; A.willOneNight = willOneNight;
   A.willDue = function () {
     var t = A.today(), out = [];
-    function scan(kind, id, w) {
-      if (!w) return; willFix(w); var o = willOpen(w);
+    function scan(kind, id, w, rec) {
+      if (!w) return; willFix(w); willExpire(w, t, rec ? function () { S.put(rec); } : null); var o = willOpen(w);
       if (o && o.due && o.due <= t) out.push({ kind: kind, id: id, what: "step", txt: o.step });
       if (w.drop && !w.drop.closed && w.drop.due && w.drop.due <= t) out.push({ kind: kind, id: id, what: "drop", txt: w.drop.why });
       if (!o && !(w.drop && !w.drop.closed) && w.reask && w.reask.due && w.reask.due <= t) out.push({ kind: kind, id: id, what: "reask", txt: "" });
     }
-    S.all("eprog", function (r) { return r && r.solve && r.solve.will; }).forEach(function (r) { scan("prob", String(r.id).replace(/^eprog_/, ""), r.solve.will); });
-    S.all("idea", function (r) { return r && r.will; }).forEach(function (r) { scan("idea", r.id, r.will); });
-    S.all("kcase", function (r) { return r && r.will; }).forEach(function (r) { scan("knot", r.id, r.will); });
+    S.all("eprog", function (r) { return r && r.solve && r.solve.will; }).forEach(function (r) { scan("prob", String(r.id).replace(/^eprog_/, ""), r.solve.will, r); });
+    S.all("idea", function (r) { return r && r.will; }).forEach(function (r) { scan("idea", r.id, r.will, r); });
+    S.all("kcase", function (r) { return r && r.will; }).forEach(function (r) { scan("knot", r.id, r.will, r); });
     return out;
   };
   if (typeof A.dueList === "function" && !A.dueList._will) {

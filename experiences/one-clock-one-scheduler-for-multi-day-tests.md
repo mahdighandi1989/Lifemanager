@@ -72,3 +72,15 @@ session logged in one never closed the others: stale "day 1 / day 3" lines staye
 - Two-stage forms: a prediction must become its dated record the moment it is written (draft included), and questions that only make sense after outcomes must be
   hidden until an outcome exists — otherwise records are dated after their own result.
 - Link "same act" across features only by content overlap with a one-click confirm (identical text = automatic); never auto-link unrelated items.
+
+## Update 2026-10-18 (round 21)
+**Evidence of stability is a run, and "late success" is one success.** A rule that let a late success "pass every shorter step" turned one success after a regression
+into "stable". Keep two things separate: the *schedule* may reward a late success with a longer next interval, but the *evidence* counts successes since the last failure,
+one per session, until it reaches the method's own step count. Any failure — early, on time or late — restarts the run; never label a failure "early".
+- When the method's steps run out without stability (late success, or a different exit criterion), derive the next gap from the system's own ladder — never index past the
+  end of the step array (that produced a NaN due).
+- A running worksheet whose rows are dated records must be *reopened*, not recreated, by every "continue" button; otherwise outcomes land in empty rows and never reach the record.
+- Use one date parser for every due field; a second, weaker parser silently drops local-language dates.
+- Identity checks across helper calls: a helper that returns fresh wrapper objects (`{p, s}`) makes `a.x === b.x` always false — compare the underlying record (`a.x.p === b.x.p`).
+- "Late" in the daily list must use the same threshold as the judgement of a session (exclusive window end ⇒ expose the last on-time day).
+
