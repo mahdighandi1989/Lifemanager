@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-16T12:00:00Z"
 created_at: "2026-10-16T12:00:00Z"
-updated_at: "2026-10-18T12:00:00Z"
+updated_at: "2026-10-18T16:00:00Z"
 merged_from: []
 ---
 
@@ -74,3 +74,20 @@ model may name the page field; a different unit is never the same fact; (3) ever
 data it used at the moment it was made, and a changed datum — by correction or by her "yes" to a copy — sets aside only the judgements that
 used it, with the reason. Return one result structure ({changed, ask, note}) from every path, so the model is told exactly what changed,
 what is waiting for her answer, and what was refused.
+## Update 2026-10-18 — one turn question per prompt, decided last; "answered" means answered in another turn
+Round 22 showed the turn-question layer drifting in four ways, all from the same root (several modules each choosing "the" question):
+- **Decide the single turn question after every module has written.** Each block (live problem, tutor frame, practice block, correction
+  block) emitted its own "ask exactly this" line, so prompts carried two. A final pass after all hooks/filters keeps one (explicit moment >
+  live-problem line > first) and marks the others as context, without the verb "ask". Any per-module demotion is only a partial fix.
+- **The successor question must never override the user's own act in the same turn.** After a step outcome the page asked "what is your
+  next step?" even when she asked to restate, had just named her next step, asked "is this right?" about her steps, or presented a proof.
+  Read her current turn first; the generic successor is only for a turn that carries none of these, and only once per outcome.
+- **"Already asked" must be keyed by turn, not by call.** The question builder ran twice per turn (two hooks); the second call saw the
+  question it had just chosen as "asked" and moved on. Record the turn key with the mark and treat calls of the same turn as one.
+- **The post-check must recognise the page's own question in every surface form**: nested quotes inside it, a preamble before it, a
+  two-sentence page question, "e.g. …?" elaborations and cheat-sheet bullets. Compare by token majority against the page questions in the
+  prompt (balanced-quote extraction), not by substring. And make the page's own turn question one sentence before it reaches the model.
+- **Classify meta messages before problem detection.** Practice requests, "keep what I learned", self-ratings ("maybe 40%"), corrections
+  and deadline notes were being taken as a new chat problem or as a guess. One classifier, consulted by the problem detector, the guess
+  detector and the statement holder, removes all three symptoms.
+

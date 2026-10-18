@@ -1733,9 +1733,18 @@
   var EN_PROB = /\b(?:prove|show\s+that|find\s+(?:the|all|a)|solve|how\s+many|how\s+much|what\s+is\s+the\s+(?:largest|smallest|maximum|minimum|number|probability|value)|compute|calculate|should\s+i)\b/i;
   var NAMED_PROB = /مسئله|معما/;
   var SOUGHT21 = /می[‌\s]?خوا(?:م|یم)[\s‌]*(?:بفهمم|بدونم|بدانم|بفهمیم|ببینم\s*(?:چرا|چطور|چی))|نمی[‌\s]?(?:دونم|دانم)\s*(?:چی\s*کار|چه\s*کار|چطور|کدوم|کدام)|(?:چی|چه)\s*کار\s*کنم|تکلیفم\s*چیه/;
+  /* دورِ ۲۲ (P5، B·D1 s12/bp2، A22-14 s07، D s35): گشایشِ بی «؟» که هدف یا گیرِ خودش را می‌گوید، و پرسشِ خودش دربارهٔ داده‌هایی که آورد — همان آشکارساز */
+  var STUCK22 = /(?:ساعت|دقیقه|روز|هفته|ماه)(?:ه|ست|است)?[\s‌]*(?:که[\s‌]*)?(?:موندم|مونده‌?ام|ماندم|مانده‌?ام|گیرم|درگیرم)(?![آ-ی])|(?:سرش|روش|رویش|توش)[\s‌]*(?:موندم|ماندم)(?![آ-ی])|(?:^|[\s‌،.])سرِ?[\s‌]+[^.؟?!\n]{1,40}?[\s‌](?:موندم|ماندم)(?![آ-ی])/;
+  var GOAL22 = /(?:می[‌\s]?خوا(?:م|یم|هم)|قصد[\s‌]*دار(?:م|یم)|برنامه[\s‌]*دار(?:م|یم))[\s‌]+[^.؟?!\n]{3,80}?(?:کنم|کنیم|بسازم|بسازیم|بخرم|برسم|بذارم|بفروشم|بچینم|بگیرم|ببرم|بکارم|بزنم)(?![آ-ی])/;
+  var ASKD22 = /(?:چیه|چیست|چنده|چقدره|چقدر[\s‌]*(?:است|ه)|کدومه|کدام[\s‌]*است|چند[\s‌]*(?:تاست|است|ه))[\s‌]*[؟?]/;
+  var WHATDO22 = /(?:چه|چی)[\s‌]*(?:کار[\s‌]*)?کن(?:م|یم)(?![آ-ی])|چیکار[\s‌]*کن(?:م|یم)/;
+  function OPEN22(t, x) { var o = ownText(t); return STUCK22.test(o) || WHATDO22.test(o) || (GOAL22.test(o) && (/[0-9]/.test(x) || /(?:^|[\s‌])(?:برای|تا)(?![آ-ی])/.test(o))) || (ASKD22.test(o) && /[0-9]/.test(x)); }
+  AS.open22 = function (t) { t = String(t || ""); return OPEN22(t, faDigits(t)); };
   function statesProblem(t, o) {
     t = String(t || "").replace(/[‏‎]/g, "").trim(); if (!t || AS.notProblem(t)) return false;
+    if (metaMsg22(t)) return false;   // دورِ ۲۲ (P5): درخواستِ تمرین/نگه‌داشتن، خودسنجی، اصلاح، موعد ⇒ مسئلهٔ تازه نیست
     var x = faDigits(t);
+    if (OPEN22(t, x)) return true;
     if (CHAT_PROB.test(t) || PROVE_RE.test(t) || LIVE_ASK.test(t) || LIVE_STUCK.test(x) || LIVE_RE2.test(t) || FAIL_ME.test(t) || SOUGHT21.test(t) || (typeof HABIT20 !== "undefined" && HABIT20 && HABIT20.test(t)) || EN_PROB.test(t)) return true;
     try { if (A.liveNatGuess && A.liveNatGuess(x)) return true; if (A.liveTypeGuess && A.liveTypeGuess(t)) return true; } catch (e) { }
     return !(o && o.cmd) && NAMED_PROB.test(t) && !/^(?:این|اون|آن)\s*(?:صفحه|دکمه)/.test(t);
@@ -1919,7 +1928,7 @@
   var CASES_FAIL = /(?:^|[\s،,.])(?:نشد|نمی[‌\s]?(?:شه|شود)|نمیشه|جور\s*(?:نشد|نمیشه|درنمیاد|درنیومد)|درنیومد|درنیامد|غلط\s*(?:شد|درومد|درآمد|بود)|ناممکن|غیر\s*ممکن|محال)(?![آ-ی])/,
     CASES_OK = /(?:^|[\s،,.])(?:درست(?:ه|\s*(?:بود|است|درومد|درآمد|شد))|جواب\s*(?:داد|می[‌\s]?ده)|کار\s*(?:کرد|می[‌\s]?کنه)|برقرار(?:ه|\s*(?:بود|است|شد))|درمیاد|درمی‌آید|درومد|درآمد)(?![آ-ی])/;
   function proofQ(t) { t = ownText(t); var cut = t.split(PROOF_ASK)[0]; return CASES_FAIL.test(cut) || !CASES_OK.test(cut) ? PROOF_Q : PROOF_OK_Q; }
-  function notGuessMsg(t) { return defAsk(t) || (WHICH_DOUBT.test(ownText(t)) && ENUM_RE.test(ownText(t))) || testedProof(t); }
+  function notGuessMsg(t) { return !!metaMsg22(t) || defAsk(t) || (WHICH_DOUBT.test(ownText(t)) && ENUM_RE.test(ownText(t))) || testedProof(t); }
   AS.coachDefAsk = defAsk; AS.coachTestedProof = testedProof;
   function opinionGuess(t) {
     var g = new RegExp(GUESS_OPIN.source, "g"), m;
@@ -1965,10 +1974,17 @@
     var C = (s && s.coach) || {}, M = ((s && s.msgs) || []).filter(isUser), cur = M.length && mkey(M[M.length - 1].text) === mkey(mt) ? M.length - 1 : M.length, pv = M[cur - 1];
     return C.rep && pv && C.rep.key === mkey(pv.text) && C.rep.pk === pk ? C.rep : null;
   }
+  var NEGOUT22 = /به[\s‌]*جایی[\s‌]*نمی[\s‌]?رس|(?:^|[\s‌،.])نمی[\s‌]?رسم(?![آ-ی])|جواب[\s‌]*(?:نمی[\s‌]?ده|نداد)|(?:^|[\s‌،.])نشد(?![آ-ی])|کار[\s‌]*نکرد|اعصابم|کلافه/;   // کارِ خودش که به شکست رسید پیشرفت نیست
+  var FILLQ22 = /^(?:خب|خوب|هوم|اوم|بعد(?:ش)?|حالا|چی|چه|ادامه|و|که\s*چی|خب\s*که\s*چی|پس|دیگه)[\s؟?!.…]*$/;   // «خب؟» پرسشِ خودش نیست
+  var PROG22 = /(?:^|[\s‌،.])(?:[آ-ی]{2,}[\s‌]+)?(?:کردم|گرفتم|دادم|نوشتم|رسیدم|ساختم|کشیدم|گذاشتم|زدم)(?![آ-ی])|انتخاب[\s‌]*(?:می[\s‌]?کنم|کردم)|تصمیم[\s‌]*(?:گرفتم|دارم)/;
   function turnSig(rep, mt, auto, teach, ctx) {
     var t = String(mt || ""), now = !auto, stuckNow = now && (STUCK_RE.test(t) || NOTKNOW_RE.test(t)), guess = now && guessNow(t, teach), related = now && RELATED_RE.test(t), asks = now && /[؟?]/.test(t);
     var found = now && !FAIL_ME.test(t) && !stuckNow && FOUND_RE.test(ownText(t));
     var resNow = now && !guess && solvedSaid(t, { intro: true }) && !OTHER18_RE.test(t) && !unsolvedNow(t, ""), fresh = resNow || guess || found || (now && AHA_RE.test(t));
+    /* دورِ ۲۲ (P4، A22-2): گیرِ نوبتِ پیش فقط به پیامِ بی‌کارِ تازه («هوم»، سکوت، «نمی‌دونم») می‌رسد — پیامی که کارِ خودش (مقایسه کرد، ثبت کرد،
+       برگزید) یا پرسشِ خودش را دارد گیر نیست و کارتِ گیر نمی‌گیرد */
+    var ownT22 = ownText(t), prog22 = now && !stuckNow && !NEGOUT22.test(ownT22) && ((asks && !FILLQ22.test(ownT22.trim())) || attemptIn(t, teach) || PROG22.test(ownT22));
+    fresh = fresh || prog22;
     return { analogy: now && CARRY_RE.test(faDigits(t).replace(/‌/g, " ")), result: resNow || !!(rep && rep.result && !stuckNow && !asks && !guess),
       stuck: !related && (stuckNow || !!(rep && rep.stuck && !fresh)), fail: (now && unsolvedNow(t, "")) || !!(rep && rep.fail && !fresh), guess: guess, related: related,
       abandon: now && abandonNow(t), text: now ? ownText(t) : "" };   // دورِ ۷ (H1): a38 «turn-abandon» و الگوهای متنیِ خودش از حرفِ خودِ کاربر
@@ -2002,7 +2018,10 @@
     /* R8+ (دورِ ۲۱، A21-2 — پسرفتِ #۱۴۲ ِ دورِ ۲۰): وقتی گامِ بازی نیست و آخرین گام نتیجه‌اش را گرفته، بخشِ مسئله پس از مصرفِ پرسشِ «فاصله» (L.c0Asked) به
        نخستین پرسشِ فهرستِ اجرا («پیش از این گام: …») برمی‌گشت — گامی که دیگر نیست. پرسشِ نوبت کارِ بازِ **بعدی** است: بیانِ دوباره اگر خودش خواست، وگرنه گامِ بعدی
        (یا رسیدن به مجهول). (پرسش‌های پایانِ هر گام همان c0 ِ بخشِ مسئله می‌مانند.) */
-    try { if (nq.ph === "c" && nq.q && PRESTEP21.test(nq.q) && !/^turn-/.test(src0)) { var L21 = lsteps(pid), op21 = L21.some(function (st) { return st && !st.closed && !(st.out && !st.out.auto); }),
+    /* دورِ ۲۲ (P4، A22-3): پرسشِ «پیش از این گام: … چه می‌شود؟» که بخشِ مسئله برای گامِ بعدی‌ای که **خودش همین نوبت گفت** داد (A.liveNextItem22) پرسشِ درستِ همین
+       لحظه است، نه e1 ِ گامِ رفته — این‌جا جانشین نمی‌گیرد (یک منبع: بخشِ مسئله) */
+    var own22 = ""; try { own22 = !auto && typeof A.liveNextItem22 === "function" ? A.liveNextItem22(pid, ownText(mt)) : ""; } catch (e) { }
+    try { if (nq.ph === "c" && nq.q && PRESTEP21.test(nq.q) && !/^turn-/.test(src0) && !(own22 && own22 === nq.q)) { var L21 = lsteps(pid), op21 = L21.some(function (st) { return st && !st.closed && !(st.out && !st.out.auto); }),
         lc21 = L21.filter(function (st) { return st && st.out && !st.out.auto; }).pop();
       if (!op21 && lc21) { var rs21 = RESTATE21.test(String(mt || "")) ? (nq.list || []).filter(function (q) { return /شکلِ?\s*دیگری\s*بیان/.test(q); })[0] : "";
         nq = Object.assign({}, nq, { q: rs21 || NEXTSTEP21, coach: Object.assign({}, nq.coach || {}, { src: rs21 ? "next-restate" : "next-step" }) }); } } } catch (e) { }
@@ -2106,7 +2125,7 @@
     if (!C.ph && !C.inh && !(b && b.done)) { var x0 = inheritPhase(s, mt); if (x0) { C.ph = x0.coach.ph; C.st = Object.assign({}, x0.coach.st || {}); C.cls = x0.coach.cls; C.inh = x0.id; } }
     var ph0 = C.ph || "", st0 = Object.assign({}, C.st || {}), teach = teachMode(s, mt);
     /* دورِ ۵ (F1، s31، s37): پیامِ نخستی که نتیجهٔ خودش را می‌گوید («حلش کردم! … ۵×۵=۲۵») صورتِ چسبانده نیست — said:result ِ آن می‌ماند */
-    var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt);
+    var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt);
     /* تورِ پولیا (RM6c، B·D1 s11): «پس X = n» ِ الگو (RESULT_WEAK) به‌تنهایی مرحله را به بازنگری نمی‌برد — فرمول/عدد درونِ ادعا یا هنگامِ گفتنِ
        صورت نتیجه نیست؛ مرحله فقط با گزارشِ مدل (said:result) یا نتیجهٔ ثبت‌شده؛ الگو فقط پیشنهاد می‌کند (C.prev.weakRes ⇒ سطرِ زمینه) */
     var said = solvedSaid(mt, { intro: true }) && !OTHER18_RE.test(mt) && !guessNow(mt, teach) && !(teach && SELF_SOLVED_RE.test(mt)), uns = unsolvedNow(mt, ph0), stuck = STUCK_RE.test(mt) || NOTKNOW_RE.test(mt);
@@ -2116,7 +2135,7 @@
     if (sp.u) st.u = 1; if (sp.d) st.d = 1; if (sp.c) st.c = 1;
     /* پرسشِ فهمی که پرسیده شد و جوابِ واقعی گرفت (دفتر یا پشتیبان) هم «گفته‌شده» است */
     var asked = askedInChat(s); phaseQs("u", C.cls || "any").forEach(function (q) { if (qParts(q).length && answeredQ(s, q, asked)) qParts(q).forEach(function (x) { st[x] = 1; }); });
-    if (!C.stmt && !AS.notProblem(mt) && !closureOnly(mt)) C.stmt = clip(mt, 400);
+    if (!C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt)) C.stmt = clip(mt, 400);   // دورِ ۲۲ (P5، A22-5/C22-4)
     if (said && !uns) ph = "b";
     else if (LOOK_RE.test(mt) && (ph === "c" || ph === "b" || ph === "p")) ph = "b";
     else if (uns && (ph === "b" || ph === "c")) ph = "c";
@@ -2906,14 +2925,16 @@
   var SIGN_SH = /(?:^|[^آ-ی‌])(?:شما|خودتان|خودتون|جنابعالی|حضرتعالی|سرکار|(?:ن?می[‌\s][آ-ی]{2,10}|[بن][آ-ی]{1,10}|[آ-ی]{2,10}[دت])(?:ید|ین))(?![آ-ی‌])/;
   /* قرنطینه (تورِ پولیا RM6a — docs/overhaul/REMOVAL_CANDIDATES.md): فهرستِ بستهٔ دورِ ۱۷ ِ نشانه‌های «تو» (فقط امرِ پیشونددار؛ «ثبت کن»، «کمک کن»،
      «باورت»، «میگی» بی نیم‌فاصله و «مطمئنی» را نمی‌شناخت و گزارشِ درستِ مدل را رد می‌کرد) */
-  var SIGN_TO = /(?:^|[^آ-ی‌])(?:تو(?!\s*(?:این|اون|آن|همین|همون|کتاب|خونه|کلاس|ذهنم|دلم))|خودت|نظرت|راهت|حدست|جوابت|برات|بهت|ازت|باهات|داری|هستی|ن?می[‌\s][آ-ی]{2,10}ی|[بن](?:گو|بین|کن|زن|ده|یا|رو|خوان|نویس|گیر|شین)|وایسا)(?![آ-ی‌])/;
+  var SIGN_TO21 = /(?:^|[^آ-ی‌])(?:تو(?!\s*(?:این|اون|آن|همین|همون|کتاب|خونه|کلاس|ذهنم|دلم))|خودت|نظرت|راهت|حدست|جوابت|برات|بهت|ازت|باهات|داری|هستی|ن?می[‌\s][آ-ی]{2,10}ی|[بن](?:گو|بین|کن|زن|ده|یا|رو|خوان|نویس|گیر|شین)|وایسا)(?![آ-ی‌])/;   // قرنطینه (دورِ ۲۲، D·dp3): «تو» ِ تنها با فهرستِ بستهٔ استثنا — در R22_QUARANTINE.signTo21
+  /* دورِ ۲۲ (P5، D·dp3): «تو» ِ تنها ضمیر نیست مگر جایگاهش ضمیری باشد (TO_PRON22 در پایانِ همین پرونده) */
+  var SIGN_TO = /(?:^|[^آ-ی‌])(?:خودت|نظرت|راهت|حدست|جوابت|برات|بهت|ازت|باهات|داری|هستی|ن?می[‌\s][آ-ی]{2,10}ی|[بن](?:گو|بین|کن|زن|ده|یا|رو|خوان|نویس|گیر|شین)|وایسا)(?![آ-ی‌])/;
   /* RO8 (دورِ ۲۰، A·A12): متنِ نقل‌شده شاهدِ ضمیرِ او نیست — گیومه، صورتِ چسبانده پس از «سؤال:/صورتِ مسئله:/تمرین:» (تا پایانِ همان جمله) و نوبتِ ✏️ */
   function unq18(t) { var x = String(t || ""); if (/^\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]/.test(x.trim())) return " ";
     return x.replace(/«[^»]*»|"[^"\n]*"|“[^”]*”/g, " ").replace(/(?:^|[\s.،!؟?\n])(?:سؤال|سوال|صورتِ?[\s‌]*(?:مسئله|سؤال|سوال)|متنِ?[\s‌]*(?:سؤال|سوال|مسئله)|مسئله|تمرین|کتاب\s*نوشته|صورت)[\s‌]*[:：][^.!؟?\n]*[.!؟?\n]?/g, " "); }
   /* R7/R7+ (دورِ ۲۱، B·D10 s14، D·s38، A21-1 «باید/نباید/بیاید/می‌گوید/بیشترین»): سوم‌شخص، فعلِ کمکی، صفتِ عالی («ـترین») و امرِ مفردِ «ببین/بنشین» یا فعلِ کمکی است، نه «شما» — «ـید» ِ دومِ‌شخصِ جمع پس از ستاکِ واکه‌دار «ـیید» است
      («می‌گویید»، «می‌آیید»)؛ واژه‌ای که به «ـوید/ـاید» ِ بی «ی» ِ پیشین ختم می‌شود شاهدِ «شما» نیست */
   function no3sg21(o) { return String(o || "").replace(/(^|[^آ-ی‌])[آ-ی‌]*?[وا]ید(?![آ-ی‌])/g, "$1 ").replace(/(^|[^آ-ی‌])[آ-ی‌]*?ترین(?![آ-ی‌])/g, "$1 ").replace(/(^|[^آ-ی‌])(?:ن?می[‌\s]?|[بن])?(?:بین|شین|چین)(?![آ-ی‌])/g, "$1 "); }
-  function regSignsR17(t) { var o = unq18(t), o3 = no3sg21(o); return { sh: SIGN_SH.test(o3), to: SIGN_TO.test(o) }; }
+  function regSignsR17(t) { var o = unq18(t), o3 = no3sg21(o); return { sh: SIGN_SH.test(o3), to: SIGN_TO.test(o) || TO_PRON22.test(o) }; }
   /* RM6a: نشانه‌های ضمیر از ساختِ واژه، نه فهرستِ بسته — «تو»: فعلِ دومِ‌شخصِ مفرد (می‌…ی، «میگی» بی نیم‌فاصله)، صفت/اسم + «ی» ِ پرسشی («مطمئنی؟»)،
      ضمیرِ پیوستهٔ «ـت/ـات» پیش از فعل («باورت میشه»)، امرِ بی «ـید» از ستاکِ فعل (همان ستاک‌های مبدلِ «شما»)، امرِ مرکب («ثبتش کن»، «کمک کن»)؛
      «شما»: «ـید/ـین» ِ دومِ‌شخصِ جمع (بی پیشوند هم: «ثبت کنید»، «کمکم کنین»). متنِ نقل‌شده («…») و حرفِ خودِ دستیار هرگز شاهد نیست. */
@@ -4043,7 +4064,10 @@
       if (a.fail === true && NEGFAIL20.test(ownText(ut))) { a = Object.assign({}, a); delete a.fail; C.failNeg20 = { at: nowIso(), mid: mid }; }
       var said0 = (Array.isArray(a.said) ? a.said : []).map(String), rTx = txtOf(a.result), gTx = txtOf(a.guess), resAsk = false;
       /* MT1 (ردهٔ ۱ ِ تورِ مدل‌ها): «نتیجه» بی متن، و پیامش هیچ نشانی از نتیجه ندارد (نه «حل کردم/رسیدم به…»، نه عدد) ⇒ برچسبِ مدل به‌تنهایی مرحله را نمی‌برد؛ یک بار پرسشِ ساختاری */
-      if (said0.indexOf("result") >= 0 && !rTx && !(SOLVED_RE.test(ut) || resultNow(ut) || /[0-9۰-۹]/.test(ut) || /جواب|نتیجه/.test(ut))) { a = Object.assign({}, a, { said: said0.filter(function (k) { return k !== "result"; }) }); resAsk = true; }
+      /* دورِ ۲۲ (P5، C22-2): پیامی که خودش صورتِ مسئله است (صورتِ گفت‌وگو یا مسئلهٔ زندهٔ این سشن) عدد و «جواب/نتیجه» ِ صورت را دارد، نه نتیجهٔ کارِ او —
+         شاهدِ «پیامش نشانِ نتیجه دارد» نیست و هرگز صورت به‌جای نتیجه نقل نمی‌شود؛ فقط نشانِ صریحِ حل (SOLVED_RE / resultNow) */
+      var stmtMsg22 = false; try { var bl22 = AS.boundLive(s), lst22 = bl22 && bl22.r && bl22.r.p ? bl22.r.p.statement : ""; stmtMsg22 = [C.stmt, lst22].some(function (x) { return x && (pastedOf(ut, x) || sameStmt(ut, x)); }) || !!(C.prev && C.prev.key === mkey(ut) && C.prev.pasted); } catch (e) { }
+      if (said0.indexOf("result") >= 0 && !rTx && !(SOLVED_RE.test(ut) || resultNow(ut) || (!stmtMsg22 && (/[0-9۰-۹]/.test(ut) || /جواب|نتیجه/.test(ut))))) { a = Object.assign({}, a, { said: said0.filter(function (k) { return k !== "result"; }) }); resAsk = true; }
       var R0 = recsAll20(s), before = [].concat(R0.guess, R0.plan, R0.promise, R0.ans, R0.said, R0.ev);
       var out = rawCS20.call(this, a);
       try {
@@ -4100,15 +4124,42 @@
   /* R7 (دورِ ۲۱، تورِ مدل‌ها ردهٔ ۸: prod ۲، haiku ۳ از چشم افتاد): دو پرسشِ مستقل = دو جملهٔ پرسشیِ جدا (هر کدام با «؟» ِ خودش)، چه با «و» چه بی آن
      («راهت چیست؟ کِی امتحانش می‌کنی؟»)؛ «… یا …؟» یک پرسشِ دوگزینه‌ای است (یک «؟»)؛ «؟» ِ درونِ نقلِ «…» (پرسشِ خودش که بازگفته شد) و فرمول شمرده نمی‌شود؛
      «یا …؟» ِ چسبیده به پرسشِ پیشین («۱۰ است؟ یا ۲۰؟») همان گزینه است. قاعدهٔ دورِ ۲۰ (فقط دومیِ بریده) در R21_QUARANTINE.twoQ20 */
+  /* دورِ ۲۲ (P4، A22-1، C22-13، B·D9): پرسشِ خودِ صفحه یک پرسش است — حتی با «…» ِ تودرتو درونش («دادهٔ «ارتفاع…» را کجا…؟ اگر هنوز نه…؟»)، با پیش‌درآمد
+     («خب، حدسی گفتی — …؟ …؟») یا بازگفتِ نزدیک: جمله‌های پرسشیِ پیاپی که هر کدام بیش از نیمِ واژه‌هایش در همان پرسشِ صفحه است یکی شمرده می‌شوند (A4 از سوی پاسخ).
+     «مثلاً/یعنی …؟» شرحِ همان پرسشِ پیشین است؛ پرسشِ تک‌واژه‌ایِ سرِ جمله («برهانش؟ چرا برای هر n …؟») سرِ همان پرسش است؛ سطرهای فهرستِ یادداشت
+     («- مجهول چیست؟» ِ چند سطرِ گلوله‌ای) پرسشی از او نیست. قاعدهٔ دورِ ۲۱ در R22_QUARANTINE.twoQ21. */
+  function tk22(x) { return faDigits(String(x || "")).replace(/[ً-ٰٟ]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/‌/g, " ").toLowerCase().split(/[^0-9a-zآ-ی]+/).filter(function (w) { return w.length >= 2; }); }
+  function hit22(w, T) { return T.some(function (v) { return v === w || (Math.min(v.length, w.length) >= 3 && (v.indexOf(w) === 0 || w.indexOf(v) === 0)); }); }
+  function inPage22(seg, PT) { var a = tk22(seg); if (!a.length) return -1; for (var j = 0; j < PT.length; j++) { var n = a.filter(function (w) { return hit22(w, PT[j]); }).length; if (n * 2 > a.length) return j; } return -1; }
+  function unquote22(x) { return ownText(String(x || "")).replace(/\$[^$]*\$/g, " ").replace(/«[^»]*»|"[^"\n]*"|‹[^›]*›|“[^”]*”/g, " "); }
   function twoQ20(t, pageQs) {
-    var o = ownText(String(t || "")).replace(/\$[^$]*\$/g, " ").replace(/«[^»]*»|"[^"\n]*"|‹[^›]*›|“[^”]*”/g, " ");
+    var raw = String(t || ""), lines = raw.split("\n"), BUL = /^\s*(?:[-•*▪]|[0-9۰-۹]+[.)])\s+/;
+    if (lines.filter(function (l) { return BUL.test(l) && /[؟?]/.test(l); }).length >= 2) raw = lines.filter(function (l) { return !BUL.test(l); }).join("\n");
+    var o = unquote22(raw);
     var qs = o.split(/(?<=[؟?])/).map(function (x) { return x.trim(); }).filter(function (x) { return /[؟?]$/.test(x); });
     qs = qs.filter(function (x, i) { return !(i > 0 && /^(?:یا|ویا)(?![آ-ی‌])/.test(x.replace(/^[\s.!،,…]+/, ""))); });
-    /* پرسشِ دوجمله‌ایِ خودِ صفحه (مثلاً «چطور می‌آزمایی‌اش؟ کدام حالتِ خاص … ردش کند؟») یک گزینه است — دو جملهٔ پیاپی که با هم درونِ یکی از پرسش‌های نقل‌شدهٔ پرامپت‌اند یکی شمرده می‌شوند */
-    var PQ = (pageQs || []).map(qNorm).filter(function (x) { return x.length >= 8; });
-    if (PQ.length) for (var k = qs.length - 1; k > 0; k--) { var jn = qNorm(qs[k - 1] + " " + qs[k]); if (PQ.some(function (q) { return q.indexOf(jn) >= 0 || (jn.length >= 8 && jn.indexOf(q) >= 0); })) qs.splice(k - 1, 2, qs[k - 1] + " " + qs[k]); }
+    for (var e = qs.length - 1; e > 0; e--) { var lead = qs[e].replace(/^[\s.!،,…:]+/, "");
+      if (/^(?:مثلاً|مثلا|مثل|یعنی|به[\s‌]*عبارتِ?[\s‌]*دیگر|منظورم)(?![آ-ی‌])/.test(lead) || tk22(qs[e - 1].split(/[.!؛\n]/).pop()).length <= 1) qs.splice(e - 1, 2, qs[e - 1] + " " + qs[e]); }
+    var PQ = (pageQs || []).map(function (q) { return tk22(unquote22(q)); }).filter(function (x) { return x.length >= 3; });
+    if (PQ.length) for (var k = qs.length - 1; k > 0; k--) { var j1 = inPage22(qs[k - 1].split(/[.!؛\n]/).pop() || qs[k - 1], PQ), j2 = inPage22(qs[k], PQ);
+      if (j1 >= 0 && j1 === j2) qs.splice(k - 1, 2, qs[k - 1] + " " + qs[k]); }
     return qs.filter(function (x) { return x.replace(/[؟?\s.!،,…]/g, "").length >= 2; }).length >= 2;
   }
+  /* دورِ ۲۲ (P4، B·D10): پرسشِ نوبتِ صفحه خودش یک پرسش است — چند جملهٔ پرسشیِ ردهٔ بالا (بیرون از «…» و پرانتز) با «؛» یک جملهٔ پرسشی می‌شوند؛ واژه‌ها همان */
+  function oneQ22(q) { q = String(q || ""); var d = 0, pos = [];
+    for (var i = 0; i < q.length; i++) { var c = q[i]; if (c === "«" || c === "(") d++; else if ((c === "»" || c === ")") && d > 0) d--; else if ((c === "؟" || c === "?") && d === 0) pos.push(i); }
+    if (pos.length < 2) return q; var out = "", prev = 0;
+    pos.slice(0, -1).forEach(function (i) { out += q.slice(prev, i).replace(/\s+$/, "") + "؛"; prev = i + 1; });
+    return out + q.slice(prev); }
+  AS.oneQ22 = oneQ22;
+  /* «…» های ردهٔ بالای یک سطر (با «» ِ تودرتو) */
+  function topQuotes22(l) { var o = [], d = 0, st = -1; l = String(l || "");
+    for (var i = 0; i < l.length; i++) { if (l[i] === "«") { if (d === 0) st = i + 1; d++; } else if (l[i] === "»" && d > 0) { d--; if (d === 0 && st >= 0) { o.push(l.slice(st, i)); st = -1; } } }
+    return o; }
+  var TQL22 = /\*\*پرسشِ این نوبت همین است:?\*\*|^- در این نوبت فقط \*\*یک\*\* پرسش/;
+  /* پرسش‌های نوبتِ صفحه در پرامپت (سطرهای پرسشِ نوبت؛ هر «…» ِ ردهٔ بالا که پرسش دارد) — برای شمارشِ پاسخ */
+  function pageTQs22(prompt) { var o = []; String(prompt || "").split("# نوبتِ تازه")[0].split("\n").forEach(function (l) { if (!TQL22.test(l) && !/^- زمینه \(نه پرسشِ دوم؛ پرسشِ این نوبت|پرسشِ صفحه برای پس از آن/.test(l)) return; topQuotes22(l).forEach(function (x) { if (/[؟?]/.test(x)) { o.push(x); var j = oneQ22(x); if (j !== x) o.push(j); } }); }); return o; }
+  AS.pageTQs22 = pageTQs22;
   AS.replyTwoQ = twoQ20;
   /* R7: آنچه ادعای کارِ انجام‌شده نیست — گزارشِ صفحه («صفحه می‌گوید/نشان می‌دهد چه چیزی عوض شد»)، پرسشِ غیرمستقیم («کجاها/چه چیزی عوض شد»)، «فرستادم» */
   function claimText21(own) {
@@ -4127,6 +4178,7 @@
     var coachOn = !!(C.prev && C.prev.key === mkey(um.text)) || (function () { try { var b = AS.boundLive(s); return !!(b && b.pid); } catch (e) { return false; } })();
     var edit = EDIT20.test(String(um.text || "").trim());
     var pQs = String((opts && opts.prompt) || "").match(/«[^«»]{6,400}[؟?][^«»]{0,400}»/g) || []; pQs = pQs.map(function (x) { return x.slice(1, -1); }).filter(function (x) { return (x.match(/[؟?]/g) || []).length >= 2; });
+    pQs = pQs.concat(pageTQs22(opts && opts.prompt));   // دورِ ۲۲ (A22-1): پرسشِ نوبتِ صفحه با «…» ِ تودرتو هم
     /* پرسشی که صفحه در نوبتی پیشنهاد کرد و مدل در نوبتِ بعد بازگفت، همان پرسشِ صفحه است — دفترِ کوتاهِ پرسش‌های دوجمله‌ایِ صفحه در همین سشن */
     try { C.pQs21 = (C.pQs21 || []).concat(pQs.filter(function (x) { return (C.pQs21 || []).indexOf(x) < 0; })).slice(-30); pQs = C.pQs21.slice(); } catch (e) { }
     if (coachOn && !edit && twoQ20(rp, pQs)) why.push("دو پرسش پرسیدی — در هر نوبت فقط یک پرسش (همان پرسشِ نوبت)");
@@ -4180,8 +4232,13 @@
     if (real && HABIT20.test(mt)) out.push("# عادت و برنامه (در دامنهٔ تونلِ زندگی)\n" + CTX18 + "ساختنِ عادت، برنامه یا عادتِ سلامتی (سحرخیزی، ورزش، کم کردنِ وزن با برنامهٔ خودش) مسئلهٔ زندگیِ خودش است و در همین تونل («🔭 مسئلهٔ حل‌نشدهٔ خودم») جا دارد — رد نکن و به جای دیگر نفرست؛ فقط نسخهٔ تخصصی (رژیمِ غذاییِ دقیق، دارو، تشخیص) بیرون است: همان را صریح بگو و بخشِ عادت/برنامه را پیش بگذار.");
     /* RO8 (B·D14): پس از اصلاحی که داده یا حکمِ مسئلهٔ بسته را عوض کرد ⇒ پرسشِ نوبت از وضعِ اصلاح‌شده (دوباره وارسی)، نه «کل را ببین» یا «سلیقه» */
     /* R7/R8 (دورِ ۲۱، D·s34 p13): «دوباره وارسی کن — هنوز همان جواب؟» فقط وقتی نتیجه/حکمی هست که دادهٔ اصلاح‌شده به کارش رفت؛ برای دادهٔ زندگیِ بی جواب بی‌معناست */
-    var hasRes21 = function (N) { return (N.ch || []).some(function (x) { return /حکمِ وارسی|سرانجامِ حدس/.test(x); }) || (s.coachEv || []).some(function (e) { return e && !e.wd && (e.how === "res" || e.how === "solved"); }) || chatClosed().some(function (x) { return (x.L.chat || {}).sess === s.id; }); };
-    try { var N = C.retNote; if (real && N && N.shown === k && N.key !== k && (N.ch || []).some(function (x) { return /حکمِ وارسی|صورت|داده/.test(x); }) && /^(?:fact|ans|step|said)$/.test(N.what || "") && hasRes21(N)) {
+    /* دورِ ۲۲ (P4، A22-7، B·D12): «با مقدارِ اصلاح‌شده دوباره وارسی کن» فقط وقتی نتیجه/حکمی واقعاً روی دادهٔ اصلاح‌شده بود — همان که اصلاح کنار گذاشت
+       (حکمِ وارسی، «حل شد»، سرانجامِ حدس) یا خودِ نتیجه اصلاح و دوباره ثبت شد؛ نه «هر نتیجه‌ای در این سشن» (قاعدهٔ دورِ ۲۱ در R22_QUARANTINE.hasRes21)؛
+       و نه در نوبتی که خودش همین بازوارسی را گزارش می‌کند */
+    var hasRes21 = function (N) { var R = N.res || {}, recs = (R.changed || []).map(function (c) { return String((c && (c.rec || c.label || c.kind)) || ""); }).concat(N.ch || []);
+      return recs.some(function (x) { return /حکمِ وارسی|«حل شد»|حل شد|سرانجامِ حدس|verdict|state|guess/.test(x); }) || (N.what === "ans" && recs.some(function (x) { return /کارنامه|نتیجه/.test(x); })); };
+    var rechkNow22 = CHECKSAID21.test(ownText(mt)) || /(?:دوباره|باز|از\s*نو)[\s‌]*(?:حساب|چک|وارسی|امتحان|بررسی)[\s‌]*کردم|نتیجه[\s‌]*(?:همونه|همان[\s‌]*است|عوض[\s‌]*نشد|فرقی[\s‌]*نکرد)|(?:همون|همان)[\s‌]*(?:جواب|نتیجه)[\s‌]*(?:درمیاد|درمی[‌\s]?آد|شد|بود)/.test(ownText(mt));
+    try { var N = C.retNote; if (real && !rechkNow22 && N && N.shown === k && N.key !== k && (N.ch || []).some(function (x) { return /حکمِ وارسی|صورت|داده/.test(x); }) && /^(?:fact|ans|step|said)$/.test(N.what || "") && hasRes21(N)) {
       var ci = -1; out.forEach(function (x, j) { if (ci < 0 && /(?:^|\n)# مربیِ حل/.test(x)) ci = j; });
       var tq = "- **پرسشِ این نوبت همین است:** با مقدارِ اصلاح‌شده («" + String(N.fix || "").replace(/[«»]/g, "") + "») نتیجه را دوباره وارسی کند — هنوز همان جواب درمی‌آید؟ (کلِ مسئله یا سلیقه را این نوبت پیش نکش.)";
       /* R7 (دورِ ۲۱، D·s34 p13): یک پرسشِ نوبت در کلِ پرامپت — هر «پرسشِ این نوبت/پیشنهادِ این نوبت/در این نوبت فقط یک پرسش» ِ بلوک‌های دیگر زمینه می‌شود */
@@ -4335,6 +4392,51 @@
       if (g && g.guess && g.hit === "نادرست بود" && Lv.reopenAt && String(g.hitAt || "") <= String(Lv.reopenAt) && ver && (!RJ[pid] || RJ[pid] === k)) { RJ[pid] = k;
         out.push("# داوریِ دوبارهٔ حدس (یک بار)\n- **پرسشِ این نوبت همین است:** حدسش («" + clip(plainTx(g.guess), 100).replace(/[«»]/g, "") + "») پیش از بازگشایی «نادرست» داوری شد و حالا مسئله با وارسی بسته شد — کوتاه بپرس: با جوابِ نهایی، آن حدس هنوز «نادرست» است یا «تاحدی/درست»؟ (داوری با خودش است؛ در صفحه‌اش «حدست با آنچه شد می‌خواند؟» را عوض می‌کند.)"); try { S.put(s); } catch (e) { } } } } catch (e) { }
     return out;
+  });
+  /* ================= دورِ ۲۲ ِ تورِ پولیا (سهمِ «turnq+class»، DECISIONS_R22: P4 پرسشِ نوبت، یک منبع؛ P5 ردبندیِ پیام) =================
+     P4 — یک پرسشِ نوبت در کلِ پرامپت (A22-22، B·D11، C22-3): پس از همهٔ قلاب‌ها و پالایه‌ها (a26 AS.prompt) فقط یک سطرِ پرسشِ نوبت می‌ماند — اولویت با
+     «**پرسشِ این نوبت همین است:**» (لحظهٔ صریح)، بعد سطرِ «در این نوبت فقط یک پرسش» ِ مسئلهٔ زنده، بعد نخستین؛ بقیه زمینه می‌شوند (بی «بپرس»)؛
+     پیشنهادِ «می‌خواهی …؟» ِ بلوک‌های دیگر کنارِ پرسشِ نوبت زمینه است؛ و پرسشِ نوبت خودش یک پرسش است (oneQ22، B·D10). */
+  var SKIP22 = /^# (?:سشن|گفت‌وگو تا این لحظه|نوبتِ تازه|صفحهٔ فعلی|نقشهٔ سامانه|برگه‌های بازِ|پیام‌های اخیرِ صفحه|متنِ فایل‌ها|امروز)/;
+  var CTXL22 = /^- زمینه \(نه پرسشِ دوم|^- \(زمینه، نه پرسشِ دوم/;
+  function demote22(l) { return "- زمینه (نه پرسشِ دوم؛ پرسشِ این نوبت همان یکی است): " + l.replace(/^-\s*/, "").replace(/\*\*پرسشِ این نوبت همین است:?\*\*\s*/, "").replace(/^در این نوبت فقط \*\*یک\*\* پرسش(?:\s*بپرس)?/, "پرسشِ دیگری")
+    .replace(/\s*—\s*این را بپرس، نه آن را/g, "").replace(/(^|[^آ-ی‌])بپرس(?![آ-ی‌])/g, "$1(نه این نوبت) پرسیدنی"); }
+  AS.oneTurnQ22 = function (outs) {
+    try { var out = (outs || []).slice(), at = [];
+      out.forEach(function (x, i) { var blk = ""; String(x || "").split("\n").forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (!SKIP22.test(blk) && !CTXL22.test(l) && TQL22.test(l)) at.push({ i: i, j: j, blk: blk, ex: /\*\*پرسشِ این نوبت همین است/.test(l), live: /^# مسئلهٔ زندهٔ این سشن/.test(blk) }); }); });
+      if (!at.length) return out;
+      var keep = at.filter(function (a) { return a.ex; })[0] || at.filter(function (a) { return a.live; })[0] || at[0];
+      var L = out.map(function (x) { return String(x || "").split("\n"); });
+      at.forEach(function (a) { if (a !== keep) L[a.i][a.j] = demote22(L[a.i][a.j]); });
+      /* پرسشِ نوبتِ نگه‌داشته: هر «…» ِ پرسشیِ ردهٔ بالا یک پرسش */
+      var kl = L[keep.i][keep.j]; topQuotes22(kl).forEach(function (q) { var j = oneQ22(q); if (j !== q) kl = kl.split("«" + q + "»").join("«" + j + "»"); }); L[keep.i][keep.j] = kl;
+      /* پیشنهادِ پرسشیِ بی‌نشان کنارِ پرسشِ نوبت («… پیشنهاد بده («می‌خواهی تمرینش کنیم؟»)») ⇒ زمینه */
+      L.forEach(function (ls) { var blk = ""; ls.forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (SKIP22.test(blk) || CTXL22.test(l) || TQL22.test(l) || !/^- /.test(l) || /^- پرسش‌های/.test(l)) return;
+        if (/پیشنهاد[\s‌]*(?:بده|کن)\s*\(«[^»]*[؟?]»\)/.test(l)) ls[j] = "- زمینه (نه پرسشِ دوم): " + l.replace(/^-\s*/, ""); }); });
+      return L.map(function (ls) { return ls.join("\n"); }); } catch (e) { return outs; }
+  };
+  /* P5 — ردبندیِ پیام (C22-4، A22-5، B·D17): درخواستِ تمرین، «این را نگه دار/بمونه تا مرور کنم»، خودسنجی («فکر کنم خوب گفتم»، «شاید ۴۰٪»)، پیامِ اصلاح و
+     پیامِ موعد هرگز «مسئلهٔ گفت‌وگو» ِ تازه یا حدس نیستند — یک ردبند برای سه جا (statesProblem، notGuessMsg، صورتِ گفت‌وگو) */
+  var MP_PRAC22 = /(?:برام|برایم|واسم|به[\s‌]*من)?[\s‌]*(?:یه|یک)?[\s‌]*تمرین(?:[\s‌]*(?:ی|ِ))?[^.؟?!\n]{0,30}(?:بذار|بگذار|بساز|بده|باز[\s‌]*کن|بچین|می[\s‌]?خوام)|(?:یادم|تو[\s‌]*ذهنم|توی[\s‌]*ذهنم|در[\s‌]*ذهنم)[\s‌]*(?:بمونه|بماند|بمونن|بمانند)|(?:جایی|جای)[\s‌]*(?:هست|هس|دارید|داری)?[^.؟?!\n]{0,30}(?:بمونه|بماند|بمونن|بمانند|نگه[\s‌]*دار)|(?:مرورش|مرورشون|مرور)[\s‌]*(?:کنم|بکنم)|(?:آموختم|آموخته‌?ام|یاد[\s‌]*گرفتم)[^.؟?!\n]{0,40}(?:نگه[\s‌]*(?:دار|داری|دارید)|ذخیره|بمونه|بماند)|پرونده(?:‌ی|ی|ٔ)?[\s‌]*تمرین[^.؟?!\n]{0,20}(?:باز|بساز)/;
+  var MP_RATE22 = /(?:^|[.!؛\n]\s*)(?:شاید|حدود|حدوداً|تقریباً|فکر[\s‌]*کنم)?[\s‌]*[0-9۰-۹]{1,3}[\s‌]*(?:٪|%|درصد)[\s.!،]*$|فکر[\s‌]*(?:کنم|می[\s‌]?کنم)[\s‌]*(?:خوب|بد|درست|کامل|نصفه|ناقص)[\s‌]*(?:گفتم|نوشتم|یادم[\s‌]*بود|بود|شد)|(?:نصفش|همه‌?اش|بیشترش|کمش)[\s‌]*یادم[\s‌]*(?:بود|رفت|اومد)/;
+  var MP_CORR22 = /^(?:یه|یک)[\s‌]*اصلاح(?:یه)?\s*[:：،]|(?:^|[\s‌،.])اشتباه[\s‌]*گفتم(?![آ-ی])|(?:^|[\s‌])(?:نه|نخیر)[\s‌،]+[^.؟?!\n]{1,40}(?:بود|است|ه)[\s.!]*$|[^.؟?!\n]{1,40}\s+نه\s+[^.؟?!\n]{1,30}(?:بود|است)\s*$/;
+  var MP_DUE22 = /(?:یادم[\s‌]*(?:بنداز|بیار|بینداز)|یادآور(?:ی)?[\s‌]*(?:کن|بذار|بگذار|ثبت)|موعد(?:ش|م)?|ددلاین|مهلت(?:ش|م)?)(?![آ-ی])|^(?:تحویل|ارائه|امتحان|جلسه)(?:ش|م)?[\s‌]+(?:[^.؟?!\n]{0,20}[\s‌])?(?:شنبه|یکشنبه|دوشنبه|سه[\s‌]*شنبه|چهارشنبه|پنجشنبه|جمعه|فردا|پس[\s‌]*فردا|[0-9۰-۹]{1,2}[\s‌]*(?:ام|م)?[\s‌]*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند))/;
+  function metaMsg22(t) { var o = ownText(String(t || "")).replace(/[‏‎]/g, "").trim(); if (!o) return "";
+    if (MP_CORR22.test(o)) return "correction";
+    if (MP_PRAC22.test(o) && !/[=<>≤≥]/.test(o)) return /تمرین|پرونده/.test(o) ? "practice" : "keep";
+    if (MP_RATE22.test(o)) return "rating";
+    if (MP_DUE22.test(o) && !/[؟?]/.test(o)) return "deadline";
+    return ""; }
+  AS.metaMsg22 = metaMsg22;
+  /* گزارشِ سرانجامِ پیش‌بینی/حدسِ خودش («پیش‌بینیِ … کرده بودم … امروز حساب کردم، درست بود») کارِ مربی است (کالیبراسیون) — D s31 p17 */
+  var OWNOUT22 = /(?:پیش[‌\s]?بینی|حدس)(?:م|ِ?[\s‌]*من|ی)?[^.؟?!\n]{0,160}?(?:درست|غلط|اشتباه|رد)[\s‌]*(?:بود|درومد|درآمد|دراومد|شد|از[\s‌]*آب[\s‌]*درومد)(?![آ-ی])/;
+  AS.ownOutcome22 = function (t) { return OWNOUT22.test(ownText(String(t || ""))); };
+  /* «تو» ِ حرفِ اضافه («تو مثلثِ گوشه‌قائمه» = «در») ضمیر نیست — ضمیر فقط پس از حرفِ اضافه («به تو»)، پیش از «که/هم/رو/بگو…» یا تنها در پایانِ جمله (D·dp3) */
+  var TO_PRON22 = /(?:^|[^آ-ی‌])(?:به|از|با|برای|مال|مثلِ?|پیشِ?|جز)\s+تو(?![آ-ی‌])|(?:^|[^آ-ی‌])تو\s+(?:که|هم|رو|را|خودت|بگو|بنویس|چی|چه|چطور|چطوری|کی|کجا|نظرت|بودی|هستی|باشی|می‌?دونی|میدونی|بلدی|دیگه)(?![آ-ی‌])|(?:^|[^آ-ی‌])تو[\s،,!؟?.]*$/;
+  AS.toPron22 = function (t) { return TO_PRON22.test(String(t || "")); };
+  AS.R22_QUARANTINE = Object.assign(AS.R22_QUARANTINE || {}, {
+    hasRes21: function (N, s) { return (N.ch || []).some(function (x) { return /حکمِ وارسی|سرانجامِ حدس/.test(x); }) || ((s && s.coachEv) || []).some(function (e) { return e && !e.wd && (e.how === "res" || e.how === "solved"); }) || chatClosed().some(function (x) { return (x.L.chat || {}).sess === (s && s.id); }); },
+    signTo21: SIGN_TO21
   });
   AS.tourKinds = KIND;
   AS.tourSyncReminder = syncReminder;
