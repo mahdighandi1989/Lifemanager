@@ -1,0 +1,1428 @@
+{
+ "banks": {
+  "banks": [
+   "R17",
+   "R18",
+   "R19",
+   "R19b",
+   "R19c",
+   "R20",
+   "R21",
+   "R22"
+  ],
+  "bytes": 134918,
+  "path": "banks.jsonl.gz",
+  "records": 1429,
+  "sha256": "321d308c8908c8aaf270e2168d7ef2e1e3f39d6eb835f43ee9cdaaa7981774a7"
+ },
+ "blocks": [
+  {
+   "bytes": 229203,
+   "path": "blocks/models20.jsonl.gz",
+   "records": 302,
+   "sha256": "1c4be86222321b941e3627941d15d584c13064f76774a19a69b9653e3b8c43ba"
+  },
+  {
+   "bytes": 185128,
+   "path": "blocks/models21.jsonl.gz",
+   "records": 295,
+   "sha256": "a427db043e7b7c83ccf09a03e35af977f5738d1d220dd71a92da041b83cbe43e"
+  },
+  {
+   "bytes": 468770,
+   "path": "blocks/round14.jsonl.gz",
+   "records": 556,
+   "sha256": "1cec4865aa77f24bdc33678612593b8538c42cd64f60f189625588fd68d0fade"
+  },
+  {
+   "bytes": 116788,
+   "path": "blocks/round15.jsonl.gz",
+   "records": 177,
+   "sha256": "0a43b426d6b60097dd82b37ed72e8b3e295ab75822e489c201c58051cc8810cb"
+  },
+  {
+   "bytes": 128426,
+   "path": "blocks/round16.jsonl.gz",
+   "records": 198,
+   "sha256": "bed37330162f45b7b67cb98b7d066e48c9ba03f72630cc757936df90dfbc89b4"
+  },
+  {
+   "bytes": 419571,
+   "path": "blocks/round17.jsonl.gz",
+   "records": 462,
+   "sha256": "840f0f8b3152faed73d094603d10c77fdf0d416e9e6ea67504baeb9885d2a088"
+  },
+  {
+   "bytes": 311086,
+   "path": "blocks/round18.jsonl.gz",
+   "records": 321,
+   "sha256": "29f44b17527f73de2d14cedaa8eecb687f157655cda87364d7816e719906b2ca"
+  },
+  {
+   "bytes": 400388,
+   "path": "blocks/round19.jsonl.gz",
+   "records": 347,
+   "sha256": "55567d85f7e25a902131c45bba9d0103b0cdc23a619241c178bba6a216e34386"
+  },
+  {
+   "bytes": 568972,
+   "path": "blocks/round20.jsonl.gz",
+   "records": 563,
+   "sha256": "047f46098b1853492f702454544f6e692ed49806b58068e55f8222fe6f42ce4b"
+  },
+  {
+   "bytes": 578113,
+   "path": "blocks/round21.jsonl.gz",
+   "records": 654,
+   "sha256": "e93c5875c21ace7064720482f6578d37748cdfcebe610fd4ef902875e00aa6fe"
+  },
+  {
+   "bytes": 1145159,
+   "path": "blocks/round22.jsonl.gz",
+   "records": 1422,
+   "sha256": "e4f1f11ec62d3ebb1e09ff3f5cf5bb830bb1b061f779fd955cbf0483f4c20982"
+  }
+ ],
+ "build_commits": {
+  "models20/haiku": {
+   "commit": "a94614ae",
+   "source": "models20/haiku/SUMMARY.md"
+  },
+  "models20/sonnet": {
+   "commit": "a94614ae",
+   "source": "models20/SUMMARY.md"
+  },
+  "models21/haiku": {
+   "commit": "ef3c1c67",
+   "source": "models21/haiku/SUMMARY.md"
+  },
+  "models21/prod": {
+   "commit": "ef3c1c67",
+   "source": "models21/prod/SUMMARY.md"
+  },
+  "rerunA": {
+   "commit": "7c21993",
+   "source": "reports/rerunA.md"
+  },
+  "rerunB": {
+   "commit": null,
+   "source": null
+  },
+  "rerunC": {
+   "commit": null,
+   "source": null
+  },
+  "rerunD": {
+   "commit": null,
+   "source": null
+  },
+  "round10A": {
+   "commit": null,
+   "source": null
+  },
+  "round10B": {
+   "commit": null,
+   "source": null
+  },
+  "round10C": {
+   "commit": null,
+   "source": null
+  },
+  "round10D": {
+   "commit": "a2a58b8",
+   "source": "reports/round10D.md"
+  },
+  "round11A": {
+   "commit": "e608930",
+   "source": "reports/round11A_handback.md"
+  },
+  "round11B": {
+   "commit": null,
+   "source": null
+  },
+  "round11C": {
+   "commit": "e608930",
+   "source": "reports/round11C_handback.md"
+  },
+  "round11D": {
+   "commit": "e608930",
+   "source": "reports/round11D.md"
+  },
+  "round12A": {
+   "commit": "53d0fc6",
+   "source": "reports/round12A_handback.md"
+  },
+  "round12B": {
+   "commit": null,
+   "source": null
+  },
+  "round12C": {
+   "commit": "53d0fc6",
+   "source": "reports/round12C_handback.md"
+  },
+  "round12D": {
+   "commit": "53d0fc6",
+   "source": "reports/round12D.md"
+  },
+  "round13A": {
+   "commit": "9898aa1",
+   "source": "reports/round13A_handback.md"
+  },
+  "round13B": {
+   "commit": "9898aa1",
+   "source": "reports/round13B_handback.md"
+  },
+  "round13C": {
+   "commit": "9898aa1",
+   "source": "reports/round13C_handback.md"
+  },
+  "round13D": {
+   "commit": "9898aa1",
+   "source": "reports/round13D_handback.md"
+  },
+  "round14A": {
+   "commit": "bd815fb",
+   "source": "reports/round14A_handback.md"
+  },
+  "round14B": {
+   "commit": "bd815fb",
+   "source": "reports/round14B_handback.md"
+  },
+  "round14C": {
+   "commit": "bd815fb",
+   "source": "reports/round14C_handback.md"
+  },
+  "round14D": {
+   "commit": "bd815fb",
+   "source": "reports/round14D_handback.md"
+  },
+  "round15A": {
+   "commit": "369a569",
+   "source": "reports/round15A_handback.md"
+  },
+  "round15B": {
+   "commit": "369a569",
+   "source": "reports/round15B_handback.md"
+  },
+  "round15C": {
+   "commit": "369a569",
+   "source": "reports/round15C_handback.md"
+  },
+  "round15D": {
+   "commit": "369a569",
+   "source": "reports/round15D_handback.md"
+  },
+  "round16A": {
+   "commit": null,
+   "source": null
+  },
+  "round16B": {
+   "commit": "79f49cc8",
+   "source": "reports/round16B_handback.md"
+  },
+  "round16C": {
+   "commit": null,
+   "source": null
+  },
+  "round16D": {
+   "commit": null,
+   "source": null
+  },
+  "round17A": {
+   "commit": "df3a0071",
+   "source": "reports/round17A_handback.md"
+  },
+  "round17B": {
+   "commit": null,
+   "source": null
+  },
+  "round17C": {
+   "commit": null,
+   "source": null
+  },
+  "round17D": {
+   "commit": null,
+   "source": null
+  },
+  "round18A": {
+   "commit": null,
+   "source": null
+  },
+  "round18B": {
+   "commit": null,
+   "source": null
+  },
+  "round18C": {
+   "commit": null,
+   "source": null
+  },
+  "round18D": {
+   "commit": null,
+   "source": null
+  },
+  "round19A": {
+   "commit": null,
+   "source": null
+  },
+  "round19B": {
+   "commit": null,
+   "source": null
+  },
+  "round19C": {
+   "commit": null,
+   "source": null
+  },
+  "round19D": {
+   "commit": null,
+   "source": null
+  },
+  "round20A": {
+   "commit": null,
+   "source": null
+  },
+  "round20B": {
+   "commit": "a94614ae",
+   "source": "reports/round20B_handback.md"
+  },
+  "round20C": {
+   "commit": "a94614ae",
+   "source": "reports/round20C_handback.md"
+  },
+  "round20D": {
+   "commit": "a94614ae",
+   "source": "reports/round20D_handback.md"
+  },
+  "round21A": {
+   "commit": "aa8f1e06",
+   "source": "reports/round21A_handback.md"
+  },
+  "round21B": {
+   "commit": "ef3c1c67",
+   "source": "reports/round21B_handback.md"
+  },
+  "round21C": {
+   "commit": "aa8f1e06",
+   "source": "reports/round21C_handback.md"
+  },
+  "round21D": {
+   "commit": "aa8f1e06",
+   "source": "reports/round21D_handback.md"
+  },
+  "round22A": {
+   "commit": "b70c1fe8",
+   "source": "reports/round22A_handback.md"
+  },
+  "round22B": {
+   "commit": "b70c1fe8",
+   "source": "reports/round22B_handback.md"
+  },
+  "round22C": {
+   "commit": "b70c1fe8",
+   "source": "reports/round22C_handback.md"
+  },
+  "round22D": {
+   "commit": "b70c1fe8",
+   "source": "reports/round22D_handback.md"
+  },
+  "round3A": {
+   "commit": null,
+   "source": null
+  },
+  "round3B": {
+   "commit": "a53d07c",
+   "source": "reports/round3B.md"
+  },
+  "round3C": {
+   "commit": "a53d07c",
+   "source": "reports/round3C.md"
+  },
+  "round3D": {
+   "commit": null,
+   "source": null
+  },
+  "round4A": {
+   "commit": "a5e54dc",
+   "source": "reports/round4A.md"
+  },
+  "round4B": {
+   "commit": "a5e54dc",
+   "source": "reports/round4B.md"
+  },
+  "round4C": {
+   "commit": null,
+   "source": null
+  },
+  "round4D": {
+   "commit": null,
+   "source": null
+  },
+  "round5A": {
+   "commit": null,
+   "source": null
+  },
+  "round5B": {
+   "commit": "8407984",
+   "source": "reports/round5B.md"
+  },
+  "round5C": {
+   "commit": "8407984",
+   "source": "reports/round5C_handback.md"
+  },
+  "round5D": {
+   "commit": "8407984",
+   "source": "reports/round5D.md"
+  },
+  "round6A": {
+   "commit": null,
+   "source": null
+  },
+  "round6B": {
+   "commit": "522f92d",
+   "source": "reports/round6B.md"
+  },
+  "round6C": {
+   "commit": "522f92d",
+   "source": "reports/round6C_handback.md"
+  },
+  "round6D": {
+   "commit": "522f92d",
+   "source": "reports/round6D.md"
+  },
+  "round7A": {
+   "commit": "3c2846b",
+   "source": "reports/round7A_handback.md"
+  },
+  "round7B": {
+   "commit": "3c2846b",
+   "source": "reports/round7B_handback.md"
+  },
+  "round7C": {
+   "commit": "8df59a4",
+   "source": "reports/round7C_handback.md"
+  },
+  "round7D": {
+   "commit": "8df59a4",
+   "source": "reports/round7D.md"
+  },
+  "round8A": {
+   "commit": "e52aae7",
+   "source": "reports/round8A_handback.md"
+  },
+  "round8B": {
+   "commit": null,
+   "source": null
+  },
+  "round8C": {
+   "commit": null,
+   "source": null
+  },
+  "round8D": {
+   "commit": "e52aae7",
+   "source": "reports/round8D.md"
+  },
+  "round9A": {
+   "commit": "936b50d",
+   "source": "reports/round9A_handback.md"
+  },
+  "round9B": {
+   "commit": null,
+   "source": null
+  },
+  "round9C": {
+   "commit": null,
+   "source": null
+  },
+  "round9D": {
+   "commit": "936b50d",
+   "source": "reports/round9D.md"
+  },
+  "runA": {
+   "commit": null,
+   "source": null
+  },
+  "runB": {
+   "commit": null,
+   "source": null
+  },
+  "runC": {
+   "commit": null,
+   "source": null
+  },
+  "runD": {
+   "commit": null,
+   "source": null
+  }
+ },
+ "counts": {
+  "bank_cases": 1429,
+  "blocks": 5297,
+  "exchanges_total": 3636,
+  "per_round": {
+   "models20": {
+    "by_author": {
+     "real-haiku": 61,
+     "real-sonnet": 56
+    },
+    "exchanges": 117,
+    "with_full_request": 117,
+    "with_page_outcome": 117,
+    "with_turn_verdict": 86
+   },
+   "models21": {
+    "by_author": {
+     "real-haiku": 84,
+     "real-sonnet": 39
+    },
+    "exchanges": 123,
+    "with_full_request": 123,
+    "with_page_outcome": 123,
+    "with_turn_verdict": 123
+   },
+   "round10": {
+    "by_author": {
+     "runner-simulated": 58
+    },
+    "exchanges": 58,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 22
+   },
+   "round11": {
+    "by_author": {
+     "runner-simulated": 52
+    },
+    "exchanges": 52,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 20
+   },
+   "round12": {
+    "by_author": {
+     "runner-simulated": 48
+    },
+    "exchanges": 48,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 9
+   },
+   "round13": {
+    "by_author": {
+     "runner-simulated": 52
+    },
+    "exchanges": 52,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 12
+   },
+   "round14": {
+    "by_author": {
+     "runner-simulated": 247
+    },
+    "exchanges": 247,
+    "with_full_request": 247,
+    "with_page_outcome": 247,
+    "with_turn_verdict": 101
+   },
+   "round15": {
+    "by_author": {
+     "runner-simulated": 251
+    },
+    "exchanges": 251,
+    "with_full_request": 251,
+    "with_page_outcome": 251,
+    "with_turn_verdict": 83
+   },
+   "round16": {
+    "by_author": {
+     "no-reply": 1,
+     "runner-simulated": 269
+    },
+    "exchanges": 270,
+    "with_full_request": 270,
+    "with_page_outcome": 270,
+    "with_turn_verdict": 132
+   },
+   "round17": {
+    "by_author": {
+     "runner-simulated": 257
+    },
+    "exchanges": 257,
+    "with_full_request": 257,
+    "with_page_outcome": 257,
+    "with_turn_verdict": 137
+   },
+   "round18": {
+    "by_author": {
+     "runner-simulated": 267
+    },
+    "exchanges": 267,
+    "with_full_request": 267,
+    "with_page_outcome": 267,
+    "with_turn_verdict": 80
+   },
+   "round19": {
+    "by_author": {
+     "runner-simulated": 271
+    },
+    "exchanges": 271,
+    "with_full_request": 271,
+    "with_page_outcome": 271,
+    "with_turn_verdict": 133
+   },
+   "round20": {
+    "by_author": {
+     "runner-simulated": 324
+    },
+    "exchanges": 324,
+    "with_full_request": 324,
+    "with_page_outcome": 324,
+    "with_turn_verdict": 119
+   },
+   "round21": {
+    "by_author": {
+     "runner-simulated": 380
+    },
+    "exchanges": 380,
+    "with_full_request": 380,
+    "with_page_outcome": 380,
+    "with_turn_verdict": 380
+   },
+   "round22": {
+    "by_author": {
+     "runner-simulated": 565
+    },
+    "exchanges": 565,
+    "with_full_request": 565,
+    "with_page_outcome": 562,
+    "with_turn_verdict": 440
+   },
+   "round3": {
+    "by_author": {
+     "no-reply": 40,
+     "runner-simulated": 10
+    },
+    "exchanges": 50,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 16
+   },
+   "round4": {
+    "by_author": {
+     "no-reply": 1,
+     "runner-simulated": 57
+    },
+    "exchanges": 58,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 1
+   },
+   "round5": {
+    "by_author": {
+     "no-reply": 1,
+     "runner-simulated": 56
+    },
+    "exchanges": 57,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 20
+   },
+   "round6": {
+    "by_author": {
+     "runner-simulated": 57
+    },
+    "exchanges": 57,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 21
+   },
+   "round7": {
+    "by_author": {
+     "runner-simulated": 58
+    },
+    "exchanges": 58,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 14
+   },
+   "round8": {
+    "by_author": {
+     "runner-simulated": 16
+    },
+    "exchanges": 16,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 6
+   },
+   "round9": {
+    "by_author": {
+     "runner-simulated": 58
+    },
+    "exchanges": 58,
+    "with_full_request": 0,
+    "with_page_outcome": 0,
+    "with_turn_verdict": 22
+   }
+  },
+  "scenarios": 50,
+  "system_prompts": 5
+ },
+ "generator": "scripts/tours/collect_dataset.py",
+ "scenarios": {
+  "bytes": 953626,
+  "path": "scenarios.jsonl.gz",
+  "records": 50,
+  "sha256": "88349262cff1cd129b94e1c6c39f70a1ff8afd5ee1aa6f8577403afae0080422"
+ },
+ "schema_version": 1,
+ "shards": [
+  {
+   "bytes": 88755,
+   "path": "exchanges/round3.jsonl.gz",
+   "preserved": false,
+   "records": 50,
+   "sha256": "1e55974238c8ae4e7fdf3e940cbd8fbcfed33c536956f22f20af94099e02c226",
+   "sources": [
+    "round3A",
+    "round3B",
+    "round3C",
+    "round3D"
+   ]
+  },
+  {
+   "bytes": 23175,
+   "path": "exchanges/round4.jsonl.gz",
+   "preserved": false,
+   "records": 58,
+   "sha256": "d7dd26ffd3a23b94609f07942964407b35d9ba076c7f289791efd264f4608313",
+   "sources": [
+    "round4A",
+    "round4B",
+    "round4C",
+    "round4D"
+   ]
+  },
+  {
+   "bytes": 25418,
+   "path": "exchanges/round5.jsonl.gz",
+   "preserved": false,
+   "records": 57,
+   "sha256": "6771b35d5a3047039634cc2ade637e59f33ba955ecf2361c27d908fc307bb59b",
+   "sources": [
+    "round5A",
+    "round5B",
+    "round5C",
+    "round5D"
+   ]
+  },
+  {
+   "bytes": 15474,
+   "path": "exchanges/round6.jsonl.gz",
+   "preserved": false,
+   "records": 57,
+   "sha256": "a4643e4419068e0d45da588fcd125203ee1322639d618134d78f55fbc0763c68",
+   "sources": [
+    "round6A",
+    "round6B",
+    "round6C",
+    "round6D"
+   ]
+  },
+  {
+   "bytes": 14434,
+   "path": "exchanges/round7.jsonl.gz",
+   "preserved": false,
+   "records": 58,
+   "sha256": "0b1f9cade7f5af4a421a9cef801dde36b4421c48c22790efae0ecccf234c12fa",
+   "sources": [
+    "round7A",
+    "round7B",
+    "round7C",
+    "round7D"
+   ]
+  },
+  {
+   "bytes": 5640,
+   "path": "exchanges/round8.jsonl.gz",
+   "preserved": false,
+   "records": 16,
+   "sha256": "562fcb9b240502c0912041a50b02731e1ff48f31685571f9b780beddb5f118e9",
+   "sources": [
+    "round8A",
+    "round8B",
+    "round8C",
+    "round8D"
+   ]
+  },
+  {
+   "bytes": 15195,
+   "path": "exchanges/round9.jsonl.gz",
+   "preserved": false,
+   "records": 58,
+   "sha256": "a8e2a9dbbe29cdb2c57f59fe96f2173dbcce17b383ae76ab0669486b8c46e1c4",
+   "sources": [
+    "round9A",
+    "round9B",
+    "round9C",
+    "round9D"
+   ]
+  },
+  {
+   "bytes": 15192,
+   "path": "exchanges/round10.jsonl.gz",
+   "preserved": false,
+   "records": 58,
+   "sha256": "a145b63463ed0ebf677eeeee6e9ec353c634ffd75b5a902bf1a69d3ae3921b79",
+   "sources": [
+    "round10A",
+    "round10B",
+    "round10C",
+    "round10D"
+   ]
+  },
+  {
+   "bytes": 15665,
+   "path": "exchanges/round11.jsonl.gz",
+   "preserved": false,
+   "records": 52,
+   "sha256": "4322407e17095c58c8b6532187d0ea1dfe897dd6915a145d5ed9aba55478cc6e",
+   "sources": [
+    "round11A",
+    "round11B",
+    "round11C",
+    "round11D"
+   ]
+  },
+  {
+   "bytes": 13960,
+   "path": "exchanges/round12.jsonl.gz",
+   "preserved": false,
+   "records": 48,
+   "sha256": "b74a4bca57b4675c9c768eeccb68fa2c756cc30b15c2fa15cd354ce3cccc1a73",
+   "sources": [
+    "round12A",
+    "round12B",
+    "round12C",
+    "round12D"
+   ]
+  },
+  {
+   "bytes": 15232,
+   "path": "exchanges/round13.jsonl.gz",
+   "preserved": false,
+   "records": 52,
+   "sha256": "5a814d82908aea9f9162b5216c7e7aff5634527277d07e955bffb4fb6773a4f5",
+   "sources": [
+    "round13A",
+    "round13B",
+    "round13C",
+    "round13D"
+   ]
+  },
+  {
+   "bytes": 134189,
+   "path": "exchanges/round14.jsonl.gz",
+   "preserved": false,
+   "records": 247,
+   "sha256": "bc6a384b79bdafce3e9b3348863521d3ea753d60ecc9a942d25ba2f02a3b7ac3",
+   "sources": [
+    "round14A",
+    "round14B",
+    "round14C",
+    "round14D"
+   ]
+  },
+  {
+   "bytes": 132800,
+   "path": "exchanges/round15.jsonl.gz",
+   "preserved": false,
+   "records": 251,
+   "sha256": "99a5cefa019aa061f107b7686dfcbbf8bb18306bb09d0f74c6c1945f09d23dca",
+   "sources": [
+    "round15A",
+    "round15B",
+    "round15C",
+    "round15D"
+   ]
+  },
+  {
+   "bytes": 141091,
+   "path": "exchanges/round16.jsonl.gz",
+   "preserved": false,
+   "records": 270,
+   "sha256": "390acd2743f6ae71b07ef18f3b25f64be4376ab1caddeffbc8f0b40a37ada9b5",
+   "sources": [
+    "round16A",
+    "round16B",
+    "round16C",
+    "round16D"
+   ]
+  },
+  {
+   "bytes": 153889,
+   "path": "exchanges/round17.jsonl.gz",
+   "preserved": false,
+   "records": 257,
+   "sha256": "f480657d0962c181c00218d4903fe750dd258a5d03cdcd27eeb88d0d2852657e",
+   "sources": [
+    "round17A",
+    "round17B",
+    "round17C",
+    "round17D"
+   ]
+  },
+  {
+   "bytes": 158606,
+   "path": "exchanges/round18.jsonl.gz",
+   "preserved": false,
+   "records": 267,
+   "sha256": "ffc1c56084898cdbe6836bd7ec9e68e6f0657a89717db438606a1b87a1007275",
+   "sources": [
+    "round18A",
+    "round18B",
+    "round18C",
+    "round18D"
+   ]
+  },
+  {
+   "bytes": 181500,
+   "path": "exchanges/round19.jsonl.gz",
+   "preserved": false,
+   "records": 271,
+   "sha256": "f50d50f2c8bf960e505bd3503f546d00b7e5efe9a7a1016213611a88e1188360",
+   "sources": [
+    "round19A",
+    "round19B",
+    "round19C",
+    "round19D"
+   ]
+  },
+  {
+   "bytes": 205603,
+   "path": "exchanges/round20.jsonl.gz",
+   "preserved": false,
+   "records": 324,
+   "sha256": "b524182b2a0ac41596e80f61bb179de17b74f4146106c4ed241c656b6a01068a",
+   "sources": [
+    "round20A",
+    "round20B",
+    "round20C",
+    "round20D"
+   ]
+  },
+  {
+   "bytes": 89829,
+   "path": "exchanges/models20.jsonl.gz",
+   "preserved": false,
+   "records": 117,
+   "sha256": "6a31f5ebf12e402bd88f5de5bf9e076eff464b80c4b3027e3517487bdc44a616",
+   "sources": [
+    "models20/haiku",
+    "models20/sonnet"
+   ]
+  },
+  {
+   "bytes": 253294,
+   "path": "exchanges/round21.jsonl.gz",
+   "preserved": false,
+   "records": 380,
+   "sha256": "6d9cc26a35f91eca3c0c162d23ec7c12a624a30d27530b71296bf2f26d08283a",
+   "sources": [
+    "round21A",
+    "round21B",
+    "round21C",
+    "round21D"
+   ]
+  },
+  {
+   "bytes": 96768,
+   "path": "exchanges/models21.jsonl.gz",
+   "preserved": false,
+   "records": 123,
+   "sha256": "f624a8c84e37ef0c6bc1541e1af7de0ff981e345db74331d6a443fffe62be9c7",
+   "sources": [
+    "models21/haiku",
+    "models21/prod"
+   ]
+  },
+  {
+   "bytes": 369239,
+   "path": "exchanges/round22.jsonl.gz",
+   "preserved": false,
+   "records": 565,
+   "sha256": "95c7f28b0595751f2face2310c90cc0818ed2a9487e4a652a5757f17c9244d27",
+   "sources": [
+    "round22A",
+    "round22B",
+    "round22C",
+    "round22D"
+   ]
+  }
+ ],
+ "source_root": "<scratchpad>/tour1_polya",
+ "split": {
+  "assignments": {
+   "bp1": {
+    "age_band": "teen",
+    "family": "prerequisite",
+    "hash": 0.269194,
+    "reason": "train",
+    "split": "train"
+   },
+   "bp2": {
+    "age_band": "adult",
+    "family": "prerequisite",
+    "hash": 0.152903,
+    "reason": "train",
+    "split": "train"
+   },
+   "bp3": {
+    "age_band": "teen",
+    "family": "prerequisite",
+    "hash": 0.051608,
+    "reason": "coverage age_band=teen",
+    "split": "eval"
+   },
+   "dp1": {
+    "age_band": "child",
+    "family": "prerequisite",
+    "hash": 0.367727,
+    "reason": "coverage age_band=child",
+    "split": "eval"
+   },
+   "dp2": {
+    "age_band": "teen",
+    "family": "prerequisite",
+    "hash": 0.663182,
+    "reason": "train",
+    "split": "train"
+   },
+   "dp3": {
+    "age_band": "adult",
+    "family": "prerequisite",
+    "hash": 0.438571,
+    "reason": "train",
+    "split": "train"
+   },
+   "pA1": {
+    "age_band": "teen",
+    "family": "prerequisite",
+    "hash": 0.277802,
+    "reason": "train",
+    "split": "train"
+   },
+   "pA2": {
+    "age_band": "adult",
+    "family": "prerequisite",
+    "hash": 0.898658,
+    "reason": "train",
+    "split": "train"
+   },
+   "pA3": {
+    "age_band": "adult",
+    "family": "prerequisite",
+    "hash": 0.82551,
+    "reason": "train",
+    "split": "train"
+   },
+   "pC1": {
+    "age_band": "teen",
+    "family": "prerequisite",
+    "hash": 0.60715,
+    "reason": "train",
+    "split": "train"
+   },
+   "pC2": {
+    "age_band": "adult",
+    "family": "prerequisite",
+    "hash": 0.484985,
+    "reason": "train",
+    "split": "train"
+   },
+   "pC3": {
+    "age_band": "senior",
+    "family": "prerequisite",
+    "hash": 0.196846,
+    "reason": "coverage age_band=senior",
+    "split": "eval"
+   },
+   "s01": {
+    "age_band": "adult",
+    "family": "open-life",
+    "hash": 0.94034,
+    "reason": "train",
+    "split": "train"
+   },
+   "s02": {
+    "age_band": "young-adult",
+    "family": "find",
+    "hash": 0.154778,
+    "reason": "train",
+    "split": "train"
+   },
+   "s03": {
+    "age_band": "teen",
+    "family": "proof",
+    "hash": 0.405744,
+    "reason": "train",
+    "split": "train"
+   },
+   "s04": {
+    "age_band": "adult",
+    "family": "find",
+    "hash": 0.127956,
+    "reason": "train",
+    "split": "train"
+   },
+   "s05": {
+    "age_band": "adult",
+    "family": "discovery",
+    "hash": 0.38723,
+    "reason": "coverage family=discovery",
+    "split": "eval"
+   },
+   "s06": {
+    "age_band": "young-adult",
+    "family": "find",
+    "hash": 0.044346,
+    "reason": "coverage age_band=young-adult",
+    "split": "eval"
+   },
+   "s07": {
+    "age_band": "young-adult",
+    "family": "discovery",
+    "hash": 0.622154,
+    "reason": "train",
+    "split": "train"
+   },
+   "s08": {
+    "age_band": "teen",
+    "family": "find",
+    "hash": 0.094048,
+    "reason": "train",
+    "split": "train"
+   },
+   "s09": {
+    "age_band": "adult",
+    "family": "find",
+    "hash": 0.634515,
+    "reason": "train",
+    "split": "train"
+   },
+   "s10": {
+    "age_band": "adult",
+    "family": "impossibility",
+    "hash": 0.003843,
+    "reason": "coverage age_band=adult",
+    "split": "eval"
+   },
+   "s11": {
+    "age_band": "teen",
+    "family": "impossibility",
+    "hash": 0.352247,
+    "reason": "train",
+    "split": "train"
+   },
+   "s12": {
+    "age_band": "senior",
+    "family": "find",
+    "hash": 0.206792,
+    "reason": "train",
+    "split": "train"
+   },
+   "s13": {
+    "age_band": "adult",
+    "family": "open-life",
+    "hash": 0.924798,
+    "reason": "train",
+    "split": "train"
+   },
+   "s14": {
+    "age_band": "young-adult",
+    "family": "meta",
+    "hash": 0.459955,
+    "reason": "coverage family=meta",
+    "split": "eval"
+   },
+   "s15": {
+    "age_band": "adult",
+    "family": "meta",
+    "hash": 0.528705,
+    "reason": "train",
+    "split": "train"
+   },
+   "s16": {
+    "age_band": "adult",
+    "family": "meta",
+    "hash": 0.988923,
+    "reason": "train",
+    "split": "train"
+   },
+   "s17": {
+    "age_band": "senior",
+    "family": "open-life",
+    "hash": 0.990526,
+    "reason": "train",
+    "split": "train"
+   },
+   "s18": {
+    "age_band": "teen",
+    "family": "discovery",
+    "hash": 0.430908,
+    "reason": "train",
+    "split": "train"
+   },
+   "s19": {
+    "age_band": "adult",
+    "family": "find",
+    "hash": 0.215124,
+    "reason": "train",
+    "split": "train"
+   },
+   "s20": {
+    "age_band": "young-adult",
+    "family": "open-life",
+    "hash": 0.394278,
+    "reason": "coverage family=open-life",
+    "split": "eval"
+   },
+   "s21": {
+    "age_band": "child",
+    "family": "find",
+    "hash": 0.949791,
+    "reason": "train",
+    "split": "train"
+   },
+   "s22": {
+    "age_band": "senior",
+    "family": "proof",
+    "hash": 0.974636,
+    "reason": "train",
+    "split": "train"
+   },
+   "s23": {
+    "age_band": "senior",
+    "family": "find",
+    "hash": 0.38459,
+    "reason": "train",
+    "split": "train"
+   },
+   "s24": {
+    "age_band": "young-adult",
+    "family": "find",
+    "hash": 0.754085,
+    "reason": "train",
+    "split": "train"
+   },
+   "s25": {
+    "age_band": "senior",
+    "family": "discovery",
+    "hash": 0.992437,
+    "reason": "train",
+    "split": "train"
+   },
+   "s26": {
+    "age_band": "young-adult",
+    "family": "find",
+    "hash": 0.632112,
+    "reason": "train",
+    "split": "train"
+   },
+   "s27": {
+    "age_band": "young-adult",
+    "family": "proof",
+    "hash": 0.114043,
+    "reason": "coverage family=proof",
+    "split": "eval"
+   },
+   "s28": {
+    "age_band": "adult",
+    "family": "find",
+    "hash": 0.556298,
+    "reason": "train",
+    "split": "train"
+   },
+   "s29": {
+    "age_band": "adult",
+    "family": "find",
+    "hash": 0.549454,
+    "reason": "train",
+    "split": "train"
+   },
+   "s30": {
+    "age_band": "young-adult",
+    "family": "meta",
+    "hash": 0.81547,
+    "reason": "train",
+    "split": "train"
+   },
+   "s31": {
+    "age_band": "teen",
+    "family": "look-back",
+    "hash": 0.747677,
+    "reason": "coverage family=look-back",
+    "split": "eval"
+   },
+   "s32": {
+    "age_band": "adult",
+    "family": "discovery",
+    "hash": 0.895063,
+    "reason": "train",
+    "split": "train"
+   },
+   "s33": {
+    "age_band": "young-adult",
+    "family": "proof",
+    "hash": 0.573046,
+    "reason": "train",
+    "split": "train"
+   },
+   "s34": {
+    "age_band": "young-adult",
+    "family": "open-life",
+    "hash": 0.534674,
+    "reason": "train",
+    "split": "train"
+   },
+   "s35": {
+    "age_band": "senior",
+    "family": "open-life",
+    "hash": 0.517545,
+    "reason": "train",
+    "split": "train"
+   },
+   "s36": {
+    "age_band": "teen",
+    "family": "find",
+    "hash": 0.953233,
+    "reason": "train",
+    "split": "train"
+   },
+   "s37": {
+    "age_band": "adult",
+    "family": "find",
+    "hash": 0.093205,
+    "reason": "train",
+    "split": "train"
+   },
+   "s38": {
+    "age_band": "teen",
+    "family": "find",
+    "hash": 0.744241,
+    "reason": "train",
+    "split": "train"
+   }
+  },
+  "eval_fraction": 0.2,
+  "exchanges": {
+   "eval": 812,
+   "train": 2824
+  },
+  "per_stratum": {
+   "age_band": {
+    "adult": {
+     "eval": 2,
+     "train": 16
+    },
+    "child": {
+     "eval": 1,
+     "train": 1
+    },
+    "senior": {
+     "eval": 1,
+     "train": 6
+    },
+    "teen": {
+     "eval": 2,
+     "train": 10
+    },
+    "young-adult": {
+     "eval": 4,
+     "train": 7
+    }
+   },
+   "family": {
+    "discovery": {
+     "eval": 1,
+     "train": 4
+    },
+    "find": {
+     "eval": 1,
+     "train": 15
+    },
+    "impossibility": {
+     "eval": 1,
+     "train": 1
+    },
+    "look-back": {
+     "eval": 1,
+     "train": 0
+    },
+    "meta": {
+     "eval": 1,
+     "train": 3
+    },
+    "open-life": {
+     "eval": 1,
+     "train": 5
+    },
+    "prerequisite": {
+     "eval": 3,
+     "train": 9
+    },
+    "proof": {
+     "eval": 1,
+     "train": 3
+    }
+   }
+  },
+  "rule": "see SCHEMA.md §Split",
+  "salt": "lla-tour-split-v1:",
+  "sizes": {
+   "eval": 10,
+   "train": 40
+  },
+  "uncovered": []
+ },
+ "system": [
+  "system/7d160ab860be97fb7e1198c9.txt.gz",
+  "system/917f9c8f6d78f766b3ab756d.txt.gz",
+  "system/b9778d55282eee0c87a1ff10.txt.gz",
+  "system/d776d525fc331fee4faa359f.txt.gz",
+  "system/eb1b24760d1655b2f07510c1.txt.gz"
+ ],
+ "total_bytes": 7816844,
+ "verdict_linking": {
+  "by_kind": {
+   "criterion": {
+    "items": 3113,
+    "linked": 793,
+    "with_turn_ref": 1278
+   },
+   "defect": {
+    "items": 1514,
+    "linked": 228,
+    "with_turn_ref": 441
+   },
+   "need": {
+    "items": 906,
+    "linked": 71,
+    "with_turn_ref": 71
+   },
+   "turn_note": {
+    "items": 544,
+    "linked": 140,
+    "with_turn_ref": 145
+   },
+   "turn_row": {
+    "items": 981,
+    "linked": 963,
+    "with_turn_ref": 980
+   }
+  },
+  "items": 7058,
+  "linked": 2195,
+  "ratio_linked": 0.311,
+  "scenario_level": 4863,
+  "with_turn_ref": 2915
+ }
+}
