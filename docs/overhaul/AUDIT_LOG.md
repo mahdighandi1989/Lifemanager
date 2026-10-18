@@ -4704,3 +4704,12 @@ dated stability, mind-card feed) under way.
 - **DECISION** Bank entry #111 («3 successes at 2→7→14 days») was the bank writer's assumption; T41's own rule («day 1, 3 and 7» from the last failure) is used.
 - Verified: new `tests/test_tour1_r21_practice.js` (bank R2 17/17, R5 21/21, runner sequences s29/s23/s31, A21 items; 29 red on the base build), whole page suite.
 
+
+## 2026-10-18 — Pólya round-21 fixes merged to main
+- **CHANGE** Merged the round-21 fixers: route+coach, live+dossier and practice. The practice fixer stopped on an API error partway through
+  its merge; the main session finished it. The R20 #131 assertion was updated per DECISIONS_R21 R2.
+- **FINDING→FIX** gate27 found a regression: the Pólya proverb line was missing from the coach block. Cause: `pickProverb` marked its pick
+  as used on every rebuild of the prompt within one turn. The longer R21 prompt exposed it. Fixed by keying picks per turn (a27).
+- **FINDING** gate28: page suite 114/114, pytest 2097 passed, build and host e2e green. One failure: `test.js` "local protocol not completed
+  P4", which appeared only under pytest's parallel browser run. It passed 7 of 7 reruns (3 sequential, 4 in parallel) and in the gate's own
+  sequential loop, so it was classed as a load flake and not taken as a regression.
