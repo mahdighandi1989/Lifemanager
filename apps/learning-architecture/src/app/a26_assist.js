@@ -518,11 +518,22 @@
   function parse(t) { var o = A.parseJSONLoose ? A.parseJSONLoose(t) : JSON.parse(t); if (!o || typeof o.reply !== "string") throw new Error("پاسخِ دستیار ناخوانا بود"); return o; }
   function unwrap(r) { return r && typeof r === "object" ? r : { text: r, files: [] }; }
   /* پاسخِ غیرِ JSON دو بار پشتِ هم ⇒ همان متن به‌عنوانِ پاسخ (بی کار روی صفحه)، نه خطا */
+  /* تورِ پولیا (MT1/RO3، دورِ ۲۰): پیش از نشان دادن، پاسخ یک بار وارسی می‌شود (AS.replyFix: شکل‌های بی‌آزار؛ AS.replyCheck: دو پرسش، «حل شد» ِ مدل، ادعای
+     کاری که صفحه هنوز نکرده، ضمیر) — اگر ایرادی بود، **یک** درخواستِ بازنویسی؛ فقط متنِ reply عوض می‌شود و کنش‌ها همان کنش‌های پاسخِ نخست می‌مانند */
+  function post(sys, user, o2, opts, o) {
+    try { if (AS.replyFix) AS.replyFix(o); } catch (e) { }
+    var why = ""; try { why = AS.replyCheck ? AS.replyCheck(o, opts) : ""; } catch (e) { why = ""; }
+    if (!why) return o;
+    return A.callAI(sys, user + "\n\n" + why, o2).then(function (r) {
+      r = unwrap(r); try { var x = parse(r.text); if (x.reply && String(x.reply).trim()) { o._rewrite = { why: why, first: o.reply }; o.reply = x.reply; } } catch (e) { }
+      return o;
+    }, function () { return o; });
+  }
   function ask(sys, user, opts) {
     var o2 = Object.assign({}, opts, { withMeta: true });
     return A.callAI(sys, user, o2).then(function (r1) {
       r1 = unwrap(r1);
-      try { var o = parse(r1.text); o._files = r1.files; return o; } catch (e) {
+      try { var o = parse(r1.text); o._files = r1.files; return post(sys, user, o2, opts, o); } catch (e) {
         return A.callAI(sys, user, o2).then(function (r2) {
           r2 = unwrap(r2);
           try { var o3 = parse(r2.text); o3._files = r2.files; return o3; } catch (e2) {

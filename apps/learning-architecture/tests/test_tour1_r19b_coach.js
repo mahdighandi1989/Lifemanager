@@ -113,7 +113,8 @@ function strictScan(user) {
     s = await st();
     chk(s.guesses.length === 1 && s.guesses[0].text === '۲^n − ۱' && hasNote(s.guesses[0].corr) && s.guesses[0].corr[0].old === '۲^n', 'inf15 guess 1 back: g1 corrected with history «اصلاح شد ⇐», not duplicated ' + JSON.stringify(s.guesses));
     chk(s.guess && s.guess.text === '۲^n − ۱', 'inf15: coach.guess follows the fix ' + JSON.stringify(s.guess));
-    chk(s.ev.filter(e => e.msg === id1).length > 0 && s.ev.filter(e => e.msg === id1).every(e => e.wd), 'inf15: every mind-card event derived from the corrected message is withdrawn (wd), not deleted ' + JSON.stringify(s.ev));
+    /* دورِ ۲۰ (RO1 — DECISIONS_R20 جای «همهٔ رویدادهای پیام» را گرفت): اصلاحِ حدس فقط رویدادهای همان حدس را برمی‌گرداند؛ بازگوییِ خودش («own»، کلیدِ said:u) می‌ماند */
+    chk(s.ev.filter(e => e.msg === id1).length > 0 && s.ev.filter(e => e.msg === id1).every(e => !e.wd || e.how !== 'own'), 'inf15 (R20 RO1): only events of the corrected fact are withdrawn; her restatement from the same message stays ' + JSON.stringify(s.ev));
     chk(s.ev.some(e => e.how === 'selfcorr' && e.ok && e.ph === 'b') && !s.ev.some(e => !e.ok && !e.wd), 'inf15: the self-correction is look-back evidence (+), never a failure ' + JSON.stringify(s.ev));
     chk(s.lr.length === 1 && s.lr[0].pid === pid && s.lr[0].id === id1 && s.lr[0].what === 'guess' && s.lr[0].fix === '۲^n − ۱' && s.lr[0].n === 1, 'inf15: live-problem records go through APP.liveRetract(pid, msgId, {what, fix}) ' + JSON.stringify(s.lr));
     chk(s.sys.some(t => /^✓ اصلاح شد: /.test(t)), 'inf15: the page says what changed (one sys line) ' + JSON.stringify(s.sys));
@@ -122,7 +123,7 @@ function strictScan(user) {
     chk(/۲\^n − ۱/.test(x) && /اصلاح شد ⇐/.test(x) && /در یک جمله/.test(x), 'inf15: next-turn context states exactly what changed ' + x.slice(0, 400));
     u = await turn('باشه.'); chk(!blockOf(u.user, /^# اصلاحی که صفحه انجام داد/), 'inf15: the change context is shown once');
     const ph = await p.evaluate(() => { const Q = APP.MIND.phases(); const r = {}; Q.rows.forEach(X => { r[X.id] = X.k + '/' + X.n; }); return r; });
-    chk(ph.back === '1/1' && ph.und === '0/0', 'inf15: mind card — the withdrawn «own restatement» is not counted; the self-correction counts as look-back + ' + JSON.stringify(ph));
+    chk(ph.back === '1/1' && ph.und === '1/1', 'inf15 (R20 RO1): mind card — her restatement still counts (only the guess was corrected); the self-correction counts as look-back + ' + JSON.stringify(ph));
     // ۲) پیامِ کنونی بی نشانهٔ اصلاح ⇒ رد؛ تکه‌ای که فقط دستیار گفت ⇒ رد؛ درست = پیشین ⇒ رد
     await wipe(); await fresh();
     await turn('حدسم اینه که جواب فیبوناچیه', 'چطور امتحانش می‌کنی؟', [cs({ guess: { text: 'فیبوناچیه' } })]);

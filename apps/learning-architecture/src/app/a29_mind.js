@@ -352,7 +352,11 @@
   M.PHASES = PH4.map(function (x) { return { id: x[0], ph: x[1], fa: x[2] }; });
   /* تورِ پولیا (INF17، دورِ ۱۹b): هر سطر «از کجا؟» دارد — فهرستِ کارهایی که آن را جابه‌جا کردند (منبع، تاریخ، +/−، مسئله برای «📜 پرونده»)، هر کار یک بار
      (همان جا که شمرده می‌شود ثبت می‌شود ⇒ شمارِ فهرست = n و جمعِ + = k)؛ کارِ پس‌گرفته (اصلاحِ پیامِ منبع، wd) نه شمرده می‌شود نه فهرست. opt.pid ⇒ فقط کارهای همان مسئله. */
-  function wdOut(o) { return !!(o && (o.wd || o.retracted || o.withdrawn)); }
+  /* تورِ پولیا (RO7، دورِ ۲۰ — B·D9): «withdrawn» در پروندهٔ تمرین (a41) فهرستِ پس‌گرفتنِ «تثبیت شد» است، نه پس‌گرفتنِ خودِ رکورد — آرایه (حتی تهی) هرگز
+     «پس‌گرفته» نیست؛ فقط true/رشته/شیءِ تکی (و wd/retracted) */
+  function wdFlag(v) { return v === true || (typeof v === "string" && !!v.trim()) || (!!v && typeof v === "object" && !Array.isArray(v)); }
+  function wdOut(o) { return !!(o && (wdFlag(o.wd) || wdFlag(o.retracted) || wdFlag(o.withdrawn))); }
+  M.wdOut = wdOut;
   M.phases = function (opt) {
     var fpid = opt && opt.pid ? String(opt.pid) : "";
     var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {}, acts: [] }; });
@@ -488,7 +492,7 @@
   M.UNMAPPED = UNMAPPED;
   function realRec(r) { return !!r && !(r.sample || r.test || r.tour || r.tourRun || r.sim || r.simulated || r.fixture || r.demo || r.seed || r.tourTest || r.runner); }
   M.realRec = realRec;
-  function wdx(x) { return !!(x && (x.wd || x.retracted || x.withdrawn)); }
+  function wdx(x) { return wdOut(x); }   // RO7: همان قاعدهٔ wdOut (آرایهٔ withdrawn ِ پرونده پس‌گرفتن نیست)
   function nq(s) { return String(s || "").replace(/[\s‌]+/g, " ").trim().toLowerCase(); }
   function byAt(a, b) { return String(a.at || "").localeCompare(String(b.at || "")); }
   function tFa(tid) { return tid ? "T" + String(tid) : "تکنیک"; }
@@ -542,6 +546,10 @@
         go: A.V && A.V.practice ? ["practice", rec.id] : tid ? ["tech", +tid] : null,
         base: (asst ? "دستیار ← " : "") + "تمرینِ " + tFa(tid) + (sb.fa ? " «" + String(sb.fa).slice(0, 50) + "»" : "") });
       (rec.history || rec.hist || []).forEach(function (x) { var st = x && (x.state || x.to); if (x && (x.d || x.at) && st && x.ev !== "claim") R.ev.push({ at: x.d || x.at, state: st, why: x.why || x.note || "" }); });
+      /* RO7 (دورِ ۲۰، قراردادِ a41): پس‌گرفتنِ «تثبیت شد» در stableOff[] {d, was, why} (رکوردهای کهنه: withdrawn ِ آرایه) — تاریخچهٔ ثبات، نه پس‌گرفتنِ رکورد */
+      R.off = []; (Array.isArray(rec.stableOff) ? rec.stableOff : Array.isArray(rec.withdrawn) ? rec.withdrawn : []).forEach(function (w) { if (!w || !w.d) return;
+        if (w.was && !R.ev.some(function (e) { return /^(stable|تثبیت)/.test(e.state) && day(e.at) === day(w.was); })) R.ev.push({ at: w.was, state: "stable", why: "" });
+        R.off.push({ at: w.d, was: w.was || "", why: w.why || "" }); });
       (rec.sessions || []).map(function (s, j) { return { s: s, j: j }; }).filter(function (x) { return x.s && (x.s.d || x.s.at); }).sort(function (a, b) { return String(a.s.d || a.s.at).localeCompare(String(b.s.d || b.s.at)) || byAt(a.s, b.s); }).forEach(function (x) {
         var s = x.s, j = x.j;
         if (wdx(s) || s.draft || s.status === "draft" || !realRec(s)) return;
@@ -581,7 +589,7 @@
     /* ۲) برگه‌های کامل‌شدهٔ تکنیک (پیش‌نویس هرگز): روبریک = خودسنجی؛ ردیف‌های جدولِ کالیبراسیون = پیش‌بینیِ داوری‌شده (در انتظار ⇒ شمرده نمی‌شود) */
     S.all("ex", function (e) { return realRec(e) && e.status === "done" && !wdx(e); }).forEach(function (e) {
       var tid = String(e.tid), t = A.TM && A.TM[e.tid], tp = e.topic && S.get(e.topic), at = e.doneAt || e.updated || e.created; if (!at) return;
-      var lk = LINK[e.id], R = lk ? rows[lk] : row("ex:" + tid + ":" + (e.topic || ""), { tech: tid, subj: tp ? tp.title : "", src: "ws", go: ["tech", +e.tid, "ws:" + e.id],
+      var lk = LINK[e.id] || (e.prc && rows["prac:" + e.prc] ? "prac:" + e.prc : ""), R = lk ? rows[lk] : row("ex:" + tid + ":" + (e.topic || ""), { tech: tid, subj: tp ? tp.title : "", src: "ws", go: ["tech", +e.tid, "ws:" + e.id],
         base: "برگهٔ " + tFa(tid) + (t ? " «" + t.fa + "»" : "") + (tp ? " — " + String(tp.title).slice(0, 40) : "") });
       var cf = null; ((t && t.ws) || []).forEach(function (f) { if (f.t === "calib") cf = f; });
       var nOk = 0, nRes = 0, nPend = 0, nFc = 0;
@@ -666,6 +674,7 @@
       h("tbody", {}, W.rows.map(function (R) {
         return h("tr", { "data-row": R.key, "data-tech": R.tech || "", "data-dim": R.dim || "" },
           h("td", {}, R.base, R.stableAt ? h("div", { class: "small good" }, "تثبیت شد: " + A.fdate(day(R.stableAt))) : null,
+            (R.off || []).map(function (w) { return h("div", { class: "small warnline mind-tech-off", "data-at": day(w.at) }, "«تثبیت شد»" + (w.was ? " (" + A.fdate(day(w.was)) + ")" : "") + " در " + A.fdate(day(w.at)) + " پس گرفته شد" + (w.why ? ": " + w.why : "")); }),
             R.decline ? h("div", { class: "small warnline mind-tech-decline", "data-at": day(R.decline.at) }, "افت در " + A.fdate(day(R.decline.at)) + (R.decline.after ? " (پس از «تثبیت شد» در " + A.fdate(day(R.decline.after)) + ")" : "") + (R.decline.why ? ": " + R.decline.why : "")) : null),
           h("td", {}, fa(R.days) + (R.pending ? " · " + fa(R.pending) + " در انتظار" : "")),
           h("td", {}, R.nm ? (R.nm > 1 ? pf0(R.first) + " ← " + pf0(R.last) + " (" + fa(R.nm) + ")" : pf0(R.last) + " (۱)") : "— (اندازه‌ای نیست)"),
