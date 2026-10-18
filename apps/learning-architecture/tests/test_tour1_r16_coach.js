@@ -207,7 +207,7 @@ function strictScan(user) {
     await newSess();
     const ST = 'کدام دو خانه را از صفحهٔ ۱۰×۱۰ برداریم که بتوان باقی را با دومینو پوشاند؟';
     await next('نگهش داشتم؛ سه روز دیگر برمی‌گردد.', [{ do: 'chat_invent', statement: ST, title: 'کدام دو خانه را برداریم', kind: 'find', nat: 'objective' }]);
-    await say('یه مسئله‌ی تازه ساختم: ' + ST);
+    await say('یه مسئله‌ی تازه ساختم: ' + ST + ' نگهش دار برای بعد.');   /* دورِ ۲۰ (MT1): chat_invent فقط به خواستِ خودش */
     const Q = await pidOf(/کدام دو خانه را برداریم/); chk(!!Q, 'n3 setup: invented problem ' + Q);
     r.stage = 'day10-21';
     await p.evaluate(() => { window.__day = '2026-11-04'; });

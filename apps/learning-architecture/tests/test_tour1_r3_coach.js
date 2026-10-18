@@ -144,7 +144,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await newSess();
   await say('ثابت کن هر عددِ صحیح را می‌شود به صورتِ جمعِ چند توانِ متمایزِ دو نوشت');
   await p.evaluate(() => __q.push(R({ reply: 'ثبتش کردم.', actions: [{ do: 'chat_invent', title: 'صحیح‌های متمایز', statement: 'بیشترین تعدادِ صحیح‌های مثبتِ متمایز با جمعِ ۱۰۰۰ چندتاست؟' }] })));
-  await say('یه مسئلهٔ تازه ساختم: بیشترین تعدادِ صحیح‌های مثبتِ متمایز با جمعِ ۱۰۰۰ چندتاست؟');
+  await say('یه مسئلهٔ تازه ساختم: بیشترین تعدادِ صحیح‌های مثبتِ متمایز با جمعِ ۱۰۰۰ چندتاست؟ ثبتش کن.');   /* دورِ ۲۰ (MT1): chat_invent فقط به خواستِ خودش — پیام خواستِ ثبت را دارد */
   info.b13 = await p.evaluate(() => { const r = APP.liveAll().filter(x => /صحیح‌های مثبتِ متمایز/.test(x.p.statement)).pop(); const ki = r && APP.liveKindInfo(r.p.id); return { kind: ki && ki.kind, set: ki && ki.set }; });
   // پدر با chat_solved و مسئلهٔ تازه‌اش؛ بعد chat_invent ِ همان با صورتِ دیگر
   await newSess();

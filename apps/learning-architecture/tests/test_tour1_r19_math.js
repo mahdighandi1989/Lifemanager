@@ -68,7 +68,7 @@ const isPlot = (e) => /plot/i.test(e.expect);
     const by = (src) => info.run.find(r => r.c.src === src);
     let r = info.run.find(r => /۴۷y بر ۸/.test(r.c.t)); chk(r && !runs(r).some(x => /۸/.test(x)), 'run RN4a: «۸» after «بر» is in no run ' + J(r && r.s));
     r = info.run.find(r => /ارقام بر ۳/.test(r.c.t)); chk(r && !runs(r).some(x => /۳/.test(x)) && J(runs(r)) === J(['x+۴+۱+۲', 'x=۲']), 'run RN4a: exactly «x+۴+۱+۲» and «x=۲», «۳» stays with «بر» ' + J(r && r.s));
-    r = by('D·2'); chk(r && J(runs(r)) === J(['y=۲ (۳۵۲)', 'x+۳+۵+۲', 'x=۲']), 'run D·2 s37: runs never start at «۸»/«۳» after «بر» ' + J(r && r.s));
+    r = by('D·2'); chk(r && J(runs(r)) === J(['y=۲', 'x+۳+۵+۲', 'x=۲'])   /* دورِ ۲۰ (D·14): «(۳۵۲)» برچسب است، نه بخشِ فرمول */, 'run D·2 s37: runs never start at «۸»/«۳» after «بر» ' + J(r && r.s));
     r = by('D·6'); chk(r && ['n≈3.7', 'n·ln(10/n)', '(10/n)^n'].every(q => runs(r).includes(q)), 'run D·6 s31: ≈, ·, ln recognised next to (10/n)^n ' + J(r && r.s));
     // RN4d: ln/≈ در درخت (mi:ln، mo:≈)، و اندیسِ یونیکد «a₁» یک msub
     const tree = await p.evaluate(() => { const sx = (n) => { const t = n.localName, k = [...n.children]; if (!k.length) return t + ':' + n.textContent; return t + '(' + k.map(sx).join(',') + ')'; };

@@ -192,12 +192,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     APP.liveBindSession(par.p.id, s, { force: true });
     // مدل داورِ دیگری پیشنهاد می‌دهد («life») — ارثِ a38 برنده است (R2: فرزند داور و فضایی بودنِ پدر را می‌گیرد)
     __q.push(R({ reply: 'ثبت شد.', actions: [{ do: 'chat_invent', statement: 'اگر انبار ۵ در ۳ بود چند جعبهٔ بیشتر جا می‌شد؟', nat: 'life' }] }));
-    await AS.send('یه مسئلهٔ تازه ساختم: اگر انبار ۵ در ۳ بود چند جعبهٔ بیشتر جا می‌شد؟');
+    await AS.send('یه مسئلهٔ تازه ساختم: اگر انبار ۵ در ۳ بود چند جعبهٔ بیشتر جا می‌شد؟ ثبتش کن.');   /* دورِ ۲۰ (MT1): chat_invent فقط به خواستِ خودش */
     const ch = APP.liveAll().filter(x => /انبار ۵ در ۳/.test(x.p.statement))[0], ki = ch && APP.liveKindInfo(ch.p.id);
     // منفی: بی مسئلهٔ بسته ⇒ origin «chat» و داورِ صریحِ مدل با by: assistant
     localStorage.removeItem('lla.assist.cur'); AS.newSession();
     __q.push(R({ reply: 'ثبت شد.', actions: [{ do: 'chat_invent', statement: 'چند راه برای چیدنِ ۴ کتابِ متفاوت در یک ردیف هست؟', kind: 'find', nat: 'objective' }] }));
-    await AS.send('مسئلهٔ تازه: چند راه برای چیدنِ ۴ کتابِ متفاوت در یک ردیف هست؟');
+    await AS.send('مسئلهٔ تازه: چند راه برای چیدنِ ۴ کتابِ متفاوت در یک ردیف هست؟ ثبتش کن.');
     const c2 = APP.liveAll().filter(x => /۴ کتابِ متفاوت/.test(x.p.statement))[0], k2 = c2 && APP.liveKindInfo(c2.p.id);
     // ردهٔ مربی از liveKindInfo: مسئلهٔ عملیِ بسته با واژهٔ «ثابت» در صورت ⇒ همچنان «تصمیم/کارِ واقعی» (نه حدسِ واژه)
     localStorage.removeItem('lla.assist.cur'); const s3 = AS.newSession();

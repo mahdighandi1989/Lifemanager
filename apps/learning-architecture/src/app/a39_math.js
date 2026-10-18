@@ -333,6 +333,8 @@
       var c = cls[k];
       if (c === "s") { if (run.length) run.push(p); else buf += p; return; }
       if (c === "D" && run.length) { run.push(p); return; }   // «…» درونِ رشته (C·W1 s25) — رشته را نمی‌بُرد
+      /* دورِ ۲۰ (RO9، D·14 s37): «(۳۵۲)» ِ تنها پس از فاصله برچسب است، نه ضریب — «y=۲ (۳۵۲)» ⇒ فرمولِ «y = ۲» و متنِ «(۳۵۲)» (نه «y = ۲(۳۵۲)») */
+      if (c === "M" && run.length && /^\s+$/.test(parts[k - 1] || "") && /^\([0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?\)[.,،:؛!?؟…»"”]*$/.test(p)) { flush(); buf += p; return; }
       if (c === "M" || c === "P") {
         if (/^[«"“]/.test(p) && run.length) flush();
         if (!run.length) { var pv = nb(k, -1); faB = pv >= 0 && cls[pv] === "T" && RTLW.test(parts[pv]) && !/[.,،:؛!?؟…»"”)]$/.test(parts[pv]); }
@@ -666,7 +668,10 @@
   function addForm(d, onAdd) {
     var w = document.createElement("div"); w.className = "mx-addw"; w.setAttribute("dir", "rtl"); w.setAttribute("style", "margin-top:3px");
     var tog = document.createElement("button"); tog.type = "button"; tog.className = "linkish small mx-add-tog"; tog.textContent = "➕ افزودنِ نقطه";
-    var f = document.createElement("span"); f.className = "mx-addf"; f.hidden = true; f.setAttribute("style", "display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap;margin-inline-start:6px");
+    var f = document.createElement("span"); f.className = "mx-addf"; f.setAttribute("style", "gap:4px;align-items:center;flex-wrap:wrap;margin-inline-start:6px");
+    /* دورِ ۲۰ (RO9، A·A15): display ِ درون‌خطی ویژگیِ hidden را بی‌اثر می‌کرد ⇒ فرمِ هر نمودار بی کلیک باز بود؛ حالا باز/بسته فقط با کلیدِ همان نمودار */
+    var show = function (v) { f.hidden = !v; f.style.display = v ? "inline-flex" : "none"; tog.setAttribute("aria-expanded", v ? "true" : "false"); };
+    show(false);
     var mk = function (cls, label) { var i = document.createElement("input"); i.type = "text"; i.className = cls; i.setAttribute("inputmode", "decimal"); i.setAttribute("aria-label", label); i.placeholder = label; i.setAttribute("style", "width:7em"); return i; };
     var ix = d.xl ? mk("mx-add-x", d.xn ? "مقدارِ " + d.xn + " (افقی)" : "مقدارِ افقی") : null, iy = mk("mx-add-y", d.yn ? "مقدارِ " + d.yn + " (عمودی)" : "مقدارِ عمودی");
     var ok = document.createElement("button"); ok.type = "button"; ok.className = "btn sm mx-add-ok"; ok.textContent = "افزودن";
@@ -676,7 +681,7 @@
       if ((ix && isNaN(num(xv))) || !yv || isNaN(num(yv))) { msg.textContent = "عدد بنویس."; return; }
       onAdd(xv, yv);
     });
-    tog.addEventListener("click", function () { f.hidden = !f.hidden; if (!f.hidden) (ix || iy).focus(); });
+    tog.addEventListener("click", function () { show(f.hidden); if (!f.hidden) (ix || iy).focus(); });
     if (ix) f.appendChild(ix); f.appendChild(iy); f.appendChild(ok); f.appendChild(msg);
     w.appendChild(tog); w.appendChild(f); return w;
   }

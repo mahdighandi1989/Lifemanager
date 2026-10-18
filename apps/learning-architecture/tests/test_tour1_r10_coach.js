@@ -329,7 +329,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await say('یه مسئلهٔ دیگه هم دارم که جدا می‌خوام حلش کنم: سقفِ انباری چکه می‌کنه؛ اول کجا رو تعمیر کنم؟ ثبتش کن.');
     await W(400);
     r.form = await p.evaluate(() => { const s = APP.ASSIST.cur(), m = (s.msgs || []).filter(x => x.role === 'sys' && x.go).pop(); return { view: APP.state.view, arg: APP.state.arg, go: m ? m.go.arg : '' }; });
-    chk(r.form.go && r.form.arg === P0, 'livenew: on a form (another problem\'s page) the page does NOT navigate away ' + JSON.stringify(r.form));
+    /* دورِ ۲۰ (MT1، models class 7، s29): مسئله‌ای که خودش خواست («… جدا می‌خوام حلش کنم … ثبتش کن») حتی از صفحهٔ مسئلهٔ دیگری باز می‌شود (پیش‌تر نمی‌رفت و مسئلهٔ دوم گم می‌شد) */
+    chk(r.form.go && r.form.arg === r.form.go && r.form.arg !== P0 && r.form.view === 'lprob', 'livenew (round 20 MT1): her own request from another problem\'s page opens the new problem ' + JSON.stringify(r.form));
     await p.evaluate(() => APP.ASSIST.toggle(true)); await W(200);
     await p.locator('.as-panel .as-go').last().click(); await W(250);
     r.clicked = await p.evaluate(() => APP.state.arg); await p.evaluate(() => APP.ASSIST.toggle(false)); delete r.stage;

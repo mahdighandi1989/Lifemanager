@@ -184,7 +184,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await newSess();
   { const n0 = await nLive();
     await act({ reply: 'هر دو را نگه داشتم.', actions: [{ do: 'chat_invent', title: 'صحیح‌های متمایز با جمعِ ۱۰', statement: 'بیشترین حاصل‌ضربِ صحیح‌های مثبتِ متمایز با جمعِ ۱۰ چیست؟', nat: 'objective' }, { do: 'chat_invent', title: 'صحیح‌های متمایز با جمعِ ۱۰۰۰', statement: 'بیشترین حاصل‌ضربِ صحیح‌های مثبتِ متمایز با جمعِ ۱۰۰۰ چیست؟', nat: 'objective' }] });
-    await say('دو تا مسئله ساختم: یکی با جمعِ ۱۰ و یکی سخت‌ترش با جمعِ ۱۰۰۰');
+    await say('دو تا مسئله ساختم: یکی با جمعِ ۱۰ و یکی سخت‌ترش با جمعِ ۱۰۰۰؛ ثبتشون کن');   /* دورِ ۲۰ (MT1): chat_invent فقط به خواستِ خودش — پیام خواستِ ثبت را دارد */
     info.e7 = { s31: (await nLive()) - n0 }; }
   await newSess();
   await act({ reply: 'ثبت شد.', actions: [{ do: 'chat_solved', title: 'پوشش با دومینو', statement: 'صفحهٔ شطرنجِ ۸×۸ که دو گوشهٔ مقابلش برداشته شده را می‌شود با دومینو پوشاند؟', kind: 'pod', lesson: 'رنگ‌آمیزی نشان داد دو گوشهٔ هم‌رنگ برداشته شده', check: 'شمردم: ۳۲ سفید و ۳۰ سیاه', newProb: 'کدام دو خانه را از صفحهٔ ۱۰×۱۰ بردارم که پوشش با دومینو ممکن شود؟' }] });

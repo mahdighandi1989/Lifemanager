@@ -157,7 +157,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await say('از یه پلکان ۱۰ پله‌ای، هر بار یک یا دو پله، به چند راه بالا می‌رم؟');
   const parS = await p.evaluate(() => APP.ASSIST.cur().lprob);
   await act({ reply: 'نگهش داشتم.', actions: [{ do: 'chat_invent', title: 'پلکانِ n پله‌ای', statement: 'اگه پلکان n پله داشته باشه، تعداد راه‌ها چنده؟', from: parS }] });
-  await say('اگه پلکان n پله داشته باشه، تعداد راه‌ها چنده؟');
+  await say('اگه پلکان n پله داشته باشه، تعداد راه‌ها چنده؟ ثبتش کن.');   /* دورِ ۲۰ (MT1): chat_invent فقط به خواستِ خودش — پیام خواستِ ثبت را دارد */
   await act({ reply: 'نگهش داشتم.', actions: [{ do: 'chat_invent', title: 'پلکانِ n پله‌ای', statement: 'آیا تعدادِ راه‌های پلکانِ n پله‌ای همیشه عددِ فیبوناچیِ n+1 ام است؟', from: parS }] });
   await say('آیا تعدادِ راه‌های پلکانِ n پله‌ای همیشه عددِ فیبوناچیِ n+1 ام است؟');
   info.f4.reguess = await p.evaluate(par => APP.liveAll().filter(r => r.origin && r.origin.id === par).map(r => ({ k: r.p.kind, t: (APP.S.get('eprog_' + r.p.id).solve || {}).type, n: (r.p.restated || []).length })), parS);
@@ -210,7 +210,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await act({ reply: 'ثبت شد.', actions: [{ do: 'chat_solved', title: 'دو بچه', statement: 'یه خانواده دو تا بچه داره و یکیشون پسره. احتمال اینکه هر دو پسر باشن چقدره؟', kind: 'find', solution: '۱/۳', lesson: 'فضای نمونه را باید کامل نوشت', check: 'با شمردن' }] });
   await say('جوابش ۱/۳ شد. درسم اینه که فضای نمونه را باید کامل نوشت؛ با شمردن وارسی کردم.');
   await act({ reply: 'نگهش داشتم.', actions: [{ do: 'chat_invent', title: 'دو بچه — پسرِ سه‌شنبه', statement: 'اگه بدونیم یکیشون پسریه که سه‌شنبه به دنیا اومده، احتمال دو پسر چقدره؟', from: P3 }] });
-  await say('اگه بدونیم یکیشون پسریه که سه‌شنبه به دنیا اومده، احتمال دو پسر چقدره؟');
+  await say('اگه بدونیم یکیشون پسریه که سه‌شنبه به دنیا اومده، احتمال دو پسر چقدره؟ ثبتش کن.');   /* دورِ ۲۰ (MT1): chat_invent فقط به خواستِ خودش — پیام خواستِ ثبت را دارد */
   const C3 = await p.evaluate(par => (APP.liveAll().filter(r => r.origin && r.origin.id === par).pop() || { p: {} }).p.id, P3);
   await p.evaluate(pid => APP.go('lprob', pid), C3); await p.waitForTimeout(150);
   await say('خب این یکی رو چطوری شروع کنم؟');

@@ -5,6 +5,7 @@
 //  rc1defer    RC1 defer — درخواستِ عقب‌افتاده از coach_state.defer {what} (سنجیده با پیامِ کاربر) قول می‌شود؛ الگوی «بعداً/ولی اول» دیگر ذخیره نمی‌کند (s32، s14 pr2)
 //  rc1taste    RC1 taste — coach_state.taste {text} سلیقه را روی بازنگری می‌گذارد؛ "unknown" هرگز (s31 «هنوز نمی‌دونم…»)
 //  rc1reg      RC1 register — ضمیر از coach_state.register (سنجیده با نشانه‌های خودِ پیام)؛ یک «شما» ِ تنها در پیامِ کاربر گفت‌وگو را «شما» نمی‌کند (s27)
+//  (دورِ ۲۰، MT1: پیامِ ساختن «ثبتش کن» دارد — chat_invent فقط به خواستِ خودش)
 //  rc1guess    RC1 guess — coach_state.guess {text} (عدد/فرمول بی «واژه» هم) سنجیده و نگه داشته؛ مسیرِ تکراریِ chat_invent حدس را فقط از گزارشِ مدل می‌گیرد (s25)
 //  rc3         RC3 — هر کنش در کلِ پرامپت (SYS + پیام) یک وجه دارد: سطرهایی که نامش را می‌برند «پیشنهاد فقط با آری» و «ثبتش کن» را با هم نمی‌گویند
 //  rc4         RC4 — «وارسی شد» از coach_state.check {msgs} (پیام‌های واقعیِ کاربرِ همین مسئله)؛ هم‌پوشانیِ واژه فقط «شاید»، هرگز «وارسی نشد» (s31)
@@ -242,14 +243,14 @@ function modalityConflicts(text) {
     // s25 (C·V2): مسئلهٔ تکراری + حدسِ فرمولی ⇒ حدسِ همان مسئله؛ بی گزارشِ مدل، الگو ذخیره نمی‌کند
     r.stage = 'dup';
     const ST = 'مجموعِ ۱/(k(k+1)(k+2)) از k=1 تا n را پیدا کن.';
-    await fresh(); await turn('مسئلهٔ تازه: ' + ST, 'نگهش داشتم.', [{ do: 'chat_invent', statement: ST, title: 'مجموعِ تلسکوپیِ سه‌تایی', kind: 'find' }]);
+    await fresh(); await turn('مسئلهٔ تازه: ' + ST + ' ثبتش کن.', 'نگهش داشتم.', [{ do: 'chat_invent', statement: ST, title: 'مجموعِ تلسکوپیِ سه‌تایی', kind: 'find' }]);
     const P = await p.evaluate(() => __pid('مجموعِ تلسکوپیِ سه‌تایی'));
     await fresh();
     await turn('برگشتم سرِ ' + ST + ' حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2))', 'حدست را می‌آزمایی؟', [{ do: 'chat_invent', statement: ST, kind: 'find' }, { do: 'coach_state', guess: { text: '۱/۴ − ۱/(2(n+1)(n+2))' } }]);
     const g1 = await p.evaluate(P => { const so = (APP.S.get('eprog_' + P) || {}).solve || {}; return (so.g && so.g[1] && so.g[1].guess) || ''; }, P);
     chk(/۱\/۴|1\/4/.test(g1) && /\(n\+1\)\(n\+2\)/.test(g1), 's25 (C·V2): the formula guess reported by the model becomes the duplicate problem\'s guess (round 17: solve.g = {}) ' + JSON.stringify(g1));
     const ST2 = 'کوچک‌ترین عددِ مربعِ کامل بخش‌پذیر بر ۶ و ۱۰ را پیدا کن.';
-    await fresh(); await turn('مسئلهٔ تازه: ' + ST2, 'باشه.', [{ do: 'chat_invent', statement: ST2, title: 'مربعِ بخش‌پذیر', kind: 'find' }]);
+    await fresh(); await turn('مسئلهٔ تازه: ' + ST2 + ' ثبتش کن.', 'باشه.', [{ do: 'chat_invent', statement: ST2, title: 'مربعِ بخش‌پذیر', kind: 'find' }]);
     const P2 = await p.evaluate(() => __pid('مربعِ بخش‌پذیر'));
     await fresh(); await turn('دوباره ' + ST2 + ' فکر کنم جوابش ۹۰۰ باشه.', 'چطور؟', [{ do: 'chat_invent', statement: ST2, kind: 'find' }]);
     const g2 = await p.evaluate(P => { const so = (APP.S.get('eprog_' + P) || {}).solve || {}; return (so.g && so.g[1] && so.g[1].guess) || ''; }, P2);

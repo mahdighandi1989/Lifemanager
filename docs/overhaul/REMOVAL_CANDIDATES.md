@@ -277,3 +277,11 @@ how to revive it.
 ## 2026-10-17 — `A.masteryCountOnly` (learning-architecture, round-19c practice)
 The count-only mastery rule (six same-day attempts counted as «fluent») is replaced by a distinct-days rule (DECISIONS_R19c LT3).
 The old function is kept reachable as `A.masteryCountOnly` in `a1_base.js`; nothing calls it. Delete only with the owner's approval.
+
+## 2026-10-18 — پروندهٔ دورِ ۱۹b (learning-architecture، تورِ پولیا دورِ ۲۰، سهمِ «live + پرونده»: RO6)
+- **پرونده:** `apps/learning-architecture/src/app/a40_dossier.js` — `dossierR19b`.
+- **چه بود:** «📜 پروندهٔ کامل» از بخشی از رکوردها، به ترتیبِ زمانِ ذخیره، با دو منبعِ وضع («در جریان — اجرا» کنارِ «اجرا — هنوز نرسیده»)، بی برنامه‌ها و اصلاح‌های گفت‌وگو،
+  با «[object Object]» برای بازگشتِ مکث و «رد شد» برای حدسی که هرگز رد نشد.
+- **چرا:** DECISIONS_R20 RO6 — یک دفترِ رویداد (`A.EVLOG`) به ترتیبِ زمانِ کنش، یک منبعِ وضع، رندرِ نوع‌دار، همان نشانه‌های کارنامه، پرونده برای گفت‌وگوی بی مسئله.
+- **وضع:** در همان پرونده مانده و از `APP.LIVE_R20_QUARANTINE.dossier` در دسترس است، ولی صدا زده نمی‌شود.
+- **حذفِ واقعی:** فقط با تأییدِ صریحِ مالک.

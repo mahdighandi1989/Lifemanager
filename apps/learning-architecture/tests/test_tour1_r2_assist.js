@@ -171,7 +171,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const all = APP.liveAll().filter(x => x.p.statement === st), s = AS.cur(), sys = s.msgs.filter(m => m.role === 'sys').map(m => m.text);
     const pid = all[0] && all[0].p.id, pg = S.get('eprog_' + pid);
     __q.push(R({ reply: 'ثبت شد.', actions: [{ do: 'chat_invent', statement: 'با سه وزنه بیشترین بازهٔ پیوسته چقدر است؟', from: pid }] }));
-    await AS.send('یه مسئلهٔ تازه ساختم: با سه وزنه بیشترین بازهٔ پیوسته چقدر است؟');
+    await AS.send('یه مسئلهٔ تازه ساختم: با سه وزنه بیشترین بازهٔ پیوسته چقدر است؟ ثبتش کن.');   /* دورِ ۲۰ (MT1): chat_invent فقط به خواستِ خودش — پیام خواستِ ثبت را دارد */
     const inv = APP.liveAll().filter(x => /بیشترین بازهٔ پیوسته/.test(x.p.statement))[0], sys2 = AS.cur().msgs.filter(m => m.role === 'sys').map(m => m.text);
     return { one: all.length === 1, made: APP.liveAll().length, n0, conf: sys.some(t => /^✓ «وزنه‌های باشه» در «🔭 مسئله‌های من» ثبت شد/.test(t)) && sys.some(t => /همان مسئله، به‌روز شد/.test(t)),
       noFail: !__calls.some(c => /انجام نشد/.test(c.user)), own: !!(pg.solve.b[1] && pg.solve.b[1].own),
