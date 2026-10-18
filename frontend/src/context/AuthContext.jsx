@@ -151,15 +151,23 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
-  const register = async (email, password, username) => {
+  // dateOfBirth (optional, 2026-10-18): exact date "YYYY-MM-DD"; sent only when
+  // given, so the request body is unchanged for callers that don't pass it.
+  const register = async (email, password, username, dateOfBirth) => {
+    const body = { email, password, username };
+    if (dateOfBirth) body.date_of_birth = dateOfBirth;
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, username }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || 'خطا در ثبت‌نام');
+      // 422 from pydantic carries a list of {msg}; show the messages, not "[object Object]"
+      const detail = Array.isArray(err.detail)
+        ? err.detail.map((d) => String(d?.msg || '').replace(/^Value error, /, '')).filter(Boolean).join(' — ')
+        : err.detail;
+      throw new Error(detail || 'خطا در ثبت‌نام');
     }
     return res.json();
   };

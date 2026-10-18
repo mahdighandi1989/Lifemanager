@@ -9,6 +9,7 @@ function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +26,7 @@ function Register() {
     }
     setLoading(true);
     try {
-      await register(email, password, username);
+      await register(email, password, username, dateOfBirth || undefined);
       // auto-login after register
       await login(email, password);
       navigate('/');
@@ -101,6 +102,22 @@ function Register() {
               placeholder="••••••••"
               className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
             />
+          </div>
+          <div dir="rtl">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              تاریخ تولد <span className="text-gray-400 font-normal">(اختیاری)</span>
+            </label>
+            <input
+              type="date"
+              value={dateOfBirth}
+              onChange={e => setDateOfBirth(e.target.value)}
+              min="1900-01-01"
+              max={new Date(Date.now() - 86400000).toISOString().slice(0, 10)}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+            />
+            <p className="mt-1 text-xs text-gray-500 leading-5">
+              با تاریخ تولدت، گفت‌وگو متناسب با سنت می‌شود و کارتِ ذهن تو را فقط با هم‌سن‌هایت مقایسه می‌کند؛ خودِ تاریخ نگه داشته می‌شود، نه عددِ سن.
+            </p>
           </div>
           <button
             type="submit"

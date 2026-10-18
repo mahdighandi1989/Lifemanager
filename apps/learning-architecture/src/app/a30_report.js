@@ -255,7 +255,7 @@
             var e = c.self, p = c.pop || { n: 0 };
             return "<tr>" + td(esc(c.fa)) + td(e.n ? pc(e.next) + ' <span style="color:' + C.mute + '">(' + fa(e.k) + " از " + fa(e.n) + ")</span>" : "—") +
               td(e.progress ? pc(e.progress.p) + ' <span style="color:' + C.mute + '">(' + fa(e.progress.from) + " ← " + fa(e.progress.to) + ")</span>" : "—") +
-              td(p.n ? "بالاتر از میانهٔ " + esc(p.peers) + ": " + pc(p.pAbove) : "—") + "</tr>";
+              td(p.n ? (p.none ? esc(A.PSY.popFa(p)) : "بالاتر از میانهٔ " + esc(p.peers) + ": " + pc(p.pAbove)) : "—") + "</tr>";
           }).join("") + "</table>";
         var black = m.black.length ? '<ul style="margin:6px 0;padding-right:18px">' + m.black.slice(0, 12).map(function (b) { return "<li>" + esc(b.fa) + "</li>"; }).join("") + "</ul>" : '<div style="color:' + C.mute + '">نقطهٔ سیاهی دیده نشد.</div>';
         var pics = imgs.map(function (im) { return '<div style="margin:12px 0;text-align:center"><div style="font-weight:700;margin-bottom:4px">' + esc(im.fa) + '</div><img src="cid:' + im.cid + '" alt="' + esc(im.fa) + '" style="max-width:100%;border:1px solid ' + C.line + ';border-radius:8px"></div>'; }).join("");

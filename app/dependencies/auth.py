@@ -34,6 +34,10 @@ from app.models.user_oauth import OAuthUser, UserRole, UserPermission
 from app.core.config import settings
 
 
+import logging
+
+_log = logging.getLogger(__name__)
+
 AuthContext = Union[User, OAuthUser]
 
 security = HTTPBearer()
@@ -98,6 +102,95 @@ async def _resolve_token_to_user(token: str, db: AsyncSession) -> Optional[AuthC
     return result.scalar_one_or_none()
 
 
+# Shadow rows for non-owner Google accounts live in ``users`` under this reserved
+# e-mail domain. ``.invalid`` is a special-use TLD that EmailStr rejects, so no
+# /auth/register or /auth/login request can ever name (or hijack) such a row, and
+# hashed_password='!' never matches a bcrypt hash.
+OAUTH_SCOPE_EMAIL_DOMAIN = "oauth-scope.invalid"
+
+
+def _oauth_scope_key(email: str) -> str:
+    import hashlib
+
+    return hashlib.sha256((email or "").strip().lower().encode("utf-8")).hexdigest()[:24]
+
+
+def oauth_scope_email(email: str) -> str:
+    """The reserved ``users.email`` of a Google account's own data scope."""
+    return f"oauth-{_oauth_scope_key(email)}@{OAUTH_SCOPE_EMAIL_DOMAIN}"
+
+
+def _is_scope_owner(oauth_user: OAuthUser) -> bool:
+    """Is this Google account THE owner (who keeps the shared scope 0)?
+
+    The owner is named ONLY by explicit configuration, never by a literal in
+    code or a guess: ``OWNER_EMAIL`` (the env var brain_service already reads),
+    else the ``ADMIN_EMAILS`` super-admins (see ``settings.owner_emails_list``).
+    Callers must check that list is non-empty first — with no owner configured
+    per-user scope is inactive (see :func:`_resolve_data_scope_user_id`)."""
+    email = (getattr(oauth_user, "email", None) or "").strip().lower()
+    return bool(email) and email in settings.owner_emails_list
+
+
+_scope_inactive_warned = False
+
+
+async def _warn_scope_inactive(db: AsyncSession) -> None:
+    """One warning per process when per-user scope is inactive because no owner
+    is configured. The lowest-id admin/approved account is logged as a hint only
+    — it NEVER activates per-user scope (a missing env var must not be able to
+    move the owner out of scope 0)."""
+    global _scope_inactive_warned
+    if _scope_inactive_warned:
+        return
+    _scope_inactive_warned = True
+    hint = None
+    try:
+        hint = (await db.execute(
+            select(OAuthUser.id).where(OAuthUser.role == UserRole.ADMIN).order_by(OAuthUser.id).limit(1)
+        )).scalar_one_or_none()
+        if hint is None:
+            hint = (await db.execute(
+                select(OAuthUser.id).where(OAuthUser.status == "approved").order_by(OAuthUser.id).limit(1)
+            )).scalar_one_or_none()
+    except Exception:
+        pass
+    _log.warning("per-user scope inactive: set OWNER_EMAIL (or ADMIN_EMAILS); every approved Google account "
+                 "shares scope 0. Diagnostic only — likely owner: oauth_users.id=%s", hint)
+
+
+async def _oauth_scope_user_id(db: AsyncSession, oauth_user: OAuthUser) -> int:
+    """Get-or-create the non-loginable ``users`` row that is this Google
+    account's own data scope. Keyed by a hash of the Google e-mail, so the same
+    Google account always lands on the same scope (even if its ``oauth_users``
+    row is deleted and re-created), and data FKs to ``users.id`` stay valid."""
+    import secrets
+
+    from sqlalchemy.exc import IntegrityError
+
+    google_email = (oauth_user.email or "").strip().lower()
+    scope_email = oauth_scope_email(google_email)
+    found = (await db.execute(select(User.id).where(User.email == scope_email))).scalar_one_or_none()
+    if found is not None:
+        return found
+    base_username = f"oauth-{_oauth_scope_key(google_email)}"
+    for attempt in range(3):
+        username = base_username if attempt == 0 else f"{base_username}-{secrets.token_hex(3)}"
+        db.add(User(email=scope_email, username=username, hashed_password="!", is_active=True,
+                    is_superuser=False, display_name=(getattr(oauth_user, "name", None) or None)))
+        try:
+            await db.commit()
+        except IntegrityError:
+            await db.rollback()
+            # a concurrent request created it, or a local account took the username
+            found = (await db.execute(select(User.id).where(User.email == scope_email))).scalar_one_or_none()
+            if found is not None:
+                return found
+            continue
+        return (await db.execute(select(User.id).where(User.email == scope_email))).scalar_one()
+    raise RuntimeError("could not create the data scope of a Google account")
+
+
 async def _resolve_data_scope_user_id(token: str, db: AsyncSession) -> Optional[int]:
     """Map a token to a per-user DATA scope id (the ``users.id`` space).
 
@@ -109,10 +202,17 @@ async def _resolve_data_scope_user_id(token: str, db: AsyncSession) -> Optional[
     cause of the /api/context/location 409s after Google sign-in went live).
 
     So the mapping is:
-      * OAuth token  → ``DEFAULT_ANON_USER_ID``: the single-tenant shared scope,
-        identical to the pre-auth behaviour. This personal deployment has one
-        real operator, so their data lives in that one scope rather than under
-        an FK-incompatible oauth id. Returns an int, never None.
+      * OAuth token, the OWNER (:func:`_is_scope_owner`) → ``DEFAULT_ANON_USER_ID``:
+        the shared scope that has held his data since before auth existed.
+      * OAuth token, any OTHER *approved* account, with ``PER_USER_OAUTH_SCOPE``
+        on (default) → its own ``users.id`` (a non-loginable shadow row, see
+        :func:`_oauth_scope_user_id`). Before 2026-10-18 it got scope 0 too, so
+        a second Google user read the owner's data; the flag off restores that.
+      * No owner configured (both e-mail settings empty) → every OAuth token gets
+        ``DEFAULT_ANON_USER_ID`` (old behaviour) plus one logged warning.
+      * OAuth token, pending/rejected/unknown account → ``DEFAULT_ANON_USER_ID``
+        (unchanged: same as an anonymous caller; :func:`get_signed_in_user_id`
+        refuses those with 403 before any data is touched).
       * Local token  → the verified ``users.id`` if the row exists, else None.
       * Invalid token → None.
     """
@@ -120,7 +220,23 @@ async def _resolve_data_scope_user_id(token: str, db: AsyncSession) -> Optional[
     if payload is None:
         return None
     if payload.get("typ") == "oauth":
-        return DEFAULT_ANON_USER_ID
+        if not settings.PER_USER_OAUTH_SCOPE:
+            return DEFAULT_ANON_USER_ID
+        if not settings.owner_emails_list:
+            # No explicitly named owner ⇒ old behaviour (everyone → 0). Never guess
+            # the owner: a missing env var must not move him out of his data.
+            await _warn_scope_inactive(db)
+            return DEFAULT_ANON_USER_ID
+        try:
+            oid = int(payload["sub"])
+        except (KeyError, TypeError, ValueError):
+            return DEFAULT_ANON_USER_ID
+        oauth_user = await get_oauth_user_by_id(db, oid)
+        if oauth_user is None or getattr(oauth_user, "status", None) != "approved":
+            return DEFAULT_ANON_USER_ID
+        if _is_scope_owner(oauth_user):
+            return DEFAULT_ANON_USER_ID
+        return await _oauth_scope_user_id(db, oauth_user)
     try:
         uid = int(payload["sub"])
     except (KeyError, TypeError, ValueError):
@@ -226,8 +342,8 @@ async def get_required_user_id(
             )
         return DEFAULT_ANON_USER_ID
     # A token was supplied — it MUST be one of our valid tokens. An OAuth token
-    # resolves to the shared single-tenant scope (see
-    # :func:`_resolve_data_scope_user_id`); a local token resolves to its
+    # resolves to the owner's shared scope 0 or, for any other approved Google
+    # account, its own scope (see :func:`_resolve_data_scope_user_id`); a local token resolves to its
     # users.id; an invalid token yields None → 401.
     try:
         uid = await _resolve_data_scope_user_id(token, db)
@@ -280,8 +396,12 @@ async def get_signed_in_user_id(
             detail="Authentication required",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    st, active = None, True
     try:
         user = await _resolve_token_to_user(token, db)
+        if user is not None:
+            # read before scope resolution — it may commit a new scope row
+            st, active = getattr(user, "status", None), getattr(user, "is_active", True)
         uid = await _resolve_data_scope_user_id(token, db) if user is not None else None
     except Exception:
         user, uid = None, None
@@ -291,8 +411,7 @@ async def get_signed_in_user_id(
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    st = getattr(user, "status", None)
-    if st in ("pending", "rejected") or getattr(user, "is_active", True) is False:
+    if st in ("pending", "rejected") or active is False:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="حسابِ شما هنوز تأیید نشده است")
     return uid
 

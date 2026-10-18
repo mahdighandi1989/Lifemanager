@@ -41,6 +41,7 @@ function OwnerField({ item, onSaved }) {
   const [draft, setDraft] = useState(item.value || '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const isDob = item.field === 'date_of_birth';
 
   useEffect(() => setDraft(item.value || ''), [item.value]);
 
@@ -50,8 +51,9 @@ function OwnerField({ item, onSaved }) {
     try {
       await api.put(`/identity-profile/${item.field}`, { value: draft });
       onSaved();
-    } catch {
-      setError('ذخیره نشد — دوباره تلاش کن.');
+    } catch (err) {
+      const detail = err?.response?.data?.detail;
+      setError(typeof detail === 'string' && detail ? detail : 'ذخیره نشد — دوباره تلاش کن.');
     } finally {
       setBusy(false);
     }
@@ -68,6 +70,10 @@ function OwnerField({ item, onSaved }) {
       <div className="mt-1.5 flex gap-2">
         <input
           className="flex-1 rounded-lg border border-gray-300 px-2 py-1.5 text-sm"
+          // تاریخ تولد (۲۰۲۶-۱۰-۱۸): انتخاب‌گرِ تاریخ وقتی مقدار خالی یا ISO است؛ نوشتهٔ
+          // آزادِ قدیمی («08 Mar 1989») همچنان متنی نمایش داده و پذیرفته می‌شود.
+          type={isDob && (!draft || /^\d{4}-\d{2}-\d{2}$/.test(draft)) ? 'date' : 'text'}
+          min={isDob ? '1900-01-01' : undefined}
           value={draft}
           placeholder={item.askable ? 'هنوز نمی‌دانم — بنویس یا بگذار در تلگرام بپرسم' : 'نامشخص'}
           onChange={(e) => setDraft(e.target.value)}
@@ -81,6 +87,11 @@ function OwnerField({ item, onSaved }) {
           ثبت
         </button>
       </div>
+      {isDob ? (
+        <div className="mt-1 text-[11px] text-gray-500" dir="rtl">
+          برای گفت‌وگوی متناسب با سنت و مقایسه با هم‌سن‌هایت در کارتِ ذهن؛ فقط خودِ تاریخ نگه داشته می‌شود.
+        </div>
+      ) : null}
       {error ? <div className="mt-1 text-[11px] text-red-600">{error}</div> : null}
     </li>
   );

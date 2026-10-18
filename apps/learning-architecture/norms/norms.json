@@ -1,7 +1,7 @@
 {
  "version": 2,
  "retrieved": "2026-10-15",
- "about": "Anchor items for «📐 سنجشِ استاندارد»: every number here comes from a cited, reputable source (peer-reviewed / large normative sample). Contract: docs/decisions/2026-10-15-mind-card-psychometric.md. Filled only after independent verification; never invent a number. | v2 (2026-10-15, independent verification): anchors = 28 MaRs-IB matrix clones (nonverbal, CC BY-NC 3.0 stimuli, 30 s, 4 options ⇒ c = 1/4), b re-estimated by the verifier from the open calibration responses (Zorowitz et al. 2024, N = 1501) with a multigroup Rasch model with fixed c (MML-EM), SEs from the cross-product information, infit/outfit checked, and agreement with the observed p-correct and with the authors' own clone-level 3PL(γ=0.25) estimates confirmed for every anchor. Descriptive items (CRT, CRT-2, syllogisms, conditionals, modus ponens, Wason, numeracy, ratio bias) carry p and n from Twin-2K-500 (CC BY 4.0) re-scored by the verifier; they never enter θ. Excluded: ICAR items (current terms: 'intended for academic use exclusively'; PsychArchives deposit under a Scientific Use License to protect the keys ⇒ no display licence for an app); Twin-2K-500 cube-rotation and matrix items (the images are not in the dataset and appear to be ICAR items ⇒ ICAR terms apply); CRT-2 'Emily' item (its trick depends on English month names); Twin overconfidence score (a 42-item total, not an item). The MaRs-IB authors state it is not an IQ test and has no population norms: percentiles here mean 'relative to US Prolific adults of the same age band in the 2021 calibration', nothing more.",
+ "about": "Anchor items for «📐 سنجشِ استاندارد»: every number here comes from a cited, reputable source (peer-reviewed / large normative sample). Contract: docs/decisions/2026-10-15-mind-card-psychometric.md. Filled only after independent verification; never invent a number. | v2 (2026-10-15, independent verification): anchors = 28 MaRs-IB matrix clones (nonverbal, CC BY-NC 3.0 stimuli, 30 s, 4 options ⇒ c = 1/4), b re-estimated by the verifier from the open calibration responses (Zorowitz et al. 2024, N = 1501) with a multigroup Rasch model with fixed c (MML-EM), SEs from the cross-product information, infit/outfit checked, and agreement with the observed p-correct and with the authors' own clone-level 3PL(γ=0.25) estimates confirmed for every anchor. Descriptive items (CRT, CRT-2, syllogisms, conditionals, modus ponens, Wason, numeracy, ratio bias) carry p and n from Twin-2K-500 (CC BY 4.0) re-scored by the verifier; they never enter θ. Excluded: ICAR items (current terms: 'intended for academic use exclusively'; PsychArchives deposit under a Scientific Use License to protect the keys ⇒ no display licence for an app); Twin-2K-500 cube-rotation and matrix items (the images are not in the dataset and appear to be ICAR items ⇒ ICAR terms apply); CRT-2 'Emily' item (its trick depends on English month names); Twin overconfidence score (a 42-item total, not an item). The MaRs-IB authors state it is not an IQ test and has no population norms: percentiles here mean 'relative to US Prolific adults of the same age band in the 2021 calibration', nothing more. | Age package (2026-10-18): sources[].ages = the ages each source actually sampled; bands marked valid:false (with invalid_why) are never used; research verdicts for child/adolescent norms in age_research.",
  "sources": [
   {
    "id": "zorowitz2024",
@@ -9,7 +9,11 @@
    "url": "https://doi.org/10.3758/s13428-023-02067-8",
    "n": 1501,
    "license": "Article CC BY 4.0; response data and code in the GitHub repository (MIT licence file). b values in this registry are the verifier's own re-estimates from these data, not numbers printed by the authors.",
-   "population": "US adults on Prolific, July–August 2021, after exclusions (83 of 1584 excluded); 811 women, 670 men; mean age 28.7 (SD 9.9, range 18–74); 507 bachelor's, 322 master's or higher. Each person solved 16 items, 30 s each, no feedback."
+   "population": "US adults on Prolific, July–August 2021, after exclusions (83 of 1584 excluded); 811 women, 670 men; mean age 28.7 (SD 9.9, range 18–74); 507 bachelor's, 322 master's or higher. Each person solved 16 items, 30 s each, no feedback.",
+   "ages": {
+    "lo": 18,
+    "hi": 74
+   }
   },
   {
    "id": "chierchia2019",
@@ -17,7 +21,11 @@
    "url": "https://osf.io/g96f4/",
    "n": 659,
    "license": "Stimuli: Creative Commons Attribution-NonCommercial 3.0 (OSF licence component); README: 'for academic and non-commercial purposes only', cite the paper; 'our task is not an IQ test'. Images here are lossless/q95 WebP conversions of the original PNGs (an adaptation, attributed).",
-   "population": "Source of the stimuli only (its 659 participants aged 11–33, UK, fixed-order task, are NOT used for any number in this registry)."
+   "population": "Source of the stimuli only (its 659 participants aged 11–33, UK, fixed-order task, are NOT used for any number in this registry).",
+   "ages": {
+    "lo": 11,
+    "hi": 33
+   }
   },
   {
    "id": "twin2k500",
@@ -25,7 +33,11 @@
    "url": "https://huggingface.co/datasets/LLM-Digital-Twin/Twin-2K-500",
    "n": 2058,
    "license": "Dataset CC BY 4.0 (Hugging Face licence tag); paper CC BY 4.0 (arXiv). Item wording from the cited original authors (Frederick 2005; Thomson & Oppenheimer 2016; Markovits & Nantel 1989; Stanovich & West 2008; Klauer et al. 2007; Johnson et al. 2019 / Lipkus et al. 2001).",
-   "population": "US adults on Prolific, wave 1 launched 2025-01-29, sampled to be representative by age, sex and ethnicity; the 2058 who completed all four waves. Age released only in bands 18–29 (388), 30–49 (735), 50–64 (658), 65+ (277). Prolific panellists are test-experienced, so famous items are easier here than in naive samples."
+   "population": "US adults on Prolific, wave 1 launched 2025-01-29, sampled to be representative by age, sex and ethnicity; the 2058 who completed all four waves. Age released only in bands 18–29 (388), 30–49 (735), 50–64 (658), 65+ (277). Prolific panellists are test-experienced, so famous items are easier here than in naive samples.",
+   "ages": {
+    "lo": 18,
+    "hi": null
+   }
   },
   {
    "id": "branas_garza2019",
@@ -33,7 +45,11 @@
    "url": "https://mpra.ub.uni-muenchen.de/68049/1/MPRA_paper_68049.pdf",
    "n": 44558,
    "license": "Numbers cited (no item display from this source).",
-   "population": "Meta-analysis of 118 CRT studies (2007–2015), 21 countries; per-item rates on N = 41,004. Age not modelled."
+   "population": "Meta-analysis of 118 CRT studies (2007–2015), 21 countries; per-item rates on N = 41,004. Age not modelled.",
+   "ages": {
+    "lo": 18,
+    "hi": null
+   }
   },
   {
    "id": "stieger_reips2016",
@@ -41,7 +57,11 @@
    "url": "https://doi.org/10.7717/peerj.2395",
    "n": 2272,
    "license": "Article CC BY 4.0 (numbers cited only).",
-   "population": "German-speaking community sample, age-stratified, convenience (word of mouth); 44.9% (n = 959) had done the CRT or similar tasks before."
+   "population": "German-speaking community sample, age-stratified, convenience (word of mouth); 44.9% (n = 959) had done the CRT or similar tasks before.",
+   "ages": {
+    "lo": 18,
+    "hi": null
+   }
   }
  ],
  "scales": [
@@ -81,7 +101,9 @@
      "mu": -0.985,
      "sd": 1.069,
      "n": 69,
-     "label": "۶۹ بزرگسالِ ۵۰ تا ۷۴ سالهٔ آمریکایی در Prolific (کالیبراسیونِ MaRs-IB، ۲۰۲۱)"
+     "label": "۶۹ بزرگسالِ ۵۰ تا ۷۴ سالهٔ آمریکایی در Prolific (کالیبراسیونِ MaRs-IB، ۲۰۲۱)",
+     "valid": false,
+     "invalid_why": "Thin cell (age package 2026-10-18, re-checked from the open calibration files 03_Calibration/data/metadata.tsv + reject.csv of github.com/ndawlab/mars-irt): the 69 kept participants aged 50–74 are 51 aged 50–59 and only 18 aged 60–74 (10 aged 65+); median age 54. The cell's mu/sd therefore describe people in their early fifties, not the 60–74 it is labelled with, and its SE(log sd) 0.179 is the largest of the four bands. Narrowing it to 50–59 would need a re-fit that has not been independently verified (AGENTS.md contract), so the page says «برای این سن هنجارِ معتبر در دست نیست» for every age 50+ and shows only the person's own trend. mu/sd/n are kept for the record; they are never used."
     }
    ],
    "note": "Metric: logits of a Rasch model with fixed c = 0.25, P = c + (1−c)·σ(θ−b); origin = sample-size-weighted mean of the age-band means (whole calibration sample ≈ 0). Band means/SDs estimated jointly with all 384 clone b's (multigroup MML-EM, 121-node grid, converged to ΔlogL < 1e-13 relative). SE(mu): 18–29 0.042, 30–39 0.085, 40–49 0.174, 50–74 0.195; SE(log sd): 0.051, 0.073, 0.109, 0.179. 5 participants without age formed their own group (mu −1.34, n = 5, not shipped). Finer split for age 37 (separate fit): 35–39 mu −0.543 (SE 0.161), sd 1.386, n = 138 — consistent with 30–39; 30–39 is shipped for stability. Timeouts (no answer in 30 s) were scored incorrect, exactly as the authors did (1.8% of trials). 28 anchors give test information ≈ 2.5 near the 30–39 mean ⇒ posterior SD ≈ 0.58 logit after all 28 (prior SD 1.40). Item b's carry SE 0.41–0.93 (≈62 responses per clone); the app's EAP treats b as known, so θ uncertainty is understated by roughly that much."
@@ -2186,5 +2208,6 @@
    "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
    "note": "Denominator neglect (Denes-Raj & Epstein 1994 via Stanovich & West 2008). 'Correct' = the normatively better small tray (10% > 8%). Paper reports P(large tray) = 0.36 ⇒ 0.64 small — matches 0.6395. Prize ($2) unnamed in Persian; it does not change the comparison."
   }
- ]
+ ],
+ "age_research": "Age package 2026-10-18 (decision docs/decisions/2026-10-18-age-and-user-scope.md item 5): search for published child/adolescent norms for the instruments in this registry. Rule: a band is added ONLY if the method matches (same items, same scoring and time limit, mean/sd/n per age band on the same scale). (1) MaRs-IB adolescents — Chierchia et al. 2019, RSOS 6:190232 (N = 659, UK, 11.27–33.15 y; younger/mid/older adolescents n = 185/184/184, adults n = 106): REJECTED. Method differs: fixed item order with 5 familiarisation items, 8-minute total limit, accuracy over completed items only (timeouts and unreached items excluded, whereas the 2021 calibration scored timeouts incorrect), the original item set rather than the colour-vision-friendly set 3 used here, and only group mean accuracy with s.e. (61/68/73/81%) is reported — no SD, no IRT/Rasch difficulty on the scale of the shipped b's. Per-item accuracy by age group is said to be on OSF; a verified re-fit on the same Rasch-c scale is a future candidate, not done. (2) Later MaRs-IB developmental norms: none found (searches 2026-10-18; the only later psychometric study is Zorowitz et al. 2024, adults 18–74). The MaRs-IB authors state there are no population norms. (3) CRT / CRT-2 / numeracy / syllogisms (descriptive items): no source found that gives per-item percent correct for the SAME wording and scoring by age band under 18 (Primi et al. CRT-Long and Toplak et al. 2014 report totals/other items; the developmental CRT-D of Young, Powers et al. 2018 uses different items) — REJECTED for this registry. Consequence in the page: under 18 (no covered band) and 50+ (thin MaRs cell) ⇒ «برای این سن هنجارِ معتبر در دست نیست», own trend only; descriptive items show the group percentage only when the person's age is inside the source's sampled ages (sources[].ages)."
 }

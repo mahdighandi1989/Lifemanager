@@ -1,0 +1,15 @@
+{
+ "id": "h20261018092010095618-session-b51d",
+ "at": "2026-10-18T09:20:10Z",
+ "by": "session",
+ "area": "psy-norms",
+ "owner": [
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "norms.json (age package part 2, decision 2026-10-18 item 5): sources[].ages added; MaRs-IB 50–74 band marked valid:false with invalid_why (verified from open calibration data: 51 of 69 aged 50–59, 18 aged 60–74, median 54); age_research records child/adolescent norms verdicts (Chierchia 2019 rejected: method mismatch; no later developmental MaRs-IB or same-wording CRT norms found). No number added or changed. WORKLOG (88); tests/test_age_norms.js",
+ "procedure": "apps/learning-architecture/AGENTS.md#«📐 سنجشِ استاندارد» و «💡 جایگاهِ ایده»",
+ "commit": "",
+ "status": "open"
+}
