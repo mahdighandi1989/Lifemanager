@@ -34,7 +34,7 @@
   /* ---------- دورِ ۲۰ (RO6، DECISIONS_R20): یک دفترِ رویداد که پرونده از آن می‌خواند ----------
      هر کنش با زمانِ **رخ‌دادنش** (نه زمانِ ذخیره): زمانِ پیامی که از آن آمد (src.at)، وگرنه زمانِ ساختِ خودِ رکورد. منبع‌ها: رکوردهای مسئله (a38)، برنامه‌ها و
      اصلاح‌های گفت‌وگو (a27: s.plans، se.retracts، s.coach.retracts)، پاسخ به «این‌جا هم عوض شود؟»، مکث و بازگشت، میانهٔ راه، بیدار شدنِ مسئلهٔ خفته، جلسه‌های تمرین
-     (a41 روی همین A.dossier) و هر چه بخش‌های دیگر با A.EVLOG.add می‌نویسند. وضع و مرحله‌ها از **یک** منبع (A.livePhase)؛ هر مقدار با رندرِ نوع‌دار (هرگز
+     (a41 روی همین A.dossier از APP.PR.events(subject) — یک بار، همان‌جا؛ این فایل دوباره نمی‌خواندش) و هر چه بخش‌های دیگر با A.EVLOG.add می‌نویسند. وضع و مرحله‌ها از **یک** منبع (A.livePhase)؛ هر مقدار با رندرِ نوع‌دار (هرگز
      «[object Object]»)؛ نشانهٔ هر کنش همان نشانهٔ کارنامهٔ ذهن (A.MIND.phases().acts). */
   var EVL = A.EVLOG = A.EVLOG || {};
   function evOwner(scope) {
@@ -72,7 +72,7 @@
   function addSessEvents(add, se, opt) {
     opt = opt || {}; var pid = opt.pid || "";
     chatPlans(se).forEach(function (q) {
-      if (pid && q.step && q.step.pid && q.step.pid !== pid) return;
+      var lk = q.step || q.will; if (pid && lk && lk.pid && lk.pid !== pid) return;   // پیوندِ برنامه ⇄ گامِ زنده (a41: q.step / q.will)
       var sm = q.src ? msgRef(se.id, q.src) : null;
       add({ k: "cplan", at: (sm && sm.at) || q.at || "", title: "برنامهٔ خودت (از گفت‌وگو)", lines: [q.text].concat(q.when ? ["موعد: " + whenFa(q.when)] : []), from: "از گفت‌وگو", src: sm && sm.text ? sm : null,
         hist: (q.corr || []).map(function (c) { return { at: c.at, old: val(c.old) + (c.oldWhen && c.oldWhen !== q.when ? " (" + whenFa(c.oldWhen) + ")" : ""), new: val(c["new"]) + (c.oldWhen && c.oldWhen !== q.when ? " (" + whenFa(q.when) + ")" : ""), why: c.note || "" }; }) });

@@ -54,7 +54,9 @@ APP.EVLOG.of({ pid } | { sess })
 - Stored on the problem (`eprog_<pid>.solve.live.evlog`) or on the session (`achat.evlog`); same `id` again replaces (no duplicate on re-save / page load).
 - The dossier (`APP.dossier(pid)`, or `APP.dossier(sessId)` / `APP.dossierSess(sessId)` for a session without a live problem) merges: its own record-derived events,
   the session's chat plans (`s.plans`, with `corr` history and `done/state/doneAt`), corrections (`se.retracts`, `s.coach.retracts`, de-duplicated by mid+frag+fix), open
-  and answered copy asks, set-aside/return, mid-course check-ins, waking a dormant problem, a41's practice sessions (a41 wraps `A.dossier`), and every `EVLOG` event.
+  and answered copy asks, set-aside/return, mid-course check-ins, waking a dormant problem, a41's practice events (a41's own `A.dossier` wrapper pushes
+  `APP.PR.events(subject)` and re-sorts by `at` then `i` — a40 renumbers `i` after its own sort so the order holds; a40 does not read `PR.events` a second time),
+  and every `EVLOG` event. Chat plans linked to another problem's step (`q.step` / `q.will` from a41) stay out of this problem's dossier.
   Order = event time; ties follow the solving order (statement → understanding → guess → plan → step → outcome → answer → verdict → «حل شد» → look-back).
 - **Coach:** please write corrections you apply in your own stores, chat-closed work and Today answers with `EVLOG.add` (`k: "retract" | "act" | "today"`), signs as
   `{row: <mind row fa>, sign: "+"|"−"}`. **Practice:** sessions dated with `A.now`; `EVLOG.add({pid, k:"practice", at, title, lines, sign})` for anything not on a case.
