@@ -55,3 +55,13 @@ DO.coach_state = function (a) {
 ## 🔗 References
 - `tests-that-cannot-fail-the-red-baseline.md`
 - `paired-agent-live-campaign-for-an-in-page-ai.md`
+
+## Update 2026-10-18 — one classifier, one result structure
+Two follow-up lessons from the round-21 tour:
+- **Route by the page's own classification, never by a second keyword list.** The router (which model tier gets a turn) had its own small keyword gate. Meanwhile
+  the page already showed "chat problem in focus" in its state line. The two disagreed on 12 of 51 decisive turns. The fix is one detector that feeds the state line,
+  the problem statement and the router. A pure command is recognised by structure ("every clause is a page command or filler"), not by "contains a command word".
+- **Hand results between modules as a structure, not as prose.** One module returned a sentence, and the caller dropped any sentence starting with «چیزی…» as "nothing".
+  As a result, no-ops and pending questions never reached the model or the user. Now the page uses one shape `{changed:[{rec,old,new,why}], ask:[{field,label,old,new}], note}`:
+  it is merged across modules, given verbatim to the model, and turned into one plain line for the user.
+  If changed is empty, the user is still told.

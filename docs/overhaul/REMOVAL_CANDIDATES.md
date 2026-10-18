@@ -296,3 +296,10 @@ The old function is kept reachable as `A.masteryCountOnly` in `a1_base.js`; noth
 `start_practice` consent is now the model's validated report (`consent {quote, kind}`, DECISIONS_R20 RO7) and the practice prompt block depends only on an open case.
 The replaced paths are kept reachable in `a41_practice.js`: `APP.PR.consentKwR19c` (keyword detector) and `APP.PR.R19C_QUARANTINE.promptHook` (keyword-gated block). Nothing calls them.
 Also unchanged but now unused for display: P3 records closed by a practice case keep `done` with `closedBy:"practice"` (never deleted). Delete only with the owner's approval.
+
+## 2026-10-18 — R20 keyword router, R20 two-question rule, «whole lesson» rule (learning-architecture, Pólya round 21, route+coach: R1/R7/R3f)
+- **Files:** `apps/learning-architecture/src/app/a26_assist.js`, `a27_tour.js`.
+- **What they did:** `chatTask` (R20) routed a coaching turn by a keyword gate (`sig`) and tested «فقط-عمل» before the live head — opening turns of a chat problem went to
+  the fast tier (12/51 in the model tour); `twoQ20` caught only a clipped second question after «و/یا»; the lesson rule replaced the whole lesson when the fragment held half its words.
+- **Why replaced:** DECISIONS_R21 R1 (route from the page's own classification), R7 (two independent «؟»), R3f (minimal lesson clause).
+- **Status:** reachable, not called: `APP.ASSIST.R21_QUARANTINE.chatTask20`, `.twoQ20`, `.lessonWhole`. Delete only with the owner's approval.

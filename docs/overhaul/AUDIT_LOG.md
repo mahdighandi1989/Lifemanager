@@ -4663,3 +4663,17 @@ dated stability, mind-card feed) under way.
   haiku alone 1/5/2 (round 20: haiku 2/2/4, sonnet 4/4/0). The routing decision is confirmed. 12 of 51 coaching turns were misrouted (the
   opening turns of problems stated in chat).
 - **DECISION** Recorded R1–R9 in `docs/tours/polya-batch1/decisions/DECISIONS_R21.md`; the independent bank is `VARIANTS_R21`.
+
+## 2026-10-18 — Pólya tour batch 1, round 21: route+coach fixer (learning-architecture)
+- **FINDING** 12 of 51 coaching turns were routed by keyword to the fast tier, although the page itself showed a chat problem in focus. The live side's
+  `{changed, ask, note}` result was flattened to text, and anything starting «چیزی…» was dropped, so no-ops and copy asks never reached the model or her.
+  A lesson fix replaced the whole lesson. Group A additions: false «شما» from «باید/بیشترین»; the turn question falling back to e1 of a step that is gone; garbled coach-side replacement; an overdue plan dropped on her answering turn.
+- **CHANGE** One page detector (`AS.statesProblem`) feeds the chat focus, the problem statement and `AS.chatTask`. Pure commands are recognised by structure.
+  The correction result is one structure, given verbatim to the model and as one plain line to her.
+  - The lesson is fixed by clause. Results and lessons are re-booked. The change line is a word diff. Coach-side substitution uses the live side's minimal diff.
+  - «حل شد؟» and «نتیجهٔ گامِ N؟» are asked with buttons. Formula-equivalent quotes are accepted (safe evaluator). `err_stage` comes from her words.
+  - Two independent questions trigger a rewrite. Claim, register and «پرونده» false positives are removed. One turn question after a correction.
+  - The next-item question follows a step outcome. A refuted guess is re-judged after a verified close. An overdue plan stays open one turn.
+  - The old paths are quarantined under `APP.ASSIST.R21_QUARANTINE`.
+- **CHANGE** New `tests/test_tour1_r21_coach.js`: red on the base build, green now; bank VARIANTS_R21 90/90 judged entries pass, 35 assigned to other fixers with a reason. Four old live tests
+  (r13–r16) and the r18/r20 coach tests were adapted only where R21 replaces a rule (mock repeats a multi-question reply for the R7 rewrite; R3g re-book), each commented.
