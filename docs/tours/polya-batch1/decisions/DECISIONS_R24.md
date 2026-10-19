@@ -130,7 +130,7 @@ Each binds as written in its findings.
 - classify (R4 + R6): a27/a26 classification and post-check.
 - age (R5): a43, a34, a29 norm line, register.
 - today (R7): a41/a40/a42/a33.
-- Docs numbering: WORKLOG 100–105, PROGRESS 114–119, in the order above. WORKLOG 99 is the freeze status entry.
+- Docs numbering: WORKLOG 101–106, PROGRESS 114–119, in the order above. WORKLOG 100 is the freeze status entry (99 went to a backtest routine).
 - Independent bank VARIANTS_R24 written in parallel from the four reports.
 - Merge order: correction ⇐ story ⇐ loop ⇐ classify ⇐ age ⇐ today.
 

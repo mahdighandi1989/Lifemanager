@@ -4850,6 +4850,9 @@ dated stability, mind-card feed) under way.
   any page field; the test was not changed.
 - **FINDING** gate31: fail=0 (pytest 2137, 126 page tests, build, host e2e).
 
+### 2026-10-19 — [CHANGE] بک‌تستِ پیوسته، دورِ ۱۵ (روتینِ بک‌تست)
+پیکره ۲۱۸ ⇒ ۲۲۳ (۵ مورد: بِم، راینهارت–روگاف، سالک، سملوایس، یک انتزاعی)؛ همه با برچسب موافق، یافتهٔ تازه ۰، audit تمیز. بازبینیِ مستقل چند خطای واقع‌نمایی و نشتِ حکم در داستان‌ها یافت و اصلاح شد؛ بازرمزگذاریِ کور و گامِ قلمرو/قابِ مسیر ۱ این دور انجام نشد (در WORKLOG (99) ثبت است). درسِ تکرارشونده: داستانِ پرونده نباید نقصِ روش یا سرانجام را بگوید — نقص به `truth.why`.
+
 ## 2026-10-19 — Pólya round 24 finished; frozen by the owner's directive
 - **FINDING** Round 24 on main eee4ff0f, 75 scenarios: zero-defect A 0/19 · B 0/19 · C 2/18 · D 0/19. One S1 (D24-1 = A24-4 = C24-14): an
   unrelated routine reply on a gap sheet is announced «🛎 ابزارِ لازم آمد» because `sysSheet` reads the sheet's own filing text and matches
