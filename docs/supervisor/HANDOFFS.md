@@ -3,10 +3,11 @@
 هر کاری که یک روتین در قلمروِ روتینِ دیگری کرد (یا از او خواست) این‌جاست؛ روتینِ مالک در آغازِ هر دور
 `python3 scripts/supervisor/handoff.py inbox --routine <خودش>` را می‌زند، می‌سنجد و می‌بندد. قواعد: `ownership.json`.
 
-**باز: 4** · کل: 56
+**باز: 5** · کل: 57
 
 | # | زمان | از | قلمرو | نوع | برگه | چه | وضع | بستنِ |
 |---|---|---|---|---|---|---|---|---|
+| h20261019021704640784-backtest-68d8 | 2026-10-19 02:17 | بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناسی | بقیهٔ Lifemanager | did | — | Recorded by the main session (not by the backtest routine) after review: d2432807 only deleted the stray tracked symlink frontend/node_modules (mode 120000) that a round-23 fixer had committed in 189f15cd — the same fix as session commit faad1da1; no other path of the app area was touched. Owner: pl | open |  |
 | h20261018092010095618-session-b51d | 2026-10-18 09:20 | session | دادهٔ جمعیتیِ «📐 سنجشِ استاندارد» (معماهای لنگردار، گروه‌های مرجع، منبع‌ها) | did | — | norms.json (age package part 2, decision 2026-10-18 item 5): sources[].ages added; MaRs-IB 50–74 band marked valid:false with invalid_why (verified from open calibration data: 51 of 69 aged 50–59, 18 aged 60–74, median 54); age_research records child/adolescent norms verdicts (Chierchia 2019 rejecte | open |  |
 | h20261018091658036045-session-2994 | 2026-10-18 09:16 | session | بقیهٔ Lifemanager | did | — | Age package part 1 (decision 2026-10-18 items 1-2): non-owner approved Google accounts get their own users.id scope (owner stays 0 via OWNER_EMAIL/ADMIN_EMAILS/first-admin fallback; flag PER_USER_OAUTH_SCOPE); optional date_of_birth at register + /api/me/date-of-birth + profile validation. Note: doc | open |  |
 | h20261017235926948403-session-0bbb | 2026-10-17 23:59 | session | بقیهٔ Lifemanager | did | — | Pólya R20 MT2: AI task route lla_coach (catalog tier=balanced: reasoning preferred, top tier Opus/Pro ordered after balanced in manager._auto_order only for tier=balanced tasks; model_discovery.TOP_TIERS/model_tier; app_records._AI_TASKS) + tests/test_lla_coach_route.py — other routes unchanged | verified | صفِ فوریِ «نظارت و سرکشی»: tests/test_lla_coach_route.py: 9 passed on current main; route lla_coach present, other routes unchanged |

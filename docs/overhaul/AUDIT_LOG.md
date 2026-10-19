@@ -4874,3 +4874,8 @@ dated stability, mind-card feed) under way.
 - **CHANGE** `git rm --cached frontend/node_modules`; `.gitignore` gains `node_modules` (no slash) so a link of that name is ignored too.
   Local deps reinstalled with `npm ci`. Lesson for fixer briefs: never commit tool links inside a worktree; check `git status` for
   mode-120000 entries before committing.
+- **FINDING→FIX (same day, 02:17 UTC)** The merge of main into the freeze branch was pushed to main BEFORE its gate result was read (a
+  chained command): gate33 had 1 pytest failure — `test_supervisor_handoff_guard::test_real_history_since_the_baseline_is_clean`. Cause:
+  the backtest routine's d2432807 also deleted the stray `frontend/node_modules` link (an app-area path) without a recorded `did`.
+  Remedy inside the audit window: the main session recorded `did` h20261019021704640784-backtest-68d8 (text says who recorded it and
+  why; owner to verify). Lesson: never chain `git push origin HEAD:main` after a gate command — read `GATE_DONE fail=0` first.
