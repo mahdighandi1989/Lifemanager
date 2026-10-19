@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-17",
- "round": 14,
+ "updated": "2026-10-18",
+ "round": 15,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -188,8 +188,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 11,
-    "freshOk": 10,
+    "fresh": 13,
+    "freshOk": 12,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -201,7 +201,8 @@
      "r13_marshall_pylori_1984",
      "r14_snow_broadstreet_1854",
      "r14_feynman_oring_1986",
-     "r14_kahneman_flight_instructors"
+     "r14_kahneman_flight_instructors",
+     "r15_salk_field_trial_1954"
     ]
    },
    "kind": "missed",
@@ -334,8 +335,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 19,
-    "freshOk": 16,
+    "fresh": 22,
+    "freshOk": 19,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -506,7 +507,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r13_challenger_1986",
@@ -540,7 +541,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -572,7 +573,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -605,7 +606,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -637,7 +638,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -670,7 +671,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -702,7 +703,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -730,7 +731,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -763,7 +764,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 14
+   "lastSeenRound": 15
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -837,14 +838,17 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 5,
-    "freshOk": 2,
+    "fresh": 8,
+    "freshOk": 5,
     "ids": [
      "r5_hitler_diaries_1983",
      "r5_abs_family_letters",
      "r13_willingham_arson_1991",
      "r14_sally_clark_1999",
-     "r14_abs_warehouse_fires"
+     "r14_abs_warehouse_fires",
+     "r15_bem_precognition_2011",
+     "r15_reinhart_rogoff_90_2010",
+     "r15_abs_clinic_sheet"
     ]
    },
    "kind": "health_alarm",

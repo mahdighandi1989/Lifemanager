@@ -4849,3 +4849,6 @@ dated stability, mind-card feed) under way.
   the last page field (test_fixes_1015b #12). Fixed at the cause — `AS.cutManifest` compresses the self-facts and registry lines before
   any page field; the test was not changed.
 - **FINDING** gate31: fail=0 (pytest 2137, 126 page tests, build, host e2e).
+
+### 2026-10-19 — [CHANGE] بک‌تستِ پیوسته، دورِ ۱۵ (روتینِ بک‌تست)
+پیکره ۲۱۸ ⇒ ۲۲۳ (۵ مورد: بِم، راینهارت–روگاف، سالک، سملوایس، یک انتزاعی)؛ همه با برچسب موافق، یافتهٔ تازه ۰، audit تمیز. بازبینیِ مستقل چند خطای واقع‌نمایی و نشتِ حکم در داستان‌ها یافت و اصلاح شد؛ بازرمزگذاریِ کور و گامِ قلمرو/قابِ مسیر ۱ این دور انجام نشد (در WORKLOG (99) ثبت است). درسِ تکرارشونده: داستانِ پرونده نباید نقصِ روش یا سرانجام را بگوید — نقص به `truth.why`.
