@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-18",
- "round": 15,
+ "updated": "2026-10-19",
+ "round": 16,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,8 +25,8 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 12,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -37,7 +37,9 @@
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_polya_conjecture_1919",
+     "r16_abs_ledger_prefix"
     ]
    },
    "kind": "missed",
@@ -77,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 24,
-    "freshOk": 18,
+    "fresh": 27,
+    "freshOk": 21,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -136,8 +138,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 13,
-    "freshOk": 7,
+    "fresh": 15,
+    "freshOk": 9,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -188,8 +190,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 13,
-    "freshOk": 12,
+    "fresh": 15,
+    "freshOk": 14,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -240,8 +242,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 12,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -252,7 +254,9 @@
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_polya_conjecture_1919",
+     "r16_abs_ledger_prefix"
     ]
    },
    "kind": "missed",
@@ -288,8 +292,8 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 12,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -300,7 +304,9 @@
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_polya_conjecture_1919",
+     "r16_abs_ledger_prefix"
     ]
    },
    "kind": "health_alarm",
@@ -335,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 22,
-    "freshOk": 19,
+    "fresh": 24,
+    "freshOk": 21,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -394,8 +400,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 12,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -406,7 +412,9 @@
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_polya_conjecture_1919",
+     "r16_abs_ledger_prefix"
     ]
    },
    "kind": "health_alarm",
@@ -507,7 +515,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r13_challenger_1986",
@@ -541,7 +549,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -573,7 +581,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -606,7 +614,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -638,7 +646,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -671,7 +679,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -703,7 +711,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -731,7 +739,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -764,7 +772,95 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
+  },
+  {
+   "id": "f_r16_birmingham_six_griess_1974",
+   "case": "r16_birmingham_six_griess_1974",
+   "opened": "2026-10-19",
+   "openedRound": 16,
+   "status": "resolved",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور برای «تخصص دیگران» x_method را ننوشت (نبودِ ویژگی ≠ «نامعلوم»؛ قاعدهٔ r15 هم «نامعلوم» صریح می‌نویسد). متنِ داستان روشِ آزمون را نمی‌گفت پس «نامعلوم» درست است. برچسب و موتور دست نخوردند.",
+   "fix": {
+    "what": "x_method=«نامعلوم» (و x_comp برای برِ-اکس) در corpus/round-0016.json افزوده شد",
+    "round": 16
+   },
+   "retest": {
+    "since": 16,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "آزمونِ گریس و شش‌نفره‌ی بیرمنگام (۱۹۷۴)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 16,
+   "resolved": "2026-10-19",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r16_bre_x_busang_1997",
+   "case": "r16_bre_x_busang_1997",
+   "opened": "2026-10-19",
+   "openedRound": 16,
+   "status": "resolved",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور برای «تخصص دیگران» x_method را ننوشت (نبودِ ویژگی ≠ «نامعلوم»؛ قاعدهٔ r15 هم «نامعلوم» صریح می‌نویسد). متنِ داستان روشِ آزمون را نمی‌گفت پس «نامعلوم» درست است. برچسب و موتور دست نخوردند.",
+   "fix": {
+    "what": "x_method=«نامعلوم» (و x_comp برای برِ-اکس) در corpus/round-0016.json افزوده شد",
+    "round": 16
+   },
+   "retest": {
+    "since": 16,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "mislocated",
+   "title": "طلای بوسانگ و شرکتِ برِ-اکس (۱۹۹۷)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [
+    "st_resp"
+   ],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 16,
+   "resolved": "2026-10-19",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -780,8 +876,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 11,
-    "freshOk": 11,
+    "fresh": 12,
+    "freshOk": 12,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -793,7 +889,8 @@
      "r5_madoff_feeders",
      "r5_hitler_diaries_1983",
      "r5_sally_clark_1999",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r16_bre_x_busang_1997"
     ]
    },
    "kind": "mislocated",
@@ -838,8 +935,8 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 8,
-    "freshOk": 5,
+    "fresh": 10,
+    "freshOk": 7,
     "ids": [
      "r5_hitler_diaries_1983",
      "r5_abs_family_letters",
@@ -848,7 +945,9 @@
      "r14_abs_warehouse_fires",
      "r15_bem_precognition_2011",
      "r15_reinhart_rogoff_90_2010",
-     "r15_abs_clinic_sheet"
+     "r15_abs_clinic_sheet",
+     "r16_birmingham_six_griess_1974",
+     "r16_bre_x_busang_1997"
     ]
    },
    "kind": "health_alarm",
@@ -882,14 +981,16 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 5,
-    "freshOk": 0,
+    "fresh": 7,
+    "freshOk": 2,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_polya_conjecture_1919",
+     "r16_abs_ledger_prefix"
     ]
    },
    "kind": "mislocated",
@@ -930,14 +1031,16 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 5,
-    "freshOk": 0,
+    "fresh": 7,
+    "freshOk": 2,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_polya_conjecture_1919",
+     "r16_abs_ledger_prefix"
     ]
    },
    "kind": "mislocated",

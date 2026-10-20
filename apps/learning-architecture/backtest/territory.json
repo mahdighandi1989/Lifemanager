@@ -270,8 +270,20 @@
    ]
   },
   "a_gettier_problem": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 16,
+     "at": "2026-10-19",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای «مسئلهٔ گتیه» (نمونه‌های گتیه و پاسخ‌ها: نفیِ باور کاذب، علّی، نفیِ شکست‌دهنده)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Internet Encyclopedia of Philosophy, «Gettier Problems» (Stephen Hetherington) — https://iep.utm.edu/gettier/",
+    "Stanford Encyclopedia of Philosophy, «The Analysis of Knowledge» (first published 2001, substantive revision 2026) — https://plato.stanford.edu/entries/knowledge-analysis/"
+   ]
   },
   "a_defeasibility_theory": {
    "stage": 0,
@@ -2891,6 +2903,6 @@
    "bookOnly": true
   }
  },
- "round": 15,
- "updated": "2026-10-18"
+ "round": 16,
+ "updated": "2026-10-19"
 }

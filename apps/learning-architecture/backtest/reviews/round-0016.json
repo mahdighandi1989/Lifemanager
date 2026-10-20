@@ -1,0 +1,53 @@
+{
+ "round": 16,
+ "reviewer": "زیرعاملِ جدا (بازبین مستقل، وب‌جستجو)",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": false,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "checkedNote": "encoding_blind=false: بازبین برچسبِ نادرست ندید؛ ولی به‌نظرِ او متنِ بیرمنگام «قطعی» می‌گفت و x_method را «تأییدنشده» می‌خواست؛ داستان اصلاح شد، رمزگذاری (x_method=نامعلوم) برای جلوگیری از نشت دست‌نخورده ماند و دورِ بعد باید بازرمزگذاری شود.",
+ "problems": [
+  {
+   "what": "نیره: دو ماه نه سه؛ ارجاعِ Middle East Watch 1991 نادرست؛ اغراق در «همه به یک شهادت»",
+   "fix": "اصلاح شد (HRW World Report 1992)",
+   "fixed": true
+  },
+  {
+   "what": "بیرمنگام: دفاع کارشناس داشت؛ تأیید با TLC بود؛ «قطعی» ⇒ ۹۸–۹۹٪؛ تکیهٔ هیئت‌منصفه نامعلوم؛ ناشرِ Mullin",
+   "fix": "اصلاح شد",
+   "fixed": true
+  },
+  {
+   "what": "لاول: صفحات Leighton 627–630؛ مناقشهٔ عکس‌های لاول",
+   "fix": "اصلاح شد",
+   "fixed": true
+  },
+  {
+   "what": "پولیا: ind_n بیش از حد؛ کنشگرِ فرضی زیرِ برچسبِ واقعی",
+   "fix": "ind_n=1500000؛ فرضی‌بودنِ کنشگر در actor نوشته شد",
+   "fixed": true
+  },
+  {
+   "what": "برِ-اکس: پیش‌امکان‌سنجی؛ ارجاعِ OSC تبرئهٔ فلدرهوف را نشان می‌دهد",
+   "fix": "اصلاح شد",
+   "fixed": true
+  },
+  {
+   "what": "پاستور: گروه‌ها تقریباً هم‌اندازه؛ واکسنِ گیسون",
+   "fix": "اصلاح شد",
+   "fixed": true
+  },
+  {
+   "what": "شمارهٔ سندِ عفو MDE 14/16/90 و صفحاتِ Maunder–Evans بی‌وارسیِ آنلاین",
+   "fix": "ثبت شد؛ در دورِ بعد وارسی",
+   "fixed": false
+  }
+ ],
+ "note": "برچسب‌ها و موتور برای قبولی دست نخوردند."
+}

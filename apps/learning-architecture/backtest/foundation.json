@@ -1,6 +1,6 @@
 {
- "round": 15,
- "at": "2026-10-18",
+ "round": 16,
+ "at": "2026-10-19",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,7 +1136,7 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 214,
+    "ok": 223,
     "health_alarm": 0,
     "missed": 8,
     "mislocated": 1
@@ -1145,10 +1145,10 @@
   },
   "deg": {
    "kinds": {
-    "ok": 204,
+    "ok": 211,
     "health_alarm": 0,
-    "missed": 15,
-    "mislocated": 4
+    "missed": 16,
+    "mislocated": 5
    },
    "changed": [
     {
@@ -1210,12 +1210,24 @@
      "t": "پروندهٔ سالی کلارک و «یک در ۷۳ میلیون» (۱۹۹۹)",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r16_lowell_mars_canals",
+     "t": "شبکهٔ «کانال‌های» مریخ (لاول)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r16_nayirah_incubators_1990",
+     "t": "شهادتِ «نیره» دربارهٔ انکوباتورها (۱۹۹۰)",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 214,
+    "ok": 223,
     "health_alarm": 0,
     "missed": 8,
     "mislocated": 1
@@ -1224,10 +1236,10 @@
   },
   "both": {
    "kinds": {
-    "ok": 204,
+    "ok": 211,
     "health_alarm": 0,
-    "missed": 15,
-    "mislocated": 4
+    "missed": 16,
+    "mislocated": 5
    },
    "changed": [
     {
@@ -1289,6 +1301,18 @@
      "t": "پروندهٔ سالی کلارک و «یک در ۷۳ میلیون» (۱۹۹۹)",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r16_lowell_mars_canals",
+     "t": "شبکهٔ «کانال‌های» مریخ (لاول)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r16_nayirah_incubators_1990",
+     "t": "شهادتِ «نیره» دربارهٔ انکوباتورها (۱۹۹۰)",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   }
@@ -1451,8 +1475,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 121,
-   "fullAfter": 121
+   "fullBefore": 128,
+   "fullAfter": 128
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1461,8 +1485,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 121,
-   "fullAfter": 121
+   "fullBefore": 128,
+   "fullAfter": 128
   },
   "p_found_scope": null
  },

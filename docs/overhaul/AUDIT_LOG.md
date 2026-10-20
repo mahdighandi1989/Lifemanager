@@ -4879,3 +4879,6 @@ dated stability, mind-card feed) under way.
   the backtest routine's d2432807 also deleted the stray `frontend/node_modules` link (an app-area path) without a recorded `did`.
   Remedy inside the audit window: the main session recorded `did` h20261019021704640784-backtest-68d8 (text says who recorded it and
   why; owner to verify). Lesson: never chain `git push origin HEAD:main` after a gate command — read `GATE_DONE fail=0` first.
+
+### 2026-10-19 — CHANGE — بک‌تستِ پیوسته، دورِ ۱۶ (روتینِ بک‌تست)
+۹ مورد به پیکره افزوده شد (`apps/learning-architecture/backtest/corpus/round-0016.json`)؛ هر ۹ حکمِ موتور با برچسب یکی بود؛ ۲ یافته به‌علتِ خطای رمزگذاری (`x_method` ننوشته) پس از اصلاحِ رمزگذاری `resolved` و منتظرِ آزمونِ تازه. حوزهٔ قلمروِ `a_gettier_problem` گامِ ۱. بازبینِ مستقل چند خطای متنی/منبع یافت و اصلاح شد. مسیرِ ۱ (قابِ بی‌گزینش) انجام نشد. جزئیات: WORKLOG (101). بی‌اثر بر کدِ برنامه.
