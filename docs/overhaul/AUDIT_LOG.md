@@ -4879,3 +4879,11 @@ dated stability, mind-card feed) under way.
   the backtest routine's d2432807 also deleted the stray `frontend/node_modules` link (an app-area path) without a recorded `did`.
   Remedy inside the audit window: the main session recorded `did` h20261019021704640784-backtest-68d8 (text says who recorded it and
   why; owner to verify). Lesson: never chain `git push origin HEAD:main` after a gate command — read `GATE_DONE fail=0` first.
+
+## 2026-10-20 — PROPOSAL (approved, not started): «کارِ پیشینِ من» — long opening text with problem, idea and partial solution
+- **FINDING** Closest earlier requests were built: forms filled from the owner's words (assistant creation), the multi-facet tour (WORKLOG 47),
+  and the chat ⇄ forms story (round 23). A per-step verdict contract for prior work was never built or tested. Today such a text would hit the
+  open round-24 defects B24·D3/D24-9 (comma-split plan), D24-3 (phase jump) and A23-35/C24-8 (stale turn question).
+- **DECISION** Accepted as roadmap §21 and DECISIONS_R24 R8 (story fixer, with R2): `coach_state.prior` with verdict per step, resume at the
+  first non-✓ step, dependents marked, facets via the tour, shown with «درست است؟», no rewrite without her yes. At least two scenarios per group
+  from round 25. Owner question bank #31. No code started (owner's pause).

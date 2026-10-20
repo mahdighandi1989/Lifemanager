@@ -123,6 +123,15 @@ Still open from round 23 (verbatim in each group's table):
   - D: D23-5 (worse), 10, 11, 18, 30, 34, 38.
 Each binds as written in its findings.
 
+R8 — «کارِ پیشینِ من» (owner 2026-10-20, roadmap §21).
+  - A long opening message with the problem, an idea and part of the solution becomes a «کارِ پیشینِ تو» section with a verdict per step.
+  - The contract is `coach_state.prior`: quotes are validated, and numbers and units are checked where computable.
+  - The resume point is the first step that is not ✓. Correct steps are never re-asked. Steps that depend on a wrong one are marked.
+  - Several facets ⇒ the multi-facet tour.
+  - Verdicts are shown with «درست است؟», and nothing of hers is rewritten without her yes.
+  - Built by the story fixer together with R2 (same mechanisms: no comma-split plan, the phase from verdicts).
+  - Scenarios: §21, at least two per group from round 25.
+
 ## Fixer split (when the owner says continue)
 - loop (R1): a44 sys*, a26 gap contract.
 - story (R2): a45, a38 import/stage, a27 turn question.

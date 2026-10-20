@@ -34,3 +34,4 @@ Columns: question · the system's correct answer today (exists / partial / missi
 | 28 | Does the system know what is planned but not built yet (the book)? | partial | roadmap / sheets | R24 D | — |
 | 29 | Is my grandchild's mind card separate from mine? | missing in one browser (same as #6 gap) | profiles | R24 D | — |
 | 30 | Does a twice-booked prediction count twice in my calibration? | defect (D24-14) | 🎯 | R24 D | — |
+| 31 | If my first message is a long text with the problem, my idea and part of my own solution, does the system find how far I got, check each step, fill or fix what is incomplete or wrong, and continue in every facet? | partial — forms from chat + multi-facet tour exist; no per-step verdict contract; would hit B24·D3/D24-3/A23-35 today | roadmap §21, R8 | from R25 | — |
