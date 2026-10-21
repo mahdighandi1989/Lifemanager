@@ -27,9 +27,9 @@
    "file": "frontend/src/pages/Register.jsx",
    "parametric": false,
    "alias_of": "",
-   "lines": 123,
+   "lines": 140,
    "buttons": 1,
-   "inputs": 4,
+   "inputs": 5,
    "forms": 1,
    "links": 1,
    "api_calls": 0,
@@ -548,7 +548,7 @@
    "file": "frontend/src/pages/IdentityProfile.jsx",
    "parametric": false,
    "alias_of": "",
-   "lines": 232,
+   "lines": 243,
    "buttons": 5,
    "inputs": 1,
    "forms": 0,
@@ -988,12 +988,12 @@
    "file": "frontend/src/pages/LearningArchitecturePage.jsx",
    "parametric": false,
    "alias_of": "",
-   "lines": 260,
+   "lines": 280,
    "buttons": 8,
    "inputs": 0,
    "forms": 0,
    "links": 0,
-   "api_calls": 22,
+   "api_calls": 26,
    "testids": 1,
    "tabs": [],
    "subpages": [],
@@ -3073,6 +3073,18 @@
     ]
    },
    {
+    "path": "/api/me/date-of-birth",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/me/date-of-birth",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
     "path": "/api/merge/execute",
     "methods": [
      "POST"
@@ -4168,11 +4180,11 @@
   "pages": 44,
   "subpages": 29,
   "buttons": 181,
-  "inputs": 87,
+  "inputs": 88,
   "forms": 15,
   "links": 59,
-  "api_calls": 102,
-  "api_routes": 429,
+  "api_calls": 106,
+  "api_routes": 431,
   "services": 158,
   "models": 69
  },

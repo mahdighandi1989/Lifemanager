@@ -64,3 +64,15 @@
 ناظرِ خودکار (Claude Code routine)
 - urgent: صف خالی؛ دست‌به‌دستِ h20261017235926948403 (lla_coach) بسته شد (verified، ۹ تست سبز). شاخه‌های supervisor-pending/* تاریخچهٔ قدیمی دارند (main بازنویسی شده) و دست نخوردند.
 - 2026-10-18 urgent round: queue empty; handoff 2994 verified; supervisor-pending branches left (unrelated histories / already closed on main)
+
+## 2026-10-21 — کامل
+
+- **کارتابل:** ۰ برگهٔ بی‌پاسخ، ۰ فایل، ۰ نیمه‌کاره، ۰ تیک‌خورده. `whoami` ok (درایو وصل، db_bytes=0).
+- **دست‌به‌دست:** `h20261018092010095618-session-b51d` (psy-norms، سنِ بسته‌ی ۲) با `test_age_norms.js` و `test_psy.js` (NO ERRORS) و `build.py` (بدون diff) بسنجیده و `verified` بسته شد. دو کهنهٔ backtest/epi-rules (۱۴۰۹، 7bcc) مالکشان روتینِ backtest است؛ دست نخورد.
+- **اجرا:** pytest ‏2136 سبز/۱ skip · `npm run build` سبز · inventory: ۴۴ صفحه، ۲۹ زیرصفحه، ۱۸۱ دکمه، ۸۸ ورودی، ۱۵ فرم، ۵۹ لینک، ۱۰۶ API، ۴۳۱ مسیر، ۱۵۸ سرویس، ۶۹ مدل، بدون alarm/error · page_map ‏۵۳ اندازه‌گیری، ۲ نشد، ۵ رد، ۳٬۹۸۰ کنترل (کنسول/۴۰۴ِ `/auth/me` همان OPEN_ITEMS ‏۳). vitest اجرا نشد.
+- **production:** `/api/health` = healthy، `/api/version` = `fc84fa8b` = `origin/main`. جز سلامت، نسخه و کارتابل سنجیده نشد.
+- **psy-norms:** `retrieved` = 2026-10-15 (<۳۰ روز) ⇒ تازه‌سازی لازم نبود. **sys-territory:** در این دور گامی جلو نرفت (گام‌برداری با شاهد و وارسی‌کنندهٔ مستقل در این اجرا انجام نشد؛ کم‌گام‌ترین‌ها در `sys_territory.py status`).
+- **یافته:** صفر. تغییر کد: هیچ.
+- **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار؛ آزمونِ دستیِ age-norms نیاز به `build.py` (dist) دارد ⇒ بدونِ build، دو آزمونِ مرورگری ERR_FILE_NOT_FOUND می‌دهند (محیطی).
+
+ناظرِ خودکار (Claude Code routine)
