@@ -92,8 +92,20 @@
    ]
   },
   "a_epistemic_rationality": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 17,
+     "at": "2026-10-21",
+     "stage": 1,
+     "what": "دور ۱۷: خواندنِ دو مدخل SEP برای عقلانیتِ معرفتی — عقلانیتِ ساختاری (انسجام در برابر پاسخ به دلیل‌های محتوایی، الزامِ enkrasia، سازگاریِ باور، هنجاری‌بودنِ الزام‌ها) و عقلانیتِ محدود (سایمون ۱۹۵۷، satisficing، عقلانیتِ بومی، بحثِ ابتکارها، فرضِ همه‌دانیِ منطقی)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy — «Structural Rationality» (چاپ ۲۰۲۳): https://plato.stanford.edu/entries/rationality-structural/",
+    "Stanford Encyclopedia of Philosophy — «Bounded Rationality» (چاپ ۲۰۱۸، بازنگری ۲۰۲۴): https://plato.stanford.edu/entries/bounded-rationality/"
+   ]
   },
   "a_epistemic_norms": {
    "stage": 0,
@@ -1499,10 +1511,12 @@
    ],
    "verify": {
     "since": 13,
-    "fresh": 1,
-    "ok": 0,
+    "fresh": 3,
+    "ok": 2,
     "ids": [
-     "r14_kahneman_flight_instructors"
+     "r14_kahneman_flight_instructors",
+     "r17_dewey_1948",
+     "r17_therac25_1986"
     ]
    }
   },
@@ -2891,6 +2905,6 @@
    "bookOnly": true
   }
  },
- "round": 16,
+ "round": 17,
  "updated": "2026-10-21"
 }

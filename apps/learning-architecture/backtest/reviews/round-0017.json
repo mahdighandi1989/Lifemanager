@@ -1,0 +1,38 @@
+{
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "checkedNote": "events_real: core facts confirmed by search/fetch (Dewey 303-189, strike, polls stopped early; Therac-25 reuse of Therac-6/20 code, interlocks dropped, six accidents Jun 1985-Jan 1987; Snow 7 Sep + handle removal next morning + decline already under way, Hampstead widow, brewery 70 / workhouse 535; GW150914 5.1 sigma, <1 per 203,000 yr, PRL 116 061102 published 11 Feb 2016, ~7 ms = 6.9 ms; Curveball BND refused direct access, Powell 5 Feb 2003, Guardian 2011; Mayfield FBI withdrawal 24 May 2004 after Daoud, Spanish negative report 13 Apr). Not independently confirmed from primary text (OIG PDF unreadable via fetch): the non-blind verification detail and the Battle detail; AECL telling hospitals overdose impossible is not in search snippets but is in Leveson&Turner. Three minor imprecisions listed (r17_snow_1854 claim wording, r17_mayfield_2004 two loose details, r17_ligo_gw150914 truth.why). Not wrong enough to fail, but fix. encoding_blind: f features trace to story/claim wording; recoded whys quote the text; none uses truth.fail wording. Caveat: several stories (curveball, therac, snow, ligo) append post-hoc outcome sentences (labs not found, six accidents, later confirmation), so a blind encoder could see outcomes; features themselves do not depend on them. verified_by_real: src entries exist (OIG 2006, Stacey JFI 54(6), Senate SSCI 2004, WMD Commission 2005, Chulov&Pidd Guardian 15 Feb 2011, Chicago Tribune 3 Nov 1948, Mosteller 1949 SSRC Bull. 60, Leveson&Turner IEEE Computer 26(7) 1993, Snow 1855, Whitehead 1854, Abbott PRL 2016). territory_evidence: both SEP pages exist; Structural Rationality first pub 13 Sep 2023 (covers enkratic requirement, belief inconsistency, coherence vs reasons-responsiveness, normativity of requirements); Bounded Rationality first pub 30 Nov 2018, revised 13 Dec 2024 (satisficing, ecological rationality, logical omniscience); the 'what' summary is faithful.",
+ "problems": [
+  {
+   "what": "r17_snow_1854 claim k1 says 'نبودِ مرگ در دو مجموعهٔ دارای چاهِ جدا' but the story itself (and history) says very few deaths: the workhouse (535 inmates) had about 5 deaths; only the brewery had none. Claim overstates and contradicts the story's 'مرگ بسیار کم'.",
+   "fix": "«...و مرگِ بسیار کم یا نبودِ مرگ در دو مجموعهٔ دارای چاهِ جدا...» (and in truth.why 'نبودِ مرگ' not used).",
+   "fixed": true
+  },
+  {
+   "what": "r17_mayfield_2004 story: 'وکالتِ یک محکومِ پروندهٔ تروریسم' is loose: Mayfield represented Jeffrey Battle (Portland Seven) in a child-custody case, not the terrorism case. Also 'کارشناسِ سومِ واحد' : the other verifier, John Massey, was a retired contract examiner, not a unit member (Wieners was unit chief). I could not read the OIG PDF to confirm non-blind detail directly.",
+   "fix": "«وکالتِ یک محکومِ پروندهٔ تروریسم در دعوای حضانت» and «و یک کارشناسِ دیگر (بازنشستهٔ قراردادی) هم همراه شد»; or drop the third-examiner clause.",
+   "fixed": true
+  },
+  {
+   "what": "r17_ligo_gw150914 truth.why says the statistic 'قابِ زمانی را از پیش تعریف کرده بود'. The 203,000-yr FAR came from time-slide background estimation on the recorded data; the event was found during an engineering run before the formal observing period, so 'pre-defined time frame' is not accurate.",
+   "fix": "«آماری که نوفهٔ پس‌زمینه را از داده‌های ثبت‌شده با جابه‌جاییِ زمانی برآورد کرد و نه از فرضِ نظری».",
+   "fixed": true
+  },
+  {
+   "what": "r17_therac25_1986 title uses «ترَک-۲۵» while story uses «تراک-۲۵»; inconsistent spelling.",
+   "fix": "Use «تراک-۲۵» in title.",
+   "fixed": true
+  }
+ ],
+ "round": 17,
+ "reviewer": "زیرعاملِ جدا (با وب‌جستجو؛ ناقص: متنِ PDF گزارشِ OIG خوانده نشد، جملهٔ AECL به بیمارستان‌ها در جستجو نیامد)",
+ "note": "چهار اصلاحِ جزئی (snow، mayfield، ligo، therac) انجام شد؛ ویژگی‌ها بی‌تغییر"
+}

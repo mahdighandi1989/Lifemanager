@@ -4879,3 +4879,5 @@ dated stability, mind-card feed) under way.
   the backtest routine's d2432807 also deleted the stray `frontend/node_modules` link (an app-area path) without a recorded `did`.
   Remedy inside the audit window: the main session recorded `did` h20261019021704640784-backtest-68d8 (text says who recorded it and
   why; owner to verify). Lesson: never chain `git push origin HEAD:main` after a gate command — read `GATE_DONE fail=0` first.
+
+- **CHANGE (2026-10-21, backtest routine, round 17)** Epistemology-factory backtest round 17: +8 corpus cases (4 real failures, 2 real sound, 2 abstract), territory `a_epistemic_rationality` → stage 1. Four "missed" findings closed after a second blind encoder completed text-stated features (`recode`, no engine/rule change). Independent web review fixed 4 minor story facts. Details: `apps/learning-architecture/docs/WORKLOG.md` (102). Lesson (recurring rounds 13–17): the blind encoder under-writes `conf`/`x_method`/`scope` unless told to read them from the claim's wording.
