@@ -2079,6 +2079,183 @@
      "بازبینیِ دورِ 14 مشکلِ اصلاح‌نشده دارد"
     ]
    }
+  },
+  {
+   "round": 16,
+   "at": "2026-10-21",
+   "note": "دورِ ۱۶: ۹ مورد (۵ شکستِ واقعی، ۲ سالمِ واقعی، ۲ انتزاعی) — پس از بازبینی و اصلاح",
+   "corpus": {
+    "n": 232,
+    "tiers": {
+     "real": 141,
+     "booklet": 51,
+     "problem": 26,
+     "abstract": 14
+    },
+    "new": 9,
+    "files": 7
+   },
+   "books": {
+    "mesbah": {
+     "n": 232,
+     "sound": 81,
+     "healthAlarms": 0,
+     "failures": 151,
+     "detected": 139,
+     "located": 138,
+     "fullyLocated": 123,
+     "controls": {
+      "agree": 0.916,
+      "negAgree": 0.271,
+      "negOk": true,
+      "posDetect": 1,
+      "posOk": true
+     }
+    }
+   },
+   "findings": {
+    "open": 13,
+    "fixed": 12,
+    "resolved": 1,
+    "verified": 0
+   },
+   "coverage": {
+    "rulesTested": 55,
+    "rules": 80,
+    "sectionsTested": 54,
+    "sections": 72,
+    "domains": 12,
+    "untested": [
+     "r_truth_narrow",
+     "r_badihi_pseudo",
+     "r_badihi_wijdani_other",
+     "r_shohud_misrouted",
+     "r_naql_unreliable_corrob",
+     "r_naql_mubham_q",
+     "r_istiqra_finite",
+     "r_istiqra_small_n",
+     "r_yad_orig_t1",
+     "r_yad_orig_t2",
+     "r_yad_orig_t3",
+     "r_yad_orig_t4",
+     "r_yad_orig_t5",
+     "r_yad_undoc_t4",
+     "r_yad_undoc_t3",
+     "r_yad_undoc_t2",
+     "r_yad_undoc_t1",
+     "r_grade_false_zero",
+     "r_r_sanad_ahad",
+     "r_expert_pop_econ",
+     "r_expert_pop_psych",
+     "r_expert_pop_socsci",
+     "r_expert_pop_unknown",
+     "r_aql_conseq",
+     "r_aql_matter_zanni"
+    ],
+    "byDomain": {
+     "پزشکی": 27,
+     "علم": 24,
+     "ریاضی": 28,
+     "فناوری و مهندسی": 18,
+     "زندگی روزمره": 18,
+     "دین": 19,
+     "فلسفه": 21,
+     "تاریخ و سیاست": 16,
+     "مالی و بانکی": 18,
+     "بازار و معامله": 11,
+     "حقوق و قضا": 16,
+     "رسانه و خبر": 16
+    }
+   },
+   "brier": {
+    "claims": 233,
+    "ceil": 0.29731
+   },
+   "foundation": {
+    "classes": {
+     "B": 25,
+     "S": 20,
+     "O": 8,
+     "X": 0,
+     "?": 0
+    },
+    "modes": {
+     "num": {
+      "ok": 219,
+      "health_alarm": 0,
+      "missed": 12,
+      "mislocated": 1,
+      "changed": 0
+     },
+     "deg": {
+      "ok": 209,
+      "health_alarm": 0,
+      "missed": 19,
+      "mislocated": 4,
+      "changed": 10
+     },
+     "derived": {
+      "ok": 219,
+      "health_alarm": 0,
+      "missed": 12,
+      "mislocated": 1,
+      "changed": 0
+     },
+     "both": {
+      "ok": 209,
+      "health_alarm": 0,
+      "missed": 19,
+      "mislocated": 4,
+      "changed": 10
+     }
+    },
+    "baseMeasured": 3,
+    "baseTotal": 11,
+    "baseval": {
+     "p_thiqa": 99.9,
+     "p_zahir": 99.9,
+     "p_mubham_q": 99.9,
+     "p_sense_unctrl": 74.95,
+     "p_hidden_inf": 74.95,
+     "p_expert_bias": 50,
+     "p_hidden_factor": 74.95,
+     "p_expert_econ_lab": 60,
+     "p_expert_psych08": 36.4,
+     "p_expert_socsci_ns": 60.9,
+     "p_mem": 50
+    },
+    "samples": 3,
+    "conventional": 0,
+    "audit": 0,
+    "baseChanges": []
+   },
+   "territory": {
+    "areas": 108,
+    "groups": 14,
+    "byStage": [
+     71,
+     3,
+     0,
+     0,
+     34,
+     0
+    ],
+    "bookOnly": 33,
+    "score": 139,
+    "scoreBookOnly": 132,
+    "scoreEvidenced": 7,
+    "max": 540,
+    "moved": []
+   },
+   "routine": {
+    "newEvents": 9,
+    "newSamples": 0,
+    "staleFindings": [],
+    "alarms": [
+     "در این دور هیچ حوزه‌ای از نقشهٔ قلمرو یک گام جلو نرفت",
+     "بازبینیِ دورِ 15 مشکلِ اصلاح‌نشده دارد"
+    ]
+   }
   }
  ]
 }

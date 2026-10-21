@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-18",
- "round": 15,
+ "updated": "2026-10-21",
+ "round": 16,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,8 +25,8 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 12,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -37,7 +37,9 @@
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_ltcm_1998",
+     "r16_abs_family_fund"
     ]
    },
    "kind": "missed",
@@ -77,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 24,
-    "freshOk": 18,
+    "fresh": 27,
+    "freshOk": 21,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -136,8 +138,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 13,
-    "freshOk": 7,
+    "fresh": 15,
+    "freshOk": 9,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -240,8 +242,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 12,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -252,7 +254,9 @@
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_ltcm_1998",
+     "r16_abs_family_fund"
     ]
    },
    "kind": "missed",
@@ -288,8 +292,8 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 12,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -300,7 +304,9 @@
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_ltcm_1998",
+     "r16_abs_family_fund"
     ]
    },
    "kind": "health_alarm",
@@ -335,7 +341,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 22,
+    "fresh": 26,
     "freshOk": 19,
     "ids": [
      "r2_cbs_killian_memos",
@@ -394,8 +400,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 12,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -406,7 +412,9 @@
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_ltcm_1998",
+     "r16_abs_family_fund"
     ]
    },
    "kind": "health_alarm",
@@ -430,7 +438,7 @@
    "case": "cs_pb_poinc_1900",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "r_aql_matter_unproven درست فعال شد (سقف ۴۵؛ s40: مقدمات «باید … از طریق سلسله‌مراتب به بدیهیات منتهی شوند»، s44: «اعتبار صوری برهان به‌تنهایی کافی نیست»)، ولی چون conf رمز نشده هیچ پرچمی ساخته نمی‌شود. truth.why می‌گوید «چون شدت اطمینانش مستند نیست، conf رمزگذاری نشده»، اما پوانکاره حکم را در «مکمل دوم» (۱۹۰۰) منتشر و «ادعا کرد» و truth.right بدیلش را «طرح به‌صورت پرسش یا حدس» می‌داند؛ پیکرهٔ هم‌خانواده (روفینی، لژاندر، وایتهد: «عدد اطمینان تقریب سامانه از رفتار انتشار است») در همین وضع conf≈۹۰ می‌گذارد.",
    "fix": {
@@ -440,7 +448,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 11,
+    "fresh": 12,
     "freshOk": 11,
     "ids": [
      "r2_chamberlain_hitler_face",
@@ -453,7 +461,8 @@
      "r4_abs_survivor_shops",
      "r5_ltcm_1998",
      "r5_sally_clark_1999",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r16_vulcan_leverrier_1859"
     ]
    },
    "kind": "missed",
@@ -507,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r13_challenger_1986",
@@ -541,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -573,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -606,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -638,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -671,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -703,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -731,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -764,14 +773,184 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 15
+   "lastSeenRound": 16
+  },
+  {
+   "id": "f_r16_abs_archive_diaries",
+   "case": "r16_abs_archive_diaries",
+   "opened": "2026-10-20",
+   "openedRound": 16,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور x_method را ننوشت (متن «بررسیِ کوتاه و نمونه‌ای» را می‌گفت ولی نه «روشِ ضعیف» را صریح)؛ بی x_method قاعدهٔ r_expert_method_weak (s49) نمی‌سنجد و issued/narrator هم رمز نشد ⇒ st_naql هم نیامد. قاعده‌ها سالم‌اند؛ هم‌ساختار با f_r16_hitler_diaries_1983. دست نخورد؛ بازرمزگذاریِ کورِ جدا دورِ بعد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "«دفترهای شخصیِ بنیان‌گذار» و نظرِ یک مشاور (حراج)",
+   "tier": "abstract",
+   "expected": [
+    "st_naql",
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q",
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s47",
+    "s48",
+    "s49",
+    "s53"
+   ],
+   "lastSeenRound": 16
+  },
+  {
+   "id": "f_r16_cottingley_1920",
+   "case": "r16_cottingley_1920",
+   "opened": "2026-10-20",
+   "openedRound": 16,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذار x_method (روشِ گواهی فقط یک نوع جعل را می‌سنجید) و sense_ctrl/hidden_inf را ننوشت؛ x_comp=احراز شده درست است. بی آن‌ها r_expert_method_weak و r_hiss_uncontrolled (s43, s46, s49) سنجیده نمی‌شوند. قاعده‌ها سالم‌اند. دست نخورد؛ بازرمزگذاریِ کور دورِ بعد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "عکس‌های «پریان کاتینگلی» و گواهیِ کارشناسِ عکاسی (۱۹۲۰)",
+   "tier": "real",
+   "expected": [
+    "st_expert",
+    "st_hiss"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_hiss_uncontrolled",
+    "r_hiss_hidden_inf",
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s19",
+    "s40",
+    "s43",
+    "s46",
+    "s49"
+   ],
+   "lastSeenRound": 16
+  },
+  {
+   "id": "f_r16_hitler_diaries_1983",
+   "case": "r16_hitler_diaries_1983",
+   "opened": "2026-10-20",
+   "openedRound": 16,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذار x_method=ضعیف و issued/narrator (خاستگاهِ تک‌واسطه) را ننوشت؛ x_comp را «احراز شده» نوشت (مورخ در محتوا صالح بود نه در جرم‌شناسیِ اسناد؛ متن این را صریح نمی‌گوید). بی آن‌ها s47–s49 سنجیده نمی‌شود. قاعده‌ها سالم‌اند (همان الگوی نبودنِ x_method در دورهای ۱۳–۱۵). دست نخورد؛ بازرمزگذاریِ کور دورِ بعد. نبودِ سرنخِ صلاحیتِ جرم‌شناسی در متن طراحیِ داستان است نه رمزگذاری (x_comp=احراز شده برای بازرمزگذاریِ کور درست است).",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "«خاطراتِ هیتلر» در استِرن و ساندی‌تایمز (۱۹۸۳)",
+   "tier": "real",
+   "expected": [
+    "st_naql",
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q",
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s47",
+    "s48",
+    "s49",
+    "s53"
+   ],
+   "lastSeenRound": 16
+  },
+  {
+   "id": "f_r16_vulcan_leverrier_1859",
+   "case": "r16_vulcan_leverrier_1859",
+   "opened": "2026-10-20",
+   "openedRound": 16,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "ممکن است خطای رمزگذار نباشد: استدلال از یک مورد (نپتون) هم استقراءِ ناقص است هم تمثیل؛ جزوه (s40, s44) آن را زیرِ استدلالِ معقول (st_aql) می‌آورد، رمزگذار way=استقراء نوشت و x_analog_rel/x_conseq_* را نه. قاعده‌ها سالم‌اند؛ تصمیمِ طبقه‌بندیِ مرزی برای بازرمزگذاریِ کور و در صورت لزوم پیشنهادِ مالک. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "سیاره‌ٔ «ولکان» و موفقیتِ لووریه با نپتون (۱۸۵۹)",
+   "tier": "real",
+   "expected": [
+    "st_aql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50"
+   ],
+   "lastSeenRound": 16
   },
   {
    "id": "f_r2_nyt_goddard_1920",
    "case": "r2_nyt_goddard_1920",
    "opened": "2026-10-13",
    "openedRound": 3,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": " — دورِ ۵: فقط کمینهٔ سقف‌ها مقصر شمرده می‌شد و حکمِ کلی از استقراء سقفِ قضیه‌ای نداشت (s51).",
    "fix": {
@@ -780,8 +959,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 11,
-    "freshOk": 11,
+    "fresh": 13,
+    "freshOk": 12,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -793,7 +972,8 @@
      "r5_madoff_feeders",
      "r5_hitler_diaries_1983",
      "r5_sally_clark_1999",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r16_vulcan_leverrier_1859"
     ]
    },
    "kind": "mislocated",
@@ -838,7 +1018,7 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 8,
+    "fresh": 11,
     "freshOk": 5,
     "ids": [
      "r5_hitler_diaries_1983",
@@ -848,7 +1028,10 @@
      "r14_abs_warehouse_fires",
      "r15_bem_precognition_2011",
      "r15_reinhart_rogoff_90_2010",
-     "r15_abs_clinic_sheet"
+     "r15_abs_clinic_sheet",
+     "r16_hitler_diaries_1983",
+     "r16_cottingley_1920",
+     "r16_abs_archive_diaries"
     ]
    },
    "kind": "health_alarm",
@@ -882,14 +1065,17 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 5,
-    "freshOk": 0,
+    "fresh": 8,
+    "freshOk": 3,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_ltcm_1998",
+     "r16_tonkin_gulf_1964",
+     "r16_abs_family_fund"
     ]
    },
    "kind": "mislocated",
@@ -930,14 +1116,17 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 5,
-    "freshOk": 0,
+    "fresh": 8,
+    "freshOk": 3,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
      "r13_abs_store_survey",
      "r14_fcic_ratings_2007",
-     "r14_abs_flood_insurer"
+     "r14_abs_flood_insurer",
+     "r16_ltcm_1998",
+     "r16_tonkin_gulf_1964",
+     "r16_abs_family_fund"
     ]
    },
    "kind": "mislocated",
