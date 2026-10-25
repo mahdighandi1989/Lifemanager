@@ -66,20 +66,51 @@
   G.g2j = function (iso) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || "")); if (!m) return null; return d2j(g2d(+m[1], +m[2], +m[3])); };
   function jalMonthLen(jy, jm) { if (jm <= 6) return 31; if (jm <= 11) return 30; var r = jalCal(jy); return r && r.leap === 0 ? 30 : 29; }
   G.faJal = function (j) { return j ? fa(j[2]) + " " + JM[j[1] - 1] + " " + fa(j[0]) : ""; };
-  G.faBoth = function (isoD) { var j = G.g2j(isoD); return j ? G.faJal(j) + " (" + isoD + " میلادی)" : isoD; };
+  /* قرنطینه (دورِ ۲۴، R5، B24·D6/D24-5/A24-20 — REMOVAL_CANDIDATES): «۱۷ اسفند ۱۳۸۸ (2010-03-08 میلادی)» — تاریخِ ISO به آدم نمی‌رسد. فقط برای سازگاری صادر می‌ماند. */
+  function faBothR23(isoD) { var j = G.g2j(isoD); return j ? G.faJal(j) + " (" + isoD + " میلادی)" : isoD; }
+  G.faBoth = faBothR23;
+  /* دورِ ۲۴ (R5): تاریخی که به آدم نشان داده می‌شود فقط شمسی و با رقمِ فارسی است («۱۷ اسفند ۱۳۸۸») — هرگز «YYYY-MM-DD» */
+  G.faDate = function (isoD) { var j = G.g2j(isoD); return j ? G.faJal(j) : String(isoD || ""); };
+  /* هر «YYYY-MM-DD» (رقمِ لاتین یا فارسی) در متنی که به آدم می‌رسد ⇒ تاریخِ شمسیِ فارسی (D24-6 «موعد ۲۰۲۶-۱۰-۲۱»)؛ بیرون از «…» (حرفِ خودش دست نمی‌خورد) */
+  var ISO_ANY = /(^|[^0-9۰-۹\-])([12۱۲][0-9۰-۹]{3})-([0-9۰-۹]{2})-([0-9۰-۹]{2})(?![0-9۰-۹])/g;
+  function faDatesRaw(t) { return String(t == null ? "" : t).replace(ISO_ANY, function (all, pre, y, m, d) { var iso = digits(y) + "-" + digits(m) + "-" + digits(d), j = G.g2j(iso);
+    return j && G.j2g(j[0], j[1], j[2]) === iso && iso >= "1800-01-01" ? pre + G.faJal(j) : all; }); }
+  G.faDates = function (t) { var l = String(t == null ? "" : t), out = "", d = 0, buf = "";
+    for (var i = 0; i < l.length; i++) { var ch = l.charAt(i);
+      if (ch === "«") { if (d === 0) { out += faDatesRaw(buf); buf = ""; } d++; out += ch; continue; }
+      if (ch === "»" && d > 0) { d--; out += ch; continue; }
+      if (d === 0) buf += ch; else out += ch; }
+    return out + faDatesRaw(buf); };
+  A.faDates = G.faDates;
   function todayJ() { return G.g2j(A.today()); }
   var JMRE = "(" + JM.join("|") + ")";
   function normTx(t) { return digits(t).replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/اردی[\s‌]*بهشت/g, "اردیبهشت").replace(/امرداد/g, "مرداد").replace(/[ًٌٍَُِّْ]/g, "").replace(/\s+/g, " ").trim(); }
+  /* دورِ ۲۴ (R5، B24·D1): نامِ ماهِ شمسی به خطِ لاتین («17 Esfand 1388») */
+  var FING = [["farvardin|farvardeen|farvadin", 0], ["ordibehesht|ordibehesh?t|ordibehest", 1], ["khordad|khordaad|xordad|khordat", 2], ["tir|teer", 3], ["mordad|amordad|mordaad", 4],
+    ["shahrivar|shahrivar|sharivar|shahrivaar", 5], ["mehr|mehre", 6], ["aban|aaban|abaan", 7], ["azar|aazar|azaar", 8], ["dey|dei", 9], ["bahman|bahmaan", 10], ["esfand|esfan|isfand|esfand", 11]];
+  function fing(x) { if (!/[a-z]/i.test(x) || !/\d/.test(x)) return x; var o = x.toLowerCase();
+    FING.forEach(function (f) { o = o.replace(new RegExp("(^|[^a-z])(?:" + f[0] + ")(?![a-z])", "g"), function (a, pre) { return pre + " " + JM[f[1]] + " "; }); });
+    return o.replace(/\s+/g, " ").trim(); }
+  /* دورِ ۲۴ (R5، A24-10): سنِ به حروف («هشتاد و یک سالمه») ⇒ رقم؛ فقط عددی که پیش از «سال…» آمده */
+  var NW = { "یک": 1, "یه": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "شیش": 6, "هفت": 7, "هشت": 8, "نه": 9, "ده": 10, "یازده": 11, "دوازده": 12, "سیزده": 13, "چهارده": 14,
+    "پانزده": 15, "پونزده": 15, "شانزده": 16, "شونزده": 16, "هفده": 17, "هیفده": 17, "هجده": 18, "هیجده": 18, "نوزده": 19, "بیست": 20, "سی": 30, "چهل": 40, "پنجاه": 50,
+    "شصت": 60, "هفتاد": 70, "هشتاد": 80, "نود": 90, "صد": 100, "یکصد": 100 };
+  var NWK = Object.keys(NW).sort(function (a, b) { return b.length - a.length; }).join("|");
+  var NW_RE = new RegExp("(^|[^آ-ی‌])((?:" + NWK + ")(?:[\\s‌]+و[\\s‌]+(?:" + NWK + "))*)(?=[\\s‌]*سال)", "g");
+  G.numWords = function (t) { return String(t == null ? "" : t).replace(NW_RE, function (all, pre, ph) { var n = 0, ok = true;
+    ph.split(/[\s‌]+و[\s‌]+/).forEach(function (w) { if (NW[w] == null) ok = false; else n += NW[w]; }); return ok && n >= 1 && n <= 120 ? pre + n : all; }); };
   function yy(y, jal) { y = +y; if (String(y).length > 2) return y; var t = todayJ(), c = t ? t[0] % 100 : 5; return jal ? (y <= c ? 1400 + y : 1300 + y) : (y <= (+A.today().slice(2, 4)) ? 2000 + y : 1900 + y); }
   /* سنی که خودش در همین متن گفت («۶۷ سالمه»، «۹ سالم شد»، «۱۵ ساله‌ام») */
   var AGE_SAID = /(?:^|[^\d])(\d{1,3})[\s‌]*(?:سالمه|سالم[\s‌]*(?:شد|است|هست)|ساله[\s‌]*(?:ام|هستم|شدم)|ساله‌ام|سالم(?![آ-ی])|سال[\s‌]*دارم|سالمه)(?![آ-ی])/;
-  G.ageSaid = function (t) { var m = AGE_SAID.exec(normTx(t)); var n = m ? +m[1] : NaN; return n >= 1 && n <= 120 ? n : null; };
+  G.ageSaid = function (t) { var m = AGE_SAID.exec(G.numWords(normTx(t))); var n = m ? +m[1] : NaN; return n >= 1 && n <= 120 ? n : null; };
   /* parse(text, {age}) ⇒ {iso, j, cal} | {need:"year", jm, jd} | {err} | null (تاریخی نیست) */
   G.parse = function (text, o) {
-    o = o || {}; var x = normTx(text), m, cal = "", y = null, mo = null, d = null, rel = null;
+    o = o || {}; var x = fing(normTx(text)), m, cal = "", y = null, mo = null, d = null, rel = null;
     if (!x) return null;
     if ((m = /(\d{4})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{1,2})/.exec(x))) { y = +m[1]; mo = +m[2]; d = +m[3]; cal = y < 1700 ? "j" : "g"; }
     else if ((m = /(?:^|[^\d])(\d{1,2})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{4})(?!\d)/.exec(x))) { y = +m[3]; mo = +m[2]; d = +m[1]; cal = y < 1700 ? "j" : "g"; }
+    /* دورِ ۲۴ (R5، B24·D1 «96/2/30»): سالِ دورقمی با رقم — شیوهٔ ایرانی سال/ماه/روز، پس شمسی */
+    else if ((m = /(?:^|[^\d])(\d{2})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{1,2})(?![\d\/\-.])/.exec(x))) { if (+m[3] > 31 && +m[1] <= 31) { y = yy(m[3], true); d = +m[1]; } else { y = yy(m[1], true); d = +m[3]; } mo = +m[2]; cal = "j"; }
     else if ((m = new RegExp("(?:^|[^\\d])(\\d{1,2})\\s*(?:ام|م|ِ)?\\s*" + JMRE + "(?:ه|ست|‌ست|است|م|ام|ِ)?(?![آ-ی])(?:\\s*(?:ماهِ|ماه))?(?:\\s*(?:سالِ|سال)?\\s*(\\d{4}|\\d{2})(?!\\d))?").exec(x))) { d = +m[1]; mo = JM.indexOf(m[2]) + 1; y = m[3] ? yy(m[3], true) : null; cal = "j"; }
     else { var lx = x.toLowerCase(); GM.some(function (g, i) { var re = new RegExp("(?:(\\d{1,2})\\s*(?:" + g.join("|") + ")|(?:" + g.join("|") + ")\\s*(\\d{1,2}))(?![a-zآ-ی])(?:\\s*,?\\s*(\\d{4}))?"), mm = re.exec(lx);
         if (!mm || (!mm[3] && g[0] === "may")) return false; d = +(mm[1] || mm[2]); mo = i + 1; y = mm[3] ? +mm[3] : null; cal = "g"; return true; }); }
@@ -184,7 +215,8 @@
       "- تا آن وقت: زبانِ روشن و ساده؛ و چون ممکن است کم‌سال باشد، هیچ دادهٔ شخصی (نشانی، مدرسه، شماره، عکس) نخواه و موضوعِ بزرگسالانه پیش نکش."
     ].join("\n");
     if (b.id === "adult") return "";
-    var head = "- کاربر " + fa(age) + " ساله است (" + b.fa + "؛ از تاریخِ تولدِ ثبت‌شده). از سنش حرف نزن و او را با سنش خطاب نکن.";
+    /* دورِ ۲۴ (R5، B24·D8): «از تاریخِ تولدِ ثبت‌شده» فقط وقتی تاریخی ثبت است؛ وگرنه از سنی که خودش گفت */
+    var head = "- کاربر " + fa(age) + " ساله است (" + b.fa + "؛ " + (G.birth() ? "از تاریخِ تولدِ ثبت‌شده" : "از سنی که خودش گفت؛ تاریخِ تولد هنوز ثبت نشده") + "). از سنش حرف نزن و او را با سنش خطاب نکن.";
     if (b.id === "early" || b.id === "child") {
       L = ["# مخاطب", head, COMMON,
         "- زبان: واژه‌های ساده و روزمرهٔ کودکِ " + (b.id === "early" ? "پیش‌دبستانی" : "دبستانی") + "؛ جمله‌های کوتاه (یک فکر در هر جمله)؛ اصطلاحِ فنی فقط با معنیِ ساده‌اش، کنارِ خودش.",
@@ -212,6 +244,32 @@
       "- ضمیر: همان قاعدهٔ ضمیرِ گفت‌وگو."].join("\n");
   };
 
+  /* ---------- دورِ ۲۴ (R5، B aB1): نامِ مدرسهٔ کم‌سال در پرونده عینی نگه داشته نمی‌شود ----------
+     پرونده (📜، متن و HTML ِ دانلودی) خلاصه‌ای است که می‌ماند و جابه‌جا می‌شود؛ نامِ مدرسه دادهٔ شناسایی است (همان که «# مخاطب» از کم‌سال نمی‌خواهد).
+     خودِ پیام در سشن دست نمی‌خورد (حرفِ خودش است)؛ فقط آنچه پرونده نقل می‌کند. */
+  var SCH = "(?:دبستانِ?|دبیرستانِ?|هنرستانِ?|مدرسه(?:‌ی|ی|ٔ|ِ)?|مهدکودکِ?|مهدِ?|پیش[\\s‌]?دبستانیِ?|آموزشگاهِ?)";
+  var SCH_STOP = /^(?:ما|من|مون|مان|اسمش|نامش|اسم|نام|رو|را|که|هم|و|می[\s‌]?رم|میرم|می[\s‌]?رفتم|امروز|فردا|دیروز|بود|هست|است|خیلی|توی|تو|از|به|با|بودم|رفتم|نرفتم|معلم|معلممون|کلاس|خانم|آقا|امسال|پارسال|شون|شان|تون|تان|ش|م|یه|یک|این|اون|آن|همون|همین|دولتی|غیرانتفاعی|نمونه|تیزهوشان|ابتدایی|متوسطه|دخترانه|پسرانه|بعد|قبل|سر|سرِ|برای|اول|دوم|سوم|گفت|گفته|گفتن|داد|داده|دادن|داره|دارم|داریم|دارن|میره|می‌ره|میرن|رفت|میاد|میان|شد|شده|نیست|نبود|بودیم|هستیم|هستم|خوندم|خوندیم)$/;
+  G.privText = function (t) {
+    var x = String(t == null ? "" : t), ag = G.age(); if (ag == null || !G.minor(ag)) return x;
+    return x.replace(new RegExp("(" + SCH + ")((?:[\\s‌]+(?:ما|مون|مان|من|شون))?(?:[\\s‌]+(?:اسمش|نامش)(?:[\\s‌]+(?:" + SCH + "))?)?)([\\s‌]+)([^\\s.،,!؟?؛:«»()]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()]+){0,2})", "g"), function (all, w, mid, sp, name) {
+      /* «مدرسه/مهد» ِ بی کسره و بی «اسمش» اسمِ عام است («تو مدرسه گفت»)؛ «دبستان/دبیرستان/هنرستان …» و «… اسمش …» نام می‌گیرند */
+      if (/^(?:مدرسه|مهدکودک|مهد|آموزشگاه)$/.test(w) && !/(?:اسمش|نامش)/.test(mid)) return all;
+      var ws = name.split(/[\s‌]+/), keep = [];
+      for (var i = 0; i < ws.length; i++) { var bare = ws[i].replace(/(?:‌ه|ه|است|‌است|ست)$/, ""); if (SCH_STOP.test(ws[i]) || SCH_STOP.test(bare) || /^[0-9۰-۹]/.test(ws[i])) break; keep.push(ws[i]); }
+      if (!keep.length) return all;
+      var rest = ws.slice(keep.length).join(" "), tail = /(?:‌ه|‌است|‌ام|‌ایم)$/.exec(keep[keep.length - 1]);
+      return w + mid + sp + "[نامِ مدرسه]" + (tail ? tail[0] : "") + (rest ? " " + rest : "");
+    });
+  };
+  G.privDossier = function (D) {
+    try { var ag = G.age(); if (!D || ag == null || !G.minor(ag)) return D;
+      (D.events || []).forEach(function (e) { if (!e) return; if (e.src && typeof e.src.text === "string") e.src = Object.assign({}, e.src, { text: G.privText(e.src.text) });
+        if (Array.isArray(e.lines)) e.lines = e.lines.map(function (l) { return typeof l === "string" ? G.privText(l) : l; }); if (typeof e.out === "string") e.out = G.privText(e.out); });
+      if (typeof D.statement === "string") D.statement = G.privText(D.statement); if (typeof D.title === "string") D.title = G.privText(D.title);
+    } catch (e) { } return D;
+  };
+  if (typeof A.dossier === "function" && !A.dossier._priv24) { var rawDos = A.dossier; A.dossier = function () { return G.privDossier(rawDos.apply(this, arguments)); }; A.dossier._priv24 = true; }
+
   /* ---------- قلاب‌های دستیار ---------- */
   var AS = A.ASSIST;
   if (AS) {
@@ -222,6 +280,28 @@
        «امروز تولدمه»)؛ تولدِ دیگری («تولدِ مامانم»)، موعد یا رویدادِ گذشته نه. صفحه خودش تبدیل و ثبت می‌کند (بی نیاز به گزارشِ مدل)؛ روز بی سال و بی سن ⇒
        فقط کارت سال را می‌پرسد. «X سالمه» ِ تنها ⇒ گروهِ سنی تا تاریخ داده شود. */
     var OWN_BIRTH = /تولدم(?![آ-ی‌]*\s*(?:رو|را)\s*(?:جشن|گرفت))|متولدِ?[\s‌][^.؟?!\n]{1,30}?(?:ام|هستم|م)(?![آ-ی])|(?:به|ب)[\s‌]*دنیا[\s‌]*(?:اومدم|آمدم)/;
+    /* دورِ ۲۴ (R5، B24·D6، D24-5، A24-20، C): یک سطرِ تأیید برای هر تاریخ در هر سشن (صفحه از گفت‌وگو، کارت یا کنشِ birth ِ مدل — هر کدام زودتر)، فقط شمسی؛
+       ضمیرش را AS.regSys هنگامِ نقش بستن می‌گذارد («تولدتان» برای «شما» و سالمند). */
+    G.confirmLine = function (iso) { return "✓ تاریخِ تولدت ثبت شد: " + G.faDate(iso) + " — سن هر بار از همین تاریخ حساب می‌شود."; };
+    G.confirmed = function (s, iso) { return !!s && (s.msgs || []).some(function (m) { return m && m.role === "sys" && m.birth === iso; }); };
+    G.confirmOnce = function (s, iso) { if (!s || !iso || G.confirmed(s, iso)) return false; s.msgs = s.msgs || []; s.msgs.push({ role: "sys", at: new Date().toISOString(), birth: iso, text: G.confirmLine(iso) }); s.ageAsk = "given"; try { S.put(s); } catch (e) { } return true; };
+    /* تاریخی که صفحه خودش از آخرین پیامِ او خواند (همان OWN_BIRTH ِ fromChat) — کنشِ مدل هرگز آن را بازنویسی نمی‌کند (B24·D7) */
+    G.pageParse = function (s) { var M = (s && s.msgs) || [], u = null; for (var i = M.length - 1; i >= 0; i--) { if (M[i] && M[i].role === "user") { u = M[i]; break; } }
+      var t = u ? String(u.text || "").trim() : ""; if (!t || /^\[/.test(t) || !OWN_BIRTH.test(normTx(t))) return "";
+      var r = G.parse(t, { age: G.ageSaid(t) }); return r && r.iso ? r.iso : ""; };
+    /* کنشِ birth ِ مدل (a34 AS.DO.birth): تاریخ همان‌طور که گفت؛ صفحه تبدیل و وارسی می‌کند؛ اگر صفحه همان پیام را خوانده، خواندنِ صفحه می‌ماند */
+    G.fromModel = function (a, s) {
+      var d = String((a && (a.date || a.text)) || "").trim(), ag = a && a.age != null && +a.age >= 1 ? +a.age : null;
+      var r = G.parse(d, { age: ag }), pg = G.pageParse(s);
+      if (r && r.iso && pg && r.iso !== pg) { console.warn("birth: model date " + r.iso + " ignored; the page read " + pg + " from her message"); r = { iso: pg }; }
+      else if ((!r || !r.iso) && pg) r = { iso: pg };
+      if (!r) return "تاریخِ تولد ثبت نشد: تاریخ را نشناختم — همان‌طور که گفت بفرست (مثلاً «۲۰ اردیبهشت ۱۳۳۸»).";
+      if (r.need) return "تاریخِ تولد ثبت نشد: روز (" + fa(r.jd) + " " + JM[r.jm - 1] + ") هست، سال نیست — سنی که گفت را با \"age\" بفرست.";
+      if (r.err) return "تاریخِ تولد ثبت نشد: " + r.err;
+      if (G.birth() !== r.iso) { var w = G.setBirthInfo(r.iso); if (!w.iso) return "تاریخِ تولد ثبت نشد: " + (w.err || ""); }
+      if (s) { G.confirmOnce(s, r.iso); return ""; }
+      return RE.test(d) ? "" : G.confirmLine(r.iso);   // بی سشن: قراردادِ پیشین — ISO ⇒ "" (test_age_sync)؛ تاریخِ گفته‌شده ⇒ همان یک سطرِ شمسی
+    };
     G.fromChat = function (s, msg) {
       var t = String(msg || "").trim(); if (!t || /^\[/.test(t)) return null;
       var x = normTx(t), age = G.ageSaid(t), st = S.settings(), pr = st.profile = st.profile || {}, out = null;
@@ -234,8 +314,7 @@
         var md = pr.birthMD; if (md && md.jm) { var w2 = G.setBirthInfo(fa(md.jd) + " " + JM[md.jm - 1], { age: age }); if (w2.iso) out = { saved: w2.iso }; }
         if (!out) { pr.ageSaid = { age: age, on: A.today() }; S.saveSettings(st); out = { age: age }; }
       }
-      if (out && out.saved && s && !(s.msgs || []).some(function (m) { return m.role === "sys" && m.birth === out.saved; })) {
-        s.msgs = s.msgs || []; s.msgs.push({ role: "sys", at: new Date().toISOString(), birth: out.saved, text: "✓ تاریخِ تولدت ثبت شد: " + G.faBoth(out.saved) + " — سن هر بار از همین تاریخ حساب می‌شود." }); s.ageAsk = "given"; try { S.put(s); } catch (e) { } }
+      if (out && out.saved && s) G.confirmOnce(s, out.saved);
       return out;
     };
     AS.promptHooks = AS.promptHooks || [];
@@ -243,16 +322,21 @@
     /* کارتِ پرسشِ تاریخِ تولد: نخستین نوبتِ سشن (پس از نخستین پیامِ کاربر)، یک بار در سشن تا داده شود */
     G.askNode = function (s, onDone) {
       /* متنی، نه type=date: پنجرهٔ بومیِ تاریخ در پنجرهٔ شناورِ دستیار رویدادهای اشاره‌گر را می‌بلعید (کشیدنِ سرتیتر در test_tour از کار می‌افتاد) */
-      var md = ((S.settings().profile) || {}).birthMD, mdTx = md && md.jm ? fa(md.jd) + " " + JM[md.jm - 1] : "";
+      var md = ((S.settings().profile) || {}).birthMD, mdTx = md && md.jm ? fa(md.jd) + " " + JM[md.jm - 1] : "", qb = null;
       var inp = h("input", { type: "text", class: "inp sm age-in", dir: "rtl", "data-own": "1", "aria-label": mdTx ? "سالِ تولد" : "تاریخِ دقیقِ تولد (شمسی یا میلادی)", placeholder: mdTx ? "مثلاً ۱۳۸۵" : "مثلاً ۲۰ تیر ۱۳۸۵ یا ۱۳۸۵/۰۴/۲۰" }), msg = h("p", { class: "small bad age-err", role: "alert" });
       var go = function () {
         var v = String(inp.value || "").trim(); if (mdTx && /^[0-9۰-۹٠-٩]{2,4}$/.test(v)) v = mdTx + " " + v;
-        var r = G.setBirthInfo(v); if (!r.iso) { msg.textContent = say(s, r.err); return; }
-        if (s) { s.ageAsk = "given"; s.msgs = s.msgs || []; s.msgs.push({ role: "sys", at: new Date().toISOString(), birth: r.iso, text: "✓ تاریخِ تولدت ثبت شد: " + G.faBoth(r.iso) + "." }); S.put(s); }
+        var r = G.setBirthInfo(v);
+        /* دورِ ۲۴ (R5، B24·D1): روزی که در خودِ کارت نوشت نگه داشته می‌شود؛ پرسشِ کارت همان‌جا «سالش را هم…» می‌شود و «۸۸» ِ بعدی همان روز را کامل می‌کند */
+        if (r.need && r.jm) { var st0 = S.settings(); st0.profile = st0.profile || {}; st0.profile.birthMD = { jm: r.jm, jd: r.jd, at: A.today() }; S.saveSettings(st0);
+          mdTx = fa(r.jd) + " " + JM[r.jm - 1]; inp.value = ""; inp.setAttribute("aria-label", "سالِ تولد"); inp.setAttribute("placeholder", "مثلاً ۱۳۸۵ یا ۸۵");
+          if (qb) qb.textContent = say(s, "روزِ تولدت را گفتی (" + mdTx + ") — سالش را هم بنویس؟ "); msg.textContent = ""; return; }
+        if (!r.iso) { msg.textContent = say(s, r.err); return; }
+        if (s) G.confirmOnce(s, r.iso);
         if (onDone) onDone(); };
       inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
       return h("div", { class: "card soft age-ask", dir: "rtl", role: "group", "aria-label": "تاریخِ دقیقِ تولد" },
-        h("p", { class: "small" }, h("b", {}, say(s, mdTx ? "روزِ تولدت را گفتی (" + mdTx + ") — سالش را هم بنویس؟ " : "تاریخِ دقیقِ تولدت را بنویس؟ (شمسی یا میلادی) ")), h("span", { class: "age-why" }, say(s, G.WHY))),
+        h("p", { class: "small" }, (qb = h("b", {}, say(s, mdTx ? "روزِ تولدت را گفتی (" + mdTx + ") — سالش را هم بنویس؟ " : "تاریخِ دقیقِ تولدت را بنویس؟ (شمسی یا میلادی) "))), h("span", { class: "age-why" }, say(s, G.WHY))),
         h("div", { class: "row gap wrap" }, inp,
           h("button", { class: "btn sm", type: "button", "data-own": "1", onclick: go }, "ثبت"),
           h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { if (s) { s.ageAsk = "later"; S.put(s); } if (onDone) onDone(); } }, "بعداً")), msg);

@@ -281,6 +281,12 @@
     return "احتمالِ بالاتر بودن از میانهٔ " + q.peers + ": " + P.pctFa(q.pAbove) + " · صدکِ مورد انتظار: " + fa(Math.round(100 * q.pct)) + " (" + fa(q.k) + " از " + fa(q.n) + " معمای لنگردار)";
   };
   /* گویهٔ توصیفی: درصدِ گروه فقط اگر سنِ کاربر در پوششِ سنیِ منبعِ همان گویه است */
+  /* دورِ ۲۴ (R5، D24-10): سنِ معلوم و هیچ معمای لنگردارِ این سازه که منبعش این سن را پوشش دهد ⇒ همان جملهٔ صادقانه، نه «هنوز جواب نداده‌ای» (مقایسه‌ای در کار نیست) */
+  P.noNormFor = function (cid, age) { if (age === undefined) age = P.age(); if (age == null) return "";
+    var an = (P.norms().items || []).filter(function (it) { return (!cid || it.construct === cid) && P.isAnchor(it); });
+    /* همان داوریِ مقایسه (peers): مقیاسِ گویه اگر هست — خانهٔ نامعتبر (valid:false، مثلاً ۵۰ تا ۷۴) هم «بی هنجار» است؛ وگرنه پوششِ سنیِ منبع */
+    var SC = P.norms().scales || [];
+    return an.length && !an.some(function (it) { var sc = SC.filter(function (x) { return x.id === it.scale; })[0]; return sc ? !peers(sc, age).none : inAges(P.srcAges(it.src), age); }) ? P.NO_NORM + "؛ فقط روندِ خودت" : ""; };
   P.descNorm = function (it, age) { if (age == null) return "birth"; return inAges(P.srcAges(it && it.src), age) ? "" : "age"; };
 
   /* بخشِ «📐 سنجشِ استاندارد» در کارنامه */
@@ -289,9 +295,11 @@
     sec.appendChild(h("h2", {}, "📐 سنجشِ استاندارد"));
     sec.appendChild(h("p", { class: "small muted" }, "سازه‌ها از مدل‌های جهانیِ روان‌سنجی: CHC برای هوش، و مدلِ عقلانیتِ استانوویچ. «هوش‌های چندگانه» پشتوانهٔ تجربیِ کافی ندارد و به کار نمی‌رود. هر عدد یک احتمال است: «پاسخِ بعدی» = (درست+۱)/(کل+۲)، که از اصلِ بی‌مرجح درمی‌آید؛ «پیشرفت» = احتمالِ اینکه درستیِ ماهِ آخر از ماهِ نخست بیشتر باشد."));
     /* سن: از تاریخِ تولدی که خودت ثبت می‌کنی (یا به دستیار می‌گویی) */
+    var bErr = h("p", { class: "small bad psy-age-err", role: "alert" });   // دورِ ۲۴ (R5، A24-13): خطای همین فیلد کنارِ خودش، نه فقط یک toast ِ گذرا
     var bIn = h("input", { type: "text", class: "inp sm", dir: "rtl", "data-own": "1", "aria-label": "تاریخِ تولد (شمسی یا میلادی)", placeholder: "مثلاً ۲۰ تیر ۱۳۸۵", value: P.birth() && A.AGE && A.AGE.g2j ? A.AGE.faJal(A.AGE.g2j(P.birth())) : P.birth() });   // دورِ ۲۳ (Q1): شمسی هم
     sec.appendChild(h("div", { class: "row gap wrap small psy-age" }, h("span", {}, age == null ? "پیش از مقایسه با هم‌سن‌ها، تاریخِ دقیقِ تولدت را بگو — " + (A.AGE ? A.AGE.WHY : "مقایسه فقط با هم‌سن‌ها معتبر است.") : "سن: " + fa(age) + " سال (از تاریخِ تولدِ ثبت‌شده)."), bIn,
-      h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { var e = P.setBirth(bIn.value); if (e) { A.toast(e.replace(/^تاریخِ تولد ثبت نشد: /, "")); return; } A.render(); } }, "ثبت")));
+      h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { var e = P.setBirth(bIn.value); if (e) { var et = e.replace(/^تاریخِ تولد ثبت نشد: /, ""); bErr.textContent = (A.ASSIST && A.ASSIST.regPage ? A.ASSIST.regPage("ثبت نشد: " + et) : "ثبت نشد: " + et); A.toast(et); return; } A.render(); } }, "ثبت")));
+    sec.appendChild(bErr);
     sec.appendChild(h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small psy-table" },
       h("thead", {}, h("tr", {}, ["سازه", "از کجا سنجیده می‌شود", "احتمالِ درستیِ پاسخِ بعدی", "احتمالِ پیشرفت", "نسبت به مردم"].map(function (x) { return h("th", {}, x); }))),
       h("tbody", {}, md.map(function (c) {
@@ -304,7 +312,7 @@
           h("td", {}, e.n ? P.pctFa(e.next) + " (" + fa(e.k) + " از " + fa(e.n) + ")" + meta : "— (هنوز پاسخی نیست)", extra),
           h("td", {}, e.progress ? P.pctFa(e.progress.p) + " (" + fa(e.progress.from) + " ← " + fa(e.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"),
           h("td", { class: "small" }, p.n ? (p.scales || [p]).map(P.popFa).join(" | ") :
-            (N.items || []).some(function (it) { return it.construct === c.id && P.isAnchor(it); }) ? "هنوز معمای لنگرداری در این سازه جواب نداده‌ای" :
+            (N.items || []).some(function (it) { return it.construct === c.id && P.isAnchor(it); }) ? (P.noNormFor(c.id, age) || "هنوز معمای لنگرداری در این سازه جواب نداده‌ای") :
             (N.items || []).some(function (it) { return it.construct === c.id; }) ? (function () {
               /* فقط گویهٔ توصیفی (کلامی/مشهور؛ ترجمه دشواری را جابه‌جا می‌کند) ⇒ بی برآوردِ مقایسه‌ای؛ فقط درستیِ تو کنارِ درصدِ گروه */
               var da = S.all("psyans").filter(function (a) { var it = P.item(a.item); return it && it.construct === c.id && it.kind === "descriptive" && !a.familiar; });
@@ -392,6 +400,14 @@
     if (S.all("psyans").some(function (a) { return a.item === it.id; })) { root.appendChild(h("p", { class: "card soft" }, "این معما را پیش‌تر جواب داده‌ای؛ هر معما فقط یک بار شمرده می‌شود.")); return root; }
     /* معمای دیگری باز و بی‌پاسخ است ⇒ همان (دیدن و رد شدن ممکن نیست؛ M1) */
     if (open.length && open.indexOf(it.id) < 0) it = P.item(open[0]);
+    /* دورِ ۲۴ (R5، C24-18): کم‌سال هرگز معمایی نمی‌گیرد که هنجارش فقط برای سنِ دیگری است (مسیرِ مستقیمِ این نما، نه فقط «امروز») — مگر همان معمای بازِ پیشین؛
+       اگر معمای هم‌سنی هست، همان */
+    var ag24 = P.age();
+    if (ag24 != null && A.AGE && A.AGE.minor(ag24) && !P.openedAt(it.id) && !inAges(P.srcAges(it.src), ag24)) {
+      var cov = P.pending().filter(function (x) { return inAges(P.srcAges(x.src), ag24); })[0];
+      if (!cov) { root.appendChild(h("p", { class: "card soft psy-noage" }, "معمای امروز برای مقایسه با هم‌سن‌هاست و " + P.NO_NORM + " — پس این‌جا معمایی پیشنهاد نمی‌شود. روندِ خودت در کارنامه هست.")); return root; }
+      it = cov;
+    }
     /* روزی یکی (M2) */
     if (!P.openedAt(it.id) && P.answeredToday()) { root.appendChild(h("p", { class: "card soft psy-tomorrow" }, "معمای امروز را جواب داده‌ای؛ روزی یک معما — معمای بعدی فردا.")); return root; }
     var st = { v: "", c: "", fam: false, done: false }, box = h("section", { class: "card psy-q" }), t0 = Date.parse(markOpen(it.id)) || A.nowMs(), fb = h("div", { class: "small" }), timer = null;
@@ -451,7 +467,10 @@
   var AS = A.ASSIST;
   if (AS && AS.DO) {
     /* دورِ ۲۳ (Q1، B·D6/D23-25): تاریخ همان‌طور که خودش گفت (شمسی یا میلادی، با نامِ ماه، یا روز + سنی که گفت) — صفحه تبدیل و وارسی می‌کند و تبدیل را نشان می‌دهد */
+    /* دورِ ۲۴ (R5، B24·D6/D7، D24-5، A24-20): یک مسیر — A.AGE.fromModel: خواندنِ خودِ صفحه از پیامِ او بر تاریخِ مدل مقدم است، یک تأیید در سشن و فقط شمسی.
+       مسیرِ دورِ ۲۳ (پایین) فقط بی بستهٔ سن */
     AS.DO.birth = function (a) {
+      if (A.AGE && A.AGE.fromModel) return A.AGE.fromModel(a, AS._turnSession || (AS.cur && AS.cur()) || null);
       var d = String((a && (a.date || a.text)) || "").trim(), ag = a && a.age != null && +a.age >= 1 ? +a.age : null;
       if (/^\d{4}-\d{2}-\d{2}$/.test(d) && d >= "1900-01-01" && d < A.today()) return P.setBirth(d) ? "تاریخِ تولد ثبت نشد: " + d + " در تقویم نیست" : "";
       if (!A.AGE || !A.AGE.setBirthInfo) return "تاریخِ تولد ثبت نشد: YYYY-MM-DD میلادی لازم است";

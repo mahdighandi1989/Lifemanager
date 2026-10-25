@@ -104,11 +104,14 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     chk(!r1.none && /تولدتان/.test(r1.text) && !/تولدت را/.test(r1.text) && /شمسی/.test(r1.text), 'B·D9 s12: the birth card speaks «شما» to a «شما» user and says Jalali is fine ' + JSON.stringify(r1.text));
     chk(/اسفند/.test(r1.err) && !NOFMT.test(r1.err), 'A23-1: a wrong day gets a human message, not «YYYY-MM-DD» ' + r1.err);
     chk(r1.b === '1959-05-11' && r1.age === 67, 'A23-1 aA3 p2: «۲۰ اردیبهشت ۱۳۳۸» saved on the page ⇒ 1959-05-11, age 67 ' + JSON.stringify(r1));
-    chk(r1.msgs.some(t => /تولدتان ثبت شد/.test(t) && /۲۰ اردیبهشت ۱۳۳۸/.test(t) && /1959-05-11/.test(t)), 'card confirmation shows both forms in «شما» ' + JSON.stringify(r1.msgs));
+    // دورِ ۲۴ (DECISIONS_R24 R5، B24·D6/D24-5 جایگزینِ «هر دو شکل»): تأیید فقط شمسی است — هرگز «1959-05-11» به آدم
+    chk(r1.msgs.some(t => /تولدتان ثبت شد/.test(t) && /۲۰ اردیبهشت ۱۳۳۸/.test(t) && !/1959-05-11|میلادی/.test(t)), 'card confirmation in «شما», Jalali only ' + JSON.stringify(r1.msgs));
     // DO.birth from the model with the Jalali words — the page converts and shows it
     await setB('');
-    const d = await ev(() => [APP.ASSIST.DO.birth({ date: '۲۵ اسفند ۱۳۳۷' }), APP.AGE.birth(), APP.ASSIST.DO.birth({ date: '1989-03-08' }), APP.ASSIST.DO.birth({ date: '۳۱ مهر ۱۳۹۶' })]);
-    chk(/^✓/.test(d[0]) && /1959-03-16/.test(d[0]) && d[1] === '1959-03-16' && d[2] === '' && /مهر/.test(d[3]) && !NOFMT.test(d[3]), 'C23-8 aC3: birth action takes the Jalali date as she said it; ISO still returns "" ' + JSON.stringify(d));
+    // دورِ ۲۴ (DECISIONS_R24 R5، A24-20): در یک سشن کنشِ مدل سطرِ «✓ …» ِ دوم برنمی‌گرداند — همان یک تأییدِ شمسیِ سشن (A.AGE.confirmOnce)
+    const d = await ev(() => [APP.ASSIST.DO.birth({ date: '۲۵ اسفند ۱۳۳۷' }), APP.AGE.birth(), APP.ASSIST.DO.birth({ date: '1989-03-08' }), APP.ASSIST.DO.birth({ date: '۳۱ مهر ۱۳۹۶' }),
+      (__cur().msgs || []).filter(m => m.role === 'sys' && m.birth === '1959-03-16').map(m => m.text).join(' | ')]);
+    chk(d[0] === '' && /۲۵ اسفند ۱۳۳۷/.test(d[4]) && !/1959-03-16/.test(d[4]) && d[1] === '1959-03-16' && d[2] === '' && /مهر/.test(d[3]) && !NOFMT.test(d[3]), 'C23-8 aC3: birth action takes the Jalali date as she said it; ISO still returns "" ' + JSON.stringify(d));
     const rule = await ev(() => (APP.ASSIST.promptHooks || []).map(f => { try { return f(null, 'تولدم ۲۰ اردیبهشته') || ''; } catch (e) { return ''; } }).join('\n'));
     chk(/همان‌طور که گفت/.test(rule) && /خودت تبدیل نکن/.test(rule), 'birth rule tells the model not to convert in its head');
   });

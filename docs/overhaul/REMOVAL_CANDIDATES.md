@@ -340,3 +340,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   range bound as the single value and read «؟» of a masked number as a sentence end; `stampUses` tied a verdict that named no datum to every datum including the whole statement.
 - **Why replaced:** DECISIONS_R23 Q4 (number role: list unit, range, counted noun, masked digits; never a borrowed unit; without `rests`, keep verdicts that do not consume the datum).
 - **Status:** reachable, not called: `APP.LIVE_R22_QUARANTINE_Q4.numCopy`, `.pickAll`. Delete only with the owner's approval.
+## 2026-10-25 — two-form birth confirmation and verb-blind register signs (learning-architecture, Pólya round 24, age: R5)
+- **Files:** `apps/learning-architecture/src/app/a43_age.js`, `a27_tour.js`.
+- **What they did:** `A.AGE.faBoth` wrote «۱۷ اسفند ۱۳۸۸ (2010-03-08 میلادی)» into every birth confirmation (an ISO date to a child or an elder); `SIGN_SH`
+  took any «…[دت]ین/ید» as a «شما» verb (the noun «روتین»); `SIGN_TO18` took a first-person subjunctive with «ـم/ـمون» («ببینم») as a «تو» imperative.
+- **Why replaced:** DECISIONS_R24 R5 (never ISO to a person; one Jalali confirmation; register signs from verbs only).
+- **Status:** reachable, not called for person-facing text: `APP.AGE.faBoth` (exported for compatibility), `APP.ASSIST.R24_QUARANTINE.signSh`, `.signTo18`.
+  Delete only with the owner's approval.

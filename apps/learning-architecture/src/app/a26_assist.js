@@ -1075,6 +1075,7 @@
       h("p", { class: "small muted" }, "می‌برمت به جای درست، فرم را از حرف‌هایت پر می‌کنم و باقی را نشانت می‌دهم. عکس و فایل هم می‌خوانم (بچسبان یا 📎).")));
     (s ? s.msgs : []).forEach(function (m) {
       var mv = m.role === "sys" && AS.regSys ? Object.assign({}, m, { text: AS.regSys(s, m.text) }) : m;   // دورِ ۲۳ (Q1، A23-14): سطرِ خودِ صفحه به ضمیرِ گفت‌وگو
+      if (m.role === "ai" && A.faDates) mv = Object.assign({}, mv, { text: A.faDates(mv.text) });   // دورِ ۲۴ (R5، D24-6): هرگز «YYYY-MM-DD» به آدم — تاریخِ پاسخِ مدل هم شمسی نشان داده می‌شود
       log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx", dir: "rtl" }, richNodes(mv)),
         m.files && m.files.length ? h("div", { class: "as-fl" }, m.files.map(function (f) { return f.link ? h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name) : h("span", { class: f.err ? "bad" : "" }, "📄 " + f.name); })) : null,
         csvNodes(m), AS.msgTools ? AS.msgTools(s, m) : null));   // INF15 (a40): «✏️ اصلاح» فقط روی حبابِ خودِ کاربر

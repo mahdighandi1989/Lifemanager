@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-18T09:30:00Z"
 created_at: "2026-10-18T09:30:00Z"
-updated_at: "2026-10-19T09:00:00Z"
+updated_at: "2026-10-25T09:00:00Z"
 merged_from: []
 ---
 
@@ -104,3 +104,28 @@ Round-23 tour of the same page (children and older adults with Iranian Jalali bi
 - [ ] Keep "what data, why, where, offline, model-independent" as module-registered facts and surface them first.
 - [ ] Gate age-normed activities by norm coverage, not only the comparison.
 
+## Update 2026-10-25
+Round-24 tour (every scenario hit at least one S3 line about age or register) showed that the surfaces around a correct date engine fail on their own:
+- **One writer per confirmation.** Three paths (the page reading her sentence, the card, the model's action) each confirmed the same date — two lines per
+  date in almost every scenario. A shared marker on the message (`birth = iso`) and one `confirmOnce(session, iso)` fixed all three at once.
+- **The deterministic parse of her own words outranks the model's structured field.** The model sent a date one day off after the page had already read
+  the sentence; the action silently overwrote it. The page re-reads her latest message when the action arrives and keeps its own parse.
+- **"Show both forms" is still showing the machine form.** A Gregorian ISO in brackets reached a 9-year-old. Show the person's calendar only; convert
+  every ISO that reaches a person at the one paint-time gate (the same gate that applies the register), plus exports such as a Drive mirror.
+- **A card that asks for the missing part must remember the part already typed** (day kept, year asked), and accept the forms people write: two-digit
+  years in numeric dates, day-first, month names in Latin script.
+- **Ages arrive as words.** «هشتاد و یک سالمه» — parse number words only directly before the age word, so «۸۱ کیلو» or «هشتاد سال پیش» never become ages.
+- **Say where a fact came from only if it did.** The audience block claimed «from the stored birth date» when only an age was said.
+- **Register: age is an input, and signs come from verbs.** Elders get the respectful form by default; their own explicit request still wins. Commands to the
+  machine («ثبتش کن»), first-person subjunctives («ببینم»), «let me…» idioms and nouns that end like verbs («روتین») are not register evidence.
+- **Gate every path to an age-normed activity, not just the push.** The daily list hid the adult puzzle from a child, but the direct view still opened it;
+  the cell for "compared with people" must use the same validity judgement as the comparison (out-of-range age or a band marked invalid ⇒ the honest line).
+- **Kept summaries of a minor's words drop identifying details** (school name) while the original message stays as typed.
+
+### How to Apply Elsewhere (additions)
+- [ ] Give every confirmation of a stored fact one writer with a dedupe marker; let all producers call it.
+- [ ] When a deterministic parser and a model both report the same field, re-run the parser on the source text and keep its value on conflict.
+- [ ] Put locale conversion of dates in the same render-time gate as other person-facing transforms; check exports too.
+- [ ] Multi-step input cards keep the partial answer and ask only for what is missing.
+- [ ] Use age as an input to address form; never let commands to a machine count as evidence of informality.
+- [ ] Enumerate every entry point to an age-gated feature (list, button, direct route) and test each.

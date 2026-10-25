@@ -4893,3 +4893,20 @@ dated stability, mind-card feed) under way.
 - **DECISION** Accepted as roadmap §21 and DECISIONS_R24 R8 (story fixer, with R2): `coach_state.prior` with verdict per step, resume at the
   first non-✓ step, dependents marked, facets via the tour, shown with «درست است؟», no rewrite without her yes. At least two scenarios per group
   from round 25. Owner question bank #31. No code started (owner's pause).
+
+## 2026-10-25 — Pólya round 24, fixer «age» (R5 age and register surfaces)
+- **FINDING** Root causes: every birth confirmation used `A.AGE.faBoth` (ISO in brackets) and three writers (page from chat, card, model `birth` action) each
+  pushed their own line with no shared marker (B24·D6, D24-5, A24-20, C); the model action called `setBirth` with its ISO date after the page had already read
+  her sentence (B24·D7, `a34_psy.js` DO.birth); the card forgot a day typed in the card and the parser needed a 4-digit year in numeric forms and Persian month
+  names only (B24·D1); `AGE_SAID` read digits only (A24-10); «# مخاطب» hard-coded «از تاریخِ تولدِ ثبت‌شده» (B24·D8); `regOf` had no age input and the
+  post-check counted «ثبتش کن/نگو» as «تو» for an 82-year-old (B24·D11); `SIGN_TO18` «[بن]STEM(م|مون)» and `SIGN_SH` «[آ-ی]{2,10}[دت](ید|ین)» (C24-10, C24-15);
+  ISO dates reached people through the model's memory/reply (D24-6); the mind-card date field only toasted (A24-13); the norm cell said «هنوز … جواب نداده‌ای»
+  for ages no source covers (D24-10); `A.V.psy_item` opened an adult-normed item for a 9-year-old (C24-18); 📜 quoted a minor's school name (B).
+- **CHANGE** a43 (`faDate`/`faDates`, `confirmOnce`, `fromModel`/`pageParse`, card memory, two-digit/Finglish/day-first forms, `numWords`, audience source,
+  `privText` + `A.dossier` wrapper), a34 (`DO.birth` ⇒ `fromModel`, `noNormFor`, inline field error, psy_item minor guard), a29 (norm line), a27 (elder ⇒ «شما»
+  unless she asked «تو», sign fixes, `regSys` dates, `toShoma` «ی‌اش»), a26 (reply dates), a12 (mirror dates). WORKLOG (109), PROGRESS 118. Old paths quarantined.
+- **DECISION** Elders get «شما» by default (the page's WHO ≥ 60 band; the Persian respect form) — her explicit «تو صدام کن» still wins. Minors' school names
+  are replaced only in kept summaries, never in her own message. **Rejected:** dropping every imperative from register evidence («بگو/نگو» stay signs for
+  adults); hiding the daily puzzle from everyone of unknown age (only known minors are gated; the comparison itself already asks for the date).
+- **CHANGE** Tests `apps/learning-architecture/tests/test_tour1_r24_age.js` (runner sentences; 28 errors on the base build, green after) and
+  `test_tour1_r24_age_bank.js` (VARIANTS_R24 R5 23/23, judged by text). Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_age_2026-10-25.md`.
