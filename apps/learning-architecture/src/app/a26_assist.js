@@ -639,6 +639,9 @@
     var sig = AS.statesProblem ? AS.statesProblem(msg) : [AS.CHAT_PROB, AS.LIVE_RE2, AS.LIVE_ASK, AS.LIVE_STUCK, AS.FAIL_ME, LIFE_HINT].some(function (re) { return re && re.test(msg); });
     /* دورِ ۲۲ (P5، D s31 p17): گزارشِ سرانجامِ پیش‌بینی/حدسِ خودش کارِ مربی است */
     if (!sig && AS.ownOutcome22 && AS.ownOutcome22(msg)) sig = true;
+    /* دورِ ۲۴ (R4، D24-13 — پسرفتِ دورِ ۲۳): گزارشِ تمرین/کاربستِ خودش («امروز مدخلِ … رو با همون روش حل کردم: ۱۵ = ۳ × ۵») و خودسنجی («۸۰٪ یادم بود»)
+       مسئلهٔ تازه نیستند (statesProblem ⇒ نه، تا «اول کل» و صورتِ تازه نیاید) ولی کارِ مربی‌اند: سنجشِ جلسه، کالیبراسیون، پرسشِ بازنگری — همان ردهٔ خودِ صفحه */
+    if (!sig && AS.metaMsg22) { var mk24 = AS.metaMsg22(msg); if (mk24 === "use" || mk24 === "rating") sig = true; }
     if (COACH_BLOCK.test(p) && (sig || o.prev === "lla_coach")) return "lla_coach";
     return "lla_assistant";
   };

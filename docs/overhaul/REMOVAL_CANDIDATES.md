@@ -350,3 +350,13 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   only `gap.step` or a step named «#k»/«#n» waits). A gap without a step is not lost: it is kept in `pre22.sysPend` and binds when the assistant's steps name its number.
 - **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.fits23`, `.namedItems23`, `.stepNow23`. Delete only with the owner's approval.
 
+
+## 2026-10-25 — first-match page-question lookup, any-percent confidence, «stripped to nothing = greeting» (learning-architecture, Pólya round 24, classify: R4/R6)
+- **Files:** `apps/learning-architecture/src/app/a27_tour.js`.
+- **What they did:** the reply post-check matched each question segment to the FIRST page question in the session log that shared enough words
+  (`inPage22`), so a re-worded two-sentence page question split across an older page question and the current one counted as two questions;
+  `unfit23` read any percentage in her last messages as a stated confidence («قسطش ۴۲٪ درآمد میشه»); `notProblem` treated any message that the
+  greeting stripper reduced to nothing as «greeting only», silence «...» included.
+- **Why replaced:** DECISIONS_R24 R6 (the page's own two-sentence question counts as one) and R4 (a confidence is booked only when she gives one;
+  a silent «...» keeps the coach block).
+- **Status:** reachable, not called: `APP.ASSIST.R24_QUARANTINE.inPage22First`, `.conf23`, `.notProblemSilence23`. Delete only with the owner's approval.
