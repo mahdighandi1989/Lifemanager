@@ -1,6 +1,6 @@
 # Tour batch 1 (Pólya) — ROUND 25 (read RUNNER.md … RUNNER24.md incl. all ADDENDA, then this; this overrides)
 
-Page: main __MAIN__ (round-24 merge; `build.py --check` in sync, dist newer — else STOP). What changed: DECISIONS_R24.md R1–R8 and the
+Page: main 64dc0667 (round-24 merge; `build.py --check` in sync, dist newer — else STOP). What changed: DECISIONS_R24.md R1–R8 and the
 handoff notes docs/overhaul/handoff-notes/_pending_tour1_R24_{correction,story,loop,classify,age,today}_2026-10-25.md.
 
 REQUIRED THIS ROUND (everything in RUNNER24 still applies; the bar only rises):
