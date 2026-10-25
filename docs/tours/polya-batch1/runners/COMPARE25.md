@@ -12,3 +12,6 @@ Do:
    table, owner-bank table), and token/time if known.
 4. Apply the decision rule mechanically and write the verdict.
 Output: tour1_polya/COMPARE25_result.md (tables + verdict + borderline note) and reply with the summary table and verdict only.
+Known run interference (record it in the result and weigh it): B_s's kill.sh pattern matched B's drivers and killed B's s11, s14 and s15
+mid-run (B re-ran them with drv25b.py); B's early reset/fin calls may have killed a B_s driver once (round25B/notes.md). Check round25B_s/notes.md
+for the same, and judge only completed scenarios; a scenario disturbed by the other run is compared only if it was re-run cleanly.
