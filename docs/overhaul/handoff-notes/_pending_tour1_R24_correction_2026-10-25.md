@@ -16,7 +16,8 @@ REMOVAL_CANDIDATES, experience `model-reports-state-page-validates` (Update 2026
 - One arrow direction for every change line: `APP.liveChFa(old, new)` ⇒ «new» (اصلاح شد ⇐ «old»). Asks and ask answers have no arrow: `APP.liveAskFa(old, new)` ⇒ «new» به‌جای «old»
   (`APP.liveAskPart(q)` uses it). Dossier retract headers use the change form; `a44 fragOf` reads both forms. **Age fixer (register):** `askUser20` lines go through the existing
   `toShoma` wrap in `coach_state` — keep it after any rewording of the ask line.
-- The why of a change is never «»: chat ⇒ «به گفتهٔ خودش: «her full words, quotes kept»»; ✏️ ⇒ «با ✏️ خودش: «old» ⇐ «new»، …» (all pairs, as written in the ✏️ turn).
+- The why of a change is never «»: chat ⇒ «به گفتهٔ خودش: «her full words, quotes kept»»; ✏️ ⇒ «با ✏️ ِ خودش روی همان پیام» (the pairs are named once in the block's
+  context line, not repeated per change — R23 today A23-24).
 
 ## Contract 3 — derived numbers (today / dossier / story fixers)
 - `APP.liveStale(pid)` ⇒ live marks `[{k, lab, raw, v, re|null, ctx, from:{o,n}, at}]` (only numbers still present in their record). Stored in `L.stale24` (per correction).
@@ -41,7 +42,8 @@ REMOVAL_CANDIDATES, experience `model-reports-state-page-validates` (Update 2026
 - `retractOne` ends with `chatDraftsFollow`: unconfirmed proposals (`L.uDraft.chat[f].st === "ask"` with `d[f] === chat[f].t`, `dl[i].chat`, `L.planChat`/`planDraft`), `L.chatUnk`,
   `L.chatImpItems` follow the same fact (role-aware `numCopy`), with `fixHist`/`was` history. `A.STORY.dest` reads them, so the 🧭 destination follows. **Story fixer:** if you
   change the draft shape (`chat` records), keep `st`, `t` and keep `d[f]` equal to `chat[f].t` until she confirms, or tell the correction owner.
-- `stampUses`: a verdict/«حل شد» naming no datum rests on the declared data (u.one, u.c, dl, prac.measure); statement clauses only when nothing is declared.
+- `stampUses`: when the declared claim is general (type `prove` and «برای هر …» in u.u/u.one), a verdict/«حل شد» naming no datum rests on the declared data (u.one, u.c, dl,
+  prac.measure), not on narrative statement clauses («۱۰ تاشو چک کردم»); otherwise (find problems, incomplete forms) the whole statement as before (C21-4 s23).
 
 ## Bank results (VARIANTS_R24, R3.corrections_numbers, 28 entries)
 - 28/28 pass. On the base build (3685102d), 16 of 28 fail; all 10 runner sentences fail there too.

@@ -3885,8 +3885,8 @@
     /* دورِ ۲۴ (R3، A24-9/B24·D16/C24-6): دلیل نقلِ واقعیِ حرفِ اوست — گیومه‌های خودش با محتوایشان (ownText آن‌ها را خالی می‌کرد: «گفتم «» — اشتباه گفتم»)؛
        نوبتِ ✏️ ساختگی است ⇒ جفت‌های «پیشین» ⇐ «درست» ِ خودِ ✏️ (همهٔ جفت‌ها)، نه «[اصلاحِ پیامِ قبلی] «» ⇐ «»» */
     why23 = (function () { var ed = /^\s*\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]\s*([\s\S]*?)\s*—\s*متنِ درستِ پیامم:/.exec(cu);
-      if (ed && String(ed[1]).trim()) return "با ✏️ خودش: " + clip(plainTx(ed[1]), 160);
-      if (R.edit) return "با ✏️ خودش: «" + clip(plainTx(R.frag), 60) + "» ⇐ «" + clip(plainTx(R.fix), 60) + "»";
+      /* ✏️: جفت‌ها یک بار در سطرِ زمینهٔ همان بلوک آمده‌اند — در دلیلِ هر تغییر تکرار نمی‌شوند (A23-24: هر تغییر یک بار) */
+      if ((ed && String(ed[1]).trim()) || R.edit) return "با ✏️ ِ خودش روی همان پیام";
       var own = clip(plainTx(cu), 120); if (String(own).replace(/«»/g, "").trim()) return "به گفتهٔ خودش: «" + own + "»"; return why23; })();
     var put = function (rec, o, n, why, line) { var o1 = plainTx(o == null ? "" : String(o)), n1 = plainTx(n == null ? "" : String(n)), oc = clip(o1, 160), nc = clip(n1, 160);
       if (oc === nc && o1 !== n1) { var w = winDiff23(o1, n1); oc = w.o; nc = w.n; }

@@ -4127,7 +4127,10 @@
     var GEN23 = /برای[\s‌]*(?:هر|همه|همهٔ)|(?:^|[\s(])هر[\s‌]+[a-zA-Zn](?![a-zA-Z])|استقرا|(?<![آ-ی])کلی(?![آ-ی])|در[\s‌]*حالت[\s‌]*کلی|for\s+(?:all|every|any)/i;
     /* دورِ ۲۴ (R3، C23-5 s25 «۱۰ تاشو چک کردم ⇐ ۸» کنارِ وارسیِ «n=11 را حساب کردم: ۱۱/۱۲»): وقتی شاهد هیچ داده‌ای را نام نمی‌برد، پایه «مسئله همان‌طور که اعلام شد» است —
        داده‌ها/شرط/کلِ مسئله در فرمِ فهم؛ بندهای روایتیِ صورت («۱۰ تا چک کردم»، «درسته دیگه؟») که در هیچ دادهٔ اعلام‌شده‌ای نیامده‌اند پایهٔ حکم نیستند. بی فرمِ فهم همان کلِ صورت. */
-    var decl = dat.filter(function (d) { return !/^stmt/.test(d.k); });
+    /* فقط وقتی حکمِ اعلام‌شده خودش کلی است (اثباتِ «برای هر n …»): برهانِ حکمِ کلی بر نمونه‌های روایت‌شده بنا نیست؛ در مسئلهٔ «پیدا کن» صورت همان داده است
+       (C21-4 s23 «تابه‌م ۲۵ در ۳۵» با فرمِ ناقص — «حل شد» همچنان کنار می‌رود) */
+    var u1g = s.u && s.u[1], genClaim = !!(u1g && u1g.type === "prove" && GEN23.test(nz([u1g.u, u1g.one].join(" "))));
+    var decl = genClaim ? dat.filter(function (d) { return !/^stmt/.test(d.k); }) : [];
     var pick = function (ev, all) { var u = dat.filter(function (d) { return usesDatum(ev, d.t); }); if (!u.length && all && !GEN23.test(nz(ev))) u = decl.length ? decl : dat; return u.map(function (d) { return { k: d.k, t: clip(d.t, 300) }; }); };
     if (b && b.verdict && b.verdict !== "unverified" && !b.uses) { b.uses = pick([b.chkHow, /سالم ماند/.test(String(b.chkRes || "")) ? "" : b.chkRes].concat(b.chkMsgs || []).join(" "), true); dirty = true; }
     if (L.state === "solved" && !L.solvedUses) { L.solvedUses = pick(L.chat && L.chat.solution ? String(L.chat.solution) : "", true); /* دورِ ۲۳ (Q4، C23-5): شاهدِ «حل شد» خودِ جواب است («با استقرا» کلی) */ if (L.chat && txt(L.chat.solution)) L.solvedUses.push({ k: "ans", t: clip(L.chat.solution, 300) }); dirty = true; }
@@ -4677,7 +4680,7 @@
     /* دورِ ۲۴ (R3): نقشِ هم‌سان گواهِ «همان واقعیت» است — مقسوم‌علیهِ هم‌مقدار («بخش‌پذیری بر ۴» با «باید بر ۴ بخش‌پذیر باشه»، بانکِ R24 #60) یا همان بزرگی
        («وامِ ۲۰۰ میلیونی» با «مبلغِ وام ۲۰۰ میلیون»، بانکِ R24 #68) با دست‌کم دو/یک واژهٔ هم‌سایهٔ مشترک */
     if (oc && c.div && oc.div && sh >= 2) return true;
-    if (oc && c.mag && c.mag === oc.mag && sh >= 1) return true;
+    if (oc && c.mag && c.mag === oc.mag && (sh + 1) * 2 > cw.length + 1) return true;   // بزرگیِ هم‌سان یک همسایهٔ مشترک است — «قیمت آپارتمان خواهرم ۸ میلیارد» با «قیمت خونهٔ بابا ۸ میلیارده» نه (R20 #12)
     if (!oc) return sh >= 1 && sh * 2 > cw.length;
     return sh >= 1 && (sh * 2 > cw.length || sh * 2 >= hw.length);
   }
