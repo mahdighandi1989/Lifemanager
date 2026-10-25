@@ -40153,7 +40153,10 @@ APP.goFromURL = function (q) {
     try { var regN = { shoma: 0, to: 0 }; (s.msgs || []).forEach(function (m) { if (isUser(m) && !EDIT20.test(String(m.text || "").trim())) { var g = fbSigns(m.text); if (g) regN[g]++; } });
       var reg = regN.to >= 2 && !regN.shoma ? "to" : regN.shoma >= 2 && !regN.to ? "shoma" : "";
       if (reg === "to" && elder24() && regOf(s, "", []) === "shoma") reg = "";   // دورِ ۲۴ (R5، B24·D11): به سالمند هرگز «تو» تحمیل نمی‌شود
+      if (!reg && elder24() && regOf(s, "", []) === "shoma") { var sgE = regSigns(rp); if (sgE.to && !sgE.sh) why.push("کاربر سالمند است و گفت‌وگو با «شما» است — «شما» بنویس، نه «تو»"); }   // دورِ ۲۴ (R5، بانکِ R24 #138)
       if (reg) { var sg = regSigns(rp); if (reg === "to" && sg.sh && !sg.to) why.push("او با تو «تو» حرف می‌زند — «تو» بنویس، نه «شما»"); else if (reg === "shoma" && sg.to && !sg.sh) why.push("او «شما» به کار می‌برد — «شما» بنویس"); } } catch (e) { }
+    /* دورِ ۲۴ (R5، D24-6، بانکِ R24 #140): هرگز «YYYY-MM-DD» به آدم — تاریخ را شمسی و فارسی بنویس (بیرون از «…» ِ حرفِ خودش) */
+    try { if (/(?:^|[^0-9۰-۹])[12۱۲][0-9۰-۹]{3}-[0-9۰-۹]{2}-[0-9۰-۹]{2}(?![0-9۰-۹])/.test(String(rp).replace(/«[^»]*»/g, " "))) why.push("تاریخ را به آدم با قالبِ «YYYY-MM-DD» ننویس — شمسی و با نامِ ماه بنویس (مثلاً «۱۲ اردیبهشت ۱۳۳۸»)"); } catch (e) { }
     if (!why.length) return "";
     return "[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: " + why.join("؛ ") + ". همان پاسخ را با همان actions دوباره بده و فقط متنِ reply را درست کن.]";
   };

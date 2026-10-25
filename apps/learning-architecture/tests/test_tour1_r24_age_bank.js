@@ -93,11 +93,19 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     ['U: ۸۱ کیلو وزنمه', async () => { const r = await ev(() => APP.AGE.ageSaid('۸۱ کیلو وزنمه')); return r === null || String(r); }],
     ['هشتاد و یک سال پیش ساخته شده', async () => { const r = await ev(() => APP.AGE.ageSaid('این خونه هشتاد و یک سال پیش ساخته شده')); return r === null || String(r); }],
     ['U: لطفاً بگو چی کار کنم', async () => { const r = await ev(() => APP.ASSIST.regSigns('لطفاً بگو چی کار کنم')); return !r.sh && r.to || JSON.stringify(r); }],
+    // R6 ورودی‌هایی که سهمِ R5 است (classify آن‌ها را به age سپرد: #138، #140)
+    ['[reply with «تو» to an elder «شما» user]', async () => { await reset({ birth: '1944-08-01' }); await turn(SH, 'بفرمایید.');
+      const w = await ev(() => { const s = __cur(); APP.ASSIST._turnSession = s; const r = APP.ASSIST.replyCheck({ reply: 'خودت فکر می‌کنی کدام راه بهتر است؟ بگو تا ببینیم.', actions: [] }, { task: 'lla_assistant' }); APP.ASSIST._turnSession = null; return r; });
+      return /«شما» بنویس/.test(w) || w; }],
+    ['[reply writes «1959-05-03» to the person]', async () => { await reset(); await turn('سلام، یه سؤال دارم.', 'بگو.');
+      const w = await ev(() => { const s = __cur(); APP.ASSIST._turnSession = s; const r = APP.ASSIST.replyCheck({ reply: 'تاریخِ تولدت را 1959-05-03 ثبت کردم.', actions: [] }, { task: 'lla_assistant' });
+        const ok = APP.ASSIST.replyCheck({ reply: 'تاریخِ تولدت را ۱۲ اردیبهشت ۱۳۳۸ ثبت کردم.', actions: [] }, { task: 'lla_assistant' }); APP.ASSIST._turnSession = null; return [r, ok]; });
+      return /YYYY-MM-DD/.test(w[0]) && !/YYYY-MM-DD/.test(w[1]) || JSON.stringify(w); }],
     ['[confirmation for a child]', async () => { await reset(); await turn('من ۹ سالمه، تولدم ۳۰ اردیبهشته.', 'باشه.', [{ do: 'birth', date: '۳۰ اردیبهشت', age: 9 }]); const L = confs(await shown());
       return await birth() === '2017-05-20' && L.length === 1 && !/[0-9]{4}/.test(L[0]) || JSON.stringify([await birth(), L]); }]
   ];
 
-  const ent = BANK.map((e, i) => Object.assign({ n: i + 1 }, e)).filter(e => e.rc === 'R5.age_register');
+  const ent = BANK.map((e, i) => Object.assign({ n: i + 1 }, e)).filter(e => e.rc === 'R5.age_register' || (e.rc === 'R6.postcheck_calibration' && /\[reply with «تو» to an elder|\[reply writes «1959-05-03»/.test(e.text)));
   if (!ent.length) errors.push('bank VARIANTS_R24.json not found or has no R5 entries');
   for (const e of ent) {
     const h = H.find(x => String(e.text).indexOf(x[0]) >= 0);
@@ -106,7 +114,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     if (r === true) passed.push(e.n); else errors.push('bank #' + e.n + ' [' + e.kind + '] «' + e.text + '» — expect: ' + e.expect + ' — got: ' + r);
   }
   await b.close();
-  console.log('R5 bank: ' + passed.length + ' / ' + ent.length + ' pass');
+  console.log('R5 (+R6 #138/#140) bank: ' + passed.length + ' / ' + ent.length + ' pass');
   if (errors.length) { console.log('ERRORS (' + errors.length + '):\n- ' + errors.join('\n- ')); process.exitCode = 1; }
   else console.log('test_tour1_r24_age_bank: NO ERRORS');
 })();

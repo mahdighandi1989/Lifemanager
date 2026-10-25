@@ -4926,4 +4926,4 @@ dated stability, mind-card feed) under way.
   are replaced only in kept summaries, never in her own message. **Rejected:** dropping every imperative from register evidence («بگو/نگو» stay signs for
   adults); hiding the daily puzzle from everyone of unknown age (only known minors are gated; the comparison itself already asks for the date).
 - **CHANGE** Tests `apps/learning-architecture/tests/test_tour1_r24_age.js` (runner sentences; 28 errors on the base build, green after) and
-  `test_tour1_r24_age_bank.js` (VARIANTS_R24 R5 23/23, judged by text). Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_age_2026-10-25.md`.
+  `test_tour1_r24_age_bank.js` (VARIANTS_R24 R5 23/23 + R6 #138 elder «تو» reply and #140 ISO in a reply, both now caught by the post-check; judged by text). Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_age_2026-10-25.md`.
