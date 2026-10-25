@@ -4922,4 +4922,16 @@ dated stability, mind-card feed) under way.
   stage from verdicts, «درست است؟» (yes ⇒ fix written with history; no ⇒ re-check), 🔭/📜/🧭 section, mind-card events.
 - **DECISION** Old plan splitter quarantined (REMOVAL_CANDIDATES 2026-10-25). Two R23 story test turns now give the model's `plan.steps` (DECISIONS_R24 replaces comma-splitting).
 - Tests: `apps/learning-architecture/tests/test_tour1_r24_story.js` (red on 3685102d); bank VARIANTS_R24 R2 28/28, R8 28/28. WORKLOG (106), PROGRESS 115. Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_story_2026-10-25.md`.
+## 2026-10-25 — Pólya tour round 24, fixer «loop» (R1, the round's only S1)
+- **FINDING** Territory loop (`apps/learning-architecture/src/app/a44_route.js`): `sysSheet` read every note of a sheet (`notes.map(...).join`), so `namedItems` took area ids from the
+  sheet's own filing text (where-to-add, the assistant's differential, `whole`) and `fits` took the first candidate with two shared words (incl. negated and generic words) ⇒
+  an unrelated routine reply was announced «🛎 ابزارِ لازم آمد» and the entry stopped waiting, so the next real build was never checked (D24-1 S1; A24-4, A24-5, C24-14, B24·D19).
+  `sysOpen` fell back to the «now» step without `gap.step` ⇒ system-itself sheets marked her step waiting (D24-2, A24-6, C24-13). The ⏸ dossier event never got its outcome (D24-8)
+  or the renamed step (A24-15); event times could go backwards (B24·D18); sys_done left no page line and no note (B24·D19).
+- **CHANGE** Reply notes only; ruled-out areas excluded; negation-aware need text; generic words ignored; every candidate scored, best wins; «arrived» only when clear (≥ two words,
+  one anchored in the step/title, no tie); half-clear ⇒ the page asks her first («این ابزارِ تازه همان است که برای گامِ … لازم بود؟»; `coach_state.sys_fit` or a plain yes/no);
+  kind=fix or no step ⇒ no waiting mark (`sysPend` until the steps name the sheet); sys_done ⇒ page line in her register + note under the sheet; ⏸ event carries the current
+  outcome and step; monotonic event times. Gap contract: taught in the «# پیش‌نیاز» RULE line (a44, user prompt); `a26_assist.js` `AS.triage` strips `step` from kind=fix (the a26 system prompt is at its 20k limit). R23 code quarantined (`APP.PRE.R24_QUARANTINE`; REMOVAL_CANDIDATES).
+- **CHANGE** Tests: `apps/learning-architecture/tests/test_tour1_r24_loop.js` (red-first on the pre-change build: 1/17, 28 errors; after: R1 bank 27/27) + bank copy `tests/variants/VARIANTS_R24.json`.
+  `test_tour1_r23_prereq.js`: G102 now carries `gap.step` (replaced by DECISIONS_R24 R1, commented). Docs: WORKLOG (107), PROGRESS 116, HANDBOOK (§2 bullet, §10 row), AGENTS.md (reply contract).
 
