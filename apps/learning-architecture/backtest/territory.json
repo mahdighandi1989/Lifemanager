@@ -211,8 +211,20 @@
    "bookOnly": true
   },
   "a_higher_order_evidence": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 18,
+     "at": "2026-10-24",
+     "stage": 1,
+     "what": "دور ۱۸: خواندنِ دو مدخل SEP — شاهدِ مرتبهٔ بالاتر (مورد هیپوکسیا، دیدگاه‌های آشتی‌جو/ایستا/تفکیکِ سطح، بازتابِ عقلانی و ضدِ آکراسیای معرفتی) و ناهم‌نظری (دیدگاه وزنِ برابر، دیدگاه‌های ایستا، شاهدِ کل، توجیه‌گرایی)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy — «Higher-Order Evidence»: https://plato.stanford.edu/entries/higher-order-evidence/",
+    "Stanford Encyclopedia of Philosophy — «Disagreement»: https://plato.stanford.edu/entries/disagreement/"
+   ]
   },
   "a_kinds_of_knowledge": {
    "stage": 4,
@@ -2905,6 +2917,6 @@
    "bookOnly": true
   }
  },
- "round": 17,
- "updated": "2026-10-21"
+ "round": 18,
+ "updated": "2026-10-24"
 }

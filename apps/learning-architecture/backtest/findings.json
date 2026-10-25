@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-21",
- "round": 17,
+ "updated": "2026-10-24",
+ "round": 18,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 28,
-    "freshOk": 21,
+    "fresh": 33,
+    "freshOk": 26,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,22 +943,26 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 17
+   "lastSeenRound": 18
   },
   {
    "id": "f_r17_abs_acquisition_source",
    "case": "r17_abs_acquisition_source",
    "opened": "2026-10-21",
    "openedRound": 17,
-   "status": "resolved",
+   "status": "verified",
    "attribution": null,
    "note": "",
    "fix": null,
    "retest": {
     "since": 17,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 3,
+    "freshOk": 3,
+    "ids": [
+     "r18_knight_capital_2012",
+     "r18_rolling_stone_2014",
+     "r18_abs_pump_library"
+    ]
    },
    "kind": "missed",
    "title": "خریدِ شرکت بر پایهٔ «چند گزارش» از یک منبع",
@@ -988,22 +992,27 @@
    ],
    "lastSeenRound": 17,
    "resolved": "2026-10-21",
-   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
+   "verified": "2026-10-24"
   },
   {
    "id": "f_r17_curveball_2002",
    "case": "r17_curveball_2002",
    "opened": "2026-10-21",
    "openedRound": 17,
-   "status": "resolved",
+   "status": "verified",
    "attribution": null,
    "note": "",
    "fix": null,
    "retest": {
     "since": 17,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 3,
+    "freshOk": 3,
+    "ids": [
+     "r18_knight_capital_2012",
+     "r18_rolling_stone_2014",
+     "r18_abs_pump_library"
+    ]
    },
    "kind": "missed",
    "title": "منبعِ «کرْوبال» و آزمایشگاه‌های سیارِ سلاحِ زیستی (۲۰۰۲–۲۰۰۳)",
@@ -1033,7 +1042,8 @@
    ],
    "lastSeenRound": 17,
    "resolved": "2026-10-21",
-   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
+   "verified": "2026-10-24"
   },
   {
    "id": "f_r17_dewey_1948",
@@ -1079,15 +1089,21 @@
    "case": "r17_mayfield_2004",
    "opened": "2026-10-21",
    "openedRound": 17,
-   "status": "resolved",
+   "status": "verified",
    "attribution": null,
    "note": "",
    "fix": null,
    "retest": {
     "since": 17,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 5,
+    "freshOk": 5,
+    "ids": [
+     "r18_reinhart_rogoff_2010",
+     "r18_knight_capital_2012",
+     "r18_chamberlain_1982",
+     "r18_abs_pump_library",
+     "r18_abs_vendor_backtest"
+    ]
    },
    "kind": "missed",
    "title": "شناساییِ اثر انگشتِ بمب‌گذاریِ مادرید با برندون میفیلد (۲۰۰۴)",
@@ -1116,6 +1132,280 @@
    ],
    "lastSeenRound": 17,
    "resolved": "2026-10-21",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
+   "verified": "2026-10-24"
+  },
+  {
+   "id": "f_r18_abs_pump_library",
+   "case": "r18_abs_pump_library",
+   "opened": "2026-10-24",
+   "openedRound": 18,
+   "status": "resolved",
+   "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
+   "note": "ادعا بدونِ بیانِ اطمینان: متنِ ادعا در همین دور پس از دیدنِ «ندید» با جملهٔ «بی‌هیچ قیدِ تردید و با اطمینانِ کامل» تکمیل و conf=۱۰۰ را رمزگذارِ کورِ جدا از متن نوشت. خطای سازنده (روتین)؛ جزوه و موتور درست‌اند. دورِ ناکور برای این کلید — بازآزمایی‌اش «تازهٔ کور» نیست (بازبینِ مستقل).",
+   "fix": {
+    "what": "افزودنِ بیانِ اطمینان به متنِ ادعا + conf (رمزگذار جدا)",
+    "round": 18
+   },
+   "retest": {
+    "since": 18,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "به‌روزرسانیِ کتابخانهٔ داروییِ پمپ‌های تزریق در یک بخش",
+   "tier": "abstract",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 18,
+   "resolved": "2026-10-24",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r18_abs_vendor_backtest",
+   "case": "r18_abs_vendor_backtest",
+   "opened": "2026-10-24",
+   "openedRound": 18,
+   "status": "resolved",
+   "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
+   "note": "ادعا بدونِ بیانِ اطمینان: متنِ ادعا در همین دور پس از دیدنِ «ندید» با جملهٔ «بی‌هیچ قیدِ تردید و با اطمینانِ کامل» تکمیل و conf=۱۰۰ را رمزگذارِ کورِ جدا از متن نوشت. خطای سازنده (روتین)؛ جزوه و موتور درست‌اند. دورِ ناکور برای این کلید — بازآزمایی‌اش «تازهٔ کور» نیست (بازبینِ مستقل).",
+   "fix": {
+    "what": "افزودنِ بیانِ اطمینان به متنِ ادعا + conf (رمزگذار جدا)",
+    "round": 18
+   },
+   "retest": {
+    "since": 18,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "آزمونِ بازگشتیِ فروشنده برای مدلِ ریسکِ یک بانک",
+   "tier": "abstract",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 18,
+   "resolved": "2026-10-24",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r18_chamberlain_1982",
+   "case": "r18_chamberlain_1982",
+   "opened": "2026-10-24",
+   "openedRound": 18,
+   "status": "resolved",
+   "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
+   "note": "ادعا بدونِ بیانِ اطمینان: متنِ ادعا در همین دور پس از دیدنِ «ندید» با جملهٔ «بی‌هیچ قیدِ تردید و با اطمینانِ کامل» تکمیل و conf=۱۰۰ را رمزگذارِ کورِ جدا از متن نوشت. خطای سازنده (روتین)؛ جزوه و موتور درست‌اند. دورِ ناکور برای این کلید — بازآزمایی‌اش «تازهٔ کور» نیست (بازبینِ مستقل).",
+   "fix": {
+    "what": "افزودنِ بیانِ اطمینان به متنِ ادعا + conf (رمزگذار جدا)",
+    "round": 18
+   },
+   "retest": {
+    "since": 18,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "لکهٔ خونِ نوزاد در خودروی چمبرلین (۱۹۸۲)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 18,
+   "resolved": "2026-10-24",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r18_knight_capital_2012",
+   "case": "r18_knight_capital_2012",
+   "opened": "2026-10-24",
+   "openedRound": 18,
+   "status": "resolved",
+   "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
+   "note": "ادعا بدونِ بیانِ اطمینان: متنِ ادعا در همین دور پس از دیدنِ «ندید» با جملهٔ «بی‌هیچ قیدِ تردید و با اطمینانِ کامل» تکمیل و conf=۱۰۰ را رمزگذارِ کورِ جدا از متن نوشت. خطای سازنده (روتین)؛ جزوه و موتور درست‌اند. دورِ ناکور برای این کلید — بازآزمایی‌اش «تازهٔ کور» نیست (بازبینِ مستقل).",
+   "fix": {
+    "what": "افزودنِ بیانِ اطمینان به متنِ ادعا + conf (رمزگذار جدا)",
+    "round": 18
+   },
+   "retest": {
+    "since": 18,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "استقرارِ نرم‌افزار در شرکتِ نایت کپیتال (۲۰۱۲)",
+   "tier": "real",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 18,
+   "resolved": "2026-10-24",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r18_reinhart_rogoff_2010",
+   "case": "r18_reinhart_rogoff_2010",
+   "opened": "2026-10-24",
+   "openedRound": 18,
+   "status": "resolved",
+   "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
+   "note": "ادعا بدونِ بیانِ اطمینان: متنِ ادعا در همین دور پس از دیدنِ «ندید» با جملهٔ «بی‌هیچ قیدِ تردید و با اطمینانِ کامل» تکمیل و conf=۱۰۰ را رمزگذارِ کورِ جدا از متن نوشت. خطای سازنده (روتین)؛ جزوه و موتور درست‌اند. دورِ ناکور برای این کلید — بازآزمایی‌اش «تازهٔ کور» نیست (بازبینِ مستقل).",
+   "fix": {
+    "what": "افزودنِ بیانِ اطمینان به متنِ ادعا + conf (رمزگذار جدا)",
+    "round": 18
+   },
+   "retest": {
+    "since": 18,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "مقالهٔ «رشد در زمانِ بدهی» و آستانهٔ ۹۰٪ (۲۰۱۰)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 18,
+   "resolved": "2026-10-24",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r18_rolling_stone_2014",
+   "case": "r18_rolling_stone_2014",
+   "opened": "2026-10-24",
+   "openedRound": 18,
+   "status": "resolved",
+   "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
+   "note": "ادعا بدونِ بیانِ اطمینان: متنِ ادعا در همین دور پس از دیدنِ «ندید» با جملهٔ «بی‌هیچ قیدِ تردید و با اطمینانِ کامل» تکمیل و conf=۱۰۰ را رمزگذارِ کورِ جدا از متن نوشت. خطای سازنده (روتین)؛ جزوه و موتور درست‌اند. دورِ ناکور برای این کلید — بازآزمایی‌اش «تازهٔ کور» نیست (بازبینِ مستقل).",
+   "fix": {
+    "what": "افزودنِ بیانِ اطمینان به متنِ ادعا + conf (رمزگذار جدا)",
+    "round": 18
+   },
+   "retest": {
+    "since": 18,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "گزارشِ «تجاوز در دانشگاه» در رولینگ‌استون (۲۰۱۴)",
+   "tier": "real",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 18,
+   "resolved": "2026-10-24",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
   },
   {
@@ -1191,8 +1481,8 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 13,
-    "freshOk": 7,
+    "fresh": 18,
+    "freshOk": 12,
     "ids": [
      "r5_hitler_diaries_1983",
      "r5_abs_family_letters",
