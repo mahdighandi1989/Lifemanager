@@ -76,3 +76,14 @@
 - **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار؛ آزمونِ دستیِ age-norms نیاز به `build.py` (dist) دارد ⇒ بدونِ build، دو آزمونِ مرورگری ERR_FILE_NOT_FOUND می‌دهند (محیطی).
 
 ناظرِ خودکار (Claude Code routine)
+
+## 2026-10-25 — کامل
+
+- **کارتابل:** ۰ برگهٔ بی‌پاسخ، ۰ فایل، ۰ نیمه‌کاره، ۰ تیک‌خورده. `whoami` ok (درایو وصل، db_bytes=0). صندوقِ دست‌به‌دستِ general خالی؛ `handoff.py check`: دو کهنهٔ backtest/epi-rules (1409، 7bcc) — مالکشان روتینِ backtest است، دست نخورد.
+- **اجرا:** pytest ‏2009 سبز/۱۲۸ skip/۰ قرمز (۱۲۷ skip = مرورگرِ lla بدونِ playwright در `apps/learning-architecture`؛ ۱ = `xlwt`) · `npm run build` سبز · inventory: ۴۴ صفحه، ۲۹ زیرصفحه، ۱۸۱ دکمه، ۸۸ ورودی، ۱۵ فرم، ۵۹ لینک، ۱۰۶ API، ۴۳۱ مسیر، ۱۵۸ سرویس، ۶۹ مدل، بدونِ alarm/error (بدونِ تغییر) · page_map ‏۵۴ اندازه‌گیری، ۱ نشد، ۵ رد، ۴٬۰۷۰ کنترل (کنسول/۴۰۴ِ `/auth/me` = OPEN_ITEMS ‏۳). vitest اجرا نشد.
+- **production:** `/api/health` = healthy، `/api/version` = `00eb8ec0` = `origin/main`. جز سلامت، نسخه و کارتابل سنجیده نشد.
+- **psy-norms:** `retrieved` = 2026-10-15 (۱۰ روز) ⇒ تازه‌سازی لازم نبود. **sys-territory:** گامی جلو نرفت (کم‌گام‌ترین‌ها در `sys_territory.py status`).
+- **یافته:** صفر. تغییر کد: هیچ. نکتهٔ محیط: playwrightِ pip به کرومیومِ ۱۱۹۴ نیاز داشت ولی محیط ۱۲۴۳ دارد ⇒ `page_map.py` با symlink ِ موقتِ بیرون از ریپو اجرا شد.
+- **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار (sha برابر).
+
+ناظرِ خودکار (Claude Code routine)

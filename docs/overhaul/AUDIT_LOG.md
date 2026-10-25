@@ -4885,3 +4885,6 @@ dated stability, mind-card feed) under way.
 ## 2026-10-24 — CHANGE: بک‌تستِ پیوسته دورِ ۱۸ (روتینِ بک‌تست)
 - +۸ مورد در `apps/learning-architecture/backtest/corpus/round-0018.json`؛ ۶ یافتهٔ «ندید» به علتِ خطای سازندهٔ روتین (ادعا بی‌بیانِ اطمینان) `resolved`؛ کلیدِ `conf` در این دور **ناکور** ثبت شد (بازبین مستقل) و تأییدهای r17 موقتی‌اند. قلمرو: `a_higher_order_evidence` گامِ ۱. جزئیات: WORKLOG (103).
 - FINDING (2026-10-24, دورِ ۱۸): گیتِ pytest سه شکست دارد که روی `main` ِ تمیز هم یکسان است و به این دور (فقط داده) ربطی ندارد: `test_tour1_r11_coach.js`، `test_tour1_r12_coach.js`، `test_tour1_r22_correction.js` (در دومی: ۱ شکست از ۵۱ در VARIANTS_R22). ۲۱۳۳ سبز، ۱ skip؛ بیلدِ فرانت سبز. پوش بر پایهٔ «بی‌اثر بر این سه» انجام شد.
+
+## 2026-10-25 — FINDING: دورِ کاملِ ناظرِ خودکار
+- FINDING (2026-10-25): گیتِ قانونِ ۴ سبز (pytest ‏2009 سبز/۱۲۸ skip، build سبز)؛ production = origin/main؛ کارتابل خالی؛ بدونِ یافتهٔ تازه و بدونِ تغییرِ کد. شکافِ محیط: skipِ ۱۲۷ تستِ مرورگریِ lla بدونِ `npm i` در `apps/learning-architecture` و ناهمخوانیِ نسخهٔ playwright/کرومیوم برای `page_map.py` (نه خرابیِ محصول). ناظرِ خودکار (Claude Code routine)
