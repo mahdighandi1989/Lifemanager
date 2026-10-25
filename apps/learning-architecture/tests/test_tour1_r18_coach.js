@@ -349,6 +349,8 @@ function devScan(sys, user) {
         const t = e.text.replace(/^\([^)]*\)\s*/, ''), want = e.kind === 'pos' ? (/شما/.test(e.expect.split(';')[0]) ? 'شما' : 'تو') : (/شما|بنویسید|کنید/.test(t) ? 'شما' : 'تو');
         await turn(t, 'باشه.', [cs({ register: want })]); const g = await reg();
         ok = e.kind === 'pos' ? g === (want === 'شما' ? 'shoma' : 'to') : !g;
+        // دورِ ۲۴ (DECISIONS_R24 R5، B24·D11 جایگزینِ این ورودی): امرِ کارِ ماشینی به خودِ صفحه («ثبتش کن») دیگر شاهدِ ضمیر نیست — ضمیرِ جاری عوض نمی‌شود
+        if (e.kind === 'pos' && /^آره ثبتش کن$/.test(t.trim())) ok = !g;
       }
       r.res.push([i + 1, ok]); chk(ok, 'rm6reg bank#' + (i + 1) + ' «' + e.text + '» → ' + e.expect + ' :: ' + (await reg()));
     }

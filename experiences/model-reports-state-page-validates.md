@@ -171,3 +171,17 @@ showed "no plan yet". Lessons:
 - **Display one direction.** If change lines say «new (corrected ⇐ old)», asks must not draw the opposite arrow; give proposals a wording without an arrow.
 - **Quote the user verbatim in reasons.** A helper that blanks quotes (to ignore quoted third parties) must not feed a "because she said …" line.
 
+## Update 2026-10-25 (round 24, classify) — normalising must not erase the signal; a log lookup asks "does ANY entry cover both?"
+- **Strip for display, detect on what was said.** Removing greetings and lead-ins makes a clean title, but a lead-in like «Problem: …» or «the teacher
+  gave this question: …» was itself the evidence that a problem follows. Run the detector on the raw message too (or treat a removed lead-in that names
+  the thing as a signal), and keep the raw text next to the cleaned one so later readers of the cleaned text can still ask the same question.
+- **A predicate defined by subtraction needs something subtracted.** "Only a greeting" was coded as "the stripper leaves nothing" — silence («...»)
+  also leaves nothing, and lost the whole coaching block. Require that the stripper actually removed a clause.
+- **Matching against an accumulating log: test membership in every entry, not the first hit.** The post-check merged two question segments only when
+  both matched the same page question, but the lookup returned the first page question with enough shared words; once the session log held an older
+  question with overlapping vocabulary, the page's own two-sentence question split across two entries and was rejected as "two questions".
+- **Single-turn tests hide state bugs — replay the real conversation.** The same reply passed in a fresh session and failed in turn 5. Replaying the
+  runners' actual prompt sequence (saved per turn) on the previous build reproduced it exactly; the fixture for the red test is the log at that turn.
+- **Mixed messages: the stronger kind wins in the direction of harm.** "I used X … and now I don't know what to do" is a stuck, not a use report —
+  misreading stuck as report silently removes help; the reverse only asks once more. Likewise a percent is a confidence only when tied to a confidence
+  word or answering "how sure are you?"; data percents never are.

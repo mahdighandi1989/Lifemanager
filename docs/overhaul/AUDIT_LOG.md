@@ -4935,3 +4935,36 @@ dated stability, mind-card feed) under way.
 - **CHANGE** Tests: `apps/learning-architecture/tests/test_tour1_r24_loop.js` (red-first on the pre-change build: 1/17, 28 errors; after: R1 bank 27/27) + bank copy `tests/variants/VARIANTS_R24.json`.
   `test_tour1_r23_prereq.js`: G102 now carries `gap.step` (replaced by DECISIONS_R24 R1, commented). Docs: WORKLOG (107), PROGRESS 116, HANDBOOK (§2 bullet, §10 row), AGENTS.md (reply contract).
 
+## 2026-10-25 — CHANGE: Pólya tour round 24, fixer «classify» (R4 opening & classification, R6 post-check calibration)
+- **FINDING** (root causes, `apps/learning-architecture/src/app/a27_tour.js` unless noted): the round-23 intro stripper removed lead-ins that name the
+  problem («مسئله: …», «معلممون این سؤال رو داده: …») and the detector then ran on the stripped text only — self-introduction openings were «not a
+  problem yet», with no prerequisite contract and (s21) the fast tier (C24-1); «سارام کلاس دهم» was not an intro (C24-2); the correction block sat on an
+  opening (C24-3); `notProblem` read «...» as greeting-only and dropped the coach block (A24-2, regression); a stuck message with «به کار بردم» was a
+  use report (A24-1); `chatTask` (a26) took the coach signal only from `statesProblem`, so practice reports went to the fast tier (D24-13, regression);
+  «بعدش چی کار کنم؟» named the unknown (C24-7); any percentage was a confidence (A24-8); «مغزم … کار نمی‌کنه» was not an ability label (D24-7, a44);
+  «درسته؟ با ضرب چک کردم» and «فکر کنم کل مسئله حل شد» were guesses, «ایمنی رو حل کردم» a whole-problem solve (B24·D15, A24-14). Post-check: the
+  page-question lookup returned the first matching page question in the session log, so the page's own two-sentence question became «two questions»
+  (A23-20, C24-4, B24·D12) — invisible in single-turn tests, reproduced by replaying the real round-24 prompts on the previous build; the assistant's
+  own «مثلاً «…»» was a quote of her (B24·D10); a natural return to the waiting step was refused (C24-16, a44); «خودت فکر می‌کنی چرا؟» on a system question.
+- **CHANGE** One detector for opening/coach/prerequisite/routing (lead-in signal + raw-message check of the kept statement), intro forms, no correction
+  block on an opening, silence keeps the coach block, stuck beats use, use/rating reports route to the coach, next-step and confidence calibration,
+  own check is not a guess, part-solved is not whole-solved; post-check: any page question covering both segments, illustrative quotes exempt, short
+  attributed quotes checked, natural return accepted by the step's own words and numbers. Old rules quarantined (`APP.ASSIST.R24_QUARANTINE`).
+- **Verify:** `apps/learning-architecture/tests/test_tour1_r24_classify.js` red on the previous build, green now; every R4/R6 entry of the independent
+  bank VARIANTS_R24 that belongs to this fixer green (3 with reasons: two are the age fixer's, one names no mechanism); whole page suite one test at a time.
+## 2026-10-25 — Pólya round 24, fixer «age» (R5 age and register surfaces)
+- **FINDING** Root causes: every birth confirmation used `A.AGE.faBoth` (ISO in brackets) and three writers (page from chat, card, model `birth` action) each
+  pushed their own line with no shared marker (B24·D6, D24-5, A24-20, C); the model action called `setBirth` with its ISO date after the page had already read
+  her sentence (B24·D7, `a34_psy.js` DO.birth); the card forgot a day typed in the card and the parser needed a 4-digit year in numeric forms and Persian month
+  names only (B24·D1); `AGE_SAID` read digits only (A24-10); «# مخاطب» hard-coded «از تاریخِ تولدِ ثبت‌شده» (B24·D8); `regOf` had no age input and the
+  post-check counted «ثبتش کن/نگو» as «تو» for an 82-year-old (B24·D11); `SIGN_TO18` «[بن]STEM(م|مون)» and `SIGN_SH` «[آ-ی]{2,10}[دت](ید|ین)» (C24-10, C24-15);
+  ISO dates reached people through the model's memory/reply (D24-6); the mind-card date field only toasted (A24-13); the norm cell said «هنوز … جواب نداده‌ای»
+  for ages no source covers (D24-10); `A.V.psy_item` opened an adult-normed item for a 9-year-old (C24-18); 📜 quoted a minor's school name (B).
+- **CHANGE** a43 (`faDate`/`faDates`, `confirmOnce`, `fromModel`/`pageParse`, card memory, two-digit/Finglish/day-first forms, `numWords`, audience source,
+  `privText` + `A.dossier` wrapper), a34 (`DO.birth` ⇒ `fromModel`, `noNormFor`, inline field error, psy_item minor guard), a29 (norm line), a27 (elder ⇒ «شما»
+  unless she asked «تو», sign fixes, `regSys` dates, `toShoma` «ی‌اش»), a26 (reply dates), a12 (mirror dates). WORKLOG (109), PROGRESS 118. Old paths quarantined.
+- **DECISION** Elders get «شما» by default (the page's WHO ≥ 60 band; the Persian respect form) — her explicit «تو صدام کن» still wins. Minors' school names
+  are replaced only in kept summaries, never in her own message. **Rejected:** dropping every imperative from register evidence («بگو/نگو» stay signs for
+  adults); hiding the daily puzzle from everyone of unknown age (only known minors are gated; the comparison itself already asks for the date).
+- **CHANGE** Tests `apps/learning-architecture/tests/test_tour1_r24_age.js` (runner sentences; 28 errors on the base build, green after) and
+  `test_tour1_r24_age_bank.js` (VARIANTS_R24 R5 23/23 + R6 #138 elder «تو» reply and #140 ISO in a reply, both now caught by the post-check; judged by text). Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_age_2026-10-25.md`.

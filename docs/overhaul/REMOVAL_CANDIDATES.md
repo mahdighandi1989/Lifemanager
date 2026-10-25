@@ -366,3 +366,20 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   only `gap.step` or a step named «#k»/«#n» waits). A gap without a step is not lost: it is kept in `pre22.sysPend` and binds when the assistant's steps name its number.
 - **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.fits23`, `.namedItems23`, `.stepNow23`. Delete only with the owner's approval.
 
+
+## 2026-10-25 — first-match page-question lookup, any-percent confidence, «stripped to nothing = greeting» (learning-architecture, Pólya round 24, classify: R4/R6)
+- **Files:** `apps/learning-architecture/src/app/a27_tour.js`.
+- **What they did:** the reply post-check matched each question segment to the FIRST page question in the session log that shared enough words
+  (`inPage22`), so a re-worded two-sentence page question split across an older page question and the current one counted as two questions;
+  `unfit23` read any percentage in her last messages as a stated confidence («قسطش ۴۲٪ درآمد میشه»); `notProblem` treated any message that the
+  greeting stripper reduced to nothing as «greeting only», silence «...» included.
+- **Why replaced:** DECISIONS_R24 R6 (the page's own two-sentence question counts as one) and R4 (a confidence is booked only when she gives one;
+  a silent «...» keeps the coach block).
+- **Status:** reachable, not called: `APP.ASSIST.R24_QUARANTINE.inPage22First`, `.conf23`, `.notProblemSilence23`. Delete only with the owner's approval.
+## 2026-10-25 — two-form birth confirmation and verb-blind register signs (learning-architecture, Pólya round 24, age: R5)
+- **Files:** `apps/learning-architecture/src/app/a43_age.js`, `a27_tour.js`.
+- **What they did:** `A.AGE.faBoth` wrote «۱۷ اسفند ۱۳۸۸ (2010-03-08 میلادی)» into every birth confirmation (an ISO date to a child or an elder); `SIGN_SH`
+  took any «…[دت]ین/ید» as a «شما» verb (the noun «روتین»); `SIGN_TO18` took a first-person subjunctive with «ـم/ـمون» («ببینم») as a «تو» imperative.
+- **Why replaced:** DECISIONS_R24 R5 (never ISO to a person; one Jalali confirmation; register signs from verbs only).
+- **Status:** reachable, not called for person-facing text: `APP.AGE.faBoth` (exported for compatibility), `APP.ASSIST.R24_QUARANTINE.signSh`, `.signTo18`.
+  Delete only with the owner's approval.

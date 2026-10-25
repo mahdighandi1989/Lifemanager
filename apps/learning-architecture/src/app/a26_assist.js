@@ -639,6 +639,9 @@
     var sig = AS.statesProblem ? AS.statesProblem(msg) : [AS.CHAT_PROB, AS.LIVE_RE2, AS.LIVE_ASK, AS.LIVE_STUCK, AS.FAIL_ME, LIFE_HINT].some(function (re) { return re && re.test(msg); });
     /* دورِ ۲۲ (P5، D s31 p17): گزارشِ سرانجامِ پیش‌بینی/حدسِ خودش کارِ مربی است */
     if (!sig && AS.ownOutcome22 && AS.ownOutcome22(msg)) sig = true;
+    /* دورِ ۲۴ (R4، D24-13 — پسرفتِ دورِ ۲۳): گزارشِ تمرین/کاربستِ خودش («امروز مدخلِ … رو با همون روش حل کردم: ۱۵ = ۳ × ۵») و خودسنجی («۸۰٪ یادم بود»)
+       مسئلهٔ تازه نیستند (statesProblem ⇒ نه، تا «اول کل» و صورتِ تازه نیاید) ولی کارِ مربی‌اند: سنجشِ جلسه، کالیبراسیون، پرسشِ بازنگری — همان ردهٔ خودِ صفحه */
+    if (!sig && AS.metaMsg22) { var mk24 = AS.metaMsg22(msg); if (mk24 === "use" || mk24 === "rating") sig = true; }
     if (COACH_BLOCK.test(p) && (sig || o.prev === "lla_coach")) return "lla_coach";
     return "lla_assistant";
   };
@@ -1078,6 +1081,7 @@
       h("p", { class: "small muted" }, "می‌برمت به جای درست، فرم را از حرف‌هایت پر می‌کنم و باقی را نشانت می‌دهم. عکس و فایل هم می‌خوانم (بچسبان یا 📎).")));
     (s ? s.msgs : []).forEach(function (m) {
       var mv = m.role === "sys" && AS.regSys ? Object.assign({}, m, { text: AS.regSys(s, m.text) }) : m;   // دورِ ۲۳ (Q1، A23-14): سطرِ خودِ صفحه به ضمیرِ گفت‌وگو
+      if (m.role === "ai" && A.faDates) mv = Object.assign({}, mv, { text: A.faDates(mv.text) });   // دورِ ۲۴ (R5، D24-6): هرگز «YYYY-MM-DD» به آدم — تاریخِ پاسخِ مدل هم شمسی نشان داده می‌شود
       log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx", dir: "rtl" }, richNodes(mv)),
         m.files && m.files.length ? h("div", { class: "as-fl" }, m.files.map(function (f) { return f.link ? h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name) : h("span", { class: f.err ? "bad" : "" }, "📄 " + f.name); })) : null,
         csvNodes(m), AS.msgTools ? AS.msgTools(s, m) : null));   // INF15 (a40): «✏️ اصلاح» فقط روی حبابِ خودِ کاربر
