@@ -340,3 +340,11 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   range bound as the single value and read «؟» of a masked number as a sentence end; `stampUses` tied a verdict that named no datum to every datum including the whole statement.
 - **Why replaced:** DECISIONS_R23 Q4 (number role: list unit, range, counted noun, masked digits; never a borrowed unit; without `rests`, keep verdicts that do not consume the datum).
 - **Status:** reachable, not called: `APP.LIVE_R22_QUARANTINE_Q4.numCopy`, `.pickAll`. Delete only with the owner's approval.
+
+## 2026-10-25 — R23 plan splitter and whole-message plan text (learning-architecture, Pólya round 24, story: R2)
+- **File:** `apps/learning-architecture/src/app/a45_story.js`.
+- **What they did:** `planPieces` (R23) cut every plan at commas, full stops and a bare «بعد» into plan steps (tB1 «گامِ ۱ ِ طرح: اگه مستقل باشن … گامِ ۸»; aD4 card/birth sentences as steps);
+  `planText` (R23) fell back to the WHOLE message when no sentence carried a plan verb, so a check/birth message became «طرح».
+- **Why replaced:** DECISIONS_R24 R2 (plan steps only from her own list or the model's validated `plan.steps`; never cut at commas or sentences; bank R24 #31/#43/#44/#45).
+- **Status:** reachable, not called: `APP.STORY.planPiecesR23`, `APP.STORY.planTextR23`. Delete only with the owner's approval.
+

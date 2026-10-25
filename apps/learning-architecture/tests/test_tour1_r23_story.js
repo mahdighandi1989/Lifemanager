@@ -99,7 +99,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     const pid = await bind('سه پروژه در ۱۲ ساعت', 'با ۱۲ ساعت در هفته، کدوم پروژه رو اول جلو ببرم: کتاب، اپ یا دوره؟');
     await turn('در یک جمله: می‌خوام با ۱۲ ساعتِ هفته سه پروژه رو طوری پیش ببرم که کتاب تا آخرِ سال تموم بشه.', 'خوب.', [cs({ ph: 'u', said: ['u'] })]);
     await turn('داده‌ها: کتاب ۱۲۰ ساعت کار مونده، اپ ۶۰ ساعت، دوره ۳۰ ساعت.', 'خوب.', [cs({ ph: 'u', said: ['d'] })]);
-    await turn('اول کتاب رو هفته‌ای ۶ ساعت جلو می‌برم، بعد اپ ۳ ساعت، آخرشم دوره ۱ ساعت.', 'طرحت روشن است.', [cs({ ph: 'p', said: ['plan'], plan: { text: 'اول کتاب رو هفته‌ای ۶ ساعت جلو می‌برم، بعد اپ ۳ ساعت، آخرشم دوره ۱ ساعت' } })]);
+    // DECISIONS_R24 R2 (B24·D3/D24-9; bank R24 #31/#32): the page never cuts a plan at commas — the three steps come from the model's validated `plan.steps` (each quote in her text)
+    await turn('اول کتاب رو هفته‌ای ۶ ساعت جلو می‌برم، بعد اپ ۳ ساعت، آخرشم دوره ۱ ساعت.', 'طرحت روشن است.', [cs({ ph: 'p', said: ['plan'], plan: { text: 'اول کتاب رو هفته‌ای ۶ ساعت جلو می‌برم، بعد اپ ۳ ساعت، آخرشم دوره ۱ ساعت', steps: ['کتاب رو هفته‌ای ۶ ساعت جلو می‌برم', 'اپ ۳ ساعت', 'دوره ۱ ساعت'] } })]);
     const ph = await p.evaluate((pid) => ({ form: APP.livePhase(pid), story: APP.liveStoryPhase(pid) }), pid);
     chk(ph.form === 'u' && ph.story === 'c', 'C23-11: the live stage advances from coach_state (form still «فهم», story «اجرا») :: ' + JSON.stringify(ph));
     const M = await Mo(pid);
@@ -217,7 +218,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     await turn('ولی خب ۲۴ تقسیم بر ۰٫۱۶ چرا اینقدر زیاد میشه؟', 'خوب.', [cs({ ph: 'c', said: [], stuck: true })]);
     M = await Mo(sid); T(60, /تعدادِ کاشی‌ها/.test(M.dest) && !/چرا اینقدر زیاد/.test(M.dest), M.dest);
     // #58 plan in chat (no ZWNJ) → three points, plan form prefilled when a live comes
-    await turn('اول مساحت کفو حساب میکنم، بعد تقسیم بر مساحت یه کاشی، آخرشم ۱۰ درصد اضافه برای شکستگی', 'طرحت روشن است.', [cs({ ph: 'p', said: ['plan'] })]);
+    // DECISIONS_R24 R2 (bank R24 #31/#32): three steps only from the model's validated plan.steps — a bare comma sentence is one plan entry
+    await turn('اول مساحت کفو حساب میکنم، بعد تقسیم بر مساحت یه کاشی، آخرشم ۱۰ درصد اضافه برای شکستگی', 'طرحت روشن است.', [cs({ ph: 'p', said: ['plan'], plan: { steps: ['مساحت کفو حساب میکنم', 'تقسیم بر مساحت یه کاشی', '۱۰ درصد اضافه برای شکستگی'] } })]);
     M = await Mo(sid); let pl = M.pts.filter(q => q.k === 'cplan23').map(q => q.t);
     // #62 step report → «اجرا»
     await turn('خب مساحت کف شد ۲۴ متر مربع', 'خوب.', [cs({ ph: 'e', said: [], step: { quote: 'مساحت کف شد ۲۴ متر مربع', done: 'yes' } })]);

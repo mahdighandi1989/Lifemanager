@@ -1362,7 +1362,7 @@
   function qParts(q) {
     q = String(q || "");
     if (/^فرض چیست؟ حکم/.test(q)) return ["u", "d"];
-    if (/^(?:مجهول|دقیقاً چه می‌خواهی)/.test(q)) return ["u"];
+    if (/^(?:(?:به\s*)?مجهول|دقیقاً چه می‌خواهی)/.test(q)) return ["u"];   // دورِ ۲۴ (R2): «به مجهول نگاه کن: …» ِ عملی/زندگی هم پرسشِ مجهول است
     if (/^(?:داده‌ها|چه داری)/.test(q)) return ["d"];
     if (/^(?:شرط چیست|کدام قیدها)/.test(q)) return ["c"];
     return [];
@@ -1455,6 +1455,23 @@
       ptr: o.live ? "پرسشِ این نوبت همان یکیِ «مسئلهٔ زندهٔ این سشن» است" : "پرسشِ این نوبت همان یکی است که بالا آمده («پیشنهادِ این نوبت» یا سطرِ «پرسشِ این نوبت همین است»)" };
   }
   AS.coachMoments = turnMoments;
+  /* دورِ ۲۴ (R2، D24-15، C24-8، A23-35): پرسشِ فهمی که جوابش را خودش داده — در داستانِ سنجیدهٔ همین مسئلهٔ گفت‌وگو (a45)، یا در پرسشِ خودش با فعلِ اول‌شخص
+     («چند تا تخته بخرم؟»، «ساعت‌ها را چطور بچینم؟») در همین پیام یا پیامی از همین مسئله، یا با همان سنجشِ پس‌وارسی (unfit23) — پیشنهادِ نوبت نمی‌شود
+     (پیش‌تر صفحه خودش «مجهول چیست؟» را پیشنهاد می‌داد و همان را پس از پاسخِ مدل «کهنه» می‌خواند) */
+  var OWNQ24 = /(?:چند|چقدر|چه\s*قدر|کدوم|کدام|چطور|چطوری|چگونه|کِی|کی|چی\s*کار|چیکار|چه\s*کار)[^.!؟?\n]{0,80}?(?:م|یم)\s*[؟?]/;
+  function storyAns24(s, q, mt) {
+    var ps = qParts(q); if (!ps.length || !s) return false;
+    var C = s.coach || {}, pk = String(C.pk || "c:0"), st = {};
+    try { if (A.STORY && A.STORY.items) A.STORY.items(s, pk).forEach(function (x) { if (x.k === "u" || x.k === "d" || x.k === "c") st[x.k] = 1; if (x.k === "whole") st.u = 1; }); } catch (e) { }
+    /* «بعدش چی کار کنم؟» پرسشِ گامِ بعد است، نه گفتنِ مجهول (بانکِ R24 #46) */
+    if (ps.indexOf("u") >= 0 && !st.u && !(mt && /(?:بعد(?:ش|ش\s*هم|ی)?|حالا|الان|دیگه)\s*(?:باید\s*)?(?:چی[\s‌]*کار|چیکار|چه[\s‌]*کار|چی)\s*(?:کنم|بکنم|کار\s*کنم)/.test(ownText(String(mt))))) {
+      var win = A.STORY && A.STORY.pkWindow ? A.STORY.pkWindow(s, pk) : { from: "", to: "~" }, U = (s.msgs || []).filter(function (m) { return isUser(m) && String(m.at || "") >= String(win.from || "") && String(m.at || "") <= String(win.to || "~"); }).map(function (m) { return ownText(String(m.text || "")); });
+      if (mt) U.push(ownText(String(mt)));
+      if (U.some(function (t) { var mm = OWNQ24.exec(t); return !!mm && !/(?:پیدا|حل|شروع|امتحان|حساب|ثابت|بفهمم)\s*(?:ش\s*)?(?:کنم|کنیم)?\s*[؟?]?$/.test(mm[0].replace(/\s*[؟?]$/, "")); }) || (mt && /مجهول را خودش در همین پیام گفت/.test(unfit23("مجهول چیست؟", mt, s)))) st.u = 1;
+    }
+    return ps.every(function (k) { return st[k]; });
+  }
+  AS.storyAns24 = storyAns24;
   function coachLines(o) {
     o = o || {}; var ph = PH_OF[o.ph] || "p", cls = o.cls || "any", s = o.s || null, mt = String(o.mt || "");
     /* H3 (دورِ ۷، s25/s12): سرواژه و فهرست از یک مرحله — حدسِ تازه پس از مسئلهٔ بسته‌شده ⇒ «فهم»؛ نوبتِ ردِ حدس ⇒ «طرح» (نه فهرستِ بازنگری زیرِ سرواژهٔ دیگر) */
@@ -1470,7 +1487,7 @@
     if (swPh && qsFollow) ph = swPh;
     var qs = qsFollow && swPh ? [] : (o.qs || []).filter(Boolean); if (!qs.length) qs = phaseQs(ph, cls, o.pid);
     /* دورِ ۶ (G1، s01 روزِ ۲۰): «گفته‌شده» ِ الگو (statedParts) فقط مرحله را جلو می‌برد؛ هرگز پرسشی را «[پاسخ گرفته]» نمی‌کند — فقط دفترِ سنجیده/صفحه */
-    var asked = s ? askedInChat(s) : [], ans = qs.filter(function (q) { return answeredQ(s, q, asked); }), open = qs.filter(function (q) { return ans.indexOf(q) < 0; });
+    var asked = s ? askedInChat(s) : [], ans = qs.filter(function (q) { return answeredQ(s, q, asked) || (!o.live && storyAns24(s, q, mt)); }), open = qs.filter(function (q) { return ans.indexOf(q) < 0; });
     /* D2: پیشنهاد به ترتیبِ کلی ⇐ خاص بر پایهٔ پلهٔ کاربر در همین مرحله (چند پرسشِ آن پاسخ گرفته) — نخستین پرسشِ پاسخ‌نگرفته؛ نه با شمارِ پیام.
        E3 (دورِ ۴، s08): در طرح، رو به جلو گیر کرده ⇒ «از خواسته به عقب» نخست (اگر هنوز پاسخ نگرفته) */
     var back = ph === "p" && o.stuck ? open.filter(function (q) { return /به\s*عقب/.test(q); })[0] : "";
@@ -1486,6 +1503,8 @@
     var win = !o.live && !o.dry ? MO.list[0] || null : null, isWin = function (id) { return !!win && win.id === id; };
     var sugList = sug;   // پلهٔ استقلالِ همین مرحله (معلمِ خیالی) از پرسشِ فهرست سنجیده می‌شود، نه از پرسشِ لحظه
     if (win && win.id !== "B231" && win.id !== "A129") sug = win.q;
+    /* دورِ ۲۴ (R8، §۲۱): کارِ پیشینِ سنجیده ⇒ پرسشِ نوبت از نقطهٔ ازسرگیری (نخستین گامی که «درست» نیست) — گامِ درست دوباره پرسیده نمی‌شود */
+    if (!win && !o.live && s) { var pr24 = ""; try { pr24 = A.STORY && A.STORY.priorTurnQ ? A.STORY.priorTurnQ(s, "") : ""; } catch (e) { } if (pr24) sug = pr24; }
     /* E1: شناسهٔ هر پرسش (u1، p3، e2، b1 …) — مدل در گزارشِ وضع با همین شناسه می‌گوید کدام پرسش پاسخ گرفت */
     if (s && !o.live) { var C1 = s.coach = s.coach || {}; C1.qmap = {}; qs.forEach(function (q, i) { C1.qmap[QID[ph] + (i + 1)] = q; }); }
     /* F4 (دورِ ۵): سرواژه از نوع × داور — اثباتیِ عینی «اثباتی»، pod ِ عینی «اثبات یا رد (حدس)»، pod ِ زندگی/عملی «فرضیه»، زندگی «تصمیمِ زندگی» */
@@ -1771,7 +1790,7 @@
   /* بلوکِ فشردهٔ مسئلهٔ زنده (همیشه، برای سشنِ بسته) — اگر قلابِ خودِ بخشِ مسئله آن را نیاورده باشد (مثلاً بیرون از صفحه‌اش) */
   var PHN2 = { u: "فهمِ مسئله", p: "طرح", c: "اجرا", b: "بازنگری" }, NATN = { objective: "برهان/وارسیِ گام (پاسخِ عینی)", practical: "واقعیت (مسئلهٔ عملی با کمیت)", life: "واقعیت و داوریِ خودش" };
   function compactLive(s, pid, nq, dataOk, fresh) {
-    var r = A.liveRec(pid), ph = A.livePhase ? A.livePhase(pid) : "", kind = liveKind(pid), pg = S.get("eprog_" + pid) || {}, so = pg.solve || {}, u = (so.u && so.u[1] && so.u[1].done) ? so.u[1] : null, L = so.live || {};
+    var r = A.liveRec(pid), ph = A.liveTurnPhase ? A.liveTurnPhase(pid) : A.livePhase ? A.livePhase(pid) : "", /* دورِ ۲۴ (R2): مرحلهٔ داستان، همان بلوکِ کامل */ kind = liveKind(pid), pg = S.get("eprog_" + pid) || {}, so = pg.solve || {}, u = (so.u && so.u[1] && so.u[1].done) ? so.u[1] : null, L = so.live || {};
     var out = ["# مسئلهٔ زندهٔ این سشن (" + pid + "): «" + clip(r.p.title, 80) + "» · مرحله: " + (PHN2[ph] || ph) + " · داور: " + (NATN[kind] || kind || "؟") + " — (فشرده؛ این سشن به همین مسئله بسته است، حتی بیرون از صفحه‌اش)",
       "- صورت (عینِ حرفِ خودش): «" + clip(r.p.statement, 220) + "»"];
     if (u) out.push("- فهمِ خودش: مجهول «" + clip(u.u || u.one || "", 100) + "»" + ((u.dl || []).length ? " · داده‌ها: " + u.dl.map(function (d) { return "«" + clip(d.t, 40) + "»"; }).join("، ") : "") + (u.c ? " · شرط «" + clip(u.c, 100) + "»" : ""));
@@ -2183,6 +2202,10 @@
     /* دورِ ۵ (F1، s34، s37): «فکر کنم باید…» در گشایشی که دلسردی یا نیتِ زورِ خام است («انصراف بدم»، «۱۰۰ حالت رو یکی‌یکی امتحان کنم») طرح نیست؛
        دورِ ۶ (G3، s21): نیتِ زورِ خام («اول همه‌ی کیش‌ها رو امتحان می‌کنم») تا مجهول گفته نشده هرگز طرح نیست، گشایش باشد یا نه */
     else if (PLAN_RE.test(mt) && ph !== "b" && ph !== "c" && !((intro || !ph0) && (FAIL_ME.test(mt) || GIVEUP_RE.test(mt))) && !((intro || !ph0 || ph0 === "u") && BRUTE_RE.test(mt))) ph = ph === "p" || (st.u && st.d && st.c) ? "c" : "p";
+    /* دورِ ۲۴ (R2، D24-15، C24-8): داستانِ سنجیدهٔ همین مسئلهٔ گفت‌وگو (a45: مجهول/داده/شرط/طرح/گام که مدل گزارش داد و صفحه با حرفش سنجید) همان «گفته‌شده» است —
+       مرحله از آن عقب‌تر نمی‌ماند و پرسشِ فهمی که داستان جوابش را دارد پیشنهادِ نوبت نمی‌شود (coachLines ← storyAns24) */
+    try { if (A.STORY && A.STORY.items) { var SI24 = A.STORY.items(s, String(C.pk || "c:0")); SI24.forEach(function (x) { if (x.k === "u" || x.k === "d" || x.k === "c") st[x.k] = 1; if (x.k === "whole") st.u = 1; });
+      var sp24 = A.STORY.phaseOfItems(SI24); if (sp24 === "c" && ORD[sp24] > ORD[ph || "u"]) ph = sp24;   /* فقط طرح/گامِ سنجیده مرحله را جلو می‌برد؛ مجهول/داده/شرط از راهِ st (قاعدهٔ همین تابع: هر سه ⇒ طرح) */ } } catch (e) { }
     if (!ph || (ph === "u" && st.u && st.d && st.c)) ph = st.u && st.d && st.c ? "p" : "u";
     /* خواندنِ پشتیبانِ همین پیام؛ گزارشِ مدل (اگر آمد) جایش را می‌گیرد — از همین وضعِ پیش از پیام؛ ولی نتیجهٔ بی‌ابهامِ خودش (strong) را به عقب برنمی‌گرداند */
     C.pk = "c:" + (C.gen || 0);
@@ -4717,7 +4740,9 @@
     if (/فکر[\s‌]*می[\s‌‌]?کنی[\s‌]*چه[\s‌]*می[\s‌‌]?شود|چقدر[\s‌]*مطمئنی/.test(q)) { var M = ((se && se.msgs) || []).filter(isUser).slice(-2).map(function (x) { return ownText(String(x.text || "")); }).concat([o]).join(" \n ");
       if (/[0-9۰-۹]{1,3}[\s‌]*(?:٪|%|درصد)|مطمئنم|احتمال(?:ش)?[\s‌]*(?:زیاده|کمه|[0-9۰-۹])|از[\s‌]*[0-9۰-۹]+[\s‌]*تا[^.!؟?\n]{0,20}[0-9۰-۹]/.test(M)) return "پیش‌بینی و اطمینانش را همین حالا گفت — دوباره نپرس"; }
     /* سهمِ story (Q3): گفت‌وگو از مرحلهٔ فرمِ فهم جلوتر است ⇒ پرسشِ فرمِ فهم («کلِ مسئله…»، «مجهول…») کهنه است */
-    try { var bl23 = AS.boundLive(se); if (bl23 && bl23.pid && A.liveStoryAhead && A.liveStoryAhead(bl23.pid) && /کلِ[\s‌]*مسئله|مجهول[^؟?]{0,20}چیست|داده‌ها[^؟?]{0,20}چیست|شرط[\s‌]*چیست/.test(q)) return "گفت‌وگو از فهمِ مسئله جلوتر رفته (همان که صفحه از گفت‌وگو گرفت) — پرسشِ فرمِ فهم کهنه است"; } catch (e) { }
+    /* دورِ ۲۴ (R2، B24·D4، C24-9): فقط خودِ پرسشِ فرمِ فهم — نه پرسشِ وارسیِ دوباره پس از اصلاحِ داده («با مقدارِ اصلاح‌شده … دوباره وارسی کند») که در پرانتزش «کلِ مسئله … را پیش نکش» آمده */
+    var qU24 = q.replace(/\([^)]*\)/g, " "), reChk24 = /اصلاح[\s‌]*شده|دوباره[\s‌]*وارسی|پس[\s‌]*از[\s‌]*اصلاح|عددِ?[\s‌]*تازه|مقدارِ?[\s‌]*تازه/.test(q);
+    try { var bl23 = AS.boundLive(se); if (!reChk24 && bl23 && bl23.pid && A.liveStoryAhead && A.liveStoryAhead(bl23.pid) && /کلِ[\s‌]*مسئله|مجهول[^؟?]{0,20}چیست|داده‌ها[^؟?]{0,20}چیست|شرط[\s‌]*چیست/.test(qU24)) return "گفت‌وگو از فهمِ مسئله جلوتر رفته (همان که صفحه از گفت‌وگو گرفت) — پرسشِ فرمِ فهم کهنه است"; } catch (e) { }
     if (/پیش‌?[\s‌]*تر[^؟?]{0,60}دیده‌?ای|مسئلهٔ[\s‌]*مرتبط/.test(q) && solvedSaid(m)) return "به نتیجه رسید — پرسشِ «پیش‌تر دیده‌ای؟» ِ طرح‌ریزی کهنه است";
     return ""; }
   AS.unfit23 = unfit23;

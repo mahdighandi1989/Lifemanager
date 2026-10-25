@@ -1674,8 +1674,18 @@
   }
   function gapAnswered(lo) { return !!(lo && !lo.auto && lo.guess && txt(lo.guess.reflect)); }
   function restatedAfter(L, lo) { var t = String((lo && (lo.at || lo.d)) || ""); return !!t && (L.restates || []).some(function (x) { return x && String(x.at || "") >= t; }); }
+  /* دورِ ۲۴ (R2 «یک داستان، مرحله و پرسشِ نوبت»، A23-35، B24·D2، C24-8): مرحلهٔ پرسشِ نوبت همان A.liveStoryPhase است (فرم یا داستانِ سنجیدهٔ گفت‌وگو، هر کدام
+     جلوتر؛ a45) — نه مرحلهٔ فرم. پیش‌تر فرمِ فهمِ تأییدنشده پرسشِ نوبت را روی «فهم» نگه می‌داشت و نردبان u1 («به مجهول نگاه کن…») را پس از نتیجه و طرح
+     دوباره می‌پرسید. «بازنگری» فقط از فرم (حل شد) یا نتیجهٔ کل؛ فرم‌ها خودشان دست نمی‌خورند (فقط «از گفت‌وگو … درست است؟»). */
+  var PH_ORD24 = { u: 0, p: 1, c: 2, b: 3, done: 4 };
+  function storyPh(r, s) {
+    var ph = phaseOf(s); if (ph !== "u" && ph !== "p" && ph !== "c") return ph;
+    var sp = ""; try { sp = A.liveStoryPhase ? A.liveStoryPhase(r.p.id) : ""; } catch (e) { sp = ""; }
+    return sp && PH_ORD24[sp] > PH_ORD24[ph] && sp !== "done" ? sp : ph;
+  }
+  A.liveTurnPhase = function (pid) { var r = rec(pid); return r ? storyPh(r, solOf(pgOf(pid))) : ""; };
   function coachCore(r, pg, s, opts) {
-    var L = live(s), ph = phaseOf(s), key = ph === "done" ? "b" : ph, Q = phaseQs(r, s, key), q = "", tut = pg.tut || {}, o = opts || {}, T = o.turn || {};
+    var L = live(s), ph = storyPh(r, s), key = ph === "done" ? "b" : ph, Q = phaseQs(r, s, key), q = "", tut = pg.tut || {}, o = opts || {}, T = o.turn || {};
     var asked = (o.asked || []).filter(Boolean), isAsked = function (x) { return asked.some(function (a) { return sameQ(a, x); }); };
     /* H2 (دورِ ۷): متنِ همین نوبت — اگر نشانه‌های نوبت متن نیاوردند، همان پیامِ کاربر در زمینهٔ قلاب (نه پیامِ سامانه) */
     var hc0 = o.turn && !T.text && A.ASSIST && A.ASSIST._hookCtx, hm0 = hc0 && !/^\s*\[سامانه/.test(String(hc0.msg || "")) ? String(hc0.msg || "") : "";
@@ -1717,6 +1727,8 @@
     /* دورِ ۲۲ (P1، A22-24): پشتهٔ پیش‌نیازِ این مسئله باز است ⇒ پرسشِ نوبت همان پرسشِ تشخیصی/تسلطِ بالای پشته (a44، یک منبع) — پیش از هر لحظهٔ دیگر */
     var PQ22 = null; try { PQ22 = A.prereqTurnQ ? A.prereqTurnQ(r.p.id) : null; } catch (e) { PQ22 = null; }
     if (PQ22 && PQ22.q) { q = PQ22.q; src = "prereq-" + PQ22.st; }
+    /* دورِ ۲۴ (R8، §۲۱): کارِ پیشینِ سنجیدهٔ همین مسئله ⇒ پرسشِ نوبت از نقطهٔ ازسرگیری (a45 A.STORY.priorTurnQ) تا کارِ تازه‌ای پس از آن حکم‌ها بیاید */
+    if (!q && o.turn && !sysT0(o)) { var PR24 = ""; try { PR24 = A.STORY && A.STORY.priorTurnQ ? A.STORY.priorTurnQ(null, r.p.id) : ""; } catch (e) { PR24 = ""; } if (PR24) { q = PR24; src = "prior-resume"; } }
     /* (۱) کارِ همین نوبت */
     /* «…درسته؟» پس از یک مقدار حدس است، نه نتیجه (G1/G2 دورِ ۶، s02/s07/s09 — turn.guess از مربی) ⇒ «چطور می‌آزمایی‌اش؟» */
     if (act && onlyAnsNow(r, s, T, tx)) pick(Q_ONLYANS, "turn-onlyans");
@@ -5213,7 +5225,7 @@
     AS.promptHooks.push(function (s, msg) { if (A.liveSessionPid(s)) return ""; var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-4).map(function (m) { return m.text; })).join(" "); return LIVE_RE.test(recent) ? RULES : ""; });
     AS.promptHooks.push(function (s, msg) {
       var st = A.state || {}, onPage = st.view === "lprob" || (st.view === "e_prob" && rec(st.arg)), bp = A.liveSessionPid(s), pid = onPage ? st.arg : bp || (s && s.lprob), r = rec(pid); if (!r) return "";
-      var pg = pgOf(pid), so = solOf(pg), ph = phaseOf(so);
+      var pg = pgOf(pid), so = solOf(pg), ph = storyPh(r, so);   // دورِ ۲۴ (R2): مرحلهٔ بلوک = مرحلهٔ داستان (A.liveStoryPhase)، نه فرم
       if (ph === "done") return "";   // مسئلهٔ بسته‌شده دیگر «مسئلهٔ زندهٔ این سشن» نیست
       /* دورِ ۲ (R1/R2): سشنی که به این مسئله بسته است (ساختنِ آن در همین سشن، یا رفتن به صفحه‌اش) همیشه این بلوک را می‌گیرد — بی شرطِ واژهٔ مشترک.
          فقط سشنِ نابسته‌ای که پیشینه دارد هنوز به «دو واژهٔ مشترک» نیاز دارد. */

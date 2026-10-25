@@ -4893,3 +4893,15 @@ dated stability, mind-card feed) under way.
 - **DECISION** Accepted as roadmap §21 and DECISIONS_R24 R8 (story fixer, with R2): `coach_state.prior` with verdict per step, resume at the
   first non-✓ step, dependents marked, facets via the tour, shown with «درست است؟», no rewrite without her yes. At least two scenarios per group
   from round 25. Owner question bank #31. No code started (owner's pause).
+
+## 2026-10-25 — CHANGE: Pólya round 24, fixer «story» (R2 one story, stage and turn question; R8 «کارِ پیشینِ من», roadmap §21)
+- **FINDING** The live turn question and the live prompt block read the FORM stage (`phaseOf`), so an unconfirmed u-form kept asking u1 after a result and a plan (A23-35, B24·D2, C24-8);
+  any chat result moved the whole problem to look-back (D24-3); plans were cut at commas and whole messages became plans (B24·D3, D24-9); correction messages, rejected attempts and
+  meta-questions became data/unknown (B24·D22, A24-7, C24-11, D24-12); chat_solved left the recorded u-form empty (B24·D2); the chat coach suggested «مجهول چیست؟» after she said it (D24-15);
+  the page demoted its own post-correction re-check (B24·D4, C24-9).
+- **CHANGE** a38 `storyPh`/`A.liveTurnPhase` (turn stage = story stage), a27 `storyAns24`/`compactLive`/`coachPhase0`/`unfit23`, a45 (fin results, list-or-validated plan steps, import filters,
+  `solvedAsk`, 🔭 strip), a44 (`cprior` main line, «حکم» stack label). R8: `coach_state.prior` with page-validated quotes, arithmetic/unit checks, dependency marks, resume point,
+  stage from verdicts, «درست است؟» (yes ⇒ fix written with history; no ⇒ re-check), 🔭/📜/🧭 section, mind-card events.
+- **DECISION** Old plan splitter quarantined (REMOVAL_CANDIDATES 2026-10-25). Two R23 story test turns now give the model's `plan.steps` (DECISIONS_R24 replaces comma-splitting).
+- Tests: `apps/learning-architecture/tests/test_tour1_r24_story.js` (red on 3685102d); bank VARIANTS_R24 R2 28/28, R8 28/28. WORKLOG (106), PROGRESS 115. Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_story_2026-10-25.md`.
+

@@ -222,7 +222,9 @@
   function gotSoFar(sc) {
     if (sc.pid) {
       var pg = S.get("eprog_" + sc.pid), so = (pg && pg.solve) || {}, L = so.live || {}, u = (so.u && so.u[1]) || L.uDraft || {}, out = [];
-      if (txt(u.u)) out.push("مجهول: «" + clip(u.u, 70) + "»");
+      /* دورِ ۲۴ (R2، بانکِ R24 #41، pA1-stack): مسئلهٔ اثباتی «حکم» دارد، نه «مجهول» */
+      var pv24 = false; try { pv24 = ((A.liveKindInfo && A.liveKindInfo(sc.pid)) || {}).type === "prove"; } catch (e) { }
+      if (txt(u.u)) out.push((pv24 ? "حکم" : "مجهول") + ": «" + clip(u.u, 70) + "»");
       if (L.plan && txt(L.plan.t)) out.push("طرح: «" + clip(L.plan.t, 80) + "»");
       var done = (L.steps || []).filter(function (st) { return st && st.out && !st.out.auto && st.out.done === "yes"; }); if (done.length) out.push(fa(done.length) + " گامِ انجام‌شده (آخری: «" + clip(done[done.length - 1].text, 50) + "»)");
       return out.join("؛ ");
@@ -539,7 +541,9 @@
   /* =================== P2 — «🧭 نقشهٔ مسیرِ مسئله» =================== */
   var MAIN_K = { sysresume: 1, stmt: 1, u: 1, udraft: 1, restate: 1, plan: 1, step: 1, out: 1, ans: 1, verdict: 1, state: 1, back: 1, cplan: 1, cplandone: 1, checkin: 1, incub: 1, incubback: 1, woke: 1, claim: 1, newprobs: 1, deadline: 1, act: 1,
     /* دورِ ۲۳ (Q3، a45): کارِ سنجیدهٔ گفت‌وگو روی خطِ اصلی — کل، مجهول، داده، شرط، طرح (هر گامش یک نقطه، به ترتیبِ خودش)، گزارشِ گام، نتیجه، پاسخِ بازنگری */
-    cwhole: 1, cunk: 1, ccond: 1, cdata: 1, cplan23: 1, cstep: 1, cres: 1, clb: 1 };
+    cwhole: 1, cunk: 1, ccond: 1, cdata: 1, cplan23: 1, cstep: 1, cres: 1, clb: 1,
+    /* دورِ ۲۴ (R8، §۲۱): «کارِ پیشینِ تو» با حکمِ هر گام یک نقطه روی خطِ اصلی (گام‌های طرح فقط از نشانه‌گذاریِ خودش — a45 planPieces؛ بُرش در ویرگول هرگز) */
+    cprior: 1 };
   /* رویدادِ گفت‌وگویی که همان رکوردِ صفحه را دارد دوبار روی خط نمی‌آید (بانکِ R23 #84): فرمِ فهمِ ثبت‌شده ⇐ کل/مجهول/داده/شرط؛ طرحِ صفحه ⇐ طرحِ گفت‌وگو */
   var CHAT_COVER = { cwhole: "u", cunk: "u", ccond: "u", cdata: "u", cplan23: "plan" };
   var DET_K = { aux: "aux", guess: "guess", gold: "guess", pre: "pre", prediag: "pre", preok: "pre", syswait: "sys", sysback: "sys", sysno: "sys", sysother: "sys", sysmis: "sys" };   // دورِ ۲۳ (Q6): انتظارِ برگه هم انحرافِ نقطه‌چین است
