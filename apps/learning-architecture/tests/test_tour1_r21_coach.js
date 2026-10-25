@@ -162,7 +162,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     // B·D7 / C21-6: سطرِ تغییر تکهٔ متفاوت را نشان می‌دهد
     x = await p.evaluate(() => [APP.ASSIST.chLine20('صورت', 'قبل از جایگذاری، مجهول رو به زبون نرخ بگم و هر کمیتِ نامعلوم رو نام بذارم', 'قبل از جایگذاری، مجهول رو به زبون سرعت بگم و هر کمیتِ نامعلوم رو نام بذارم'),
       APP.ASSIST.chLine20('حدس', 'حدسم ۱۲ ـه و ۱۵ دقیقه طول کشید', 'حدسم ۱۴ ـه و ۲۰ دقیقه طول کشید'), APP.ASSIST.chLine20('حدس', '۲^n', '۲^n − ۱')]);
-    chk(/«سرعت» \(اصلاح شد ⇐ «نرخ»\)/.test(x[0]) && /«۱۲» ⇐ «۱۴»/.test(x[1]) && /«۱۵» ⇐ «۲۰»/.test(x[1]) && /۲(?:\^n|ⁿ) − ۱/.test(x[2]), 'B·D7/C21-6/h: the change line shows each differing fragment ' + JSON.stringify(x));
+    // دورِ ۲۴ (DECISIONS_R24 R3، B24·D16، بانکِ R24 #65/#79 جایگزینِ قالبِ «پیشین» ⇐ «تازه»): هر سطرِ تغییر یک سو — «تازه» (اصلاح شد ⇐ «پیشین»)
+    chk(/«سرعت» \(اصلاح شد ⇐ «نرخ»\)/.test(x[0]) && /«۱۴» \(اصلاح شد ⇐ «۱۲»\)/.test(x[1]) && /«۲۰» \(اصلاح شد ⇐ «۱۵»\)/.test(x[1]) && /۲(?:\^n|ⁿ) − ۱/.test(x[2]), 'B·D7/C21-6/h: the change line shows each differing fragment ' + JSON.stringify(x));
     // A21-5: جای‌گزینیِ مربی درهم نمی‌شود (همان diff ِ بخشِ مسئله)
     await wipe(); await fresh(); await turn('یه مسئلهٔ تازه: ۹ نقطه داخل یک مثلث متساوی‌الاضلاع به ضلع ۳ داریم؛ ثابت کن دو تاشون فاصله‌شون حداکثر ۱ هست.', 'چه می‌دانی؟');
     await turn('حدسم اینه: مثلث رو به ۹ تا مثلثِ کوچیک با ضلع ۱ تقسیم کنم؛ بیشترین فاصله توی مثلثِ ضلع ۱ ارتفاعشه یعنی √۳/۲', 'چرا؟', [cs({ guess: { text: 'بیشترین فاصلهٔ دو نقطه توی مثلثِ ضلع ۱ می‌شه ارتفاعش، یعنی √۳/۲' } })]);
@@ -242,7 +243,7 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     T(75, /«۲۵۰» \(اصلاح شد ⇐ «۲۰۰»\)|«۲۰۰» ⇐ «۲۵۰»/.test(ln75) && !/بارش/.test(ln75), ln75);
     // ۶۹: ✏️ دو عدد ⇒ دو تکه در سطرِ تغییر
     x = await p.evaluate(() => APP.ASSIST.chLine20('حدس', 'حدسم ۱۲ ـه و ۱۵ دقیقه طول کشید', 'حدسم ۱۴ ـه و ۲۰ دقیقه طول کشید'));
-    T(69, /«۱۲» ⇐ «۱۴»/.test(x) && /«۱۵» ⇐ «۲۰»/.test(x), x);
+    T(69, /«۱۴» \(اصلاح شد ⇐ «۱۲»\)/.test(x) && /«۲۰» \(اصلاح شد ⇐ «۱۵»\)/.test(x), x);   // دورِ ۲۴ (R3، B24·D16): یک سو
     // A21-20: در ✏️ بلوکِ نتیجه با سطرهای صفحه یکی است
     await wipe(); await fresh(); const pidE = await bind('حدسِ مثلث'); await turn('حدسم اینه که جواب ۱۲ ـه', 'چرا؟', [cs({ guess: { text: 'جواب ۱۲' } })]);
     x = await p.evaluate(async () => { const s = __cur(), m = s.msgs.filter(m => m.role === 'user')[0], n0 = __calls.length; __q.push(R({ reply: 'درست شد.' })); APP.ASSIST.retractEdit(s, m, 'حدسم اینه که جواب ۱۴ ـه');

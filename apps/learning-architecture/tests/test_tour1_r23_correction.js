@@ -177,7 +177,8 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
     await turn('یه چیز از همون روزِ اول رو درست کنم: اون موقع اشتباه حساب کرده بودم — از اون روز ۱۸ هفته تا عروسی بود نه ۱۶؛ عروسی ۱۵ اسفنده.', 'فرستادم.', RT({ msg: '۱۶ هفته تا عروسی برادرم مونده', key: 'deadline:d1', what: 'fact', fix: 'عروسی ۱۵ اسفنده', old: '۱۶ هفته' }));
     const x = await ev((pid) => ({ st: APP.S.get('eprob_' + pid).p.statement, cst: (__cur().coach || {}).stmt || '', q: __asks() }), pid);
     const st = x.q.filter(a => a.path === 'stmt')[0];
-    return { ok: !GARBLE.test(x.st) && !GARBLE.test(x.cst) && (!st || (!GARBLE.test(st.new) && /عروسی ۱۵ اسفنده/.test(st.new))) && (/۱۵ اسفند/.test(x.st) || !!st), got: x }; });
+    // دورِ ۲۴ (DECISIONS_R24 R3، B24·D5، بانکِ R24 #59 جایگزینِ این بند): نقشِ عدد — «۱۶ هفته» ⇒ «۱۸ هفته» ِ خودش (همان پیام)، نه چسباندنِ «عروسی ۱۵ اسفنده» به صورت
+    return { ok: !GARBLE.test(x.st) && !GARBLE.test(x.cst) && (!st || (!GARBLE.test(st.new) && /عروسی ۱۵ اسفنده|۱۸ هفته تا عروسی/.test(st.new))) && (/۱۵ اسفند|۱۸ هفته تا عروسی/.test(x.st) || !!st), got: x }; });
 
   // D23-7 aD3 (S2، تازه): ««اولش که گفتم ۶۷ ماه اشتباه بود؛ درستش ۶۱ و نیمه» (ردِ نتیجهٔ خودش) مثلِ «اشتباهِ گفتاری» اجرا شد: متنِ حدس به «۶۱ و نیم ماه» بازنویسی و سرانجامِ «رد شد» کنار رفت؛ صورتِ گفت‌وگو هم بازنویسی شد»
   await T('D23-7 aD3 a refuted own result is never rewritten: guess stays «۶۷ ماه دوام میاره» with «رد شد»; chat statement untouched; told why', async () => { await ev(() => { __wipe(); __fresh(); });

@@ -218,7 +218,7 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
     const q = await ev(() => __asks()), d1 = q.filter(a => a.path === 'dl:d1')[0], d2 = q.filter(a => a.path === 'dl:d2')[0], d3 = q.filter(a => a.path === 'dl:d3')[0];
     const line = await ev((q) => APP.liveAskPart(q), d3 || { old: '', new: '' });
     const blk = blockOf(e.user, /^# اصلاحِ پیامِ قبلی — نتیجهٔ صفحه/);
-    return { ok: d1 && /۴ ساعت ⇒ ۸ سانت/.test(d1.new) && d2 && /۸ ساعت ⇒ ۱۵ سانت/.test(d2.new) && d3 && /«۹» ⇐ «۸»|۹ سانتی‌متر» ⇐ «۸ سانتی‌متر/.test(line) && /متنِ تازه: «/.test(blk), got: { q, line, blk: blk.slice(0, 700) } }; });
+    return { ok: d1 && /۴ ساعت ⇒ ۸ سانت/.test(d1.new) && d2 && /۸ ساعت ⇒ ۱۵ سانت/.test(d2.new) && d3 && /«۹» ⇐ «۸»|۹ سانتی‌متر» ⇐ «۸ سانتی‌متر|«۸» به‌جای «۹»|«۸ سانتی‌متر» به‌جای «۹ سانتی‌متر/.test(line)   /* دورِ ۲۴ (R3، B24·D16): پرسش بی پیکان — «تازه» به‌جای «پیشین» */ && /متنِ تازه: «/.test(blk), got: { q, line, blk: blk.slice(0, 700) } }; });
 
   // C22-5 s23 (S2): «the size she wrote with units in the form («۲۵ سانتی‌متر × ۳۵ سانتی‌متر») was not asked»؛ C22-10 (S3): «Title does not follow the correction in s23»
   await T('C22-5/C22-10 s23 «۲۵ در ۳۵ ⇒ ۲۵ در ۳۰»: lpPrMeasure with units asked; the title follows', async () => { await ev(() => { __wipe(); __fresh(); });
