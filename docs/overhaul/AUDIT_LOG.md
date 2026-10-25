@@ -4980,3 +4980,16 @@ dated stability, mind-card feed) under way.
   `apps/learning-architecture/tests/test_tour1_r24_today.js` (17 runner sentences, 16 red on base 3685102d; bank VARIANTS_R24 R7 #142–#160 19/19, 16 red on base).
 - **DECISION** Verdicts only with her quoted sentence; a no-number guess only from the immediately next message; "fulfilled" = a write action in the same turn;
   the chat prediction owns the 🎯 and the form completes it; no date she did not give («جلسهٔ بعد»). Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_today_2026-10-25.md`.
+
+## 2026-10-25 — Pólya round-24 fixes merged to main; gate36 green
+- **CHANGE** Merged six fixers (DECISIONS_R24): correction R3, story R2+R8 (prior-work intake, roadmap §21), loop R1 (the round-24 S1:
+  only the routine's reply is read, negation/generic/ruled-out aware best match, half-clear ⇒ ask her), classify R4+R6, age R5, today R7.
+  WORKLOG 105–110, PROGRESS 114–119, HANDBOOK §12 rows 62–66.
+- **FINDING→FIX (integration)** One real code conflict in `a45_story.js` `importChat` (today's import-window cut vs story's `fin`/`ph`
+  fields and `prior` copy): kept both — prior verdicts are copied only when the window was not cut to a new problem. Duplicate PROGRESS rows
+  116/117 and two HANDBOOK §10 rows (carried twice through sibling merges) removed; clashing §12 rows renumbered (classify 64, age 65, today 66).
+- **FINDING** The a26 system prompt is at ~19,988 of the server's 20,000-character cap (loop fixer). Every fixer kept new model contracts in
+  page-built user-prompt blocks; the cap test passes. Future work must not add to `AS.SYS`.
+- **FINDING (not changed, not this area)** A Python virtualenv `.venv_t/` (5,475 files, 138 MB, 4 symlinks) has been tracked since the July
+  import commit e1271e7a. Harmless at runtime; left for the routine that owns the repo root (`docs/supervisor/ownership.json`).
+- **FINDING** gate36: fail=0 (pytest 2144, 133 page tests, build, host e2e).
