@@ -340,3 +340,13 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   range bound as the single value and read «؟» of a masked number as a sentence end; `stampUses` tied a verdict that named no datum to every datum including the whole statement.
 - **Why replaced:** DECISIONS_R23 Q4 (number role: list unit, range, counted noun, masked digits; never a borrowed unit; without `rests`, keep verdicts that do not consume the datum).
 - **Status:** reachable, not called: `APP.LIVE_R22_QUARANTINE_Q4.numCopy`, `.pickAll`. Delete only with the owner's approval.
+## 2026-10-25 — R23 territory-loop matching and the «now»-step fallback (learning-architecture, Pólya round 24, loop: R1)
+- **File:** `apps/learning-architecture/src/app/a44_route.js`.
+- **What they did:** `fits` (R23) accepted the FIRST candidate sharing two words with the step's need, counting words inside negated clauses and generic words; `namedItems` (R23)
+  read area ids / views from ALL notes of a sheet — including the sheet's own filing text («کجا افزوده شود», the assistant's differential, `whole`) — so an unrelated reply
+  was declared «🛎 ابزارِ لازم آمد» (D24-1 S1, A24-4, A24-5, C24-14, B24·D19); `sysOpen` fell back to the assistant's «now» step when a gap had no `gap.step`, so sheets about the
+  system itself (kind=fix, self-knowledge, companion book) marked a step of her problem as waiting (D24-2, A24-6, C24-13).
+- **Why replaced:** DECISIONS_R24 R1 (reply notes only; ruled-out areas excluded; negation-aware; generic words ignored; best candidate scored; ask her when not clear;
+  only `gap.step` or a step named «#k»/«#n» waits). A gap without a step is not lost: it is kept in `pre22.sysPend` and binds when the assistant's steps name its number.
+- **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.fits23`, `.namedItems23`, `.stepNow23`. Delete only with the owner's approval.
+

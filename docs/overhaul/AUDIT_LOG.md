@@ -4893,3 +4893,17 @@ dated stability, mind-card feed) under way.
 - **DECISION** Accepted as roadmap §21 and DECISIONS_R24 R8 (story fixer, with R2): `coach_state.prior` with verdict per step, resume at the
   first non-✓ step, dependents marked, facets via the tour, shown with «درست است؟», no rewrite without her yes. At least two scenarios per group
   from round 25. Owner question bank #31. No code started (owner's pause).
+
+## 2026-10-25 — Pólya tour round 24, fixer «loop» (R1, the round's only S1)
+- **FINDING** Territory loop (`apps/learning-architecture/src/app/a44_route.js`): `sysSheet` read every note of a sheet (`notes.map(...).join`), so `namedItems` took area ids from the
+  sheet's own filing text (where-to-add, the assistant's differential, `whole`) and `fits` took the first candidate with two shared words (incl. negated and generic words) ⇒
+  an unrelated routine reply was announced «🛎 ابزارِ لازم آمد» and the entry stopped waiting, so the next real build was never checked (D24-1 S1; A24-4, A24-5, C24-14, B24·D19).
+  `sysOpen` fell back to the «now» step without `gap.step` ⇒ system-itself sheets marked her step waiting (D24-2, A24-6, C24-13). The ⏸ dossier event never got its outcome (D24-8)
+  or the renamed step (A24-15); event times could go backwards (B24·D18); sys_done left no page line and no note (B24·D19).
+- **CHANGE** Reply notes only; ruled-out areas excluded; negation-aware need text; generic words ignored; every candidate scored, best wins; «arrived» only when clear (≥ two words,
+  one anchored in the step/title, no tie); half-clear ⇒ the page asks her first («این ابزارِ تازه همان است که برای گامِ … لازم بود؟»; `coach_state.sys_fit` or a plain yes/no);
+  kind=fix or no step ⇒ no waiting mark (`sysPend` until the steps name the sheet); sys_done ⇒ page line in her register + note under the sheet; ⏸ event carries the current
+  outcome and step; monotonic event times. Gap contract: taught in the «# پیش‌نیاز» RULE line (a44, user prompt); `a26_assist.js` `AS.triage` strips `step` from kind=fix (the a26 system prompt is at its 20k limit). R23 code quarantined (`APP.PRE.R24_QUARANTINE`; REMOVAL_CANDIDATES).
+- **CHANGE** Tests: `apps/learning-architecture/tests/test_tour1_r24_loop.js` (red-first on the pre-change build: 1/17, 28 errors; after: R1 bank 27/27) + bank copy `tests/variants/VARIANTS_R24.json`.
+  `test_tour1_r23_prereq.js`: G102 now carries `gap.step` (replaced by DECISIONS_R24 R1, commented). Docs: WORKLOG (107), PROGRESS 116, HANDBOOK (§2 bullet, §10 row), AGENTS.md (reply contract).
+

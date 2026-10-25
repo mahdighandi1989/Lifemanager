@@ -744,6 +744,9 @@
       if (c.dup_of) return { skip: "نظرِ دوم: همین در برگهٔ #" + fa(c.dup_of) + " هست؛ برگهٔ تازه ثبت نشد." };
       if (!c.agree) return { skip: "نظرِ دوم: برگه لازم نیست — " + (c.reason || "") };
       var out = Object.assign({}, g, c.fix || {});
+      /* دورِ ۲۴ (R1، قراردادِ gap): برگه‌ای دربارهٔ خودِ سامانه (kind=fix) گامی از مسئلهٔ کاربر را منتظر نمی‌کند — step ندارد. قراردادِ step برای مدل در «# پیش‌نیاز» ِ a44 است
+         (پرامپتِ سیستم در سقفِ ۲۰k است) و صفحه در a44 (sysOpen) دوباره می‌سنجد */
+      if (out.kind === "fix") delete out.step;
       if (c.area && validArea(c.area)) out.area = c.area;
       if (c.kind) out.kind = c.kind;
       out.consult = "موافق" + (c.area && c.area !== g.area ? " (قلمرو اصلاح شد: " + g.area + " ⇒ " + c.area + ")" : "") + " — " + (c.reason || "");
@@ -751,7 +754,7 @@
       return holesSkip(out) || { gap: out };
     }, function (e) {
       // مشاور در دسترس نیست: فقط تشخیصِ بسیار مطمئن، و با نشانِ «بی نظرِ دوم» تا روتین‌ها سخت‌گیرانه‌تر بسنجند
-      if (conf >= 0.9 && validArea(g.area)) return holesSkip(g) || { gap: Object.assign({}, g, { consult: "در دسترس نبود (" + errText(e) + ")" }) };
+      if (conf >= 0.9 && validArea(g.area)) return holesSkip(g) || { gap: Object.assign({}, g, { consult: "در دسترس نبود (" + errText(e) + ")" }, g.kind === "fix" ? { step: "" } : {}) };
       return { skip: "نظرِ دوم در دسترس نبود و اطمینان برای ثبتِ بی‌مشاوره کافی نبود؛ برگه ثبت نشد (" + errText(e) + ")." };
     });
   };
