@@ -3212,8 +3212,18 @@
     if (/(?:^|[\s،])(?:امروز|امشب|همین\s*الان)(?![آ-ی‌])/.test(x)) return td;
     if (/آخرِ?\s*(?:همین\s*)?هفته/.test(x)) { var p0 = td.split("-"), d0 = new Date(+p0[0], +p0[1] - 1, +p0[2]).getDay(); return A.addDays(td, (5 - d0 + 7) % 7); }
     return planDate(x); }
+  /* دورِ ۲۴ (R7، B24·D21): «… به ترتیب بخونم. خوبه؟» پرسشِ نظر است، نه برنامه؛ و تاریخِ مدل فقط وقتی پذیرفته است که حرفِ خودش زمانی دارد
+     (وگرنه «جلسهٔ بعد» — صفحه تاریخی نمی‌سازد که او نگفته) */
+  var HER_WHEN24 = new RegExp(PLAN_WHEN.source + "|(?:^|[\\s،])(?:امروز|امشب|روزی|روزانه|آخرِ?\\s*(?:همین\\s*)?(?:هفته|ماه)|ماهِ?\\s*(?:بعد|دیگه|آینده)|فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند|ساعتِ?\\s*[0-9۰-۹]|تا\\s*[0-9۰-۹]|[0-9۰-۹]{1,2}\\s*(?:روز|هفته|ماه)\\s*(?:دیگه|بعد))(?![آ-ی‌])");
+  function askOnly24(ut, pt) { var U = String(ut || ""), k = pt ? U.indexOf(String(pt).slice(0, 20)) : -1; if (k < 0) return false;
+    var after = U.slice(k).split(/(?<=[.!؟?\n])/), own = after[0] || "", next = (after.slice(1).join(" ") || "").trim();
+    return /[؟?]\s*$/.test(own.trim()) || /^(?:خوبه|خوب\s*است|درسته|درست\s*است|چطوره|چطور\s*است|به\s*نظرت(?:\s*چطوره)?|موافقی|جواب\s*میده|کار\s*می‌?کنه)\s*[؟?]/.test(next); }
   function plan18(s, o, pt, key, at) {
-    var td = A.today(), w = String((o && typeof o === "object" && o.when) || "");
+    var td = A.today(), w = String((o && typeof o === "object" && o.when) || ""), um24 = lastUserMsg(s), ut24 = um24 ? String(um24.text || "") : "";
+    if (askOnly24(ut24, pt)) return;
+    /* حرفِ زمان‌دارِ او در همین پیام یا دو پیامِ پیشِ خودش («از کی؟» ⇐ «از فردا»)؛ تاریخِ گذشته همچنان رد می‌شود (پایین) */
+    var her24 = (s.msgs || []).filter(isUser).slice(-3).map(function (m) { return String(m.text || ""); }).join(" \n ");
+    if (realDate(w) && w >= td && !HER_WHEN24.test(String(pt || "")) && !HER_WHEN24.test(her24)) w = "next-session";
     var when = /^next[-_ ]?session$/i.test(w) ? "next-session" : realDate(w) ? (w >= td ? w : "") : planDate18(pt);
     if (!when) return;   // تاریخِ گذشته هرگز پیشنهاد نمی‌شود
     var AP = plansAll(s), sm = o && o.same ? AP.filter(function (x) { return x.p.id === String(o.same); })[0] : null;

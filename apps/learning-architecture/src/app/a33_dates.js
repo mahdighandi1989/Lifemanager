@@ -34,8 +34,22 @@
     if (a && a.time != null && String(a.time).trim() && !parseTime(a.time)) return "ساعتِ «" + clip(a.time, 20) + "» خوانا نیست";
     return "";
   };
+  /* دورِ ۲۴ (R7، بانکِ R24 #151): روزِ نسبیِ خودش («تا شنبه‌ی بعد»، «فردا»، «پس‌فردا») را صفحه از ساعتِ خودش حساب می‌کند — تاریخِ مدل اگر با آن نخواند کنار می‌رود
+     (فقط وقتی پیامش یک و فقط یک روزِ نسبی دارد و تاریخِ صریح ندارد) */
+  var WD24 = { "شنبه": 6, "یکشنبه": 0, "دوشنبه": 1, "سهشنبه": 2, "چهارشنبه": 3, "پنجشنبه": 4, "جمعه": 5 };
+  AS.herDay24 = function (t) {
+    var x = String(t || "").replace(/(یک|دو|سه|چهار|پنج)[‌\s]+(?=شنبه)/g, "$1"), td = A.today();
+    if (/[0-9۰-۹]{1,4}\s*(?:\/|-|فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)/.test(x)) return "";
+    var hits = [], m, re = /(?:^|[\s،.])(پس[‌\s]?فردا|فردا|یکشنبه|دوشنبه|سهشنبه|چهارشنبه|پنجشنبه|جمعه|شنبه)(?![آ-ی])/g;
+    while ((m = re.exec(x))) hits.push(m[1]);
+    if (hits.length !== 1) return "";
+    var w = hits[0]; if (/^پس/.test(w)) return A.addDays(td, 2); if (w === "فردا") return A.addDays(td, 1);
+    var p = td.split("-"), d0 = new Date(+p[0], +p[1] - 1, +p[2]).getDay(), k = (WD24[w] - d0 + 7) % 7; return A.addDays(td, k === 0 ? 7 : k);
+  };
   AS.DO.deadline = function (a) {
     var s = AS._turnSession, what = clip(a && a.what, 120), date = String((a && a.date) || "").trim();
+    try { var um24 = null, M24 = (s && s.msgs) || []; for (var i24 = M24.length - 1; i24 >= 0; i24--) if (M24[i24] && M24[i24].role === "user") { um24 = M24[i24]; break; }
+      var hd = um24 ? AS.herDay24(um24.text) : ""; if (hd && hd !== date) { date = hd; a = Object.assign({}, a, { date: hd }); } } catch (e) { }
     var why0 = AS.deadlineRefusal(a); if (why0) return "یادآور ثبت نشد: " + why0 + " — تاریخ (و اگر خواستی ساعتِ) درست را بگو تا ثبتش کنم.";
     var tm = a && a.time != null && String(a.time).trim() ? parseTime(a.time) : "";
     var same = S.all("deadline", function (x) { return !x.done && x.what === what; })[0];
