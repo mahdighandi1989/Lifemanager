@@ -4993,3 +4993,5 @@ dated stability, mind-card feed) under way.
 - **FINDING (not changed, not this area)** A Python virtualenv `.venv_t/` (5,475 files, 138 MB, 4 symlinks) has been tracked since the July
   import commit e1271e7a. Harmless at runtime; left for the routine that owns the repo root (`docs/supervisor/ownership.json`).
 - **FINDING** gate36: fail=0 (pytest 2144, 133 page tests, build, host e2e).
+## 2026-10-25 — FINDING: دورِ کاملِ ناظرِ خودکار
+- FINDING (2026-10-25): گیتِ قانونِ ۴ سبز (pytest ‏2009 سبز/۱۲۸ skip، build سبز)؛ production = origin/main؛ کارتابل خالی؛ بدونِ یافتهٔ تازه و بدونِ تغییرِ کد. شکافِ محیط: skipِ ۱۲۷ تستِ مرورگریِ lla بدونِ `npm i` در `apps/learning-architecture` و ناهمخوانیِ نسخهٔ playwright/کرومیوم برای `page_map.py` (نه خرابیِ محصول). ناظرِ خودکار (Claude Code routine)
