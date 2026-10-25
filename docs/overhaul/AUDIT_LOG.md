@@ -5006,3 +5006,8 @@ dated stability, mind-card feed) under way.
   567 exchanges; total 5,343). Storyboards A–D on round 25. All runners sent their own e-mails (A 21, B 24, C 20, D 25, B_s 25).
 ## 2026-10-25 — FINDING: دورِ کاملِ ناظرِ خودکار
 - FINDING (2026-10-25): گیتِ قانونِ ۴ سبز (pytest ‏2009 سبز/۱۲۸ skip، build سبز)؛ production = origin/main؛ کارتابل خالی؛ بدونِ یافتهٔ تازه و بدونِ تغییرِ کد. شکافِ محیط: skipِ ۱۲۷ تستِ مرورگریِ lla بدونِ `npm i` در `apps/learning-architecture` و ناهمخوانیِ نسخهٔ playwright/کرومیوم برای `page_map.py` (نه خرابیِ محصول). ناظرِ خودکار (Claude Code routine)
+- **FINDING (2026-10-25, routine check at the owner's request)** Backtest ran nightly (rounds 16–18, green; last 2026-10-24). Lifemanager
+  general supervisor 2026-10-25: success, empty inbox, pytest green, production healthy at main's sha. Urgent queue every 3 h: success,
+  empty. Four other-repo routines failed on 2026-10-23/24 with USAGE_LIMIT_REACHED (owner's quota), not a defect. Gap: in the supervisor's
+  environment the 127 learning-architecture browser tests are skipped (no playwright), so that routine's green pytest does not cover the
+  page; the main session's gate runs them. Proposal: the routine's setup installs the browser. main = c858f7f8 (gate37 fail=0).
