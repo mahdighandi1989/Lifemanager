@@ -4894,6 +4894,24 @@ dated stability, mind-card feed) under way.
   first non-✓ step, dependents marked, facets via the tour, shown with «درست است؟», no rewrite without her yes. At least two scenarios per group
   from round 25. Owner question bank #31. No code started (owner's pause).
 
+## 2026-10-25 — FINDING→CHANGE: Pólya round 24, fixer «correction» (R3: corrections spread and number boundaries)
+- **FINDING** Root causes from round24{A,B,C,D}: the coach's `subst19b` replaced fragments without number boundaries («۱» inside «۱.۷۵» ⇒ «۱.۵.۷۵», C24-12);
+  a ✏️'s `what` came from every record of the edited message, so the coach replaced a same-type record wholesale with a bare number (guess ⇒ «۱۲۰»);
+  each ✏️ pair ran the coach separately (only the last pair in the result, page changes repeated, A23-24) and the page's own copy asks never reached the
+  result (A22-17 «ask»:[]); the why was built from quote-stripped text («[اصلاحِ پیامِ قبلی] «» ⇐ «»», A24-9/B24·D16/C24-6); weeks and month days had no role,
+  so «۱۶ هفته» was offered «۱۵» from «عروسی ۱۵ اسفنده» (B24·D5); an unitless number next to «متر» neighbours lost the new unit («۱۵۰ ارتفاع», A24-3);
+  unconfirmed «از گفت‌وگو» drafts and the 🧭 destination never followed a correction (C24-11); numbers computed from the old datum were never marked
+  (B24·D17); a verdict naming no datum was tied to narrative statement clauses (C23-5); «بر ۴» (divisor) matched «رقم اول ۴» (D23-5); change lines pointed
+  both ways (B24·D16). Found while testing: a short `old` with a long `fix` («۶ متر» ⇐ «۷ متر در ۴ متر») duplicated the tail; «160cm» was not a number;
+  a month-day copy kept the old month («۲ مهر»).
+- **CHANGE** `apps/learning-architecture/src/app/a38_live.js`, `a27_tour.js`, `a40_dossier.js`, `a44_route.js` — see WORKLOG (105). Derived numbers are found by
+  a verifiable one-operation closure from the old value and earlier numbers of the same problem, marked «🕰 کهنه پس از اصلاح» with a recompute
+  suggestion only when every derivation agrees; nothing is rewritten silently.
+- **DECISION** Model reports are not used for numeric dependence (unverifiable; replaces the round-23 proposal in HANDBOOK §12 row 57 a).
+- **Tests** `apps/learning-architecture/tests/test_tour1_r24_correction.js` (10 runner sentences + 1 guard, all runner sentences red on 3685102d) and
+  `tour1_r24_correction_bank.js` (VARIANTS_R24 R3: 28/28; 16 red on base). Old assertions replaced per DECISIONS_R24 (with a comment): R23 B·D4,
+  R21 coach #69/B·D7, R22 correction askPart. Quarantine: `APP.LIVE_R23_QUARANTINE_R3`, `APP.ASSIST.R23_QUARANTINE_R3` (REMOVAL_CANDIDATES).
+
 ## 2026-10-25 — CHANGE: Pólya round 24, fixer «story» (R2 one story, stage and turn question; R8 «کارِ پیشینِ من», roadmap §21)
 - **FINDING** The live turn question and the live prompt block read the FORM stage (`phaseOf`), so an unconfirmed u-form kept asking u1 after a result and a plan (A23-35, B24·D2, C24-8);
   any chat result moved the whole problem to look-back (D24-3); plans were cut at commas and whole messages became plans (B24·D3, D24-9); correction messages, rejected attempts and

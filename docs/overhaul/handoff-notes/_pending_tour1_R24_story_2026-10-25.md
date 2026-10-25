@@ -1,8 +1,7 @@
 # Tour 1 (Pólya), round 24: fixer «story» handoff (2026-10-25)
 
 Scope (DECISIONS_R24 «Fixer split / story»): R2 (one story, stage and turn question) + R8 («کارِ پیشینِ من», roadmap §21). Base: `3685102d`.
-WORKLOG (106), PROGRESS 115, HANDBOOK §10 row (2026-10-25) + §12 row 62. Numbering follows FIX24 (correction 105/114 comes first in the merge order;
-until it is merged this branch alone has the PROGRESS gap at 114, which the handbook gate reports).
+WORKLOG (106), PROGRESS 115, HANDBOOK §10 row (2026-10-25) + §12 row 63. Numbering follows FIX24; the correction fixer (105/114, its §12 row 62) is merged in.
 
 Files: `src/app/a45_story.js` (most of it), `a38_live.js` (`storyPh`, `A.liveTurnPhase`, prompt block stage, prior turn question in `coachCore`),
 `a27_tour.js` (`storyAns24`, `qParts`, `coachPhase0` story merge, `compactLive` stage, `unfit23` re-check exemption, prior suggestion in `coachLines`),
@@ -39,9 +38,9 @@ two turns of `tests/test_tour1_r23_story.js` now give `plan.steps` (commented).
 - Mind card: `AS.coachEvent(s, "c", "prior", quote, ok, {prior: n, cause})` per judged step. **today (a29/a42):** if the mind card groups events, `src:"prior"` with `ok:true` is her own
   correct step (never a «گیر»); `ok:false` has `cause`.
 - **classify:** the multi-facet tour from a prior text (self-label, factual claim) is only a prompt line («اگر چند وجه دارد … ترتیبشان را بپرس»); building facets from `prior` is open
-  (HANDBOOK §12 row 62 b). **loop:** a prior step that needs a missing tool should go through your `gap.step` (bank R24 #166 is NC here).
+  (HANDBOOK §12 row 63 b). **loop:** a prior step that needs a missing tool should go through your `gap.step` (bank R24 #166 is NC here).
 
 ## Not done
-- No real-model run of `prior` / `plan.steps` (AGENTS rule for AI-path changes) — HANDBOOK §12 row 62 (a).
+- No real-model run of `prior` / `plan.steps` (AGENTS rule for AI-path changes) — HANDBOOK §12 row 63 (a).
 - Symbolic numeric checks (π, parentheses, equation roots) and electrical unit dimensions (W/V = A) are the model's.
 - No sibling fixer branch was named by the coordinator before this commit.

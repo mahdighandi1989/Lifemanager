@@ -278,7 +278,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     chk(/پیش‌نیاز تشخیص داده شد/.test(tip) && /انحراف \(پیش‌نیاز/.test(tip) && /گامِ منتظر/.test(tip) && !/pq\d|pre22_|lstep:/.test(tip), 'P2: hovering a point shows what it was and what was done there (Persian, no raw ids) :: ' + tip);
     await p.hover('.rt-pt.rt-p-back >> nth=0'); await p.waitForTimeout(80);
     tip = await p.evaluate(() => { const t = document.querySelector('.rt-tip'); return t && !t.hidden ? t.textContent : ''; });
-    chk(/اصلاح \/ پرشِ برگشت/.test(tip) && /«۴۰» ⇐ «۴۴»/.test(tip), 'hover on a correction keeps the old value as history :: ' + tip);
+    // دورِ ۲۴ (DECISIONS_R24 R3، B24·D16، بانکِ R24 #65 جایگزینِ قالبِ «پیشین» ⇐ «تازه»): پرونده و نقشه یک سو — «تازه» (اصلاح شد ⇐ «پیشین»)؛ مقدارِ پیشین همچنان پیداست
+    chk(/اصلاح \/ پرشِ برگشت/.test(tip) && /«۴۰» ⇐ «۴۴»|«۴۴» \(اصلاح شد ⇐ «۴۰»\)/.test(tip), 'hover on a correction keeps the old value as history :: ' + tip);
     // no second store
     const ls1 = await p.evaluate(() => Object.keys(localStorage).sort().join(','));
     const nRec1 = await p.evaluate(() => Object.keys(APP.S.recs).length);

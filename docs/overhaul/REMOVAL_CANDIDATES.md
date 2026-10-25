@@ -340,6 +340,15 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   range bound as the single value and read «؟» of a masked number as a sentence end; `stampUses` tied a verdict that named no datum to every datum including the whole statement.
 - **Why replaced:** DECISIONS_R23 Q4 (number role: list unit, range, counted noun, masked digits; never a borrowed unit; without `rests`, keep verdicts that do not consume the datum).
 - **Status:** reachable, not called: `APP.LIVE_R22_QUARANTINE_Q4.numCopy`, `.pickAll`. Delete only with the owner's approval.
+## 2026-10-25 — round-23 correction display/replacement forms (learning-architecture, Pólya round 24, correction: R3)
+- **Files:** `apps/learning-architecture/src/app/a38_live.js`, `apps/learning-architecture/src/app/a27_tour.js`.
+- **What they did:** the ask line read «پیشین» ⇐ «تازه» and the page note «label «پیشین» ⇐ «تازه»» while the coach's change line read «تازه» (اصلاح شد ⇐ «پیشین»)
+  (two directions in one dossier, B24·D16); the coach's `subst19b` used `hasFrag`/`repFrag` without number boundaries (C24-12); the why came from
+  `ownText` (quotes emptied); a verdict naming no datum fell back to every datum including narrative statement clauses (C23-5).
+- **Why replaced:** DECISIONS_R24 R3 (number boundaries everywhere; one arrow direction; the why quotes her real words; the base of a verdict is the declared data).
+- **Status:** reachable, not called: `APP.LIVE_R23_QUARANTINE_R3.askPart`, `.noteLine`, `.usesFallbackAll`; `APP.ASSIST.R23_QUARANTINE_R3.repFrag`, `.hasFrag`, `.why`,
+  `.chLineMulti`. (`hasFrag`/`repFrag` themselves stay in use for unbounded look-ups such as a clipped 40-character prefix.) Delete only with the owner's approval.
+
 
 ## 2026-10-25 — R23 plan splitter and whole-message plan text (learning-architecture, Pólya round 24, story: R2)
 - **File:** `apps/learning-architecture/src/app/a45_story.js`.

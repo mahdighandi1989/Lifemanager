@@ -11,6 +11,7 @@ updated_at: "2026-10-18T14:00:00Z"
 updated_at: "2026-10-18T16:00:00Z"
 updated_at: "2026-10-18T21:00:00Z"
 updated_at: "2026-10-18T20:00:00Z"
+updated_at: "2026-10-25T09:00:00Z"
 merged_from: []
 ---
 
@@ -157,3 +158,16 @@ showed "no plan yet". Lessons:
   person recompute. Her own refuted guess/result is evidence of her work — "I misstated" (rewrite) differs from "my result was refuted" (keep «رد شد»).
 - **A bare "yes" is ambiguous.** Apply a chat answer to an open copy question only when it names the field or says "change it" with exactly one question open.
 - **Test the meaning, not a regex the bug can pass.** The round-22 assertion accepted the reordered «عروسی ۱۵ اسفنده برادرم مونده»; write the negative of the exact runner text.
+
+## Update 2026-10-25 — every replacement path needs the same boundaries; derived values by verifiable arithmetic
+- **One rule, every path.** The page's replacement respected number boundaries since round 22, but a second, older replacement path (the coach's fallback) did not — «۱» inside
+  «۱.۷۵» again. When two modules rewrite the same records, grep for every raw `replace`/substring match and give them the same boundary rule.
+- **Roles beyond units.** «۱۶ هفته» (a count of days) and «۱۵ اسفند» (a day of the month) are both "numbers"; give each a role (unit family, «بر» = divisor, a month name = day of
+  month) and never pair different roles. When the model's report pairs two roles, take the same-role value from the person's own message («۱۸ هفته … نه ۱۶»).
+- **An unspoken unit is recoverable from neighbours.** «۳.۲ متر طول، ۱.۸ عرض، ۱.۶ ارتفاع» ⇒ the 1.6 is metres; writing the corrected «۱۵۰» there without its unit reads as 150 m.
+- **Derived numbers: compute, don't ask the model.** A number is stale when one arithmetic operation on the old value and an earlier number reproduces it; suggest the recomputed value
+  only when every derivation agrees, and skip any number some derivation leaves unchanged (10÷10 = 8÷8). Mark, never rewrite — it is her text.
+- **One user action, one result.** A multi-pair edit must run the downstream engine once with all pairs; per-pair runs overwrite the result and repeat shared lines.
+- **Display one direction.** If change lines say «new (corrected ⇐ old)», asks must not draw the opposite arrow; give proposals a wording without an arrow.
+- **Quote the user verbatim in reasons.** A helper that blanks quotes (to ignore quoted third parties) must not feed a "because she said …" line.
+
