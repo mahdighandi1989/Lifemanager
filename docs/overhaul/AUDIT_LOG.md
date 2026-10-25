@@ -4880,6 +4880,12 @@ dated stability, mind-card feed) under way.
   Remedy inside the audit window: the main session recorded `did` h20261019021704640784-backtest-68d8 (text says who recorded it and
   why; owner to verify). Lesson: never chain `git push origin HEAD:main` after a gate command — read `GATE_DONE fail=0` first.
 
+- **CHANGE (2026-10-21, backtest routine, round 17)** Epistemology-factory backtest round 17: +8 corpus cases (4 real failures, 2 real sound, 2 abstract), territory `a_epistemic_rationality` → stage 1. Four "missed" findings closed after a second blind encoder completed text-stated features (`recode`, no engine/rule change). Independent web review fixed 4 minor story facts. Details: `apps/learning-architecture/docs/WORKLOG.md` (102). Lesson (recurring rounds 13–17): the blind encoder under-writes `conf`/`x_method`/`scope` unless told to read them from the claim's wording.
+
+## 2026-10-24 — CHANGE: بک‌تستِ پیوسته دورِ ۱۸ (روتینِ بک‌تست)
+- +۸ مورد در `apps/learning-architecture/backtest/corpus/round-0018.json`؛ ۶ یافتهٔ «ندید» به علتِ خطای سازندهٔ روتین (ادعا بی‌بیانِ اطمینان) `resolved`؛ کلیدِ `conf` در این دور **ناکور** ثبت شد (بازبین مستقل) و تأییدهای r17 موقتی‌اند. قلمرو: `a_higher_order_evidence` گامِ ۱. جزئیات: WORKLOG (103).
+- FINDING (2026-10-24, دورِ ۱۸): گیتِ pytest سه شکست دارد که روی `main` ِ تمیز هم یکسان است و به این دور (فقط داده) ربطی ندارد: `test_tour1_r11_coach.js`، `test_tour1_r12_coach.js`، `test_tour1_r22_correction.js` (در دومی: ۱ شکست از ۵۱ در VARIANTS_R22). ۲۱۳۳ سبز، ۱ skip؛ بیلدِ فرانت سبز. پوش بر پایهٔ «بی‌اثر بر این سه» انجام شد.
+
 ## 2026-10-20 — PROPOSAL (approved, not started): «کارِ پیشینِ من» — long opening text with problem, idea and partial solution
 - **FINDING** Closest earlier requests were built: forms filled from the owner's words (assistant creation), the multi-facet tour (WORKLOG 47),
   and the chat ⇄ forms story (round 23). A per-step verdict contract for prior work was never built or tested. Today such a text would hit the

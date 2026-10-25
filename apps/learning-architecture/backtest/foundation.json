@@ -1,6 +1,6 @@
 {
- "round": 15,
- "at": "2026-10-18",
+ "round": 18,
+ "at": "2026-10-24",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 214,
+    "ok": 235,
     "health_alarm": 0,
-    "missed": 8,
+    "missed": 12,
     "mislocated": 1
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 204,
+    "ok": 222,
     "health_alarm": 0,
-    "missed": 15,
-    "mislocated": 4
+    "missed": 20,
+    "mislocated": 6
    },
    "changed": [
     {
@@ -1208,6 +1208,24 @@
     {
      "id": "r5_sally_clark_1999",
      "t": "پروندهٔ سالی کلارک و «یک در ۷۳ میلیون» (۱۹۹۹)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r17_curveball_2002",
+     "t": "منبعِ «کرْوبال» و آزمایشگاه‌های سیارِ سلاحِ زیستی (۲۰۰۲–۲۰۰۳)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r17_dewey_1948",
+     "t": "تیترِ «دیویی ترومن را شکست داد» (۱۹۴۸)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r17_abs_acquisition_source",
+     "t": "خریدِ شرکت بر پایهٔ «چند گزارش» از یک منبع",
      "from": "ok",
      "to": "mislocated"
     }
@@ -1215,19 +1233,19 @@
   },
   "derived": {
    "kinds": {
-    "ok": 214,
+    "ok": 235,
     "health_alarm": 0,
-    "missed": 8,
+    "missed": 12,
     "mislocated": 1
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 204,
+    "ok": 222,
     "health_alarm": 0,
-    "missed": 15,
-    "mislocated": 4
+    "missed": 20,
+    "mislocated": 6
    },
    "changed": [
     {
@@ -1287,6 +1305,24 @@
     {
      "id": "r5_sally_clark_1999",
      "t": "پروندهٔ سالی کلارک و «یک در ۷۳ میلیون» (۱۹۹۹)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r17_curveball_2002",
+     "t": "منبعِ «کرْوبال» و آزمایشگاه‌های سیارِ سلاحِ زیستی (۲۰۰۲–۲۰۰۳)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r17_dewey_1948",
+     "t": "تیترِ «دیویی ترومن را شکست داد» (۱۹۴۸)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r17_abs_acquisition_source",
+     "t": "خریدِ شرکت بر پایهٔ «چند گزارش» از یک منبع",
      "from": "ok",
      "to": "mislocated"
     }
@@ -1451,8 +1487,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 121,
-   "fullAfter": 121
+   "fullBefore": 134,
+   "fullAfter": 134
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1461,8 +1497,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 121,
-   "fullAfter": 121
+   "fullBefore": 134,
+   "fullAfter": 134
   },
   "p_found_scope": null
  },

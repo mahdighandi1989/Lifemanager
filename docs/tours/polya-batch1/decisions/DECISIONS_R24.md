@@ -139,7 +139,7 @@ R8 — «کارِ پیشینِ من» (owner 2026-10-20, roadmap §21).
 - classify (R4 + R6): a27/a26 classification and post-check.
 - age (R5): a43, a34, a29 norm line, register.
 - today (R7): a41/a40/a42/a33.
-- Docs numbering: WORKLOG 101–106, PROGRESS 114–119, in the order above. WORKLOG 100 is the freeze status entry (99 went to a backtest routine).
+- Docs numbering: take the next free numbers on main at launch time (routines keep adding entries: during the pause the backtest routine used WORKLOG 101–103), six consecutive WORKLOG and PROGRESS numbers in the order above. WORKLOG 100 is the freeze status entry.
 - Independent bank VARIANTS_R24 written in parallel from the four reports.
 - Merge order: correction ⇐ story ⇐ loop ⇐ classify ⇐ age ⇐ today.
 

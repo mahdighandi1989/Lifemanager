@@ -12,5 +12,11 @@
  "what": "Recorded by the main session (not by the backtest routine) after review: d2432807 only deleted the stray tracked symlink frontend/node_modules (mode 120000) that a round-23 fixer had committed in 189f15cd — the same fix as session commit faad1da1; no other path of the app area was touched. Owner: please verify.",
  "procedure": "CLAUDE.md#Non-negotiable rules",
  "commit": "d2432807",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-19T03:54:38Z",
+  "note": "d2432807 only removed the stray tracked frontend/node_modules symlink; origin/main has no such path; no other app path touched.",
+  "commit": ""
+ }
 }

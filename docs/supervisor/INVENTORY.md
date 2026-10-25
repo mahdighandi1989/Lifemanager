@@ -9,11 +9,11 @@
 | صفحه‌ها | 44 |
 | زیرصفحه‌ها (تب‌ها) | 29 |
 | دکمه‌ها | 181 |
-| ورودی‌ها | 87 |
+| ورودی‌ها | 88 |
 | فرم‌ها | 15 |
 | لینک‌ها | 59 |
-| فراخوانی‌های API در صفحه‌ها | 102 |
-| مسیرهای API | 429 |
+| فراخوانی‌های API در صفحه‌ها | 106 |
+| مسیرهای API | 431 |
 | سرویس‌ها | 158 |
 | مدل‌ها | 69 |
 
@@ -22,7 +22,7 @@
 | مسیر | برچسب | گروه | زیرصفحه‌ها | دکمه | ورودی | API |
 |---|---|---|---|---|---|---|
 | `/login` | ورود | public | — | 1 | 2 | 0 |
-| `/register` | ثبت‌نام | public | — | 1 | 4 | 0 |
+| `/register` | ثبت‌نام | public | — | 1 | 5 | 0 |
 | `/welcome` | خوش‌آمد | public | — | 0 | 0 | 0 |
 | `/` | میز فرمان | daily | — | 17 | 4 | 12 |
 | `/tasks` | کارها | daily | — | 9 | 7 | 3 |
@@ -54,7 +54,7 @@
 | `/import` | داده (ایمپورت و ادغام) | tools | `?tab=import`، `?tab=files`، `?tab=merge` | 1 | 0 | 0 |
 | `/drive-files` | فایل‌های درایو | tools | درِ دیگرِ `/import` | 1 | 0 | 0 |
 | `/merge` | ادغام | tools | درِ دیگرِ `/import` | 1 | 0 | 0 |
-| `/apps/learning-architecture` | معماری یادگیری عمیق | tools | — | 8 | 0 | 22 |
+| `/apps/learning-architecture` | معماری یادگیری عمیق | tools | — | 8 | 0 | 26 |
 | `/apps/:slug` | صفحهٔ افزوده | tools | — | 1 | 0 | 0 |
 | `/settings` | تنظیمات | tools | `?tab=ai`، `?tab=notifications`، `?tab=drive`، `?tab=dev`، `?tab=attention`، `?tab=safety` | 1 | 0 | 0 |
 | `/settings/notifications` | تنظیمات اعلان | tools | درِ دیگرِ `/settings` | 1 | 0 | 0 |
@@ -356,6 +356,8 @@
 | POST | `/api/local-files` |
 | POST | `/api/location` |
 | GET | `/api/location/history` |
+| GET | `/api/me/date-of-birth` |
+| PUT | `/api/me/date-of-birth` |
 | POST | `/api/merge/execute` |
 | POST | `/api/merge/suggestions` |
 | GET | `/api/mini-apps` |
