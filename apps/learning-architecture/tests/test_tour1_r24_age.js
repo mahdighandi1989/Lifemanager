@@ -135,7 +135,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await wipe(); await fresh();
     const f = await ev(() => [APP.faDates('پیش‌بینی در 🎯 ثبت شد (موعد ۲۰۲۶-۱۰-۲۱).'), APP.faDates('موعد 2026-10-21 است'), APP.faDates('«تاریخش 2026-10-21 بود»'), APP.faDates('شمارهٔ 12345-12-12')]);
     chk(/۲۹ مهر ۱۴۰۵/.test(f[0]) && !ISO.test(f[0]) && /۲۹ مهر ۱۴۰۵/.test(f[1]) && /2026-10-21/.test(f[2]) && f[3] === 'شمارهٔ 12345-12-12', 'D24-6 oD1 p19: «موعد ۲۰۲۶-۱۰-۲۱» ⇒ «۲۹ مهر ۱۴۰۵»; her quoted words untouched ' + JSON.stringify(f));
-    await turn('پیش‌بینیم رو ثبت کن: هشتاد درصد مطمئنم.', 'پیش‌بینی‌ات ثبت شد؛ موعد 2026-10-21.', [], { memory: 'پیش‌بینی در 🎯 ثبت شد (موعد ۲۰۲۶-۱۰-۲۱).' });
+    // پس‌سنجی (بانکِ R24 #140) پاسخِ ISO‌دار را یک بار برای بازنویسی برمی‌گرداند؛ این‌جا مدل همان را تکرار می‌کند — نمایش باز هم شمسی است
+    await ev(async () => { const rr = R({ reply: 'پیش‌بینی‌ات ثبت شد؛ موعد 2026-10-21.', memory: 'پیش‌بینی در 🎯 ثبت شد (موعد ۲۰۲۶-۱۰-۲۱).' }); __q.push(rr, rr, rr); await APP.ASSIST.send('پیش‌بینیم رو ثبت کن: هشتاد درصد مطمئنم.'); __q.length = 0; });
     const shown = await ev(() => { APP.ASSIST.toggle(true); APP.ASSIST.paint(); return [...document.querySelectorAll('.as-msg.ai .as-tx')].map(x => x.textContent).join(' | '); });
     chk(shown && !ISO.test(shown) && /۲۹ مهر ۱۴۰۵/.test(shown), 'D24-6: a model reply with an ISO date is shown to her in Jalali ' + shown);
     await ev(() => APP.ASSIST.toggle(false));
