@@ -1,3 +1,4 @@
+const wdNext = (w) => { const t = new Date(); t.setUTCHours(12, 0, 0, 0); if (w >= 0) while (t.getUTCDay() !== w) t.setUTCDate(t.getUTCDate() + 1); return t.toISOString().slice(0, 10); };
 // بانکِ مستقلِ VARIANTS_R22 — هر ورودیِ P3.correction_engine یک بررسی (برای tests/test_tour1_r22_correction.js؛ خودش آزمون نیست).
 // هر بررسی همان نقشِ ورودی را اجرا می‌کند: [chat] نوبتِ واقعیِ دستیار با گزارشِ retract ِ مدلِ لفظی، [edit] ✏️ ِ کامل، [page] فیلدهای تایپ‌شدهٔ خودش،
 // [events] پروندهٔ کامل، [time] سشنِ پیشین، [prompt] ساختارِ نتیجه. دلیلِ «not covered» فقط برای بخشی که مالِ سازوکارِ دیگری است.
@@ -133,9 +134,11 @@ async function run(ctx) {
     await turn('متراژش ۵۰ نیست، ۶۰ ـه', 'فرستادم.', RT({ msg: 'متراژ خونه ۵۰ ـه', what: 'fact', key: 'datum:متراژ', fix: '۶۰', old: '۵۰' }));
     const x = await snap(pid); return { ok: !ask(x, 'dl:d1') && x.u.dl[0] === 'اجاره ۵۰ میلیون', got: { asks: x.asks, dl: x.u.dl } }; };
   C[87] = async () => { const pid = await scen({ prior: ['تحویلش پنجشنبه‌ست و حدسم اینه که با دو روز کار تموم میشه'], live: { u: { dl: [{ id: 'd1', t: 'دو روز کار' }] }, g: { guess: 'دو روز بس است', test: 'دو روز کار کردم و تموم نشد', hit: 'نادرست بود' }, suff: 'کافی است' },
-      dl: [{ id: 'd1', what: 'تحویل', date: '2026-10-22', span: 'تحویلش پنجشنبه‌ست', from: 0 }] });
+      dl: [{ id: 'd1', what: 'تحویل', date: wdNext(4), span: 'تحویلش پنجشنبه‌ست', from: 0 }] });
     await turn('تحویلش پنجشنبه نیست، شنبه‌ست', 'فرستادم.', RT({ msg: 'تحویلش پنجشنبه‌ست', what: 'fact', key: 'deadline:d1', fix: 'شنبه‌ست', old: 'پنجشنبه' }));
-    const x = await snap(pid), d = x.dls[0]; return { ok: d && d.date === '2026-10-24' && x.g.hit === 'نادرست بود' && !x.g.sup && x.suff && x.suff.ans === 'کافی است', got: { d, g: x.g, suff: x.suff } }; };
+    // date-independent (was a fixed 2026-10-24, which broke once the calendar passed it): the corrected deadline is a Saturday from today on, never the old Thursday
+    const x = await snap(pid), d = x.dls[0], isSat = d && new Date(d.date + 'T12:00:00Z').getUTCDay() === 6 && d.date >= wdNext(-1);
+    return { ok: !!isSat && x.g.hit === 'نادرست بود' && !x.g.sup && x.suff && x.suff.ans === 'کافی است', got: { d, g: x.g, suff: x.suff } }; };
   C[88] = async () => { const pid = await scen({ prior: ['محیط ۴۰ متره'], live: { stmt: 'محیط ۴۰ متره', b: { verdict: 'verified', chkRes: 'نتیجه سالم ماند', chkHow: 'برای هر محیطی مربع بیشترین مساحت را دارد', use: 'مربع بهترین است' } } });
     const u = await turn('محیط ۴۴ متره نه ۴۰', 'فرستادم.', RT({ msg: 'محیط ۴۰ متره', what: 'fact', key: 'datum:محیط', fix: '۴۴', old: '۴۰', rests: [] }));
     const x = await snap(pid); return { ok: x.b.v === 'verified' && !x.b.sup && !(x.res && x.res.changed.some(c => /حکم/.test(c.rec))), got: { b: x.b, res: x.res } }; };
