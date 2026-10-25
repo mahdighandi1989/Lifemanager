@@ -1,0 +1,1506 @@
+[
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "events",
+  "text": "[sheet #101 reply note] پاسخ به برگهٔ دستیار #۱۰۱ — حوزهٔ تازهٔ `pr_prior_art` («جست‌وجوی سابقهٔ اختراع») در s_problem افزوده شد. [registry diff: + pr_prior_art]",
+  "expect": "state wait ⇒ arrived; chat/Today line «🛎 ابزارِ لازم آمد: «جست‌وجوی سابقهٔ اختراع»» naming THAT area; the resume turn asks exactly step «۶-ب ثبتِ اختراع» again (not step 1, not «now»); 🔭, 🧭 and 📜 show «رسید»",
+  "context": "problem in focus; step «۶-ب ثبتِ اختراع: آیا قبلاً ثبت شده؟» ⏸ waiting for sheet #101 (gap.step = 6-ب)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "events",
+  "text": "[reply] ابزارِ «سنجشِ نیازِ مشتری» ساخته شد و در ساحتِ تصمیم است. [registry diff: + dc_customer_validation, title «سنجشِ نیازِ مشتری»; the note gives no id]",
+  "expect": "matched by the Persian title in the reply alone ⇒ arrived for the step whose gap.step names «اعتبارسنجیِ مشتری»; Today «🛎 ابزارِ لازم آمد» once",
+  "context": "step «۳ — آیا کسی حاضر است بخرد؟» waits for #104 (gap.step = 3)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "events",
+  "text": "[reply] دو حوزه افزوده شد: «سنجشِ ایمنیِ ساخته‌های برقیِ خانگی» و «جست‌وجوی سابقهٔ اختراع و مرزِ نوآوری». [registry diff lists the safety area FIRST]",
+  "expect": "every candidate is scored; the prior-art area wins on the step's own words (سابقه، اختراع، ثبت); the safety area (shares only «سنجش، مرز») is NOT chosen although listed first; the arrival line and resume name step ۶-ب",
+  "context": "problem in focus; step «۶-ب ثبتِ اختراع: آیا قبلاً ثبت شده؟» ⏸ waiting for sheet #101 (gap.step = 6-ب)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[reply] یه حوزه‌ی جدید برای سنجش اضافه شد ‖ [registry diff: + one area whose title shares one specific word with the step]",
+  "expect": "score not clear ⇒ before resuming the page asks her «این ابزارِ تازه همان است که برای گامِ «۶-ب ثبتِ اختراع» لازم بود؟»; state stays wait until she answers; no «🛎 ابزارِ لازم آمد» yet",
+  "context": "problem in focus; step «۶-ب ثبتِ اختراع: آیا قبلاً ثبت شده؟» ⏸ waiting for sheet #101 (gap.step = 6-ب); reply written colloquially, ZWNJ missing"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[page asks «این ابزارِ تازه همان است…؟»] ‖ U: آره همونه، بریم",
+  "expect": "her yes ⇒ arrived ⇒ resumed; the resume question is step ۶-ب; 📜 event «سرانجام: رسید (تأییدِ تو)»",
+  "context": "problem in focus; step «۶-ب ثبتِ اختراع: آیا قبلاً ثبت شده؟» ⏸ waiting for sheet #101 (gap.step = 6-ب)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: خودم یه راه دیگه پیدا کردم، با سایتِ ثبتِ شرکت‌ها گشتم و چیزی نبود",
+  "expect": "sys_done: state other; a page line «گامِ ۶-ب از راهِ دیگری برداشته شد ✓»; a note under sheet #101 for the routine («کاربر از راهِ دیگری برداشت — هنوز لازم است؟»); the sheet is not deleted; 📜 event outcome «از راهِ دیگری»",
+  "context": "problem in focus; step «۶-ب ثبتِ اختراع: آیا قبلاً ثبت شده؟» ⏸ waiting for sheet #101 (gap.step = 6-ب)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: شما زحمت نکشید، خودم با جدول حلش کردم. دیگر آن ابزار لازم نیست.",
+  "expect": "sys_done as above in «شما» register («از راهِ دیگری برداشتید ✓»); 🔭 card stops saying «وقتی روتین ساخت، صفحه خودش می‌فهمد…»",
+  "context": "elder 81, «شما»; step waits for #102"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "page",
+  "text": "[📜 after arrival] event «⏸ منتظرِ برگهٔ #۱۰۲»",
+  "expect": "the event now carries «سرانجام: رسید» (or «از راهِ دیگری» after sys_done), never still «منتظر»; the 🔭 card no longer repeats the fixed waiting text",
+  "context": "arrival happened two days after filing (D0+2)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "page",
+  "text": "[📜 / 🔭 / 🧭 titles for sheet #101]",
+  "expect": "all three name the SAME waiting step — the one gap.step points to (e.g. «۵ ایمنی»), never the first step «۱ آبِ روزانه» and never a renamed «(برگهٔ دوم)» variant; her complaint text never becomes a story step",
+  "context": "gap.step = 5"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "time",
+  "text": "[D0 filed #101] ‖ [D0+1 unrelated reply ⇒ mismatch] ‖ [D0+3 real build ⇒ arrival]",
+  "expect": "📜 and the route list events in time order: filed → mismatch (reopened) → arrival → resumed; the dossier never puts «🛎 ابزارِ لازم آمد» under D0 before the D0+1 mismatch",
+  "context": "relative test clock; no fixed dates"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "events",
+  "text": "[gap sheet with gap.step = 2, filed while the focus is on step 4]",
+  "expect": "the ⏸ mark goes on step 2 (the named one), not on the current step 4; prompt tells the model step 2 waits",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "events",
+  "text": "[sheet text from her own problem: «برای گامِ #۳ ابزارِ تخمینِ فرمی لازم است»; no gap.step]",
+  "expect": "a step explicitly named «#۳» counts ⇒ step 3 ⏸ waiting for this sheet",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "events",
+  "text": "[reply] reply to sheet #101: added area pr_change_detection (تشخیصِ تغییر) [registry diff: + pr_change_detection]",
+  "expect": "Latin «#101» ≡ «#۱۰۱»; matched by id from the REPLY ⇒ arrived for the step needing «تشخیصِ تغییر»",
+  "context": "step «۲ — آیا روند واقعاً عوض شده؟» waits (gap.step = 2)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "pos",
+  "role": "events",
+  "text": "[reply] واسه تخمین فرمی یه بخش جدید ساختیم [registry diff: + pr_estimation_fermi]",
+  "expect": "colloquial, no ZWNJ, no id ⇒ still matched on the title words «تخمین/فرمی» ⇒ arrived for the estimation step",
+  "context": "teen 15; step «۱ — چند تا کوک‌ساز در تهران؟» waits (gap.step = 1)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[reply under #101 names only the `farm` view] [the sheet's own filing text — the assistant's differential — mentions pr_hypothesis_testing]",
+  "expect": "NOT arrived: ids are read from the routine's reply only; page line «⚠️ پاسخِ روتین به گامِ «۵ ایمنی» جواب نداد»; a note is left under the sheet; the sheet is reopened; the step stays ⏸; nothing in Today says «آمد»",
+  "context": "round-24 A24-4 shape; step 5 waits"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[reply names `pr_estimation_fermi`] [the sheet's «کجا افزوده شود» line named pr_representation]",
+  "expect": "NOT arrived for «بازنماییِ مسئله»; no «سنجیدم که نیازِ گام را جواب می‌دهد»; entry stays wait so the NEXT real build is still checked (S1 D24-1)",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[assistant's `whole` text of the sheet contains «🧭 این برنامه چیست؟»; reply mentions nothing built]",
+  "expect": "the «built» list of the mismatch record never contains «🧭 این برنامه چیست؟» (taken from `whole`); built = []",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[differential in the sheet: «نه آزمونِ فرضیه — آن هست و کافی نیست»] [reply: «آزمونِ فرضیه را کمی بهتر کردیم»]",
+  "expect": "pr_hypothesis_testing is a ruled-out area ⇒ excluded from candidates ⇒ not arrived; at most the page asks her whether this helps; step stays ⏸",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[reply] هیچ ابزارِ تازه‌ای برای اقناع و تعهد ساخته نشد؛ فعلاً نیست.",
+  "expect": "words inside the «هیچ/نشد/نیست» clause never count ⇒ score 0 ⇒ not arrived; mismatch line + note",
+  "context": "step «۴ — چطور قانعش کنم که تعهد بده؟» waits"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[reply] در واقع تغییری در مسئله و ابزار و نمودار نبود، هیچ.",
+  "expect": "only generic words (مسئله، تغییر، ابزار، نمودار، واقع، هیچ) ⇒ score 0 ⇒ not arrived",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[reply names only «سنجشِ ایمنیِ ساخته‌های برقیِ خانگی»; shared words with the step: «سنجش، مرز»]",
+  "expect": "two shared generic words are not a match ⇒ not arrived for «۶-ب ثبتِ اختراع» (A24-5 shape); ask or mismatch",
+  "context": "problem in focus; step «۶-ب ثبتِ اختراع: آیا قبلاً ثبت شده؟» ⏸ waiting for sheet #101 (gap.step = 6-ب)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[assistant files kind=fix sheet «دکمهٔ ✏️ روی گوشی کار نمی‌کند» while her problem is in focus]",
+  "expect": "a sheet about the system itself never marks a step of her problem ⏸; her steps unchanged; no «گامِ منتظر» in the next prompt",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[self-knowledge sheet: «آیا روش روی چند مدل سنجیده شده؟» (bank #4) while «تصمیمِ پیشنهادِ کار» is in focus]",
+  "expect": "no ⏸ on «فهمِ مسئله (دادهٔ ثبات)» or any step (A24-6); the sheet is listed as filed only",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[companion-book sheet «کتابِ همراه هنوز نیست» while the battery problem is in focus]",
+  "expect": "no step «⏸ منتظرِ برگهٔ #۱۰۲»; the next prompt has no «در جمع‌بندی گامِ منتظر را صریح بگو» (D24-2)",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "events",
+  "text": "[gap sheet about her domain WITHOUT gap.step and without any «#n» in a step]",
+  "expect": "no fallback to the «now» step; nothing marked waiting; the page may ask her which step needs it",
+  "context": ""
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: امروز خیلی خسته‌ام، بعداً ادامه بدیم",
+  "expect": "not sys_done, not arrival; the step stays ⏸; the waiting marker still shows",
+  "context": "problem in focus; step «۶-ب ثبتِ اختراع: آیا قبلاً ثبت شده؟» ⏸ waiting for sheet #101 (gap.step = 6-ب)"
+ },
+ {
+  "rc": "R1.territory_loop",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: راهِ دیگه‌ای هم هست که خودم برم جلو؟",
+  "expect": "a question about another way is not a report of having done it ⇒ no sys_done; the coach may offer one",
+  "context": "problem in focus; step «۶-ب ثبتِ اختراع: آیا قبلاً ثبت شده؟» ⏸ waiting for sheet #101 (gap.step = 6-ب)"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: می‌خوام بدونم چند تا تخته‌ی ۲۴۰ سانتی بخرم ‖ [later the problem becomes live (live_new)]",
+  "expect": "🔭 «مجهول» pre-filled «از گفت‌وگو: چند تخته‌ی ۲۴۰ سانتی؟ — درست است؟»; no turn question «مجهول چیست؟ / به مجهول نگاه کن…»; the coach block's «پیشنهادِ این نوبت» is not «مجهول چیست؟»",
+  "context": "elder 81, carpentry"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[chat already holds: unknown, data, a plan and one executed step] ‖ [any next turn]",
+  "expect": "the live-problem block's stage = A.liveStoryPhase («اجرای طرح»), the same as 🧭 «اکنون» and the 🔭 stage; never «فهمِ مسئله» from the empty form",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: طرحم اینه: ۱) مساحتِ کف رو حساب کنم ۲) تقسیم بر مساحتِ یه کاشی ۳) ده درصد اضافه برای پرت",
+  "expect": "exactly three plan steps with her words; 🧭 «مانده: ۳ گام از ۳»",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: plan:\n- قیمتِ هر سه تا خونه رو بنویسم\n- هزینه‌ی رفت‌وآمد رو اضافه کنم\n- مقایسه",
+  "expect": "a bulleted list ⇒ three plan steps, one per bullet; «plan:» header not a step",
+  "context": "teen 17, Latin header"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: طرحم این است که اول مساحت را حساب کنم، بعد بر ۰٫۳۶ تقسیم کنم و گرد کنم.",
+  "expect": "marked as a plan but written as one sentence ⇒ stored as ONE plan entry (or exactly the model's validated `plan` items, each quote found in her text); never pieces cut at the commas",
+  "context": "formal «شما»"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[model coach_state.plan = 3 steps, each quote found verbatim in her message]",
+  "expect": "the validated plan is imported (3 steps); a plan item whose quote is not in her text is rejected",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۰٫۳ تقسیم بر ۰٫۰۵ میشه ۶ برابر",
+  "expect": "recorded as the result of sub-problem 2 only; the whole problem stays «اجرای طرح»; 🧭 never «اکنون: بازنگری · ۰ مرحله از ۴»",
+  "context": "multi-part dose problem; sub-problem 2 in focus"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پس کلاً ۱۴ تا تخته لازمه، با یه دونه اضافه. فکر کنم همینه",
+  "expect": "a result that answers the whole unknown ⇒ stage may move to «بازنگری»; 🔭/🧭/prompt agree",
+  "context": "elder 81, «شما» earlier; unknown = number of boards"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: اولی رو امتحان کردم ساعت ۸ صبح، نشد. ۴ بعدازظهر و ۱۲ شب هم نشد. الان ۱۰ شب رو گذاشتم و دو هفته‌ست خوبه",
+  "expect": "import: data/plan = «۱۰ شب، دو هفته خوب»; 8am/4pm/12am go to «امتحان‌های ردشده» history, never to «داده»",
+  "context": "sleep problem"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ببخشید یه اشتباه کردم: حقوقم ماهی ۱۸ نیست، ۱۹ میلیونه",
+  "expect": "the datum becomes «حقوقِ ماهانه: ۱۹ میلیون (اصلاح شد ⇐ ۱۸)»; her correction message is never itself an imported item; one datum, not fragments",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: راستی این فرم‌ها کجا ذخیره میشن؟ مجهولم کلِ هزینه‌ی سفره",
+  "expect": "the meta-question is answered/routed (not swallowed into a draft); «مجهول: کلِ هزینهٔ سفر» drafted «از گفت‌وگو … درست است؟»",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: فکر کردم دورش سه تا مثلثِ دیگه هست که اگه مساحتشونو کم کنم میشه، ولی مساحتِ مثلث رو نمی‌دونم",
+  "expect": "goes to plan idea + stuck (prerequisite: area of a triangle); NOT to «مجهول»",
+  "context": "child 11"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[datum corrected to ۶] ‖ U: کل مسئله: آهنگِ تغییر میشه -54/(144π) ≈ -0.37",
+  "expect": "the page keeps ITS re-check question («با دادهٔ تازه دوباره بسنج») — never demoted as «پرسشِ فرمِ فهم کهنه است»; -54/(144π) ≈ -0.119, so her -0.37 is flagged for checking",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حل شد! ۲۰ تا مرغ و ۱۵ تا خرگوش. با ضرب چک کردم ‖ [chat_solved]",
+  "expect": "chat_solved imports unknown, data, condition and solution named earlier in the chat, not only the statement",
+  "context": "elder 82"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حکم اینه که مجموعِ زاویه‌های داخلیِ هر پنج‌ضلعی ۵۴۰ درجه‌ست. می‌خوام ثابتش کنم ‖ [live_new]",
+  "expect": "🔭 «حکم» filled from the chat («از گفت‌وگو»); no «حکم چیست؟» turn question; no stack line «مجهول» for a proof",
+  "context": "teen 14, proof problem"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[she named the unknown in the same message] coach block",
+  "expect": "no stale suggestion «مجهول چیست؟»; the suggestion follows the story's stage (e.g. «طرح» or «دادهٔ لازم»)",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اگه مستقل باشن، احتمال ضرب میشه، بعد با جدول چک می‌کنم، حالا جمع‌بندی کن ببینم کجام",
+  "expect": "no plan steps cut at commas (never «گامِ ۱ ِ طرح: اگه مستقل باشن» … «گامِ ۴ ِ طرح: حالا جمع‌بندی کن…»); 🧭/Today never «مانده: ۰ گام از ۸»; at most one «این طرحت است؟»",
+  "context": "B24·D3 shape"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اون کارتِ تاریخ رو زدم، قبول نکرد، بعد دوباره زدم، من ۵ تیر ۱۳۲۴ به دنیا اومدم",
+  "expect": "no plan steps; the birth date is never a «گامِ طرح»; it goes to the birth parser only",
+  "context": "elder 81"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: نصفِ ۴ در ۶ میشه ۱۲، جمع ۳۰، ولی طولش رو ندارم",
+  "expect": "computations + a stuck, never three plan steps",
+  "context": "parent helping a child"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: بعدش چی کار کنم؟",
+  "expect": "not «مجهول را گفت»; the turn question is still given (next-step question for the stage)",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: کتاب‌ها رو به ترتیب بخونم. خوبه؟",
+  "expect": "a question ⇒ not stored as her plan; no موعد attached",
+  "context": "teacher, three weeks in"
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "page",
+  "text": "[after the sub-result «۶ برابر» of sub-problem 2]",
+  "expect": "🧭 must not show «اکنون: بازنگری»; 🔭 must not jump to look-back",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[datum corrected] ‖ U: کل مسئله: … (her message begins with «کل مسئله»)",
+  "expect": "her opening word «کل» does not mark the story «ahead of understanding»; the page's own re-check stays",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "page",
+  "text": "[import after «اولی رو امتحان کردم ساعت ۸ صبح، نشد»]",
+  "expect": "«ساعت ۸ صبح» never appears as «داده (از گفت‌وگو)»",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۶ نه، ۱۵",
+  "expect": "the correction message is never imported as a datum; «اصلاحِ خودم: …» is never appended to the statement text («می‌خوام (اصلاحِ خودم…)» must not appear)",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: خسته‌ام، دیروز تا دیروقت کار کردم، امروزم جلسه دارم",
+  "expect": "no plan, no data from a non-problem message with commas",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: سؤالم اینه که الان کجای کارم؟",
+  "expect": "a meta-question is not stored as the unknown; it is answered from the stage",
+  "context": ""
+ },
+ {
+  "rc": "R2.story_stage_turnq",
+  "kind": "neg",
+  "role": "page",
+  "text": "[a NEW problem started in the same session after the first was solved]",
+  "expect": "the first problem's unknown/plan never appear as «از گفت‌وگو» drafts of the new one",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "edit",
+  "text": "[✏️ on «طول ۵ متر، عرض ۳ متر، حدسم ۱.۷۵ متره»] pairs ۵⇐۴ and ۳⇐۲",
+  "expect": "only standalone numbers change: «طول ۴ متر، عرض ۲ متر»; «۱.۷۵» untouched (never «۱.۴۷»/«۱.۵.۷۵»/«۱۲۰»)",
+  "context": "C24-12 shape"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۶۰ سانت نبود، ۱۵۰ سانته",
+  "expect": "statement «… ۱.۸ عرض، ۱۵۰ سانت ارتفاع …» — the unit stays; form datum «۱.۵ متر» consistent",
+  "context": "A24-3 shape"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "edit",
+  "text": "[✏️ «height 160cm» ⇒ «height 150cm»]",
+  "expect": "Latin digits and unit preserved: «150cm»; the Persian form datum shows ۱۵۰ سانت",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۸ هفته مونده نه ۱۶؛ عروسی ۱۵ اسفنده",
+  "expect": "number roles: «۱۶ هفته ⇒ ۱۸ هفته»; «۱۵ اسفند» is a day of the month; no ask to change «۱۶» into «۱۵»; «بله» cannot corrupt the weeks",
+  "context": "B24·D5 shape"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: بر ۴ بخش‌پذیر نه، باید بر ۵ بخش‌پذیر باشه",
+  "expect": "the plan step «بخش‌پذیری بر ۴» is changed or asked; the digit «۴» inside «۴۵۷» is not touched; step 1 is not rewritten as «بر ۵ … بر ۵»",
+  "context": "D23-5 shape"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "edit",
+  "text": "[✏️ ۱۶⇐۱۵ on the bubble that produced the typed form row «داده: ۸ ساعت ⇒ ۱۶ سانت»]",
+  "expect": "the typed form row is changed after a yes or the page asks «ردیفِ داده هم عوض شود؟» (ask list not empty)",
+  "context": "A22-17 shape"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: نه ۱۵ نفر نبودیم، ۱۲ نفر بودیم",
+  "expect": "the correction flows into every «از گفت‌وگو» draft and the 🧭 destination (12); old value kept as history",
+  "context": "C24-11 shape"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: صفحه ۸ در ۸ بود نه ۱۰ در ۱۰ ‖ U: بله",
+  "expect": "derived values recomputed or marked «کهنه پس از اصلاح»: «۱۰۰ خانه»→۶۴, «۹۸ خانه»→۶۲, «۴۹ دومینو»→۳۱; plan «(۵۰ و ۴۸)» and «10^2 = 100» marked stale",
+  "context": "B24·D17 shape"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "page",
+  "text": "[result «why» after the correction «۱۶۰ ⇐ ۱۵۰»]",
+  "expect": "why shows the real quotes: «۱۶۰ سانت» ⇐ «۱۵۰ سانت»; never «گفتم «» — اشتباه گفتم» or ««» ⇐ «»»",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "page",
+  "text": "[dossier/route after one correction touching statement and lesson]",
+  "expect": "exactly one change line per corrected field; every arrow points the same way («new (اصلاح شد ⇐ old)»)",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "edit",
+  "text": "[✏️ «۲.۵ میلیون» ⇒ «۲.۸ میلیون» on «۵ نفریم، هر کدوم ۲.۵ میلیون»]",
+  "expect": "only the amount changes; «۵ نفر» untouched; the total (۱۲.۵ ⇒ ۱۴) marked stale or recomputed",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۳ کیلو نه، ۲ کیلو",
+  "expect": "statement keeps «کیلو»: «۲ کیلو»; no unit borrowed from another field",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: عذر می‌خواهم، مبلغِ وام ۳۰۰ میلیون است نه ۲۰۰",
+  "expect": "copy asks in «شما» («این‌جا هم عوض شود؟»); the derived monthly installment marked «کهنه پس از اصلاح» until recomputed",
+  "context": "elder 72, «شما»"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: نه ۱۲ تا مداد نبود، ۱۵ تا بود!",
+  "expect": "answer per child «۴» recomputed to ۵ or marked stale; simple child wording",
+  "context": "child 9"
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: 3.5 نه، 3.75 بود (Latin digits)",
+  "expect": "«۳.۵» ⇒ «۳.۷۵»; a «۳» elsewhere and «۵۰» untouched",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "edit",
+  "text": "[✏️ pair ۵⇐۶ on «۲۵ نفر، ۵ گروه، سال ۱۴۰۵»]",
+  "expect": "only «۵ گروه» changes; «۲۵» and «۱۴۰۵» untouched",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "edit",
+  "text": "[✏️ pair ۲⇐۳ (people) on «x² + ۲ نفر»]",
+  "expect": "the exponent in «x²» is never changed",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: عروسی ۱۵ اسفنده (no correction, a new datum)",
+  "expect": "no copy ask, no stale marks; nothing replaced",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۵۰ همون ۱.۵ متره دیگه، فقط دقیق‌تر گفتم",
+  "expect": "same value restated ⇒ no correction, no stale marks, no «اصلاح شد» line",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: نه، اون ۵ متر رد شد، ۷ متر بود",
+  "expect": "a result she tested and refuted keeps «رد شد»; the correction does not turn it into «درست بود»",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "page",
+  "text": "[correction in today's problem]",
+  "expect": "a closed older problem with the same number is not changed",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "page",
+  "text": "[why line after any correction]",
+  "expect": "never empty quotes «[اصلاحِ پیامِ قبلی] «» ⇐ «»»",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "page",
+  "text": "[after one ✏️]",
+  "expect": "the same change line never appears two or three times",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "page",
+  "text": "[statement and lesson after one correction]",
+  "expect": "the lesson arrow is never reversed («old ⇐ new») while the statement shows «new ⇐ old»",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[copy ask after «۱۸ هفته … عروسی ۱۵ اسفند»] ‖ U: بله",
+  "expect": "«بله» never writes ۱۵ into «۱۶ هفته» nor into «کل در یک جمله»",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "page",
+  "text": "[after «صفحه ۸ در ۸ بود»]",
+  "expect": "a value not derived from the side (the deadline date, her name) is not marked stale",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۲ نفر بودیم ولی ۱۵ صندلی داریم",
+  "expect": "two different quantities, no correction; neither replaced",
+  "context": ""
+ },
+ {
+  "rc": "R3.corrections_numbers",
+  "kind": "neg",
+  "role": "edit",
+  "text": "[✏️ ۱۲⇐۱۵ where «۱۲» also appears in «ساعت ۱۲»]",
+  "expect": "only the people count changes, or the page asks which; the clock time «ساعت ۱۲» is not silently changed",
+  "context": ""
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سلام من کیانم ۹ سالمه. ۱۲ تا مداد رو بین ۳ نفر تقسیم کنیم هر کی چند تا میگیره؟",
+  "expect": "a problem from turn one: route lla_coach; «# پیش‌نیاز» present; title «۱۲ مداد بینِ ۳ نفر» without greeting/name/age; no «هنوز مسئله نیست»",
+  "context": "child 9"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سارام کلاس دهم، این سواله رو نمی‌فهمم: دو عدد جمعشون ۲۰ ضربشون ۹۶",
+  "expect": "chat statement stripped of «سارام کلاس دهم»; title = the problem; same stripping as «پروندهٔ تازه»",
+  "context": "teen 16, ZWNJ missing"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: با سلام، اینجانب احمدی هستم، ۷۲ سال دارم. می‌خواستم بدانم پس‌انداز ۵۰۰ میلیونی با سود ۲۰٪ پس از سه سال چه می‌شود.",
+  "expect": "problem from turn one; lla_coach; the session dossier does not count the greeting as «مسئلهٔ ۱»",
+  "context": "elder 72, formal"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: خب ۳.۲ رو که تو همون قطر کف به کار بردم، ۱.۸ رو هم. دیگه نمی‌دونم چی کار کنم.",
+  "expect": "a stuck, not a use report: the stuck question (e.g. «از خواسته به عقب») is asked",
+  "context": "A24-1 shape"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ...",
+  "expect": "the «# مربیِ حل» block and the silence rule stay in the prompt",
+  "context": "A24-2 regression"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: چند روز دیر شد. امروز مدخلِ «۱۵ ذرع کرباس» رو با همون روش حل کردم. درسته؟",
+  "expect": "practice report with a new solution ⇒ lla_coach (not lla_assistant)",
+  "context": "D24-13 regression"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پیر شدم، مغزم دیگه مثلِ قدیم کار نمی‌کنه",
+  "expect": "read as an ability self-label; a page line says the stuck came from the missing datum (e.g. blade width), not age; route stays coach",
+  "context": "elder 81"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: x²−9 = (x−3)(x+3). درسته؟ با ضرب هم چک کردم",
+  "expect": "her own reported check is recorded as a check, not «همین پیام حدس است … چطور می‌آزمایی‌اش؟»",
+  "context": "teen"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: هشتاد درصد مطمئنم جواب «ج» است",
+  "expect": "prediction booked with confidence 80",
+  "context": ""
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: بعدش چی کار کنم؟",
+  "expect": "a next-step question, not «unknown named»; the turn question is still produced",
+  "context": ""
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: فکر کنم ج رو انتخاب می‌کنم",
+  "expect": "no confidence booked; the e1 confidence question is not skipped as «already said»",
+  "context": "A24-8 shape"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: سلام من مینام ۱۳ سالمه، می‌خواستم بپرسم ۲ به توانِ ۱۰ چند میشه؟",
+  "expect": "an opening never gets the «# اصلاحِ پیامِ پیشین (شاید)» block",
+  "context": "teen 13"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: سلام، من مریمم",
+  "expect": "greeting only ⇒ no problem detected; no «مسئلهٔ ۱» in the session dossier",
+  "context": ""
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: امروز روشِ «کار از آخر» رو به کار بردم و جواب داد",
+  "expect": "a real use report (no stuck words) ⇒ use, not stuck",
+  "context": ""
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: پیر شدم دیگه، نوه‌م امسال رفت دانشگاه",
+  "expect": "not an ability self-label (no claim about thinking); no «این کم‌هوشی نیست» line",
+  "context": "elder"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: حدس می‌زنم x=3 باشه",
+  "expect": "a guess (no check reported) ⇒ booked as a guess",
+  "context": ""
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: می‌شه چک کنی ببینی درسته؟",
+  "expect": "a request to check is not her own check",
+  "context": ""
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: مجهولش چیه اصلاً؟",
+  "expect": "she asks what the unknown is ⇒ not «unknown named»",
+  "context": "child 10"
+ },
+ {
+  "rc": "R4.opening_classification",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: امروز وقت نکردم تمرین کنم",
+  "expect": "no new solution ⇒ not routed as a solved practice report; no «حل شد»",
+  "context": ""
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "page",
+  "text": "[birth card] ۱۲ اردیبهشت ۱۳۳۸",
+  "expect": "stored 1959-05-03; exactly ONE confirmation «✓ تاریخِ تولدتان ثبت شد: ۱۲ اردیبهشت ۱۳۳۸» with no Gregorian/ISO in brackets; age = full years at D0; band elder",
+  "context": "elder, «شما»"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۵ تیر ۱۳۲۴ به دنیا اومدم ‖ [model also sends {\"do\":\"birth\"}]",
+  "expect": "page + model save ⇒ still one confirmation line; stored 1945-06-26",
+  "context": "elder 81"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "page",
+  "text": "[birth card] 96/2/30",
+  "expect": "two-digit Jalali year accepted ⇒ 1396/02/30 = 2017-05-20; child band",
+  "context": "child"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "page",
+  "text": "[birth card] ۱۷ اسفند ‖ [card asks for the year] 88",
+  "expect": "the day typed in the card is kept; «88» ⇒ ۱۳۸۸ ⇒ 1388/12/17 = 2010-03-08",
+  "context": "teen"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "page",
+  "text": "[birth card] 17 Esfand 1388",
+  "expect": "Finglish month accepted ⇒ 2010-03-08",
+  "context": "teen, Latin script"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: هشتاد و یک سالمه",
+  "expect": "age in words read ⇒ 81, elder; «# مخاطب» never says «ممکن است کم‌سال باشد»; no date invented",
+  "context": "elder"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "page",
+  "text": "[mind-card date field] ۱۳۲۴/۴/۵۱",
+  "expect": "not saved AND a visible human error («روز ۵۱ نداریم؛ لطفاً روز را دوباره ببینید»)",
+  "context": "elder 81, «شما»"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: ۸۲ سالمه (no date given)",
+  "expect": "«# مخاطب» elder block WITHOUT «از تاریخِ تولدِ ثبت‌شده»",
+  "context": ""
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "page",
+  "text": "[page lines for an 81-year-old «شما» user: card, system lines, turn questions, card error]",
+  "expect": "all «شما»: «تاریخِ تولدتان»، «سلیقه‌تان»، «روز را دوباره ببینید»; no «تو» form",
+  "context": ""
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: لطفاً اینو ثبتش کن",
+  "expect": "an imperative to the machine is not a «تو» sign; the post-check does not force «تو» on the elder after six «شما» turns",
+  "context": "elder 82"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "page",
+  "text": "[Today and mind card for a 9-year-old]",
+  "expect": "no adult-normed puzzle (no MaRs-IB «مقایسهٔ منصفانه با آن‌ها»); mind card «برای این سن هنجارِ معتبر در دست نیست»",
+  "context": "child 9"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: من کلاس هشتمِ مدرسه‌ی شهید بهشتی‌ام",
+  "expect": "dossier keeps the grade, not the school name verbatim",
+  "context": "teen 14"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پیش‌بینی می‌کنم تا شنبه‌ی بعد تموم شه",
+  "expect": "🎯 «موعد: شنبه <Jalali date of the first Saturday after D0>» — computed from the test clock, shown in Persian; never «۲۰۲۶-…» ISO",
+  "context": ""
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "events",
+  "text": "[page parsed «۱۲ اردیبهشت ۱۳۳۸» = 1959-05-03] ‖ [model {\"do\":\"birth\",\"date\":\"1959-05-02\"}]",
+  "expect": "the page's parse is kept; the model ISO never silently overrides it",
+  "context": ""
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: بذار ببینم چی میشه",
+  "expect": "«ببینم» is not a «تو» sign; an elder «شما» register is unchanged",
+  "context": "elder"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: روتینِ صبحم به هم ریخته",
+  "expect": "the noun «روتین» is not a «شما» sign",
+  "context": "adult «تو»"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "page",
+  "text": "[birth card] ۳۰ اسفند ۱۳۸۸",
+  "expect": "refused with a human line («اسفندِ ۱۳۸۸ ۲۹ روز دارد») in her register; nothing saved",
+  "context": "teen"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "page",
+  "text": "[mind card for a 35-year-old]",
+  "expect": "the 30–39 comparison with its source IS shown (no-norm line only where no valid norm exists)",
+  "context": "adult"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: لطفاً با من راحت باش، «تو» صدام کن",
+  "expect": "after an explicit request, «تو» is right for this elder",
+  "context": "elder 67"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۸۱ کیلو وزنمه",
+  "expect": "not an age",
+  "context": ""
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: این خونه هشتاد و یک سال پیش ساخته شده",
+  "expect": "not her age",
+  "context": ""
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: لطفاً بگو چی کار کنم (adult, «تو» elsewhere)",
+  "expect": "«لطفاً» alone does not switch to «شما»",
+  "context": "adult 30"
+ },
+ {
+  "rc": "R5.age_register",
+  "kind": "neg",
+  "role": "page",
+  "text": "[confirmation for a child]",
+  "expect": "no Latin ISO run inside the child's chat; Jalali only",
+  "context": "child 9"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[page's own turn question: «با واقعیت سنجیدی‌اش؟ از راهِ دیگری هم به همین می‌رسیدی؟»]",
+  "expect": "counted as ONE question; no «دو پرسش» rewrite",
+  "context": "pass = no rewrite"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[reply: «گفتی هر دومینو «دو خانهٔ مجاور را می‌پوشاند»…» where the quoted phrase is the assistant's own earlier wording]",
+  "expect": "the assistant's own «…» phrase is not treated as a quote of her; no rewrite",
+  "context": ""
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: خب برگردیم به همون سکه‌ها که گیر کرده بودیم",
+  "expect": "a natural return to the waiting step accepted; no heavy template demanded",
+  "context": "child 9"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: این برنامه داده‌هامو کجا نگه می‌داره؟",
+  "expect": "no «خودت فکر می‌کنی چرا؟» on a question about the system; answered from the system map",
+  "context": "owner-like adult"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[she reported «با جای‌گذاری چک کردم، درست درومد» one turn earlier]",
+  "expect": "no «جواب را در شرط جای‌گذاری کن» in the next turn question",
+  "context": "elder 82"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[page composite question «طرحت چیست و از کدام داده شروع می‌کنی؟»]",
+  "expect": "one question",
+  "context": ""
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[reply quotes her two consecutive messages joined]",
+  "expect": "accepted when both parts are her consecutive words",
+  "context": ""
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: برگشتم سرِ همون گامِ دوم که منتظر بودیم",
+  "expect": "accepted return; no rewrite",
+  "context": "adult"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[model reply: «چند تا داری؟ چرا این‌طوری حساب کردی؟»]",
+  "expect": "two independent questions ⇒ still caught",
+  "context": "catch = rewrite"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[reply: «گفتی «همه‌اش غلطه»» — she never wrote it]",
+  "expect": "fabricated quote still caught",
+  "context": ""
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[return reply that moves to a different step than the waiting one]",
+  "expect": "caught",
+  "context": ""
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[reply gives a child the full next step]",
+  "expect": "caught (child: ask, not tell)",
+  "context": "child 9"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[reply with «تو» to an elder «شما» user]",
+  "expect": "caught",
+  "context": "elder"
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[reply asks for a check she reported in THIS message]",
+  "expect": "caught",
+  "context": ""
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[reply writes «1959-05-03» to the person]",
+  "expect": "caught (never ISO to a person)",
+  "context": ""
+ },
+ {
+  "rc": "R6.postcheck_calibration",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[reply with «خودت فکر می‌کنی چرا؟» to a math stuck where it fits]",
+  "expect": "allowed on her problem (not suppressed)",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: میان‌ترم رو ۱۴ گرفتم",
+  "expect": "deadline_done; Today no longer «امتحانش را دادی؟ چطور شد؟»",
+  "context": "exam deadline was three days before D0"
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حدسم ۲۵۰۰ بود ‖ U: آره چون ۵۰ در ۵۰ میشه ۲۵۰۰",
+  "expect": "the guess gets outcome «تأیید شد/موجه شد» in her words",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: فکر می‌کردم یه بار خوندن بسه ‖ U: ولی ۱۹ از ۲۰ گرفتم وقتی دو بار خوندم و بار اول ۱۲",
+  "expect": "guess outcome «رد شد» recorded",
+  "context": "teen"
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: به نظرم چهار تا بسه … نه، از یه تخته‌ی ۲۴۰ درنمیاد، پنج تا",
+  "expect": "the guess refuted in the same message gets outcome «رد شد»; 🧭 never «آزموده نشده»",
+  "context": "elder 81"
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: اینو یه جا بنویس که فردا یادم بیاد بقیه‌شو حساب کنیم",
+  "expect": "left unfulfilled this turn ⇒ promise with HER request text; returns in Today on D0+1",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پیش‌بینی: صفر یا یک، ۷۰ درصد",
+  "expect": "exactly one 🎯 record (page and form follow-up merge); calibration counts it once",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: فکر کنم این برای هر n فرد هم درسته، بذار امتحان کنم",
+  "expect": "the look-back conjecture she is testing becomes a live problem (coach has a problem in play)",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "page",
+  "text": "[🧭 after the problem is solved]",
+  "expect": "never «مانده: طرح هنوز نیست · ۰ مرحله از ۴»",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "page",
+  "text": "[route map after a detour problem in the session]",
+  "expect": "every session event bound to its own problem; the decision problem shows no guess «۱۰۰» from another one",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: تا شنبه‌ی بعد باید تحویلش بدم",
+  "expect": "deadline = the first Saturday after D0 (computed from the test clock); shown as a Jalali date",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: کتاب‌ها رو به ترتیب بخونم. خوبه؟ [model when = some date]",
+  "expect": "not stored as a plan; the model `when` without her words is rejected",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اینا رو یه جا نگه دار که یادم نره ‖ [same turn: two list_add done]",
+  "expect": "fulfilled ⇒ no promise",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "page",
+  "text": "[any promise]",
+  "expect": "its text is never the assistant's own question («پاسخ به «…؟»»)",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: هنوز امتحانو ندادم، هفته‌ی بعده",
+  "expect": "no deadline_done",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: حدسم ۱۲ه (never tested later)",
+  "expect": "«آزموده نشده» is right",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "page",
+  "text": "[one stuck recorded once]",
+  "expect": "mind card lists it once, never three times",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "page",
+  "text": "[follow-up after opening 🧭, a view with no fields]",
+  "expect": "never «فیلدهای این صفحه را پر کن»",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: شاید یه الگو باشه، ولش کن",
+  "expect": "no live problem from an idle remark",
+  "context": ""
+ },
+ {
+  "rc": "R7.today_dossier_promises",
+  "kind": "neg",
+  "role": "page",
+  "text": "[page «🔭 نگه داشتم: …» shown]",
+  "expect": "the assistant never says «ثبت نشده» in the same turn",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: می‌خوام بدونم کابلِ ۲.۵ برای کولرِ ۳۵۰۰ واتی کافیه یا نه. ایده‌م اینه که جریان رو حساب کنم و با جدول مقایسه کنم. گام ۱: P=V·I پس I=P/V. گام ۲: ۳۵۰۰ تقسیم بر ۲۲۰ میشه ۱۵.۹ میلی‌آمپر. گام ۳: با ضریبِ ۱.۲۵ برای راه‌اندازی میشه ۱۹.۹. گام ۴: جدول میگه کابلِ ۲.۵ تا ۲۰ آمپر رو می‌کشه، پس کافیه.",
+  "expect": "a «کارِ پیشینِ تو» section: گام ۱ ✓; گام ۲ ✗ unit (۱۵.۹ is right, but amperes, not milliamperes — page checks 3500/220 ≈ 15.9); گام ۳ number right (≈19.9) but «وابسته به گامِ ۲»; گام ۴ ناقص (margin 19.9 vs 20 too thin; length/installation method missing). Resume = گام ۲. گام ۱ never re-asked",
+  "context": "adult, engineering"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[after the section above] ‖ U: آره درسته",
+  "expect": "only after her yes is گام ۲ written as «۱۵.۹ آمپر (اصلاح شد ⇐ میلی‌آمپر)»; گام ۳ dependency mark cleared/recomputed; nothing rewritten before the yes",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: می‌خوام ثابت کنم برای هر n طبیعی، n³−n بر ۶ بخش‌پذیره. ایده‌م تجزیه‌ست. گام ۱: n³−n = (n−1)n(n+1). گام ۲: سه عدد متوالی‌ان پس یکی‌شون بر ۳ بخش‌پذیره. گام ۳: چون حاصل بر ۶ بخش‌پذیره پس بر ۲ هم بخش‌پذیره. گام ۴: بر ۲ و ۳ بخش‌پذیره پس بر ۶.",
+  "expect": "گام ۱ ✓, گام ۲ ✓, گام ۳ ✗ (assumes what is to be proved; why + where; hint: among two consecutive numbers one is even), گام ۴ «وابسته به گامِ ۳». Resume = گام ۳; steps 1–2 never re-asked; stage from verdicts = اجرا (not «بازنگری» from the last sentence); formulas displayed properly",
+  "context": "teen 17, olympiad-style proof"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: بین سه تا کار موندم. الف: ۴۰ میلیون، ۱۰ دقیقه راه. ب: ۵۵ میلیون، ۹۰ دقیقه راه. ج: ۴۸ میلیون، دورکاری. معیارهام حقوق و راهه. گام ۱: به حقوق وزن ۰.۶ دادم و به راه ۰.۴. گام ۲: به هر کدوم از ۱۰ نمره دادم و ب برنده شد.",
+  "expect": "گام ۱ ناقص — the page asks whether an important criterion is missing (does NOT invent one for her); گام ۲ «نسنجیده» (her scores are value judgments; the model judges, the page only checks structure and quotes) — the honest boundary is said in the reply. Resume = گام ۱",
+  "context": "adult life decision"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: من ۱۰ سالمه. مامان ۲۴ تا شیرینی داشت، نصفشو به مهمونا داد، بعد ۳ تا خودش خورد. چند تا موند؟ اول نصفِ ۲۴ رو حساب کردم میشه ۱۲. بعد ۱۲ منهای ۳ میشه ۸. جوابم ۸.",
+  "expect": "گام ۱ ✓ (said simply); گام ۲ ✗ (page computes 12−3 = 9); answer «۸» «وابسته به گامِ ۲». Resume at گام ۲ with a child-simple question (never gives «۹» outright); «# پیش‌نیاز» checks subtraction",
+  "context": "child 10"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: من کلاً استعدادِ ریاضی ندارم. یه جا خوندم آدم‌ها فقط ۱۰ درصدِ مغزشون رو استفاده می‌کنن. حالا این مسئله: یه مستطیل محیطش ۳۰ و طولش دو برابرِ عرضشه. عرض رو x گرفتم، پس طول 2x. محیط = 2(x+2x) = 6x پس x = 5.",
+  "expect": "multi-facet tour with an order: the problem (steps ✓: x=5, 6x=30), the belief «استعداد ندارم» (self-label facet), the factual claim «۱۰ درصدِ مغز» (epistemic facet); each facet named; problem resumes at look-back (all steps ✓; answer: width 5, length 10)",
+  "context": "teen 15, colloquial, no ZWNJ in «مغزشون»"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ایده‌ی یه دستگاه دارم که آبِ باران رو از ناودون جمع کنه و برای باغچه بده. گام ۱: حجم: سقفم ۸۰ متره، بارشِ سالانه ۲۵۰ میلی‌متر، پس ۲۰ مترمکعب. گام ۲: مخزنِ ۲ تُنی کافیه. گام ۳: باید ببینم قبلاً کسی ثبتش کرده یا نه، نمی‌دونم از کجا.",
+  "expect": "گام ۱ ✓ (page checks 80 m² × 0.25 m = 20 m³); گام ۲ ناقص (2 m³ holds a tenth of the year — depends on usage timing); گام ۳ needs a tool that does not exist ⇒ territory sheet «[دستیار · کمبودِ سامانه]» with gap.step = 3; step 3 ⏸; resume = گام ۲",
+  "context": "adult invention"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: x^2-5x+6=0 رو حل کردم. گام1: delta=25-24=1. گام2: x=(5±1)/2 پس 3 و 2. میخواستم با تجزیه هم برم ولی نمیدونم چطوری",
+  "expect": "both steps ✓ (page checks delta and roots); nothing re-asked; resume = the open part «با تجزیه» (look-back / another method), stage from verdicts",
+  "context": "teen 16, Latin digits, no ZWNJ"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: با سلام. سپردهٔ ۱۰۰ میلیونی با سودِ سالانهٔ ۲۰ درصد دارم. گام ۱: پایانِ سالِ اول ۱۲۰ میلیون. گام ۲: پایانِ سالِ دوم ۱۴۰. گام ۳: پایانِ سالِ سوم ۱۶۰. پس سه سال بعد ۱۶۰ میلیون دارم.",
+  "expect": "گام ۱ ✓; گام ۲ cannot be judged until the kind of interest is known ⇒ the page asks in «شما» «سودِ شما ساده است یا مرکب؟»; if مرکب: گام ۲ ✗ (۱۴۴), گام ۳ ✗ and «وابسته به گامِ ۲» (۱۷۲.۸); if ساده: all ✓. Resume = گام ۲",
+  "context": "elder 72, formal «شما»"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[🧭, 🔭 forms and 📜 after any prior-work opening]",
+  "expect": "all show the «کارِ پیشینِ تو» section with each step's verdict (✓ / ناقص / نادرست / نسنجیده) and the dependency marks",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[mind card after P2]",
+  "expect": "steps 1–2 credited to her (not «گیر»); step 3 has a cause (skill/prerequisite/unknown), not a blanket «فهمِ مسئله»",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[verdict گام ۳ ✗ on P2] ‖ U: نه، گام ۳ درسته چون حاصل‌ضربِ سه عدد متوالی همیشه زوجه",
+  "expect": "re-judged: her new reason is a valid argument (among consecutive numbers one is even) ⇒ گام ۳ rewritten only with her yes as «… چون یکی از دو عددِ متوالی زوج است»; neither caving without reason nor insisting",
+  "context": "teen 17"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "time",
+  "text": "[D0: verdict on P2 rejected, she leaves] ‖ [D0+3: U: یه راهِ دیگه برای گامِ ۳ پیدا کردم: n(n+1) همیشه زوجه]",
+  "expect": "the prior section is remembered; the return resumes at گام ۳ with the new step judged; steps 1–2 not re-asked",
+  "context": "owner-like persona, multi-day return"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[a 2,500-word first message with 7 steps]",
+  "expect": "the prompt carries all 7 prior steps (full reading); the budget never drops prior steps",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سلام. ۱۵۰ سانت = ۱.۵ متر. پس مساحت ۱.۵ در ۲ میشه ۳ مترمربع. گام بعدی رو نمی‌دونم",
+  "expect": "unit conversion ✓ and area ✓ (page checks); resume at the next step (not re-asking the data)",
+  "context": "adult"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[model coach_state.prior with a quote using Persian digits; her text uses Latin digits]",
+  "expect": "the quote validates after digit normalisation",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: یه مسئله دارم: چطور هزینه‌ی سفرمونو کم کنیم؟ فکر می‌کنم باید زودتر بلیت بخریم.",
+  "expect": "problem + idea but no steps ⇒ no «کارِ پیشین» section with invented verdicts; normal stage",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: (long story about her day, no problem)",
+  "expect": "no prior section",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اول مساحت رو حساب کردم، بعد تقسیم کردم، بعد گرد کردم، جوابم ۱۴ شد",
+  "expect": "no prior steps cut at commas by the page; only the model's `prior` items whose quotes are found in her text; each verdict justified",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[model prior item quote «گام ۵: …» not in her text]",
+  "expect": "rejected; never shown",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[model verdict ✓ on «۱۲ منهای ۳ میشه ۸»]",
+  "expect": "the page's own arithmetic check overrides: shown as ✗ (or flagged), never ✓",
+  "context": "child 10"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "page",
+  "text": "[any verdict before her answer to «درست است؟»]",
+  "expect": "none of her steps is rewritten",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[verdict ✗ on P1 گام ۲] ‖ U: نه اشتباه نکردم!",
+  "expect": "without a reason, the verdict is re-checked and kept with evidence (۳۵۰۰÷۲۲۰ is in amperes), not withdrawn to please her",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[mind card after P4]",
+  "expect": "her correct step 1 is never counted as a stuck",
+  "context": "child 10"
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "page",
+  "text": "[P1 step 2 result «۱۵.۹»]",
+  "expect": "a sub-result in prior work never moves the whole problem to «بازنگری»",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[all prior steps ✓ and a complete answer]",
+  "expect": "the unknown/data are never re-asked; resume = look-back",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۵۰ سانت = ۱.۵ متر (correct conversion)",
+  "expect": "the page never flags a correct unit conversion as wrong",
+  "context": ""
+ },
+ {
+  "rc": "R8.prior_work",
+  "kind": "neg",
+  "role": "page",
+  "text": "[non-numeric step in P3]",
+  "expect": "the page never claims it verified a value judgment; verdict «نسنجیده» or model-judged with the boundary said",
+  "context": ""
+ }
+]
