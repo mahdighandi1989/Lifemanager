@@ -50,4 +50,4 @@ Test: `apps/learning-architecture/tests/test_tour1_r24_classify.js` + byte copy 
 
 ## Bank (VARIANTS_R24, R4 + R6)
 - All entries of this fixer's mechanisms judged green. Given to others with reasons: #138 (register for elders), #140 (ISO to a person) → age fixer (R5);
-  #137 «reply gives a child the full next step ⇒ caught» names no R6 mechanism and no such post-check exists — not built (HANDBOOK §12 row 62).
+  #137 «reply gives a child the full next step ⇒ caught» names no R6 mechanism and no such post-check exists — not built (HANDBOOK §12 row 64).

@@ -185,3 +185,14 @@ showed "no plan yet". Lessons:
 - **Mixed messages: the stronger kind wins in the direction of harm.** "I used X … and now I don't know what to do" is a stuck, not a use report —
   misreading stuck as report silently removes help; the reverse only asks once more. Likewise a percent is a confidence only when tied to a confidence
   word or answering "how sure are you?"; data percents never are.
+## Update 2026-10-25 (round 24, today) — the page closes a record only from her own sentence, read at the right grain
+- **Read negation per clause, not per message.** «میان‌ترم رو ۱۴ گرفتم، سر جلسه قفل نکردم» is a done-report; the «نکردم» belongs to another clause. Split at sentence
+  punctuation, commas and «ولی/اما» before testing "done" vs "not done" — and keep the whole message as the quoted evidence.
+- **An outcome needs her sentence, in the shapes people actually use.** Refuting in the same message after the guess («… = ۱۰۰. زیاد شد»), testing a no-number guess in the
+  *immediately* next message, justifying («چون … پس … = ۲۵۰۰»), or concluding another number («درنمیاد … پس پنج تا»). Store the sentence with the verdict; never infer
+  across unrelated messages (no link ⇒ stays "untested").
+- **"Fulfilled" is what the turn did, not what she asked.** A later-request («… فردا») is a promise only when the same turn ran no write action; the promise text is her
+  request — the assistant's question is context only when her message is a reply to it.
+- **One decision, one place.** When a gate decides "refuse" and a later wrapper turns that into "kept", the reply pre-check still reads "refuse" and the model contradicts
+  the page. Put the final decision in the gate both readers call.
+- **A model date needs her time words.** Without them use a dateless follow-up («جلسهٔ بعد»); a relative day she said («تا شنبه‌ی بعد») is computed by the page clock.

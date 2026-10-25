@@ -4968,3 +4968,15 @@ dated stability, mind-card feed) under way.
   adults); hiding the daily puzzle from everyone of unknown age (only known minors are gated; the comparison itself already asks for the date).
 - **CHANGE** Tests `apps/learning-architecture/tests/test_tour1_r24_age.js` (runner sentences; 28 errors on the base build, green after) and
   `test_tour1_r24_age_bank.js` (VARIANTS_R24 R5 23/23 + R6 #138 elder «تو» reply and #140 ISO in a reply, both now caught by the post-check; judged by text). Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_age_2026-10-25.md`.
+
+## 2026-10-25 — CHANGE: Pólya tour round 24, «today» fixer (R7 — Today, dossier, mind card, promises)
+- **FINDING** Root causes (file: function): `a41` `PR.dlDoneFromHer` read negation over the whole message (B24·D13); `a41` `PR.guessOwnTest` saw only a later
+  message with every guess expression (B24·D14, D24-11); `a29` `causes.prereq` one line per stuck event (B24·D20); `a27` `plan18` stored an approval question
+  as a plan and accepted the model `when` without her words (B24·D21); `a41` `PR.herLater` ignored that the same turn fulfilled the request (B24·D9);
+  `a41` fcast form saw only verbatim duplicates (D24-14); `a45` `importChat` took the window of the previous chat problem (A23-32); `a38` `inventGate` and the
+  round-23 back-pend wrapper made two decisions (D24-4) and kept a conjecture she was testing as a note only (C24-5); `a44` remain line in look-back (C24-17);
+  `a26` fill follow-up for a view without fields (A24-16); `a33` model date over her relative day (bank R24 #151).
+- **CHANGE** Fixed at those roots; details WORKLOG (110), PROGRESS 119, HANDBOOK §10 row / §12 row 66 / 🧪 bullet. New test
+  `apps/learning-architecture/tests/test_tour1_r24_today.js` (17 runner sentences, 16 red on base 3685102d; bank VARIANTS_R24 R7 #142–#160 19/19, 16 red on base).
+- **DECISION** Verdicts only with her quoted sentence; a no-number guess only from the immediately next message; "fulfilled" = a write action in the same turn;
+  the chat prediction owns the 🎯 and the form completes it; no date she did not give («جلسهٔ بعد»). Handoff: `docs/overhaul/handoff-notes/_pending_tour1_R24_today_2026-10-25.md`.

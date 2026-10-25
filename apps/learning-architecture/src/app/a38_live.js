@@ -5191,6 +5191,13 @@
         /* دورِ ۲۳ (Q7، A23-29): live_new خودش سطرِ «🔭 مسئله ثبت شد…» را گذاشت یا در صفِ پس از نوبت (s.lpNew) نهاد ⇒ سطرِ دومِ «✓ … ساخته شد» نه — یک ساختن، یک سطر */
         if (G.k === "live") { var se23 = AS._turnSession, n23 = se23 ? (se23.msgs || []).length + (se23.lpNew || []).length : 0, rl = AS.DO.live_new({ title: a && a.title, statement: a && a.statement, kind: a && a.kind, nat: a && a.nat }); if (!rl && se23 && (se23.msgs || []).length + (se23.lpNew || []).length > n23) return ""; return rl || "✓ مسئله در «🔭 مسئله‌های من» ساخته شد و صفحه‌اش باز شد — همین حالا با هم رویش کار می‌کنیم."; }
         if (G.k === "keepback") return keepBackNew(G.pid, a, AS._turnSession);
+        if (G.k === "backpend") return A.PR.backPendAdd(AS._turnSession, a);
+        if (G.k === "wake") { var rw = rec(G.pid), sw = AS._turnSession; if (rw && rw.dormant && !rw.woke) { rw.woke = nowISO(); S.put(rw); } if (sw) { try { A.liveBindSession(G.pid, sw, { force: true }); } catch (e) { } S.put(sw); }
+          return "✓ حدسی که در بازنگری ساختی و می‌آزمایی همان مسئلهٔ تازهٔ «" + clip(rw ? rw.p.title : "", 60) + "» است — حالا گفت‌وگو رویش است (رکوردِ دوم ساخته نشد)."; }
+        if (G.k === "promote") { var pg24 = pgOf(G.pid), ch24 = ((((solOf(pg24).b || {})[1] || {}).newProbs) || []).filter(function (y) { return y.id === G.id; })[0];
+          if (ch24) { ch24.t = clip(txt(a && a.statement) || ch24.t, 600); if (a && a.title) ch24.title = clip(txt(a.title), 80); S.put(pg24); }
+          var np24 = A.livePromoteNew(G.pid, G.id); if (np24) { var se24 = AS._turnSession; if (se24) { try { A.liveBindSession(np24, se24, { force: true }); } catch (e) { } S.put(se24); } return "✓ حدسی که در بازنگری ساختی و می‌آزمایی حالا مسئلهٔ زنده است («" + clip((ch24 && ch24.title) || "", 60) + "») — همین حالا رویش کار می‌کنیم."; }
+          return AS.DO.live_new({ title: a && a.title, statement: a && a.statement, kind: a && a.kind, nat: a && a.nat }); }
         if (G.k === "refuse") return { info: "🔭 این مسئله را ثبت نکردم، چون نخواسته بودی — اگر می‌خواهی نگهش دارم، بگو «ثبتش کن»." };
         if (G.k === "raw") return rawInvent.apply(this, arguments);
         var se = AS._turnSession, sg = A.liveReqSignals(lastUserText(se)), st0 = txt(a && a.statement);
@@ -5211,6 +5218,8 @@
     /* دورِ ۲۱ — دروازهٔ chat_invent: raw (کوتاه/تکراری/بیرون از نوبت/مسئلهٔ برای بعد) · live («ثبتش کن» دربارهٔ همان مسئله‌ای که رویش کار می‌کند، یا «همین حالا روش کار کنیم»)
        · keepback (بی خواسته، ولی در بازنگریِ مسئلهٔ همین گفت‌وگو ⇒ مسئلهٔ تازهٔ بازنگری همان‌جا می‌ماند، بی مسئلهٔ زنده) · refuse (بی خواسته: فقط پیشنهاد) */
     var CUR_REF = /(?:همین|این|همون)\s*(?:مسئله|مساله|معما|سوال|سؤال|تصمیم|موضوع|مورد)|(?:^|\s)(?:اینو|اینها|اینا|همینو|همینا|اینم)(?:\s|$)/, OTHER_REF = /(?:یه|یک)\s*(?:مسئله|مساله|معما|سوال|سؤال)(?:\s*ی)?\s*(?:دیگه|دیگر|تازه|جدید)|مسئله(?:\s*ی)?\s*(?:دیگه|دیگر)/;   // متنِ نرمال: نیم‌فاصله ⇒ فاصله
+    var TESTS24 = /(?:چک|امتحان|حساب|وارسی|آزمون)(?:ش|شون|اش)?\s*(?:کردم|کردیم)|(?:بذار|بزار|بگذار|می‌?\s*خوام)\s*(?:امتحان|چک|حساب|وارسی)(?:ش)?\s*کنم|تاش(?:و|ون)?\s*(?:رو\s*)?(?:چک|امتحان|حساب)\s*کردم/, OWNCONJ24 = /(?:^|\s)(?:حدس(?:م|ِ?\s*من)|فکر\s*کنم)(?![آ-ی])|(?:خودم|من)\s+[^.!؟?]{0,60}(?:ساختم|درست\s*کردم)/;
+    function herTests24(x, st0) { if (!AS.DO.live_new || !OWNCONJ24.test(x) || !TESTS24.test(x)) return false; var u = ctoks(st0).filter(function (w, i, X) { return X.indexOf(w) === i; }); return u.length >= 3 && overlapN(st0, x) / u.length >= 0.6; }
     function inventGate(a, se) {
       var st0 = txt(a && a.statement), ut = lastUserText(se), sg = A.liveReqSignals(ut), x = ownTx(ut);
       var ti0 = nz(a && a.title || ""), from0 = a && a.from, blv = typeof AS.boundLive === "function" ? AS.boundLive(se) : null;
@@ -5221,6 +5230,19 @@
       if (st0.length < 10 || dupOf || !ACT) return { k: "raw" };
       var bp = se && se.lprob && rec(se.lprob) ? se.lprob : blv && blv.pid && rec(blv.pid) ? blv.pid : "";
       var inBack = !!bp && (function () { var so = solOf(pgOf(bp)), L = live(so), ph = phaseOf(so); return ph === "b" || ph === "done" || L.state === "solved" || !!(so.b && so.b[1] && so.b[1].done); })();
+      /* دورِ ۲۴ (R7، C24-5): حدسی که خودش در بازنگری ساخت و همین حالا می‌آزماید («حدسم اینه که … سه تاشو چک کردم») کارِ زندهٔ اوست ⇒ مسئلهٔ زنده (مربی بی مسئله نمی‌ماند)؛
+         (D24-4) یک منبع برای «ثبت شد/نشد»: مسئلهٔ تازهٔ بازنگریِ گفت‌وگو که صفحه نگهش می‌دارد (s.backPend، a41) «رد» نیست — پیش‌سنجیِ پاسخ هم همین را می‌بیند */
+      if (!sg.req && herTests24(x, st0)) {
+        /* همان فرزندِ بازنگری که پیش‌تر نگه داشته شد (بازگفتِ آن) ⇒ همان یکی زنده می‌شود، نه رکوردِ دوم (E7 ِ دورِ ۴ ⇐ R24 R7) */
+        /* فرزندِ خفتهٔ همین بازنگری (مسئلهٔ تازه‌ای که chat_solved با newProb ساخت) با صورتِ هم‌پوشان ⇒ همان یکی بیدار و به گفت‌وگو بسته می‌شود */
+        if (inBack) { var kin24 = lives().filter(function (y) { return y.origin && y.origin.id === bp && overlapN(st0, y.p.statement) >= 2; }).sort(function (u, v) { return overlapN(st0, v.p.statement) - overlapN(st0, u.p.statement); })[0];
+          if (kin24) return { k: "wake", pid: kin24.p.id }; }
+        if (inBack) { var N24 = (((solOf(pgOf(bp)).b || {})[1] || {}).newProbs || []).filter(function (y) { return y && !y.pid; }), best24 = null, bn24 = 0;
+          N24.forEach(function (y) { var n = overlapN(st0, y.t); if (n > bn24) { bn24 = n; best24 = y; } });
+          if (best24 && bn24 >= 2) return { k: "promote", pid: bp, id: best24.id }; }
+        return { k: "live" };
+      }
+      if (!sg.req && !inBack && A.PR && A.PR.backPendOk && A.PR.backPendOk(se, a)) return { k: "backpend" };
       if (!sg.req) return inBack ? { k: "keepback", pid: bp } : { k: "refuse" };
       if (sg.notNow || OTHER_REF.test(x)) return { k: "raw" };   // «برای بعد» یا «یه مسئلهٔ دیگه» ⇒ همان نگه‌داشتن برای بعد
       if (sg.now) return { k: "live" };
