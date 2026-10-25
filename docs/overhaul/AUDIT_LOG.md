@@ -4894,6 +4894,23 @@ dated stability, mind-card feed) under way.
   first non-✓ step, dependents marked, facets via the tour, shown with «درست است؟», no rewrite without her yes. At least two scenarios per group
   from round 25. Owner question bank #31. No code started (owner's pause).
 
+## 2026-10-25 — CHANGE: Pólya tour round 24, fixer «classify» (R4 opening & classification, R6 post-check calibration)
+- **FINDING** (root causes, `apps/learning-architecture/src/app/a27_tour.js` unless noted): the round-23 intro stripper removed lead-ins that name the
+  problem («مسئله: …», «معلممون این سؤال رو داده: …») and the detector then ran on the stripped text only — self-introduction openings were «not a
+  problem yet», with no prerequisite contract and (s21) the fast tier (C24-1); «سارام کلاس دهم» was not an intro (C24-2); the correction block sat on an
+  opening (C24-3); `notProblem` read «...» as greeting-only and dropped the coach block (A24-2, regression); a stuck message with «به کار بردم» was a
+  use report (A24-1); `chatTask` (a26) took the coach signal only from `statesProblem`, so practice reports went to the fast tier (D24-13, regression);
+  «بعدش چی کار کنم؟» named the unknown (C24-7); any percentage was a confidence (A24-8); «مغزم … کار نمی‌کنه» was not an ability label (D24-7, a44);
+  «درسته؟ با ضرب چک کردم» and «فکر کنم کل مسئله حل شد» were guesses, «ایمنی رو حل کردم» a whole-problem solve (B24·D15, A24-14). Post-check: the
+  page-question lookup returned the first matching page question in the session log, so the page's own two-sentence question became «two questions»
+  (A23-20, C24-4, B24·D12) — invisible in single-turn tests, reproduced by replaying the real round-24 prompts on the previous build; the assistant's
+  own «مثلاً «…»» was a quote of her (B24·D10); a natural return to the waiting step was refused (C24-16, a44); «خودت فکر می‌کنی چرا؟» on a system question.
+- **CHANGE** One detector for opening/coach/prerequisite/routing (lead-in signal + raw-message check of the kept statement), intro forms, no correction
+  block on an opening, silence keeps the coach block, stuck beats use, use/rating reports route to the coach, next-step and confidence calibration,
+  own check is not a guess, part-solved is not whole-solved; post-check: any page question covering both segments, illustrative quotes exempt, short
+  attributed quotes checked, natural return accepted by the step's own words and numbers. Old rules quarantined (`APP.ASSIST.R24_QUARANTINE`).
+- **Verify:** `apps/learning-architecture/tests/test_tour1_r24_classify.js` red on the previous build, green now; every R4/R6 entry of the independent
+  bank VARIANTS_R24 that belongs to this fixer green (3 with reasons: two are the age fixer's, one names no mechanism); whole page suite one test at a time.
 ## 2026-10-25 — Pólya round 24, fixer «age» (R5 age and register surfaces)
 - **FINDING** Root causes: every birth confirmation used `A.AGE.faBoth` (ISO in brackets) and three writers (page from chat, card, model `birth` action) each
   pushed their own line with no shared marker (B24·D6, D24-5, A24-20, C); the model action called `setBirth` with its ISO date after the page had already read
