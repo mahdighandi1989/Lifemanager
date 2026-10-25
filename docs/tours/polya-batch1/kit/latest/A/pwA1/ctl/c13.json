@@ -1,0 +1,1 @@
+{"eval": "(()=>{document.querySelectorAll(\"#main details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"همهٔ نقطه‌ها\");return t.slice(i,i+2500)+\" || TITLES: \"+[...document.querySelectorAll(\"#main svg title, #main [data-tip]\")].map(x=>x.textContent||x.getAttribute(\"data-tip\")).join(\" ## \").slice(0,2500)})()"}

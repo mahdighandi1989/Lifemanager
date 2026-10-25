@@ -1,0 +1,1 @@
+{"eval": "(()=>{const r=[F(\"lpOne\",\"باید نشون بدم توانِ ۲ تو n! همیشه از n کمتره\"),F(\"lpUnk\",\"2^n عددِ n! را نمی‌شمارد، یعنی توانِ ۲ در n! کمتر از n است\"),F(\"lpD_d1\",\"n عددِ طبیعی است\")];return r.join(\",\")+\" spatial=\"+document.getElementById(\"lpSpatial\").checked})()"}

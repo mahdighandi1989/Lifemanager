@@ -1,1 +1,1 @@
-{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"}
+{"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"چهار مرحله\");const j=t.indexOf(\"سن:\");return APP.state.view+\"\\n\"+t.slice(Math.max(0,i),i+900)+\"\\n---\\n\"+t.slice(j,j+200)})()"}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جست‌وجوی سابقه\");return APP.state.view+\" | \"+(i<0?\"NOT SHOWN\":t.slice(Math.max(0,i-100),i+300))})()"}
+{"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,(x.e.checks||[]).map(c=>c.reason).join(\" || \")]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text)})"}

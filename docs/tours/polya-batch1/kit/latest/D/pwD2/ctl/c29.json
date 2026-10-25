@@ -1,0 +1,1 @@
+{"eval": "(async()=>{APP.go('mind');await new Promise(r=>setTimeout(r,1200));document.querySelectorAll('details').forEach(d=>d.open=true);return document.getElementById('main').innerText.slice(0,4000)})()"}

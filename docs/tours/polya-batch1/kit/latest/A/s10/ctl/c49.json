@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','pb_l_mvc61pd9ggq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

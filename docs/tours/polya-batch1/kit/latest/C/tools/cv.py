@@ -1,25 +1,33 @@
-# cv.py sid [N] -> compact review: task, turn, mapped r21 p, filtered diff (minus noise), Q lines, r21 reply
-import json,re,sys,glob,os,difflib
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid=sys.argv[1]; D=f'{T}/round24C/{sid}'
-n=int(sys.argv[2]) if len(sys.argv)>2 else max(int(f.split('/p')[-1][:-5]) for f in glob.glob(D+'/ai/p*.json'))
-j=json.load(open(f'{D}/ai/p{n}.json')); u=j['user']
-m=re.search(r'# نوبتِ تازه\n(.*)',u,re.S); print(f'=== {sid} p{n} task={j.get("task")}\nTURN:',(m.group(1).strip()[:900] if m else '?'))
-mp=json.load(open(D+'/drv.json')).get('map',{}).get(str(n),-1); print('MAP r21 p',mp)
-NOISE=('- زمینه (نه پرسشِ دوم): این پیام شاید حرفِ پیشینِ خودش را اصلاح','- بازنگری: اگر درسی گفت','# پرونده‌های تمرینِ باز','- پروندهٔ تازه','- همهٔ تکنیک‌ها','- ضرب‌المثلِ همین مرحله','- زمینه (نه پرسشِ دوم): در actions یک {"do":"coach_state"','# مرحلهٔ خطا','- زمینه (نه پرسشِ دوم): در این مسئله شکست','# فرمول','- زمینه (نه پرسشِ دوم): اگر فرمول','# گزارشِ وضع (همهٔ')
-def norm(x):
-    L=[]
-    for pt in re.split(r'(?m)^(?=# )',x):
-        h=pt.split('\n',1)[0]
-        if any(k in h for k in ['نقشهٔ سامانه','# امروز','برگه‌های باز','صفحهٔ فعلی','گفت‌وگو تا','تور (ماندگار','پیام‌های اخیر','نوبتِ تازه']): continue
-        L+=[re.sub(r'pb_l_[a-z0-9]+|\d+ دقیقه','X',l) for l in pt.split('\n') if l.strip()]
-    return L
-p6=f'{T}/round23C/{sid}/ai/p{mp}.json'
-if os.path.exists(p6):
-    u6=json.load(open(p6))['user']
-    d=[l for l in difflib.unified_diff(norm(u6),norm(u),lineterm='',n=0) if l[:1] in '+-' and not l.startswith(('+++','---')) and not l[1:].startswith(NOISE)]
-    print('DIFF (%d):'%len(d)); [print('  ',l[:int(os.environ.get('W',500))]) for l in d[:40]]
-for l in u.split('\n'):
-    if 'فقط **یک** پرسش' in l or 'پرسشِ این نوبت همین' in l: print('Q:',l[:600])
-r=f'{T}/round23C/{sid}/ai/r{mp}.txt'
-if os.path.exists(r): print('R21:',open(r).read()[:int(os.environ.get('R',1500))])
+# cv.py -> compact view of all pending turns
+import json,glob,os,re,subprocess
+R=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(R)
+out=subprocess.run(['bash','tools/st.sh'],capture_output=True,text=True).stdout
+for line in out.split('\n'):
+    if 'PENDING' not in line: continue
+    sid=line.split()[0]; n=int(re.search(r'PENDING p(\d+)',line).group(1))
+    u=json.load(open(f'{sid}/ai/p{n}.json')); task=u.get('task'); u=u['user']
+    m=re.search(r'# نوبتِ تازه\n(.*)',u,re.S); t=m.group(1).strip() if m else '?'
+    flags=[]
+    for k,lab in [('# اصلاحی','CORR-RESULT'),('# اصلاحِ پیامِ پیشین','CORR?'),('[سامانه — وارسیِ صفحه','POSTCHECK'),('# کارِ پیشینِ تو (حکمِ','PRIOR-LEDGER'),('پیامش کارِ پیشینِ خودش را دارد','PRIOR-ASK'),('طرحِ همین مسئله با چند گام','PLANSTEPS?'),('# برگه','SHEET'),('⏸','WAIT'),('ابزار','TOOL'),('# پیش‌نیاز (کمبودِ','')]:
+        if k in u and lab: flags.append(lab)
+    tq=''
+    mm=re.search(r'\*\*پرسشِ این نوبت همین است:\*\*([^\n]*)',u)
+    if mm: tq=mm.group(1)[:220]
+    else:
+        mm=re.search(r'- در این نوبت فقط \*\*یک\*\* پرسش[^\n]*?: «([^\n]*?)»\. اگر',u)
+        if mm: tq='(card) '+mm.group(1)[:220]
+    stg=re.search(r'# مسئلهٔ زندهٔ این سشن \([^)]*\): «([^»]*)» · مرحله: ([^·]*)',u)
+    d=json.load(open(f'{sid}/drv.json')) if os.path.exists(f'{sid}/drv.json') else {}
+    mp=d.get('map',{}).get(str(n))
+    r24=''
+    if mp and mp!=-1 and os.path.exists(f'../round24C/{sid}/ai/r{mp}.txt'):
+        try: r24=json.load(open(f'../round24C/{sid}/ai/r{mp}.txt')).get('reply','')[:260]
+        except: r24='?'
+    pc=re.search(r'\[سامانه — وارسیِ صفحه[^\]]*\]',u)
+    print(f'=== {sid} p{n} [{task}] map={mp} {" ".join(flags)}')
+    print('  U:',t[:330].replace('\n',' '))
+    if stg: print('  LIVE:',stg.group(1)[:50],'|',stg.group(2).strip())
+    if tq: print('  TQ:',tq)
+    if pc: print('  PC:',pc.group(0)[:300])
+    if r24: print('  R24:',r24)

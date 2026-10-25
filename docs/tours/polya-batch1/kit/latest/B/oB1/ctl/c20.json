@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"practice\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}
+{"say": "و از کجا ببینم هر بخشِ این سیستم توی این مدت چطور کار کرده و بهتر شده؟ عکس یا تصویری هست که قبل و بعد رو نشون بده؟ اگه بخوام بعد از هر جلسه یه گزارش برام ایمیل بشه، میشه؟"}

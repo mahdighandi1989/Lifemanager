@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveRec(\"pb_l_mvaqm4p4843\");const L=APP.S.get(\"eprog_pb_l_mvaqm4p4843\");const u=L&&L.solve&&L.solve.live;return JSON.stringify({stmt:r&&r.p&&(r.p.statement||r.p.stmt||r.p.text),dl:u&&u.uDraft&&u.uDraft.dl,u:u&&u.u&&u.u.dl})})()"}
+{"shot": {"name": "part_mind23_psy", "full": true, "sel": ".psy"}}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('lprob','pb_l_mvaqm5apgyr');const sel=document.querySelector('.prc-tsel');if(sel){sel.value='24';sel.dispatchEvent(new Event('change',{bubbles:true}));}const b=document.querySelector('.prc-start');if(b)b.click();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+' | '+FL().slice(0,300)})()"}
+{"say": "می‌خوام عادت کنم قبل از هر اندازه‌گیری پیش‌بینیِ عددی با درصدِ اطمینان بنویسم و بعد ببینم چقدر درست بوده — برای آزمایش‌های بعدیِ لوبیا یه تمرین برام راه بنداز."}

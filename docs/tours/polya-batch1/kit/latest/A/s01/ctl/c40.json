@@ -1,1 +1,1 @@
-{"eval": "(()=>{const p=\"pb_l_mvaqmaffy5b\";return JSON.stringify(APP.liveCoach(p)).slice(0,700)+\"\\nPH:\"+APP.livePhase(p)+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",500)+\"\\nBL:\"+BL()})()"}
+{"eval": "(()=>{const p=\"pb_l_mvaqm8g3sdz\";return JSON.stringify(APP.liveCoach(p)).slice(0,700)+\"\\nPH:\"+APP.livePhase(p)+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",500)+\"\\nBL:\"+BL()})()"}

@@ -1,5 +1,5 @@
-import sys; sys.path.insert(0,'/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24B/tools')
-exec(open('/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24B/tools/gen_findings.py').read().split('S={}')[0])
+import sys; sys.path.insert(0,'/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25B/tools')
+exec(open('/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25B/tools/gen_findings.py').read().split('S={}')[0])
 TH="| # | turns back / path | what should change | what did | what must stay | did it stay | assistant's words vs page result | vs round 20 |\n|---|---|---|---|---|---|---|---|\n"
 S={}
 S['s18']=dict(title='سینا و قیفِ مخروطی (نرخ تغییر) · آزمودنِ اصلاح (ریاضی)',

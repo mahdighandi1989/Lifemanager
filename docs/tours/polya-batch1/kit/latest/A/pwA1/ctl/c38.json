@@ -1,0 +1,1 @@
+{"eval": "[...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|طرح|بازنگری|✅/.test(x)).join(\"\\n\")"}

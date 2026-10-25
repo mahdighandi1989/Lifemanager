@@ -1,6 +1,6 @@
 # route23.py sid... -> routing table per scenario (turn / kind / task / correct?)
 import json,glob,re,sys
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25C'
 out=[]; tot=[0,0]
 for sid in sys.argv[1:]:
     L=[f'### {sid}','| turn | kind | task | ok |','|---|---|---|---|']; ok=n=0

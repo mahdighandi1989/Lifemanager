@@ -1,0 +1,1 @@
+{"reply": "کلِ مسئله را خوب گفتی. طرحت تقسیم به ۹ مثلثِ کوچک است؛ هر گامش را وارسی کن: روشن می‌بینی که بیشترین فاصلهٔ دو نقطه در مثلثِ ضلع ۱ همان است که در حدست گفتی؟", "status": "related", "next": false, "outside": "", "know": [], "actions": [{"do": "coach_state", "ph": "u", "said": ["u"], "ans": ["u0"], "stuck": false, "fail": false, "role": "self", "nat": "objective"}]}

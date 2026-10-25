@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5deutt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"}
+{"eval": "(()=>{APP.go('dossier','pb_l_mvar7oy85gi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"}

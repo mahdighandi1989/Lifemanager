@@ -1,0 +1,1 @@
+(()=>{const m=document.getElementById('main');return JSON.stringify([...m.querySelectorAll('input,textarea,select')].filter(e=>e.offsetParent&&e.type!=='button').map(e=>{const l=e.closest('label');return [(e.id||''),(l?l.textContent:'').trim().slice(0,50),String(e.value).slice(0,120)]}).filter(x=>x[2]))})()

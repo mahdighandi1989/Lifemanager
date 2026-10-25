@@ -1,6 +1,6 @@
 #!/bin/bash
 # autoacc.sh sids... -> for each pending sid with no drive running: if acc.py ok => ok.sh; else print reason
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25C
 for s in "$@"; do
   [ -d $s/ai ] || continue
   r=$(ps aux | grep "[d]rive.py $s " | wc -l); [ $r -gt 0 ] && continue

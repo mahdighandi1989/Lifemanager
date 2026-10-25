@@ -1,0 +1,1 @@
+{"eval": "(async()=>{APP.go('today');await new Promise(r=>setTimeout(r,1200));return (document.getElementById('main')||{}).innerText.slice(0,2500)})()"}

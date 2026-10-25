@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify({url:location.pathname.slice(-60),areas:APP.SYST.areas().length,live:APP.liveAll().length,sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).map(c=>c.reason).join(\" || \")])})"}
+{"shot":{"name":"tA1_today_armB","full":true}}

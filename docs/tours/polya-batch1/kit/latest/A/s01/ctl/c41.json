@@ -1,1 +1,1 @@
-{"eval": "(()=>{const p=\"pb_l_mvaqmaffy5b\";const pl=APP.livePlausible(p);C(\".lp-solved\");return JSON.stringify(pl)+\" SUB:\"+APP.state.sub})()"}
+{"eval": "(()=>{const p=\"pb_l_mvaqm8g3sdz\";const pl=APP.livePlausible(p);C(\".lp-solved\");return JSON.stringify(pl)+\" SUB:\"+APP.state.sub})()"}

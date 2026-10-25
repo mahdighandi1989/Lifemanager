@@ -1,6 +1,6 @@
 # helpers for building insertion specs
 import json
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24D/tools/'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25D/tools/'
 REC=open(T+'rec22.js').read(); SETF=open(T+'setf.js').read(); PRC=open(T+'prc.js').read()+'\n;'+open(T+'lists.js').read()
 def rec(tag): return {'new':{'eval0':SETF+'\n;'+PRC,'eval':REC},'tag':tag}
 def say(t,tag): return {'new':{'say':t},'tag':tag}

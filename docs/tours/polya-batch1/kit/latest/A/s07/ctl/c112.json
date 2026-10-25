@@ -1,1 +1,1 @@
-{"shot": {"name": "part_list_models_1", "full": true}}
+{"eval": "(()=>{APP.go(\"practice\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/قفسهٔ مدل/.test(b.textContent));b.click();return MT(\"باز (\",500)})()"}

@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.otherQuote||\"\"]))"}
+{"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-2).map(c=>c.reason).join(\" || \"),x.e.ask?x.e.ask.fa:\"\"]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-3),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/برگه|ابزار/.test(t))},null,0)"}

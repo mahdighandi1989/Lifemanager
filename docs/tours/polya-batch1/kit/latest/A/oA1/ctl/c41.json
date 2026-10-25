@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(Object.keys(APP.S.all('eprob',r=>r&&r.live)[0]||{}))"}
+{"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.step||\"\"]),pend:(APP.S.get(\"pre22\")||{}).sysPend||null})"}

@@ -1,0 +1,1 @@
+{"eval": "[...document.querySelectorAll(\"#main summary, #main h3, #main h4\")].map(x=>x.textContent.trim().slice(0,50)).join(\" | \")"}

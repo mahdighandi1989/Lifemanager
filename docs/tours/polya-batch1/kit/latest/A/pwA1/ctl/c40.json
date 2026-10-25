@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvnlnc51v6a\",\"exec\");return [...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.className.split(\" \")[0]+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|گام|بازنگری|✅|ثبت/.test(x)).join(\"\\n\")+\"\\n---\\n\"+MT(\"۳)\",2500)})()"}

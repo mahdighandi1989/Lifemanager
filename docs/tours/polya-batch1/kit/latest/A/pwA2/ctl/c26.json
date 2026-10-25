@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=[...document.querySelectorAll(\"#main select\")].find(x=>[...x.options].some(o=>/کِی می‌خوانی/.test(o.text)));if(!s)return \"NOSEL\";const o=[...s.options].find(o=>/کِی می‌خوانی/.test(o.text));s.value=o.value;s.dispatchEvent(new Event(\"change\",{bubbles:true}));const r=CT(\"ثبتِ پاسخ‌های بازنگری\");return r+\" | \"+TT()})()"}

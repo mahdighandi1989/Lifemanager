@@ -1,5 +1,5 @@
 import os,sys
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25C'
 COMMON_PARTS_NEED = """### بخش‌ها (از طراحیِ خودشان)
 - **تونلِ «🔭 مسئلهٔ حل‌نشدهٔ خودم»** (HANDBOOK، VIEW_META.lprob): فهم ⇐ طرح ⇐ اجرا با وارسی ⇐ بازنگری؛ باید خودش در لحظهٔ درست دروازه بگذارد (داده‌ها، حدسِ نیازموده، گامِ باز) و نتیجهٔ گام را از هر جا (فرم یا گفت‌وگو) یک بار ثبت کند.
 - **دستیار/مربی** (a26/a27): یک پرسش در هر نوبت از روی کارتِ صفحه، داوری نکند، گزارشِ وضع بدهد؛ از این دور: اصلاحِ پیامِ پیشین را بگیرد و دقیق بگوید چه عوض شد.

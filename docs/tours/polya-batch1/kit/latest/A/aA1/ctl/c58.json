@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvb5ub4wvc5\");const t=document.getElementById(\"main\").innerText;return \"N=\"+(t.split(\"از گفت‌وگو\").length-1)+\" | \"+t.slice(t.indexOf(\"🔭\"),t.indexOf(\"🔭\")+2600)})()"}
+{"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id+\" \"+r.p.title+\" | \"+(r.live&&r.live.state||\"\")).join(\"\\n\")"}

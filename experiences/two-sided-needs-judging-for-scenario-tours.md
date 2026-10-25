@@ -81,3 +81,15 @@ candidate over a two-word threshold instead of the best one.
 - **Reading the trend:** the round that first tests several mechanisms end to end shows *fewer* zero-defect scenarios while the system
   is clearly better (routing near perfect, dates exact, the loop built). Report both numbers and say why; never present the drop as a
   regression or hide it.
+
+## Update 2026-10-25 — choosing a cheaper model for the judging role: measure, with the rule fixed first
+When a long tour costs too much, the tempting move is to put the scenario runner on a cheaper model. The runner's real job is judging (two
+need maps, defects with severities), and a weaker judge fails silently: it marks scenarios PASS and the defects surface later.
+- **Method:** run one group twice on the same page, scenarios and brief — once with each model, independently. An independent judge on the
+  strong model unions both defect lists and verifies every defect only one run reported against the raw evidence.
+- **Fix the decision rule before the run:** the cheaper model may take the role only if it misses no S1/S2 and no more S3 than the strong
+  model in the same comparison. Writing the rule afterwards invites bending it toward the saving.
+- **Isolate the runs:** separate ports, profile names and process-kill patterns. In our run a broad `pkill` pattern of one runner killed the
+  other's drivers; the judge had to confirm every compared scenario was a clean final run.
+- **Result here:** the cheaper runner missed two S2 on byte-identical prompts, gave five wrong PASS verdicts and pasted one generic
+  "upgrades needed" block everywhere. The strong model stayed; slower rounds are the cheaper risk.

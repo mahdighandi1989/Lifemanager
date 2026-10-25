@@ -4993,3 +4993,14 @@ dated stability, mind-card feed) under way.
 - **FINDING (not changed, not this area)** A Python virtualenv `.venv_t/` (5,475 files, 138 MB, 4 symlinks) has been tracked since the July
   import commit e1271e7a. Harmless at runtime; left for the routine that owns the repo root (`docs/supervisor/ownership.json`).
 - **FINDING** gate36: fail=0 (pytest 2144, 133 page tests, build, host e2e).
+
+## 2026-10-25 — Pólya round 25 finished; runner-model comparison; frozen at the owner's point 2
+- **FINDING** Round 25 on main 64dc0667, 92 scenarios: zero-defect A 0/21 · B 4/26 · C 3/20 · D 6/25 = 13/92 (round 24: 2/75). The round-24 S1
+  is fixed everywhere. Two new S1: the territory loop accepts an unclear fit on sheet-frame/generic words and ignores her later «نه»
+  (B25·D1 = D25-21); the prior-work arithmetic check misreads correct fraction sums (D25-12). The new prior-work intake judges every step
+  correctly but its ledger is replaced by later reports, ignores her own fixes and mixed replies, and gives no mind-card credit.
+- **DECISION** Runner-model comparison (independent Opus judge, rule fixed in advance): Opus stays as runner. Sonnet missed two S2 defects on
+  byte-identical prompts (U10, U13), gave five wrong PASS verdicts and two false defects; S3 tied. Not borderline. `decisions/COMPARE25_result.md`.
+- **DECISION** Root mechanisms P1–P7 and the seven-fixer split in `docs/tours/polya-batch1/decisions/DECISIONS_R25.md`. Fixers NOT launched
+  (owner's directive: stop at point 2 and wait). Owner question bank: R25 verdicts for 1–31, new questions 32–41. Dataset refreshed (round 25:
+  567 exchanges; total 5,343). Storyboards A–D on round 25. All runners sent their own e-mails (A 21, B 24, C 20, D 25, B_s 25).

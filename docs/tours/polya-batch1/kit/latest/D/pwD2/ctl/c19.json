@@ -1,0 +1,1 @@
+{"eval": "(async()=>{APP.ASSIST.toggle(false);APP.go('e_prob','live');await new Promise(r=>setTimeout(r,1200));return JSON.stringify({lp:APP.liveAll().map(r=>[r.p.id,r.p.title,APP.livePhase(r.p.id)]),main:(document.getElementById('main')||{}).innerText.slice(0,1500)})})()"}

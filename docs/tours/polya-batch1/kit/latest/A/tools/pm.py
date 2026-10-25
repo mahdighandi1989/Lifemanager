@@ -8,13 +8,13 @@ def ids(f):
     for x in R.findall(p['sys']+p['user']):
         if x not in out: out.append(x)
     return out
-mpf=f'{T}/round24A/{s}/pidmap.json'
+mpf=f'{T}/round25A/{s}/pidmap.json'
 mp=json.load(open(mpf)) if os.path.exists(mpf) else {}
-o=ids(f'{T}/round23A/{s}/ai/p{m}.json'); w=ids(f'{T}/round24A/{s}/ai/p{n}.json')
+o=ids(f'{T}/round24A/{s}/ai/p{m}.json'); w=ids(f'{T}/round25A/{s}/ai/p{n}.json')
 for pre in ('pb_l_','prc_'):
     oo=[x for x in o if x.startswith(pre) and x not in mp]; ww=[x for x in w if x.startswith(pre) and x not in mp.values()]
     for a,b in zip(oo,ww): mp[a]=b
 json.dump(mp,open(mpf,'w'))
-ans=open(f'{T}/round23A/{s}/ai/r{m}.txt').read()
+ans=open(f'{T}/round24A/{s}/ai/r{m}.txt').read()
 miss=[x for x in set(R.findall(ans)) if x not in mp]
 if miss: print('UNMAPPED in answer:',miss,'map',mp); sys.exit(1)

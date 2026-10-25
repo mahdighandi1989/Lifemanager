@@ -1,1 +1,1 @@
-{"shot":{"name":"dossier24_full_4","full":true}}
+{"eval": "(()=>{APP.go('dossier','pb_l_mvggd8rmenh');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}

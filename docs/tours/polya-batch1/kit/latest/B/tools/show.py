@@ -3,8 +3,8 @@
 import json, os, sys, re
 sys.path.insert(0, os.path.dirname(__file__))
 B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid = sys.argv[1]; D = f'{B}/round24B/{sid}'
-src = sys.argv[3] if len(sys.argv) > 3 else os.environ.get('SRCS', sid); S = f'{B}/round23B/{src}'
+sid = sys.argv[1]; D = f'{B}/round25B/{sid}'
+src = sys.argv[3] if len(sys.argv) > 3 else os.environ.get('SRCS', sid); S = f'{B}/round24B/{src}'
 import importlib.util
 def pend():
     a = f'{D}/ai'; ps = sorted(int(f[1:-5]) for f in os.listdir(a) if re.match(r'p\d+\.json$', f))

@@ -1,6 +1,6 @@
 #!/bin/bash
 # redo.sh SID : resume replay; answer each pending prompt from prev/ if same turn; stop when no prev match
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24A
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25A
 [ -f $R/$1/stops.env ] && { . $R/$1/stops.env; export STOPCTL; }
 for k in $(seq 1 60); do
   N=$(python3 -c "

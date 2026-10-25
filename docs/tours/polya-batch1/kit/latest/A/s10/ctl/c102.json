@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','achat_mvaqlryhh77mo');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}
+{"shot": {"name": "dossier23_full_2", "full": true}}

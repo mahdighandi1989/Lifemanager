@@ -1,1 +1,1 @@
-{"eval": "(()=>{const L=APP.S.all(\"eprob\",r=>r&&r.live&&r.p);const id=L[L.length-1].p.id;APP.go(\"lprob\",id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"🔭\");return id+\" N=\"+(t.split(\"از گفت‌وگو\").length-1)+\" | \"+t.slice(i,i+1800)})()"}
+{"shot": {"name": "part_mind23_psy", "full": true, "sel": ".psy"}}

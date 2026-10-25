@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# auto2.py SID : replay round23A ctl from pos+1; for each R11 AI prompt find the R10 prompt with same task+«نوبتِ تازه»;
+# auto2.py SID : replay round24A ctl from pos+1; for each R11 AI prompt find the R10 prompt with same task+«نوبتِ تازه»;
 # auto-answer with R10 answer if key blocks equal after dropping context/proverb/figure/definition lines; else stop & diff.
 import sys,os,json,re,subprocess,difflib
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R11=T+'/round24A'; R10=T+'/round23A'; sid=sys.argv[1]; D=R11+'/'+sid
+R11=T+'/round25A'; R10=T+'/round24A'; sid=sys.argv[1]; D=R11+'/'+sid
 PID=re.compile(r'pb_l_[a-z0-9]{8,}')
 KEYS=('# مسئلهٔ','# مربیِ حل','# پس از شکست','# دانسته‌های قلمرو','# معلم','# نوبتِ تازه-NO')
 DROP=('زمینه (نه پرسشِ دوم)','- این مسئله پاسخِ عینی دارد','- از کتاب برای همین مرحله','سکوت، «نمی‌دونم»','حلِ مسئله مهارتی عملی','سطحِ استقلالِ کاربر','چهار مرحلهٔ حل در','این گفت‌وگو به همین مسئله بسته','# دانسته‌های قلمرو (','- یافته‌اند، نه دستور','- می‌خواهد کلِ راه را دور بریزد','- ادعای محلِ بحث','- کار به عقب شاخه می‌دهد','- بازنگری مهم‌ترین بخشِ کار','- قارچ‌ها خوشه‌ای','- فرع «نتیجه','- ضرب‌المثلِ همین مرحله','- شکل «حتی','- به تعریف‌ها برگرد','- مسئلهٔ عملی: داده‌ها بی‌شمار')
@@ -23,6 +23,7 @@ def blocks(p):
         if inb:
             if any(k in l for k in DROP): continue
             l=PID.sub('PID',l); l=l.replace(' (برای وضعِ همین نوبت؛ کارتِ صفحه پرسشِ دیگری نشان می‌دهد — این را بپرس، نه آن را؛','(ONEQ;').replace('، هم‌گام با صفحه (همان که صفحه همین حالا می‌پرسد؛','(ONEQ;').replace(' (برای وضعِ همین نوبت؛','(ONEQ;'); l=re.sub(r'احتمالِ ضعیف‌ترین بودن [۰-۹]+٪','P%',l); l=re.sub(r'\(تا حالا [۰-۹]+ پیام\)','(N)',l); l=l.replace('«گامِ بعدیِ تو چیست — و پیش از انجامش فکر می‌کنی چه می‌شود؟»','«PRESTEP»').replace('«پیش از این گام: فکر می‌کنی چه می‌شود، و چقدر مطمئنی؟»','«PRESTEP»'); l=re.sub(r'\([۰-۹]+ نمونه\)|[۰-۹]+ نمونه','N',l)
+            l=l.replace(' [در گفت‌وگو پاسخ گرفته — دوباره نپرس]','')
             l2=re.sub(r'u0\) «[^»]*» · ','',l)
             if l2!=l: U0.append(1)
             out.append(l2)

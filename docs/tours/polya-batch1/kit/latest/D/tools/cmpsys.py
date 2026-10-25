@@ -1,7 +1,7 @@
-# cmpsys.py sid — per «say» ctl: sys lines (page lines) produced in old (round23D) vs new (round24D) run; marks differences
+# cmpsys.py sid — per «say» ctl: sys lines (page lines) produced in old (round24D) vs new (round25D) run; marks differences
 import json,sys,os,glob
 B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/'
-s=sys.argv[1]; O=B+'round23D/'+s; N=B+'round24D/'+s
+s=sys.argv[1]; O=B+'round24D/'+s; N=B+'round25D/'+s
 def ctl(D,k):
     try: return json.load(open(f'{D}/ctl/c{k}.json'))
     except: return None

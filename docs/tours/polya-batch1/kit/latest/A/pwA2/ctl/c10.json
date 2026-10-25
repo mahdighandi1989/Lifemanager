@@ -1,0 +1,1 @@
+{"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[3];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');return (t?t.innerText:'').slice(0,300)})()"}

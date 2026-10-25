@@ -1,1 +1,1 @@
-{"eval": "(()=>{const L=APP.S.get(\"eprog_pb_l_mvaqm4p4843\");const t=JSON.stringify(L);const out=[];let i=-1;while((i=t.indexOf(\"ارتفاع بار\",i+1))>=0&&out.length<8)out.push(t.slice(Math.max(0,i-60),i+80));return out.join(\"\\n\")})()"}
+{"eval": "(()=>{const r=APP.liveRec(\"pb_l_mvaqm5f1lj8\");const L=APP.S.get(\"eprog_pb_l_mvaqm5f1lj8\");const u=L&&L.solve&&L.solve.live;return JSON.stringify({stmt:r&&r.p&&(r.p.statement||r.p.stmt||r.p.text),dl:u&&u.uDraft&&u.uDraft.dl,u:u&&u.u&&u.u.dl})})()"}

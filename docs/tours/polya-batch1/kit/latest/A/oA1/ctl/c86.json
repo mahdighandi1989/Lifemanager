@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.step||\"\"]),pend:((APP.S.get(\"pre22\")||{}).sysPend||[]).map(x=>x.number),today:APP.today()})"}

@@ -1,11 +1,11 @@
-# drive.py sid [N]  -> feed round23C ctls until an AI request or out of ctls (or N ctl steps). Prints outs briefly, AI digest+diff.
+# drive.py sid [N]  -> feed round24C ctls until an AI request or out of ctls (or N ctl steps). Prints outs briefly, AI digest+diff.
 import sys, os, json, time, glob, re, difflib
 
 import datetime as _dt
 def _shd(t):
     return t
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid=sys.argv[1]; D=f'{T}/round24C/{sid}'; S6=f'{T}/round23C/'+os.environ.get('SRC',sid)
+sid=sys.argv[1]; D=f'{T}/round25C/{sid}'; S6=f'{T}/round24C/'+os.environ.get('SRC',sid)
 lim=int(sys.argv[2]) if len(sys.argv)>2 and sys.argv[2].isdigit() else 999
 stf=D+'/drv.json'
 S=json.load(open(stf)) if os.path.exists(stf) else {'ptr':1,'wait':0}
@@ -21,7 +21,7 @@ def sect(u):
 AUTO='auto' in sys.argv
 kf=lambda x:[l[:110] for l in x.split('\n') if re.match(r'- k\d+ \|',l)]
 def digest(n):
-    mf=f'{T}/round24C/man/{sid}/r{n}.txt'
+    mf=f'{T}/round25C/man/{sid}/r{n}.txt'
     if os.path.exists(mf):
         txt=open(mf).read(); u0=json.load(open(D+'/ai/p%d.json'%n))['user']
         def _pick(kind):
@@ -79,7 +79,7 @@ def digest(n):
             try: return [a.get('do') for a in json.load(open(f)).get('actions',[])]
             except Exception: return []
         clos='chat_solved' in acts(m6) or 'chat_solved' in acts(m6-1) or 'chat_invent' in acts(m6)
-        _sf=f'{T}/round24C/stop_{sid}.txt'
+        _sf=f'{T}/round25C/stop_{sid}.txt'
         if os.path.exists(_sf) and any(x.strip() and x.strip() in turnOf(u) for x in open(_sf).read().split('\n')): print('!!! STOP-LIST'); dd=dd or ['(stoplist)']
         if first or clos: print('!!! STOP-REVIEW first=%s closure=%s'%(first,clos)); dd=dd or ['(review)']
         sysT=bool(re.search(r'# نوبتِ تازه\n\[سامانه',u))
@@ -87,7 +87,7 @@ def digest(n):
             open(D+'/ai/r%d.txt'%n,'w').write(_shd(open(S6+'/ai/r%d.txt'%m6).read())); print('   AUTO-reused r20 r%d'%m6); return True
         if AUTO and (sysT or os.environ.get('AUTOU')) and not dd and kf(u)!=kf(u6) and os.path.exists(S6+'/ai/r%d.txt'%m6):
             import subprocess
-            o=subprocess.run(['python3',T+'/round24C/tools/remap.py',sid,str(n)],env=dict(os.environ,SRC=str(m6)),capture_output=True,text=True)
+            o=subprocess.run(['python3',T+'/round25C/tools/remap.py',sid,str(n)],env=dict(os.environ,SRC=str(m6)),capture_output=True,text=True)
             print('   AUTO-remapped r22 r%d'%m6, o.stdout.replace(chr(10),' | ')[:300])
             if o.returncode==0: return True
             print('!!! REMAP FAILED — manual')
@@ -99,7 +99,7 @@ def digest(n):
         r6=S6+'/ai/r%d.txt'%m6
         if os.path.exists(r6): print('R6 ANSWER:',open(r6).read()[:1500])
     else: print('(no r6 counterpart)')
-ctl6=sorted(glob.glob(f'{T}/round24C/src/{sid}/ctl/c*.json'),key=lambda x:int(x.split('/c')[-1][:-5]))
+ctl6=sorted(glob.glob(f'{T}/round25C/src/{sid}/ctl/c*.json'),key=lambda x:int(x.split('/c')[-1][:-5]))
 steps=0
 while True:
     p=pend()
@@ -138,11 +138,11 @@ while True:
     if n>1 and os.path.exists(lo) and '"exit":true' in open(lo).read():
         import subprocess
         for _w in range(30):
-            if subprocess.run("ps aux | grep '[h]arness6c.js' | grep -q 'round24C/%s$'"%sid,shell=True).returncode!=0: break
+            if subprocess.run("ps aux | grep '[h]arness6c.js' | grep -q 'round25C/%s$'"%sid,shell=True).returncode!=0: break
             time.sleep(1)
         else:
-            subprocess.run("for p in $(ps aux | grep '[h]arness6c.js' | grep 'round24C/%s$' | awk '{print $2}'); do kill -9 $p; done"%sid,shell=True); time.sleep(2)
-        if subprocess.run("ps aux | grep '[h]arness6c.js' | grep -q 'round24C/%s$'"%sid,shell=True).returncode!=0:
-            time.sleep(3); subprocess.run(['bash',T+'/round24C/tools/start.sh',D]); time.sleep(8); print('>> restarted harness')
+            subprocess.run("for p in $(ps aux | grep '[h]arness6c.js' | grep 'round25C/%s$' | awk '{print $2}'); do kill -9 $p; done"%sid,shell=True); time.sleep(2)
+        if subprocess.run("ps aux | grep '[h]arness6c.js' | grep -q 'round25C/%s$'"%sid,shell=True).returncode!=0:
+            time.sleep(3); subprocess.run(['bash',T+'/round25C/tools/start.sh',D]); time.sleep(8); print('>> restarted harness')
     open(D+'/ctl/c%d.json'%n,'w').write(src); print('>> fed r6 c%d as c%d: %s'%(S['ptr'],n,src[:160].replace('\n',' ')))
     S['ptr']+=1; S['wait']=n; json.dump(S,open(stf,'w')); steps+=1

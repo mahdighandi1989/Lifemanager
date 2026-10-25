@@ -1,6 +1,6 @@
 # turns.py sid [from] — per AI call: task, new-turn text, kept turn-question (short), reply
 import json,sys,glob,re,os
-D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24D/'+sys.argv[1]
+D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25D/'+sys.argv[1]
 a=int(sys.argv[2]) if len(sys.argv)>2 else 1
 n=len(glob.glob(D+'/ai/p*.json'))
 for i in range(a,n+1):

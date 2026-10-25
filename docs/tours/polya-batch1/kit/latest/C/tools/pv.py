@@ -1,7 +1,7 @@
 # pv.py sid [N] -> compact pending view: task, turn, turn-question new vs old, special blocks, r23 reply
 import json,sys,re,glob,os
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid=sys.argv[1]; D=f'{T}/round24C/{sid}'
+sid=sys.argv[1]; D=f'{T}/round25C/{sid}'
 n=int(sys.argv[2]) if len(sys.argv)>2 else max(int(f.split('/p')[-1][:-5]) for f in glob.glob(D+'/ai/p*.json'))
 W=int(os.environ.get('W','400'))
 def tq(u):
@@ -27,14 +27,14 @@ j=json.load(open(f'{D}/ai/p{n}.json')); u=j['user']
 m=re.search(r'# نوبتِ تازه\n(.*)',u,re.S); t=m.group(1).strip() if m else '?'
 mp=json.load(open(D+'/drv.json')).get('map',{}).get(str(n)) if os.path.exists(D+'/drv.json') else None
 ot=None
-if mp and mp!=-1 and os.path.exists(f'{T}/round23C/{sid}/ai/p{mp}.json'): ot=json.load(open(f'{T}/round23C/{sid}/ai/p{mp}.json'))
+if mp and mp!=-1 and os.path.exists(f'{T}/round24C/{sid}/ai/p{mp}.json'): ot=json.load(open(f'{T}/round24C/{sid}/ai/p{mp}.json'))
 print(f'=== {sid} p{n} task={j.get("task")} (r23 p{mp} task={ot.get("task") if ot else "-"})\nTURN: {t[:900]}')
 for l in tq(u): print(' N|',l)
 if ot:
     for l in tq(ot['user']): print(' O|',l)
 for l in spec(u): print(' S|',l)
 if ot:
-    r=f'{T}/round23C/{sid}/ai/r{mp}.txt'
+    r=f'{T}/round24C/{sid}/ai/r{mp}.txt'
     if os.path.exists(r):
         d=json.load(open(r)); print(' R23:',d.get('reply','')[:900]); print(' ACTS:',json.dumps([a for a in d.get('actions',[])],ensure_ascii=False)[:1200])
         for k in ('status','gap','title','pinned'):

@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('route','pb_l_mvdlhf7b13m');const t=document.getElementById('main').innerText;return t})()"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"}

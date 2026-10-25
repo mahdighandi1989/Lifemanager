@@ -1,1 +1,1 @@
-{"shot": {"name": "part_list_mistakes_1", "full": true}}
+{"eval": "(()=>{const b=[...document.querySelectorAll('#main button')].find(b=>/اشتباهات/.test(b.textContent));if(b)b.click();return MT('پوشهٔ',1500)})()"}

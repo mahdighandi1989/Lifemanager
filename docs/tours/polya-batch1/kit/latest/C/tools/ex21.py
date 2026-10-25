@@ -2,10 +2,10 @@
 import json,sys,glob,os
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
 sid=sys.argv[1]; K=int(sys.argv[2]); spec=json.load(open(sys.argv[3]))
-D=f'{T}/round24C/src/{sid}/ctl'
+D=f'{T}/round25C/src/{sid}/ctl'
 for f in glob.glob(D+'/c*.json'):
     if int(f.split('/c')[-1][:-5])>K: os.remove(f)
-REC=open(f'{T}/round24C/tools/rec.js').read()
+REC=open(f'{T}/round25C/tools/rec.js').read()
 HELP=json.load(open(T+'/round19C/s22/ctl/c1.json'))['eval0']
 PIDJ="(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id)"
 GOP="(()=>{const p=%s;APP.go('lprob',p);return p})()"%PIDJ

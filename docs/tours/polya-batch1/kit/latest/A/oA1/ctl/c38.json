@@ -1,1 +1,1 @@
-{"shot": {"name": "oA1_today_return", "full": true}}
+{"eval": "(()=>{APP.go('today');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('کارهای موعددار'),t.indexOf('کارهای موعددار')+900)})()"}

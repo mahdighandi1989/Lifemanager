@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveAll()[0];const p=r.p;return JSON.stringify({stmt:(p.statement||p.text||\"\").slice(0,200),dl:(r.solve&&r.solve.u1&&r.solve.u1.dl||[]).map(x=>x.t||x).slice(0,8)})})()"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"}

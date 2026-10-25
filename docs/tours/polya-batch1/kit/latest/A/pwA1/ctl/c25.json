@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=[...document.querySelectorAll('.lp-prior-ok')].find(x=>{let p=x.parentElement;while(p&&!/گامِ/.test(p.textContent))p=p.parentElement;return p&&p.textContent.trim().startsWith('گامِ '+'2'.replace(/\\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])+' ')});if(!b)return 'NOBTN';b.click();return 'clicked '+TT()})()"}

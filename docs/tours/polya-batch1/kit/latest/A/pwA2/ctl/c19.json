@@ -1,0 +1,1 @@
+{"eval": "(APP.ASSIST.cur().msgs.slice(-3).map(m=>m.role+\": \"+m.text).join(\"\\n\"))"}

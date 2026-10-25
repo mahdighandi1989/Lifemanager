@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",APP.ASSIST.cur().id,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}
+{"say": "راستی یه مسئله‌ی دیگه هم دارم که به همین بیداری ربط داره ولی جداست: شب‌ها شام رو ساعت ۱۰ می‌خوریم و بعدش خوابم نمی‌بره. می‌خوام اینم حل کنم."}

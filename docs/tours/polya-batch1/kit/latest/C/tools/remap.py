@@ -10,10 +10,10 @@ def keys(u):
         if l.startswith('دکمه‌ها:') or 'دکمه‌ها: k' in l:
             for mm in re.finditer(r'(k\d+)=«([^»]*)»',l): d.setdefault(mm.group(1),'BTN:'+mm.group(2))
     return d
-uo=json.load(open(f'{T}/round23C/{sid}/ai/p{src}.json'))['user']; un=json.load(open(f'{T}/round24C/{sid}/ai/p{N}.json'))['user']
+uo=json.load(open(f'{T}/round24C/{sid}/ai/p{src}.json'))['user']; un=json.load(open(f'{T}/round25C/{sid}/ai/p{N}.json'))['user']
 ko,kn=keys(uo),keys(un); inv={}
 for k,l in kn.items(): inv.setdefault(l,k)
-d=json.load(open(f'{T}/round23C/{sid}/ai/r{src}.txt'))
+d=json.load(open(f'{T}/round24C/{sid}/ai/r{src}.txt'))
 bad=[]
 for a in d.get('actions',[]):
     if 'k' in a:
@@ -21,5 +21,5 @@ for a in d.get('actions',[]):
         nk=inv.get(ko[a['k']]); print(a['do'],a['k'],'->',nk,ko[a['k']][:40]); a['k']=nk
 if bad: print('REMAP-FAIL unmapped keys',bad); sys.exit(3)
 if 'omit' in sys.argv: d['actions']=[a for a in d['actions'] if a.get('do')!='coach_state']
-s=json.dumps(d,ensure_ascii=False); open(f'{T}/round24C/{sid}/ai/r{N}.txt','w').write(s)
-os.makedirs(f'{T}/round24C/man/{sid}',exist_ok=True); open(f'{T}/round24C/man/{sid}/r{N}.txt','w').write(s)
+s=json.dumps(d,ensure_ascii=False); open(f'{T}/round25C/{sid}/ai/r{N}.txt','w').write(s)
+os.makedirs(f'{T}/round25C/man/{sid}',exist_ok=True); open(f'{T}/round25C/man/{sid}/r{N}.txt','w').write(s)

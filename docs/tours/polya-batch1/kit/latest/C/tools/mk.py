@@ -31,21 +31,21 @@ def fin(tag='post', chat=False):
     L.append(panel(tag+'_panel'))
     return L
 def clock(d):
-    HELP=json.load(open('/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C/s22/ctl/c1.json'))['eval0']
+    HELP=json.load(open('/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C/s22/ctl/c1.json'))['eval0']
     PIDJ="(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id)"
     return [{"eval":"(()=>{const p=%s;if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('%s')+' pid='+p})()"%(PIDJ,d)},{"exit":True},{"eval0":HELP+";window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID"}]
 def write(sid, L):
     import os,glob
-    D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C/src/%s/ctl'%sid
+    D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25C/src/%s/ctl'%sid
     os.makedirs(D,exist_ok=True)
     for f in glob.glob(D+'/*'): os.remove(f)
     for i,o in enumerate(L): open('%s/c%d.json'%(D,i+1),'w').write(o if isinstance(o,str) else json.dumps(o,ensure_ascii=False))
     print(sid,len(L))
 def append(sid, L):
     import os,glob
-    D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C/src/%s/ctl'%sid
+    D='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25C/src/%s/ctl'%sid
     n=len(glob.glob(D+'/c*.json'))
     for i,o in enumerate(L): open('%s/c%d.json'%(D,n+i+1),'w').write(o if isinstance(o,str) else json.dumps(o,ensure_ascii=False))
     print(sid,'appended',len(L),'->',n+len(L))
 def old(sid,i):
-    return open('/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round23C/%s/ctl/c%d.json'%(sid,i)).read()
+    return open('/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C/%s/ctl/c%d.json'%(sid,i)).read()

@@ -1,1 +1,1 @@
-{"eval": "(()=>{document.querySelectorAll('details').forEach(d=>{d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('📐');return t.slice(i,i+1500)+'\\n=====\\n'+t.slice(t.indexOf('در یک نگاه'),t.indexOf('در یک نگاه')+1800)+'\\n====\\n'+t.slice(t.indexOf('🧩 چهار مرحلهٔ حل'),t.indexOf('🧩 چهار مرحلهٔ حل')+1200)})()"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"}

@@ -1,6 +1,6 @@
 #!/bin/bash
 # rec.sh SID TAG : dump REC() to SID/corr_TAG.json
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24A
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25A
 T=$(mktemp -p $R); echo '{"eval":"(()=>{if(!window.REC){'"$(python3 -c "import json;print(json.dumps(open('$R/tools/inject.js').read())[1:-1])")"'};return REC()})()"}' > $T
 python3 -c "import json;json.load(open('$T'))" || { echo BADJSON; exit 1; }
 python3 $R/tools/d.py $1 send @$T > $T.o; rm -f $T

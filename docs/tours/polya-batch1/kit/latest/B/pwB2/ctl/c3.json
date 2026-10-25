@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();let o={};try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;o.pid=b&&b.pid;o.prior=APP.STORY.priorFor(s,o.pid||'')}catch(e){o.err=String(e)}try{o.tq=APP.STORY.priorTurnQ?APP.STORY.priorTurnQ(s,o.pid||''):null}catch(e){o.tqerr=String(e)}return JSON.stringify(o).slice(0,5000)})()"}

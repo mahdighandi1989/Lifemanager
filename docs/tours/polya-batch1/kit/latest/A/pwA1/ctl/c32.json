@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify(APP.STORY.priorFor(APP.ASSIST.cur(),\"pb_l_mvnlnc51v6a\")).slice(0,1500)"}

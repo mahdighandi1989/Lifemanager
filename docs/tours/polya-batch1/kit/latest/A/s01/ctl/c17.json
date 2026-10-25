@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify({ans:APP.ASSIST.cur().coach.ansBy||APP.ASSIST.cur().coach.ans, ph:APP.ASSIST.cur().coach.ph})+\"\\n\"+JSON.stringify(APP.liveCoach(\"pb_l_mvaqmaffy5b\"))"}
+{"eval": "JSON.stringify({ans:APP.ASSIST.cur().coach.ansBy||APP.ASSIST.cur().coach.ans, ph:APP.ASSIST.cur().coach.ph})+\"\\n\"+JSON.stringify(APP.liveCoach(\"pb_l_mvaqm8g3sdz\"))"}

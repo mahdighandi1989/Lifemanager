@@ -1,1 +1,1 @@
-{"say": "فرض: ۱۰ نقطه، مثلث متساوی‌الاضلاع با ضلع ۳، نقطه‌ها داخلش. اصلِ لانهٔ کبوتری: ۱۰ نقطه تو ۹ مثلثِ کوچیک، پس دو تا تو یه مثلث می‌افتن."}
+{"eval": "(()=>{const pid=\"pb_l_mvggdct7yod\";const s=APP.ASSIST.cur();const L=APP.S.get(\"eprog_\"+pid);const lv=L&&L.solve&&L.solve.live;return JSON.stringify({ph:APP.livePhase&&APP.livePhase(pid),story:APP.liveStoryPhase&&APP.liveStoryPhase(pid),chatPh:lv&&lv.chatPh,saidOk:s.coach&&s.coach.saidOk,story2:s.coach&&s.coach.story&&Object.keys(s.coach.story)})})()"}

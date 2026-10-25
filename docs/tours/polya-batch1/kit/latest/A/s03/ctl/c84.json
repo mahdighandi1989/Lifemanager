@@ -1,1 +1,1 @@
-{"eval": "(()=>{const pid=\"pb_l_mvggdb1gapg\";const s=APP.ASSIST.cur();const L=APP.S.get(\"eprog_\"+pid);const lv=L&&L.solve&&L.solve.live;return JSON.stringify({ph:APP.livePhase&&APP.livePhase(pid),story:APP.liveStoryPhase&&APP.liveStoryPhase(pid),chatPh:lv&&lv.chatPh,saidOk:s.coach&&s.coach.saidOk,story2:s.coach&&s.coach.story&&Object.keys(s.coach.story)})})()"}
+{"say": "حدسم اینه: مثلث رو به ۹ تا مثلثِ کوچیک با ضلع ۱ تقسیم کنم؛ بیشترین فاصلهٔ دو نقطه توی مثلثِ ضلع ۱ می‌شه ارتفاعش، یعنی √۳/۲."}

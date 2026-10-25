@@ -1,0 +1,1 @@
+{"eval": "document.getElementById(\"main\").innerText.slice(document.getElementById(\"main\").innerText.indexOf(\"📜\"),4000)"}

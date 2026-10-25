@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.S.all('eprob',r=>r&&r.live).map(r=>({id:r.p&&r.p.id,g:(r.guesses||r.p&&r.p.guesses||[]).map(x=>[x.id,x.text,x.res||x.status])})))"}
+{"say": "برگشتم. با هر دو نفر حرف زدم و گزارش رو خوندم: دو فصلِ آخر زیان دادن و یکیشون گفت تیمش نصف شده. پس پیش‌بینیم غلط بود."}

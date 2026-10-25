@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify(APP.STORY.priorFor(APP.ASSIST.cur(),null)).slice(0,2500)"}

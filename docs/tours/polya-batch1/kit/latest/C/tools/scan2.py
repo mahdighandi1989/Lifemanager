@@ -1,6 +1,6 @@
 # scan2.py sid... -> per prompt: header list + every line (outside turn line / context-marked) with «بپرس» or ending in «؟»
 import json,sys,re,glob
-T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C'
+T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25C'
 SKIP=('# نوبتِ تازه','# پیام‌های اخیر','# گفت‌وگو','# نقشهٔ سامانه','# امروز','# برگه','# صفحهٔ فعلی')
 args=sys.argv[1:]; only=None
 if args and args[-1].isdigit(): only=int(args.pop())

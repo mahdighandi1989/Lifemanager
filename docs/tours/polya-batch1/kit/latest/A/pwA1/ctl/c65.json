@@ -1,0 +1,1 @@
+{"eval": "(()=>{document.querySelectorAll(\"#main details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+2500)})()"}

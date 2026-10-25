@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('route','pb_l_mvb9wg4gjj5');const t=document.getElementById('main').innerText;return t})()"}
+{"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جست‌وجوی سابقه\");return APP.state.view+\" | \"+(i<0?\"NOT SHOWN\":t.slice(Math.max(0,i-100),i+300))})()"}

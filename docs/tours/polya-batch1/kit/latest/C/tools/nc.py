@@ -2,9 +2,9 @@
 import json,sys,glob,os
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
 sid,k=sys.argv[1],sys.argv[2]; v=sys.argv[3] if len(sys.argv)>3 else ''
-D=f'{T}/round24C/src/{sid}/ctl'; os.makedirs(D,exist_ok=True)
+D=f'{T}/round25C/src/{sid}/ctl'; os.makedirs(D,exist_ok=True)
 n=len(glob.glob(D+'/c*.json'))+1
-HELP=json.load(open(T+'/round23C/s22/ctl/c1.json'))['eval0']
+HELP=json.load(open(T+'/round24C/s22/ctl/c1.json'))['eval0']
 PIDJ="(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id)"
 if k=='say': o={'say':v}
 elif k=='eval': o={'eval':v}

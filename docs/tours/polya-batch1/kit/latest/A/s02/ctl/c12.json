@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveKindInfo(\"pb_l_mvaqm4p4843\"))+\" PH:\"+APP.livePhase(\"pb_l_mvaqm4p4843\")+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",500)"}
+{"eval": "JSON.stringify(APP.liveKindInfo(\"pb_l_mvaqm5f1lj8\"))+\" PH:\"+APP.livePhase(\"pb_l_mvaqm5f1lj8\")+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",500)"}

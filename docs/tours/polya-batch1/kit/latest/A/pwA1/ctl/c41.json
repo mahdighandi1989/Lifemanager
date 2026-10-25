@@ -1,0 +1,1 @@
+{"eval": "[...document.querySelectorAll(\"#main [class*=lp-ph], #main [class*=chip], #main [role=tab], #main a\")].slice(0,30).map(x=>x.tagName+\".\"+x.className+\":\"+x.textContent.trim().slice(0,40)).join(\"\\n\")"}

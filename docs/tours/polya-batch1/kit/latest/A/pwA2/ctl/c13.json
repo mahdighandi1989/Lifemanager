@@ -1,0 +1,1 @@
+{"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];return g.map((x,i)=>{x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');return i+': '+(t?t.innerText.replace(/\\n/g,' / '):'')}).join('\\n').slice(0,3000)})()"}

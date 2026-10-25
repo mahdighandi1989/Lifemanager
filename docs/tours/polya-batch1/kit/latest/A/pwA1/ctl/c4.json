@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=[...document.querySelectorAll(\".as-panel .as-msg, .as-panel [class*=msg]\")];const u=b.find(x=>/لژاندر/.test(x.textContent));if(!u)return \"none\";u.scrollIntoView({block:\"start\"});return u.innerHTML.slice(0,3000)})()"}

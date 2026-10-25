@@ -1,1 +1,1 @@
-{"reload":true}
+{"eval": "APP.today()+\" | \"+JSON.stringify(APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.step||x.e.stepName||\"\",(x.e.ruled||[]).join(\",\")]))"}

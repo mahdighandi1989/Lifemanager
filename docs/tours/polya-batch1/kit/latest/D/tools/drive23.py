@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# drive23.py sid [plan.json] — replay round21D/<sid> ctl list (or plan items) into round24D/<sid>.
+# drive23.py sid [plan.json] — replay round21D/<sid> ctl list (or plan items) into round25D/<sid>.
 # plan = [{"src":k} | {"new":{ctl},"tag":"x"} | {"exit":true}]; no plan => all source ctls in order.
 # src AI calls: mapping from round22D mtimes (P files between Ck and Sk). answer = ovr/r{N}.txt else subst(old rN).
 # extra AI calls beyond source => ovr/x{k}_{j}.txt (NEED + exit 3). new => ovr/{tag}_{j}.txt. Resumable.
 import sys,os,json,glob,re,subprocess
 B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R=B+'/round24D'; s=sys.argv[1]; S=B+'/round22D/'+s; D=R+'/'+s; T=R+'/tools'; O=R+'/'+s+'.ovr'
+R=B+'/round25D'; s=sys.argv[1]; S=B+'/round22D/'+s; D=R+'/'+s; T=R+'/tools'; O=R+'/'+s+'.ovr'
 os.makedirs(O,exist_ok=True)
 N=len(glob.glob(S+'/ctl/c*.json'))
 plan=json.load(open(sys.argv[2])) if len(sys.argv)>2 else [{'src':k} for k in range(1,N+1)]

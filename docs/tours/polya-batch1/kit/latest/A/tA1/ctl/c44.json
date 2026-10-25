@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','achat_mvb9w95jmymh5');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}
+{"eval": "JSON.stringify(APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.otherQuote||\"\"]))"}

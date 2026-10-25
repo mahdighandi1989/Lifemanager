@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"}
+{"eval": "JSON.stringify({url:location.pathname.slice(-60),areas:APP.SYST.areas().length,live:APP.liveAll().length,sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).map(c=>c.reason).join(\" || \")])})"}

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# auto2.py SID : replay round23A ctl from pos+1; for each R11 AI prompt find the R10 prompt with same task+«نوبتِ تازه»;
+# auto2.py SID : replay round24A ctl from pos+1; for each R11 AI prompt find the R10 prompt with same task+«نوبتِ تازه»;
 # auto-answer with R10 answer if key blocks equal after dropping context/proverb/figure/definition lines; else stop & diff.
 import sys,os,json,re,subprocess,difflib
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R11=T+'/round24A'; R10=T+'/round23A'; sid=sys.argv[1]; D=R11+'/'+sid
+R11=T+'/round25A'; R10=T+'/round24A'; sid=sys.argv[1]; D=R11+'/'+sid
 PID=re.compile(r'pb_l_[a-z0-9]{8,}')
 KEYS=('# مسئلهٔ','# مربیِ حل','# پس از شکست','# دانسته‌های قلمرو','# معلم','# نوبتِ تازه-NO')
 DROP=('زمینه (نه پرسشِ دوم)','- این مسئله پاسخِ عینی دارد','- از کتاب برای همین مرحله','سکوت، «نمی‌دونم»','حلِ مسئله مهارتی عملی','سطحِ استقلالِ کاربر','چهار مرحلهٔ حل در','این گفت‌وگو به همین مسئله بسته','# دانسته‌های قلمرو (','- یافته‌اند، نه دستور','- می‌خواهد کلِ راه را دور بریزد','- ادعای محلِ بحث','- کار به عقب شاخه می‌دهد','- بازنگری مهم‌ترین بخشِ کار','- قارچ‌ها خوشه‌ای','- فرع «نتیجه','- ضرب‌المثلِ همین مرحله','- شکل «حتی','- به تعریف‌ها برگرد','- مسئلهٔ عملی: داده‌ها بی‌شمار')

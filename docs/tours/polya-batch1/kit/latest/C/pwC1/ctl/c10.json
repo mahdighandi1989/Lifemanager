@@ -1,0 +1,1 @@
+{"eval": "(async()=>JSON.stringify((await window.__sheetList()).map(s=>({n:s.number,st:s.status,t:s.title.slice(0,80)}))))()"}

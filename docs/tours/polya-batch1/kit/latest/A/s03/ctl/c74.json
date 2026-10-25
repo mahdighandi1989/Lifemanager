@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvggdb1gapg\");C('.lp-dadd');const D=['۹ نقطه داخلِ مثلث داریم','مثلث متساوی‌الاضلاع با ضلع ۳'];const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.slice(0,2).forEach((id,i)=>F(id,D[i]));F('lpUnk','دو نقطه که فاصله‌شان حداکثر ۱ است');const pid=APP.state.arg;const P=APP.S.get('eprog_'+pid)||{};return ids.join(',')+' | '+JSON.stringify(((P.solve||{}).live||{}).uDraft||null).slice(0,600)+' | '+TT()})()"}
+{"eval": "APP.go(\"lprob\",\"pb_l_mvggdct7yod\")"}

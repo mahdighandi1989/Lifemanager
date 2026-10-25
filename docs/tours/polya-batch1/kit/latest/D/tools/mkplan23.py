@@ -12,5 +12,5 @@ for k in range(1,N+1):
     c=json.load(open(f'{S}/ctl/c{k}.json'))
     if not done and c.get('say'):
         plan.append({'new':{'eval':JS},'tag':'birth'}); done=True
-json.dump(plan,open(f'{B}/round24D/{s}.plan.json','w'),ensure_ascii=False,indent=0)
+json.dump(plan,open(f'{B}/round25D/{s}.plan.json','w'),ensure_ascii=False,indent=0)
 print(s,N,'items',len(plan))

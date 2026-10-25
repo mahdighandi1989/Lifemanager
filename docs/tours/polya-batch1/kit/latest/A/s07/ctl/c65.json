@@ -1,1 +1,1 @@
-{"say": "می‌خوام عادت کنم قبل از هر اندازه‌گیری پیش‌بینیِ عددی با درصدِ اطمینان بنویسم و بعد ببینم چقدر درست بوده — برای آزمایش‌های بعدیِ لوبیا یه تمرین برام راه بنداز."}
+{"eval": "APP.today()+' '+APP.state.view+' '+APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>r.p.id+':'+r.p.title+':'+(APP.liveClosure(r.p.id)||{}).state).join(' | ')+' sess:'+APP.ASSIST.cur().id+' lp:'+(APP.ASSIST.cur().lprob||'')"}

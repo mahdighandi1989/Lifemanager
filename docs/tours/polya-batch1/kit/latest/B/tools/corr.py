@@ -1,5 +1,5 @@
 import json,sys,os,re
-B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24B'
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25B'
 s=sys.argv[1]; D=f'{B}/{s}'
 ks=sorted(int(x[1:-5]) for x in os.listdir(f'{D}/ctl') if re.match(r'c\d+\.json$',x))
 seen=set()

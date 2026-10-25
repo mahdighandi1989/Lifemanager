@@ -1,0 +1,1 @@
+{"eval": "(APP.ASSIST.cur().msgs.slice(-1).map(m=>m.text).join(\"\"))+\"\\n---\\n\"+DUE()"}

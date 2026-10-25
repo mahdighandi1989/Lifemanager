@@ -1,6 +1,6 @@
 #!/bin/bash
 # cyc.sh secs -> loop: autoacc all; stop when there is a MANUAL pending or timeout; print statuses
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round24C
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25C
 ALL=${SIDS:-s21 s22 s23 s24 s25 s26 s27 s28 s29 pC1 pC2 pC3 aC1 aC2 aC3 aC4 tC1 oC1}
 t0=$(date +%s)
 while [ $(( $(date +%s)-t0 )) -lt ${1:-300} ]; do
