@@ -30,6 +30,7 @@ Tests: `tests/test_tour1_r24_age.js` (runner sentences), `tests/test_tour1_r24_a
 - Register signs (`AS.regSigns`, fallback `fbSigns`): «ببینم/بگم» (first person) are no longer «تو» signs; «بذار ببینم/بذار فکر کنم» are not either;
   an imperative of a machine operation to the page («ثبتش کن», «ذخیره کن», «پاکش کن») is not a register sign; «ـید/ـین» counts as «شما» only after a past
   stem ending (ـاد ـید ـود ـرد ـند ـزد ـشد ـمد ـست ـشت ـخت ـفت) — nouns «روتین/لاتین/کراتین» are not verbs. Old regexes: `AS.R24_QUARANTINE.signSh/.signTo18`.
+- `AS.replyCheck` now also flags (a) a «تو»-only reply when `AS.elder24()` and the register is «شما» (bank #138) and (b) any «YYYY-MM-DD» outside «…» in the reply (bank #140).
 - `toShoma` converts «سنجیدی‌اش» ⇒ «سنجیدیدش» (past + clitic).
 
 ## Contract: minors (age-normed activities and kept summaries)
@@ -41,9 +42,13 @@ Tests: `tests/test_tour1_r24_age.js` (runner sentences), `tests/test_tour1_r24_a
   (`A.dossier._priv24`) so 📜 (view, text, HTML) never keeps it verbatim. Her own chat message is not changed. **today fixer (a40):** if you build another
   kept summary from her messages, pass it through `A.AGE.privText`.
 
+## Merge
+- This branch already contains the classify fixer (046d813d, merged cleanly in source; docs appended in merge order 108 ⇒ 109, HANDBOOK open item renumbered 63).
+
 ## Old assertions changed (DECISIONS_R24 R5 replaces them)
 - `tests/test_tour1_r23_ageclass.js` — see the comments marked «دورِ ۲۴ (R5)» there: the confirmation shows only the Jalali date (no ISO) and a model
   birth action in a session confirms once instead of returning a second «✓ …» line.
+- `tests/test_tour1_r18_coach.js` rm6reg — the R18 bank entry «آره ثبتش کن» (compound imperative ⇒ «تو») is replaced by R5: a machine-operation imperative is no register evidence (comment in place).
 
 ## Not done here (other areas)
 - Intro stripping with word ages (R4 classify, above). The R7 «🎯 موعد» line itself (today fixer) — it is now converted on display, but the source still stores ISO in memory, which is fine for the model.
