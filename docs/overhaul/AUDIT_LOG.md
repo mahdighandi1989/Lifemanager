@@ -5004,3 +5004,5 @@ dated stability, mind-card feed) under way.
 - **DECISION** Root mechanisms P1–P7 and the seven-fixer split in `docs/tours/polya-batch1/decisions/DECISIONS_R25.md`. Fixers NOT launched
   (owner's directive: stop at point 2 and wait). Owner question bank: R25 verdicts for 1–31, new questions 32–41. Dataset refreshed (round 25:
   567 exchanges; total 5,343). Storyboards A–D on round 25. All runners sent their own e-mails (A 21, B 24, C 20, D 25, B_s 25).
+## 2026-10-25 — FINDING: دورِ کاملِ ناظرِ خودکار
+- FINDING (2026-10-25): گیتِ قانونِ ۴ سبز (pytest ‏2009 سبز/۱۲۸ skip، build سبز)؛ production = origin/main؛ کارتابل خالی؛ بدونِ یافتهٔ تازه و بدونِ تغییرِ کد. شکافِ محیط: skipِ ۱۲۷ تستِ مرورگریِ lla بدونِ `npm i` در `apps/learning-architecture` و ناهمخوانیِ نسخهٔ playwright/کرومیوم برای `page_map.py` (نه خرابیِ محصول). ناظرِ خودکار (Claude Code routine)
