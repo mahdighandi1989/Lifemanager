@@ -306,7 +306,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
   const G101 = { title: 'سنجشِ ایمنیِ یک ساختهٔ برقیِ خانگی (کم‌ولتاژ، کنارِ آب، بیرون)', area: 'sys-territory', kind: 'build', step: 'سنجشِ ایمنیِ برقِ کیت کنارِ آب',
     abstract: 'وقتی کاربر چیزی برقی می‌سازد که کنارِ آب و بیرون کار می‌کند، روشی منظم برای سنجشِ ایمنیِ برق لازم دارد.', missing: 'هیچ حوزه‌ای برای ایمنیِ برقِ ساخته‌های خانگی کنارِ آب نیست.',
     where: 'قلمروِ سامانه‌ها ‹ حلِ مسئله', how: 'حوزه با منابع و فهرستِ وارسیِ ایمنی', confidence: 0.9 };
-  const G102 = { title: 'جست‌وجوی پیشینه و ثبتِ اختراع', area: 'sys-territory', kind: 'build', abstract: 'پیش از فروشِ یک ساخته باید پیشینهٔ اختراع و راهِ ثبت را بداند.', missing: 'هیچ حوزه‌ای برای جست‌وجوی پیشینهٔ اختراع و ثبت نیست.', where: 'قلمروِ سامانه‌ها', how: 'حوزه + کاربرگ', confidence: 0.9 };
+  // DECISIONS_R24 R1 (D24-2/A24-6): a gap without gap.step no longer falls back to the «now» step — only gap.step (or a step naming «#n») marks a step waiting; so #102 now carries its step.
+  const G102 = { title: 'جست‌وجوی پیشینه و ثبتِ اختراع', area: 'sys-territory', kind: 'build', step: 'جست‌وجوی پیشینه و ثبتِ اختراعِ کیت', abstract: 'پیش از فروشِ یک ساخته باید پیشینهٔ اختراع و راهِ ثبت را بداند.', missing: 'هیچ حوزه‌ای برای جست‌وجوی پیشینهٔ اختراع و ثبت نیست.', where: 'قلمروِ سامانه‌ها', how: 'حوزه + کاربرگ', confidence: 0.9 };
   const gapTurn = (text, g, reply, acts, n) => p.evaluate(([t, g, r, a, n]) => { __sheetNo.push(n); return __turn(t, r, a, [__consult()], { status: 'gap', gap: g }); }, [text, g, reply, acts || [], n]);
   await p.evaluate((c) => { window.__consult = () => c; }, CONSULT);
   const sysAll = () => p.evaluate(() => APP.PRE.sysAll().map(x => ({ id: x.e.id, n: x.e.number, st: x.e.state, step: x.e.step, sc: x.sc.pid ? 'pid' : 'sess', tool: (x.e.tool || {}).id || '', checks: (x.e.checks || []).length })));
