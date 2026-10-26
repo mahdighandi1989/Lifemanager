@@ -294,8 +294,20 @@
    ]
   },
   "a_gettier_problem": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 19,
+     "at": "2026-10-25",
+     "stage": 1,
+     "what": "منابع: دو مدخلِ مرجع که در این دور خوانده شد (خلاصهٔ گتیه، پاسخ‌های «بی مقدمهٔ کاذب»، شکست‌پذیری، علّی، ضدِبخت)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «The Analysis of Knowledge» — https://plato.stanford.edu/entries/knowledge-analysis/",
+    "Internet Encyclopedia of Philosophy, «Gettier Problems» — https://iep.utm.edu/gettier/"
+   ]
   },
   "a_defeasibility_theory": {
    "stage": 0,
@@ -2917,6 +2929,6 @@
    "bookOnly": true
   }
  },
- "round": 18,
- "updated": "2026-10-24"
+ "round": 19,
+ "updated": "2026-10-25"
 }
