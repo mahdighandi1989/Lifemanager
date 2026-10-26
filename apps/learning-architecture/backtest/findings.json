@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-25",
- "round": 19,
+ "updated": "2026-10-26",
+ "round": 20,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,8 +25,8 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 15,
-    "freshOk": 10,
+    "fresh": 17,
+    "freshOk": 12,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -79,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 31,
-    "freshOk": 25,
+    "fresh": 34,
+    "freshOk": 28,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -138,8 +138,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 18,
-    "freshOk": 12,
+    "fresh": 20,
+    "freshOk": 14,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -190,8 +190,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 18,
-    "freshOk": 17,
+    "fresh": 19,
+    "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -242,8 +242,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 15,
-    "freshOk": 10,
+    "fresh": 17,
+    "freshOk": 12,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -292,8 +292,8 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 15,
-    "freshOk": 10,
+    "fresh": 17,
+    "freshOk": 12,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 33,
-    "freshOk": 26,
+    "fresh": 34,
+    "freshOk": 27,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -400,8 +400,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 15,
-    "freshOk": 10,
+    "fresh": 17,
+    "freshOk": 12,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 19
+   "lastSeenRound": 20
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1050,16 +1050,18 @@
    "case": "r17_dewey_1948",
    "opened": "2026-10-21",
    "openedRound": 17,
-   "status": "resolved",
+   "status": "verified",
    "attribution": null,
    "note": "",
    "fix": null,
    "retest": {
     "since": 17,
-    "fresh": 1,
-    "freshOk": 1,
+    "fresh": 3,
+    "freshOk": 3,
     "ids": [
-     "r19_ltcm_1998"
+     "r19_ltcm_1998",
+     "r20_mertens_conjecture_1985",
+     "r20_abs_invoice_rounding"
     ]
    },
    "kind": "missed",
@@ -1084,7 +1086,8 @@
    ],
    "lastSeenRound": 17,
    "resolved": "2026-10-21",
-   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
+   "verified": "2026-10-26"
   },
   {
    "id": "f_r17_mayfield_2004",
@@ -1201,9 +1204,11 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 1,
+    "freshOk": 1,
+    "ids": [
+     "r20_willingham_fire_1991"
+    ]
    },
    "kind": "missed",
    "title": "آزمونِ بازگشتیِ فروشنده برای مدلِ ریسکِ یک بانک",
@@ -1244,9 +1249,11 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 1,
+    "freshOk": 1,
+    "ids": [
+     "r20_willingham_fire_1991"
+    ]
    },
    "kind": "missed",
    "title": "لکهٔ خونِ نوزاد در خودروی چمبرلین (۱۹۸۲)",
@@ -1337,9 +1344,11 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 1,
+    "freshOk": 1,
+    "ids": [
+     "r20_willingham_fire_1991"
+    ]
    },
    "kind": "missed",
    "title": "مقالهٔ «رشد در زمانِ بدهی» و آستانهٔ ۹۰٪ (۲۰۱۰)",
@@ -1417,6 +1426,84 @@
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
   },
   {
+   "id": "f_r20_snow_broadstreet_1854",
+   "case": "r20_snow_broadstreet_1854",
+   "opened": "2026-10-26",
+   "openedRound": 20,
+   "status": "resolved",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذار برای ادعای بی‌قیدِ اسنو conf=۱۰۰ نوشته بود، در حالی که متن اطمینانی نمی‌گفت (قاعدهٔ «آنچه متن نمی‌گوید ننویس»)؛ سقفِ ۹۹٫۹ ِ تجربه (s51) درست کار کرده بود. conf حذف شد. جزوه و موتور درست‌اند.",
+   "fix": {
+    "what": "حذفِ conf از رمزگذاریِ ادعای اسنو (متن اطمینان نمی‌گوید)",
+    "round": 20
+   },
+   "retest": {
+    "since": 20,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "health_alarm",
+   "title": "جان اسنو و وبا در لندن (۱۸۵۴)",
+   "tier": "real",
+   "expected": [],
+   "flagged": [
+    "st_tajrobe"
+   ],
+   "rules": [
+    "r_tajrobe_ceiling"
+   ],
+   "secs": [
+    "s51"
+   ],
+   "lastSeenRound": 20,
+   "resolved": "2026-10-26",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r20_willingham_fire_1991",
+   "case": "r20_willingham_fire_1991",
+   "opened": "2026-10-26",
+   "openedRound": 20,
+   "status": "resolved",
+   "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
+   "note": "داستان ضعفِ روشِ بازرسان را فقط به‌صورتِ شناختِ پسین می‌گفت؛ رمزگذارِ کور درست x_method را ننوشت. سازنده (روتین) داستان را با آنچه در زمانِ تصمیم صادق بود (نشانه‌ها هرگز در آزمایشِ کنترل‌شده سنجیده نشده بودند) بازنوشت و موردِ را رمزگذارِ کورِ جدا دوباره رمز کرد. موتور و جزوه درست‌اند.",
+   "fix": {
+    "what": "بازنویسیِ داستان بی‌نشتِ برچسب + رمزگذاریِ دوبارهٔ کور",
+    "round": 20
+   },
+   "retest": {
+    "since": 20,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "شواهدِ آتش‌سوزیِ ویلینگام (۱۹۹۱–۲۰۰۴)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 20,
+   "resolved": "2026-10-26",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
    "id": "f_r2_nyt_goddard_1920",
    "case": "r2_nyt_goddard_1920",
    "opened": "2026-10-13",
@@ -1430,8 +1517,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 16,
-    "freshOk": 15,
+    "fresh": 17,
+    "freshOk": 16,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -1489,8 +1576,8 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 18,
-    "freshOk": 12,
+    "fresh": 19,
+    "freshOk": 13,
     "ids": [
      "r5_hitler_diaries_1983",
      "r5_abs_family_letters",
@@ -1537,8 +1624,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 11,
-    "freshOk": 6,
+    "fresh": 13,
+    "freshOk": 8,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
@@ -1550,7 +1637,8 @@
      "r16_abs_family_fund",
      "r17_dewey_1948",
      "r17_therac25_1986",
-     "r19_ltcm_1998"
+     "r19_ltcm_1998",
+     "r20_mertens_conjecture_1985"
     ]
    },
    "kind": "mislocated",
@@ -1591,8 +1679,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 11,
-    "freshOk": 6,
+    "fresh": 13,
+    "freshOk": 8,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
@@ -1604,7 +1692,8 @@
      "r16_abs_family_fund",
      "r17_dewey_1948",
      "r17_therac25_1986",
-     "r19_ltcm_1998"
+     "r19_ltcm_1998",
+     "r20_mertens_conjecture_1985"
     ]
    },
    "kind": "mislocated",

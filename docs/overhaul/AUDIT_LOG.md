@@ -5006,3 +5006,6 @@ dated stability, mind-card feed) under way.
   567 exchanges; total 5,343). Storyboards A–D on round 25. All runners sent their own e-mails (A 21, B 24, C 20, D 25, B_s 25).
 ## 2026-10-25 — FINDING: دورِ کاملِ ناظرِ خودکار
 - FINDING (2026-10-25): گیتِ قانونِ ۴ سبز (pytest ‏2009 سبز/۱۲۸ skip، build سبز)؛ production = origin/main؛ کارتابل خالی؛ بدونِ یافتهٔ تازه و بدونِ تغییرِ کد. شکافِ محیط: skipِ ۱۲۷ تستِ مرورگریِ lla بدونِ `npm i` در `apps/learning-architecture` و ناهمخوانیِ نسخهٔ playwright/کرومیوم برای `page_map.py` (نه خرابیِ محصول). ناظرِ خودکار (Claude Code routine)
+
+## 2026-10-26 — CHANGE: بک‌تستِ پیوسته دورِ ۲۰
+- CHANGE: ۵ واقعهٔ تازهٔ بک‌تست + گامِ ۲ ِ قلمروِ گتیه؛ دو یافتهٔ خطای رمزگذار/سازنده اصلاح شد؛ جزئیات در apps/learning-architecture/docs/WORKLOG.md (113). epi-decisions به‌خاطر ۴۰۱ ِ Render خوانده نشد.

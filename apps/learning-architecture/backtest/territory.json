@@ -294,7 +294,7 @@
    ]
   },
   "a_gettier_problem": {
-   "stage": 1,
+   "stage": 2,
    "history": [
     {
      "round": 19,
@@ -302,11 +302,36 @@
      "stage": 1,
      "what": "منابع: دو مدخلِ مرجع که در این دور خوانده شد (خلاصهٔ گتیه، پاسخ‌های «بی مقدمهٔ کاذب»، شکست‌پذیری، علّی، ضدِبخت)",
      "by": "ناظرِ بک‌تست"
+    },
+    {
+     "round": 20,
+     "at": "2026-10-26",
+     "stage": 2,
+     "what": "گزاره‌های محوری: چهار ملاکِ «کِی باورِ صادقِ موجه معرفت است» که SEP «The Analysis of Knowledge» و IEP «Gettier Problems» به دست می‌دهند — اصلاحِ شماره‌بخش‌ها پس از بازبینیِ مستقلِ دورِ ۲۰ (چهار گزاره پیشنهادهای تحلیلی‌اند با مشکلاتشان؛ شکست‌ناپذیری فقط در IEP §10)",
+     "by": "ناظرِ بک‌تست"
     }
    ],
    "sources": [
     "Stanford Encyclopedia of Philosophy, «The Analysis of Knowledge» — https://plato.stanford.edu/entries/knowledge-analysis/",
     "Internet Encyclopedia of Philosophy, «Gettier Problems» — https://iep.utm.edu/gettier/"
+   ],
+   "claims": [
+    {
+     "txt": "باورِ صادقِ موجه (JTB) برای معرفت بس نیست: در موردهای نوعِ گتیه باور هم صادق و هم موجه است ولی صدقش تصادفی است",
+     "src": "SEP «The Analysis of Knowledge» §3؛ IEP «Gettier Problems» §3، §5–6"
+    },
+    {
+     "txt": "پاسخِ «بی مقدمهٔ کاذب» پیشنهاد می‌کند باورِ استنتاج‌شده از مقدمهٔ کاذب معرفت نباشد؛ هر دو منبع نشان می‌دهند این شرط به‌تنهایی حل نمی‌کند",
+     "src": "SEP «The Analysis of Knowledge» §4؛ IEP «Gettier Problems» §9 (به‌عنوان پیشنهادی که هر دو منبع ناکافی/مسئله‌دار می‌دانند)"
+    },
+    {
+     "txt": "صدقِ باور نباید با بختِ محیط برسد: باید در موقعیت‌های نزدیک نیز صادق بماند (شرطِ ایمنی/ضدِبخت)",
+     "src": "SEP «The Analysis of Knowledge» §5.2 و §8؛ IEP «Gettier Problems» §8"
+    },
+    {
+     "txt": "توجیه نباید با شاهدی که از دست رفته یا در دسترس بود شکست‌پذیر باشد (شکست‌ناپذیری)",
+     "src": "IEP «Gettier Problems» §10 (فقط IEP)"
+    }
    ]
   },
   "a_defeasibility_theory": {
@@ -2929,6 +2954,6 @@
    "bookOnly": true
   }
  },
- "round": 19,
- "updated": "2026-10-25"
+ "round": 20,
+ "updated": "2026-10-26"
 }
