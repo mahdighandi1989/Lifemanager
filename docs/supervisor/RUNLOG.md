@@ -87,3 +87,14 @@
 - **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار (sha برابر).
 
 ناظرِ خودکار (Claude Code routine)
+
+## 2026-10-28 — کامل
+
+- **کارتابل:** ۰ برگهٔ بی‌پاسخ، ۰ فایل، ۰ نیمه‌کاره، ۰ تیک‌خورده. `whoami` ok (درایو وصل، db_bytes=0). صندوقِ دست‌به‌دستِ general خالی؛ دو کهنهٔ backtest/epi-rules (1409، 7bcc) مالکشان روتینِ backtest است، دست نخورد.
+- **اجرا:** pytest ‏2009 سبز/۱۳۵ skip/۰ قرمز · `npm run build` سبز · inventory: ۴۴ صفحه، ۲۹ زیرصفحه، ۱۸۱ دکمه، ۸۸ ورودی، ۱۵ فرم، ۵۹ لینک، ۱۰۶ API، ۴۳۱ مسیر، ۱۵۸ سرویس، ۶۹ مدل، بدونِ alarm/error (بی‌تغییر) · page_map ‏۵۴ اندازه‌گیری، ۱ نشد، ۵ رد، ۴٬۰۷۰ کنترل (کنسول/۴۰۴ِ `/auth/me` = OPEN_ITEMS ‏۳). vitest اجرا نشد.
+- **production:** `/api/health` = healthy، `/api/version` = `40208adb` = `origin/main`. جز سلامت، نسخه و کارتابل سنجیده نشد.
+- **psy-norms:** `retrieved` = 2026-10-15 (۱۳ روز) ⇒ لازم نبود. **sys-territory:** گامی جلو نرفت (کم‌گام‌ترین‌ها در `sys_territory.py status`).
+- **یافته:** صفر. تغییر کد: هیچ. محیط: playwrightِ pip کرومیومِ ۱۱۹۴ می‌خواست و محیط ۱۲۴۳ دارد ⇒ `PLAYWRIGHT_BROWSERS_PATH` با symlink ِ موقت.
+- **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار (sha برابر).
+
+ناظرِ خودکار (Claude Code routine)

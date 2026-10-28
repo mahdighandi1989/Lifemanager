@@ -5012,3 +5012,6 @@ dated stability, mind-card feed) under way.
 
 ## 2026-10-27 — CHANGE: بک‌تستِ پیوسته دورِ ۲۱
 - CHANGE: ۷ واقعهٔ تازه + گامِ ۳ ِ قلمروِ گتیه؛ سه یافتهٔ باز، پیشنهادِ `p_qual_conf_high` منتظرِ مالک؛ جزئیات در apps/learning-architecture/docs/WORKLOG.md (114). epi-decisions به‌خاطر ۴۰۱ ِ Render خوانده نشد.
+
+## 2026-10-28 — FINDING — دورِ کاملِ ناظرِ خودکار
+دورِ بی‌برگه؛ pytest ‏2009 سبز، build سبز، inventory بی‌تغییر، production = origin/main (`40208adb`). یافتهٔ تازه: صفر؛ تغییرِ کد: هیچ. جزئیات: `docs/supervisor/RUNLOG.md`.
