@@ -5009,3 +5009,6 @@ dated stability, mind-card feed) under way.
 
 ## 2026-10-26 — CHANGE: بک‌تستِ پیوسته دورِ ۲۰
 - CHANGE: ۵ واقعهٔ تازهٔ بک‌تست + گامِ ۲ ِ قلمروِ گتیه؛ دو یافتهٔ خطای رمزگذار/سازنده اصلاح شد؛ جزئیات در apps/learning-architecture/docs/WORKLOG.md (113). epi-decisions به‌خاطر ۴۰۱ ِ Render خوانده نشد.
+
+## 2026-10-27 — CHANGE: بک‌تستِ پیوسته دورِ ۲۱
+- CHANGE: ۷ واقعهٔ تازه + گامِ ۳ ِ قلمروِ گتیه؛ سه یافتهٔ باز، پیشنهادِ `p_qual_conf_high` منتظرِ مالک؛ جزئیات در apps/learning-architecture/docs/WORKLOG.md (114). epi-decisions به‌خاطر ۴۰۱ ِ Render خوانده نشد.

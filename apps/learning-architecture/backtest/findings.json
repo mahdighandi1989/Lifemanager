@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-26",
- "round": 20,
+ "updated": "2026-10-28",
+ "round": 21,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -79,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 34,
-    "freshOk": 28,
+    "fresh": 36,
+    "freshOk": 29,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -190,8 +190,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 19,
-    "freshOk": 18,
+    "fresh": 20,
+    "freshOk": 19,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 34,
-    "freshOk": 27,
+    "fresh": 36,
+    "freshOk": 28,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -448,8 +448,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 12,
-    "freshOk": 11,
+    "fresh": 13,
+    "freshOk": 12,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 20
+   "lastSeenRound": 21
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,10 +1154,13 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 1,
-    "freshOk": 1,
+    "fresh": 4,
+    "freshOk": 2,
     "ids": [
-     "r19_killian_memos_2004"
+     "r19_killian_memos_2004",
+     "r21_camping_rapture_2011",
+     "r21_iraq_nie_2002",
+     "r21_abs_lender_single_source"
     ]
    },
    "kind": "missed",
@@ -1204,10 +1207,11 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 1,
+    "fresh": 2,
     "freshOk": 1,
     "ids": [
-     "r20_willingham_fire_1991"
+     "r20_willingham_fire_1991",
+     "r21_mayfield_fingerprint_2004"
     ]
    },
    "kind": "missed",
@@ -1249,10 +1253,11 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 1,
+    "fresh": 2,
     "freshOk": 1,
     "ids": [
-     "r20_willingham_fire_1991"
+     "r20_willingham_fire_1991",
+     "r21_mayfield_fingerprint_2004"
     ]
    },
    "kind": "missed",
@@ -1294,10 +1299,13 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 1,
-    "freshOk": 1,
+    "fresh": 4,
+    "freshOk": 2,
     "ids": [
-     "r19_killian_memos_2004"
+     "r19_killian_memos_2004",
+     "r21_camping_rapture_2011",
+     "r21_iraq_nie_2002",
+     "r21_abs_lender_single_source"
     ]
    },
    "kind": "missed",
@@ -1344,10 +1352,11 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 1,
+    "fresh": 2,
     "freshOk": 1,
     "ids": [
-     "r20_willingham_fire_1991"
+     "r20_willingham_fire_1991",
+     "r21_mayfield_fingerprint_2004"
     ]
    },
    "kind": "missed",
@@ -1389,10 +1398,13 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 1,
-    "freshOk": 1,
+    "fresh": 4,
+    "freshOk": 2,
     "ids": [
-     "r19_killian_memos_2004"
+     "r19_killian_memos_2004",
+     "r21_camping_rapture_2011",
+     "r21_iraq_nie_2002",
+     "r21_abs_lender_single_source"
     ]
    },
    "kind": "missed",
@@ -1439,9 +1451,11 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 1,
+    "freshOk": 1,
+    "ids": [
+     "r21_meselson_stahl_1958"
+    ]
    },
    "kind": "health_alarm",
    "title": "جان اسنو و وبا در لندن (۱۸۵۴)",
@@ -1474,9 +1488,11 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 0,
+    "fresh": 1,
     "freshOk": 0,
-    "ids": []
+    "ids": [
+     "r21_mayfield_fingerprint_2004"
+    ]
    },
    "kind": "missed",
    "title": "شواهدِ آتش‌سوزیِ ویلینگام (۱۹۹۱–۲۰۰۴)",
@@ -1504,6 +1520,210 @@
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
   },
   {
+   "id": "f_r21_abs_lender_single_source",
+   "case": "r21_abs_lender_single_source",
+   "opened": "2026-10-27",
+   "openedRound": 21,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "پس از بازرمزگذاریِ کور (داستانِ نشت‌زدوده): chain تک‌منبع و راوی غیرموثق ولی conf عددی ندارد ⇒ سقفِ s47/s48 فعال نمی‌شود؛ فقط st_resp پرچم شد (mislocated). همان علتِ p_qual_conf_high.",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "تأمین مالیِ شرکتی بر پایهٔ ادعای یک واسطه",
+   "tier": "abstract",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [
+    "st_resp"
+   ],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 21
+  },
+  {
+   "id": "f_r21_camping_rapture_2011",
+   "case": "r21_camping_rapture_2011",
+   "opened": "2026-10-27",
+   "openedRound": 21,
+   "status": "resolved",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": {
+    "since": 21,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "پیش‌بینیِ هارولد کمپینگ از رستاخیز در ۲۱ مه ۲۰۱۱",
+   "tier": "real",
+   "expected": [
+    "st_naql",
+    "st_conflict"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q",
+    "r_conflict_cert",
+    "r_conflict_ignored"
+   ],
+   "secs": [
+    "s40",
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 21,
+   "resolved": "2026-10-27",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r21_iraq_nie_2002",
+   "case": "r21_iraq_nie_2002",
+   "opened": "2026-10-27",
+   "openedRound": 21,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "پس از اصلاحِ بازبینی و بازرمزگذاریِ کور: راوی «نامعلوم» (متن نمی‌گوید غیرموثق بود) و conf عددی ندارد ⇒ موتور چیزی نمی‌بیند. متنِ واقعه فقط می‌گوید «اطمینانِ بالا»؛ عددِ قراردادی ممنوع ⇒ p_qual_conf_high (مالک). بخشی از خطا آگاهیِ تحلیلگران بود که طبقِ گزارشِ سنا به آن‌ها نرسید — این خودش درسِ معرفتی است نه نقصِ رمزگذار.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "ارزیابیِ اطلاعاتیِ ملیِ آمریکا دربارهٔ عراق (اکتبر ۲۰۰۲)",
+   "tier": "real",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 21
+  },
+  {
+   "id": "f_r21_mars_climate_orbiter_1999",
+   "case": "r21_mars_climate_orbiter_1999",
+   "opened": "2026-10-27",
+   "openedRound": 21,
+   "status": "resolved",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": {
+    "since": 21,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "فضاپیمای مدارگردِ مریخ (مارس کلایمیت اوربیتر) ۱۹۹۹",
+   "tier": "real",
+   "expected": [
+    "st_worlds",
+    "st_resp"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_worlds_mix",
+    "r_resp_inquiry"
+   ],
+   "secs": [
+    "s16",
+    "s19",
+    "s22",
+    "s6",
+    "s71",
+    "s80",
+    "s86"
+   ],
+   "lastSeenRound": 21,
+   "resolved": "2026-10-27",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r21_mayfield_fingerprint_2004",
+   "case": "r21_mayfield_fingerprint_2004",
+   "opened": "2026-10-27",
+   "openedRound": 21,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "پس از بازرمزگذاریِ کور: متن نه روشِ ضعیف (x_method) و نه تعارضِ منافع (x_bias) می‌گوید، و شاهدِ ناسازگار (گزارشِ منفیِ اسپانیا) را رمزگذارِ کور conflict_ignored ننوشت (ویژگیِ تشخیصی) ⇒ موتور نمی‌بیند. محدودیتِ رمزگذاریِ کور از متنِ پیشین است (خطاهای روش در مورد‌های کارشناسی معمولاً پسینی‌اند).",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "شناساییِ اثرِ انگشتِ مادرید و براندون میفیلد (۲۰۰۴)",
+   "tier": "real",
+   "expected": [
+    "st_expert",
+    "st_conflict"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_conflict_cert",
+    "r_conflict_ignored",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49",
+    "s53"
+   ],
+   "lastSeenRound": 21
+  },
+  {
    "id": "f_r2_nyt_goddard_1920",
    "case": "r2_nyt_goddard_1920",
    "opened": "2026-10-13",
@@ -1517,8 +1737,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 17,
-    "freshOk": 16,
+    "fresh": 21,
+    "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -1576,7 +1796,7 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 19,
+    "fresh": 20,
     "freshOk": 13,
     "ids": [
      "r5_hitler_diaries_1983",
@@ -1624,8 +1844,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 13,
-    "freshOk": 8,
+    "fresh": 14,
+    "freshOk": 9,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
@@ -1679,8 +1899,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 13,
-    "freshOk": 8,
+    "fresh": 14,
+    "freshOk": 9,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
