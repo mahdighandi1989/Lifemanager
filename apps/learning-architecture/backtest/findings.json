@@ -1,6 +1,6 @@
 {
  "updated": "2026-10-28",
- "round": 21,
+ "round": 22,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,8 +25,8 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 17,
-    "freshOk": 12,
+    "fresh": 19,
+    "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -79,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 36,
-    "freshOk": 29,
+    "fresh": 38,
+    "freshOk": 30,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -138,8 +138,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 20,
-    "freshOk": 14,
+    "fresh": 22,
+    "freshOk": 15,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -242,8 +242,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 17,
-    "freshOk": 12,
+    "fresh": 19,
+    "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -292,8 +292,8 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 17,
-    "freshOk": 12,
+    "fresh": 19,
+    "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 36,
-    "freshOk": 28,
+    "fresh": 38,
+    "freshOk": 29,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -400,8 +400,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 17,
-    "freshOk": 12,
+    "fresh": 19,
+    "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,13 +1154,17 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 4,
-    "freshOk": 2,
+    "fresh": 8,
+    "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
      "r21_iraq_nie_2002",
-     "r21_abs_lender_single_source"
+     "r21_abs_lender_single_source",
+     "r22_nayirah_incubators_1990",
+     "r22_emulex_hoax_2000",
+     "r22_wapo_fake_accuser_2017",
+     "r22_abs_village_miracle"
     ]
    },
    "kind": "missed",
@@ -1207,11 +1211,13 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 2,
-    "freshOk": 1,
+    "fresh": 4,
+    "freshOk": 2,
     "ids": [
      "r20_willingham_fire_1991",
-     "r21_mayfield_fingerprint_2004"
+     "r21_mayfield_fingerprint_2004",
+     "r22_mozart_effect_georgia_1998",
+     "r22_abs_philosopher_one_study"
     ]
    },
    "kind": "missed",
@@ -1253,11 +1259,13 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 2,
-    "freshOk": 1,
+    "fresh": 4,
+    "freshOk": 2,
     "ids": [
      "r20_willingham_fire_1991",
-     "r21_mayfield_fingerprint_2004"
+     "r21_mayfield_fingerprint_2004",
+     "r22_mozart_effect_georgia_1998",
+     "r22_abs_philosopher_one_study"
     ]
    },
    "kind": "missed",
@@ -1299,13 +1307,17 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 4,
-    "freshOk": 2,
+    "fresh": 8,
+    "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
      "r21_iraq_nie_2002",
-     "r21_abs_lender_single_source"
+     "r21_abs_lender_single_source",
+     "r22_nayirah_incubators_1990",
+     "r22_emulex_hoax_2000",
+     "r22_wapo_fake_accuser_2017",
+     "r22_abs_village_miracle"
     ]
    },
    "kind": "missed",
@@ -1352,11 +1364,13 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 2,
-    "freshOk": 1,
+    "fresh": 4,
+    "freshOk": 2,
     "ids": [
      "r20_willingham_fire_1991",
-     "r21_mayfield_fingerprint_2004"
+     "r21_mayfield_fingerprint_2004",
+     "r22_mozart_effect_georgia_1998",
+     "r22_abs_philosopher_one_study"
     ]
    },
    "kind": "missed",
@@ -1398,13 +1412,17 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 4,
-    "freshOk": 2,
+    "fresh": 8,
+    "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
      "r21_iraq_nie_2002",
-     "r21_abs_lender_single_source"
+     "r21_abs_lender_single_source",
+     "r22_nayirah_incubators_1990",
+     "r22_emulex_hoax_2000",
+     "r22_wapo_fake_accuser_2017",
+     "r22_abs_village_miracle"
     ]
    },
    "kind": "missed",
@@ -1488,10 +1506,12 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 1,
-    "freshOk": 0,
+    "fresh": 3,
+    "freshOk": 1,
     "ids": [
-     "r21_mayfield_fingerprint_2004"
+     "r21_mayfield_fingerprint_2004",
+     "r22_mozart_effect_georgia_1998",
+     "r22_abs_philosopher_one_study"
     ]
    },
    "kind": "missed",
@@ -1557,7 +1577,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1570,9 +1590,14 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 4,
+    "freshOk": 3,
+    "ids": [
+     "r22_nayirah_incubators_1990",
+     "r22_emulex_hoax_2000",
+     "r22_wapo_fake_accuser_2017",
+     "r22_abs_village_miracle"
+    ]
    },
    "kind": "missed",
    "title": "پیش‌بینیِ هارولد کمپینگ از رستاخیز در ۲۱ مه ۲۰۱۱",
@@ -1644,7 +1669,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1721,7 +1746,87 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 21
+   "lastSeenRound": 22
+  },
+  {
+   "id": "f_r22_emulex_hoax_2000",
+   "case": "r22_emulex_hoax_2000",
+   "opened": "2026-10-28",
+   "openedRound": 22,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "پس از رمزگذاریِ کور: راوی «نامعلوم»، زنجیره «به‌ظاهر مستقل از یک منبع»، issued=false، ولی متنِ ادعا اطمینانی نمی‌گوید ⇒ conf نیامد ⇒ سقفِ s47/s48 فعال نمی‌شود (عددِ قراردادی ممنوع). همان الگوی p_qual_conf_high؛ جزوه و موتور درست‌اند. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "اطلاعیهٔ جعلیِ «ایمولکس» و سقوطِ ۱۶ دقیقه‌ایِ سهام (۲۰۰۰)",
+   "tier": "real",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 22
+  },
+  {
+   "id": "f_r22_mozart_effect_georgia_1998",
+   "case": "r22_mozart_effect_georgia_1998",
+   "opened": "2026-10-28",
+   "openedRound": 22,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "پس از رمزگذاریِ کور: way=استقراء، ind_n=۳۶، scope=کلی نامحدود، ولی بدونِ conf (متن اطمینانِ عددی نمی‌گوید) و بی x_field/x_method (متن روشِ ضعیف را صریح نمی‌گوید؛ «یافتهٔ تک‌پژوهش از واسطه» هم رمز نشد) ⇒ r_istiqra_*/r_expert_* فعال نمی‌شود. محدودیتِ رمزگذاریِ کور و الگوی نبودنِ conf؛ جزوه (s49–s51) درست است. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "«اثرِ موتسارت» و لوحِ موسیقیِ کلاسیک برای هر نوزادِ گرجستان (۱۹۹۸)",
+   "tier": "real",
+   "expected": [
+    "st_expert",
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 22
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -1796,8 +1901,8 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 20,
-    "freshOk": 13,
+    "fresh": 22,
+    "freshOk": 14,
     "ids": [
      "r5_hitler_diaries_1983",
      "r5_abs_family_letters",
@@ -1844,8 +1949,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 14,
-    "freshOk": 9,
+    "fresh": 16,
+    "freshOk": 10,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
@@ -1899,8 +2004,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 14,
-    "freshOk": 9,
+    "fresh": 16,
+    "freshOk": 10,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",

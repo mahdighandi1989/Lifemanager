@@ -5015,3 +5015,6 @@ dated stability, mind-card feed) under way.
 
 ## 2026-10-28 — FINDING — دورِ کاملِ ناظرِ خودکار
 دورِ بی‌برگه؛ pytest ‏2009 سبز، build سبز، inventory بی‌تغییر، production = origin/main (`40208adb`). یافتهٔ تازه: صفر؛ تغییرِ کد: هیچ. جزئیات: `docs/supervisor/RUNLOG.md`.
+
+## 2026-10-28 — CHANGE: بک‌تستِ پیوسته دورِ ۲۲
+- CHANGE: ۶ مورد تازه (۳ شکستِ واقعی، ۱ سالمِ واقعی، ۲ انتزاعی) + گامِ ۱ قلمروِ هنجارهای معرفتی؛ دو یافتهٔ تازهٔ diagnosed (نبودِ conf در متن، پیشنهادِ `p_qual_conf_high` منتظرِ مالک)؛ جزئیات: apps/learning-architecture/docs/WORKLOG.md (115). epi-decisions به‌خاطر ۴۰۱ ِ Render خوانده نشد.

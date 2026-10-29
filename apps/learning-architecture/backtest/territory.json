@@ -108,8 +108,20 @@
    ]
   },
   "a_epistemic_norms": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 22,
+     "at": "2026-10-28",
+     "stage": 1,
+     "what": "منابع: دو مدخلِ مرجع که در این دور خوانده شد (SEP «Epistemology» — از جمله توجیهِ تکلیف‌گرایانه §3.1 — و SEP «The Ethics of Belief» — کلیفورد و جیمز، غایتِ باور، اراده‌گراییِ باوری، شواهدگرایی)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Epistemology» — https://plato.stanford.edu/entries/epistemology/",
+    "Stanford Encyclopedia of Philosophy, «The Ethics of Belief» — https://plato.stanford.edu/entries/ethics-belief/"
+   ]
   },
   "a_certainty": {
    "stage": 4,
@@ -2969,6 +2981,6 @@
    "bookOnly": true
   }
  },
- "round": 21,
+ "round": 22,
  "updated": "2026-10-28"
 }

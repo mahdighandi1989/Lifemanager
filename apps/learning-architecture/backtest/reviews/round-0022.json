@@ -1,0 +1,34 @@
+{
+ "checked": {
+  "events_real": true,
+  "no_hindsight_leak": true,
+  "encoding_blind": true,
+  "verified_by_real": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true,
+  "frames_unselected": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true
+ },
+ "checkedNote": "Verified: Nayirah (10 Oct 1990, unsworn, ABC 15 Mar 1991, Amnesty retraction, ID Jan 1992, 5-vote margin, 'few minutes' at hospital); Emulex (SEC LR-16671: 9:30, 10:13, 10:29, ~$61 drop in 16 min, Jakob ex-Internet Wire); Mozart (Nature 1993 n=36, Georgia 13 Jan 1998 $105k, Chabris 1999 16 studies); WaPo/Project Veritas (false name, Veritas link, no publication). Both SEP URLs exist. Minor: the claim that the Emulex email arrived 'the night before' was not confirmed by SEC text. Nayirah said 'only stopped by a few minutes' to Kroll, 'volunteer briefly' phrasing in why is slightly softer than source. WaPo f.narrator=نامعلوم/chain=تک‌منبع/qarina come from story (false name) more than claim text, borderline blind. Territory 'what' lists structural/content requirements and 'deontological justification': SEP ethics-belief covers them only partly (structural/content requirements are not headed topics; deontological justification is in epistemology §3.1, which is the other cited URL). | frames_unselected/proofs_from_axioms: در این دور قاب و برهانِ تازه‌ای نبود (بی‌موضوع، true)؛ اصلاح‌ها: «شب پیش» از داستانِ ایملکس حذف، توضیحِ قلمرو دقیق‌تر شد؛ جملهٔ زائدِ نایرا (آرایشی) ماند.",
+ "problems": [
+  {
+   "what": "Emulex story: 'اطلاعیه شب پیش با ایمیل ... رسیده بود' not confirmed by SEC/Wikipedia (email sent from a fresh Yahoo address via El Camino College library; timing not shown as night before).",
+   "fix": "Replace with 'اطلاعیه با ایمیلی از نشانیِ مستعار به اینترنت وایر رسیده بود' (drop 'شب پیش').",
+   "fixed": true
+  },
+  {
+   "what": "Nayirah truth.why: 'فقط مدتی کوتاه در بیمارستان بوده' is fine, but story has redundant sentence 'شاهد هویتش را فاش نکرده بود'.",
+   "fix": "Remove the duplicate sentence (cosmetic).",
+   "fixed": true
+  },
+  {
+   "what": "territory a_epistemic_norms history 'what' claims reading of 'الزام‌های ساختاری و محتوایی' and 'تکلیف‌گرایی در توجیه' from the two SEP entries; ethics-belief has no content-requirements section and deontological justification is only in epistemology §3.1.",
+   "fix": "Reword 'what' to: 'کلیفورد و جیمز، غایتِ باور، اراده‌گراییِ باوری، شواهدگرایی، ساختارِ هنجارها (اخلاق باور §2) و توجیهِ تکلیف‌گرایانه (معرفت‌شناسی §3.1)'.",
+   "fixed": true
+  }
+ ],
+ "round": 22,
+ "reviewer": "زیرعاملِ جدا (با وب)",
+ "note": "دور ۲۲"
+}
