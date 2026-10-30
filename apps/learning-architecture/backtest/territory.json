@@ -362,8 +362,20 @@
    ]
   },
   "a_defeasibility_theory": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 23,
+     "at": "2026-10-29",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده: IEP «Gettier Problem» بخش ۱۰ («Attempted Solutions: Eliminating Defeat» = پیشنهادِ نبودِ ناقض؛ ناقض = واقعیتی که افزودنش به شواهد توجیه را جدی سست کند؛ تمایزِ ناقضِ گمراه‌کننده/واقعی در آن مقاله نیامده) و SEP «Defeasible Reasoning» (بخش‌های ۱٫۱ و ۴٫۱: ناقضِ ردکننده/rebutting و ناقضِ تضعیف‌کننده/undercutting؛ باور فقط وقتی «نهایتاً موجه» است که بر استدلالِ بی‌ناقض بنا شود).",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Internet Encyclopedia of Philosophy, «The Gettier Problem» §10 — https://iep.utm.edu/gettier/",
+    "Stanford Encyclopedia of Philosophy, «Defeasible Reasoning» §1.1, §4.1 — https://plato.stanford.edu/entries/reasoning-defeasible/"
+   ]
   },
   "a_modal_anti_luck": {
    "stage": 0,
@@ -2981,6 +2993,6 @@
    "bookOnly": true
   }
  },
- "round": 22,
- "updated": "2026-10-28"
+ "round": 23,
+ "updated": "2026-10-29"
 }

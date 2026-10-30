@@ -1,0 +1,43 @@
+{
+ "checked": {
+  "events_real": true,
+  "no_hindsight_leak": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true,
+  "encoding_blind": true,
+  "verified_by_real": true,
+  "frames_unselected": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true
+ },
+ "checkedNote": "Gospel of Jesus's Wife: all facts match Wikipedia (18 Sep 2012 Rome, 1997 purchase/1960s East Germany, Bagnall+Luijendijk, C14 mean 741 AD, Grondin interlinear, Askeland, Sabar/Fritz June 2016, Munro 1982 letter). Ariane 501: all matches (4 Jun 1996, ~37 s, 64-bit float to 16-bit int BH overflow, both IRUs, >$370M, 4 of 7 protected, ~40 s alignment, no Ariane 5 trajectory test, 4 Cluster). Kelsey: 60-day rule, Lenz 18 Nov 1961 Dusseldorf, March 1962 withdrawal, 7 Aug 1962 medal confirmed; specific dates in story (Sept 1960 application, 10 Nov 1960 letter, mid-Dec in-person data, Jan 1961 request for another reviewer, pressure to Sept 1961) not in Wikipedia - not verified (Sci Am not checked). Wirecard: EY refusal to sign on 18 Jun 2020 and ~1.9bn unconfirmed, Philippine banks denying, 25 Jun insolvency confirmed; EUR 440M/four instalments, Feb 2019 EY review concluding Singapore-only, and trustee-confirmation-without-bank-statement practice not confirmed by Wikipedia or my search (probably from the cited Accounting Today piece; not checked). IEP s10 exists (Eliminating Defeat, No Defeat proposal, defeater defined as fact whose addition seriously weakens support) and matches the territory 'what'; SEP Defeasible Reasoning exists with rebutting/undercutting defeaters (read first 100k chars; the 'ultimately justified' s4.1 wording not verified). 5 f_r23_* findings all status diagnosed with coherent reasons (missing conf encoding; st_resp co-flag). Booklet sections s40/s47/s48/s49/s50 match titles (nature of certainty, naql, khabar types, expert reliance, induction); s80/s53 not checked. Hindsight: see problems. | frames/proofs: بی‌موضوع (قاب و برهانِ تازه نبود). مسیرِ ۱ انجام نشد (epi-decisions ۴۰۱).",
+ "problems": [
+  {
+   "what": "Ariane story (r23_ariane5_501_1996) embeds inquiry-board post-mortem findings as pre-decision facts: '4 of 7 variables protected', 'alignment function runs ~40 s after liftoff', 'ground tests did not use Ariane 5 flight data'. These are conclusions of the failure investigation, not known to the engineering team at decision time, and hand the solver the diagnosis.",
+   "fix": "Rewrite story to what the team knew then (reuse of Ariane 4 software, new bigger rocket, tests done with Ariane 4-type data or simulated inputs); move the three post-mortem facts into truth.why.",
+   "fixed": true
+  },
+  {
+   "what": "Wirecard story/truth.why: EUR 440M in four instalments, Feb 2019 EY review concluding Singapore-only, and EY not requesting bank statements are not corroborated by Wikipedia/my search; truth.why says Wirecard announced 1.9bn 'disappeared' on 18 June (Wikipedia ties it to 25 June; sources show 18 June was EY refusal/Wirecard statement that EY couldn't confirm). Also Wikipedia says KPMG found EY fai",
+   "fix": "Confirm each figure against the cited Accounting Today article or drop it; reword 18 June as 'EY refused to sign; Wirecard said 1.9bn could not be confirmed'.",
+   "fixed": true
+  },
+  {
+   "what": "Kelsey story dates (Sept 1960, 10 Nov 1960, mid-Dec in-person data, Jan 1961, Sept 1961) not verified by Wikipedia; Wikipedia says the Florence BMJ letter was Dec 1960, story says a British report - fine, but add date. Pressure 'until Sept 1961' extends past the decision point.",
+   "fix": "Cite Sci Am / FDA history page for the dates or soften to months/years only.",
+   "fixed": true
+  },
+  {
+   "what": "f_r23_abs_poll_model_reuse note says text has no certainty wording so conf not written, but the story contains 'پیش‌بینی ما ۹۸٪ قطعی است' (only claim.txt lacks it).",
+   "fix": "Fix note to say the certainty wording is in story not claim txt, or add it to claim txt as a separate encoding decision.",
+   "fixed": true
+  },
+  {
+   "what": "Ariane and Wirecard findings are attributed 'unknown' (mislocated: st_resp flagged but not in truth.fail); fact patterns have acted+stakes high+inquiry possible-and-not-done, so truth.fail likely incomplete.",
+   "fix": "Decide whether st_resp belongs in truth.fail (probably yes) and then reclassify as case-label error.",
+   "fixed": true
+  }
+ ],
+ "round": 23,
+ "reviewer": "زیرعاملِ جدا"
+}

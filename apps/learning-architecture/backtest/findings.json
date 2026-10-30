@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-28",
- "round": 22,
+ "updated": "2026-10-29",
+ "round": 23,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,7 +25,7 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 19,
+    "fresh": 21,
     "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
@@ -79,7 +79,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 38,
+    "fresh": 41,
     "freshOk": 30,
     "ids": [
      "r2_cbs_killian_memos",
@@ -138,7 +138,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 22,
+    "fresh": 24,
     "freshOk": 15,
     "ids": [
      "r4_wald_survivorship",
@@ -242,7 +242,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 19,
+    "fresh": 21,
     "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
@@ -292,7 +292,7 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 19,
+    "fresh": 21,
     "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
@@ -341,7 +341,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 38,
+    "fresh": 40,
     "freshOk": 29,
     "ids": [
      "r2_cbs_killian_memos",
@@ -400,7 +400,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 19,
+    "fresh": 21,
     "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,7 +1154,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 8,
+    "fresh": 11,
     "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
@@ -1164,7 +1164,10 @@
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
      "r22_wapo_fake_accuser_2017",
-     "r22_abs_village_miracle"
+     "r22_abs_village_miracle",
+     "r23_gospel_jesus_wife_2012",
+     "r23_wirecard_trust_accounts_2019",
+     "r23_abs_manuscript_auction"
     ]
    },
    "kind": "missed",
@@ -1211,13 +1214,15 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 4,
+    "fresh": 6,
     "freshOk": 2,
     "ids": [
      "r20_willingham_fire_1991",
      "r21_mayfield_fingerprint_2004",
      "r22_mozart_effect_georgia_1998",
-     "r22_abs_philosopher_one_study"
+     "r22_abs_philosopher_one_study",
+     "r23_gospel_jesus_wife_2012",
+     "r23_abs_manuscript_auction"
     ]
    },
    "kind": "missed",
@@ -1259,13 +1264,15 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 4,
+    "fresh": 6,
     "freshOk": 2,
     "ids": [
      "r20_willingham_fire_1991",
      "r21_mayfield_fingerprint_2004",
      "r22_mozart_effect_georgia_1998",
-     "r22_abs_philosopher_one_study"
+     "r22_abs_philosopher_one_study",
+     "r23_gospel_jesus_wife_2012",
+     "r23_abs_manuscript_auction"
     ]
    },
    "kind": "missed",
@@ -1307,7 +1314,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 8,
+    "fresh": 11,
     "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
@@ -1317,7 +1324,10 @@
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
      "r22_wapo_fake_accuser_2017",
-     "r22_abs_village_miracle"
+     "r22_abs_village_miracle",
+     "r23_gospel_jesus_wife_2012",
+     "r23_wirecard_trust_accounts_2019",
+     "r23_abs_manuscript_auction"
     ]
    },
    "kind": "missed",
@@ -1364,13 +1374,15 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 4,
+    "fresh": 6,
     "freshOk": 2,
     "ids": [
      "r20_willingham_fire_1991",
      "r21_mayfield_fingerprint_2004",
      "r22_mozart_effect_georgia_1998",
-     "r22_abs_philosopher_one_study"
+     "r22_abs_philosopher_one_study",
+     "r23_gospel_jesus_wife_2012",
+     "r23_abs_manuscript_auction"
     ]
    },
    "kind": "missed",
@@ -1412,7 +1424,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 8,
+    "fresh": 11,
     "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
@@ -1422,7 +1434,10 @@
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
      "r22_wapo_fake_accuser_2017",
-     "r22_abs_village_miracle"
+     "r22_abs_village_miracle",
+     "r23_gospel_jesus_wife_2012",
+     "r23_wirecard_trust_accounts_2019",
+     "r23_abs_manuscript_auction"
     ]
    },
    "kind": "missed",
@@ -1506,12 +1521,14 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 3,
+    "fresh": 5,
     "freshOk": 1,
     "ids": [
      "r21_mayfield_fingerprint_2004",
      "r22_mozart_effect_georgia_1998",
-     "r22_abs_philosopher_one_study"
+     "r22_abs_philosopher_one_study",
+     "r23_gospel_jesus_wife_2012",
+     "r23_abs_manuscript_auction"
     ]
    },
    "kind": "missed",
@@ -1577,7 +1594,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1590,13 +1607,16 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 4,
+    "fresh": 7,
     "freshOk": 3,
     "ids": [
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
      "r22_wapo_fake_accuser_2017",
-     "r22_abs_village_miracle"
+     "r22_abs_village_miracle",
+     "r23_gospel_jesus_wife_2012",
+     "r23_wirecard_trust_accounts_2019",
+     "r23_abs_manuscript_auction"
     ]
    },
    "kind": "missed",
@@ -1669,7 +1689,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1682,9 +1702,12 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 0,
+    "fresh": 2,
     "freshOk": 0,
-    "ids": []
+    "ids": [
+     "r23_wirecard_trust_accounts_2019",
+     "r23_ariane5_501_1996"
+    ]
    },
    "kind": "missed",
    "title": "فضاپیمای مدارگردِ مریخ (مارس کلایمیت اوربیتر) ۱۹۹۹",
@@ -1746,7 +1769,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1784,7 +1807,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1826,7 +1849,211 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 22
+   "lastSeenRound": 23
+  },
+  {
+   "id": "f_r23_abs_manuscript_auction",
+   "case": "r23_abs_manuscript_auction",
+   "opened": "2026-10-29",
+   "openedRound": 23,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "هم‌ساختار با f_r23_gospel_jesus_wife_2012: conf ننوشته شد؛ قاعده‌های s47–s49 سالم‌اند. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "دست‌نوشتهٔ «کشف‌شدهٔ» منسوب به شاعری نامدار در یک حراجِ خصوصی",
+   "tier": "abstract",
+   "expected": [
+    "st_naql",
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q",
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s47",
+    "s48",
+    "s49",
+    "s53"
+   ],
+   "lastSeenRound": 23
+  },
+  {
+   "id": "f_r23_abs_poll_model_reuse",
+   "case": "r23_abs_poll_model_reuse",
+   "opened": "2026-10-29",
+   "openedRound": 23,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور برای «conf» عددی ننوشت، با آنکه داستان «۹۸٪ قطعی» می‌گوید (ادعای خودِ کنشگر لفظِ یقین ندارد و رمزگذار فقط به claims[].txt تکیه کرد) ⇒ r_istiqra_* بی سقف ماند. الگوی p_encode_flat_assertion_conf؛ پرونده پس از دیدنِ حکم دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "مدلِ پیش‌بینیِ انتخاباتِ ملی که برای شورای یک شهرِ کوچک بازاستفاده شد",
+   "tier": "abstract",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 23
+  },
+  {
+   "id": "f_r23_ariane5_501_1996",
+   "case": "r23_ariane5_501_1996",
+   "opened": "2026-10-29",
+   "openedRound": 23,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "st_istiqra پرچم نخورد چون conf نیامد؛ st_resp (ترکِ تحقیقِ ممکن) پرچم خورد که با داستان سازگار است (آزمونِ مسیرِ پروازِ تازه انجام نشد، s80) — پس بخشی خطای برچسبِ ناقص (fail فقط st_istiqra) و بخشی نبودِ conf. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "نرم‌افزارِ ناوبریِ آریان۴ در نخستین پروازِ آریان۵ (۱۹۹۶)",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [
+    "st_resp"
+   ],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 23
+  },
+  {
+   "id": "f_r23_gospel_jesus_wife_2012",
+   "case": "r23_gospel_jesus_wife_2012",
+   "opened": "2026-10-29",
+   "openedRound": 23,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور برای «conf» عددی ننوشت (ادعا لفظِ اطمینان نمی‌گوید)؛ بی conf سقف‌های s47/s48/s49 فعال نمی‌شود و x_method هم نیامد. همان الگوی p_encode_flat_assertion_conf که منتظرِ مالک است؛ پرونده پس از دیدنِ حکم دست نخورد تا کورِ رمزگذاری نشکند.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "قطعهٔ پاپیروسِ «همسرِ عیسی» و گواهیِ دو متخصصِ پاپیروس (۲۰۱۲)",
+   "tier": "real",
+   "expected": [
+    "st_naql",
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q",
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s47",
+    "s48",
+    "s49",
+    "s53"
+   ],
+   "lastSeenRound": 23
+  },
+  {
+   "id": "f_r23_wirecard_trust_accounts_2019",
+   "case": "r23_wirecard_trust_accounts_2019",
+   "opened": "2026-10-29",
+   "openedRound": 23,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "st_naql پرچم نخورد چون conf نیامد؛ st_resp پرچم خورد و با داستان سازگار است (صورت‌حساب بانکی خواسته نشد). برچسبِ پرونده فقط st_naql؛ بخشی برچسبِ ناقص، بخشی نبودِ conf. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "حسابرسیِ حساب‌های امانیِ ویرکارد بر پایهٔ تأییدِ امین (۲۰۱۹)",
+   "tier": "real",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [
+    "st_resp"
+   ],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 23
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -1842,7 +2069,7 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 21,
+    "fresh": 23,
     "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
@@ -1901,7 +2128,7 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 22,
+    "fresh": 24,
     "freshOk": 14,
     "ids": [
      "r5_hitler_diaries_1983",
@@ -1949,7 +2176,7 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 16,
+    "fresh": 18,
     "freshOk": 10,
     "ids": [
      "r13_challenger_1986",
@@ -2004,7 +2231,7 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 16,
+    "fresh": 18,
     "freshOk": 10,
     "ids": [
      "r13_challenger_1986",

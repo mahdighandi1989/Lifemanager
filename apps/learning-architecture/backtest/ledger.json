@@ -3314,6 +3314,182 @@
     "staleFindings": [],
     "alarms": []
    }
+  },
+  {
+   "round": 23,
+   "at": "2026-10-29",
+   "note": "دورِ ۲۳: ۶ مورد (انجیلِ همسرِ عیسی، ویرکارد، آریان۵، کلزی–تالیدومید سالم، دو انتزاعی) + قلمرو a_defeasibility_theory گامِ ۱؛ ۵ یافته diagnosed؛ پس از اصلاح‌های بازبین",
+   "corpus": {
+    "n": 280,
+    "tiers": {
+     "real": 177,
+     "booklet": 51,
+     "problem": 26,
+     "abstract": 26
+    },
+    "new": 6,
+    "files": 14
+   },
+   "books": {
+    "mesbah": {
+     "n": 280,
+     "sound": 91,
+     "healthAlarms": 0,
+     "failures": 189,
+     "detected": 170,
+     "located": 166,
+     "fullyLocated": 147,
+     "controls": {
+      "agree": 0.887,
+      "negAgree": 0.276,
+      "negOk": true,
+      "posDetect": 1,
+      "posOk": true
+     }
+    }
+   },
+   "findings": {
+    "open": 23,
+    "fixed": 12,
+    "resolved": 11,
+    "verified": 4
+   },
+   "coverage": {
+    "rulesTested": 55,
+    "rules": 80,
+    "sectionsTested": 54,
+    "sections": 72,
+    "domains": 12,
+    "untested": [
+     "r_truth_narrow",
+     "r_badihi_pseudo",
+     "r_badihi_wijdani_other",
+     "r_shohud_misrouted",
+     "r_naql_unreliable_corrob",
+     "r_naql_mubham_q",
+     "r_istiqra_finite",
+     "r_istiqra_small_n",
+     "r_yad_orig_t1",
+     "r_yad_orig_t2",
+     "r_yad_orig_t3",
+     "r_yad_orig_t4",
+     "r_yad_orig_t5",
+     "r_yad_undoc_t4",
+     "r_yad_undoc_t3",
+     "r_yad_undoc_t2",
+     "r_yad_undoc_t1",
+     "r_grade_false_zero",
+     "r_r_sanad_ahad",
+     "r_expert_pop_econ",
+     "r_expert_pop_psych",
+     "r_expert_pop_socsci",
+     "r_expert_pop_unknown",
+     "r_aql_conseq",
+     "r_aql_matter_zanni"
+    ],
+    "byDomain": {
+     "پزشکی": 31,
+     "علم": 27,
+     "ریاضی": 29,
+     "فناوری و مهندسی": 23,
+     "زندگی روزمره": 22,
+     "دین": 22,
+     "فلسفه": 22,
+     "تاریخ و سیاست": 21,
+     "مالی و بانکی": 22,
+     "بازار و معامله": 17,
+     "حقوق و قضا": 22,
+     "رسانه و خبر": 22
+    }
+   },
+   "brier": {
+    "claims": 233,
+    "ceil": 0.29731
+   },
+   "foundation": {
+    "classes": {
+     "B": 25,
+     "S": 20,
+     "O": 8,
+     "X": 0,
+     "?": 0
+    },
+    "modes": {
+     "num": {
+      "ok": 257,
+      "health_alarm": 0,
+      "missed": 19,
+      "mislocated": 4,
+      "changed": 0
+     },
+     "deg": {
+      "ok": 244,
+      "health_alarm": 0,
+      "missed": 27,
+      "mislocated": 9,
+      "changed": 13
+     },
+     "derived": {
+      "ok": 257,
+      "health_alarm": 0,
+      "missed": 19,
+      "mislocated": 4,
+      "changed": 0
+     },
+     "both": {
+      "ok": 244,
+      "health_alarm": 0,
+      "missed": 27,
+      "mislocated": 9,
+      "changed": 13
+     }
+    },
+    "baseMeasured": 3,
+    "baseTotal": 11,
+    "baseval": {
+     "p_thiqa": 99.9,
+     "p_zahir": 99.9,
+     "p_mubham_q": 99.9,
+     "p_sense_unctrl": 74.95,
+     "p_hidden_inf": 74.95,
+     "p_expert_bias": 50,
+     "p_hidden_factor": 74.95,
+     "p_expert_econ_lab": 60,
+     "p_expert_psych08": 36.4,
+     "p_expert_socsci_ns": 60.9,
+     "p_mem": 50
+    },
+    "samples": 3,
+    "conventional": 0,
+    "audit": 0,
+    "baseChanges": []
+   },
+   "territory": {
+    "areas": 108,
+    "groups": 14,
+    "byStage": [
+     66,
+     7,
+     0,
+     1,
+     34,
+     0
+    ],
+    "bookOnly": 33,
+    "score": 146,
+    "scoreBookOnly": 132,
+    "scoreEvidenced": 14,
+    "max": 540,
+    "moved": [
+     "a_defeasibility_theory"
+    ]
+   },
+   "routine": {
+    "newEvents": 6,
+    "newSamples": 0,
+    "staleFindings": [],
+    "alarms": []
+   }
   }
  ]
 }
