@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-29",
- "round": 23,
+ "updated": "2026-10-30",
+ "round": 24,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,7 +25,7 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 21,
+    "fresh": 23,
     "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
@@ -79,7 +79,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 41,
+    "fresh": 44,
     "freshOk": 30,
     "ids": [
      "r2_cbs_killian_memos",
@@ -138,7 +138,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 24,
+    "fresh": 26,
     "freshOk": 15,
     "ids": [
      "r4_wald_survivorship",
@@ -242,7 +242,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 21,
+    "fresh": 23,
     "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
@@ -292,7 +292,7 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 21,
+    "fresh": 23,
     "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
@@ -400,7 +400,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 21,
+    "fresh": 23,
     "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,7 +1154,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 11,
+    "fresh": 12,
     "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
@@ -1167,7 +1167,8 @@
      "r22_abs_village_miracle",
      "r23_gospel_jesus_wife_2012",
      "r23_wirecard_trust_accounts_2019",
-     "r23_abs_manuscript_auction"
+     "r23_abs_manuscript_auction",
+     "r24_katrina_superdome_rumors_2005"
     ]
    },
    "kind": "missed",
@@ -1314,7 +1315,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 11,
+    "fresh": 12,
     "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
@@ -1327,7 +1328,8 @@
      "r22_abs_village_miracle",
      "r23_gospel_jesus_wife_2012",
      "r23_wirecard_trust_accounts_2019",
-     "r23_abs_manuscript_auction"
+     "r23_abs_manuscript_auction",
+     "r24_katrina_superdome_rumors_2005"
     ]
    },
    "kind": "missed",
@@ -1424,7 +1426,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 11,
+    "fresh": 12,
     "freshOk": 5,
     "ids": [
      "r19_killian_memos_2004",
@@ -1437,7 +1439,8 @@
      "r22_abs_village_miracle",
      "r23_gospel_jesus_wife_2012",
      "r23_wirecard_trust_accounts_2019",
-     "r23_abs_manuscript_auction"
+     "r23_abs_manuscript_auction",
+     "r24_katrina_superdome_rumors_2005"
     ]
    },
    "kind": "missed",
@@ -1594,7 +1597,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1607,7 +1610,7 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 7,
+    "fresh": 8,
     "freshOk": 3,
     "ids": [
      "r22_nayirah_incubators_1990",
@@ -1616,7 +1619,8 @@
      "r22_abs_village_miracle",
      "r23_gospel_jesus_wife_2012",
      "r23_wirecard_trust_accounts_2019",
-     "r23_abs_manuscript_auction"
+     "r23_abs_manuscript_auction",
+     "r24_katrina_superdome_rumors_2005"
     ]
    },
    "kind": "missed",
@@ -1689,7 +1693,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1702,11 +1706,13 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 2,
+    "fresh": 4,
     "freshOk": 0,
     "ids": [
      "r23_wirecard_trust_accounts_2019",
-     "r23_ariane5_501_1996"
+     "r23_ariane5_501_1996",
+     "r24_abs_trader_five_years",
+     "r24_abs_bank_symmetry_rule"
     ]
    },
    "kind": "missed",
@@ -1769,7 +1775,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1807,7 +1813,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1849,7 +1855,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1898,7 +1904,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1930,7 +1936,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -1964,7 +1970,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2013,7 +2019,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2053,7 +2059,169 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 23
+   "lastSeenRound": 24
+  },
+  {
+   "id": "f_r24_abs_bank_symmetry_rule",
+   "case": "r24_abs_bank_symmetry_rule",
+   "opened": "2026-10-30",
+   "openedRound": 24,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "همانِ پاریته: badihi=«اولی» نوشته شد (باورِ کنشگر) ⇒ r_badihi_pseudo نگرفت؛ st_resp به‌درستی پرچم خورد (آزمونِ ممکن انجام نشد). ناسازگاریِ طرحِ رمزگذاری با s39. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "قاعدهٔ «تقارنِ بدهکار و بستانکار» در سامانهٔ تسویهٔ یک بانک",
+   "tier": "abstract",
+   "expected": [
+    "st_badihi"
+   ],
+   "flagged": [
+    "st_resp"
+   ],
+   "rules": [
+    "r_badihi_pseudo",
+    "r_badihi_wijdani_other"
+   ],
+   "secs": [
+    "s11",
+    "s39",
+    "s40"
+   ],
+   "lastSeenRound": 24
+  },
+  {
+   "id": "f_r24_abs_trader_five_years",
+   "case": "r24_abs_trader_five_years",
+   "opened": "2026-10-30",
+   "openedRound": 24,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "conf ننوشته شد ⇒ سقف‌های r_istiqra_* (s50) نگرفت؛ st_resp (ترکِ تحقیقِ ممکن) پرچم خورد که با داستان سازگار است. همان الگوی p_encode_flat_assertion_conf. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "قاعدهٔ معاملاتیِ «بعد از پنج روز قرمز بخر» که پنج سالِ پیاپی جواب داد",
+   "tier": "abstract",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [
+    "st_resp"
+   ],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 24
+  },
+  {
+   "id": "f_r24_fermat_numbers_1640",
+   "case": "r24_fermat_numbers_1640",
+   "opened": "2026-10-30",
+   "openedRound": 24,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور conf ننوشت (متنِ ادعا لفظِ اطمینانِ عددی ندارد)؛ سقف‌های r_istiqra_* (s50) فقط با conf فعال می‌شوند ⇒ نگرفت. همان الگوی p_encode_flat_assertion_conf که منتظرِ مالک است؛ قاعده‌ها و جزوه سالم‌اند. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "عددهای فرما و گمانِ «همه اول‌اند» (۱۶۴۰–۱۷۳۲)",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 24
+  },
+  {
+   "id": "f_r24_katrina_superdome_rumors_2005",
+   "case": "r24_katrina_superdome_rumors_2005",
+   "opened": "2026-10-30",
+   "openedRound": 24,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "conf ننوشته شد و رمزگذار narrator را «نامعلوم» گذاشت نه «غیرموثق»؛ r_naql_unreliable_corrob (s47/s48) بی‌conf سقف نمی‌گذارد. الگوی p_encode_flat_assertion_conf؛ قاعده‌ها سالم‌اند. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "شایعه‌های «ابردوم» و مرکز همایش‌های نیواورلئان پس از کاترینا (۲۰۰۵)",
+   "tier": "real",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 24
+  },
+  {
+   "id": "f_r24_parity_conservation_1956",
+   "case": "r24_parity_conservation_1956",
+   "opened": "2026-10-30",
+   "openedRound": 24,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور badihi را «اولی» نوشت (چنان‌که کنشگر می‌پندارد)، ولی r_badihi_pseudo فقط با badihi=«نظری» می‌شکفد؛ تشخیصِ «نظری بودنِ در واقع» همان کاری است که رمزگذارِ کور نباید از پیامد بداند. ناسازگاریِ طرحِ رمزگذاری با قاعده (s39)، نه خطای جزوه؛ دست نخورد، در پیشنهادِ رمزگذاری ثبت می‌شود.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "پایستگیِ پاریته در واپاشیِ ضعیف پیش از آزمایشِ وو (۱۹۵۶)",
+   "tier": "real",
+   "expected": [
+    "st_badihi"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_badihi_pseudo",
+    "r_badihi_wijdani_other"
+   ],
+   "secs": [
+    "s11",
+    "s39",
+    "s40"
+   ],
+   "lastSeenRound": 24
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2069,7 +2237,7 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 23,
+    "fresh": 25,
     "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
@@ -2176,7 +2344,7 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 18,
+    "fresh": 20,
     "freshOk": 10,
     "ids": [
      "r13_challenger_1986",
@@ -2231,7 +2399,7 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 18,
+    "fresh": 20,
     "freshOk": 10,
     "ids": [
      "r13_challenger_1986",

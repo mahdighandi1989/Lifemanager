@@ -1,0 +1,48 @@
+{
+ "round": 24,
+ "reviewer": "زیرعاملِ جدا",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "note": "Verified: Fermat (letter to Mersenne 25 Dec 1640, t5k; Euler 1732 641x6700417; no Fermat prime beyond F4: Wikipedia). Katrina (Compass 1 Sep + Oprah 5 days later; Nagin on Oprah; state count 10 Superdome/4 Convention Center with only two possible murders; freezer 30-40 bodies by Arkansas guardsman, nothing found; Compass admitted false info: Al Jazeera/Seattle Times). Parity (Wigner 1927; Lee-Yang 1956 'neither confirmed nor refuted'; Wu Dec 1956, pub 1957; Nobel 1957 Lee-Yang only: Wikipedia). Valla 1439-40, Baronius 1588-1607, 8th/9th c. dating: Wikipedia. SEP: rebutting/undercutting, 'ultimately warranted', self-defeat, collective defeat all in s4.1; IEP s10 No Defeat proposal and defeater definition match. Story outcome leakage: none found in the 4 real stories. Findings f_r24_* five diagnosed with coherent notes (missing conf / badihi encoded 'avvali' = actor belief). frames_unselected / proofs_from_axioms: n/a this round. Problems below are minor/unsourced details, none fabricated outright. Review text is independent; corpus/findings were not edited.",
+ "problems": [
+  {
+   "what": "territory.json a_defeasibility_theory history entry is dated/numbered round 25 (at 2026-10-30) while the file's round is 24 and the stage-2 step was done this round: inconsistent ledger and can mis-trigger next-round health checks.",
+   "fix": "Change history[].round from 25 to 24.",
+   "fixed": true
+  },
+  {
+   "what": "Valla story: details 'satrap', other later-era terms, and 'no older source mentions it' are not in any of the 3 cited sources (Wikipedia mentions 'fief'; CHI does not mention satrap or silence of sources, and notes Nicholas of Cusa had already exposed it in 1433). Also 'the pope and his supporters defended the document' is thinly supported (sources: papacy suppressed/ignored the treatise, Valla was accused of heresy then protected by Alfonso).",
+   "fix": "Add a source that states the satrap/silence arguments (e.g. Valla's treatise or a scholarly summary) or reword to what the cited sources say (anachronistic language such as 'fief', dating to ~8th c.); reword the papal reaction to 'the papacy did not accept/suppressed it'.",
+   "fixed": true
+  },
+  {
+   "what": "Valla claim encoded as way='تخصص دیگران' (x_method/x_comp) although the actor is Valla himself reasoning from textual evidence, not relying on someone else's expertise; the case therefore tests something other than what story narrates (verdict ok=true is correct but via a mismatched path).",
+   "fix": "Encode as the actor's own philological inference (or make the story about a reader trusting Valla/philologists) and state which one the case tests.",
+   "fixed": false,
+   "fix_note": "طرحِ رمزگذاری: باز؛ مورد سالم است و بازرمزگذاری بی‌نتیجه می‌ماند؛ در WORKLOG ثبت شد"
+  },
+  {
+   "what": "Katrina story: 'AP sometimes repeated without specific attribution' and the lurid rumor details (throat-cut children, bodies in basement) are not in cited sources (Seattle Times piece is Newhouse, not AP; Al Jazeera attributes the 'throat cut' detail to the guardsman Brooks). Also truth.why says 'only two possibly murder' and the Seattle Times says 1 of 4 at the Convention Center and 6 (not 10) bodies at the Dome per Col. Beron - the figures differ between cited sources and the case uses only one.",
+   "fix": "Drop or source the AP claim; note that counts vary (10+4 state count, 2 possible homicides vs. Seattle Times 6/4 with 1 murder at the Convention Center) or cite explicitly 'state health department count'.",
+   "fixed": true
+  },
+  {
+   "what": "Fermat story ends with 'no proof was available for later cases' and 'historians read the letters so': ProofWiki says Fermat himself admitted he could not prove it, so this hands the solver a hint in the story; the Dec 1640 letter is also quoted by t5k only as 'usually taken as' the conjecture, while the claim text asserts belief.",
+   "fix": "Keep the story to the observed five primes and Fermat's stated expectation; move 'no proof exists' to truth.why, and hedge the claim ('usually taken as').",
+   "fixed": true
+  },
+  {
+   "what": "Parity story phrase 'the tau-theta puzzle made this difficult' and the claim's actor being a physicist who 'unquestioningly assumes' parity hint at the failure; and the Wikipedia source for the tau/theta pion counts calls them kaons; one source only for the case (Wu experiment page) and no Lee-Yang 1956 primary reference.",
+   "fix": "Add the Lee-Yang 1956 Phys. Rev. paper / Nobel page as source; soften the puzzle sentence or move it to truth.why.",
+   "fixed": true
+  }
+ ]
+}

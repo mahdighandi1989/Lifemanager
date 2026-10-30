@@ -1,6 +1,6 @@
 {
- "round": 23,
- "at": "2026-10-29",
+ "round": 24,
+ "at": "2026-10-30",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 257,
+    "ok": 258,
     "health_alarm": 0,
-    "missed": 19,
-    "mislocated": 4
+    "missed": 22,
+    "mislocated": 6
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 244,
+    "ok": 245,
     "health_alarm": 0,
-    "missed": 27,
-    "mislocated": 9
+    "missed": 30,
+    "mislocated": 11
    },
    "changed": [
     {
@@ -1233,19 +1233,19 @@
   },
   "derived": {
    "kinds": {
-    "ok": 257,
+    "ok": 258,
     "health_alarm": 0,
-    "missed": 19,
-    "mislocated": 4
+    "missed": 22,
+    "mislocated": 6
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 244,
+    "ok": 245,
     "health_alarm": 0,
-    "missed": 27,
-    "mislocated": 9
+    "missed": 30,
+    "mislocated": 11
    },
    "changed": [
     {

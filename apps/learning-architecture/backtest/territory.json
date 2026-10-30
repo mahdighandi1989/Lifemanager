@@ -362,7 +362,7 @@
    ]
   },
   "a_defeasibility_theory": {
-   "stage": 1,
+   "stage": 2,
    "history": [
     {
      "round": 23,
@@ -370,11 +370,36 @@
      "stage": 1,
      "what": "منابعِ خوانده‌شده: IEP «Gettier Problem» بخش ۱۰ («Attempted Solutions: Eliminating Defeat» = پیشنهادِ نبودِ ناقض؛ ناقض = واقعیتی که افزودنش به شواهد توجیه را جدی سست کند؛ تمایزِ ناقضِ گمراه‌کننده/واقعی در آن مقاله نیامده) و SEP «Defeasible Reasoning» (بخش‌های ۱٫۱ و ۴٫۱: ناقضِ ردکننده/rebutting و ناقضِ تضعیف‌کننده/undercutting؛ باور فقط وقتی «نهایتاً موجه» است که بر استدلالِ بی‌ناقض بنا شود).",
      "by": "ناظرِ بک‌تست"
+    },
+    {
+     "round": 24,
+     "at": "2026-10-30",
+     "stage": 2,
+     "what": "گزاره‌های محوری: چهار ملاکِ «کِی باور موجه (یا معرفت) است» در نظریهٔ شکست‌پذیری، از SEP «Defeasible Reasoning» و IEP «The Gettier Problem» که در این دور خوانده شد",
+     "by": "ناظرِ بک‌تست"
     }
    ],
    "sources": [
     "Internet Encyclopedia of Philosophy, «The Gettier Problem» §10 — https://iep.utm.edu/gettier/",
     "Stanford Encyclopedia of Philosophy, «Defeasible Reasoning» §1.1, §4.1 — https://plato.stanford.edu/entries/reasoning-defeasible/"
+   ],
+   "claims": [
+    {
+     "txt": "باور فقط وقتی نهایتاً موجه/مجاز است که استدلالی نهایتاً بی‌ناقض آن را از شواهدِ کل پشتیبانی کند؛ وجودِ دلیلِ ظاهری (prima facie) به‌تنهایی بس نیست",
+     "src": "SEP «Defeasible Reasoning» §1.1، §4.1 (ultimate warrant)"
+    },
+    {
+     "txt": "ناقض دو گونه است و هر دو توجیه را می‌شکنند: ناقضِ ردکننده (rebutting) دلیلی برای نقیضِ نتیجه می‌دهد و ناقضِ تضعیف‌کننده (undercutting) رابطهٔ معمولِ مقدمه با نتیجه را در آن مورد زیر سؤال می‌برد",
+     "src": "SEP «Defeasible Reasoning» §1.1، §4.1"
+    },
+    {
+     "txt": "معرفت مستلزم نبودِ ناقض است: حقیقتی که افزودنش به شواهد پشتوانهٔ توجیهیِ باور را جدی سست کند نباید در بافتِ باورنده نادیده مانده باشد (تحلیلِ «نبودِ ناقض»)",
+     "src": "IEP «The Gettier Problem» §10 (Attempted Solutions: Eliminating Defeat)"
+    },
+    {
+     "txt": "استدلالی که خودش ناقضِ یکی از گام‌های شکست‌پذیرِ خود را پشتیبانی کند (خودشکن) پذیرفته نیست؛ و مجموعه‌ای از باورها که هرکدام را عضوی دیگر بشکند و ناقضِ بیرونیِ بی‌ناقض نباشد، شکستِ جمعی می‌خورد",
+     "src": "SEP «Defeasible Reasoning» §4.1 (self-defeat، collective defeat)"
+    }
    ]
   },
   "a_modal_anti_luck": {
@@ -2993,6 +3018,6 @@
    "bookOnly": true
   }
  },
- "round": 23,
- "updated": "2026-10-29"
+ "round": 24,
+ "updated": "2026-10-30"
 }
