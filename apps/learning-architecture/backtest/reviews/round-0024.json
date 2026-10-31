@@ -25,8 +25,8 @@
   },
   {
    "what": "Valla claim encoded as way='تخصص دیگران' (x_method/x_comp) although the actor is Valla himself reasoning from textual evidence, not relying on someone else's expertise; the case therefore tests something other than what story narrates (verdict ok=true is correct but via a mismatched path).",
-   "fix": "Encode as the actor's own philological inference (or make the story about a reader trusting Valla/philologists) and state which one the case tests.",
-   "fixed": false,
+   "fix": "Encode as the actor's own philological inference (or make the story about a reader trusting Valla/philologists) and state which one the case tests. — دورِ ۲۵: رمزگذاریِ والا به way=«عقل» (بدون x_method/x_comp) اصلاح شد؛ حکمِ ok=true بی‌تغییر؛ اصلاحِ غیرکور، در WORKLOG ثبت شد.",
+   "fixed": true,
    "fix_note": "طرحِ رمزگذاری: باز؛ مورد سالم است و بازرمزگذاری بی‌نتیجه می‌ماند؛ در WORKLOG ثبت شد"
   },
   {

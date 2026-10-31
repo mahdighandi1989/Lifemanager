@@ -1,6 +1,6 @@
 {
- "round": 24,
- "at": "2026-10-30",
+ "round": 25,
+ "at": "2026-10-31",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 258,
+    "ok": 264,
     "health_alarm": 0,
     "missed": 22,
-    "mislocated": 6
+    "mislocated": 7
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 245,
+    "ok": 248,
     "health_alarm": 0,
-    "missed": 30,
-    "mislocated": 11
+    "missed": 33,
+    "mislocated": 12
    },
    "changed": [
     {
@@ -1228,24 +1228,42 @@
      "t": "خریدِ شرکت بر پایهٔ «چند گزارش» از یک منبع",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r25_tripathi_reddit_boston_2013",
+     "t": "نام‌بردنِ ردیت و توییتر از سونیل تریپاتی به‌عنوان بمب‌گذار بوستون (۲۰۱۳)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r25_neisser_challenger_memory_1986",
+     "t": "خاطرهٔ «شنیدنِ خبرِ چلنجر» در دانشجویان ایموری (۱۹۸۶ تا ۱۹۸۸)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r25_abs_ticker_delisting_rumor",
+     "t": "شایعهٔ «حذف از بورس» در کانال معامله‌گران",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 258,
+    "ok": 264,
     "health_alarm": 0,
     "missed": 22,
-    "mislocated": 6
+    "mislocated": 7
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 245,
+    "ok": 248,
     "health_alarm": 0,
-    "missed": 30,
-    "mislocated": 11
+    "missed": 33,
+    "mislocated": 12
    },
    "changed": [
     {
@@ -1325,6 +1343,24 @@
      "t": "خریدِ شرکت بر پایهٔ «چند گزارش» از یک منبع",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r25_tripathi_reddit_boston_2013",
+     "t": "نام‌بردنِ ردیت و توییتر از سونیل تریپاتی به‌عنوان بمب‌گذار بوستون (۲۰۱۳)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r25_neisser_challenger_memory_1986",
+     "t": "خاطرهٔ «شنیدنِ خبرِ چلنجر» در دانشجویان ایموری (۱۹۸۶ تا ۱۹۸۸)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r25_abs_ticker_delisting_rumor",
+     "t": "شایعهٔ «حذف از بورس» در کانال معامله‌گران",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   }
@@ -1487,8 +1523,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 147,
-   "fullAfter": 147
+   "fullBefore": 151,
+   "fullAfter": 151
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1497,8 +1533,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 147,
-   "fullAfter": 147
+   "fullBefore": 151,
+   "fullAfter": 151
   },
   "p_found_scope": null
  },
