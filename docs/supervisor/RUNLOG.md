@@ -98,3 +98,14 @@
 - **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار (sha برابر).
 
 ناظرِ خودکار (Claude Code routine)
+
+## 2026-11-01 — کامل
+
+- **کارتابل:** ۰ برگهٔ بی‌پاسخ، ۰ فایل، ۰ نیمه‌کاره، ۰ تیک‌خورده. `whoami` ok (درایو وصل، db_bytes=0). صندوقِ دست‌به‌دستِ general خالی؛ دو کهنهٔ backtest/epi-rules (1409، 7bcc) مالکشان روتینِ backtest است، دست نخورد.
+- **اجرا:** pytest ‏2009 سبز/۱۳۵ skip/۰ قرمز (پس از `npm i` در `apps/learning-architecture`؛ پیش از آن `test_tour1_r11_coach.js` فقط به‌خاطر نبودِ playwright قرمز بود — محیطی) · `npm run build` سبز · inventory: ۴۴ صفحه، ۲۹ زیرصفحه، ۱۸۱ دکمه، ۸۸ ورودی، ۱۵ فرم، ۵۹ لینک، ۱۰۶ API، ۴۳۱ مسیر، ۱۵۸ سرویس، ۶۹ مدل، بدون alarm/error (بی‌تغییر) · page_map ‏۵۳ اندازه‌گیری، ۲ نشد، ۵ رد، ۴٬۰۱۷ کنترل (کنسول/۴۰۴ِ `/auth/me` = OPEN_ITEMS ‏۳). vitest اجرا نشد.
+- **production:** `/api/health` = healthy، `/api/version` = `8fb9da44` = `origin/main`. جز سلامت، نسخه و کارتابل سنجیده نشد.
+- **psy-norms:** `retrieved` = 2026-10-15 (۱۷ روز) ⇒ لازم نبود. **sys-territory:** گامی جلو نرفت.
+- **یافته:** صفر. تغییر کد: هیچ. محیط: playwrightِ pip کرومیومِ ۱۱۹۴ می‌خواست ⇒ symlink موقت + `PLAYWRIGHT_BROWSERS_PATH`.
+- **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار (sha برابر). شکافِ تکراریِ کوچک: نبودِ playwright در `apps/learning-architecture` به‌جای skip، تست را قرمز می‌کند.
+
+ناظرِ خودکار (Claude Code routine)

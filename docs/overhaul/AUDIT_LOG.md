@@ -5018,3 +5018,6 @@ dated stability, mind-card feed) under way.
 
 ## 2026-10-28 — CHANGE: بک‌تستِ پیوسته دورِ ۲۲
 - CHANGE: ۶ مورد تازه (۳ شکستِ واقعی، ۱ سالمِ واقعی، ۲ انتزاعی) + گامِ ۱ قلمروِ هنجارهای معرفتی؛ دو یافتهٔ تازهٔ diagnosed (نبودِ conf در متن، پیشنهادِ `p_qual_conf_high` منتظرِ مالک)؛ جزئیات: apps/learning-architecture/docs/WORKLOG.md (115). epi-decisions به‌خاطر ۴۰۱ ِ Render خوانده نشد.
+
+## 2026-11-01 — FINDING — دورِ ناظرِ عمومی
+بدون یافتهٔ تازه؛ کارتابل خالی، pytest 2009 سبز، build سبز، production = origin/main. تنها نکته: `test_tour1_r11_coach.js` بدونِ `npm i` در `apps/learning-architecture` قرمز می‌شود (محیطی). جزئیات: `docs/supervisor/RUNLOG.md`.
