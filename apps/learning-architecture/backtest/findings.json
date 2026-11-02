@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-31",
- "round": 25,
+ "updated": "2026-11-01",
+ "round": 26,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,8 +25,8 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 25,
-    "freshOk": 14,
+    "fresh": 27,
+    "freshOk": 16,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -79,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 46,
-    "freshOk": 31,
+    "fresh": 49,
+    "freshOk": 33,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -138,8 +138,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 28,
-    "freshOk": 16,
+    "fresh": 30,
+    "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -242,8 +242,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 25,
-    "freshOk": 14,
+    "fresh": 27,
+    "freshOk": 16,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -292,8 +292,8 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 25,
-    "freshOk": 14,
+    "fresh": 27,
+    "freshOk": 16,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 40,
-    "freshOk": 29,
+    "fresh": 44,
+    "freshOk": 32,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -400,8 +400,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 25,
-    "freshOk": 14,
+    "fresh": 27,
+    "freshOk": 16,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -448,8 +448,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 13,
-    "freshOk": 12,
+    "fresh": 17,
+    "freshOk": 15,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1597,7 +1597,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1610,7 +1610,7 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 11,
+    "fresh": 12,
     "freshOk": 5,
     "ids": [
      "r22_nayirah_incubators_1990",
@@ -1623,7 +1623,8 @@
      "r24_katrina_superdome_rumors_2005",
      "r25_tripathi_reddit_boston_2013",
      "r25_flint_lead_sampling_2015",
-     "r25_abs_ticker_delisting_rumor"
+     "r25_abs_ticker_delisting_rumor",
+     "r26_mco_units_1999"
     ]
    },
    "kind": "missed",
@@ -1696,7 +1697,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1709,13 +1710,14 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 4,
+    "fresh": 5,
     "freshOk": 0,
     "ids": [
      "r23_wirecard_trust_accounts_2019",
      "r23_ariane5_501_1996",
      "r24_abs_trader_five_years",
-     "r24_abs_bank_symmetry_rule"
+     "r24_abs_bank_symmetry_rule",
+     "r26_mco_units_1999"
     ]
    },
    "kind": "missed",
@@ -1778,7 +1780,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1816,7 +1818,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1858,7 +1860,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1907,7 +1909,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1939,7 +1941,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -1973,7 +1975,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2022,7 +2024,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2062,7 +2064,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2092,7 +2094,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2126,7 +2128,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2158,7 +2160,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2196,7 +2198,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2224,7 +2226,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2237,9 +2239,12 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 2,
+    "freshOk": 2,
+    "ids": [
+     "r26_ltcm_models_1998",
+     "r26_abs_lender_boom_model"
+    ]
    },
    "kind": "missed",
    "title": "بازرسی سیم‌کشیِ شش واحد از ساختمانِ ۲۴۰ واحدی",
@@ -2342,7 +2347,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 25
+   "lastSeenRound": 26
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2431,6 +2436,119 @@
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
   },
   {
+   "id": "f_r26_abs_lender_boom_model",
+   "case": "r26_abs_lender_boom_model",
+   "opened": "2026-11-01",
+   "openedRound": 26,
+   "status": "resolved",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": {
+    "since": 26,
+    "fresh": 1,
+    "freshOk": 1,
+    "ids": [
+     "r26_ltcm_models_1998"
+    ]
+   },
+   "kind": "missed",
+   "title": "وام‌دهیِ خردِ یک استارتاپ و مدلی که فقط سه سالِ رونق را دیده بود",
+   "tier": "abstract",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 26,
+   "resolved": "2026-11-01",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r26_ltcm_models_1998",
+   "case": "r26_ltcm_models_1998",
+   "opened": "2026-11-01",
+   "openedRound": 26,
+   "status": "resolved",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": {
+    "since": 26,
+    "fresh": 1,
+    "freshOk": 1,
+    "ids": [
+     "r26_abs_lender_boom_model"
+    ]
+   },
+   "kind": "missed",
+   "title": "صندوقِ LTCM و مدلی که بر چند سالِ داده تکیه داشت (۱۹۹۸)",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 26,
+   "resolved": "2026-11-01",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r26_mco_units_1999",
+   "case": "r26_mco_units_1999",
+   "opened": "2026-11-01",
+   "openedRound": 26,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "موتور خطا را گرفت اما در st_aql/st_conflict/st_resp (مقدمهٔ اثبات‌نشدهٔ «یکاها سازگارند»، نشانهٔ ناسازگاریِ نادیده‌گرفته، تحقیقِ ممکنِ انجام‌نشده) نه st_worlds. برچسبِ st_worlds (خلطِ یکا/واژه، s5–s6) را خودِ روتین گذاشته و دقیق‌بودنش محل تردید است: ناسازگاریِ یکا دقیقاً «یک واژه به دو معنا» نیست و حکمِ موتور هم دفاع‌پذیر است. برچسب بی‌تغییر ماند (برای قبول‌شدن دست‌کاری نمی‌شود)؛ در دورِ بعد با وقایعِ تازهٔ همساختار (ناسازگاریِ یکا/قرارداد) سنجیده شود، سپس برچسب یا قاعده با دلیل بازبینی شود.",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "مدارگرد مریخیِ ناسا و یکاهای نیرو (۱۹۹۹)",
+   "tier": "real",
+   "expected": [
+    "st_worlds"
+   ],
+   "flagged": [
+    "st_aql",
+    "st_conflict",
+    "st_resp"
+   ],
+   "rules": [
+    "r_worlds_mix"
+   ],
+   "secs": [
+    "s16",
+    "s19",
+    "s22"
+   ],
+   "lastSeenRound": 26
+  },
+  {
    "id": "f_r2_nyt_goddard_1920",
    "case": "r2_nyt_goddard_1920",
    "opened": "2026-10-13",
@@ -2444,8 +2562,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 25,
-    "freshOk": 18,
+    "fresh": 29,
+    "freshOk": 21,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -2551,8 +2669,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 22,
-    "freshOk": 11,
+    "fresh": 24,
+    "freshOk": 13,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
@@ -2606,8 +2724,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 22,
-    "freshOk": 11,
+    "fresh": 24,
+    "freshOk": 13,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",

@@ -1,0 +1,42 @@
+{
+ "round": 26,
+ "reviewer": "زیرعاملِ جدا",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "problems": [
+  {
+   "what": "داستانِ MCO یکای پوند‌نیرو/نیوتون را لو می‌داد و ارتفاعِ ۱۵۰ کیلومتر نادرست بود (طرح ≈ ۲۲۶).",
+   "fix": "جملهٔ یکا حذف و ارتفاع اصلاح شد؛ ویژگی‌های رمزگذاری‌شده بی‌تغییر.",
+   "fixed": true
+  },
+  {
+   "what": "اسنو: مقایسهٔ شرکت‌های آب پیش از ۷ سپتامبر جا افتاده بود (۱۸۴۹ بود).",
+   "fix": "اصلاح شد.",
+   "fixed": true
+  },
+  {
+   "what": "LTCM: «به سرمایه‌گذاران گفتند» تأییدپذیر نبود؛ رقم و تاریخِ بازسازی.",
+   "fix": "اصلاح شد.",
+   "fixed": true
+  },
+  {
+   "what": "URL پی‌دی‌اف NASA بازنشد.",
+   "fix": "با پیوندِ ویکی‌پدیا جایگزین شد.",
+   "fixed": true
+  },
+  {
+   "what": "شمارهٔ بخش‌های جزوه وارسی نشد؛ قلمرو/قاب/مسیر۱ این دور انجام نشد.",
+   "fix": "دورِ بعد.",
+   "fixed": true
+  }
+ ],
+ "note": "سه واقعهٔ واقعی تأیید شد. دورِ کم‌حجم: قاب، مسیر ۱ و گامِ قلمرو انجام نشد (مواردِ n/a در checked)."
+}
