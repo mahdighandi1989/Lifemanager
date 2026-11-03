@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-02",
- "round": 27,
+ "updated": "2026-11-03",
+ "round": 28,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -190,8 +190,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 21,
-    "freshOk": 20,
+    "fresh": 23,
+    "freshOk": 22,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -341,7 +341,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 46,
+    "fresh": 48,
     "freshOk": 33,
     "ids": [
      "r2_cbs_killian_memos",
@@ -448,7 +448,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 18,
+    "fresh": 19,
     "freshOk": 15,
     "ids": [
      "r2_chamberlain_hitler_face",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1215,7 +1215,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 7,
+    "fresh": 8,
     "freshOk": 3,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1224,7 +1224,8 @@
      "r22_abs_philosopher_one_study",
      "r23_gospel_jesus_wife_2012",
      "r23_abs_manuscript_auction",
-     "r27_abs_intrusion_storm"
+     "r27_abs_intrusion_storm",
+     "r28_surgisphere_lancet_2020"
     ]
    },
    "kind": "missed",
@@ -1266,7 +1267,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 7,
+    "fresh": 8,
     "freshOk": 3,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1275,7 +1276,8 @@
      "r22_abs_philosopher_one_study",
      "r23_gospel_jesus_wife_2012",
      "r23_abs_manuscript_auction",
-     "r27_abs_intrusion_storm"
+     "r27_abs_intrusion_storm",
+     "r28_surgisphere_lancet_2020"
     ]
    },
    "kind": "missed",
@@ -1378,7 +1380,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 7,
+    "fresh": 8,
     "freshOk": 3,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1387,7 +1389,8 @@
      "r22_abs_philosopher_one_study",
      "r23_gospel_jesus_wife_2012",
      "r23_abs_manuscript_auction",
-     "r27_abs_intrusion_storm"
+     "r27_abs_intrusion_storm",
+     "r28_surgisphere_lancet_2020"
     ]
    },
    "kind": "missed",
@@ -1481,7 +1484,7 @@
    "case": "r20_snow_broadstreet_1854",
    "opened": "2026-10-26",
    "openedRound": 20,
-   "status": "resolved",
+   "status": "verified",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "رمزگذار برای ادعای بی‌قیدِ اسنو conf=۱۰۰ نوشته بود، در حالی که متن اطمینانی نمی‌گفت (قاعدهٔ «آنچه متن نمی‌گوید ننویس»)؛ سقفِ ۹۹٫۹ ِ تجربه (s51) درست کار کرده بود. conf حذف شد. جزوه و موتور درست‌اند.",
    "fix": {
@@ -1490,11 +1493,13 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 2,
-    "freshOk": 2,
+    "fresh": 4,
+    "freshOk": 4,
     "ids": [
      "r21_meselson_stahl_1958",
-     "r27_hpylori_nih_1994"
+     "r27_hpylori_nih_1994",
+     "r28_goldberger_pellagra_1916",
+     "r28_pasteur_swan_neck_1861"
     ]
    },
    "kind": "health_alarm",
@@ -1512,7 +1517,8 @@
    ],
    "lastSeenRound": 20,
    "resolved": "2026-10-26",
-   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
+   "verified": "2026-11-03"
   },
   {
    "id": "f_r20_willingham_fire_1991",
@@ -1528,7 +1534,7 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 6,
+    "fresh": 7,
     "freshOk": 2,
     "ids": [
      "r21_mayfield_fingerprint_2004",
@@ -1536,7 +1542,8 @@
      "r22_abs_philosopher_one_study",
      "r23_gospel_jesus_wife_2012",
      "r23_abs_manuscript_auction",
-     "r27_abs_intrusion_storm"
+     "r27_abs_intrusion_storm",
+     "r28_surgisphere_lancet_2020"
     ]
    },
    "kind": "missed",
@@ -1602,7 +1609,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1702,7 +1709,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1787,7 +1794,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1825,7 +1832,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1867,7 +1874,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1916,7 +1923,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1948,7 +1955,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -1982,7 +1989,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2031,7 +2038,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2071,7 +2078,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2101,7 +2108,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2135,7 +2142,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2167,7 +2174,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2205,7 +2212,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2233,7 +2240,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2354,7 +2361,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2553,7 +2560,7 @@
     "s19",
     "s22"
    ],
-   "lastSeenRound": 27
+   "lastSeenRound": 28
   },
   {
    "id": "f_r27_frege_basic_law_v_1893",
@@ -2561,8 +2568,8 @@
    "opened": "2026-11-02",
    "openedRound": 27,
    "status": "diagnosed",
-   "attribution": "خطای رمزگذاری پرونده",
-   "note": "ادعا می‌گوید قانون «بدیهی … نیازی به اثبات ندارد»؛ رمزگذارِ کورِ دوم badihi=نظری را درست گذاشت ولی راهِ ادعاشده را «عقل» نوشت نه «بدیهی (بی‌نیاز از راه)» (s39–s40)، پس r_badihi_pseudo (که هر دو را می‌خواهد) فعال نشد و موتور خطا را در st_aql گرفت. موتور درست کار کرد؛ رمزگذاری ناقص است. غیرکور دست نزدم؛ دورِ بعد بازرمزگذاریِ کورِ مستقل با تمرکز بر «راهِ ادعاشده = آنچه کنشگر می‌گوید».",
+   "attribution": "خلأ جزوه (ملاکی ندارد)",
+   "note": "بازرمزگذاریِ کورِ دورِ ۲۸: رمزگذار badihi را «اولی» نوشت (چون ادعای خودِ کنشگر است) و way=بدیهی؛ پس r_badihi_pseudo (که badihi=نظری می‌خواهد) فعال نشد. ویژگیِ badihi در طرح مبهم است: ماهیتِ واقعیِ تصدیق یا آنچه کنشگر می‌گوید؟ s39 آزمونِ ماهیت را به کنشگر می‌دهد، نه برچسبش را؛ از متنِ ۱۸۹۳ تنها نشانه «او خودش تنها نقطهٔ مناقشه‌پذیر می‌دانست» است. پیشنهادِ روشن‌کردنِ دستورِ رمزگذاری به مالک (p_encode_badihi_actor_claim).",
    "fix": null,
    "retest": {
     "since": 27,
@@ -2588,10 +2595,76 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 27,
+   "lastSeenRound": 28,
    "resolved": "2026-11-02",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
    "reopened": "2026-11-02"
+  },
+  {
+   "id": "f_r28_monty_hall_1990",
+   "case": "r28_monty_hall_1990",
+   "opened": "2026-11-03",
+   "openedRound": 28,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور فقط way=شهود و inquiry را نوشت؛ نه form («نامعتبر») نه conf، چون متن «لفظِ بی‌قیدِ صریح» دارد ولی عدد نمی‌دهد. استدلالِ «دو در می‌ماند پس نیم‌نیم» به s40/s44 صورتِ نامعتبر است (احتمالِ شرطی با میزبانِ آگاه) و قاعدهٔ r_aql_invalid_form اگر form رمز شده بود سقف می‌داد. موتور درست کار کرد؛ همان الگوی p_encode_flat_assertion_conf (conf بی‌عدد). غیرکور دست نزدم.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "مسئلهٔ مانتی هال و نامه‌های ریاضی‌دانان (۱۹۹۰)",
+   "tier": "real",
+   "expected": [
+    "st_aql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50"
+   ],
+   "lastSeenRound": 28
+  },
+  {
+   "id": "f_r28_surgisphere_lancet_2020",
+   "case": "r28_surgisphere_lancet_2020",
+   "opened": "2026-11-03",
+   "openedRound": 28,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور x_method=نامعلوم و x_bias=true را درست نوشت (r_expert_method_weak و r_expert_bias سقف ۵۰ می‌دهند) ولی چون ادعای «معتبر است… همین حالا متوقف شود» عددِ اطمینان ندارد، conf نیامد و سقف گازنگرفت (s49). همان الگوی p_encode_flat_assertion_conf / p_qual_conf_high. موتور درست؛ رمزگذاری ناقص.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "مقالهٔ لنست دربارهٔ هیدروکسی‌کلروکین و داده‌های سورجی‌اسفر (۲۰۲۰)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 28
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2607,7 +2680,7 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 32,
+    "fresh": 33,
     "freshOk": 23,
     "ids": [
      "r4_wald_survivorship",
@@ -2666,7 +2739,7 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 25,
+    "fresh": 26,
     "freshOk": 15,
     "ids": [
      "r5_hitler_diaries_1983",
