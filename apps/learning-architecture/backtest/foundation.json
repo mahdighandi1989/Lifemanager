@@ -1,6 +1,6 @@
 {
- "round": 26,
- "at": "2026-11-01",
+ "round": 27,
+ "at": "2026-11-02",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 267,
+    "ok": 271,
     "health_alarm": 0,
     "missed": 22,
-    "mislocated": 8
+    "mislocated": 9
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 251,
+    "ok": 254,
     "health_alarm": 0,
-    "missed": 33,
-    "mislocated": 13
+    "missed": 34,
+    "mislocated": 14
    },
    "changed": [
     {
@@ -1244,6 +1244,12 @@
     {
      "id": "r25_abs_ticker_delisting_rumor",
      "t": "شایعهٔ «حذف از بورس» در کانال معامله‌گران",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r27_bloodsworth_1985",
+     "t": "کرک بلادزورث و شاهدانِ عینی (بالتیمور، ۱۹۸۵)",
      "from": "ok",
      "to": "missed"
     }
@@ -1251,19 +1257,19 @@
   },
   "derived": {
    "kinds": {
-    "ok": 267,
+    "ok": 271,
     "health_alarm": 0,
     "missed": 22,
-    "mislocated": 8
+    "mislocated": 9
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 251,
+    "ok": 254,
     "health_alarm": 0,
-    "missed": 33,
-    "mislocated": 13
+    "missed": 34,
+    "mislocated": 14
    },
    "changed": [
     {
@@ -1359,6 +1365,12 @@
     {
      "id": "r25_abs_ticker_delisting_rumor",
      "t": "شایعهٔ «حذف از بورس» در کانال معامله‌گران",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r27_bloodsworth_1985",
+     "t": "کرک بلادزورث و شاهدانِ عینی (بالتیمور، ۱۹۸۵)",
      "from": "ok",
      "to": "missed"
     }
@@ -1523,8 +1535,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 153,
-   "fullAfter": 153
+   "fullBefore": 156,
+   "fullAfter": 156
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1533,8 +1545,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 153,
-   "fullAfter": 153
+   "fullBefore": 156,
+   "fullAfter": 156
   },
   "p_found_scope": null
  },
