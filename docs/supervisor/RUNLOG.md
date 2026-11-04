@@ -109,3 +109,14 @@
 - **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار (sha برابر). شکافِ تکراریِ کوچک: نبودِ playwright در `apps/learning-architecture` به‌جای skip، تست را قرمز می‌کند.
 
 ناظرِ خودکار (Claude Code routine)
+
+## 2026-11-04 — کامل
+
+- **کارتابل:** ۰ برگهٔ بی‌پاسخ، ۰ فایل، ۰ نیمه‌کاره، ۰ تیک‌خورده. `whoami` ok (درایو وصل، db_bytes=0). صندوقِ دست‌به‌دستِ general خالی؛ دو کهنهٔ backtest/epi-rules (1409، 7bcc) مالکشان روتینِ backtest است و دست نخورد.
+- **اجرا:** pytest ‏2009 سبز/۱۳۵ skip/۰ قرمز (پس از `npm i` در `apps/learning-architecture`؛ پیش از آن `test_tour1_r11_coach.js` فقط به‌خاطر نبودِ playwright قرمز بود — محیطی) · `npm run build` سبز. inventory/page_map در این دور بازتولید نشد (بدونِ تغییرِ کد از دورِ قبل جز دورهای backtest).
+- **production:** `/api/health` = healthy، `/api/version` = `b5927d62` = `origin/main`. جز سلامت، نسخه و کارتابل سنجیده نشد.
+- **psy-norms:** `retrieved` = 2026-10-15 (۲۰ روز) ⇒ لازم نبود. **sys-territory:** گامی جلو نرفت.
+- **یافته:** صفر. تغییر کد: هیچ.
+- **فلسفه:** دیپلویِ زنده = آخرین main ⇒ برقرار. شکافِ تکراری: نبودِ playwright در `apps/learning-architecture` تست را قرمز می‌کند نه skip.
+
+ناظرِ خودکار (Claude Code routine)
