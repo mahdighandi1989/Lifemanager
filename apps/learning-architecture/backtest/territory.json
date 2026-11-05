@@ -1661,12 +1661,14 @@
    ],
    "verify": {
     "since": 13,
-    "fresh": 3,
+    "fresh": 5,
     "ok": 2,
     "ids": [
      "r14_kahneman_flight_instructors",
      "r17_dewey_1948",
-     "r17_therac25_1986"
+     "r17_therac25_1986",
+     "r29_wakefield_lancet_1998",
+     "r29_abs_pilot_supplier"
     ]
    }
   },
@@ -3055,6 +3057,6 @@
    "bookOnly": true
   }
  },
- "round": 28,
- "updated": "2026-11-03"
+ "round": 29,
+ "updated": "2026-11-04"
 }

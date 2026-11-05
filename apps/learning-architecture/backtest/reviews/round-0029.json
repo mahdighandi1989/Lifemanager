@@ -1,0 +1,42 @@
+{
+ "round": 29,
+ "reviewer": "زیرعاملِ جدا (با وب)",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "problems": [
+  {
+   "what": "داستان‌ها خودِ نقص (نبودِ گروهِ مقایسه، گزینش) را لو می‌دادند",
+   "fix": "از هر دو داستان برداشته شد؛ ویژگی‌های رمزگذاری بی‌تغییر",
+   "fixed": true
+  },
+  {
+   "what": "«هیچ مطالعهٔ دیگری» مطلق بود؛ ادعای k1 قوی‌تر از مقاله",
+   "fix": "نرم شد؛ در actor صریح شد که برداشتِ خودِ پزشک است",
+   "fixed": true
+  },
+  {
+   "what": "scope/stakes انتزاعی با واقعی ناهم‌تراز",
+   "fix": "هم‌تراز شد",
+   "fixed": true
+  },
+  {
+   "what": "یادداشتِ یافته‌ها یکسان/کلیشه‌ای",
+   "fix": "جدا و دقیق شد؛ شاهدِ سوم برای p_encode_flat_assertion_conf",
+   "fixed": true
+  },
+  {
+   "what": "پیوندهای BMJ c696 و NEJM DOI بازگشایی نشد",
+   "fix": "در این اجرا وارسی نشد",
+   "fixed": false
+  }
+ ],
+ "note": "این دور قلمرو و مسیرِ ۱ را نداشت (کم‌حجم)."
+}
