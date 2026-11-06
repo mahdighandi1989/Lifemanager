@@ -1,0 +1,27 @@
+{
+ "round": 30,
+ "reviewer": "زیرعاملِ جدا (با وب)",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "problems": [
+  {
+   "what": "پیوندِ NHM (۴۰۴)",
+   "fix": "با نشانیِ درست جایگزین و بازگشایی شد",
+   "fixed": true
+  },
+  {
+   "what": "جزئیاتِ رنگ‌آمیزیِ مصنوعی در why نبود",
+   "fix": "افزوده شد",
+   "fixed": true
+  }
+ ],
+ "note": "دورِ کم‌حجم: یک واقعه + یک گامِ قلمرو؛ مسیرِ ۱ (قاب) انجام نشد."
+}

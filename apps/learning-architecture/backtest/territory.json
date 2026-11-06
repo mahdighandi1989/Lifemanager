@@ -444,8 +444,20 @@
    "history": []
   },
   "a_fallibilism": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 30,
+     "at": "2026-11-05",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای حوزهٔ «خطاپذیری‌گرایی» (دور ۳۰)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Internet Encyclopedia of Philosophy, «Fallibilism» (§3 صورت‌بندی F، §9 فرضِ دانشِ خطاپذیر، §8–10 نسبت با شکاکیت) — https://iep.utm.edu/fallibil/",
+    "Stanford Encyclopedia of Philosophy, «Certainty» (Baron Reed؛ §2.2 دانشِ خطاپذیر و یقین، §2.3–2.4 یقین و توجیه) — https://plato.stanford.edu/entries/certainty/"
+   ]
   },
   "a_knowledge_first": {
    "stage": 0,
@@ -3057,6 +3069,6 @@
    "bookOnly": true
   }
  },
- "round": 29,
- "updated": "2026-11-04"
+ "round": 30,
+ "updated": "2026-11-05"
 }
