@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-06",
- "round": 31,
+ "updated": "2026-11-07",
+ "round": 32,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -341,7 +341,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 53,
+    "fresh": 55,
     "freshOk": 34,
     "ids": [
      "r2_cbs_killian_memos",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1215,7 +1215,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 10,
+    "fresh": 12,
     "freshOk": 4,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1227,7 +1227,9 @@
      "r27_abs_intrusion_storm",
      "r28_surgisphere_lancet_2020",
      "r31_dreyfus_bordereau_1894",
-     "r31_bre_x_busang_1996"
+     "r31_bre_x_busang_1996",
+     "r32_hitler_diaries_1983",
+     "r32_madoff_trackrecord_2005"
     ]
    },
    "kind": "missed",
@@ -1269,7 +1271,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 10,
+    "fresh": 12,
     "freshOk": 4,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1281,7 +1283,9 @@
      "r27_abs_intrusion_storm",
      "r28_surgisphere_lancet_2020",
      "r31_dreyfus_bordereau_1894",
-     "r31_bre_x_busang_1996"
+     "r31_bre_x_busang_1996",
+     "r32_hitler_diaries_1983",
+     "r32_madoff_trackrecord_2005"
     ]
    },
    "kind": "missed",
@@ -1384,7 +1388,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 10,
+    "fresh": 12,
     "freshOk": 4,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1396,7 +1400,9 @@
      "r27_abs_intrusion_storm",
      "r28_surgisphere_lancet_2020",
      "r31_dreyfus_bordereau_1894",
-     "r31_bre_x_busang_1996"
+     "r31_bre_x_busang_1996",
+     "r32_hitler_diaries_1983",
+     "r32_madoff_trackrecord_2005"
     ]
    },
    "kind": "missed",
@@ -1540,7 +1546,7 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 9,
+    "fresh": 11,
     "freshOk": 3,
     "ids": [
      "r21_mayfield_fingerprint_2004",
@@ -1551,7 +1557,9 @@
      "r27_abs_intrusion_storm",
      "r28_surgisphere_lancet_2020",
      "r31_dreyfus_bordereau_1894",
-     "r31_bre_x_busang_1996"
+     "r31_bre_x_busang_1996",
+     "r32_hitler_diaries_1983",
+     "r32_madoff_trackrecord_2005"
     ]
    },
    "kind": "missed",
@@ -1617,7 +1625,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1717,7 +1725,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1802,7 +1810,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1840,7 +1848,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1882,7 +1890,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1931,7 +1939,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1963,7 +1971,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -1997,7 +2005,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2046,7 +2054,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2086,7 +2094,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2116,7 +2124,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2150,7 +2158,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2182,7 +2190,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2220,7 +2228,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2248,7 +2256,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2373,7 +2381,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2578,7 +2586,7 @@
     "s19",
     "s22"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r27_frege_basic_law_v_1893",
@@ -2613,7 +2621,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 31,
+   "lastSeenRound": 32,
    "resolved": "2026-11-02",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
    "reopened": "2026-11-02"
@@ -2649,7 +2657,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r28_surgisphere_lancet_2020",
@@ -2682,7 +2690,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r29_abs_pilot_supplier",
@@ -2714,7 +2722,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r29_wakefield_lancet_1998",
@@ -2746,7 +2754,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2841,7 +2849,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r31_bre_x_busang_1996",
@@ -2874,7 +2882,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 31
+   "lastSeenRound": 32
   },
   {
    "id": "f_r31_dreyfus_bordereau_1894",
@@ -2890,9 +2898,12 @@
    },
    "retest": {
     "since": 31,
-    "fresh": 0,
+    "fresh": 2,
     "freshOk": 0,
-    "ids": []
+    "ids": [
+     "r32_hitler_diaries_1983",
+     "r32_madoff_trackrecord_2005"
+    ]
    },
    "kind": "mislocated",
    "title": "بوردرو و محاکمهٔ دریفوس: «خطِ او همان است» (۱۸۹۴)",
@@ -2923,6 +2934,74 @@
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
   },
   {
+   "id": "f_r32_hitler_diaries_1983",
+   "case": "r32_hitler_diaries_1983",
+   "opened": "2026-11-07",
+   "openedRound": 32,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "متنِ تصدیق («واقعاً نوشتهٔ هیتلرند») درجهٔ اطمینانِ عددی نمی‌گوید و رمزگذارِ کور درست conf ننوشت ⇒ سقف‌های r_expert_method_weak/out_of_field (s49) که با conf فعال می‌شوند اجرا نشد؛ x_method=ضعیف و x_comp=خارج از تخصص درست رمزگذاری شده بودند. ششمین شاهد برای p_encode_flat_assertion_conf؛ برچسب/قاعده دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "«دفترچه‌های هیتلر» و داوریِ مورخان (۱۹۸۳)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 32
+  },
+  {
+   "id": "f_r32_madoff_trackrecord_2005",
+   "case": "r32_madoff_trackrecord_2005",
+   "opened": "2026-11-07",
+   "openedRound": 32,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور راهِ تصدیق را «استقراء» (تکیه بر سابقهٔ بازدهی) و تعارضِ منفعت را bg_undue نوشت، نه x_bias/x_comp؛ موتور st_background را گرفت که با s49/s50 (تعارضِ منافع) همخوان است، ولی ایستگاهِ برچسب st_expert بود. برچسبِ من (روتین) مبهم بود: تصدیق هم به اعتبارِ شخص و هم به استقراءِ سابقه تکیه دارد. برای آبروی آزمون چیزی دست نخورد؛ حکم موتور (نادرست‌شمردنِ تصدیق) درست است و فقط جای ایستگاه فرق دارد.",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "مدیر صندوقِ سرمایه‌گذاری و بازدهِ همواره‌منظمِ مدوف (۲۰۰۵)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [
+    "st_background"
+   ],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 32
+  },
+  {
    "id": "f_r4_redfield_arsenic",
    "case": "r4_redfield_arsenic",
    "opened": "2026-10-14",
@@ -2933,7 +3012,7 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 28,
+    "fresh": 30,
     "freshOk": 16,
     "ids": [
      "r5_hitler_diaries_1983",

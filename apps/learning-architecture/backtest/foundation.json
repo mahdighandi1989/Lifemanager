@@ -1,6 +1,6 @@
 {
- "round": 31,
- "at": "2026-11-06",
+ "round": 32,
+ "at": "2026-11-07",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1138,8 +1138,8 @@
    "kinds": {
     "ok": 277,
     "health_alarm": 0,
-    "missed": 28,
-    "mislocated": 9
+    "missed": 29,
+    "mislocated": 10
    },
    "changed": []
   },
@@ -1147,8 +1147,8 @@
    "kinds": {
     "ok": 260,
     "health_alarm": 0,
-    "missed": 40,
-    "mislocated": 14
+    "missed": 41,
+    "mislocated": 15
    },
    "changed": [
     {
@@ -1259,8 +1259,8 @@
    "kinds": {
     "ok": 277,
     "health_alarm": 0,
-    "missed": 28,
-    "mislocated": 9
+    "missed": 29,
+    "mislocated": 10
    },
    "changed": []
   },
@@ -1268,8 +1268,8 @@
    "kinds": {
     "ok": 260,
     "health_alarm": 0,
-    "missed": 40,
-    "mislocated": 14
+    "missed": 41,
+    "mislocated": 15
    },
    "changed": [
     {
