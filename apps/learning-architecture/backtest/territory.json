@@ -442,8 +442,20 @@
    }
   },
   "a_modal_anti_luck": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 34,
+     "at": "2026-11-08",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای حوزهٔ «شرایط موجهاتی و ضدِبخت»",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «The Analysis of Knowledge» — §5 Modal Conditions (5.1 Sensitivity, 5.2 Safety, 5.3 Relevant Alternatives) و §8 Epistemic Luck — https://plato.stanford.edu/entries/knowledge-analysis/",
+    "Stanford Encyclopedia of Philosophy, «Epistemology» — §2.3 Knowing Facts (دانش به عنصری نیاز دارد که بخت را کنار بگذارد) — https://plato.stanford.edu/entries/epistemology/"
+   ]
   },
   "a_fallibilism": {
    "stage": 3,
@@ -3111,6 +3123,6 @@
    "bookOnly": true
   }
  },
- "round": 32,
- "updated": "2026-11-07"
+ "round": 33,
+ "updated": "2026-11-08"
 }

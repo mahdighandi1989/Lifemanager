@@ -5064,6 +5064,180 @@
     "staleFindings": [],
     "alarms": []
    }
+  },
+  {
+   "round": 33,
+   "at": "2026-11-08",
+   "note": "دورِ ۳۳ (پس از بازبینی): برینگر، لیند؛ کانت excluded",
+   "corpus": {
+    "n": 318,
+    "tiers": {
+     "real": 207,
+     "booklet": 51,
+     "problem": 26,
+     "abstract": 34
+    },
+    "new": 2,
+    "files": 23
+   },
+   "books": {
+    "mesbah": {
+     "n": 318,
+     "sound": 100,
+     "healthAlarms": 0,
+     "failures": 218,
+     "detected": 188,
+     "located": 178,
+     "fullyLocated": 159,
+     "controls": {
+      "agree": 0.834,
+      "negAgree": 0.266,
+      "negOk": true,
+      "posDetect": 1,
+      "posOk": true
+     }
+    }
+   },
+   "findings": {
+    "open": 41,
+    "fixed": 13,
+    "resolved": 16,
+    "verified": 5
+   },
+   "coverage": {
+    "rulesTested": 57,
+    "rules": 80,
+    "sectionsTested": 54,
+    "sections": 72,
+    "domains": 12,
+    "untested": [
+     "r_truth_narrow",
+     "r_badihi_pseudo",
+     "r_badihi_wijdani_other",
+     "r_shohud_misrouted",
+     "r_naql_unreliable_corrob",
+     "r_naql_mubham_q",
+     "r_istiqra_small_n",
+     "r_yad_orig_t1",
+     "r_yad_orig_t2",
+     "r_yad_orig_t3",
+     "r_yad_orig_t4",
+     "r_yad_orig_t5",
+     "r_yad_undoc_t4",
+     "r_yad_undoc_t3",
+     "r_yad_undoc_t2",
+     "r_yad_undoc_t1",
+     "r_grade_false_zero",
+     "r_r_sanad_ahad",
+     "r_expert_pop_econ",
+     "r_expert_pop_psych",
+     "r_expert_pop_socsci",
+     "r_expert_pop_unknown",
+     "r_aql_conseq"
+    ],
+    "byDomain": {
+     "پزشکی": 37,
+     "علم": 31,
+     "ریاضی": 30,
+     "فناوری و مهندسی": 26,
+     "زندگی روزمره": 25,
+     "دین": 23,
+     "فلسفه": 24,
+     "تاریخ و سیاست": 25,
+     "مالی و بانکی": 25,
+     "بازار و معامله": 23,
+     "حقوق و قضا": 25,
+     "رسانه و خبر": 24
+    }
+   },
+   "brier": {
+    "claims": 233,
+    "ceil": 0.29731
+   },
+   "foundation": {
+    "classes": {
+     "B": 25,
+     "S": 20,
+     "O": 8,
+     "X": 0,
+     "?": 0
+    },
+    "modes": {
+     "num": {
+      "ok": 278,
+      "health_alarm": 0,
+      "missed": 30,
+      "mislocated": 10,
+      "changed": 0
+     },
+     "deg": {
+      "ok": 261,
+      "health_alarm": 0,
+      "missed": 42,
+      "mislocated": 15,
+      "changed": 17
+     },
+     "derived": {
+      "ok": 278,
+      "health_alarm": 0,
+      "missed": 30,
+      "mislocated": 10,
+      "changed": 0
+     },
+     "both": {
+      "ok": 261,
+      "health_alarm": 0,
+      "missed": 42,
+      "mislocated": 15,
+      "changed": 17
+     }
+    },
+    "baseMeasured": 3,
+    "baseTotal": 11,
+    "baseval": {
+     "p_thiqa": 99.9,
+     "p_zahir": 99.9,
+     "p_mubham_q": 99.9,
+     "p_sense_unctrl": 74.95,
+     "p_hidden_inf": 74.95,
+     "p_expert_bias": 50,
+     "p_hidden_factor": 74.95,
+     "p_expert_econ_lab": 60,
+     "p_expert_psych08": 36.4,
+     "p_expert_socsci_ns": 60.9,
+     "p_mem": 50
+    },
+    "samples": 3,
+    "conventional": 0,
+    "audit": 0,
+    "baseChanges": []
+   },
+   "territory": {
+    "areas": 108,
+    "groups": 14,
+    "byStage": [
+     64,
+     7,
+     0,
+     2,
+     35,
+     0
+    ],
+    "bookOnly": 33,
+    "score": 153,
+    "scoreBookOnly": 132,
+    "scoreEvidenced": 21,
+    "max": 540,
+    "moved": []
+   },
+   "routine": {
+    "newEvents": 2,
+    "newSamples": 0,
+    "staleFindings": [],
+    "alarms": [
+     "در این دور هیچ حوزه‌ای از نقشهٔ قلمرو یک گام جلو نرفت"
+    ]
+   }
   }
  ]
 }
