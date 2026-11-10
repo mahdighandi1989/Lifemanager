@@ -1,6 +1,6 @@
 {
- "round": 33,
- "at": "2026-11-08",
+ "round": 34,
+ "at": "2026-11-09",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,18 +1136,18 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 278,
+    "ok": 280,
     "health_alarm": 0,
-    "missed": 30,
+    "missed": 31,
     "mislocated": 10
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 261,
+    "ok": 263,
     "health_alarm": 0,
-    "missed": 42,
+    "missed": 43,
     "mislocated": 15
    },
    "changed": [
@@ -1257,18 +1257,18 @@
   },
   "derived": {
    "kinds": {
-    "ok": 278,
+    "ok": 280,
     "health_alarm": 0,
-    "missed": 30,
+    "missed": 31,
     "mislocated": 10
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 261,
+    "ok": 263,
     "health_alarm": 0,
-    "missed": 42,
+    "missed": 43,
     "mislocated": 15
    },
    "changed": [
@@ -1535,8 +1535,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 159,
-   "fullAfter": 159
+   "fullBefore": 160,
+   "fullAfter": 160
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1545,8 +1545,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 159,
-   "fullAfter": 159
+   "fullBefore": 160,
+   "fullAfter": 160
   },
   "p_found_scope": null
  },

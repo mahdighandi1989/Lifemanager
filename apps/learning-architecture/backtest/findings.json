@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-08",
- "round": 33,
+ "updated": "2026-11-09",
+ "round": 34,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -79,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 53,
-    "freshOk": 35,
+    "fresh": 55,
+    "freshOk": 36,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -190,8 +190,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 26,
-    "freshOk": 23,
+    "fresh": 27,
+    "freshOk": 24,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,8 +1154,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 15,
-    "freshOk": 7,
+    "fresh": 16,
+    "freshOk": 8,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1327,8 +1327,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 15,
-    "freshOk": 7,
+    "fresh": 16,
+    "freshOk": 8,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1444,8 +1444,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 15,
-    "freshOk": 7,
+    "fresh": 16,
+    "freshOk": 8,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1505,14 +1505,15 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 5,
-    "freshOk": 5,
+    "fresh": 6,
+    "freshOk": 6,
     "ids": [
      "r21_meselson_stahl_1958",
      "r27_hpylori_nih_1994",
      "r28_goldberger_pellagra_1916",
      "r28_pasteur_swan_neck_1861",
-     "r33_lind_scurvy_trial_1747"
+     "r33_lind_scurvy_trial_1747",
+     "r34_snow_broad_street_1854"
     ]
    },
    "kind": "health_alarm",
@@ -1626,7 +1627,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1639,8 +1640,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 16,
-    "freshOk": 8,
+    "fresh": 17,
+    "freshOk": 9,
     "ids": [
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
@@ -1726,7 +1727,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1739,8 +1740,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 7,
-    "freshOk": 2,
+    "fresh": 9,
+    "freshOk": 3,
     "ids": [
      "r23_wirecard_trust_accounts_2019",
      "r23_ariane5_501_1996",
@@ -1748,7 +1749,9 @@
      "r24_abs_bank_symmetry_rule",
      "r26_mco_units_1999",
      "r27_tonkin_aug4_1964",
-     "r27_abs_intrusion_storm"
+     "r27_abs_intrusion_storm",
+     "r34_chicago_tribune_election_1948",
+     "r34_wire_buyout_abstract"
     ]
    },
    "kind": "missed",
@@ -1811,7 +1814,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1849,7 +1852,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1891,7 +1894,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1940,7 +1943,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1972,7 +1975,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -2006,7 +2009,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2055,7 +2058,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2095,7 +2098,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2125,7 +2128,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2159,7 +2162,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2191,7 +2194,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2229,7 +2232,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2257,7 +2260,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2314,10 +2317,11 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 1,
-    "freshOk": 0,
+    "fresh": 2,
+    "freshOk": 1,
     "ids": [
-     "r31_bre_x_busang_1996"
+     "r31_bre_x_busang_1996",
+     "r34_wire_buyout_abstract"
     ]
    },
    "kind": "missed",
@@ -2382,7 +2386,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2436,10 +2440,11 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 1,
-    "freshOk": 0,
+    "fresh": 2,
+    "freshOk": 1,
     "ids": [
-     "r31_bre_x_busang_1996"
+     "r31_bre_x_busang_1996",
+     "r34_wire_buyout_abstract"
     ]
    },
    "kind": "missed",
@@ -2587,7 +2592,7 @@
     "s19",
     "s22"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r27_frege_basic_law_v_1893",
@@ -2622,7 +2627,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 33,
+   "lastSeenRound": 34,
    "resolved": "2026-11-02",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
    "reopened": "2026-11-02"
@@ -2658,7 +2663,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r28_surgisphere_lancet_2020",
@@ -2691,7 +2696,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r29_abs_pilot_supplier",
@@ -2723,7 +2728,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r29_wakefield_lancet_1998",
@@ -2755,7 +2760,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2771,8 +2776,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 36,
-    "freshOk": 23,
+    "fresh": 38,
+    "freshOk": 24,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -2850,7 +2855,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r31_bre_x_busang_1996",
@@ -2883,7 +2888,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r31_dreyfus_bordereau_1894",
@@ -2965,7 +2970,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r32_madoff_trackrecord_2005",
@@ -3000,7 +3005,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r33_beringer_lying_stones_1725",
@@ -3028,7 +3033,7 @@
     "s43",
     "s46"
    ],
-   "lastSeenRound": 33
+   "lastSeenRound": 34
   },
   {
    "id": "f_r33_kant_euclid_apodictic_1781",
@@ -3057,6 +3062,34 @@
     "s40"
    ],
    "lastSeenRound": 33
+  },
+  {
+   "id": "f_r34_chicago_tribune_election_1948",
+   "case": "r34_chicago_tribune_election_1948",
+   "opened": "2026-11-09",
+   "openedRound": 34,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "قاعدهٔ r_resp_inquiry (s80,s86) به stakes=«زیاد» نیاز دارد؛ داستانِ پرونده صریحاً «بهای خطا بالا» نمی‌گفت (فقط «هر دو هزینه داشت») و رمزگذارِ کور درست stakes را ننوشت. موتور عیبی ندارد؛ پروندهٔ ناقصِ نوشتهٔ روتین است. اصلاحِ ناکور نشد؛ دورِ بعد با داستانِ اصلاح‌شده و رمزگذاریِ مستقلِ دوم بازآزمایی شود.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "سرتیتر روزنامه شبِ انتخابات ریاست‌جمهوری آمریکا ۱۹۴۸",
+   "tier": "real",
+   "expected": [
+    "st_resp"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_resp_inquiry"
+   ],
+   "secs": [
+    "s6",
+    "s71",
+    "s80",
+    "s86"
+   ],
+   "lastSeenRound": 34
   },
   {
    "id": "f_r4_redfield_arsenic",
@@ -3117,8 +3150,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 26,
-    "freshOk": 13,
+    "fresh": 28,
+    "freshOk": 14,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
@@ -3172,8 +3205,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 26,
-    "freshOk": 13,
+    "fresh": 28,
+    "freshOk": 14,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
