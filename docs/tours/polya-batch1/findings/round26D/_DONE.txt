@@ -1,5 +1,7 @@
 round26D/aD2/DONE
 round26D/arD1/DONE
+round26D/dp1/DONE
+round26D/dp2/DONE
 round26D/oD1/DONE
 round26D/oD1b/DONE
 round26D/oD1e/DONE
