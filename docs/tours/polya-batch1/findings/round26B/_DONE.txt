@@ -1,6 +1,10 @@
+round26B/bp1/DONE
+round26B/bp3/DONE
+round26B/s11/DONE
 round26B/s12/DONE
 round26B/s14/DONE
 round26B/s15/DONE
 round26B/s16/DONE
 round26B/s17/DONE
+round26B/s18/DONE
 round26B/s20/DONE
