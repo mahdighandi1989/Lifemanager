@@ -420,7 +420,8 @@
       var cv = parseFloat(mc[1]) * c1.f / c2.f, ct = tolOf(mc[3], false); out.push({ expr: mc[1] + " " + txt(mc[2]), said: mc[3], val: cv, ok: Math.abs(cv - parseFloat(mc[3])) <= ct + 1e-9, conv: true, unit: Math.abs(cv - parseFloat(mc[3])) <= ct + 1e-9 ? "" : "تبدیلِ " + txt(mc[2]) + " به " + txt(mc[4]) }); }
     return out;
   }
-  ST.arithChk = arithChk;
+  /* دورِ ۲۵ (P2): این نسخه قرنطینه است (A.STORY.arithChkR24 — REMOVAL_CANDIDATES)؛ حسابِ صفحه را a46_arith.js با عددِ گویا و خواندنِ هر دو سمتِ تساوی می‌سنجد و A.STORY.arithChk را جایگزین می‌کند */
+  ST.arithChkR24 = arithChk; ST.arithChk = arithChk;
   function fmtN(v) { var x = Math.round(v * 1000) / 1000; return fa(String(x).replace(".", "٫")); }
   function herMsgs(s, um) { return ((s && s.msgs) || []).filter(isUser).map(function (m) { return String(m.text || ""); }).concat(um ? [String(um.text || "")] : []); }
   /* ---------- دورِ ۲۵ (P1 «قراردادِ دفترِ کارِ پیشین»، DECISIONS_R25؛ نقشهٔ راهِ منبع‌ها §۲۱) ----------
@@ -501,15 +502,14 @@
       if (!q || !H.some(function (t) { return quoteIn(q, t); })) { rej++; return; }   // نقلِ ساختگی ⇒ کنار
       var hm = H.filter(function (t) { return quoteIn(q, t); }).pop(), span = A.PRE && A.PRE.herSpan ? A.PRE.herSpan(q, hm) : q;
       var v = /^(?:ok|incomplete|wrong|unchecked)$/.test(String(x.verdict)) ? String(x.verdict) : "unchecked", why = clip(txt(x.why || ""), 220), fix = clip(txt(x.fix || ""), 220);
-      var ck = arithChk(span), bad = ck.filter(function (c) { return !c.ok; }), chk = "";
-      /* chk برای خودش (عددِ درست لو نمی‌رود — بانکِ R24 #164)؛ chkM برای مربی (با مقدار، «لو نده») */
-      var chkM = "";
-      if (bad.length) { v = "wrong"; chk = bad.map(function (c) { return c.unit ? "واحد (" + c.unit + ") با عددِ نوشته‌شده نمی‌خواند" : "حسابِ «" + fa(c.expr) + "» با عددِ نوشته‌شده («" + fa(c.said) + "») نمی‌خواند"; }).join("؛ ");
-        chkM = bad.map(function (c) { return c.unit ? "واحد: " + c.unit + " — با تبدیل " + fmtN(c.val) + " می‌شود، نه " + fa(c.said) : "حسابِ صفحه: " + fa(c.expr) + " = " + fmtN(c.val) + "، نه " + fa(c.said); }).join("؛ ") + " (عددِ درست را لو نده)"; }
-      else if (ck.length) chk = chkM = "حسابِ عددی‌اش را صفحه سنجید: درست" + (v === "wrong" ? " — پس نادرستیِ این گام (اگر هست) از جای دیگری است (داوریِ مربی)" : "");
+      /* دورِ ۲۵ (P2، a46_arith.js): حساب با زمینهٔ همهٔ پیامش (عددی که خودش گرد کرده، واحدِ هر عدد)؛ chk برای خودش (عددِ درست لو نمی‌رود — بانکِ R24 #164)، chkM برای مربی؛ کنارِ «✗» هرگز «درست» */
+      var ck = ST.arithChk(span, hm), nt = ST.arithNote ? ST.arithNote(ck, v) : { bad: false, chk: "", chkM: "" }, chk = nt.chk, chkM = nt.chkM;
+      if (nt.bad) v = "wrong";
       var dep = (Array.isArray(x.dep) ? x.dep : x.dep != null ? [x.dep] : []).map(function (n) { return +digs(n) || 0; }).filter(function (n) { return n > 0; });
       var cause = /^(?:prereq|knot|skill|unknown)$/.test(String(x.cause || "")) ? String(x.cause) : "";
-      steps.push({ n: steps.length + 1, step: st || clip(span, 80), quote: clip(span, 300), verdict: v, why: why, fix: fix, chk: chk, chkM: chkM, dep: dep, said: ck.filter(function (c) { return !c.conv; }).map(function (c) { return c.said; }),
+      /* ادغامِ دورِ ۲۵ (P1 + P2): «bad» = حساب‌هایی که موتورِ a46 نادرست خواند (فقط وقتی یادداشتِ همان موتور گام را نادرست دانست) */
+      var bad = nt.bad ? ck.filter(function (c) { return !c.ok; }) : [];
+      steps.push({ n: steps.length + 1, step: st || clip(span, 80), quote: clip(span, 300), verdict: v, why: why, fix: fix, chk: chk, chkM: chkM, dep: dep, said: ST.arithSaid ? ST.arithSaid(ck) : ck.filter(function (c) { return !c.conv; }).map(function (c) { return c.said; }),
         bad: bad.map(function (c) { return String(c.said); }), badC: bad.map(function (c) { return { key: String(c.expr).replace(/\s+/g, ""), val: c.val, said: String(c.said) }; }), pageBad: bad.length > 0, test: isTestStep(span, hm, x), mn: x.n != null ? (+digs(x.n) || 0) : 0, cause: cause, her: "" });
     });
     if (!steps.length) return null;
@@ -521,7 +521,7 @@
   ST.priorOf = priorOf;
   /* متنِ تازهٔ یک گام (اصلاحِ خودِ او، یا پیشنهادِ مدل با «آری» ِ او): حسابِ متنِ تازه را صفحه دوباره می‌سنجد؛ عددهای پیشین که دیگر در متن نیستند «کهنه» می‌شوند */
   function applyFix(x, t, at, by, v) {
-    var was = curText(x), ck = arithChk(t), bad = [], nw = numsOf(t);
+    var was = curText(x), ck = ST.arithChk(t), bad = [], nw = numsOf(t);
     x.v0 = x.v0 || x.verdict; x.oldNums = (x.oldNums || []).concat((x.bad || []).concat(x.said || []).map(String)).filter(function (m, i, X) { return m && X.indexOf(m) === i && nw.indexOf(String(m)) < 0; });
     x.fixed = { t: clip(t, 300), was: clip(was, 300), at: at, by: by }; delete x.stale;
     x.said = ck.filter(function (c) { return !c.conv; }).map(function (c) { return c.said; }); x.bad = bad.map(function (c) { return String(c.said); }); x.pageBad = bad.length > 0;
@@ -532,7 +532,7 @@
   /* C8 (DECISIONS_R25): اصلاحِ خودِ او فقط وقتی می‌نشیند که حسابِ خودِ صفحه — هر جا گام حساب‌پذیر است — با آن بخواند. مدل «درست» گفت و صفحه چیزِ دیگری حساب کرد ⇒
      نمی‌نشیند؛ صفحه ناهم‌خوانی را (بی عددِ درست) نشان می‌دهد و همان گام پرسیده می‌ماند */
   function tryFix(x, t, at, by, v) {
-    var bad = arithChk(t).filter(function (c) { return !c.ok; }), cs = calcs(t), nums = numsOf(t), ok = !bad.length && !cs.some(function (c) { return !c.ok; });
+    var bad = ST.arithChk(t).filter(function (c) { return !c.ok; }), cs = calcs(t), nums = numsOf(t), ok = !bad.length && !cs.some(function (c) { return !c.ok; });
     if (ok && (x.badC || []).length && !x.fixed) ok = x.badC.every(function (b) { var same = cs.filter(function (c) { return c.key === b.key; }); if (same.length) return same.every(function (c) { return c.ok; });
       return nums.some(function (n) { return Math.abs(parseFloat(n) - b.val) <= tolOf(n, false) + 1e-9; }); });
     if (!ok) { x.retry = { t: clip(t, 200), at: at }; return false; }
@@ -640,7 +640,7 @@
       if (x.verdict === "ok" && !x.stale) return;   // حکمِ «درست» را رد نمی‌کند
       (x.herHist = x.herHist || []).push({ her: x.her || "", at: x.herAt || "", noAt: at }); x.her = "no"; x.herAt = at; x.turns = 0; delete x.reAt; delete x.re; if (a.why) x.herWhy = a.why; else delete x.herWhy; pr.st = "no"; ch.push({ n: x.n, k: "no" });
       /* حکمی که از حسابِ خودِ صفحه آمده همین حالا دوباره حساب می‌شود — نتیجه با شاهد روی صفحه */
-      if (x.pageBad) { var bad = arithChk(curText(x)).filter(function (c) { return !c.ok; }); x.re = { at: at, by: "page", was: x.verdict, to: bad.length ? "wrong" : x.verdict, why: bad.length ? x.chk : "", her: a.why || "" }; if (bad.length) x.reAt = at; } });
+      if (x.pageBad) { var bad = ST.arithChk(curText(x)).filter(function (c) { return !c.ok; }); x.re = { at: at, by: "page", was: x.verdict, to: bad.length ? "wrong" : x.verdict, why: bad.length ? x.chk : "", her: a.why || "" }; if (bad.length) x.reAt = at; } });
     if (ch.length) { relink(pr); pr.upAt2 = at; }
     if (G.pg) S.put(G.pg);
     return ch;
@@ -1109,7 +1109,7 @@
     if (!L.prior) { var p0 = ST.priorFor(null, pid); if (!p0) return; L.prior = JSON.parse(JSON.stringify(p0)); S.put(pg); }
     var r0 = A.liveRec && A.liveRec(pid), se0 = (r0 && r0.sess && S.get(r0.sess)) || S.all("achat", function (x) { return x && x.lprob === pid; }).pop() || null, R = function (t) { try { return AS.regSys ? AS.regSys(se0, t) : t; } catch (e) { return t; } };   // «شما» برای سالمند/کاربرِ «شما» (R5)
     var pr = markWait(null, pid, L.prior), closed = priorClosed(pid), sec = h("section", { class: "card soft lp-prior", dir: "rtl" }, h("h4", {}, R("کارِ پیشینِ تو — حکمِ هر گام")), h("p", { class: "small muted" }, R(closed ? pr.sum.replace(/\s*·\s*ازسرگیری از گامِ\s*[۰-۹]+/, "") + " · مسئله بسته شد — این دفتر تاریخچه است" : pr.sum) + " · صفحه فقط نقل، عدد و واحد را سنجید؛ درستیِ گامِ غیرعددی داوریِ مربی است."));
-    var set = function (x, v) { (x.herHist = x.herHist || []).push({ her: x.her || "", at: x.herAt || "", undoAt: v ? "" : nowIso() }); x.her = v; x.herAt = nowIso(); if (v === "no") { x.turns = 0; delete x.reAt; delete x.re; if (x.pageBad) { var bad = arithChk(curText(x)).filter(function (c) { return !c.ok; }); x.re = { at: x.herAt, by: "page", was: x.verdict, to: x.verdict, why: x.chk, her: "" }; if (bad.length) x.reAt = x.herAt; } pr.st = "no"; } else { delete x.herWhy; delete x.turns; } S.put(pg); A.render(); };
+    var set = function (x, v) { (x.herHist = x.herHist || []).push({ her: x.her || "", at: x.herAt || "", undoAt: v ? "" : nowIso() }); x.her = v; x.herAt = nowIso(); if (v === "no") { x.turns = 0; delete x.reAt; delete x.re; if (x.pageBad) { var bad = ST.arithChk(curText(x)).filter(function (c) { return !c.ok; }); x.re = { at: x.herAt, by: "page", was: x.verdict, to: x.verdict, why: x.chk, her: "" }; if (bad.length) x.reAt = x.herAt; } pr.st = "no"; } else { delete x.herWhy; delete x.turns; } S.put(pg); A.render(); };
     pr.steps.forEach(function (x) {
       var row = h("div", { class: "lp-prior-step small", "data-v": x.verdict, "data-n": String(x.n), "data-fixed": x.fixed ? "1" : "", "data-stale": x.stale || (x.depStale || []).length ? "1" : "" }, h("span", {}, R(stepLine(Object.assign({}, x, { her: "" }), false, 140)) + (x.n === pr.resume && !closed ? " · ⟵ ازسرگیری از این‌جا" : "")));
       if (closed) row.appendChild(h("span", { class: "muted" }, x.her === "ok" ? " · تأیید شد ✓" : ""));

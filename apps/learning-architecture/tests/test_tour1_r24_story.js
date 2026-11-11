@@ -382,7 +382,7 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
       { step: 'جدول', quote: 'جدول میگه کابلِ ۲.۵ تا ۲۰ آمپر رو می‌کشه، پس کافیه', verdict: 'incomplete', why: 'حاشیهٔ ۱۹.۹ تا ۲۰ کم است؛ طول و روشِ نصب نیامده' }], { cs: { ph: 'e', said: ['u', 'd'] } });
     let pr = await PR(), q = await PQ();
     const s2 = pr && pr.steps[1];
-    T(160, wm && /کارِ پیشینِ خودش را دارد/.test(head(u.user)) && pr && pr.steps.length === 4 && pr.steps[0].verdict === 'ok' && s2.verdict === 'wrong' && /درست/.test(s2.chk) && pr.steps[2].depWrong.indexOf(2) >= 0 && pr.steps[3].verdict === 'incomplete' && pr.resume === 2 && /گامِ ۲/.test(q) && !/گامِ ۱ /.test(q), { wm, pr: pr && pr.steps.map(x => [x.n, x.verdict, x.chk, x.depWrong]), resume: pr && pr.resume, q });
+    T(160, wm && /کارِ پیشینِ خودش را دارد/.test(head(u.user)) && pr && pr.steps.length === 4 && pr.steps[0].verdict === 'ok' && s2.verdict === 'wrong' && /می‌خواند/.test(s2.chk) && !/درست/.test(s2.chk) /* DECISIONS_R25 P2: کنارِ «✗» هرگز «درست» — پیش‌تر /درست/ */ && pr.steps[2].depWrong.indexOf(2) >= 0 && pr.steps[3].verdict === 'incomplete' && pr.resume === 2 && /گامِ ۲/.test(q) && !/گامِ ۱ /.test(q), { wm, pr: pr && pr.steps.map(x => [x.n, x.verdict, x.chk, x.depWrong]), resume: pr && pr.resume, q });
     T(184, pr && pr.ph !== 'b', pr && pr.ph);
     T(181, pr && !pr.steps.some(x => x.fixed), pr && pr.steps.map(x => x.fixed));
     // #182 «نه اشتباه نکردم!» without a reason: the verdict is kept with its evidence; the turn question asks her reason

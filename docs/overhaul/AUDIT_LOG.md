@@ -5054,3 +5054,16 @@ dated stability, mind-card feed) under way.
 ## 2026-11-11 — FINDING + CHANGE: تورِ پولیا دورِ ۲۵، سهمِ «prior» (P1 — قراردادِ دفترِ «کارِ پیشینِ من»)
 - FINDING: دفترِ کارِ پیشین با هر گزارشِ مدل جایگزین می‌شد؛ درخواستِ گزارش روی هر پیامِ حساب‌دار می‌آمد و روی پیامِ آغازینِ تک‌گام نه؛ پرسشِ نوبتِ آغاز «اول کل»/آزمونِ حدس بود؛ پاسخِ او فقط با «آره» ِ تنها یا «نه» ِ آغازِ پیام خوانده می‌شد؛ اصلاحِ خودِ او دفتر را نمی‌شناخت؛ سطرِ مربی («عددِ درست را لو نده») به 📜 و 🧭 می‌رسید؛ کارنامه رویدادِ `prior` را نمی‌خواند؛ مسئلهٔ حل‌شده در گفت‌وگو قابِ فهم را دوباره می‌خواست.
 - CHANGE: `apps/learning-architecture/src/app/a45_story.js` (ادغام، خوانشِ معناییِ پاسخ، اصلاحِ خودِ او با سنجشِ صفحه، دوباره‌سنجی، کهنگی، بستنِ حل‌شده در گفت‌وگو)، `a27_tour.js` (لحظهٔ `prior`، `C145v`)، `a38_live.js` (پرسشِ نوبتِ ردِ حکم)، `a29_mind.js` (اعتبارِ گام‌ها)، `a44_route.js` (🧭 از گام‌های دفتر). آزمون: `tests/test_tour1_r25_prior.js` (قرمز روی eeb11d1f، سبز پس از اصلاح) + ۴۹ ورودیِ P1 ِ `VARIANTS_R25.json`. سند: WORKLOG (123)، PROGRESS 122 در این شاخه (پس از ادغامِ correction و story: ۱۲۳ و ۱۲۲)، HANDBOOK §۱۰ و §۱۲ ردیف ۶۷، `experiences/model-reports-state-page-validates.md` (Update 2026-11-11)، قرنطینهٔ `NO24` در REMOVAL_CANDIDATES. Claude Code (رفع‌کنندهٔ prior ِ دورِ ۲۵)
+## 2026-11-11 — FINDING + CHANGE: Pólya tour round 25, fixer «arith» (P2 — the page's arithmetic check; S1 D25-12)
+- FINDING: `arithChk` (round 24, `apps/learning-architecture/src/app/a45_story.js`) matched «expression = ONE number» with floats. A fraction sum on the right
+  («4/2 = 1/1 + 1/2 + 1/2», «7/1460 = 1/210 + 1/30660») was compared with its first fraction only, chained «a = b = c» with the first term, a running sum
+  («با ۱/۲۰ میشه ۴/۵») as «1/20 = 4/5», «۲ و خرده‌ای، یعنی ۲٫۵۷» as «2», «−۳ + ۴۲» as «3 + 42»; kJ ⇒ kWh and «یه متر صد میلی‌متره» were not read; «درست» stood beside ✗.
+  The page turned the coach's ✓ into ✗ on correct work (resume point, turn question and mind card followed).
+- CHANGE: new `apps/learning-architecture/src/app/a46_arith.js` replaces `A.STORY.arithChk`: a real parser reads both sides of every «=», chains link by link, running sums
+  only with the number right before them; exact rational arithmetic (BigInt); tolerance only from the digits she wrote (DECISIONS_R25 C9); ✗ only when no natural reading
+  holds, ambiguity ⇒ silence; units with dimensions (conversion, sums, stated factors, bare products with units from the same message), unreadable unit ⇒ «نسنجیده» (C10);
+  no «درست» beside ✗ (`A.STORY.arithNote`); page-built prompt block for later messages (nothing added to `AS.SYS`). `a45_story.js`: three lines in `priorOf`. `build.py`: file list.
+- CHANGE (quarantine): the round-24 check stays reachable as `A.STORY.arithChkR24` (REMOVAL_CANDIDATES).
+- TEST: `apps/learning-architecture/tests/test_tour1_r25_arith.js` (red first on eeb11d1f: 56 errors, bank 24/58; now bank P2 58/58); one R24 assertion replaced with a comment
+  (#160, «درست» beside ✗). WORKLOG (124), PROGRESS 123 (on this branch; the launch numbers 124/123 apply after the coordinator renumbers at merge — the docs gate demands 1..N without gaps), HANDBOOK §10 + §12 row 70, `experiences/exact-arithmetic-check-of-a-persons-written-work.md`,
+  handoff `docs/overhaul/handoff-notes/_pending_tour1_R25_arith_2026-11-11.md`. Claude Code (fixer «arith», round 25)
