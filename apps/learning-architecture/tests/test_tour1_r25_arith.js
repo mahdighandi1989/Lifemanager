@@ -4,7 +4,7 @@
 //           pwB1 p1 و bp2 p4 (B25·D14 کیلوژول ⇒ کیلووات‌ساعت، «یه متر صد میلی‌متره»، ۰٫۵۹ از ۰٫۲۹۴)، bp3 p9 («درست» کنارِ ✗)، pwD1 (حساب‌های درستِ یک متنِ بلند)
 //  bank     همهٔ ۵۸ ورودیِ P2 در بانکِ مستقلِ tests/variants/VARIANTS_R25.json (OK = بی «نادرست»؛ FLAG = همان حلقه؛ neg = اصلاً سنجیده نشود)
 //  clock    روزِ صفحه منجمد است (APP.today)؛ هیچ انتظاری به تاریخِ تقویم بسته نیست
-// LLA_FILE = ساختِ دیگر (برای «قرمزِ نخست»: ساختِ BASE25)؛ ONLY=runners,page,later,bank
+// LLA_FILE = ساختِ دیگر (برای «قرمزِ نخست»: ساختِ BASE25)؛ ONLY=runners,page,later,guards,bank
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
@@ -202,6 +202,17 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     chk(/✗ «۷ × ۸» را «۵۴» نوشته — حسابِ صفحه: ۵۶/.test(head(u.user)), 'a wrong sum in any message reaches the coach with the page\'s computation :: ' + head(u.user).slice(-400));
     const sysLen = await p.evaluate(() => (APP.ASSIST.SYS || '').length);
     chk(sysLen <= 20000, 'AS.SYS stays within the cap (nothing added to it) :: ' + sysLen);
+  });
+
+  // ================= guards — شبیه‌هایی که نباید «نادرست» شوند (و چند نادرستِ واقعی) — بیرون از بانک =================
+  await section('guards', async () => {
+    const G = [['۱۰۰ − ۲۰٪ = ۸۰', 'none'], ['۶ ÷ ۲(۱+۲) = ۹', 'none'], ['۱۰۰۰ گرم میشه ۱ کیلو و ۲۵۰۰ گرم میشه ۲ کیلو و ۵۰۰ گرم', 'ok'], ['جذرِ ۱۶ + ۹ = ۵', 'none'], ['نصفِ ۲۴ + ۶ = ۱۸', 'none'],
+      ['sin 30 + 1 = 1.5', 'none'], ['۵ + ۵ میشه ۲ برابرِ ۵', 'none'], ['۷ تقسیم بر ۴ میشه ۱ و ۳/۴', 'ok'], ['۲۴ −۳ + ۴۲ = ۳۹', 'ok'], ['هر ساعت ۴۵ دقیقه درس می‌خونم', 'none'], ['۱/۲ + ۱/۳ = ۲/۵', 'none'],
+      ['۱.۲ + ۳ = ۵', 'none'], ['x² + 3 = 12', 'none'], ['پس ۲۰ = ۴x و x = ۵', 'none'], ['۳ متر در ۴ متر = ۱۲ مترمربع', 'none'], ['۷ روز هفته × ۲۴ ساعت = ۱۶۸ ساعت', 'none'], ['نمره‌م از ۲۰ شد ۱۷', 'none'],
+      ['۳² + ۴² = ۲۵', 'ok'], ['۳ + ۴ × ۲ = ۱۱', 'ok'], ['(۳ + ۴) × ۲ = ۱۴', 'ok'], ['۲/۳ = ۰٫۶۷', 'ok'], ['۲/۳ = ۰٫۶۶', 'ok'], ['۷۲ کیلومتر در ساعت = ۲۰ متر بر ثانیه', 'ok'], ['۲ × −۳ = −۶', 'ok'],
+      ['۳² + ۴² = ۲۴', 'flag'], ['۳ + ۴ × ۲ = ۱۴', 'flag'], ['۲/۳ = ۰٫۶۵', 'flag'], ['۱۲ + ۲۴ = ۳۵', 'flag'], ['۱۲ + ۲۴ = ۳۷', 'flag'], ['۱۴٫۴ تقسیم بر ۱٫۴۴ میشه ۱۲ جعبه', 'flag'], ['۱.۸ متر + ۲۰ سانت = ۲۱.۸', 'flag']];
+    for (const [t, e] of G) { const r = await AC(t), oks = r.map(c => c.ok);
+      chk(e === 'ok' ? r.length > 0 && oks.every(Boolean) : e === 'none' ? r.length === 0 : oks.some(x => !x), 'guard [' + e + '] «' + t + '» :: ' + JSON.stringify(r.map(c => [c.expr, c.said, c.ok, c.unit]))); }
   });
 
   // ================= bank — P2 (۴۹…۱۰۶، صفرپایه) =================

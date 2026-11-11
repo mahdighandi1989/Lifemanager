@@ -56801,6 +56801,7 @@ APP.goFromURL = function (q) {
       X.single = X.lits.length === 1 && !X.ops && !X.par;
       X.div2 = X.lits.length === 2 && X.ops === 1 && X.divs === 1 && !X.par && !X.un && X.lits[0].int && X.lits[1].int;
       X.prod = X.lits.length >= 2 && !X.adds && !X.par && !X.un && X.mops.length === X.lits.length - 1 && X.ops === X.mops.length;
+      X.pctMix = X.adds > 0 && X.lits.some(function (l) { return l.pct; }) && !X.lits.every(function (l) { return l.pct; }); /* «۱۰۰ − ۲۰٪»: درصدِ چه؟ */
       X.pctSum = X.lits.length >= 2 && X.lits.every(function (l) { return l.pct; }) && !X.muls && !X.divs;
       return X;
     };
@@ -56826,6 +56827,7 @@ APP.goFromURL = function (q) {
     var pv = T[s - 1]; if (!pv) return true;
     if (pv.k === "o" || pv.k === "(" || pv.k === "w2") return false;
     if (pv.k === ")" && pv.ok) return false;
+    if (pv.k === "n" && T[s].k === "(" && !T[s].sp) return false;                 // «۲(۱+۲)»: ضربِ ضمنی
     if (pv.k === "L") return T[s].sp && pv.t.length > 1 && !FUNC_EN.test(pv.t);
     if (pv.k === "p" && MATH.test(pv.t)) return false;
     if (pv.k === "w" && FUNC_FA.test(pv.t)) return false;
@@ -56850,7 +56852,7 @@ APP.goFromURL = function (q) {
       var mv = add(X.lits[0].v, F(B(m[1]), B(m[2]))); X.v = iv(mv); X.mixed = true; X.t = textOf(seg, X) + " و " + m[1] + "/" + m[2]; X.b += m[0].length; return X; }
     if (X.single && !X.un && !X.lits[0].pct) {                                                               // «۵ متر و ۸۵ سانت»
       var u1 = unitAt(rest), m2 = u1 && /^\s*و\s*(\d+(?:\.\d+)?)/.exec(rest.slice(u1.len)), u2 = m2 && unitAt(rest.slice(u1.len + m2[0].length));
-      if (u2 && u2.dim === u1.dim && cmp(u2.f, u1.f) < 0) { var c2 = div(mul(dec(m2[1]), u2.f), u1.f); X.v = iv(add(X.lits[0].v, c2)); X.comp = div(mul(tolSaid({ raw: m2[1], mag: 0, pct: false }, false), u2.f), u1.f);
+      if (u2 && u2.dim === u1.dim && cmp(u2.f, u1.f) < 0 && cmp(mul(dec(m2[1]), u2.f), u1.f) < 0) { var c2 = div(mul(dec(m2[1]), u2.f), u1.f); X.v = iv(add(X.lits[0].v, c2)); X.comp = div(mul(tolSaid({ raw: m2[1], mag: 0, pct: false }, false), u2.f), u1.f);
         X.t = textOf(seg, X) + " " + u1.w + " و " + m2[1] + " " + u2.w; X.b += u1.len + m2[0].length + u2.len; return X; }
       if (u1 && m2) return null;
     }
@@ -56943,7 +56945,7 @@ APP.goFromURL = function (q) {
     var Rd = segs.map(function (_, i) { return read(i, false); }), members = [];
     for (var i = 1; i < segs.length; i++) {
       var L = Rd[i - 1].trail, R = Rd[i].lead;
-      if (!L || !R) { members = []; continue; }
+      if (!L || !R || L.pctMix || R.pctMix) { members = []; continue; }
       /* زنجیره: تکهٔ پیشین سراسر یک عبارت بود و خودش حلقهٔ پیشین را داشت */
       var pure = Rd[i - 1].lead && !L.run && Rd[i - 1].lead.end === Rd[i - 1].n && L.s === 0;
       members = pure && members.length ? members.concat([L]) : [L];
@@ -57022,7 +57024,7 @@ APP.goFromURL = function (q) {
       if (skip[k]) continue;
       if (q1.u.dim === q2.u.dim && cmp(q1.u.f, q2.u.f) !== 0 && CONN.test(bt)) {
         var apx = /≈|حدود|تقریب|نزدیک/.test(bt), exp = div(mul(q1.v, q1.u.f), q2.u.f), said = q2.v, tl = tolSaid({ raw: q2.raw, mag: q2.mag, pct: false }, apx), saidT = q2.raw, q3 = Q[k + 2];
-        if (q3 && q3.u.dim === q2.u.dim && cmp(q3.u.f, q2.u.f) < 0 && /^\s*و\s*$/.test(t.slice(q2.e, q3.a))) { said = add(said, div(mul(q3.v, q3.u.f), q2.u.f)); tl = div(mul(tolSaid({ raw: q3.raw, mag: q3.mag, pct: false }, false), q3.u.f), q2.u.f); saidT = q2.raw + " " + q2.u.w + " و " + q3.raw + " " + q3.u.w; }
+        if (q3 && q3.u.dim === q2.u.dim && cmp(q3.u.f, q2.u.f) < 0 && cmp(mul(q3.v, q3.u.f), q2.u.f) < 0 && /^\s*و\s*$/.test(t.slice(q2.e, q3.a))) { /* «۵ متر و ۸۵ سانت»: جزءِ دوم کمتر از یک واحدِ اول */ said = add(said, div(mul(q3.v, q3.u.f), q2.u.f)); tl = div(mul(tolSaid({ raw: q3.raw, mag: q3.mag, pct: false }, false), q3.u.f), q2.u.f); saidT = q2.raw + " " + q2.u.w + " و " + q3.raw + " " + q3.u.w; }
         var ok = near(iv(exp), said, tl, apx);
         if (!ok && disowned(t, q1.a, (q3 && saidT !== q2.raw ? q3 : q2).e)) continue;
         out.push({ expr: q1.raw + (q1.mag ? " × ۱۰^" + q1.mag : "") + " " + q1.u.w, said: saidT, saidT: saidT, val: num(exp), valT: fmtF(exp) + " " + q2.u.w, ok: ok, conv: true, kind: "conv", unit: ok ? "" : "تبدیلِ " + q1.u.w + " به " + q2.u.w, pos: q1.a, pe: (q3 && saidT !== q2.raw ? q3 : q2).e });
