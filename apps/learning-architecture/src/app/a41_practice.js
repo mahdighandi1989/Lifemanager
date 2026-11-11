@@ -2244,7 +2244,7 @@
           /* (۷) حدسِ کسری و آزمونِ خودش با کسرِ دیگر (یا همان) */
           var Fg = fracs25(g.text);
           if (!res && Fg.length === 1 && TEST_DID25.test(t)) { var cf = /(?:یعنی|پس|میشه|می‌شه|=|⇒)\s*(\d+\/\d+)/.exec(dg(wnum(t)).replace(/\s*\/\s*/g, "/")), Ft = fracs25(t);
-            if (cf && cf[1] !== Fg[0] && Ft.indexOf(Fg[0]) < 0) res = "refuted"; else if (cf && cf[1] === Fg[0] && Ft.length === 1) res = "confirmed"; }
+            if (cf && cf[1] !== Fg[0]) res = "refuted"; else if (cf && cf[1] === Fg[0] && Ft.length === 1) res = "confirmed"; }
           /* (۹) حدسِ تک‌عدد («با ۵ تا کاشی پر میشه») و کارِ خودش با نتیجه («چیدم، با ۵ تا شد») ⇒ همان عدد: تأیید؛ عددِ دیگر: رد (بانکِ R25 #222) */
           if (!res && !ge.length && gn.length === 1 && (TEST_DID25.test(t) || ACT25.test(t)) && !CONTRA24.test(t)) { var d9 = dg(wnum(t)).replace(/٫/g, "."), rm = RES25.exec(d9), mn9 = nums24(t);
             if (rm && String(+rm[1]) === gn[0] && !no) res = "confirmed"; else if (rm && String(+rm[1]) !== gn[0] && mn9.indexOf(gn[0]) < 0) res = "refuted"; }
@@ -2468,10 +2468,10 @@
   PR.datePend = function (s0) {
     var U = userMsgs(s0), m = U[U.length - 1]; if (!m || !s0) return false; var t = String(m.text || ""), dirty = false, P0 = s0.datePend;
     /* الف) پاسخِ او به پرسشِ پیشینِ صفحه — یک بار */
-    if (P0 && P0.state === "open" && String(P0.at) < String(m.at || "")) {
+    if (P0 && P0.state === "open" && String(P0.msg) !== String(m.at || "")) {
       var done = [], x0 = dg(t);
       (P0.items || []).forEach(function (it) {
-        if (it.amb) { var same = /همین\s*امروز|(?:^|[\s،])امروز(?![آ-ی])|همین\s*(?:شنبه|یکشنبه|دوشنبه|سه[‌\s]?شنبه|چهارشنبه|پنج[‌\s]?شنبه|جمعه)/.test(x0), next = /بعد|دیگه|دیگر|آینده|هفته/.test(x0);
+        if (it.amb) { var same = /همین\s*امروز|(?:^|[\s،])امروز(?![آ-ی])|همین\s*(?:شنبه|یکشنبه|دوشنبه|سه[‌\s]?شنبه|چهارشنبه|پنج[‌\s]?شنبه|جمعه)/.test(x0), next = /(?:شنبه|جمعه)[ٔیِ]?\s*(?:ی\s*)?(?:بعد|دیگه|دیگر|آینده)|هفته[ٔیِ]?\s*(?:ی\s*)?(?:بعد|دیگه|دیگر|آینده)|^\s*(?:بعدی|بعد|اون\s*یکی)\s*[.!]*$/.test(x0);
           if (same === next) return; it.date = same ? P0.d0 : add(P0.d0, 7); }
         else if (!YES25.test(t)) return;
         if (it.pred) { var px = ((s0.coach || {}).preds || []).filter(function (y) { return y && String(y.at) === String(it.pred); })[0];

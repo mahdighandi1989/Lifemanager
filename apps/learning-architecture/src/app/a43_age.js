@@ -259,7 +259,7 @@
     return { n: keep.length, pre: ws.slice(0, ws.indexOf(keep[0])).join(" "), rest: ws.slice(ws.indexOf(keep[0]) + keep.length).join(" "), tail: tail && last.length > tail[0].length + 1 ? (tail[0] === "یه" ? "ه" : tail[0]) : "" }; }
   function priv25(x) {
     /* «اسم(ِ) مدرسه‌مون [هم] نام» و «مدرسه‌مون اسمش نام» */
-    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + SCH25 + ")([\\s‌]+)" + NAME25, "g"), function (all, w, sp, name) { var c = nameCut25(name); if (!c) return all; return w + sp + (c.pre ? c.pre + " " : "") + "[نامِ مدرسه]" + c.tail + (c.rest ? " " + c.rest : ""); });
+    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + SCH25 + ")([\\s‌]+)" + NAME25, "g"), function (all, w, sp, name) { if (/\[نامِ/.test(name)) return all; var c = nameCut25(name); if (!c) return all; return w + sp + (c.pre ? c.pre + " " : "") + "[نامِ مدرسه]" + c.tail + (c.rest ? " " + c.rest : ""); });
     x = x.replace(new RegExp("(" + SCH25 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), function (all, w, sp, name) { if (/\[نامِ مدرسه\]/.test(name)) return all; var c = nameCut25(name); if (!c) return all; return w + sp + (c.pre ? c.pre + " " : "") + "[نامِ مدرسه]" + c.tail + (c.rest ? " " + c.rest : ""); });
     /* برچسبِ کلاس: «کلاسِ دوم ج»، «کلاس ۴/۲» — پایه می‌ماند */
     x = x.replace(/(کلاسِ?[\s‌]+(?:اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم|یازدهم|دوازدهم|[0-9۰-۹]{1,2}))(?:[\s‌]+([ا-هی]|الف)(?=[\s.،,!؟?؛:]|$)|\s*[\/\-]\s*[0-9۰-۹]{1,2})/g, "$1");
@@ -285,6 +285,8 @@
       if (typeof D.statement === "string") D.statement = G.privText(D.statement); if (typeof D.title === "string") D.title = G.privText(D.title);
     } catch (e) { } return D;
   };
+  /* دورِ ۲۵ (P7، D25-22 aD1): «📜 پروندهٔ این گفت‌وگو» هم همان پرونده است — پیش‌تر فقط پروندهٔ مسئله پالوده می‌شد و نقلِ پیامِ کودک در پروندهٔ سشن عینی می‌ماند */
+  if (typeof A.dossierSess === "function" && !A.dossierSess._priv25) { var rawDosS = A.dossierSess; A.dossierSess = function () { return G.privDossier(rawDosS.apply(this, arguments)); }; A.dossierSess._priv25 = true; }
   if (typeof A.dossier === "function" && !A.dossier._priv24) { var rawDos = A.dossier; A.dossier = function () { return G.privDossier(rawDos.apply(this, arguments)); }; A.dossier._priv24 = true; }
 
   /* ---------- قلاب‌های دستیار ---------- */

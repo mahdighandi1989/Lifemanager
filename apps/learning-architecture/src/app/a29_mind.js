@@ -666,6 +666,11 @@
       R.acts.forEach(function (a) { if (a.rep > 1) a.fa += " (" + fa(a.rep) + " بار در همین روز — یک بار شمرده شد)"; });
       var ms = R.acts.filter(function (a) { return a.v != null; });
       R.last = ms.length ? ms[ms.length - 1].v : null; R.first = ms.length ? ms[0].v : null; R.nm = ms.length;
+      /* دورِ ۲۵ (P7، A21-11 s05 «ردیفِ T24 — (اندازه‌ای نیست)»): اندازهٔ پروندهٔ کالیبراسیون پیش‌بینی‌های داوری‌شدهٔ خودش است (اطمینان + سرانجام)، نه درصدِ بازیابی —
+         ردیف همان را می‌شمارد (هر 🎯 یک بار)؛ عددِ تازه‌ای ساخته نمی‌شود */
+      var cj = Object.keys(R.fcs || {}).map(function (id) { return R.fcs[id]; }).filter(function (f) { return f && /^(?:شد|نشد|درست|نادرست|yes|no)$/.test(String(f.outcome || "")); }).map(function (f) { return /^(?:شد|درست|yes)$/.test(String(f.outcome)); })
+        .concat(R.acts.filter(function (a) { return a.cal; }).map(function (a) { return !!a.cal.ok; }));
+      R.calN = cj.length; R.calK = cj.filter(Boolean).length;
       R.days = R.acts.length;
       var last = R.acts[R.acts.length - 1], stab = R.ev.filter(function (x) { return /^(stable|تثبیت)/.test(x.state); }).sort(byAt).pop();
       if (last && last.ok === false && ((stab && String(stab.at) <= String(last.at)) || R.acts.slice(0, -1).some(function (a) { return a.ok !== false; })))
@@ -710,7 +715,7 @@
             (R.off || []).map(function (w) { return h("div", { class: "small warnline mind-tech-off", "data-at": day(w.at) }, "«تثبیت شد»" + (w.was ? " (" + A.fdate(day(w.was)) + ")" : "") + " در " + A.fdate(day(w.at)) + " پس گرفته شد" + (w.why ? ": " + w.why : "")); }),
             R.decline ? h("div", { class: "small warnline mind-tech-decline", "data-at": day(R.decline.at) }, "افت در " + A.fdate(day(R.decline.at)) + (R.decline.after ? " (پس از «تثبیت شد» در " + A.fdate(day(R.decline.after)) + ")" : "") + (R.decline.why ? ": " + R.decline.why : "")) : null),
           h("td", {}, fa(R.days) + (R.pending ? " · " + fa(R.pending) + " در انتظار" : "")),
-          h("td", {}, R.nm ? (R.nm > 1 ? pf0(R.first) + " ← " + pf0(R.last) + " (" + fa(R.nm) + ")" : pf0(R.last) + " (۱)") : "— (اندازه‌ای نیست)"),
+          h("td", {}, R.nm ? (R.nm > 1 ? pf0(R.first) + " ← " + pf0(R.last) + " (" + fa(R.nm) + ")" : pf0(R.last) + " (۱)") : R.calN ? fa(R.calK) + " از " + fa(R.calN) + " پیش‌بینیِ داوری‌شده درست درآمد (جزئیات در 🎯)" : "— (اندازه‌ای نیست)"),
           h("td", { class: "mind-tech-dim" }, R.dim ? (dimFa[R.dim] || R.dim) + " — " + R.dimHow : UNMAPPED),
           h("td", { class: "small" }, techList(R.acts, "tech:" + R.key)));
       })))));

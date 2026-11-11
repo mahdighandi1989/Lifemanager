@@ -608,12 +608,19 @@
     var pgL = rid.pid ? S.get("eprog_" + rid.pid) : null, soL = (pgL && pgL.solve) || {}, LL = soL.live || {}, cover = { u: !!(soL.u && soL.u[1] && soL.u[1].done && soL.u[1].from !== "chat"), plan: !!(LL.plan && LL.plan.at) };   // فرمی که خودِ گفت‌وگو بست (chat_solved) تکرارِ رویدادهای گفت‌وگو نیست
     var pts = [], dets = [], backs = [], lastMain = -1, preDet = {}, originEv = null;
     function addPt(p) { p.i = pts.length; pts.push(p); return p; }
+    var seen25 = {};
     (D.events || []).forEach(function (e) {
       if (SKIP_K[e.k] || /^prc:/.test(String(e.kind || ""))) return;
       if (win && e.k !== "stmt" && e.at && (String(e.at) < String(win.from) || String(e.at) >= String(win.to))) return;
       if (CHAT_COVER[e.k] && cover[CHAT_COVER[e.k]]) return;
       if (e.k === "stmt") { originEv = { lines: (e.lines || []).slice(0, 4), hist: (e.hist || []).length }; return; }   // مبدأ خودش گره است؛ نقطهٔ دوم نمی‌گیرد
+      /* دورِ ۲۵ (P7، B24·D18 aB4/aB2 «نتیجه (از گفت‌وگو)» ×۳، A23-8 نقطه‌های هم‌نام؛ بانکِ R25 #226/#238): ریشه — هر رویدادِ گفت‌وگو فقط نامِ نوعش را برچسب داشت،
+         پس سه نتیجهٔ جدا «سه بار همان» خوانده می‌شد و همان حرف که دو بار ثبت شده بود دو نقطه می‌گرفت. حالا: همان نوع با همان متن ⇒ یک نقطه؛ و برچسبِ هر نقطه
+         محتوای خودش را دارد («نتیجه: مساحت شد ۴۰»). دو نتیجهٔ واقعاً جدا دو نقطه می‌مانند. */
+      var chatK25 = /^c(?:res|lb|data|unk|cond|whole|step|tried)$/.test(String(e.k || "")), l025 = String((e.lines || [])[0] || "");
+      if ((chatK25 || e.k === "guess") && l025) { var k25 = e.k + "|" + nk(l025); if (seen25[k25]) return; seen25[k25] = 1; }
       var base = { k: e.k, at: e.at || "", title: e.title, lines: (e.lines || []).slice(0, 6), out: e.out || "", from: e.from || "" };
+      if (chatK25 && l025) base.short = String(e.title || "").replace(/\s*\(از گفت‌وگو\)\s*$/, "") + ": " + clip(l025, 60);
       var isBack = BACK_K[e.k] || (e.withdrawn && MAIN_K[e.k]);
       var dk = DET_K[e.k];
       var mainLike = false;
@@ -768,7 +775,7 @@
       h("p", { class: "small muted rt-legend" }, "خطِ پر = خطِ اصلیِ حل · نقطه‌چین = انحراف (پیش‌نیاز، مسئلهٔ کمکی، آزمودنِ حدس) که به خط برمی‌گردد · قوسِ خط‌چین ↶ = اصلاح و پرشِ برگشت · حلقه = جایی که الان هستی.")));
     root.appendChild(h("section", { class: "card rt-card" }, B.el));
     root.appendChild(h("details", { class: "card small rt-listbox" }, h("summary", {}, "همهٔ نقطه‌ها به ترتیب (" + fa(M.pts.length) + ")"),
-      h("ol", { class: "rt-list" }, M.pts.map(function (p) { var d = p.cls === "det" ? M.dets[p.det] : null; return h("li", { "data-cls": p.cls }, (d ? "┈ " + DET_FA[d.kind] + " · " : p.cls === "back" ? "↶ " : p.k === "rejoin" ? "↩ " : "— ") + p.title + (p.at ? " · " + when(p.at) : "") + (p.out ? " — " + p.out : "")); }))));
+      h("ol", { class: "rt-list" }, M.pts.map(function (p) { var d = p.cls === "det" ? M.dets[p.det] : null; return h("li", { "data-cls": p.cls }, (d ? "┈ " + DET_FA[d.kind] + " · " : p.cls === "back" ? "↶ " : p.k === "rejoin" ? "↩ " : "— ") + (p.short && /^c(?:res|lb|data|unk|cond|whole|step|tried)$/.test(String(p.k || "")) ? p.short : p.title) + (p.at ? " · " + when(p.at) : "") + (p.out ? " — " + p.out : "")); }))));
     return root;
   };
   A.VIEW_META = A.VIEW_META || {};

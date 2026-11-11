@@ -4520,7 +4520,7 @@
       var fdn = faDateOf(D.n); if (x.date && fdn && !wdOf(D.n)) { var nd2 = isoOfFa(fdn, x.date); if (nd2 && nd2 !== x.date) { x.date = nd2; any = true; } }   // دورِ ۲۱ (R3e): تاریخِ خورشیدی
       var nw = fixVal(x.what, D); if (nw != null && nw !== x.what) { x.what = clip(nw, 120); any = true; }
       if (!any) return;
-      (x.fixHist = x.fixHist || []).push(Object.assign({}, base, { field: "deadline", old: before + (ow !== x.what ? " — " + ow : ""), new: dlFa(x), why: o.cur ? "به گفتهٔ خودش: «" + clip(o.cur, 120) + "»" : o.edit || o.full ? "با ✏️ ِ خودش روی همان پیام" : "اصلاح شد ⇐ «" + clip(before, 60) + "»" }));   // دورِ ۲۵ (P7، A25-21): دلیل حرفِ خودش است، نه مقدارِ پیشین
+      (x.fixHist = x.fixHist || []).push(Object.assign({}, base, { field: "deadline", old: before + (ow !== x.what ? " — " + ow : ""), new: dlFa(x), why: o.by === "model" && o.corr ? "به گفتهٔ خودش: «" + o.corr + "»" : o.by !== "model" ? "با ✏️ ِ خودش روی همان پیام" : "اصلاح شد ⇐ «" + clip(before, 60) + "»" }));   // دورِ ۲۵ (P7، A25-21): دلیل حرفِ خودش است، نه مقدارِ پیشین
       S.put(x); try { if (A.ASSIST && A.ASSIST.deadlineSync) A.ASSIST.deadlineSync(x); } catch (e) { }
       ch.push({ kind: "deadline", label: "یادآورِ «" + clip(x.what, 40) + "»", old: ow !== x.what ? ow + (before !== dlFa(x) ? " · " + before : "") : before, new: ow !== x.what ? x.what + (before !== dlFa(x) ? " · " + dlFa(x) : "") : dlFa(x) });   // دورِ ۲۳ (Q4، D23-6): «چه» ِ عوض‌شده هم در سطر
     });
