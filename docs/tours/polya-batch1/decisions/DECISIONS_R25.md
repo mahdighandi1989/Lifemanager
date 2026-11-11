@@ -197,3 +197,6 @@ Decided from the owner's recorded concerns: no conventional numbers, honesty ove
 - C12 (P7) Her own stated date reaches «امروز» through the page: the page reads the date from her own sentence, shows «… درست است؟», and
   books it on her yes (the model may report it in coach_state; the page validates the quote). No invented plan date.
 The earlier-round open items outside P1–P7 keep binding as written (no variants; the owning fixer proves each with its own test).
+- C13 (P2; decided after the arith fixer's report) Her own rounded number, reused later in the same message, stands for the interval of
+  values that round or truncate to it; a later result consistent with any value in that interval is not flagged. This follows from C9
+  (her rounding is accepted) and is kept.
