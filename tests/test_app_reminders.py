@@ -261,3 +261,37 @@ async def test_per_channel_detail_telegram_only_email_neutral(db_session):
     # a broken stored value fails closed (neutral), never half-leaks
     rows["a"].detail = '{"text": "x", "chan'
     assert svc._detail_for(rows["a"], "telegram") == ""
+
+
+@pytest.mark.asyncio
+async def test_upsert_survives_a_concurrent_insert_of_the_same_key(db_session):
+    """Supervisor 2026-11-11: the page posts several reminders at once; two requests for the same NEW
+    key both SELECT nothing, the second INSERT hits the unique constraint ⇒ was a 500. Simulate the
+    loser deterministically: its first SELECT is stale (row already inserted by the winner)."""
+    from app.models.app_reminder import AppReminder
+    from app.services import app_reminder_service as svc
+    from sqlalchemy import select
+
+    item = {"key": "knot:race", "due_date": "2026-10-20", "hour": 9, "tz": "Asia/Dubai", "title": "t", "body": "b"}
+    await svc.upsert(db_session, user_id=1, app="learning-architecture", items=[item])  # the winner
+
+    real_execute, stale = db_session.execute, {"left": 1}
+
+    class _Empty:
+        def scalar_one_or_none(self):
+            return None
+
+    async def execute(stmt, *a, **kw):
+        if stale["left"] and "app_reminders" in str(stmt):
+            stale["left"] -= 1
+            return _Empty()
+        return await real_execute(stmt, *a, **kw)
+
+    db_session.execute = execute
+    try:
+        res = await svc.upsert(db_session, user_id=1, app="learning-architecture", items=[dict(item, title="t2")])
+    finally:
+        db_session.execute = real_execute
+    assert res == {"saved": 1}
+    rows = (await db_session.execute(select(AppReminder).where(AppReminder.rkey == "knot:race"))).scalars().all()
+    assert len(rows) == 1 and rows[0].title == "t2"

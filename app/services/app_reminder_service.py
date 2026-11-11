@@ -21,6 +21,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.app_reminder import AppReminder
@@ -58,6 +59,18 @@ def _clean_channels(ch: Any) -> str:
 
 
 async def upsert(db: AsyncSession, *, user_id, app: str, items: List[dict]) -> Dict[str, int]:
+    """Insert-or-update by (user, app, key). Two requests for the same NEW key can race between the
+    SELECT and the INSERT (the page posts several reminders at once on load) ⇒ the loser hits the
+    unique constraint. Retry once after a rollback: by then the row exists and the update path wins
+    (supervisor 2026-11-11 — was a 500 on every first open of /apps/learning-architecture)."""
+    try:
+        return await _upsert_once(db, user_id=user_id, app=app, items=items)
+    except IntegrityError:
+        await db.rollback()
+        return await _upsert_once(db, user_id=user_id, app=app, items=items)
+
+
+async def _upsert_once(db: AsyncSession, *, user_id, app: str, items: List[dict]) -> Dict[str, int]:
     n = 0
     for it in items:
         key = str(it.get("key") or "").strip()[:160]

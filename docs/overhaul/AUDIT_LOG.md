@@ -5021,3 +5021,8 @@ dated stability, mind-card feed) under way.
 
 ## 2026-11-01 — FINDING — دورِ ناظرِ عمومی
 بدون یافتهٔ تازه؛ کارتابل خالی، pytest 2009 سبز، build سبز، production = origin/main. تنها نکته: `test_tour1_r11_coach.js` بدونِ `npm i` در `apps/learning-architecture` قرمز می‌شود (محیطی). جزئیات: `docs/supervisor/RUNLOG.md`.
+
+## 2026-11-11 — FINDING + CHANGE: دورِ کاملِ ناظرِ خودکار — ۵۰۰ ِ یادآورهای «گره‌گشا»
+- FINDING: `500 POST /api/app-records/learning-architecture/reminders` روی هر بارِ تازه‌بازکردنِ `/apps/learning-architecture`. ریشه، رقابتِ SELECT-سپس-INSERT در `app_reminder_service.upsert` است: صفحه چند یادآور را هم‌زمان می‌فرستد و درخواستِ دوم برای کلیدِ تازه به قیدِ یکتایی می‌خورد. این خطا از page_map ِ ۲۰۲۶-۱۱-۰۱ در فایل بود ولی گزارش نشده بود.
+- CHANGE: `upsert` با `IntegrityError` rollback و یک بار دیگر تکرار می‌کند. رفتار برای حالتِ عادی بی‌تغییر است و شِما تغییری نکرده. تست: `tests/test_app_reminders.py::test_upsert_survives_a_concurrent_insert_of_the_same_key` (بی‌اصلاح قرمز). در مرورگر هم سنجیده شد: ۳ بار بازکردنِ تازه، بدونِ ۵۰۰.
+- FINDING: ۱۶ شاخهٔ `supervisor-pending/*` کهنه‌اند و محتوایشان روی main است. حذف در محیطِ روتین ممکن نشد ⇒ OPEN_ITEMS ‏۱۴. همچنین sys-territory شش دور جلو نرفته ⇒ OPEN_ITEMS ‏۱۵. جزئیات در `docs/supervisor/RUNLOG.md`. ناظرِ خودکار (Claude Code routine)

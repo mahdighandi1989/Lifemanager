@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-08T00:00:00Z"
 created_at: "2026-10-08"
-updated_at: "2026-10-08"
+updated_at: "2026-11-11"
 merged_from: []
 ---
 
@@ -90,3 +90,24 @@ sqlalchemy.ext.asyncio.create_async_engine = _create
 ## 🔗 References
 - Related: `owner-inspection-loop-with-supervisor-routines`,
   `silent-capture-channel-needs-a-liveness-surface` (absence ≠ nothing happened).
+
+## Update 2026-11-11 — a known, dominant error hides a new one
+
+**Challenge.** Every crawl reported "console errors on N pages = the known 404 on `/auth/me`". Three
+consecutive runs repeated that sentence while the same `bad_responses` list also held a
+`500 POST /api/app-records/learning-architecture/reminders` on one page — a real select-then-insert
+race (the page posts several reminders at once; the second INSERT of a new key hit the unique
+constraint). The 500 was hidden behind the noise of the 404 everyone already knew about.
+
+**Solution.** Count the `bad_responses` across all pages as a multiset and compare it with the
+known/baseline set (the open items). Report anything left over, starting with every 5xx, even if
+the page count did not change. Then reproduce it in a real browser against a throwaway server
+with server logs on. A `curl` GET of the same path returned 200: the failure only appeared under
+the page's real concurrent POSTs.
+
+**How to apply elsewhere.** In any crawler or monitor summary, never collapse errors into "same as
+last time" by page count. Diff the full error multiset against an explicit baseline, and treat
+every new 5xx as a finding even when the totals look unchanged. For any "get-or-create by unique
+key" path that a client can call concurrently, either use the database's native upsert or catch
+the unique-violation, roll back, and retry once (the row now exists, so the update branch wins).
+Prove it with a deterministic test that makes the first lookup stale.
