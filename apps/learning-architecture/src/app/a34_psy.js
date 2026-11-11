@@ -332,7 +332,10 @@
         h("p", {}, "هنوز هیچ دادهٔ جمعیتیِ وارسی‌شده‌ای نیست. ناظر آن را از منابعِ معتبر (مقاله‌های داوری‌شده، فراتحلیل‌ها، نمونه‌های هنجاریِ بزرگ) جمع می‌کند و بازبینِ مستقل وارسی‌اش می‌کند.")));
     /* روزی یکی (M2): دکمه فقط اگر امروز جواب نداده‌ای، یا معمایی باز و بی‌پاسخ مانده (ادامهٔ همان) */
     if (P.canOpenToday()) sec.appendChild(h("button", { class: "btn ghost sm psy-open", type: "button", onclick: function () { A.go("psy_item"); } }, P.openItems().length ? "🧩 ادامهٔ معمای امروز" : "🧩 معمای امروز"));
-    else if (P.pending().length) sec.appendChild(h("p", { class: "small muted psy-tomorrow" }, "معمای امروز را جواب داده‌ای؛ معمای بعدی فردا."));
+    /* دورِ ۲۵ (P7، C25-17 aC1): «جواب داده‌ای» فقط وقتی راست است که امروز جواب داده باشد — پیش‌تر هر دلیلِ نبودِ دکمه همین جمله را می‌گرفت، هم برای کم‌سالی که
+       هنجاری برای سنش نیست و معمایی نگرفته */
+    else if (P.ageBlocked()) sec.appendChild(h("p", { class: "small muted psy-noage" }, P.NO_NORM + " — معمایی پیشنهاد نمی‌شود. روندِ خودت در همین کارنامه هست."));
+    else if (P.pending().length && P.answeredToday()) sec.appendChild(h("p", { class: "small muted psy-tomorrow" }, "معمای امروز را جواب داده‌ای؛ معمای بعدی فردا."));
     return sec;
   };
 

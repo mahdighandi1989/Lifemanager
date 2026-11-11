@@ -3292,13 +3292,17 @@
     /* حرفِ زمان‌دارِ او در همین پیام یا دو پیامِ پیشِ خودش («از کی؟» ⇐ «از فردا»)؛ تاریخِ گذشته همچنان رد می‌شود (پایین) */
     var her24 = (s.msgs || []).filter(isUser).slice(-3).map(function (m) { return String(m.text || ""); }).join(" \n ");
     if (realDate(w) && w >= td && !HER_WHEN24.test(String(pt || "")) && !HER_WHEN24.test(her24)) w = "next-session";
-    var when = /^next[-_ ]?session$/i.test(w) ? "next-session" : realDate(w) ? (w >= td ? w : "") : planDate18(pt);
+    /* دورِ ۲۵ (P7، B_s·D7 = U15 «📌 برنامهٔ خودت … موعد: ۱۰ آبان» که او نگفت؛ بانکِ R25 #228/#240؛ C1/C12): بی تاریخِ مدل، روز فقط از حرفِ زمان‌دارِ خودِ برنامه
+       خوانده می‌شود (A.PR.whenInfo: «۱۴ اسفند»، «سه‌شنبه»، «یه هفته دیگه»، «جمعهٔ هفتهٔ بعد») — پیش‌تر برنامهٔ بی‌زمان «هفت روز بعد» ِ ساختگی می‌گرفت (planDate).
+       بی حرفِ زمان‌دار ⇒ «جلسهٔ بعد»؛ نامِ همین روزِ هفته در خودِ همان روز دوپهلوست ⇒ «جلسهٔ بعد» + whenAsk (a41 PR.datePend یک بار می‌پرسد). */
+    var I25 = !/^next[-_ ]?session$/i.test(w) && !realDate(w) && A.PR && A.PR.whenInfo ? A.PR.whenInfo(pt) : null, amb25 = I25 && I25.amb ? I25.wd : "";
+    var when = /^next[-_ ]?session$/i.test(w) ? "next-session" : realDate(w) ? (w >= td ? w : "") : amb25 ? "next-session" : I25 && I25.date ? (I25.date >= td ? I25.date : "") : (PLAN_WHEN.test(String(pt || "")) || /(?:^|[\s،])(?:امروز|امشب|همین\s*الان)(?![آ-ی‌])|آخرِ?\s*(?:همین\s*)?هفته/.test(String(pt || ""))) ? planDate18(pt) : "next-session";
     if (!when) return;   // تاریخِ گذشته هرگز پیشنهاد نمی‌شود
     var AP = plansAll(s), sm = o && o.same ? AP.filter(function (x) { return x.p.id === String(o.same); })[0] : null;
     if (sm) return;   // همان برنامه که دوباره گفت — نه برنامهٔ دوم، نه پیشنهادِ دوباره
     if (AP.some(function (x) { var q = x.p; return (q.d || "") === td && (qNorm(q.text) === qNorm(pt) || (x.s === s && (quoteIn(q.text, pt) || quoteIn(pt, q.text)))); })) return;   // همان متن در همان روز (در همین سشن: هر کدام درونِ دیگری)
     var PL = s.plans = s.plans || [], og = o && typeof o === "object" && (o.on_guess === true || o.on_guess === "true");
-    PL.push({ id: "pl" + (AP.length + 1), text: clip(pt, 300), when: when, at: at, d: td, key: key, done: false, state: "open", sess: s.id, onGuess: og || undefined });
+    PL.push({ id: "pl" + (AP.length + 1), text: clip(pt, 300), when: when, at: at, d: td, key: key, done: false, state: "open", sess: s.id, onGuess: og || undefined, whenAsk: amb25 || undefined });
   }
   function planDoneR18(s, pd) {
     var id = typeof pd === "string" ? pd : pd && (pd.id || pd.plan), ok = !(pd && typeof pd === "object" && (pd.done === false || pd.done === "false"));
@@ -4145,6 +4149,9 @@
     if (chS.length || askS.length) notes = notes.filter(function (t) { return !/رکوردی\s*ساخته\s*نشده|ثبت\s*نشده\s*بود|چیزی\s*(?:دیگری\s*)?عوض\s*نشد|^از آن|^چیزی/.test(String(t)); });
     /* دورِ ۲۳ (Q4، C23-16 «سرتیترِ کهنه در همان پرامپت»): نمای جاری پس از اصلاح دوباره کشیده می‌شود تا سرتیتر/فرمِ پیشِ چشم همان رکوردِ تازه باشد */
     if (chS.length) { try { if (A.state && /^(?:lprob|dossier|route)$/.test(String(A.state.view || "")) && typeof A.render === "function") A.render(); } catch (e) { } }
+    /* دورِ ۲۵ (P7، A25-21 s09 p17 «اصلاح شد ⇐ «یکشنبه ۱۵ آذر ۱۴۰۵»»، بانکِ R25 #227/#239): دلیلِ هر تغییر حرفِ خودِ اوست (یا ✏️ ِ خودش) — تغییرهایی که از راهِ رکوردهای
+       سشن/مسئله می‌آیند (موعد، اندازه، کارت) دلیلِ پیش‌فرضِ «اصلاح شد ⇐ «مقدارِ پیشین»» را می‌آوردند، که مقدارِ قدیم است نه دلیل. دلیل‌های ویژه (حکمِ کنار رفته، نشانِ کهنه) می‌مانند. */
+    chS.forEach(function (c) { if (c && c.kind !== "stale" && (!String(c.why || "").trim() || /^اصلاح شد ⇐ «/.test(String(c.why)))) c.why = why23; });
     return { ch: ch, pend: pend, nEv: nE, res: { changed: chS, ask: askS, note: notes.join(" · ") } };
   }
   /* یک موتور برای گفت‌وگو و ✏️ (RO5): همان سنجش، همان برگرداندن، همان «نتیجهٔ صفحه» (retNote) و همان یک شاهدِ «بازنگری» */
