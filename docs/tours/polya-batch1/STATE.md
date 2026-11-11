@@ -19,10 +19,10 @@
 - پایتون: venv در scratchpad با `requirements.txt` + `requirements-dev.txt` (pip ِ سیستم با بسته‌های debian درگیر می‌شود). `frontend`: `npm ci`. گیت: worktree ِ `gatewt` + پیوندِ `frontend/node_modules` و پیوندِ `apps/learning-architecture/node_modules → /usr/local/lib/node_modules_global` (هر دو untracked؛ بی دومی، r11_coach و r12_coach قرمز می‌شوند) + `PATH=<venv>/bin`.
 
 **گام‌ها (هر کدام که تمام شد همین‌جا تیک می‌خورد):**
-- [ ] گیتِ پایه روی main f0e24f43 (پس از ۱۷ روز کارِ روتین‌ها)
+- [x] گیتِ پایه روی main f0e24f43: آزمون‌های صفحه سبز (دو قرمزِ r11/r12 فقط از نبودِ پیوندِ playwright بود)؛ pytest تا ۵۳٪ بی‌خطا و سپس سقفِ زمانیِ یک‌ساعته — کامل نشد؛ گیتِ ادغام همه را می‌پوشاند
 - [x] بانکِ مستقلِ VARIANTS_R25 (۲۴۱ مورد؛ ابهام‌ها در «Clarifications» ِ DECISIONS_R25 تصمیم شد)
-- [ ] هفت اصلاح‌گر با `runners/FIX25.md`: correction، story، prior، arith، loop، classify، today
-- [ ] ادغام به ترتیبِ correction ⇐ story ⇐ prior ⇐ arith ⇐ loop ⇐ classify ⇐ today؛ گیت؛ **نتیجه پیش از push خوانده شود**؛ main
+- [x] هفت اصلاح‌گر با `runners/FIX25.md` تمام شدند؛ گزارش‌ها در `reports/fix25/`. شاخه‌ها: correction a439159a (3b016baf)، story a13da105 (54bdf348)، prior afe46fbc (bf7f7c89)، arith aaeb0130 (aacd23b0)، loop ad1aba09 (1211afac)، classify a9e88cb9 (67597c2a)، today a97f5cac (dccb2e09)
+- [ ] ادغام انجام شد در شاخهٔ محلیِ `merge25` (worktree در scratchpad؛ سر: c0dc47cc). تداخل‌های کد: a45 onState (story+prior)، a45 priorOf (prior+arith؛ تابع‌های دفترِ prior به موتورِ a46 وصل شد)، a38 نردبان (story+classify)، a21 غلطِ تایپی. شماره‌ها: WORKLOG 121–127، PROGRESS 120–126. **گیتِ ۳۹ در جریان** (`gate39.log`)؛ **نتیجه پیش از push خوانده شود**؛ سپس main. اگر قطع شد: `merge25` محلی است و پوش نشده ⇒ ادغام را از شاخه‌های worktree-agent-* با `mergefix.py` از نو بساز (همین تداخل‌ها).
 - [ ] دورِ ۲۶ (Fable) + گروهِ شاهدِ Opus + داوری
 - [ ] DECISIONS_R26، تصویرنامه‌ها، ایمیل‌ها، بانکِ پرسش‌ها، مجموعه‌داده
 
