@@ -390,3 +390,8 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R25 P4 + C11 (only numbers actually derived; never goals, measured results, data percentages, deadline times, list indices, bounds;
   every proposed value is the page's own correct recomputation, otherwise the page asks).
 - **Status:** reachable, not called: `APP.LIVE_R24_QUARANTINE_P4.staleScan`. Delete only with the owner's approval.
+
+## 2026-11-11 — Tour 1 round 25, fixer «story»: `A.STORY.phaseOfItemsR24`
+- **What it did:** any intermediate chat result (`res` with `fin:false`) put the problem at «اجرا», even with no plan and no validated step.
+- **Why replaced:** DECISIONS_R25 P5 («the stage never jumps to «اجرا» before a plan»; C25-10 aC4 p4, A25-16 oA1).
+- **Status:** reachable as `APP.STORY.phaseOfItemsR24`, not called. Delete only with the owner's approval.

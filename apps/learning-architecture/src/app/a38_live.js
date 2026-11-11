@@ -1692,12 +1692,15 @@
     if (hm0) T = Object.assign({}, T, { text: hm0 });
     var stuckT = !!(T.stuck || o.stuck), tx = norm(T.text || ""), ok = function (x) { return x && !isAsked(x) && qOk(s, x, stuckT); };
     /* (۴) پرسشِ بازِ کارتِ طرح/اجرا */
-    var pageQ = "", c0Mark = false;
+    var pageQ = "", c0Mark = false, own25none = false;   // دورِ ۲۵ (C25-5، بانکِ R25 #170): مسئلهٔ خودساختهٔ بیدارشده — نردبانِ فهم («کل»، «مجهول چیست؟») پرسشِ صفحه نیست؛ پرسش از حرفِ خودش می‌آید
     /* دورِ ۲۳ (Q3، A23-35/B·D5): فهم را در گفت‌وگو تمام کرد (کل + مجهول + داده/شرط، یا طرح/نتیجه — سنجیدهٔ coach_state، a45) ⇒ پرسش‌های فرمِ فهم پرسشِ نوبت نیستند؛
        فرم با «از گفت‌وگو: … درست است؟» روی صفحه می‌ماند (دوباره پرسیده نمی‌شود) */
     var storyAhead23 = false; try { storyAhead23 = ph === "u" && !!(A.liveStoryAhead && A.liveStoryAhead(r.p.id)); } catch (e) { }
     if (ph === "u" && storyAhead23) pageQ = "";
-    else if (ph === "u") { var d = L.uDraft || {}; pageQ = wholeOpen(s) ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
+    /* دورِ ۲۵ (P5): (۱) C25-5 s25 p12 — مسئله‌ای که صورتش را خودش ساخت و حالا بیدار شد (ساختهٔ بازنگری: origin.lprob، یا r.woke) «کل» را به حرفِ خودش گفته است؛
+       u0 («کلِ مسئله را در یک جمله…») پرسشِ نوبتِ آن نیست. (۲) A23-35 s10 p5 — فهمی که دوباره باز شد (L.reU) و هنوز پیش‌نویسی ندارد همان فهمِ ثبت‌شده را پیشِ رو دارد
+       (فرم هم با همان پر می‌شود): پرسشِ نوبت از همان خوانده می‌شود، نه از پیش‌نویسِ خالی («مجهول چیست؟» برای مجهولی که ثبت است). */
+    else if (ph === "u") { var d = L.uDraft || (L.reU ? uOf(s) : null) || {}, own25 = !!(r.woke || (r.origin && r.origin.type === "lprob")); if (own25 && !txt(d.u) && !txt(d.one)) { pageQ = ""; own25none = true; } else pageQ = wholeOpen(s) && !own25 ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
     else if (ph === "p" && Q.length) { var P = tut.plan || [], qi0 = tut.qi && tut.qi.lplan != null ? +tut.qi.lplan : 0;
       for (var k = 0; k < Q.length; k++) { var j = (qi0 + k) % Q.length; if (qOk(s, Q[j]) && !P.some(function (e) { return e && e.src === "live" && e.q === Q[j] && (e.text || e.skip); })) { pageQ = Q[j]; break; } } }
     else if (ph === "c") { var o0 = openStep(s); if (o0 && chatOut(o0)) pageQ = "";   // RN2a (دورِ ۱۹): نتیجه‌اش را در گفت‌وگو گفت و ثبت شد — دوباره پرسیده نمی‌شود
@@ -1799,7 +1802,7 @@
     /* (۴) کارتِ صفحه — موعدِ گامِ باز حتی اگر پیش‌تر پرسیده شده، چون صفحه هنوز همان را می‌پرسد */
     if (!q && pageQ && (ok(pageQ) || (ph === "c" && openStep(s)))) { q = pageQ; src = "page"; }
     /* (۵) نردبان */
-    if (!q) { q = Q.filter(function (x) { return ok(x) && !(ph === "c" && !openStep(s) && STEP_BOUND.test(x)) && !(ph === "p" && (tut.plan || []).some(function (e) { return e && e.src === "live" && e.q === x && (e.text || e.skip); })); })[0] || ""; if (q) src = "ladder"; }
+    if (!q && !own25none) { q = Q.filter(function (x) { return ok(x) && !(ph === "c" && !openStep(s) && STEP_BOUND.test(x)) && !(ph === "p" && (tut.plan || []).some(function (e) { return e && e.src === "live" && e.q === x && (e.text || e.skip); })); })[0] || ""; if (q) src = "ladder"; }
     var rung = Q.length ? Q.indexOf(q) : 0; if (rung < 0) rung = Q.filter(isAsked).length;
     if (K && R && (stuckT || !R.st)) R.q = q;
     var c0Put = false; if (c0Mark && o.turn && !sysT && q && q === pageQ) { if (c0Mark.A[q] !== c0Mark.k) { c0Mark.A[q] = c0Mark.k; if (c0Mark.T && c0Mark.t) c0Mark.T[q] = c0Mark.t; } c0Put = true; }
@@ -5650,7 +5653,10 @@
     /* سشنی که مسئلهٔ زندهٔ باز دارد، قاعدهٔ «بساز» را دوباره نمی‌گیرد (دورِ ۲، s26: قاعده‌ها دوباره تزریق می‌شد و مسئلهٔ تکراری ساخته می‌شد) */
     AS.promptHooks.push(function (s, msg) { if (A.liveSessionPid(s)) return ""; var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-4).map(function (m) { return m.text; })).join(" "); return LIVE_RE.test(recent) ? RULES : ""; });
     AS.promptHooks.push(function (s, msg) {
-      var st = A.state || {}, onPage = st.view === "lprob" || (st.view === "e_prob" && rec(st.arg)), bp = A.liveSessionPid(s), pid = onPage ? st.arg : bp || (s && s.lprob), r = rec(pid); if (!r) return "";
+      var st = A.state || {}, onPage = st.view === "lprob" || (st.view === "e_prob" && rec(st.arg)), bp = A.liveSessionPid(s);
+      /* دورِ ۲۵ (P5، B25·D12): پس از «یه مسئلهٔ دیگه هم دارم …» کانونِ نوبت مسئلهٔ تازهٔ گفت‌وگوست — صفحهٔ بازِ مسئلهٔ پیشین بلوکِ «مسئلهٔ زندهٔ این سشن» نمی‌آورد (a45 ST.keepSplit) */
+      try { if (onPage && A.STORY && A.STORY.keepSplit && A.STORY.keepSplit(s, st.arg)) onPage = false; } catch (e) { }
+      var pid = onPage ? st.arg : bp || (s && s.lprob), r = rec(pid); if (!r) return "";
       var pg = pgOf(pid), so = solOf(pg), ph = storyPh(r, so);   // دورِ ۲۴ (R2): مرحلهٔ بلوک = مرحلهٔ داستان (A.liveStoryPhase)، نه فرم
       if (ph === "done") return "";   // مسئلهٔ بسته‌شده دیگر «مسئلهٔ زندهٔ این سشن» نیست
       /* دورِ ۲ (R1/R2): سشنی که به این مسئله بسته است (ساختنِ آن در همین سشن، یا رفتن به صفحه‌اش) همیشه این بلوک را می‌گیرد — بی شرطِ واژهٔ مشترک.
