@@ -16,7 +16,7 @@
 
 **محیطِ تازه (کانتینر عوض شد؛ scratchpad خالی بود):**
 - `kit/restore.sh <repo> <scratchpad>` درختِ کارِ تور را از git بازمی‌سازد (وارونِ checkpoint.sh). عکس‌ها و ai/pN.json و better/ ِ دورِ ۲۵ در git نیستند.
-- پایتون: venv در scratchpad با `requirements.txt` + `requirements-dev.txt` (pip ِ سیستم با بسته‌های debian درگیر می‌شود). `frontend`: `npm ci`. گیت: worktree ِ `gatewt` + پیوندِ node_modules (untracked) + `PATH=<venv>/bin`.
+- پایتون: venv در scratchpad با `requirements.txt` + `requirements-dev.txt` (pip ِ سیستم با بسته‌های debian درگیر می‌شود). `frontend`: `npm ci`. گیت: worktree ِ `gatewt` + پیوندِ `frontend/node_modules` و پیوندِ `apps/learning-architecture/node_modules → /usr/local/lib/node_modules_global` (هر دو untracked؛ بی دومی، r11_coach و r12_coach قرمز می‌شوند) + `PATH=<venv>/bin`.
 
 **گام‌ها (هر کدام که تمام شد همین‌جا تیک می‌خورد):**
 - [ ] گیتِ پایه روی main f0e24f43 (پس از ۱۷ روز کارِ روتین‌ها)

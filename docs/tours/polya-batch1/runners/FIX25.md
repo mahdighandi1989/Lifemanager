@@ -5,6 +5,8 @@ Environment (new container): `export PATH=/tmp/claude-0/-home-user-Lifemanager/4
 (`require('playwright')` works from any directory; Chromium is preinstalled — never run "playwright install", never npm-install playwright).
 The tour's working tree was restored from git: T = /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya (briefs, decisions, reports, round25X/<sid>/findings.md, defects.md,
 PARTS.md, ans_*.json, round25X/tools and ctl). Screenshots, ai/pN.json and better/ of round 25 were NOT kept; the findings quote the turns.
+Two old tests (test_tour1_r11_coach.js, r12_coach.js) load playwright through tests/prompt_tap.js from apps/learning-architecture/node_modules:
+create the untracked link `ln -sfn /usr/local/lib/node_modules_global apps/learning-architecture/node_modules` in your worktree (never commit it).
 NEVER commit a tool link: temporary node_modules symlinks stay untracked. Before every commit run `git status` and make sure no mode-120000
 entry is staged.
 Read: CLAUDE.md; apps/learning-architecture/AGENTS.md (edit only src/, then `python apps/learning-architecture/build.py`; tests load
