@@ -29,6 +29,9 @@ Files and the exact functions changed:
 - `AS.finalFilter25` runs after ALL prompt filters (a26): every line «**پرسشِ این نوبت همین است:**» / «- در این نوبت فقط **یک** پرسش … «…»» gets ONE «؟»
   outside parentheses and inner quotes (middle «؟» become «،»). Lines starting «- زمینه» are untouched. You may keep writing book questions with several
   «؟» in registries; the model receives one question sentence. `AS.oneQ25(q)` is the same function for your own use.
+- The same gate rewrites «پیشنهادِ این نوبت: «…»» and «پرسشِ پیشنهادیِ این نوبت: «…»» (so one question never appears in two wordings in one prompt).
+  «X؟ — Y؟» becomes «X — Y؟». Old assertions updated with a comment: `test_fixes_1015c`, `test_tour1_assist`, `test_tour1_r5_live`, `test_tour1_r5_coach`,
+  `test_tour1_r6_coach`. **If your new test expects a registry question verbatim in the prompt, compare with `AS.oneQ25(q)`.**
 - The non-objective result question is now «نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟ (…)»; «از راهِ دیگری…؟» belongs to the look-back form.
 - Ladder (a38, branch 5): a rung is not the turn question again in a later turn (`L.lad25[q] = turnKey`); «این گام جواب نداد؟» only when the last closed
   step failed (or this turn reports a failure) and once per outcome. All rungs asked ⇒ `ladderEnd` (q = ""), as before for an exhausted ladder.

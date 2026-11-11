@@ -118,7 +118,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await newSess();
   await next('هوم.', ST({ ph: 'b', said: ['result'] }));
   await say('فرض: ۵ نقطه، مربع ضلع ۱، نقطه‌ها داخلش. حکم: دو تا فاصله‌شون ≤ √۲/۲. هفت تا شکل کشیدم با ۵ نقطه، همیشه دو تا نزدیک بودن. پس درسته، ثابت شد دیگه!');
-  info.f1g = { claim: /برهانش؟/.test(coachOf(await lastUser())) };
+  /* دورِ ۲۵ (classify P6، DECISIONS_R25 «the page's own two-question turn questions»): پرسشِ صفحه در گذرگاهِ پایانی یک «؟» می‌گیرد — «برهانش — چرا برای هر حالت …؟» */ 
+  info.f1g = { claim: /برهانش(?:؟| —)/.test(coachOf(await lastUser())) };
   await say('خب');
   info.f1g.ph = phOf(coachOf(await lastUser()));
   chk(info.f1g.claim && info.f1g.ph !== 'بازنگری', 'F1: a heuristic «ثابت شد دیگه!» after drawings only is a CLAIM («برهانش؟»), not look-back (s03) ' + JSON.stringify(info.f1g));

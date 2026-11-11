@@ -233,8 +233,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     chk(g3.a073.machine && g3.a073.why && !g3.a073.ctl, 'G3: A073 (ask the learner\'s own attempt/guess first) on «شما که ماشینی، بگو» and on «چرا X؟», not on a plain problem (s12, s14) ' + JSON.stringify(g3.a073));
     // heurClaim «۱۰ تا چک کردم… اثباته»
     g3.heur = {
-      a: /برهانش؟/.test(await first('امروز دیدم ۱/۲ + ۱/۶ + ۱/۱۲ = ۳/۴. با ۱/۲۰ میشه ۴/۵! فکر کنم همیشه n/(n+1) میشه. ۱۰ تاشو چک کردم. درسته دیگه؟ ثابت شد.')),
-      b: /برهانش؟/.test(await hookFor('دیدم ۱/۲ + ۱/۶ + ۱/۱۲ = ۳/۴؛ فکر کنم همیشه n/(n+1) میشه.', 'خب ۱۰ تا چک کردم، دیگه اثباته! ولی باشه، ثبتش کن ببینیم.')),
+      /* دورِ ۲۵ (classify P6، DECISIONS_R25 «the page's own two-question turn questions»): پرسشِ صفحه در گذرگاهِ پایانی یک «؟» می‌گیرد — «برهانش — چرا برای هر حالت …؟» */ 
+      a: /برهانش(?:؟| —)/.test(await first('امروز دیدم ۱/۲ + ۱/۶ + ۱/۱۲ = ۳/۴. با ۱/۲۰ میشه ۴/۵! فکر کنم همیشه n/(n+1) میشه. ۱۰ تاشو چک کردم. درسته دیگه؟ ثابت شد.')),
+      b: /برهانش(?:؟| —)/.test(await hookFor('دیدم ۱/۲ + ۱/۶ + ۱/۱۲ = ۳/۴؛ فکر کنم همیشه n/(n+1) میشه.', 'خب ۱۰ تا چک کردم، دیگه اثباته! ولی باشه، ثبتش کن ببینیم.')),
     };
     chk(g3.heur.a && g3.heur.b, 'G3: heurClaim catches «۱۰ تاشو چک کردم… ثابت شد» and «۱۰ تا چک کردم، دیگه اثباته!» ⇒ «برهانش؟» (C145, s25) ' + JSON.stringify(g3.heur));
     // BRUTE_RE: «اول همه‌ی کیش‌ها رو امتحان می‌کنم» طرح نیست (s21)
