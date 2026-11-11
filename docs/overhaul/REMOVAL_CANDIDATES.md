@@ -410,3 +410,12 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   Unicode minus was dropped, «با ۱/۲۰ میشه ۴/۵» was read as «1/20 = 4/5».
 - **Why replaced:** DECISIONS_R25 P2 (S1 D25-12; C25-1, A25-8, B25·D5/D14, B_s D1) and C9/C10 — `a46_arith.js` (`A.STORY.arithChk`).
 - **Status:** reachable, not called: `APP.STORY.arithChkR24`. Delete only with the owner's approval.
+
+## 2026-11-11 — flat (equal-weight) scoring of the territory loop (learning-architecture, Pólya round 25, loop: P3)
+- **File:** `apps/learning-architecture/src/app/a44_route.js`.
+- **What it did:** `rank` (R24) counted every non-generic shared word the same and called a fit «clear» on any two of them with one in the step OR the sheet title. An unfit
+  area was declared «🛎 ابزارِ لازم آمد» on «ایده» (sheet title) + «جایگاه» (the existing view name «💡 جایگاهِ ایده» inside the sheet's own text) — B25·D1 — and on
+  «نویز، عدد، آر، پنجره» — D25-21 (the round's S1).
+- **Why replaced:** DECISIONS_R25 P3 + C2/C3 (words spread across the systems, words of an existing view/area name the sheet itself cites, and stem fragments cannot make an
+  arrival; a clear fit needs a full-weight word of HER step; anything less ⇒ ask her).
+- **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.rank24`. Delete only with the owner's approval.

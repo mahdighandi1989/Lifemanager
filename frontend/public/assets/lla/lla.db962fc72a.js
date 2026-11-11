@@ -55415,7 +55415,7 @@ APP.goFromURL = function (q) {
     "{\"do\":\"coach_state\",\"prereq\":{\"concept\":\"نامِ دقیقِ مفهوم (نه «جبر»/«ریاضی»)\",\"step\":\"گامی از همین حل که آن را لازم دارد\",\"quote\":\"عینِ حرفش\",\"q\":\"یک پرسشِ تشخیصیِ کوتاه\",\"topic\":\"موضوعِ بزرگ‌ترش (اختیاری)\"}} بده؛ تنها پرسشِ همین پاسخ همان پرسشِ تشخیصی است. " +
     "چند پیش‌نیاز ⇒ آرایه به ترتیبِ اولویتِ همین حل (آن‌که راه را زودتر بسته اول)؛ پیش‌نیازی که هنگامِ یاد گرفتنِ پیش‌نیازِ دیگر پیدا شد ⇒ \"parent\":\"شناسهٔ آن\". گیرِ بی پیش‌نیاز ⇒ \"cause\":{\"kind\":\"knot|skill\",\"quote\":\"عینِ حرفش\"} (knot = مفهوم را دارد و راه را نمی‌بیند؛ skill = روش را می‌داند و در اجرا لغزید). " +
     "گفت مفهومی را آموخت (حتی وقتی به دیگری یاد می‌داد) ⇒ \"learned\":{\"concept\":\"…\",\"quote\":\"عینِ حرفش\"}. صفحه نقل را با پیامش می‌سنجد. " +
-    "برگهٔ کمبودِ سامانه (status=gap) برای گامی از همین مسئله ⇒ gap.step = همان گام (زیرمسئله‌ای که منتظرِ برگه می‌ماند)؛ برگه‌ای دربارهٔ خودِ سامانه (اصلاح، خودشناسیِ سامانه، کتابِ همراه، سنجشِ مدل‌ها) gap.step ندارد و هیچ گامی را منتظر نمی‌کند. گامِ منتظرِ برگه را خودش از راهِ دیگری برداشت (گزارشِ انجام، نه پرسش) ⇒ \"sys_done\":{\"sheet\":شماره,\"quote\":\"عینِ حرفش\"}؛ به پرسشِ صفحه «این ابزارِ تازه همان است…؟» جواب داد ⇒ \"sys_fit\":{\"sheet\":شماره,\"fit\":true|false,\"quote\":\"عینِ حرفش\"}. " +
+    "برگهٔ کمبودِ سامانه (status=gap) برای گامی از همین مسئله ⇒ gap.step = همان گام (زیرمسئله‌ای که منتظرِ برگه می‌ماند)؛ برگه‌ای دربارهٔ خودِ سامانه (اصلاح، خودشناسیِ سامانه، کتابِ همراه، سنجشِ مدل‌ها) gap.step ندارد و هیچ گامی را منتظر نمی‌کند. گامِ منتظرِ برگه را خودش از راهِ دیگری برداشت (گزارشِ انجام، نه پرسش) ⇒ \"sys_done\":{\"sheet\":شماره,\"quote\":\"عینِ حرفش\"}؛ به پرسشِ صفحه «این ابزارِ تازه همان است…؟» جواب داد، یا پس از «ابزارِ لازم آمد» گفت آن ابزار همان نیست / به کارِ گامش نمی‌آید ⇒ \"sys_fit\":{\"sheet\":شماره,\"fit\":true|false,\"quote\":\"عینِ حرفش\"} (fit=false ⇒ گام دوباره منتظر می‌شود). " +
     "قاعدهٔ «نامِ قضیه را لو نده» فقط برای پیش‌نیازِ تشخیص‌داده‌شده برقرار نیست: آن‌جا نامِ دقیقِ مفهوم و گام را بگو (هرگز «جبر بلد نیستی»)؛ جاهای دیگر همان قاعده می‌ماند.";
   /* دورِ ۲۳ (A23-23): «پرسیده شد» فقط وقتی واقعاً پرسیده شد (پاسخِ همان نوبت پرسید، یا رهنمودِ پرسشِ این نوبت برای همان بود) */
   function stLabel(e) { return e.state === "diag" ? "پرسشِ تشخیصی" + (e.asked ? " پرسیده شد" : " هنوز پرسیده نشده") : e.state === "wait" ? "در نوبت" : "در حالِ یاد گرفتن" + (e.tries ? "، تلاشِ " + fa(e.tries + 1) : "") + (e.mastPending ? "، تسلطش گزارش شد — پس از پیش‌نیازِ درونی بسته می‌شود" : ""); }
@@ -55453,8 +55453,11 @@ APP.goFromURL = function (q) {
     var m = String(msg || ""); if (/^\s*\[/.test(m)) return "";
     var sc = PRE.scope(s);
     if (!sc) {
-      var ls = PRE.ability(m) ? lastScope(s) : null, RL = ls && store(ls); if (!RL) return "";
-      return ["# پیش‌نیاز (کمبودِ پیش‌نیاز ≠ گرهٔ ذهنی ≠ کم‌هوشی) — مسئلهٔ «" + noq(clip(scTitle(ls), 60)) + "» بسته است", abilityLine(s, m, openOf(RL.X), RL.X.st.filter(function (e) { return e && e.state === "learned"; }))].join("\n");
+      /* دورِ ۲۵ (A25-22): تکهٔ پس از بستن که منتظرِ برگه است — همان خط‌های حلقه، برای مسئلهٔ بسته */
+      var lt = null, LT = []; try { lt = sysScope(s); var Rl = lt && store(lt); if (Rl) LT = sysLines(s, lt, Rl.X, m, false, function (e) { return !!e.late; }); } catch (e) { LT = []; }
+      var lateB = LT.length ? ["# تکهٔ منتظرِ ابزار — مسئلهٔ «" + noq(clip(scTitle(lt), 60)) + "» بسته است و بسته می‌ماند"].concat(LT).join("\n") : "";
+      var ls = PRE.ability(m) ? lastScope(s) : null, RL = ls && store(ls); if (!RL) return lateB;
+      return (lateB ? lateB + "\n" : "") + ["# پیش‌نیاز (کمبودِ پیش‌نیاز ≠ گرهٔ ذهنی ≠ کم‌هوشی) — مسئلهٔ «" + noq(clip(scTitle(ls), 60)) + "» بسته است", abilityLine(s, m, openOf(RL.X), RL.X.st.filter(function (e) { return e && e.state === "learned"; }))].join("\n");
     }
     var R = store(sc), X = R ? R.X : { st: [] }, L = ["# پیش‌نیاز (کمبودِ پیش‌نیاز ≠ گرهٔ ذهنی ≠ کم‌هوشی)", RULE];
     var nt = X.note, um = lastUser(s); if (nt && (nt.lines || []).length && nt.key !== mid(um) && !nt.shown) { L.push(CTX + "نتیجهٔ گزارشِ پیش‌نیازِ نوبتِ پیش: " + nt.lines.map(noq).join("؛ ") + "."); }
@@ -55554,7 +55557,7 @@ APP.goFromURL = function (q) {
     cprior: 1 };
   /* رویدادِ گفت‌وگویی که همان رکوردِ صفحه را دارد دوبار روی خط نمی‌آید (بانکِ R23 #84): فرمِ فهمِ ثبت‌شده ⇐ کل/مجهول/داده/شرط؛ طرحِ صفحه ⇐ طرحِ گفت‌وگو */
   var CHAT_COVER = { cwhole: "u", cunk: "u", ccond: "u", cdata: "u", cplan23: "plan" };
-  var DET_K = { aux: "aux", guess: "guess", gold: "guess", pre: "pre", prediag: "pre", preok: "pre", syswait: "sys", sysback: "sys", sysno: "sys", sysother: "sys", sysmis: "sys", sysask: "sys" };   // دورِ ۲۳ (Q6): انتظارِ برگه هم انحرافِ نقطه‌چین است
+  var DET_K = { aux: "aux", guess: "guess", gold: "guess", pre: "pre", prediag: "pre", preok: "pre", syswait: "sys", sysback: "sys", sysno: "sys", sysother: "sys", sysmis: "sys", sysask: "sys", sysundo: "sys" };   // دورِ ۲۳ (Q6): انتظارِ برگه هم انحرافِ نقطه‌چین است
   var BACK_K = { retract: 1, copyans: 1, stepold: 1, uold: 1, planold: 1 };
   var SKIP_K = { mind: 1, chatwork: 1, copyask: 1, fcast: 1, practice: 1 };
   var DET_FA = { pre: "پیش‌نیاز", aux: "مسئلهٔ کمکی", guess: "آزمودنِ حدس", sys: "منتظرِ ابزار" };
@@ -55860,14 +55863,28 @@ APP.goFromURL = function (q) {
        (همان قاعدهٔ «دو واژه» ِ R6 در a27/a28 — نه عددِ تازه). نامربوط ⇒ هیچ؛ ساخته‌شدهٔ ناهم‌خوان ⇒ ثبتِ ناهم‌خوانی و یادداشت زیرِ برگه (دوباره باز). */
   var SWK = /^sys23_(sw\d+)_(\w+)$/;
   PRE.sysEvId = function (id) { var m = SWK.exec(String(id || "")); return m ? { eid: m[1], k: m[2] } : null; };
-  function toksOf(t) { try { return A.SYST && A.SYST.toks ? A.SYST.toks(t) : String(t || "").split(/\s+/).filter(function (w) { return w.length >= 3; }); } catch (e) { return []; } }
+  /* دورِ ۲۵ (P3، D25-21 — S1): تکه‌واژه واژه نیست. ریشه‌یابیِ a28 «آرام» را «آر» می‌کرد و همان تکه «واژهٔ مشترک» شمرده می‌شد ⇒ ریشه‌ای که از سه حرف
+     کوتاه‌تر شد دور ریخته می‌شود. ولی واژهٔ **کاملِ** دوحرفی («آب»، «نخ») واژه است و شمرده می‌شود (a28 همه را می‌انداخت) — جز حرف‌ها و ضمیرهای دوحرفی (ردهٔ بسته). */
+  function rawW(t) { return String(t || "").replace(/[\u064B-\u065F\u0670\u0654\u200c]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[\u060C\u061B\u061F\u066B\u066C\u06D4«»]+/g, " ").replace(/[^\u0600-\u06FFa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(Boolean); }
+  var W2_STOP = /^(?:از|به|با|در|که|را|تا|یا|هم|من|تو|ما|او|چه|هر|پس|بر|بی|نه|کی|چی|یک|دو|سه|ای|آن|شد|کن|رو|ها|هی|اش|ام|ات|بس|پی|کم|پر|وی|جز|تر|یه|می|اگ|ان|نی|شش|نه|ده|صد|آی|ول|خب|آه|اه)$/;
+  var TKC = Object.create(null);
+  function tok1(w) {
+    if (w in TKC) return TKC[w]; var o = null;
+    if (w.length === 2) o = /^[\u0600-\u06FF]{2}$/.test(w) && !/[\u06F0-\u06F9\u0660-\u0669]/.test(w) && !W2_STOP.test(w) ? w : null;
+    else { var st = A.SYST.toks(w); o = st.length === 1 && st[0].length >= 3 ? st[0] : null; }
+    return (TKC[w] = o);
+  }
+  function toksOf(t) { try { if (!(A.SYST && A.SYST.toks)) return String(t || "").split(/\s+/).filter(function (w) { return w.length >= 3; }); var out = []; rawW(t).forEach(function (w) { var o = tok1(w); if (o) out.push(o); }); return out; } catch (e) { return []; } }
   function areaText(a) { return [a.fa, a.en || "", a.desc_fa || "", (a.key_questions_fa || []).join(" "), (a.claims || []).map(function (c) { return c && c.fa; }).join(" ")].join(" "); }
   /* واژه‌ای که در بیش از نیمِ حوزه‌های قلمرو هست دربارهٔ «کدام» چیزی نمی‌گوید (همان معیارِ distinctFor ِ a28 از A4) — در هم‌خوانی شمرده نمی‌شود */
-  var DFC = { n: -1, d: {}, N: 0 };
-  function dfWide(w) {
-    var L0 = A.SYST && A.SYST.areas ? A.SYST.areas() : []; if (DFC.n !== L0.length) { DFC = { n: L0.length, d: {}, N: L0.length }; L0.forEach(function (x) { var seen = {}; toksOf(areaText(x.a)).forEach(function (t) { if (!seen[t]) { seen[t] = 1; DFC.d[t] = (DFC.d[t] || 0) + 1; } }); }); }
-    return DFC.N > 0 && (DFC.d[w] || 0) * 2 > DFC.N;
+  /* دورِ ۲۵ (P3): یک نمایه از واژه‌های هر حوزه (کلیدش شناسه‌های ثبت‌گاه، نه شمارشان — افزودن و برداشتنِ هم‌زمان نمایهٔ کهنه نمی‌گذارد) */
+  var DFC = { k: null, d: {}, N: 0, m: {} };
+  function areaIdx() {
+    var L0 = A.SYST && A.SYST.areas ? A.SYST.areas() : [], k = L0.map(function (x) { return x.a && x.a.id; }).join("|");
+    if (DFC.k !== k) { DFC = { k: k, d: {}, N: L0.length, m: {}, sys: {} }; L0.forEach(function (x) { var seen = {}; toksOf(areaText(x.a)).forEach(function (t) { if (!seen[t]) { seen[t] = 1; DFC.d[t] = (DFC.d[t] || 0) + 1; } }); DFC.m[x.a.id] = seen; DFC.sys[x.a.id] = x.sys ? x.sys.id : "epi"; }); }
+    return DFC;
   }
+  function dfWide(w) { var D = areaIdx(); return D.N > 0 && (D.d[w] || 0) * 2 > D.N; }
   function regFP() {
     var v = Object.keys(A.V || {}).filter(function (k) { return typeof A.V[k] === "function"; }).sort(), a = {};
     try { (A.SYST && A.SYST.areas ? A.SYST.areas() : []).forEach(function (x) { a[x.a.id] = (A.SYST.stage(x.a) || 0) + "/" + (x.a.tools || []).length + "/" + (txt(x.a.gap_fa) ? 1 : 0); }); } catch (e) { }
@@ -55907,10 +55924,11 @@ APP.goFromURL = function (q) {
      • هر نامزد امتیاز می‌گیرد (شمارِ واژه‌های کاملِ مشترک با نیاز) و بهترین برمی‌گزیده می‌شود، نه نخستین. «رسید» فقط وقتی روشن است: دست‌کم دو
        واژه (همان قاعدهٔ «دو واژه» ِ R6)، دست‌کم یکی از خودِ گام یا عنوانِ برگه (لنگر — واژهٔ حاشیه‌ایِ متنِ کمبود به‌تنهایی کافی نیست)، و
        بی‌رقیبِ هم‌امتیاز. نه روشن ولی با لنگر ⇒ پیش از از سر گرفتن از خودِ او می‌پرسد «این ابزارِ تازه همان است که برای گامِ … لازم بود؟» (هر
-       نامزد یک بار). بی لنگر یا صفر ⇒ ناهم‌خوانی: خطِ صفحه، یادداشت زیرِ برگه (دوباره باز)، گام منتظر می‌ماند. */
+       نامزد یک بار). بی لنگر یا صفر ⇒ ناهم‌خوانی: خطِ صفحه، یادداشت زیرِ برگه (دوباره باز)، گام منتظر می‌ماند.
+     دورِ ۲۵ (P3): «دو واژه» دیگر هم‌وزن نیست و لنگر فقط خودِ گام است — بلوکِ «وزنِ واژه» پایین‌تر جای این قاعدهٔ امتیاز را گرفته (امتیازِ هم‌وزن: R24_QUARANTINE.rank24). */
   var GEN = null;
   function generic(w) {
-    if (!GEN) { GEN = {}; toksOf("مسئله مسئله‌ها تغییر تغییری ابزار ابزاری هیچ واقع واقعاً واقعا نمودار حوزه حوزه‌ای قلمرو قلمروِ سامانه سامانه‌ها برگه برگهٔ کمبود روتین صفحه کاربر ساخته ساختن ساخت تازه جدید فقط بیشتر بهتر اینکه چیز درباره کار خود دیگر بدون پیش قبل میان بین").forEach(function (t) { GEN[t] = 1; }); }
+    if (!GEN) { GEN = {}; toksOf("دستیار مسئله مسئله‌ها تغییر تغییری ابزار ابزاری هیچ واقع واقعاً واقعا نمودار حوزه حوزه‌ای قلمرو قلمروِ سامانه سامانه‌ها برگه برگهٔ کمبود روتین صفحه کاربر ساخته ساختن ساخت تازه جدید فقط بیشتر بهتر اینکه چیز درباره کار خود دیگر بدون پیش قبل میان بین").forEach(function (t) { GEN[t] = 1; }); }
     return !!GEN[w] || dfWide(w);
   }
   var CL_SPLIT = /[،,؛;.:!?؟\n()\[\]«»"—–⇐⇒|]+|\s(?:ولی|اما|بلکه)\s/;
@@ -55933,17 +55951,71 @@ APP.goFromURL = function (q) {
   /* نیازِ گام = نامِ گام + عنوانِ برگه + «دقیقاً چه کم است» (نه «کجا افزوده شود» که واژه‌های ساختارِ خودِ صفحه است) — بی‌نفی */
   function needText(e) { return [negFree(e.step), negFree(e.title), negFree(e.miss != null ? e.miss : e.need)].join(" ، "); }
   function anchorText(e) { return [negFree(e.step), negFree(e.title)].join(" ، "); }
-  function score(e, it) { var w = shared(needText(e), it.text); return { it: it, w: w, n: w.length, a: shared(anchorText(e), it.text).length }; }
-  /* همهٔ نامزدها امتیاز می‌گیرند؛ بهترین (بیشترین واژه، سپس لنگر) */
-  function rank(e, C) {
-    var R0 = C.map(function (it) { return score(e, it); }).sort(function (x, y) { return (y.n - x.n) || (y.a - x.a); });
-    var b = R0[0] || null, s2 = R0[1] || null;
-    var clear = !!(b && b.n >= 2 && b.a >= 1 && !(s2 && s2.n === b.n));
-    return { best: b, second: s2, clear: clear, all: R0 };
+  /* ---------- دورِ ۲۵ (P3؛ S1 ِ دور: B25·D1 = D25-21؛ روشن‌سازی‌های C2–C3) — وزنِ واژه: صفر، کم، کامل ----------
+     ریشه: «دو واژهٔ مشترک» همهٔ واژه‌ها را هم‌وزن می‌شمرد. tB1: «بررسیِ بازار و رقیبان» با «ایده» و «جایگاه» «رسید» شد — «ایده» از عنوانِ برگه و «جایگاه» از
+     نامِ نمای موجودِ «💡 جایگاهِ ایده» در متنِ خودِ برگه؛ oD1u: «هموارسازیِ نویزِ اندازه‌گیری» با «نویز» (عنوان)، «عدد» (عام)، «آر» (تکه) و «پنجره» (حاشیهٔ متنِ کمبود).
+       • صفر (شمرده نمی‌شود): واژگانِ عامِ R24 و خودِ حلقه، و واژهٔ بیش از نیمِ حوزه‌ها (dfWide) — بی‌تغییر؛ و تکه‌واژه.
+       • کم‌وزن: (۱) واژهٔ **پخش** میانِ سامانه‌ها — همان معیارِ «متمایز» ِ a28 از A4: در حوزه‌های موجودِ لحظهٔ ثبت (نه نامزد) هیچ سامانه‌ای بیش از نیمِ حوزه‌های
+         دارندهٔ آن واژه را ندارد («عدد»، «داده»، «اندازه»، «برآورد»، «ایده») ⇒ دربارهٔ «کدام حوزه» چیزی نمی‌گوید؛ (۲) واژهٔ نامِ نما یا حوزه‌ای که در لحظهٔ ثبت بود
+         و متنِ برگه نامش را برده (قابِ خودِ برگه)، مگر خودِ همان نامزد — و مگر (C2) واژه در خودِ گامِ او هم باشد **و** جوابِ روتین آن را دربارهٔ ساخته به کار برده باشد.
+       • کامل: بقیه.
+     «رسید» (C3) فقط وقتی دست‌کم یک واژهٔ کامل از **خودِ گامِ او** با متنِ ساخته مشترک است (عنوان و متنِ کمبودِ برگه نوشتهٔ دستیارند: پشتیبان‌اند، لنگر نه)،
+     همراهِ همان قاعدهٔ «دو واژه» ِ R6 (دو واژهٔ کامل؛ عددِ تازه‌ای نیست)، بی‌رقیبِ هم‌امتیاز، و بیش از امتیازِ چیزی که خودش رد کرده (e.rejS). گامی که خودش
+     هیچ واژهٔ کاملی ندارد (فقط برچسب: «۵ ایمنی») لنگرش را از عنوانِ برگه می‌گیرد. هر هم‌واژگیِ دیگر (کم‌وزن، قاب، بی‌لنگرِ گام) ⇒ از خودش می‌پرسد؛ صفر ⇒ ناهم‌خوانی. */
+  function labelToks(fa0) { return toksOf(String(fa0 || "")).filter(function (w) { return !generic(w); }); }
+  function quotedIs(T, fa0) { var z = zk(String(fa0 || "").replace(/[^\u0600-\u06FFa-zA-Z0-9 \u200c]/g, " ")); return z.trim().length >= 2 && (String(T || "").match(/«[^»]{1,60}»/g) || []).some(function (q) { return zk(q.replace(/[^\u0600-\u06FFa-zA-Z0-9 \u200c]/g, " ")) === z; }); }
+  /* نام‌های موجودِ لحظهٔ ثبت که متنِ برگه برده: نامِ چندواژه‌ای در متن، نامِ تک‌واژه‌ای فقط درونِ «…»، یا شناسهٔ نما (`idea`، view=idea، VIEW_META.idea) */
+  function framing(e) {
+    var T = [e.title, e.need, e.step].join(" ، "), out = [], fp = e.fp || null, vs = fp && fp.v ? fp.v : Object.keys(A.V || {});
+    vs.forEach(function (id) {
+      var fa0 = ""; try { fa0 = AS.labelOf ? AS.labelOf(id) : ""; } catch (er) { } if (!fa0 || fa0 === id) return;
+      var multi = zk(fa0).trim().split(" ").length >= 2;
+      if ((multi ? Z_IN(fa0, T) : quotedIs(T, fa0)) || new RegExp("(?:`|view\\s*[=:]\\s*|VIEW_META\\.)" + id + "(?![a-z0-9_])").test(T)) out.push({ id: id, w: labelToks(fa0) });
+    });
+    /* نامی که برگه خودش به‌عنوانِ نما آورده — «…» ِ آغازشده با نشانه (💡، 🧮) یا پس از «نمای» — قاب است حتی اگر در این نسخه نمایی به آن نام نباشد */
+    (T.match(/(?:نما(?:ی)?[\s‌]*)?«[^»]{2,60}»/g) || []).forEach(function (q) {
+      var inner = q.replace(/^[^«]*«/, "").replace(/»$/, ""), mark = /^نما/.test(q) || /^[^\u0600-\u06FFa-zA-Z0-9\s]/.test(inner); if (!mark) return;
+      var w = labelToks(inner); if (w.length) out.push({ id: "q:" + zk(inner).trim(), w: w });
+    });
+    try { (A.SYST && A.SYST.areas ? A.SYST.areas() : []).forEach(function (x) {
+      var id = x.a && x.a.id; if (!id || (fp && fp.a && fp.a[id] == null)) return;
+      var multi = zk(x.a.fa).trim().split(" ").length >= 2;
+      if (multi ? Z_IN(x.a.fa, T) : quotedIs(T, x.a.fa)) out.push({ id: id, w: labelToks(x.a.fa) });
+    }); } catch (er) { }
+    return out;
   }
-  function fits(e, it) { var r = score(e, it); return r.n >= 2 && r.a >= 1 ? r.w : null; }
+  function Z_IN(fa0, T) { return zk(T).indexOf(zk(fa0)) >= 0; }
+  PRE.sysFraming = function (e) { return framing(e).map(function (f) { return f.id + ":" + f.w.join("+"); }); };
+  function ctxOf(e, C, tx) {
+    var D = areaIdx(), cand = {}, fp = e.fp || null, FR = framing(e), RT = {}; (C || []).forEach(function (it) { cand[it.id] = 1; });
+    if (tx) toksOf(negFree(String(tx), true)).forEach(function (w) { RT[w] = 1; });
+    var pre = Object.keys(D.m).filter(function (id) { return !cand[id] && !(fp && fp.a && fp.a[id] == null); }), SP = {};
+    function spread(w) { if (w in SP) return SP[w]; var by = {}, n = 0, mx = 0; pre.forEach(function (id) { if (D.m[id][w]) { n++; var k = D.sys[id]; by[k] = (by[k] || 0) + 1; if (by[k] > mx) mx = by[k]; } }); return (SP[w] = n > 0 && mx * 2 <= n); }
+    function framed(w, cid) { return FR.some(function (f) { return f.id !== cid && f.w.indexOf(w) >= 0; }); }
+    return { framed: framed, low: function (w, cid, inStep) { return spread(w) || (framed(w, cid) && !(inStep && RT[w])); } };
+  }
+  function score(e, it, cx) {
+    cx = cx || ctxOf(e, [it]);
+    /* خودِ گام یا عنوانِ برگه نامِ همین نامزد را (کامل یا تکه‌ای دوواژه‌ای از آن) برده ⇒ واژه‌های همان نام کامل‌اند («(تخمینِ فرمی)» ⇄ «تخمینِ فرمی و برآوردِ مرتبهٔ بزرگی») */
+    var nm = {}; if (namedIn(it.fa, anchorText(e))) toksOf(it.fa).forEach(function (x) { nm[x] = 1; });
+    var ST = {}; toksOf(negFree(e.step)).forEach(function (x) { ST[x] = 1; });
+    var full = function (x) { return !!nm[x] || !cx.low(x, it.id, !!ST[x]); };
+    var stepHas = Object.keys(ST).some(function (x) { return !generic(x) && full(x); });
+    var w = shared(needText(e), it.text), aw = shared(anchorText(e), it.text), s = w.filter(full);
+    var sw = (stepHas ? shared(negFree(e.step), it.text) : aw).filter(full);
+    return { it: it, w: w, n: w.length, a: aw.length, s: s, sn: s.length, sa: sw.length, fr: w.some(function (x) { return cx.framed(x, it.id); }) };
+  }
+  /* همهٔ نامزدها امتیاز می‌گیرند؛ بهترین (بیشترین واژهٔ کامل، سپس لنگرِ گام، سپس همهٔ واژه‌ها) */
+  function rank(e, C, tx) {
+    var cx = ctxOf(e, C, tx), R0 = C.map(function (it) { return score(e, it, cx); }).sort(function (x, y) { return (y.sn - x.sn) || (y.sa - x.sa) || (y.n - x.n) || (y.a - x.a); });
+    var b = R0[0] || null, s2 = R0[1] || null;
+    var clear = !!(b && b.sn >= 2 && b.sa >= 1 && !(s2 && s2.sn === b.sn && s2.sa === b.sa) && b.sn > (e.rejS || 0));
+    return { best: b, second: s2, clear: clear, all: R0, tie: b && s2 && s2.sn === b.sn && s2.sa === b.sa && s2.n === b.n ? R0.filter(function (x) { return x !== b && x.sn === b.sn && x.sa === b.sa && x.n === b.n; }) : [] };
+  }
+  function fits(e, it) { var r = score(e, it); return r.sn >= 2 && r.sa >= 1 ? r.s : null; }
   PRE.sysFits = function (e, it) { return fits(e, it); };
-  PRE.sysRank = function (e, C) { var r = rank(e, C); return { clear: r.clear, best: r.best ? { id: r.best.it.id, n: r.best.n, a: r.best.a, w: r.best.w } : null, all: r.all.map(function (x) { return x.it.id + ":" + x.n + "/" + x.a; }) }; };
+  PRE.sysRank = function (e, C, tx) { var r = rank(e, C, tx); return { clear: r.clear, best: r.best ? { id: r.best.it.id, n: r.best.n, a: r.best.a, w: r.best.w, sn: r.best.sn, sa: r.best.sa, s: r.best.s } : null, all: r.all.map(function (x) { return x.it.id + ":" + x.n + "/" + x.a; }), full: r.all.map(function (x) { return x.it.id + ":" + x.sn + "/" + x.sa; }) }; };
+  PRE.sysToks = toksOf;
   /* نامِ فارسیِ یک قلم در متن: کلِ عنوان یا بخشی دوواژه‌ای از آن (جدا با «و»، «،»، پرانتز) — «آزمونِ فرضیه» ⊂ «استدلالِ علمی و آزمونِ فرضیه» */
   function zk(t) { return " " + String(t || "").replace(/[ً-ٰٟ]/g, "").replace(/[‌]/g, " ").replace(/ك/g, "ک").replace(/ي/g, "ی").replace(/ۀ|هٔ/g, "ه").replace(/[«»"'.,،؛:!؟?…()\[\]{}\-–—]/g, " ").replace(/\s+/g, " ").trim() + " "; }
   function namedIn(fa0, T) {
@@ -55965,6 +56037,8 @@ APP.goFromURL = function (q) {
       (T.match(/\b[a-z]{1,4}_[a-z0-9_]+\b/g) || []).forEach(function (id) { if (seen[id]) return; seen[id] = 1; var it = areaItem(id); if (it) out.push(it); });
       (T.match(/(?:view\s*[=:]\s*|`)([a-z][a-z0-9_]{1,30})`?/g) || []).forEach(function (m) { var id = m.replace(/^(?:view\s*[=:]\s*|`)/, "").replace(/`$/, ""); if (seen["v:" + id] || !(A.V && typeof A.V[id] === "function")) return; seen["v:" + id] = 1; out.push(viewItem(id)); });
       return out; },
+    /* قرنطینه (دورِ ۲۵، P3): امتیازِ هم‌وزنِ دورِ ۲۴ — «رسید» با هر دو واژهٔ غیرعام */
+    rank24: function (e, C) { var R0 = C.map(function (it) { var w = shared(needText(e), it.text); return { it: it, w: w, n: w.length, a: shared(anchorText(e), it.text).length }; }).sort(function (x, y) { return (y.n - x.n) || (y.a - x.a); }), b = R0[0] || null, s2 = R0[1] || null; return { best: b, second: s2, clear: !!(b && b.n >= 2 && b.a >= 1 && !(s2 && s2.n === b.n)), all: R0 }; },
     stepNow23: function (s, g) { var now = ((s && s.steps || []).filter(function (x) { return x && x.s === "now"; })[0] || {}).t || ""; return txt(g && g.step) ? clip(g.step, 200) : now ? clip(now, 200) : clip((g && g.title) || "", 200); }
   };
   PRE.sysNamed = function (t) { return namedItems(t).map(function (it) { return it.kind + ":" + it.id; }); };
@@ -56011,14 +56085,26 @@ APP.goFromURL = function (q) {
     if (!A.EVLOG || !A.EVLOG.add) return; var se = sessOf(e), um = null;
     if (k === "wait" && se) um = ((se.msgs || []).filter(function (m) { return isUser(m) && mid(m) === e.msg; })[0]) || null;
     var at = evAtFor(e, k, um); if (k === "wait") { if (!e.waitAt) e.waitAt = at; if (!e.lastEvAt || e.lastEvAt < at) e.lastEvAt = at; }
+    try { evHome(sc, e); } catch (er) { }
     try { A.EVLOG.add(Object.assign(evScope(sc), { id: "sys23_" + e.id + "_" + (idk || k), k: "sys" + k, at: at, title: title, lines: lines, out: out || "", src: um ? { sess: se.id, mid: mid(um), text: um.text, at: um.at || "", title: se.title || "" } : (k === "wait" && e.waitSrc ? e.waitSrc : null), by: "page" })); } catch (er) { }
     if (k === "wait" && um) e.waitSrc = { sess: se.id, mid: mid(um), text: um.text, at: um.at || "", title: se.title || "" };
+  }
+  /* دورِ ۲۵ (P3، B25·D19 — «⏸ منتظرِ برگهٔ #۱۰۱» دو بار در 📜 و 🧭): مدخلی که در مسئلهٔ گفت‌وگو ساخته شد و با پشته به مسئلهٔ زنده رفت، رویدادهایش در دفترِ
+     سشن مانده بود و نوشتنِ بعدی همان شناسه را در دفترِ مسئله می‌ساخت — دو سطر با دو سرانجام. رویدادهای همان مدخل با خودش می‌آیند (یک دفتر، یک سطر). */
+  function evHome(sc, e) {
+    if (!sc.pid || !e.sess) return; var se = S.get(e.sess); if (!se || !(se.evlog || []).length) return;
+    var P = (se.coach && se.coach.pre22) || {}; if (Object.keys(P).some(function (k) { var Y = P[k]; return Y && !Y.movedTo && (Y.sys || []).some(function (x) { return x.id === e.id; }); })) return;   // مدخلِ هم‌شناسهٔ مسئلهٔ گفت‌وگوی دیگری که هنوز همان‌جاست
+    var pre = "sys23_" + e.id + "_", since = String(e.waitAt || e.at || ""), mv = se.evlog.filter(function (x) { return x && String(x.id).indexOf(pre) === 0 && !x.pid && String(x.at || "") >= since; }); if (!mv.length) return;
+    se.evlog = se.evlog.filter(function (x) { return mv.indexOf(x) < 0; }); S.put(se);
+    var pg = S.get("eprog_" + sc.pid); if (!pg) return; var so = pg.solve = pg.solve || {}, L0 = so.live = so.live || {}, EL = L0.evlog = L0.evlog || [], have = {}; EL.forEach(function (x) { have[x.id] = 1; });
+    mv.forEach(function (x) { if (!have[x.id]) EL.push(Object.assign({}, x, { pid: sc.pid, sess: "" })); }); S.put(pg);
   }
   /* رویدادِ «⏸ منتظر» در 📜 سرانجامِ کنونی را دارد (D24-8) و نامِ گامِ کنونی را (A24-15) — همان شناسه، همان زمان، دوباره‌نویسی */
   var WOUT = { wait: "منتظر", arrived: "رسید", resumed: "رسید — همان گام از سر گرفته شد", other: "از راهِ دیگری برداشته شد", declined: "برگه بی ساختن بسته شد — راهِ دیگر", moot: "مسئله پیش از رسیدن بسته شد" };
   function waitEv(sc, e) {
     var out = WOUT[e.state] || "منتظر"; if ((e.state === "arrived" || e.state === "resumed") && e.how === "ask") out = out.replace(/^رسید/, "رسید (تأییدِ تو)");
     if (e.state === "wait" && (e.checks || []).some(function (c) { return c.mismatch; })) out = "منتظر — پاسخِ آمده گام را جواب نداد؛ برگه دوباره باز شد";
+    if (backNow(e)) out = "منتظر — به گفتهٔ خودش «" + clip(e.backBy.fa, 50) + "» همان نبود؛ برگه دوباره باز شد";
     if (e.state === "wait" && e.ask) out = "منتظر — ابزاری آمد؛ پرسیدم همان است یا نه";
     swEv(sc, e, "wait", "⏸ منتظرِ برگهٔ " + nn(e) + ": «" + clip(e.step, 70) + "»", ["کمبودِ سامانه: «" + clip(e.title, 120) + "»" + (e.area ? " · قلمرو: " + e.area : ""), "بقیهٔ کار ادامه دارد — وقتی ساخته شد، صفحه خودش می‌فهمد، می‌سنجد که همین گام را جواب می‌دهد و همین گام از سر گرفته می‌شود"], out);
   }
@@ -56026,7 +56112,7 @@ APP.goFromURL = function (q) {
   function nn(e) { return e.number ? "#" + fa(e.number) : "برگهٔ محلی"; }
   function closedProb(sc) { if (!sc.pid) return false; var pg = S.get("eprog_" + sc.pid), L = pg && pg.solve && pg.solve.live; return !!(L && (L.state === "solved" || L.state === "abandoned")) || solved(sc); }
   function arrive(o, e, it, how, w) {
-    var conf = how === "ask"; e.state = "arrived"; e.arrivedAt = nowIso(); e.how = how; e.tool = { kind: it.kind, id: it.id, fa: clip(it.fa, 80), go: it.go }; delete e.ask;
+    var conf = how === "ask"; e.state = "arrived"; e.arrivedAt = nowIso(); e.how = how; e.tool = { kind: it.kind, id: it.id, fa: clip(it.fa, 80), go: it.go, text: clip(it.text, 600), sn: conf ? ((e.ask || {}).sn || 0) : (w || []).length }; delete e.ask; delete e.backBy; delete e.lastRej;
     (e.checks = e.checks || []).push({ at: nowIso(), ok: true, how: how, item: it.kind + ":" + it.id, reason: conf ? "«" + clip(it.fa, 60) + "» — خودش تأیید کرد که همان ابزارِ گامِ «" + clip(e.step, 60) + "» است" : "«" + clip(it.fa, 60) + "» با نیازِ گامِ «" + clip(e.step, 60) + "» هم‌خوان است — واژه‌های مشترک: " + w.slice(0, 6).map(function (x) { return "«" + x + "»"; }).join("، ") });
     swEv(o.sc, e, "back", "🛎 ابزارِ لازم آمد: «" + clip(it.fa, 60) + "»", ["گامِ منتظر: «" + clip(e.step, 120) + "»", "برگهٔ " + nn(e) + (how === "sheet" ? " — بسته شد با «پاسخ به برگهٔ دستیار " + nn(e) + "»" : how === "ask" ? " — پرسیدم و خودش گفت همان است" : " — ثبت‌گاهِ سامانه تازه شد"), "سنجش: " + e.checks[e.checks.length - 1].reason], "از سر گرفتنِ همان گام");
     waitEv(o.sc, e);
@@ -56036,22 +56122,24 @@ APP.goFromURL = function (q) {
   }
   /* نه روشن، نه صفر ⇒ پیش از از سر گرفتن از خودِ او (وضع «منتظر» می‌ماند تا جواب دهد) */
   function askFit(o, e, r, how) {
-    var it = r.best.it; e.ask = { id: it.id, kind: it.kind, fa: clip(it.fa, 80), go: it.go, text: clip(it.text, 600), how: how, w: r.best.w, at: nowIso(), key: "", n: 0 };
+    var it = r.best.it; e.ask = { id: it.id, kind: it.kind, fa: clip(it.fa, 80), go: it.go, text: clip(it.text, 600), how: how, w: r.best.w, sn: r.best.sn || 0, at: nowIso(), key: "", n: 0, alt: (r.tie || []).slice(0, 2).map(function (x) { return clip(x.it.fa, 60); }) }; delete e.backBy;
+    var altT = e.ask.alt.length ? " (هم‌امتیاز با «" + e.ask.alt.join("» و «") + "» آمد — اگر این نیست و آن است، همان را بگو)" : "";
     (e.checks = e.checks || []).push({ at: nowIso(), ok: null, ask: true, how: how, item: it.kind + ":" + it.id, reason: "«" + clip(it.fa, 60) + "» با نیازِ گامِ «" + clip(e.step, 60) + "» روشن هم‌خوان نیست" + (r.best.w.length ? " (واژهٔ مشترک: " + r.best.w.slice(0, 4).map(function (x) { return "«" + x + "»"; }).join("، ") + ")" : "") + " — از خودش می‌پرسم" });
     swEv(o.sc, e, "ask", "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + clip(it.fa, 60) + "» — همان ابزارِ گام است؟", ["گامِ منتظر: «" + clip(e.step, 120) + "»", "سنجش: " + e.checks[e.checks.length - 1].reason], "پرسیدم؛ تا جوابش گام منتظر می‌ماند");
     waitEv(o.sc, e);
     var sh = shE(e);
-    sysMsg(e, "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + clip(it.fa, 60) + "». مطمئن نیستم همان چیزی باشد که گامِ «" + clip(e.step, 70) + "» لازم داشت — پیش از ادامه از " + (sh ? "شما" : "تو") + " می‌پرسم؛ تا آن وقت گام منتظر می‌ماند.");
+    sysMsg(e, "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + clip(it.fa, 60) + "»" + altT + ". مطمئن نیستم همان چیزی باشد که گامِ «" + clip(e.step, 70) + "» لازم داشت — پیش از ادامه از " + (sh ? "شما" : "تو") + " می‌پرسم؛ تا آن وقت گام منتظر می‌ماند.");
     o.put();
   }
   /* ناهم‌خوانی ⇒ ثبت، خطِ صفحه، یادداشت زیرِ برگه (دوباره باز)، گام منتظر می‌ماند */
-  function mismatch(o, e, built, why, byHer) {
-    (e.checks = e.checks || []).push({ at: nowIso(), ok: false, mismatch: true, built: built.map(function (it) { return it.kind + ":" + it.id; }), reason: why });
+  function mismatch(o, e, built, why, byHer, herWhy) {
+    (e.checks = e.checks || []).push({ at: nowIso(), ok: false, mismatch: true, byHer: !!byHer, built: built.map(function (it) { return it.kind + ":" + it.id; }), reason: why });
     var nM = (e.checks || []).filter(function (c) { return c.mismatch; }).length;
     swEv(o.sc, e, "mis", "⚠️ وارسیِ برگهٔ " + nn(e) + ": " + (byHer ? "به گفتهٔ خودش" : "پاسخِ روتین") + " همین گام را جواب نداد", [why], "برگه دوباره باز شد؛ گام منتظر می‌ماند", nM > 1 ? "mis" + nM : "mis");
     waitEv(o.sc, e);
     if (e.sheet && A.HOST && A.HOST.note) Promise.resolve(A.HOST.note(e.sheet, "[دستیار · وارسیِ برگه — حلقهٔ قلمرو]\n" + why + ".\nگامِ منتظر: «" + e.step + "»؛ نیاز: «" + clip(e.need, 600) + "».\nاین یادداشت برگه را دوباره باز کرد (روال: همان «هماهنگی میانِ روتین‌ها»).")).then(null, function () { });
-    sysMsg(e, "⚠️ پاسخِ " + (byHer ? "آمده" : "روتین") + " زیرِ برگهٔ " + nn(e) + " به گامِ «" + clip(e.step, 70) + "» جواب نداد" + (byHer ? " (" + (shE(e) ? "گفتید" : "گفتی") + " همان نیست)" : "") + " — زیرِ برگه نوشتم و دوباره باز شد؛ گام منتظر می‌ماند.");
+    /* دورِ ۲۵ (B25·D18): خطِ ⚠️ هر بار دلیلِ همان بار را برای خودِ او می‌گوید (چه آمد و چرا جوابِ این گام نیست) — نه یک جملهٔ یکسان */
+    sysMsg(e, "⚠️ پاسخِ " + (byHer ? "آمده" : "روتین") + " زیرِ برگهٔ " + nn(e) + " به گامِ «" + clip(e.step, 70) + "» جواب نداد" + (byHer ? " (" + (shE(e) ? "گفتید" : "گفتی") + " همان نیست)" : "") + (herWhy ? " — " + herWhy : "") + " — زیرِ برگه نوشتم و دوباره باز شد؛ گام " + (byHer && herWhy ? "دوباره " : "") + "منتظر می‌ماند.");
     o.put();
   }
   function ruledFor(e) { return (e.ruled || []).concat(e.rejected || []); }
@@ -56060,12 +56148,15 @@ APP.goFromURL = function (q) {
     var ch = false;
     (o.X.sys || []).forEach(function (e) {
       if (e.state !== "wait") return;
-      if (closedProb(o.sc)) { e.state = "moot"; e.mootAt = nowIso(); delete e.ask; swEv(o.sc, e, "other", "⏹ گامِ «" + clip(e.step, 60) + "» دیگر منتظرِ برگهٔ " + nn(e) + " نیست", ["مسئله پیش از رسیدنِ ابزار بسته شد — دوباره باز نمی‌شود"], "بسته"); waitEv(o.sc, e); ch = true; return; }
-      var RL = ruledFor(e), C = regDiff(e.fp).filter(function (it) { return RL.indexOf(it.id) < 0 && (e.asked || []).indexOf(it.id) < 0; }); if (!C.length) return;
+      if (closedProb(o.sc) && !e.late) { e.state = "moot"; e.mootAt = nowIso(); delete e.ask; swEv(o.sc, e, "other", "⏹ گامِ «" + clip(e.step, 60) + "» دیگر منتظرِ برگهٔ " + nn(e) + " نیست", ["مسئله پیش از رسیدنِ ابزار بسته شد — دوباره باز نمی‌شود"], "بسته"); waitEv(o.sc, e); ch = true; return; }
+      /* دورِ ۲۵ (P3، B25·D14 / tB1d): پرسشِ بی‌جواب ⇒ هیچ سرانجامِ دیگری در همان لحظه. پیش‌تر نامزدِ پرسیده‌شده از رتبه‌بندی کنار می‌رفت و رقیبِ هم‌امتیازش
+         تنها می‌ماند و «رسید» می‌شد — هم «تا آن وقت گام منتظر می‌ماند» هم «همان گام را از سر می‌گیریم». نامزدِ پرسیده‌شده تا جوابِ او رقیب می‌ماند. */
+      if (e.ask) return;
+      var RL = ruledFor(e), C = regDiff(e.fp).filter(function (it) { return RL.indexOf(it.id) < 0; }); if (!C.length) return;
       var r = rank(e, C);
-      if (r.clear) { arrive(o, e, r.best.it, "registry", r.best.w); ch = true; return; }
-      /* بی جوابِ روتین فقط وقتی می‌پرسد که واژهٔ مشترک از خودِ گام یا عنوانِ برگه باشد — تغییرِ نامربوطِ ثبت‌گاه هرگز پرسشی برای او نمی‌سازد */
-      if (!e.ask && r.best && r.best.a >= 1) { (e.asked = e.asked || []).push(r.best.it.id); askFit(o, e, r, "registry"); ch = true; }
+      if (r.clear) { arrive(o, e, r.best.it, "registry", r.best.s); ch = true; return; }
+      /* بی جوابِ روتین فقط وقتی می‌پرسد که واژه‌ای **کامل** از خودِ گام یا عنوانِ برگه مشترک باشد — تغییرِ نامربوطِ ثبت‌گاه (یا هم‌واژگیِ کم‌وزن) هرگز پرسشی برای او نمی‌سازد */
+      if (r.best && r.best.sa >= 1 && (e.asked || []).indexOf(r.best.it.id) < 0) { (e.asked = e.asked || []).push(r.best.it.id); askFit(o, e, r, "registry"); ch = true; }
     });
     if (ch) o.put(); return ch;
   }
@@ -56087,12 +56178,17 @@ APP.goFromURL = function (q) {
       var last = NEW[NEW.length - 1];
       if (!e.ruled) { var fpp = filingParts(((rep.notes || [])[0] || {}).text || rep.text || ""); e.ruled = ruledOf(fpp.whyNot, fpp.other); }
       var markRead = function () { e.readNotes = done.concat(NEW.map(function (n, i) { return String(n.id || n.at || ("i" + i)); })); };
-      if (closedProb(o.sc)) { markRead(); sysLocal(o); return; }
+      if (closedProb(o.sc) && !e.late) { markRead(); sysLocal(o); return; }
       var RL = ruledFor(e), named = namedItems(tx), C0 = named.concat(regDiff(e.fp)), seen = {};
       C0 = C0.filter(function (it) { var k = it.kind + ":" + it.id; if (seen[k]) return false; seen[k] = 1; return true; });
       var C = C0.filter(function (it) { return RL.indexOf(it.id) < 0; });
-      var r = rank(e, C);
-      if (r.clear) { markRead(); arrive(o, e, r.best.it, "sheet", r.best.w); return; }
+      /* دورِ ۲۵ (P3، B25·D18 / tB1y): صفحه هرگز هم‌زمان نمی‌پرسد و حکم نمی‌دهد. پرسشی که هنوز جواب نگرفته (از ثبت‌گاه یا از همین برگه) ⇒ جوابِ روتینی که
+         فقط همان چیزِ پرسیده‌شده را نام می‌برد خوانده‌شده حساب می‌شود و سرانجامش را جوابِ خودِ او می‌دهد؛ جوابی که چیزِ دیگری هم آورده پس از جوابِ او سنجیده می‌شود. */
+      if (e.ask) { if (C0.every(function (it) { return it.id === e.ask.id; })) markRead(); return; }
+      /* جوابی که فقط چیزی را نام می‌برد که خودِ او رد کرده: سرانجامش را حرفِ او داده و زیرِ برگه نوشته شده — وارسیِ دوم و یادداشتِ دوم نه */
+      if (C0.length && C0.every(function (it) { return (e.rejected || []).indexOf(it.id) >= 0; })) { markRead(); o.put(); return; }
+      var r = rank(e, C, tx);
+      if (r.clear) { markRead(); arrive(o, e, r.best.it, "sheet", r.best.s); return; }
       if ((DECLINE.test(tx) && !NOT_YET.test(tx)) || /^(?:rejected|wontfix)$/.test(st)) {
         markRead(); delete e.ask; e.state = "declined"; e.declinedAt = nowIso(); (e.checks = e.checks || []).push({ at: nowIso(), ok: false, declined: true, reason: clip(last.text || "", 300) });
         swEv(o.sc, e, "no", "⛔ برگهٔ " + nn(e) + " بی ساختن بسته شد", ["گامِ «" + clip(e.step, 120) + "» باز می‌ماند — از راهِ دیگری ادامه بده", "جوابِ روتین: «" + clip(last.text || "", 200) + "»"], "بی ابزارِ تازه");
@@ -56100,19 +56196,41 @@ APP.goFromURL = function (q) {
         sysMsg(e, "⛔ برگهٔ " + nn(e) + " بی ساختن بسته شد («" + clip(last.text || "", 120) + "») — گامِ «" + clip(e.step, 70) + "» باز می‌ماند؛ از راهِ دیگری با هم جلو می‌رویم."); o.put(); return;
       }
       /* نه روشن و نه بی‌ربط: دست‌کم یک واژه از خودِ گام یا عنوانِ برگه ⇒ از خودش؛ واژهٔ حاشیه‌ای فقط از متنِ کمبود ⇒ ناهم‌خوانی (پرسیدنِ چیزی که روشن است جواب نمی‌دهد، کار او نیست) */
-      if (r.best && r.best.n >= 1 && r.best.a >= 1 && (e.asked || []).indexOf(r.best.it.id) < 0) { markRead(); (e.asked = e.asked || []).push(r.best.it.id); askFit(o, e, r, "sheet"); return; }
-      /* جواب ادعای ساختن دارد ولی هیچ چیزِ نام‌برده یا تازه‌ای در ثبت‌گاه دیده نمی‌شود ⇒ شاید نسخهٔ تازه هنوز منتشر نشده (دوباره می‌سنجد) */
-      if (!C0.length && BUILT_CLAIM.test(negFree(tx, true))) {
-        if (!(e.checks || []).some(function (c) { return c.lag && c.note === String(last.id || ""); })) { (e.checks = e.checks || []).push({ at: nowIso(), ok: false, lag: true, note: String(last.id || ""), reason: "جواب آمد ولی ساخته‌اش هنوز در سامانه دیده نمی‌شود" });
-          sysMsg(e, "⏳ روتین زیرِ برگهٔ " + nn(e) + " جواب داد ولی ساخته‌اش هنوز در سامانه دیده نمی‌شود — شاید نسخهٔ تازه هنوز منتشر نشده؛ پس از تازه‌کردنِ صفحه دوباره می‌سنجم."); o.put(); }
+      /* دورِ ۲۵ (C2): هم‌واژگی‌ای که فقط از قابِ خودِ برگه می‌آید (نامِ نمای موجود در متنِ کمبود) هم پرسیدنی است، نه ناهم‌خوانیِ خاموش */
+      if (r.best && r.best.n >= 1 && (r.best.a >= 1 || r.best.fr) && (e.asked || []).indexOf(r.best.it.id) < 0) { markRead(); (e.asked = e.asked || []).push(r.best.it.id); askFit(o, e, r, "sheet"); return; }
+      /* «شاید نسخهٔ تازه هنوز منتشر نشده» فقط وقتی جواب چیزِ ساخته‌ای را **نام برده** که در این نسخهٔ صفحه نیست (شناسه یا نامِ درونِ `…`) و برگه خودش آن را
+         کنار نگذاشته بود. دورِ ۲۵ (C25-19، B25·D15 ِ B_s): جوابِ واژه‌های عام («یک ابزارِ تازه برای تغییر در مسئله‌ها…») یا جوابی که قلمروِ کنارگذاشته را نام
+         می‌برد همین خط را می‌گرفت — از چشمِ او «ابزاری در راه است»، در حالی که جواب هیچ چیزی برای گامِ او نام نبرده بود. آن‌ها ناهم‌خوانی‌اند، با دلیل. */
+      var UN = unseenNames(tx), WN = String(e.whyNot != null ? e.whyNot : filingParts(((rep.notes || [])[0] || {}).text || rep.text || "").whyNot);
+      var unR = UN.filter(function (n) { return ruledName(n, WN); }), unL = UN.filter(function (n) { return unR.indexOf(n) < 0; });
+      if (!C0.length && unL.length && BUILT_CLAIM.test(negFree(tx, true))) {
+        if (!(e.checks || []).some(function (c) { return c.lag && c.note === String(last.id || ""); })) { (e.checks = e.checks || []).push({ at: nowIso(), ok: false, lag: true, note: String(last.id || ""), reason: "جواب «" + unL.slice(0, 3).join("»، «") + "» را نام برد ولی هنوز در سامانه دیده نمی‌شود" });
+          sysMsg(e, "⏳ روتین زیرِ برگهٔ " + nn(e) + " نوشت «" + unL.slice(0, 3).join("»، «") + "» را ساخته، ولی هنوز در این نسخهٔ صفحه دیده نمی‌شود — شاید نسخهٔ تازه هنوز منتشر نشده؛ پس از تازه‌کردنِ صفحه دوباره می‌سنجم. تا آن وقت گامِ «" + clip(e.step, 70) + "» منتظر می‌ماند."); o.put(); }
         return;
       }
       markRead();
       var nm = C0.slice(0, 3).map(function (it) { return "«" + clip(it.fa, 50) + "»" + (RL.indexOf(it.id) >= 0 ? " (تشخیصِ افتراقیِ برگه همین را کنار گذاشته بود)" : ""); }).join("، ");
-      var why = (C0.length ? "آنچه آمد (" + nm + ")" : "جوابِ روتین («" + clip(last.text || "", 140) + "») چیزی برای این گام نساخت و") + " نیازِ گامِ «" + clip(e.step, 80) + "» را جواب نمی‌دهد" + (C.length ? " — واژهٔ کاملِ مشترکِ کافی با «" + clip(needText(e), 120) + "» ندارد" : "");
-      mismatch(o, e, C0, why, false);
+      var why = (C0.length ? "آنچه آمد (" + nm + ")" : unR.length ? "جوابِ روتین فقط «" + unR.slice(0, 3).join("»، «") + "» را نام برد که تشخیصِ افتراقیِ برگه کنار گذاشته بود و" : "جوابِ روتین («" + clip(last.text || "", 140) + "») چیزی برای این گام نساخت و") + " نیازِ گامِ «" + clip(e.step, 80) + "» را جواب نمی‌دهد" + (C.length ? " — واژهٔ کاملِ مشترکِ کافی با «" + clip(needText(e), 120) + "» ندارد" : "");
+      var allR = C0.length && C0.every(function (it) { return RL.indexOf(it.id) >= 0; });
+      var herWhy = C0.length ? "آنچه آمد " + C0.slice(0, 3).map(function (it) { return "«" + clip(it.fa, 50) + "»"; }).join("، ") + " است" + (allR ? " که خودِ برگه از اول کنار گذاشته بود" : (r.best && r.best.n ? "؛ با نیازِ این گام فقط در " + r.best.w.slice(0, 3).map(function (x) { return "«" + x + "»"; }).join("، ") + " مشترک است، نه در خودِ کارِ گام" : "؛ با نیازِ این گام هیچ واژهٔ مشترکی ندارد"))
+        : unR.length ? "جواب فقط «" + unR.slice(0, 3).join("»، «") + "» را نام برد که خودِ برگه از اول کنار گذاشته بود"
+        : "جواب هیچ نما یا حوزه‌ای را که برای این گام ساخته شده باشد نام نبرد";
+      mismatch(o, e, C0, why, false, herWhy);
     }, function () { });
   }
+  /* نام‌هایی که جوابِ روتین برده و در این نسخهٔ صفحه نیستند: شناسه‌شکل (pr_x) یا درونِ `…` (`epi-claims`، `نامِ حوزه`) — فقط از بندهای بی‌نفی */
+  function unseenNames(text) {
+    var T = negFree(String(text || ""), true), out = [], seen = {};
+    (T.match(/`[^`\n]{2,40}`|\b[a-z]{1,4}_[a-z0-9_]+\b/g) || []).forEach(function (m) {
+      var id = m.replace(/`/g, "").trim(); if (!id || seen[id]) return; seen[id] = 1;
+      if (areaItem(id) || (A.V && typeof A.V[id] === "function")) return;
+      try { if ((A.SYST && A.SYST.areas ? A.SYST.areas() : []).some(function (x) { return x.a && namedIn(x.a.fa, id); })) return; } catch (er) { }
+      out.push(id);
+    });
+    return out;
+  }
+  function ruledName(n, whyNot) { var W = String(whyNot || ""); if (!W || !n) return false; if (W.indexOf(n) >= 0) return true; var m = /^([a-z]+)[-_]/.exec(n); return !!(m && W.indexOf(m[1] + "-*") >= 0); }
+  PRE.sysUnseen = unseenNames;
   PRE.sysCheck = function () {
     var L = sysStores(), chain = Promise.resolve();
     L.forEach(function (o) { try { sysLocal(o); } catch (e) { } (o.X.sys || []).forEach(function (e) { chain = chain.then(function () { return sysSheet(o, e); }); }); });
@@ -56136,14 +56254,25 @@ APP.goFromURL = function (q) {
   }
   function sysEntry(s, sc, R, g, r, um, fp, step, stepBy) {
     var X = R.X; X.sys = X.sys || []; X.sn = X.sn || X.sys.length;
-    var e = { id: "sw" + (++X.sn), number: r.number || "", sheet: r.id || "", title: clip(g.title || "", 140), area: g.area || "", kind: g.kind || "", step: clip(step, 200), stepBy: stepBy,
+    var dup = r.number ? X.sys.filter(function (x) { return String(x.number) === String(r.number); })[0] : null; if (dup) return dup;   // دورِ ۲۵ (B25·D19): یک برگه، یک مدخل
+    var late = !!sc.late || closedProb(sc);   // تکه‌ای که پس از بستنِ مسئله آمد (A25-22)
+    var e = { id: "sw" + (++X.sn), late: late, whyNot: clip(g.why_not || "", 600), number: r.number || "", sheet: r.id || "", title: clip(g.title || "", 140), area: g.area || "", kind: g.kind || "", step: clip(step, 200), stepBy: stepBy,
       need: clip([g.missing, g.abstract, g.where].filter(Boolean).join(" "), 900), miss: clip(g.missing || "", 600), ruled: ruledOf(g.why_not, g.kind === "priority" ? "" : [g.evidence, g.missing].join(" ، ")), at: nowIso(), state: "wait", fp: fp || regFP(), msg: typeof um === "string" ? um : mid(um), sess: s.id, checks: [] };
     X.sys.push(e); R.put();
     waitEv(sc, e);
     sysMark(s);
-    s.msgs.push({ role: "sys", at: nowIso(), k23: e.id, text: "⏸ گامِ «" + clip(e.step, 70) + "» منتظرِ برگهٔ " + nn(e) + " ماند — بقیهٔ کار ادامه دارد؛ وقتی ساخته شد، صفحه خودش می‌فهمد، می‌سنجد که همین گام را جواب می‌دهد و از همین‌جا ادامه می‌دهیم." });
+    s.msgs.push({ role: "sys", at: nowIso(), k23: e.id, text: late
+      ? "⏸ تکهٔ تازهٔ «" + clip(e.step, 70) + "» منتظرِ برگهٔ " + nn(e) + " ماند — مسئلهٔ «" + clip(scTitle(sc), 50) + "» بسته است و بسته می‌ماند؛ وقتی ابزار ساخته شد، صفحه خودش می‌فهمد، می‌سنجد که همین تکه را جواب می‌دهد و در «امروز» خبر می‌دهد."
+      : "⏸ گامِ «" + clip(e.step, 70) + "» منتظرِ برگهٔ " + nn(e) + " ماند — بقیهٔ کار ادامه دارد؛ وقتی ساخته شد، صفحه خودش می‌فهمد، می‌سنجد که همین گام را جواب می‌دهد و از همین‌جا ادامه می‌دهیم." });
     S.put(s); R.put(); return e;
   }
+  /* دورِ ۲۵ (P3، A25-22 — tA1 p18): تکه‌ای که پس از بستنِ مسئله آورد و برگهٔ کمبود با gap.step گرفت، نه مدخل گرفت نه سطر — PRE.scope برای مسئلهٔ بسته هیچ
+     است. همان مسئلهٔ بستهٔ همین گفت‌وگو میزبانِ مدخل می‌شود (late): مسئله بسته می‌ماند، مدخل «مسئله بسته شد» نمی‌گیرد و وقتی ابزار آمد همان حلقه کار می‌کند. */
+  function lateScope(s, g) {
+    try { var b = AS.boundLive ? AS.boundLive(s) : null; if (!b || !b.done || !b.pid) return null; if (g && !txt(g.step)) return null; return { pid: b.pid, late: true }; } catch (e) { return null; }
+  }
+  function sysScope(s) { var sc = PRE.scope(s); if (sc) return sc; var lt = lateScope(s), R = lt && store(lt); return R && (R.X.sys || []).some(function (e) { return e.late; }) ? lt : null; }
+  PRE.sysScope = sysScope;
   var SELF_K = { fix: 1 };
   function sysOpen(s, sc, g, r, um, fp) {
     var R = store(sc); if (!R) return null; if (SELF_K[g.kind]) return null;
@@ -56164,7 +56293,7 @@ APP.goFromURL = function (q) {
   if (typeof AS.fileGap === "function" && !AS.fileGap._r23sys) {
     var rawFG23 = AS.fileGap;
     AS.fileGap = function (s, g) {
-      var um = lastUser(s), sc = null, fp = null; try { sc = PRE.scope(s); } catch (e) { } try { fp = regFP(); } catch (e) { }
+      var um = lastUser(s), sc = null, fp = null; try { sc = PRE.scope(s) || lateScope(s, g); } catch (e) { } try { fp = regFP(); } catch (e) { }
       return Promise.resolve(rawFG23.apply(this, arguments)).then(function (r) { try { if (r && !r.dup && sc && (r.number || r.local)) sysOpen(s, sc, g || {}, r, um, fp); } catch (e) { console.warn(e); } return r; });
     };
     Object.keys(rawFG23).forEach(function (k) { AS.fileGap[k] = rawFG23[k]; });
@@ -56177,7 +56306,7 @@ APP.goFromURL = function (q) {
     var um = lastUser(s), d = a && a.sys_done; if (!um || !d || typeof d !== "object") return;
     var q = txt(d.quote), n = String(d.sheet || d.number || "").replace(/[^0-9۰-۹]/g, "").replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 1776); }); if (!q || !quoteIn(q, um.text) || !n) return;
     var span = herSpan(q, um.text); if (/[؟?]\s*$/.test(span) || !DONE_V.test(span)) return;
-    var sc = PRE.scope(s), R = sc && store(sc); if (!R) return; var e = (R.X.sys || []).filter(function (x) { return String(x.number) === n && (x.state === "wait" || x.state === "arrived"); })[0]; if (!e) return;
+    var sc = sysScope(s), R = sc && store(sc); if (!R) return; var e = (R.X.sys || []).filter(function (x) { return String(x.number) === n && (x.state === "wait" || x.state === "arrived"); })[0]; if (!e) return;
     e.state = "other"; e.otherAt = nowIso(); e.otherQuote = span; delete e.ask;
     var sh = shoma(s);
     swEv(sc, e, "other", "✓ گامِ «" + clip(e.step, 60) + "» از راهِ دیگری برداشته شد", ["از حرفِ " + (sh ? "خودتان" : "خودت") + ": «" + clip(e.otherQuote, 200) + "»", "برگهٔ " + nn(e) + " دیگر منتظرِ این گام نیست (برگه برای دیگران سرِ جایش می‌ماند)"], "از راهِ دیگری — بی انتظار");
@@ -56188,18 +56317,58 @@ APP.goFromURL = function (q) {
   };
   /* پاسخِ او به «این ابزارِ تازه همان است…؟»: coach_state.sys_fit {sheet, fit, quote} با نقل، یا «آره/بله/همونه» و «نه/همون نیست» ِ آغازِ پیامِ بعدی */
   var FIT_YES = /^\s*(?:آره|آری|اره|بله|بلی|آها|همینه|همونه|همون[\s‌]*است|همان[\s‌]*است|درسته|دقیقاً|دقیقا|yes)(?=[\s،,.!]|$)/i, FIT_NO = /^\s*(?:نه|نخیر|نیست|نه[\s‌]*همون|همون[\s‌]*نیست|همان[\s‌]*نیست|این[\s‌]*نیست|ربطی[\s‌]*نداره|به[\s‌]*کارم[\s‌]*نمیاد|no)(?=[\s،,.!]|$)/i;
-  function fitAnswer(o, e, yes, byQuote) {
-    var it = { kind: e.ask.kind, id: e.ask.id, fa: e.ask.fa, go: e.ask.go, text: e.ask.text };
+  function fitAnswer(o, e, yes, byQuote, span) {
+    var it = { kind: e.ask.kind, id: e.ask.id, fa: e.ask.fa, go: e.ask.go, text: e.ask.text }, sn = e.ask.sn || 0;
     if (yes) { arrive(o, e, it, "ask", e.ask.w || []); return true; }
-    (e.rejected = e.rejected || []).push(it.id); delete e.ask;
-    mismatch(o, e, [it], "«" + clip(it.fa, 60) + "» — " + (byQuote ? "به گفتهٔ خودش" : "خودش گفت") + " همان چیزی نیست که گامِ «" + clip(e.step, 80) + "» لازم داشت؛ آن نیاز هنوز جواب نگرفته", true);
+    herNo(o, e, it, sn, byQuote, span);
     return true;
   }
+  /* «نه / همون نیست» ِ خودِ او — به پرسشِ صفحه، یا پس از «ابزارِ لازم آمد» (دورِ ۲۵، S1 B25·D1 = D25-21: ردِ صریحِ او پس از «رسید» مدخل را «از سر گرفته شد ✓»
+     می‌کرد، برگه بسته می‌ماند و خطِ «امروز» می‌رفت — گامِ منتظرش گم می‌شد). یک راه برای هر دو: آن چیز ردشدهٔ اوست (دیگر نامزد نیست، و نامزدِ بعدی باید از آن
+     قوی‌تر باشد)، گام دوباره «منتظر» است، زیرِ برگه یادداشت می‌رود (دوباره باز)، و «امروز» می‌گوید دوباره منتظر است. */
+  function herNo(o, e, it, sn, byQuote, span) {
+    (e.rejected = e.rejected || []).push(it.id); delete e.ask; if ((sn || 0) > (e.rejS || 0)) e.rejS = sn;
+    var was = e.state; e.state = "wait"; delete e.tool; delete e.how; delete e.arrivedAt; delete e.resumeKey; delete e.resumedAt;
+    e.backBy = { at: nowIso(), id: it.id, fa: clip(it.fa, 80), q: clip(span || "", 200), was: was, key: curMsgKey() }; e.lastRej = { it: it, sn: sn || 0 };
+    mismatch(o, e, [it], "«" + clip(it.fa, 60) + "» — " + (byQuote ? "به گفتهٔ خودش" : "خودش گفت") + " همان چیزی نیست که گامِ «" + clip(e.step, 80) + "» لازم داشت" + (span ? " («" + clip(span, 160) + "»)" : "") + "؛ آن نیاز هنوز جواب نگرفته" + (was !== "wait" ? " (پیش‌تر «رسید» اعلام شده بود — پس گرفته شد)" : ""), true,
+      was !== "wait" ? "«" + clip(it.fa, 50) + "» را «رسید» اعلام کرده بودم و نادرست بود" : "");
+  }
+  /* C5 (دورِ ۲۵): «نه» ِ اشتباهی برگشت‌پذیر است، با تاریخچه — ردِ پیشین در 📜 می‌ماند، رویدادِ «پس گرفت» افزوده می‌شود، همان برگه یادداشتِ تازه می‌گیرد (نه برگهٔ دوم) */
+  function takeBack(o, e, span) {
+    var it = e.lastRej.it, sn = e.lastRej.sn || 0; e.rejected = (e.rejected || []).filter(function (id) { return id !== it.id; }); if ((e.rejS || 0) <= sn) e.rejS = 0;
+    (e.checks = e.checks || []).push({ at: nowIso(), ok: null, undo: true, item: it.kind + ":" + it.id, reason: "«نه» ِ پیشین را پس گرفت" + (span ? " («" + clip(span, 120) + "»)" : "") });
+    swEv(o.sc, e, "undo", "↩ «نه» پس گرفته شد: «" + clip(it.fa, 60) + "» همان است", ["گامِ منتظر: «" + clip(e.step, 120) + "»"].concat(span ? ["از حرفِ " + (shE(e) ? "خودتان" : "خودت") + ": «" + clip(span, 200) + "»"] : []), "همان ابزار پذیرفته شد", "undo" + (e.checks || []).filter(function (c) { return c.undo; }).length);
+    if (e.sheet && A.HOST && A.HOST.note) Promise.resolve(A.HOST.note(e.sheet, "[دستیار · حلقهٔ قلمرو — «نه» پس گرفته شد]\nکاربر گفت اشتباه کرده بود: «" + clip(it.fa, 80) + "» همان چیزی است که گامِ «" + e.step + "» لازم داشت" + (span ? " («" + clip(span, 200) + "»)" : "") + ". یادداشتِ پیشینِ «همان نیست» دیگر برقرار نیست؛ این گام دیگر منتظرِ این برگه نیست.")).then(null, function () { });
+    e.ask = { sn: sn }; arrive(o, e, it, "ask", []);
+  }
+  var TAKE_BACK = /(?:اشتباه(?:ی)?|غلط)[^.؟?\n]{0,30}(?:گفتم|کردم|زدم|بود)[^؟?\n]{0,30}(?:همون|همان|همین)(?:ه|[\s‌]*است|[\s‌]*بود)|نه[،,\s‌]+(?:همون|همان)[\s‌]*بود/;
+  function backNow(e) { var c = (e.checks || [])[(e.checks || []).length - 1]; return !!(e && e.state === "wait" && !e.ask && e.backBy && c && c.mismatch && c.byHer); }
+  PRE.sysBackNow = backNow;
+  /* ردِ جورشدن به معنا (نه فقط «نه» ِ آغازِ پیام): «همون نیست»، «ربطی نداره»، «به کارِ گامِ سوم نمیاد»، «جوابِ … رو نمیده» — در بندی که پرسش نیست */
+  var NOFIT = /(?:^|[\s‌«،,])(?:همون|همان|اون|آن|این)[\s‌]*(?:چیزی[\s‌]*)?نیست(?=[\s‌]*(?:$|[.،؛!»]|که[\s‌]*(?:لازم|می[‌\s]?خوا|دنبال|گفتم|باید)))|ربط(?:ی)?[\s‌]*(?:به[^.،؛!؟?\n]{0,50})?[\s‌]*(?:نداره|ندارد)|به[\s‌]*(?:کار|درد)(?:م|ِ)?(?:[\s‌]+[^.،؛!؟?\n]{0,50}?)?[\s‌]*(?:نمیاد|نمی[‌\s]?آید|نمی[‌\s]?خوره|نمی[‌\s]?خورد)|جواب(?:م|ش|ِ)?(?:[\s‌]+[^.،؛!؟?\n]{0,40}?)?[\s‌]*(?:رو|را)?[\s‌]*نمی[‌\s]?(?:ده|دهد)|کمک(?:ی|م)?[\s‌]*(?:به[^.،؛!؟?\n]{0,40})?[\s‌]*نمی[‌\s]?کن(?:ه|د)/;
+  function noFitSpan(m) {
+    var P0 = String(m || "").split(/(?<=[.!؟?\n؛])/);
+    for (var i = 0; i < P0.length; i++) { var cl = P0[i]; if (/[؟?]\s*$/.test(cl)) continue; if (/^\s*(?:اگه|اگر)[\s‌]/.test(cl)) continue; if (NOFIT.test(cl)) return txt(cl.replace(/[.!؛]\s*$/, "")); }
+    return "";
+  }
+  PRE.sysNoFit = noFitSpan;
+  function oOf(sc, R) { return { sc: sc, X: R.X, put: function () { R.put(); } }; }
   PRE.sysFit = function (s, a) {
     var um = lastUser(s), d = a && a.sys_fit; if (!um || !d || typeof d !== "object" || typeof d.fit !== "boolean") return;
     var q = txt(d.quote), n = String(d.sheet || d.number || "").replace(/[^0-9۰-۹]/g, "").replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 1776); }); if (!q || !quoteIn(q, um.text)) return;
-    var sc = PRE.scope(s), R = sc && store(sc); if (!R) return; var e = (R.X.sys || []).filter(function (x) { return x.state === "wait" && x.ask && x.ask.key && (!n || String(x.number) === n); })[0]; if (!e) return;
-    fitAnswer({ sc: sc, X: R.X, put: function () { R.put(); } }, e, d.fit, true);
+    var sc = sysScope(s), R = sc && store(sc); if (!R) return; var Y = R.X.sys || [], by = function (f) { return Y.filter(function (x) { return (!n || String(x.number) === n) && f(x); }); };
+    var span = herSpan(q, um.text), e = by(function (x) { return x.state === "wait" && x.ask && x.ask.key; })[0];
+    if (e) { fitAnswer(oOf(sc, R), e, d.fit, true, span); return; }
+    if (/[؟?]\s*$/.test(span)) return;   // پرسش جواب نیست
+    if (d.fit === false) {
+      /* پس از «ابزارِ لازم آمد» (هنوز از سر گرفته نشده، یا از سر گرفته شده و حالا می‌گوید به کارش نیامد) */
+      e = by(function (x) { return x.state === "arrived" && x.tool; })[0] || by(function (x) { return x.state === "resumed" && x.tool; }).slice(-1)[0];
+      if (e) herNo(oOf(sc, R), e, { kind: e.tool.kind, id: e.tool.id, fa: e.tool.fa, go: e.tool.go, text: e.tool.text || "" }, e.tool.sn || 0, true, span);
+      return;
+    }
+    /* «نه» ِ اشتباهی را پس می‌گیرد («اشتباه کردم، همون بود») ⇒ همان چیز با تأییدِ خودش می‌رسد */
+    e = by(function (x) { return backNow(x) && x.lastRej && x.lastRej.it; })[0];
+    if (e) takeBack(oOf(sc, R), e, span);
   };
   if (AS.DO && AS.DO.coach_state && !AS.DO.coach_state._r23sys) {
     var rawCS23 = AS.DO.coach_state;
@@ -56208,11 +56377,24 @@ APP.goFromURL = function (q) {
     AS.DO.coach_state._r23sys = true;
   }
   /* پرامپت: گام‌های منتظرِ همین مسئله (زمینه)، و نوبتِ از سر گرفتن پس از رسیدنِ ابزار (پرسشِ این نوبت) */
-  function sysLines(s, sc, X, m, busy) {
-    var L = [], um = lastUser(s), k = mid(um), Y = X.sys || [], dirty = false;
+  function sysLines(s, sc, X, m, busy, only) {
+    var L = [], um = lastUser(s), k = mid(um), Y = (X.sys || []).filter(function (e) { return !only || only(e); }), dirty = false;
     try { var o0 = { sc: sc, X: X, put: function () { var R0 = store(sc); if (R0) R0.put(); } }; if (sysLocal(o0)) dirty = true; } catch (e) { }
     /* دورِ ۲۴ (R1): جوابِ او به پرسشِ «همان است؟» در آغازِ همین پیام */
-    try { Y.forEach(function (e) { if (e.state !== "wait" || !e.ask || !e.ask.key || e.ask.key === k) return; var yes = FIT_YES.test(m), no = !yes && FIT_NO.test(m); if (yes || no) { fitAnswer({ sc: sc, X: X, put: function () { var R0 = store(sc); if (R0) R0.put(); } }, e, yes, false); dirty = true; } }); } catch (e) { }
+    var oS = { sc: sc, X: X, put: function () { var R0 = store(sc); if (R0) R0.put(); } }, nf = noFitSpan(m);
+    try { Y.forEach(function (e) { if (e.state !== "wait" || !e.ask || !e.ask.key || e.ask.key === k) return; var yes = FIT_YES.test(m), no = !yes && (FIT_NO.test(m) || !!nf); if (yes || no) { fitAnswer(oS, e, yes, false, no ? nf : ""); dirty = true; } }); } catch (e) { }
+    /* دورِ ۲۵ (S1): ردِ او پس از «ابزارِ لازم آمد» — خودِ صفحه هم می‌خواند (مدل شاید گزارش ندهد): پیامِ پس از اعلام که می‌گوید آن ابزار همان نیست / به کارِ گام
+       نمی‌آید. برای مدخلِ از سر گرفته‌شده فقط وقتی نامِ همان ابزار در پیام هست. «نه» ِ تنها (بی «همان نیست») جوابِ پرسشِ از سرگیری است، نه ردِ ابزار. */
+    try { if (nf) Y.forEach(function (e) {
+      if (!e.tool) return;
+      var hit = (e.state === "arrived" && e.resumeKey !== k) || (e.state === "resumed" && e.resumeKey !== k && namedIn(e.tool.fa, m));
+      if (hit) { herNo(oS, e, { kind: e.tool.kind, id: e.tool.id, fa: e.tool.fa, go: e.tool.go, text: e.tool.text || "" }, e.tool.sn || 0, false, nf); dirty = true; }
+    }); } catch (e) { }
+    try { if (TAKE_BACK.test(m) && !/[؟?]\s*$/.test(m)) Y.forEach(function (e) { if (backNow(e) && e.lastRej && e.lastRej.it && e.backBy.key !== k) { takeBack(oS, e, clip(m, 160)); dirty = true; } }); } catch (e) { }
+    Y.forEach(function (e) {
+      if (!backNow(e) || e.backBy.key !== k) return;
+      L.push(CTX + "همین حالا گفت ابزارِ «" + noq(clip(e.backBy.fa, 60)) + "» همان نیست که گامِ «" + noq(clip(e.step, 70)) + "» لازم داشت" + (e.backBy.q ? " («" + noq(clip(e.backBy.q, 120)) + "»)" : "") + " ⇒ صفحه حرفش را پذیرفت: گام دوباره منتظرِ برگهٔ " + nn(e) + " است، زیرِ برگه نوشته شد و برگه دوباره باز شد" + (e.backBy.was !== "wait" ? "؛ اعلامِ «ابزارِ لازم آمد» نادرست بود — همین را ساده بپذیر" : "") + ". آن ابزار را برای این گام پیشنهاد نکن و گام را «از سر گرفته» نخوان؛ بگو منتظر می‌ماند و بقیهٔ کار ادامه دارد. اگر بعداً گفت اشتباه کرده و همان بود ⇒ {\"do\":\"coach_state\",\"sys_fit\":{\"sheet\":" + (e.number || 0) + ",\"fit\":true,\"quote\":\"عینِ حرفش\"}}.");
+    });
     var W = Y.filter(function (e) { return e.state === "wait"; }), V = Y.filter(function (e) { return e.state === "arrived"; }), Q = W.filter(function (e) { return e.ask; });
     if (W.length) L.push(CTX + "گام‌های منتظرِ برگه (کمبودِ سامانه): " + W.map(function (e) { return "«" + noq(clip(e.step, 70)) + "» منتظرِ برگهٔ " + nn(e) + " (از " + A.fdate(String(e.at).slice(0, 10)) + ")"; }).join("؛ ") +
       " — بقیهٔ کار ادامه دارد و در جمع‌بندی گامِ منتظر را صریح بگو. اگر پرسید «آمد؟/کی ادامه؟»: «هنوز نه — برگهٔ " + nn(W[0]) + " باز است؛ وقتی ساخته شد صفحه خودش خبر می‌دهد و همین گام را از سر می‌گیریم». انتظار ضعفِ او نیست.");
@@ -56222,11 +56404,14 @@ APP.goFromURL = function (q) {
     if (V.length) {
       var e = V[0], t = e.tool || {};
       var q = "ابزارِ «" + noq(clip(t.fa, 60)) + "» برای گامِ «" + noq(clip(e.step, 70)) + "» آمد (برگهٔ " + nn(e) + ")" + (t.go && t.go[0] ? " — جایش: {\"do\":\"go\",\"view\":\"" + t.go[0] + "\"" + (t.go[1] ? ",\"arg\":\"" + t.go[1] + "\"" : "") + "}" : "") + ". برگردیم به مسئلهٔ «" + noq(clip(scTitle(sc), 60)) + "»، گامِ «" + noq(clip(e.step, 70)) + "»" + (gotSoFar(sc) ? " (تا این‌جا: " + noq(gotSoFar(sc)) + ")" : "") + " — همان گام را با آن چطور برمی‌داری؟";
+      /* دورِ ۲۵ (S1): راهِ «نه» پس از رسیدن — در همین بلوکِ کاربر، نه در پرامپتِ سامانه */
+      var qNo = " (اگر گفت این ابزار همان نیست یا به کارِ این گام نمی‌آید: تحمیلش نکن ⇒ {\"do\":\"coach_state\",\"sys_fit\":{\"sheet\":" + (e.number || 0) + ",\"fit\":false,\"quote\":\"عینِ حرفش\"}} — گام دوباره منتظر می‌شود و برگه باز.)";
+      q += qNo;
       if (!busy) { L.push("- **پرسشِ این نوبت همین است:** (از سر گرفتنِ گامِ منتظرِ ابزار) " + q); if (k && e.resumeKey !== k) { e.resumeKey = k; dirty = true; } }
       else L.push(CTX + "پس از پیش‌نیاز: " + q);
     }
     if (Q.length) {
-      var eq = Q[0], aq = eq.ask, qq = "«این ابزارِ تازه همان است که برای گامِ «" + noq(clip(eq.step, 70)) + "» لازم بود؟» — ابزار: «" + noq(clip(aq.fa, 60)) + "» (برگهٔ " + nn(eq) + ")" + (aq.go && aq.go[0] ? "، جایش: {\"do\":\"go\",\"view\":\"" + aq.go[0] + "\"" + (aq.go[1] ? ",\"arg\":\"" + aq.go[1] + "\"" : "") + "}" : "") + ". صفحه مطمئن نیست همان باشد؛ تا جوابِ او گام منتظر می‌ماند و از سر گرفته نمی‌شود. جوابش ⇒ {\"do\":\"coach_state\",\"sys_fit\":{\"sheet\":" + (eq.number || 0) + ",\"fit\":true|false,\"quote\":\"عینِ حرفش\"}}";
+      var eq = Q[0], aq = eq.ask, qq = "«این ابزارِ تازه همان است که برای گامِ «" + noq(clip(eq.step, 70)) + "» لازم بود؟» — ابزار: «" + noq(clip(aq.fa, 60)) + "»" + ((aq.alt || []).length ? " (هم‌امتیاز با «" + noq(aq.alt.join("» و «")) + "» آمد؛ اگر گفت آن یکی است، برای این fit=false بده — صفحه دربارهٔ آن یکی جدا می‌پرسد)" : "") + " (برگهٔ " + nn(eq) + ")" + (aq.go && aq.go[0] ? "، جایش: {\"do\":\"go\",\"view\":\"" + aq.go[0] + "\"" + (aq.go[1] ? ",\"arg\":\"" + aq.go[1] + "\"" : "") + "}" : "") + ". صفحه مطمئن نیست همان باشد؛ تا جوابِ او گام منتظر می‌ماند و از سر گرفته نمی‌شود. جوابش ⇒ {\"do\":\"coach_state\",\"sys_fit\":{\"sheet\":" + (eq.number || 0) + ",\"fit\":true|false,\"quote\":\"عینِ حرفش\"}}";
       if (!busy && !V.length && (!aq.n || aq.key === k)) { L.push("- **پرسشِ این نوبت همین است:** (پیش از از سر گرفتنِ گامِ منتظرِ ابزار) " + qq); if (k && aq.key !== k) { aq.key = k; aq.n = (aq.n || 0) + 1; dirty = true; } }
       else L.push(CTX + "پرسیده شده و هنوز بی‌جواب: " + qq);
     }
@@ -56236,7 +56421,7 @@ APP.goFromURL = function (q) {
   PRE.sysLines = sysLines;
   AS.afterTurnHooks.push(function (s, o) {
     try {
-      var sc = PRE.scope(s), R = sc && store(sc); if (!R) return; var k = mid(lastUser(s)), d = false;
+      var sc = sysScope(s), R = sc && store(sc); if (!R) return; var k = mid(lastUser(s)), d = false;
       (R.X.sys || []).forEach(function (e) {
         if (e.state === "arrived" && e.resumeKey && e.resumeKey === k) { e.state = "resumed"; e.resumedAt = nowIso(); swEv(sc, e, "resume", "↩ گامِ «" + clip(e.step, 60) + "» از سر گرفته شد", ["با ابزارِ «" + clip((e.tool || {}).fa || "", 60) + "» (برگهٔ " + nn(e) + ")"], ""); d = true; }
         if (e.state === "declined" && !e.ack) { e.ack = nowIso(); d = true; }
@@ -56261,6 +56446,8 @@ APP.goFromURL = function (q) {
           var go = function () { if (sc.pid) A.go("lprob", sc.pid); else { try { localStorage.setItem("lla.assist.cur", sc.sess); } catch (er) { } if (AS.toggle) AS.toggle(true); } };
           if (e.state === "arrived") items.unshift({ k: "warn", txt: "🛎 ابزارِ لازم آمد: «" + clip((e.tool || {}).fa || "", 50) + "» — گامِ «" + clip(e.step, 50) + "»", sub: "مسئلهٔ «" + ttl + "» · برگهٔ " + nn(e) + " — همان گام را از سر بگیر", go: go, sys23: e.id });
           else if (e.state === "wait" && e.ask) items.push({ k: "p", txt: "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + clip(e.ask.fa, 50) + "» — همان ابزارِ گامِ «" + clip(e.step, 50) + "» است؟", sub: "مسئلهٔ «" + ttl + "» — تا جوابت گام منتظر می‌ماند", go: go, sys23: e.id });
+          /* دورِ ۲۵ (S1): ابزاری که آمد و خودش گفت همان نیست ⇒ «امروز» می‌گوید گام دوباره منتظر است (تا سرانجامِ بعدی) */
+          else if (backNow(e)) items.push({ k: "p", txt: "⏸ گامِ «" + clip(e.step, 50) + "» دوباره منتظرِ برگهٔ " + nn(e) + " است — «" + clip(e.backBy.fa, 50) + "» همان نبود", sub: "مسئلهٔ «" + ttl + "» — به گفتهٔ " + (shE(e) ? "خودتان" : "خودت") + "؛ زیرِ برگه نوشتم و دوباره باز شد", go: go, sys23: e.id });
           else if (e.state === "declined" && !e.ack) items.push({ k: "p", txt: "⛔ برگهٔ " + nn(e) + " بی ساختن بسته شد — گامِ «" + clip(e.step, 50) + "» را از راهِ دیگری ادامه بده", sub: "مسئلهٔ «" + ttl + "»", go: go, sys23: e.id });
         });
       } catch (e) { }
@@ -56274,7 +56461,7 @@ APP.goFromURL = function (q) {
     var R = store(sc), Y = R && R.X.sys; if (!Y || !Y.length) return null;
     var anyW = Y.some(function (e) { return e.state === "wait"; });
     return h("section", { class: "card soft lp-syscard", dir: "rtl" }, h("h4", {}, anyW ? "⏸ گام‌های منتظرِ ابزار (کمبودِ سامانه)" : "گام‌هایی که منتظرِ ابزار بودند (کمبودِ سامانه)"),
-      h("ul", { class: "small" }, Y.map(function (e) { return h("li", { "data-state": e.state, "data-sheet": String(e.number || "") }, "«" + e.step + "» — " + (e.state === "wait" ? "منتظرِ برگهٔ " + nn(e) + " (از " + A.fdate(String(e.at).slice(0, 10)) + ")" + (e.ask ? " · ابزاری آمد: «" + e.ask.fa + "» — پرسیدم همان است یا نه" : "") : SW_FA[e.state] + " · برگهٔ " + nn(e)) + (e.tool && e.tool.fa ? " · ابزار: «" + e.tool.fa + "»" : "")); })),
+      h("ul", { class: "small" }, Y.map(function (e) { return h("li", { "data-state": e.state, "data-sheet": String(e.number || "") }, "«" + e.step + "» — " + (e.state === "wait" ? "منتظرِ برگهٔ " + nn(e) + " (از " + A.fdate(String(e.at).slice(0, 10)) + ")" + (e.ask ? " · ابزاری آمد: «" + e.ask.fa + "» — پرسیدم همان است یا نه" : backNow(e) ? " · «" + e.backBy.fa + "» آمد و به گفتهٔ " + (shE(e) ? "خودتان" : "خودت") + " همان نبود — برگه دوباره باز شد" : "") : SW_FA[e.state] + " · برگهٔ " + nn(e)) + (e.tool && e.tool.fa ? " · ابزار: «" + e.tool.fa + "»" : "")); })),
       /* دورِ ۲۴ (D24-8): متنِ ثابتِ انتظار فقط وقتی گامی هنوز منتظر است */
       anyW ? h("p", { class: "small muted" }, "بقیهٔ کار ادامه دارد؛ وقتی روتینِ مسئول ابزار را ساخت، صفحه خودش می‌فهمد، می‌سنجد که همین گام را جواب می‌دهد، در «امروز» خبر می‌دهد و همین گام از سر گرفته می‌شود.") : null);
   }
