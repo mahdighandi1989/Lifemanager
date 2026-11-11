@@ -1,4 +1,6 @@
 round26A/pA1/DONE
+round26A/pA2/DONE
+round26A/pA3/DONE
 round26A/s01/DONE
 round26A/s02/DONE
 round26A/s03/DONE
