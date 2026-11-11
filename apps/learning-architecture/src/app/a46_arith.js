@@ -326,7 +326,9 @@
           if (L2 && L2.s === 0 && agree(L2, R, apx, Rd[i].leadW)) continue;
         }
       }
-      var L0 = members[members.length - 1], said = R.t, c = { expr: L0.t, said: R.single && !R.floor && R.rem == null && !R.mixed && !R.comp && R.lits[0] ? R.lits[0].raw : said, saidT: said, val: num(L0.v.lo), valT: fmtV(L0.v), ok: !!how, kind: L0.run ? "run" : how === "quot" ? "quot" : R.floor ? "floor" : "chain", pos: segs[i - 1].at + L0.a, sx: !R.single || !!R.floor || R.rem != null || !!R.mixed || !!R.comp };
+      var L0 = members[members.length - 1], said = R.t, c = { expr: L0.t, said: R.single && !R.floor && R.rem == null && !R.mixed && !R.comp && R.lits[0] ? R.lits[0].raw : said, saidT: said, val: num(L0.v.lo), valT: /\//.test(said) && pt(L0.v) && L0.v.lo.d !== ONE && String(L0.v.lo.d).length <= 9 ? fa(String(L0.v.lo.n) + "/" + String(L0.v.lo.d)) : fmtV(L0.v), ok: !!how, kind: L0.run ? "run" : how === "quot" ? "quot" : R.floor ? "floor" : "chain", pos: segs[i - 1].at + L0.a, pe: segs[i].at + R.b, sx: !R.single || !!R.floor || R.rem != null || !!R.mixed || !!R.comp };
+      /* «۲/۳ = ۱/۲ + ۱/۵»: حساب سمتِ راست است و عددِ نوشته سمتِ چپ */
+      if (!R.single && !L0.run && L0.lits.length < R.lits.length && pt(R.v)) { c.expr = R.t; c.said = c.saidT = L0.t; c.val = num(R.v.lo); c.valT = /\//.test(L0.t) && R.v.lo.d !== ONE && String(R.v.lo.d).length <= 9 ? fa(String(R.v.lo.n) + "/" + String(R.v.lo.d)) : fmtV(R.v); }
       if (L0.div2 && (how === "quot" || how === "floor" || how === "rem" || (!how && R.single && R.lits[0].int))) { var qn = L0.lits[0].v.n / L0.lits[1].v.n, rn = L0.lits[0].v.n % L0.lits[1].v.n; c.valT = fa(String(qn)) + (rn ? " با باقی‌ماندهٔ " + fa(String(rn)) : ""); }
       /* واحد در ضرب/تقسیمِ بی‌واحد («سقف ۶۰ مترمربع، بارش ۳۲۰ میلی‌متر، پس ۶۰ × ۳۲۰ = ۱۹۲۰۰ مترمکعب»): واحدِ هر عدد از نوشتهٔ خودش در همین پیام؛
          خواناست ⇒ با ضریب‌ها سنجیده می‌شود؛ ناخوانا ⇒ «واحد نسنجیده» — نه «درست»، نه «نادرست» (C10) */
@@ -390,7 +392,7 @@
         if (q3 && q3.u.dim === q2.u.dim && cmp(q3.u.f, q2.u.f) < 0 && /^\s*و\s*$/.test(t.slice(q2.e, q3.a))) { said = add(said, div(mul(q3.v, q3.u.f), q2.u.f)); tl = div(mul(tolSaid({ raw: q3.raw, mag: q3.mag, pct: false }, false), q3.u.f), q2.u.f); saidT = q2.raw + " " + q2.u.w + " و " + q3.raw + " " + q3.u.w; }
         var ok = near(iv(exp), said, tl, apx);
         if (!ok && disowned(t, q1.a, (q3 && saidT !== q2.raw ? q3 : q2).e)) continue;
-        out.push({ expr: q1.raw + (q1.mag ? " × ۱۰^" + q1.mag : "") + " " + q1.u.w, said: saidT, saidT: saidT, val: num(exp), valT: fmtF(exp) + " " + q2.u.w, ok: ok, conv: true, kind: "conv", unit: ok ? "" : "تبدیلِ " + q1.u.w + " به " + q2.u.w, pos: q1.a });
+        out.push({ expr: q1.raw + (q1.mag ? " × ۱۰^" + q1.mag : "") + " " + q1.u.w, said: saidT, saidT: saidT, val: num(exp), valT: fmtF(exp) + " " + q2.u.w, ok: ok, conv: true, kind: "conv", unit: ok ? "" : "تبدیلِ " + q1.u.w + " به " + q2.u.w, pos: q1.a, pe: (q3 && saidT !== q2.raw ? q3 : q2).e });
         if (note && !q2.mag) { if (ok && cmp(exp, q2.v) !== 0 && saidT === q2.raw) note(q2.raw, hull(iv(q2.v), iv(exp))); else if (apx) note(q2.raw, wide(iv(q2.v), tolSaid({ raw: q2.raw, mag: 0, pct: false }, false))); }
         continue;
       }
@@ -403,7 +405,7 @@
         var base = op[1] === "+" ? add(mul(q1.v, q1.u.f), mul(q2.v, q2.u.f)) : sub(mul(q1.v, q1.u.f), mul(q2.v, q2.u.f)), tl2 = tolSaid({ raw: sraw, mag: 0, pct: false }, sm[1] === "≈");
         var cand = u3 ? [u3] : [q1.u, q2.u], okU = cand.some(function (u) { return near(iv(div(base, u.f)), sv, tl2, sm[1] === "≈"); });
         var rawSum = op[1] === "+" ? add(q1.v, q2.v) : sub(q1.v, q2.v), slip = !okU && cmp(q1.u.f, q2.u.f) !== 0 && meet(iv(rawSum), wide(iv(sv), tl2)), cu = cand[0];
-        out.push({ expr: q1.raw + " " + q1.u.w + " " + (op[1] === "+" ? "+" : "−") + " " + q2.raw + " " + q2.u.w, said: sraw, saidT: sraw, val: num(div(base, cu.f)), valT: fmtF(div(base, cu.f)) + " " + cu.w, ok: okU, kind: "mix", unit: okU ? "" : slip ? q1.u.w + "/" + q2.u.w + " بی تبدیل" : cmp(q1.u.f, q2.u.f) !== 0 ? "جمعِ " + q1.u.w + " و " + q2.u.w : "", pos: q1.a });
+        out.push({ expr: q1.raw + " " + q1.u.w + " " + (op[1] === "+" ? "+" : "−") + " " + q2.raw + " " + q2.u.w, said: sraw, saidT: sraw, val: num(div(base, cu.f)), valT: fmtF(div(base, cu.f)) + " " + cu.w, ok: okU, kind: "mix", unit: okU ? "" : slip ? q1.u.w + "/" + q2.u.w + " بی تبدیل" : cmp(q1.u.f, q2.u.f) !== 0 ? "جمعِ " + q1.u.w + " و " + q2.u.w : "", pos: q1.a, pe: q2.e + sm[0].length });
       }
     }
     /* ضریبِ گفته: «یه متر صد میلی‌متره»، «هر متر مکعب هزار لیتره» — فقط با فعلِ ربطی (نرخ نیست: «هر ساعت ۴۵ دقیقه درس می‌خوانم») */
@@ -414,25 +416,32 @@
       var u2 = unitAt(r1.slice(nm[0].length)); if (!u2 || u2.dim !== u1.dim || cmp(u1.f, u2.f) === 0) continue;
       var tail = r1.slice(nm[0].length + u2.len), cop = !!nm[1] && nm[1] !== "،" || /^(?:\u200c?ه|\u200c?ست|\u200c?ئه|\u200c?اس|هاست)$/.test(u2.suf) || /^\s*(?:است|هست|=)/.test(tail); if (!cop) continue;
       var w = nm[2].replace(/\s+/g, " "), nv = WNUM[w] != null ? F(B(WNUM[w])) : dec(w), ex = div(u1.f, u2.f), okF = cmp(ex, nv) === 0;
-      out.push({ expr: "هر " + u1.w, said: w, saidT: w + " " + u2.w, val: num(ex), valT: fmtF(ex) + " " + u2.w, ok: okF, conv: true, kind: "factor", unit: okF ? "" : "تبدیلِ " + u1.w + " به " + u2.w, pos: p0 });
+      out.push({ expr: "هر " + u1.w, said: w, saidT: w + " " + u2.w, val: num(ex), valT: fmtF(ex) + " " + u2.w, ok: okF, conv: true, kind: "factor", unit: okF ? "" : "تبدیلِ " + u1.w + " به " + u2.w, pos: p0, pe: p0 + u1.len + nm[0].length + u2.len });
     }
   }
 
   /* ---------- درگاه ---------- */
-  function run(q, reg, note, CU) { var t = norm(q), out = []; try { chains(t, reg, out, note, CU); } catch (e) { console.warn(e); } try { units(t, out, note); } catch (e2) { console.warn(e2); } return out.sort(function (a, b) { return a.pos - b.pos; }); }
+  function run(t, reg, note, CU) { var out = []; try { chains(t, reg, out, note, CU); } catch (e) { console.warn(e); } try { units(t, out, note); } catch (e2) { console.warn(e2); } return out.sort(function (a, b) { return a.pos - b.pos; }); }
   function arithChk(q, ctx) {
     var reg = {}, note = function (raw, v) { reg[raw] = reg[raw] ? hull(reg[raw], v) : v; };
     /* عددهایی که خودش «حدود/تقریباً» نوشته یا گرد کرده (در همهٔ پیام، نه فقط همین نقل) */
     var t0 = norm(ctx || q), ra = new RegExp("(?:≈|" + APX + ")\\s*(\\d+(?:\\.\\d+)?)(?![\\d.\\/%])", "g"), m;
     while ((m = ra.exec(t0))) { var tk = { raw: m[1], mag: 0, pct: false }; note(m[1], wide(iv(dec(m[1])), tolSaid(tk, false))); }
-    run(ctx || q, {}, note, null);
+    run(t0, {}, note, null);
     /* واحدِ هر عدد از نوشتهٔ خودش (یک واحد برای یک عدد؛ دو واحدِ ناهم‌سان ⇒ ناخوانا) */
     var CU = {}; quants(t0).forEach(function (x) { if (x.mag) return; var o = CU[x.raw]; CU[x.raw] = o === undefined || (o && o.dim === x.u.dim && cmp(o.f, x.u.f) === 0) ? x.u : null; });
-    return run(q, reg, null, CU);
+    /* نقلِ یک گام درونِ پیامش: همان پیام سنجیده می‌شود و فقط حساب‌هایی که در همین نقل تمام می‌شوند برمی‌گردند — جمعِ پیاپی («با ۱/۲۰ میشه ۴/۵») عددِ پیشینش را از پیام می‌گیرد */
+    var tq = norm(q).trim(), at = ctx && tq ? t0.indexOf(tq) : -1;
+    if (at >= 0 && ctx) return run(t0, reg, null, CU).filter(function (c) { return c.pe > at && c.pe <= at + tq.length && (c.kind === "run" || c.pos >= at); });
+    return run(norm(q), reg, null, CU);
   }
   ST.arithChk = arithChk;
   /* عددهای نتیجه برای ردگیریِ وابستگیِ گام‌ها (نه تبدیل، نه سمتِ راستِ عبارتی) */
-  ST.arithSaid = function (ck) { return (ck || []).filter(function (c) { return !c.conv && !c.sx && /^\d+(?:\.\d+)?$/.test(String(c.said)); }).map(function (c) { return c.said; }); };
+  ST.arithSaid = function (ck) {
+    var N = function (c) { return /^\d+(?:\.\d+)?$/.test(String(c.said)); }, bad = (ck || []).filter(function (c) { return !c.ok && N(c); });
+    /* گامی که صفحه حسابش را نادرست خواند: فقط همان عددِ نادرست وابستگی می‌آورد (نه عددهای درستِ همان گام — B25·D7)؛ وگرنه نتیجه‌های عددیِ گام */
+    return (bad.length ? bad : (ck || []).filter(function (c) { return !c.conv && !c.sx && N(c); })).map(function (c) { return c.said; });
+  };
   /* سطرِ کنارِ حکمِ هر گام: chk برای خودش (عددِ درست لو نمی‌رود)، chkM برای مربی. کنارِ «✗» هرگز «درست» نمی‌آید (DECISIONS_R25 P2). */
   function sideT(c) { return c.unit ? "" : "«" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "»"; }
   ST.arithNote = function (ck, verdict) {
