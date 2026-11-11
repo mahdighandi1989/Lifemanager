@@ -111,6 +111,8 @@
        «تنها مسئلهٔ زندهٔ سشن» (chatScope) دیگر کافی نیست: حدسِ ۱۰۰ ِ مهمانی مالِ «پیشنهادِ کار» نبود */
     if (!pid || chatScope(se, pid)) (((se.coach || {}).guesses) || []).forEach(function (g) { if (!g || !g.text) return; if (pid && !own23(g.at || "")) return;
       var res = g.res === "confirmed" ? "تأیید شد" : g.res === "refuted" ? "رد شد" : g.resRecheck ? "سرانجامِ پیشین («" + (g.resRecheck.was === "confirmed" ? "تأیید شد" : "رد شد") + "») کنار رفت — با مقدارِ درست دوباره آزموده شود" : "هنوز آزموده نشده";
+      /* دورِ ۲۵ (P7، C22-11 s24): حدسی که فقط دلیلِ همان پیامِ خودش را دارد «آزموده» نیست، ولی دلیلش کنارش می‌آید (a41 g.ground) */
+      if (!g.res && !g.resRecheck && g.ground && g.ground.from) res += " — دلیلِ خودت در همان پیام: «" + clip(String(g.ground.from), 140) + "»";
       add({ k: "guess", at: g.at || "", title: "حدس (از گفت‌وگو)", lines: [g.text], out: res, hist: (g.corr || []).map(function (c) { var isRes = c.field === "res" || RAWFA[String(c.old || "").trim()] || RAWFA[String(c["new"] || "").trim()];
           return isRes ? { at: c.at, old: hv(String(c.old == null ? "" : c.old)) || "—", new: String(c["new"] || "").trim() ? hv(String(c["new"])) : "سرانجام کنار رفت — دوباره آزموده شود", why: c.note || "" } : { at: c.at, old: val(c.old), new: val(c["new"]), why: c.note || "" }; }),
         mind: g.res ? [{ row: "حدس/کالیبراسیون", sign: g.res === "confirmed" ? "+" : "−" }] : [] }); });
@@ -259,6 +261,11 @@
         PR.events(null).forEach(function (e) { if (e && cs[e.prc]) add(Object.assign({}, e)); });
         S.all("fcast", function (f) { return f && f.prc && cs[f.prc]; }).forEach(function (f) { add({ k: "fcast", at: f.outcomeAt || f.created || "", title: "🎯 پیش‌بینی", lines: [f.q].concat(f.p != null ? ["اطمینان: " + fa(f.p) + "٪"] : []).concat(f.due ? ["موعدِ داوری: " + val(f.due)] : []),
           out: f.outcome === "yes" || f.outcome === "درست" ? "شد" : f.outcome === "no" || f.outcome === "نادرست" ? "نشد" : f.outcome ? val(f.outcome) : "هنوز داوری نشده" }); }); } } catch (e) { console.warn(e); }
+    /* دورِ ۲۵ (P7، A25-14): پیش‌بینی‌های خودش در همین گفت‌وگو (a41 coach.preds) و سرانجامشان — همان یک رکورد؛ آن‌که 🎯 اش به پروندهٔ تمرینِ همین سشن بسته شد بالا آمده است */
+    try { var csP = (typeof cs === "object" && cs) || {}; (((se.coach || {}).preds) || []).forEach(function (x) { if (!x || !x.text) return; var f = x.fc ? S.get(x.fc) : null; if (f && f.prc && csP[f.prc]) return;
+        var o = x.out && x.out.res ? x.out.res : f && f.outcome ? f.outcome : "", due = (f && f.due) || x.due || "", p = f && f.p != null ? f.p : x.p, sm = x.at ? (se.msgs || []).filter(function (m) { return m && m.role === "user" && String(m.at || "") === String(x.at); })[0] : null;
+        add({ k: "fcast", at: x.at || "", title: "🎯 پیش‌بینی (از گفت‌وگو)", lines: [x.text].concat(p != null ? ["اطمینان: " + fa(p) + "٪"] : []).concat(due && !o ? ["موعدِ داوری: " + val(due)] : []),
+          out: o ? o + (x.out && x.out.quote ? " — به گفتهٔ خودت: «" + clip(x.out.quote, 120) + "»" : "") : due ? "هنوز داوری نشده" : "هنوز داوری نشده — موعدی نگفتی", src: sm && sm.text ? msgRef(sid, A.liveMsgId ? A.liveMsgId(sm) : "") : null }); }); } catch (e) { console.warn(e); }
     ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
     var title = se.title || (first ? clip(first.text, 60) : "گفت‌وگو");
     /* دورِ ۲۱ (R4، C21-13، bank #94): سشنی که مسئلهٔ زنده دارد ⇒ عنوانِ درست و پیوند به پروندهٔ همان مسئله */

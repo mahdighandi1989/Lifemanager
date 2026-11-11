@@ -2277,7 +2277,13 @@
     var C = (s && s.coach) || {}, pu = prevUserMsg(s); return !!(C.guess && pu && C.guess.key === mkey(pu.text));
   }
   var META_Q19 =/(?:^|[\s.،!؛…])(?:بعدی|بعدیش|خب|خوب|ادامه|ادامه\s*بدیم|دیگه|بعدش|و\s*بعد|حالا\s*چی|حالا)\s*[؟?]+[\s!.…]*$/;
+  /* دورِ ۲۵ (P7، A23-25 s06 کارنامه «− … گیر … — «آره ثبتش کن.»»): فرمان یا رضایتِ خالص («آره ثبتش کن»، «باشه»، «ادامه بده») گیر نیست، هر چه مدل گزارش کند —
+     صفحه گزارشِ «گیر/شکست» را با خودِ پیام می‌سنجد؛ پیامی که هیچ حرفی از مسئله ندارد شاهدِ ضعفِ هیچ مرحله‌ای نیست */
+  var PURE_CMD25 = /^[\s«"]*(?:(?:آره|اره|آری|بله|باشه|اوکی|خب|حتماً|حتما|لطفاً|لطفا|ok)[\s،,.!]*)*(?:(?:همین\s*رو\s*|اینو\s*|این\s*رو\s*)?(?:ثبت(?:ش)?\s*کن(?:ید)?|بنویس(?:ش)?|ذخیره(?:ش)?\s*کن|یادداشت(?:ش)?\s*کن|ادامه\s*بده|برو\s*(?:بعدی|جلو)|بریم))?[\s.!…»"]*$/;
+  function pureCmd25(mt) { var t = String(mt || "").trim(); return !!t && t.split(/\s+/).length <= 6 && PURE_CMD25.test(t); }
+  AS.pureCmd25 = pureCmd25;
   function coachEv(s, ph, src, mt, ok, x) {
+    if (!ok && src === "chat" && pureCmd25(mt)) return;
     var E = s.coachEv = s.coachEv || [], key = src + (ok ? "|" + ph : "") + "|" + clip(mt, 80); if (E.some(function (e) { return e.key === key; })) return;
     /* تورِ پولیا (INF15/INF17، دورِ ۱۹b): هر رویداد شناسهٔ پیامِ منبعش (msg) و مسئله‌اش (pid) را دارد — تا اصلاحِ آن پیام رویدادهایش را پس بگیرد و «از کجا؟» ِ کارنامه منبع را نشان دهد */
     var um19b = evSrc19b(s, mt), pid19b = evPid19b(s);
@@ -3371,13 +3377,17 @@
     /* حرفِ زمان‌دارِ او در همین پیام یا دو پیامِ پیشِ خودش («از کی؟» ⇐ «از فردا»)؛ تاریخِ گذشته همچنان رد می‌شود (پایین) */
     var her24 = (s.msgs || []).filter(isUser).slice(-3).map(function (m) { return String(m.text || ""); }).join(" \n ");
     if (realDate(w) && w >= td && !HER_WHEN24.test(String(pt || "")) && !HER_WHEN24.test(her24)) w = "next-session";
-    var when = /^next[-_ ]?session$/i.test(w) ? "next-session" : realDate(w) ? (w >= td ? w : "") : planDate18(pt);
+    /* دورِ ۲۵ (P7، B_s·D7 = U15 «📌 برنامهٔ خودت … موعد: ۱۰ آبان» که او نگفت؛ بانکِ R25 #228/#240؛ C1/C12): بی تاریخِ مدل، روز فقط از حرفِ زمان‌دارِ خودِ برنامه
+       خوانده می‌شود (A.PR.whenInfo: «۱۴ اسفند»، «سه‌شنبه»، «یه هفته دیگه»، «جمعهٔ هفتهٔ بعد») — پیش‌تر برنامهٔ بی‌زمان «هفت روز بعد» ِ ساختگی می‌گرفت (planDate).
+       بی حرفِ زمان‌دار ⇒ «جلسهٔ بعد»؛ نامِ همین روزِ هفته در خودِ همان روز دوپهلوست ⇒ «جلسهٔ بعد» + whenAsk (a41 PR.datePend یک بار می‌پرسد). */
+    var I25 = !/^next[-_ ]?session$/i.test(w) && !realDate(w) && A.PR && A.PR.whenInfo ? A.PR.whenInfo(pt) : null, amb25 = I25 && I25.amb ? I25.wd : "";
+    var when = /^next[-_ ]?session$/i.test(w) ? "next-session" : realDate(w) ? (w >= td ? w : "") : amb25 ? "next-session" : I25 && I25.date ? (I25.date >= td ? I25.date : "") : (PLAN_WHEN.test(String(pt || "")) || /(?:^|[\s،])(?:امروز|امشب|همین\s*الان)(?![آ-ی‌])|آخرِ?\s*(?:همین\s*)?هفته/.test(String(pt || ""))) ? planDate18(pt) : "next-session";
     if (!when) return;   // تاریخِ گذشته هرگز پیشنهاد نمی‌شود
     var AP = plansAll(s), sm = o && o.same ? AP.filter(function (x) { return x.p.id === String(o.same); })[0] : null;
     if (sm) return;   // همان برنامه که دوباره گفت — نه برنامهٔ دوم، نه پیشنهادِ دوباره
     if (AP.some(function (x) { var q = x.p; return (q.d || "") === td && (qNorm(q.text) === qNorm(pt) || (x.s === s && (quoteIn(q.text, pt) || quoteIn(pt, q.text)))); })) return;   // همان متن در همان روز (در همین سشن: هر کدام درونِ دیگری)
     var PL = s.plans = s.plans || [], og = o && typeof o === "object" && (o.on_guess === true || o.on_guess === "true");
-    PL.push({ id: "pl" + (AP.length + 1), text: clip(pt, 300), when: when, at: at, d: td, key: key, done: false, state: "open", sess: s.id, onGuess: og || undefined });
+    PL.push({ id: "pl" + (AP.length + 1), text: clip(pt, 300), when: when, at: at, d: td, key: key, done: false, state: "open", sess: s.id, onGuess: og || undefined, whenAsk: amb25 || undefined });
   }
   function planDoneR18(s, pd) {
     var id = typeof pd === "string" ? pd : pd && (pd.id || pd.plan), ok = !(pd && typeof pd === "object" && (pd.done === false || pd.done === "false"));
@@ -4120,7 +4130,7 @@
       corrPush(dl, (dl.date || "") + (dl.time ? " " + dl.time : ""), dd + (tm ? " " + tm : (dl.time ? " " + dl.time : "")), ctx);
       if (AS.DO.deadline) { var o2 = AS.DO.deadline({ what: dl.what, date: dd, time: tm || dl.time || "" }); if (o2) { dl.date = dd; if (tm) dl.time = tm; S.put(dl); } } else { dl.date = dd; if (tm) dl.time = tm; S.put(dl); }
       var dLine = plainD(dd) + (tm || dl.time ? "، ساعت " + fa(String(tm || dl.time).replace(/^0/, "").replace(/:00$/, "")) : "");
-      chS.push({ rec: "یادآوری «" + clip(dl.what, 50) + "»", old: dlOld, "new": dLine, why: "" }); ch.push("یادآوری «" + clip(dl.what, 50) + "»: " + dLine + (dlOld ? " (اصلاح شد ⇐ «" + dlOld + "»)" : "")); }); } catch (e) { console.warn(e); }
+      chS.push({ rec: "یادآوری «" + clip(dl.what, 50) + "»", old: dlOld, "new": dLine, why: why23 }); ch.push("یادآوری «" + clip(dl.what, 50) + "»: " + dLine + (dlOld ? " (اصلاح شد ⇐ «" + dlOld + "»)" : "")); }); } catch (e) { console.warn(e); }
     /* قول‌ها (درخواستِ عقب‌افتاده‌ای که از آن پیام آمد) */
     (s.promises || []).forEach(function (p) { if (p.done || !(p.src === R.srcId || quoteIn(p.ask, R.src.text)) || !(over(p.ask) === true || (over(p.ask) == null && rel19b(p.ask, R.frag)))) return; var v = sub(p.ask, false); if (v == null || v === p.ask) return;
       corrPush(p, p.ask, v, ctx); put("درخواست", p.ask, v); p.ask = clip(v, 200); });
@@ -4222,7 +4232,7 @@
       askS.push({ field: q.path, label: q.label, old: clip(q.old, 300), "new": clip(q["new"], 300), id: q.id }); pend.push(q.label + ": " + (A.liveAskPart ? A.liveAskPart(q) : "«" + clip(q.old, 40) + "» ⇐ «" + clip(q["new"], 40) + "»") + " (در صفحه پرسیده شد «این‌جا هم عوض شود؟»)"); }); } catch (e) { console.warn(e); } }
     /* دورِ ۲۲ (P3، B·D16 s19، D s38): سشنِ بی مسئلهٔ زنده — موعد، اندازه‌ها و کارتِ همان پیام هم پیش از نوشتنِ نتیجه (نه پس از آن، با «چیزی ثبت نشده بود») */
     if (!Object.keys(pids).length && !R.edit && typeof A.liveRetractSessApply === "function") { try { var ls22 = A.liveRetractSessApply(s.id, R.srcId, { frag: R.frag, fix: R.fix, old: R.old, key: R.key || "", cur: cu });
-      (ls22.changed || []).forEach(function (c) { var o0 = typeof c.old === "string" ? c.old : "", n0 = typeof c["new"] === "string" ? c["new"] : ""; chS.push({ rec: String(c.label || c.rec || "رکورد"), old: clip(plainTx(o0), 160), "new": clip(plainTx(n0), 160), why: String(c.why || "") }); ch.push(o0 || n0 ? chLine20(String(c.label || c.rec || "رکورد"), o0, n0) : String(c.label || "")); }); } catch (e) { console.warn(e); } }
+      (ls22.changed || []).forEach(function (c) { var o0 = typeof c.old === "string" ? c.old : "", n0 = typeof c["new"] === "string" ? c["new"] : ""; chS.push({ rec: String(c.label || c.rec || "رکورد"), old: clip(plainTx(o0), 160), "new": clip(plainTx(n0), 160), why: !String(c.why || "").trim() || /^اصلاح شد ⇐ «/.test(String(c.why)) ? why23 : String(c.why) }); ch.push(o0 || n0 ? chLine20(String(c.label || c.rec || "رکورد"), o0, n0) : String(c.label || "")); }); } catch (e) { console.warn(e); } }
     /* دفترِ کارها: خودِ اصلاح یک کارِ تاریخ‌دار است (برای پرونده و کارنامه) */
     C.acts20 = (C.acts20 || []).concat([{ at: nowIso(), kind: "correction", sess: s.id, msg: R.curId, from: R.srcId, key: R.key || R.what, old: clip(R.frag, 160), "new": clip(R.fix, 160), changed: ch.length, edit: !!R.edit }]).slice(-80);
     if (!chS.length && !askS.length && !notes.length) notes.push("از آن بخشِ پیامت رکوردی ساخته نشده بود — چیزی برای عوض کردن نبود (فقط متنِ پیام اصلاح‌شده خوانده می‌شود)");
@@ -4230,6 +4240,9 @@
     if (chS.length || askS.length) notes = notes.filter(function (t) { return !/رکوردی\s*ساخته\s*نشده|ثبت\s*نشده\s*بود|چیزی\s*(?:دیگری\s*)?عوض\s*نشد|^از آن|^چیزی/.test(String(t)); });
     /* دورِ ۲۳ (Q4، C23-16 «سرتیترِ کهنه در همان پرامپت»): نمای جاری پس از اصلاح دوباره کشیده می‌شود تا سرتیتر/فرمِ پیشِ چشم همان رکوردِ تازه باشد */
     if (chS.length) { try { if (A.state && /^(?:lprob|dossier|route)$/.test(String(A.state.view || "")) && typeof A.render === "function") A.render(); } catch (e) { } }
+    /* دورِ ۲۵ (P7، A25-21 s09 p17 «اصلاح شد ⇐ «یکشنبه ۱۵ آذر ۱۴۰۵»»، بانکِ R25 #227/#239): دلیلِ هر تغییر حرفِ خودِ اوست (یا ✏️ ِ خودش) — تغییرهایی که از راهِ رکوردهای
+       سشن می‌آیند (موعد، اندازه، کارت — پایین، liveRetractSessApply، و یادآوریِ همین تابع) دلیلِ پیش‌فرضِ «اصلاح شد ⇐ «مقدارِ پیشین»» یا دلیلِ خالی می‌آوردند، که مقدارِ قدیم است
+       نه دلیل. رکوردهای مسئلهٔ زنده (liveRes20) دست نخورده‌اند — سطرِ «اصلاح شد ⇐» ِ آن‌ها قراردادِ دورهای پیش است. */
     return { ch: ch, pend: pend, nEv: nE, res: { changed: chS, ask: askS, note: notes.join(" · ") } };
   }
   /* یک موتور برای گفت‌وگو و ✏️ (RO5): همان سنجش، همان برگرداندن، همان «نتیجهٔ صفحه» (retNote) و همان یک شاهدِ «بازنگری» */

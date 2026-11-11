@@ -5085,3 +5085,7 @@ dated stability, mind-card feed) under way.
 - **PROPOSAL** Not done, with reasons: A23-6 and A23-19 (turn-question/stage owners), one display for bracket sums vs MathML, register of fixed form
   texts outside the chat (needs her own text marked in the DOM first).
 
+## 2026-11-11 — FINDING + CHANGE: تورِ پولیا دورِ ۲۵، fixer «today» (P7 + C1/C12)
+- FINDING: یک پیش‌بینی دو 🎯 می‌شد (داوریِ `practice_log` فقط 🎯 های پرونده را می‌دید؛ جملهٔ داوری پیش‌بینیِ تازه ثبت می‌شد)؛ موعدِ «تا جمعه» به روزِ برنامهٔ بی‌ربط می‌افتاد؛ برنامهٔ بی‌زمان «هفت روز بعد» ِ ساختگی می‌گرفت؛ سرانجامِ حدس فقط از عدد خوانده می‌شد؛ پروندهٔ سشنِ کم‌سال پالوده نمی‌شد؛ «جواب داده‌ای» بی معما؛ نقطه‌های هم‌نامِ 🧭؛ دلیلِ اصلاحِ موعد = مقدارِ پیشین؛ «آره ثبتش کن» گیر شمرده می‌شد.
+- CHANGE: `apps/learning-architecture/src/app/` — `a41_practice.js` (پیش‌بینی، تاریخِ خودش `PR.whenInfo/herDates/datePend`، `PR.guessOwnTest`)، `a27_tour.js` (`plan18`، `coachEv`، دلیلِ اصلاح)، `a38_live.js` (یک سطر در `retractSess`)، `a40_dossier.js`، `a44_route.js` (`ROUTE.model`)، `a43_age.js` (`privText`)، `a34_psy.js`، `a29_mind.js`، `a21_orient.js`. آزمون: `tests/test_tour1_r25_today.js` (۱۹/۱۹؛ بانکِ R25 P7 ‏۲۶/۲۶؛ ۱۸ و ۲۱ قرمز روی پایه). WORKLOG (127)، PROGRESS 126، HANDBOOK §۱۰ و §۱۲ ردیف ۶۷.
+- DECISION: «تا جمعه» در خودِ جمعه و تعهدِ تاریخ‌دارِ بی‌رکورد را صفحه می‌پرسد و فقط با پاسخِ خودش ثبت می‌کند (C1/C12)؛ حدسی که فقط دلیل دارد «آزموده نشده — دلیلِ خودت» می‌ماند (صداقت بر حکمِ خوش‌بینانه).

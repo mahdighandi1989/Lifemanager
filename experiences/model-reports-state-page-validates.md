@@ -10,6 +10,7 @@ created_at: "2026-10-16T12:00:00Z"
 updated_at: "2026-10-18T14:00:00Z"
 updated_at: "2026-10-18T16:00:00Z"
 updated_at: "2026-10-18T21:00:00Z"
+updated_at: "2026-11-11T12:00:00Z"
 updated_at: "2026-10-18T20:00:00Z"
 updated_at: "2026-10-25T09:00:00Z"
 merged_from: []
@@ -257,3 +258,26 @@ Three failures of one kind: the page had a single slot where the conversation ha
   the answer itself to the person. Build the person line from the person field; pass a flag for the coach variant; test every surface that renders the log.
 - **A reader that the gate filters is a reader that the screen needs.** The mind card ignored events whose source it did not list; the events existed and were never shown.
   When adding an event source, grep every consumer's source filter.
+
+## Update 2026-11-11 (round 25, today) — a judgment must find the record it judges; a date is read, shown and confirmed, never defaulted
+
+**What happened.** (1) A prediction made in chat and later judged through another path (a practice log) became two records: the judging path
+only searched records already linked to its own container, so it created a fresh one and the original stayed open in the daily list. The
+sentence that judged a prediction («پس پیش‌بینیم غلط بود») was itself booked as a new prediction, because the trigger word was matched
+without asking what the sentence does. (2) A plan with no time words got a default date (+7 days); a prediction whose date the model's
+quote had dropped took the date of an unrelated open plan. (3) A weekday named on that same weekday is ambiguous and was silently resolved.
+
+**Rules.**
+- Before a path creates a record for an outcome, it searches every place the same thing may already live (unlinked records from the same
+  conversation first) and, on a hit, links instead of creating. "One thing, one record" is a search rule at every writer, not a display rule.
+- A sentence that contains a trigger word is classified by what it does (states, judges, asks, hedges) before anything is booked.
+- A date comes only from her own sentence. No fallback number. If the sentence is ambiguous, the page asks once and books her answer; if a
+  dated commitment has no record, the page shows the sentence with the date it read and books it on her yes. Unanswered ⇒ nothing is booked.
+- When the model's quote is shorter than her sentence, read the missing part (date, confidence) from her own sentence that contains the quote
+  — never from a neighbouring record.
+- An outcome needs a test. A claim she only argued for keeps the status "not tested" and shows her reason beside it; do not upgrade it.
+
+## How to Apply Elsewhere (round 25 addendum)
+- For every "create" in an event handler, list the other writers of the same entity and make the handler look in their output first.
+- Replace any `else default_date` branch with "ask once" plus a stored pending question that the next user message answers.
+- Compare pending answers by message identity, not by timestamp order (two events can share a millisecond in tests and in fast replies).
