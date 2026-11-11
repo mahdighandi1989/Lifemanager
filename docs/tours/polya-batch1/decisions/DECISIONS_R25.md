@@ -200,3 +200,7 @@ The earlier-round open items outside P1–P7 keep binding as written (no variant
 - C13 (P2; decided after the arith fixer's report) Her own rounded number, reused later in the same message, stands for the interval of
   values that round or truncate to it; a later result consistent with any value in that interval is not flagged. This follows from C9
   (her rounding is accepted) and is kept.
+- C14 (P3; decided after the loop fixer's report) The existing R6 two-word rule stays on top of C3's step-specific word: one shared word
+  cannot tell a description of her step from a coincidence (tB1y: «پیشینه» alone would arrive, and the runner judged asking correct there).
+  It is the minimum that distinguishes «a phrase» from «a word», not a tuned threshold; with fewer the page asks her, which costs one
+  question and never a wrong «رسید».
