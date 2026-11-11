@@ -10,6 +10,7 @@ created_at: "2026-10-16T12:00:00Z"
 updated_at: "2026-10-18T14:00:00Z"
 updated_at: "2026-10-18T16:00:00Z"
 updated_at: "2026-10-18T21:00:00Z"
+updated_at: "2026-11-11T12:00:00Z"
 updated_at: "2026-10-18T20:00:00Z"
 updated_at: "2026-10-25T09:00:00Z"
 merged_from: []
@@ -196,3 +197,87 @@ showed "no plan yet". Lessons:
 - **One decision, one place.** When a gate decides "refuse" and a later wrapper turns that into "kept", the reply pre-check still reads "refuse" and the model contradicts
   the page. Put the final decision in the gate both readers call.
 - **A model date needs her time words.** Without them use a dateless follow-up («جلسهٔ بعد»); a relative day she said («تا شنبه‌ی بعد») is computed by the page clock.
+## Update 2026-11-11 (round 25, correction) — "can be computed from" is not "was computed from"; propose only your own recomputation, otherwise ask
+- **A closure over arithmetic coincidences is not a dependency.** "One operation on the old value and any earlier number gives this number" is true of most small
+  numbers (her goal 8 = 16 ÷ 2, a list index 2 = 8 ÷ 4, a data percentage 10 = 20 − 10). Dependency needs *evidence in her own text*: the number stands in a result
+  position (after «= / یعنی / پس / سهمِ هر نفر», before «رسید / شد», in an explaining parenthesis, or is a one-number result record) **and** its relation is identified.
+- **Rank the evidence, let the best class decide.** Written expression that evaluates to the number → a word of the sentence that defines the formula («محیط», «مساحت»,
+  «جفت») → one operation with a number of the same sentence → one operation with an earlier number. Run the weaker class only after the stronger ones reached a fixed
+  point, or a coincidence found early (100 = 20 × 5) beats the written relation found later (10 × 10).
+- **Role comes from position, not from a word list.** An unmarked number in the statement/data form is a given (goal, measurement, bound) and so is every later
+  restatement; list indices, labels («گامِ ۳», «n=4»), years are never quantities; clock times and month days only subtract from their own kind.
+- **Dimensions cut most coincidences cheaply.** Add/subtract only like units; a ratio of two like quantities cannot carry that unit; percent is ÷100; when the unit
+  table has no unit, the noun after the number is its kind; a unit-less number inherits the unit of an equal number written with one; an old value without a unit
+  takes the unit from a record that states it — if none does, no value is computed.
+- **A proposed number must be the tool's own verified computation.** Show a new value only when every relation of the deciding class agrees and no operand is itself
+  "possibly stale"; otherwise ask «was this computed from it?» with no number. A wrong confident proposal is worse than a question.
+- **Set-asides follow the same basis rule.** A result/guess/verdict is set aside by a correction only if it rests on that value: not when the corrected value is a
+  time or date, not when her own written computation of that number does not contain it, not when the kinds differ. Keep the old presumption only for "unknown".
+- **Bank entries are user sentences: run them through the real validator.** Two entries failed only because the correction-cue check did not know «X ندارم، ۱۵ …».
+
+## Update 2026-11-11 (round 25, story) — one conversation can hold several problems; a "result" is whole only if nothing is left
+
+Three failures of one kind: the page had a single slot where the conversation had two things.
+
+- **A label is not a state.** The model reported `result`, and every result moved the problem to look-back. A result is *whole* only when
+  nothing is left: the person says in the same message what she still does not know, or the problem's own ledger (prior-work steps not yet
+  correct, plan steps not yet done) still has work. Judge it in ONE function and let every reader (stage machine, story ledger, turn
+  question) call it. Decide from her words and the ledger, never from a word-overlap threshold.
+- **Focus must be able to move.** While a session was bound to an open problem, no message could introduce another one, so the second
+  problem was filed as data of the first. Run the "is this a new problem?" check BEFORE every other prompt builder of the turn, so that
+  all blocks of one prompt see the same problem. Every place that derives "the problem of this turn" (bound record, page in view, cached
+  key) must honour the same decision; a fix in one of four places looks done and is not.
+- **The boundary message belongs to both.** "The first is solved, the answer is 12. Another problem: …" carries a result of the old
+  problem and the statement of the new one. Split it by sentence at the point where the new problem starts; attribute by position, and
+  mark what you excluded so later readers (dossier, route) do not re-attribute it by timestamp.
+- **Two readers, two stage sources** is the same bug again: when a second derived source appears (story ahead of the form), grep for
+  every reader of the first one.
+
+### How to Apply Elsewhere (this update)
+1. For any "done/result/solved" signal ask "what would still be open?" and read that from the user's own message and the record's ledger.
+2. When state is bound to "the current item", list every derivation of "current" and route them through one predicate.
+3. Put scope-changing detection first in the pipeline; let later stages only read it.
+4. For a message that closes one item and opens another, split at the opening sentence; keep an explicit exclusion mark on what you cut.
+
+## Update 2026-11-11 (round 25, prior) — a ledger the model reports into is merged, never replaced; and the page asks its question before the model has reported
+
+- **A report is a delta, the record is the ledger.** When a model reports structured state turn after turn (judged steps), storing "the latest report" as the record
+  silently deletes everything the latest report did not repeat: her confirmations, a waiting step, the still-wrong step. Key every reported item (its number, or the same
+  quote) into ONE persistent ledger; a new item is appended only when the message itself qualifies (the opening, or she names it her earlier work); unmatched items on
+  ordinary turns are ignored. Recompute every derived field (resume point, dependency marks, stage, summary) from the ledger after each change — never carry them over.
+- **The turn question is built before the reply, so read the message yourself.** A contract that says "the model reports X, then the page asks about X" produces the wrong
+  question on the very turn that matters, because the prompt is assembled before the report exists. Give the page a pure reader of her message (opening with her own worked
+  step, dispute of a verdict, acceptance, a fix it can check itself) and use the SAME reader before the reply (to choose the turn instruction) and after it (to record).
+- **Per-item replies need per-clause reading.** «گامِ ۳ را قبول ندارم، چون … ولی گامِ ۴ را قبول دارم» is two states. Split on sentence ends and «ولی/اما», read each
+  clause's own polarity and step number; a leading «نه» decides nothing by itself («نه، بس نیست!» answers another question; «نه نه، درست میگی» is acceptance).
+- **Her fix lands only when the page's own check agrees.** If the step is computable, a "validated" model report is not enough: the page re-evaluates the new text against
+  what it computed for the old one; disagreement leaves the step as it was, shows the mismatch without the right value, and keeps the question.
+- **A question about a state must expire with the state.** «به چه دلیل؟» for a rejected verdict is asked once; a re-check (the model's report for that step, or the page's
+  own recomputation) writes its result on the record and ends it; a repeat without a new reason shows the recorded evidence instead of opening a new dispute.
+- **Coach-facing text and person-facing text are two fields from the start.** One line used for both the prompt and the event log leaks «don't give the answer away» and
+  the answer itself to the person. Build the person line from the person field; pass a flag for the coach variant; test every surface that renders the log.
+- **A reader that the gate filters is a reader that the screen needs.** The mind card ignored events whose source it did not list; the events existed and were never shown.
+  When adding an event source, grep every consumer's source filter.
+
+## Update 2026-11-11 (round 25, today) — a judgment must find the record it judges; a date is read, shown and confirmed, never defaulted
+
+**What happened.** (1) A prediction made in chat and later judged through another path (a practice log) became two records: the judging path
+only searched records already linked to its own container, so it created a fresh one and the original stayed open in the daily list. The
+sentence that judged a prediction («پس پیش‌بینیم غلط بود») was itself booked as a new prediction, because the trigger word was matched
+without asking what the sentence does. (2) A plan with no time words got a default date (+7 days); a prediction whose date the model's
+quote had dropped took the date of an unrelated open plan. (3) A weekday named on that same weekday is ambiguous and was silently resolved.
+
+**Rules.**
+- Before a path creates a record for an outcome, it searches every place the same thing may already live (unlinked records from the same
+  conversation first) and, on a hit, links instead of creating. "One thing, one record" is a search rule at every writer, not a display rule.
+- A sentence that contains a trigger word is classified by what it does (states, judges, asks, hedges) before anything is booked.
+- A date comes only from her own sentence. No fallback number. If the sentence is ambiguous, the page asks once and books her answer; if a
+  dated commitment has no record, the page shows the sentence with the date it read and books it on her yes. Unanswered ⇒ nothing is booked.
+- When the model's quote is shorter than her sentence, read the missing part (date, confidence) from her own sentence that contains the quote
+  — never from a neighbouring record.
+- An outcome needs a test. A claim she only argued for keeps the status "not tested" and shows her reason beside it; do not upgrade it.
+
+## How to Apply Elsewhere (round 25 addendum)
+- For every "create" in an event handler, list the other writers of the same entity and make the handler look in their output first.
+- Replace any `else default_date` branch with "ask once" plus a stored pending question that the next user message answers.
+- Compare pending answers by message identity, not by timestamp order (two events can share a millisecond in tests and in fast replies).

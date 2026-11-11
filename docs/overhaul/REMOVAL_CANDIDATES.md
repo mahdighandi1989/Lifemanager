@@ -383,3 +383,48 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R24 R5 (never ISO to a person; one Jalali confirmation; register signs from verbs only).
 - **Status:** reachable, not called for person-facing text: `APP.AGE.faBoth` (exported for compatibility), `APP.ASSIST.R24_QUARANTINE.signSh`, `.signTo18`.
   Delete only with the owner's approval.
+## 2026-11-11 — one-operation coincidence scan for derived numbers (learning-architecture, Pólya round 25, correction: P4)
+- **Files:** `apps/learning-architecture/src/app/a38_live.js`.
+- **What it did:** `staleScan` (round 24) marked a number «کهنه پس از اصلاح» when one arithmetic operation on the old value (or an already stale number) and any earlier
+  number of the same problem produced it, and proposed the same operation with the new value.
+- **Why replaced:** DECISIONS_R25 P4 + C11 (only numbers actually derived; never goals, measured results, data percentages, deadline times, list indices, bounds;
+  every proposed value is the page's own correct recomputation, otherwise the page asks).
+- **Status:** reachable, not called: `APP.LIVE_R24_QUARANTINE_P4.staleScan`. Delete only with the owner's approval.
+
+## 2026-11-11 — Tour 1 round 25, fixer «story»: `A.STORY.phaseOfItemsR24`
+- **What it did:** any intermediate chat result (`res` with `fin:false`) put the problem at «اجرا», even with no plan and no validated step.
+- **Why replaced:** DECISIONS_R25 P5 («the stage never jumps to «اجرا» before a plan»; C25-10 aC4 p4, A25-16 oA1).
+- **Status:** reachable as `APP.STORY.phaseOfItemsR24`, not called. Delete only with the owner's approval.
+
+## 2026-11-11 — verdict rejection only by a leading «نه», and the replace-on-report prior ledger (learning-architecture, Pólya round 25, prior: P1)
+- **What:** `NO24` in `apps/learning-architecture/src/app/a45_story.js` (a rejection of a prior-work verdict was any message starting with «نه / نخیر / اشتباه نکردم …», applied
+  to every step number in the message) and the round-24 storage rule «a new `coach_state.prior` report replaces the ledger» (`E2.prior = pr24`, `LP.prior = cp`).
+- **Why replaced:** DECISIONS_R25 P1 + C5–C8: replies are read by meaning, per step (`readReply`); reports merge (`priorMerge`); «نه، بس نیست!» is not a dispute.
+- **Status:** `NO24` is kept and reachable as `APP.STORY.R25_QUARANTINE.NO24` (not called). The replace rule has no separate function to keep; the first report of a
+  problem still creates the ledger exactly as before. Delete only with the owner's approval.
+
+## 2026-11-11 — one-number float arithmetic check of prior work (learning-architecture, Pólya round 25, arith: P2)
+- **File:** `apps/learning-architecture/src/app/a45_story.js` (`evalChain`, `tolOf`, `UNIT`, `unitOf`, `arithChk`).
+- **What they did:** one regular expression «expression = one number» evaluated with floats and a `1e-9` slack; units only length/mass/time with digit numbers.
+  The right-hand side of an equality was never an expression («4/2 = 1/1 + 1/2 + 1/2» compared with «1/1»; chained «a = b = c» with the first term), a leading
+  Unicode minus was dropped, «با ۱/۲۰ میشه ۴/۵» was read as «1/20 = 4/5».
+- **Why replaced:** DECISIONS_R25 P2 (S1 D25-12; C25-1, A25-8, B25·D5/D14, B_s D1) and C9/C10 — `a46_arith.js` (`A.STORY.arithChk`).
+- **Status:** reachable, not called: `APP.STORY.arithChkR24`. Delete only with the owner's approval.
+
+## 2026-11-11 — flat (equal-weight) scoring of the territory loop (learning-architecture, Pólya round 25, loop: P3)
+- **File:** `apps/learning-architecture/src/app/a44_route.js`.
+- **What it did:** `rank` (R24) counted every non-generic shared word the same and called a fit «clear» on any two of them with one in the step OR the sheet title. An unfit
+  area was declared «🛎 ابزارِ لازم آمد» on «ایده» (sheet title) + «جایگاه» (the existing view name «💡 جایگاهِ ایده» inside the sheet's own text) — B25·D1 — and on
+  «نویز، عدد، آر، پنجره» — D25-21 (the round's S1).
+- **Why replaced:** DECISIONS_R25 P3 + C2/C3 (words spread across the systems, words of an existing view/area name the sheet itself cites, and stem fragments cannot make an
+  arrival; a clear fit needs a full-weight word of HER step; anything less ⇒ ask her).
+- **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.rank24`. Delete only with the owner's approval.
+## 2026-11-11 — blanket «press nothing» follow-up, paint-only register, two-question result prompt (learning-architecture, Pólya round 25, classify: P6)
+- **Files:** `apps/learning-architecture/src/app/a26_assist.js`, `a27_tour.js`, `a38_live.js`.
+- **What they did:** the follow-up after navigation to a field-less view said «چیزی پر نکن و دکمه‌ای نزن» even when her request needed a tab/button there;
+  `AS.regSys` skipped every «…» (page labels included) and was the only place the register was applied (stored text stayed «تو»); `A.liveReqSignals`
+  needed the words «ثبت/بساز»; the non-objective result turn question asked two questions; `natGuess0` called any text with a school-subject name objective.
+- **Why replaced:** DECISIONS_R25 P6 (C25-2, A23-14, D25-13, B24·D12, D23-30).
+- **Status:** reachable, not called: `APP.ASSIST.R25_QUARANTINE.noFieldTxt24` (still used for views with no button or no request), `.regSys24`,
+  `APP.R25_QUARANTINE.liveReqSignals24`, `.resultQ24`, `.natGuess24`. Delete only with the owner's approval.
+

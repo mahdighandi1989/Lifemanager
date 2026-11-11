@@ -169,7 +169,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // DECISIONS_R5 F1: «پاسخ‌گرفته» فقط از گزارشِ سنجیدهٔ مدل (coach_state)، نه از «پیامِ بعدی» — گزارشِ مدل پس از هر پاسخِ کاربر
     const rep = (id) => { AS._turnSession = s; AS.DO.coach_state({ ph: 'u', said: [], ans: [id], stuck: false, fail: false, role: 'self', nat: 'objective' }); };
     said('ai', TQ.und.qs[0]); said('user', 'الف'); rep('u1'); said('ai', TQ.und.qs[1]); said('user', 'ب'); rep('u2');
-    const a3 = ask('ج'); o.p1 = a3.q === TQ.und.qs[2];
+    /* دورِ ۲۵ (classify P6، DECISIONS_R25 «the page's own two-question turn questions»): پرسشِ نوبتِ صفحه در گذرگاهِ پایانی یک «؟» می‌گیرد — همان پرسشِ کتاب، یک جملهٔ پرسشی */
+    const a3 = ask('ج'); o.p1 = a3.q === (AS.oneQ25 ? AS.oneQ25(TQ.und.qs[2]) : TQ.und.qs[2]);
     await at(P2.id); const b1 = ask('مسئلهٔ دوم را شروع کنم'); o.p2fresh = b1.q === TQ.und.qs[0];
     await at(P1.id); const a4 = ask('حلش کردم!'); o.back = /بازنگری/.test(a4.ph);
     const a5 = ask('[سامانه: کارهایت انجام شد و صفحه دوباره خوانده شد — کارِ بعدی‌ای را که گفتی همین حالا انجام بده]'); o.autoKeeps = /بازنگری/.test(a5.ph) && a5.q === a4.q;

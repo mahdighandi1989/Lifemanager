@@ -382,10 +382,11 @@
       /* تورِ پولیا (RM1a): موفقیتِ سنجیدهٔ گفت‌وگو (src «chatok»، ok:true) هم — هر کدام یک رویداد */
       /* تورِ پولیا (RN3c): رویدادِ «در انتظارِ» الگو (pend، بی گزارشِ مدل) شمرده نمی‌شود؛ (RN2e) هر کار یک بار — رویدادی که شناسه‌اش (act) همان گامِ ثبت‌شدهٔ
          مسئلهٔ زنده است کنار می‌رود (پیامد همان‌جا شمرده می‌شود)، و دو رویدادِ گفت‌وگو با یک شناسه و یک مرحله یکی‌اند */
-      (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok") || e.pend || e.wd) return;
+      (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok" || e.src === "prior") || e.pend || e.wd) return;
+        /* دورِ ۲۵ (P1، A25-6/B25·D11/C25-18): گامِ کارِ پیشین — درست ⇒ به حسابِ خودش (اجرا +)؛ نادرست/ناقص ⇒ با علتِ خودش؛ اصلاحِ خودش ⇒ موفقیت. پیش‌تر رویدادِ src «prior» اصلاً خوانده نمی‌شد */
         if (e.act) { if (liveActs[e.act]) return; var ak = e.act + "|" + e.ph + "|" + (e.ok ? 1 : 0); if (seenAct[ak]) return; seenAct[ak] = 1; }
         /* تورِ پولیا (R3g، دورِ ۲۱، B·D9/D·11): کلیدِ کارِ دوباره‌ثبت‌شده «…|rebook:u6» است — «از کجا؟» نقلِ حرفِ خودش را نشان می‌دهد، نه شناسهٔ خام */
-        var kp = String(e.key || "").split("|").filter(function (x) { return x && !/^rebook:|^sc$/.test(x); }), q0 = e.rebook && e.src20 && e.src20.span ? String(e.src20.span) : (kp.pop() || ""), how = { selfcorr: "خودش حرفِ پیشینش را اصلاح کرد (بازنگری)", plan_done: "برنامه‌اش را انجام داد", solved: "«حل شد» در گفت‌وگو", own: "بازگوییِ خودش", res: "نتیجه‌ای که گفت", lesson: "درسی که گفت", plan: "طرحی که گفت", ans: "پاسخ به پرسشِ مرحله", pass: "گذر از مرحله" }[e.how] || "";
+        var kp = String(e.key || "").split("|").filter(function (x) { return x && !/^rebook:|^sc$/.test(x); }), q0 = e.rebook && e.src20 && e.src20.span ? String(e.src20.span) : (kp.pop() || ""), how = { selfcorr: "خودش حرفِ پیشینش را اصلاح کرد (بازنگری)", plan_done: "برنامه‌اش را انجام داد", solved: "«حل شد» در گفت‌وگو", own: "بازگوییِ خودش", res: "نتیجه‌ای که گفت", lesson: "درسی که گفت", plan: "طرحی که گفت", ans: "پاسخ به پرسشِ مرحله", pass: "گذر از مرحله", priorfix: "گامِ کارِ پیشین که خودش درست کرد" }[e.how] || (e.src === "prior" ? (e.ok ? "گامِ درستِ کارِ پیشینِ خودش" : "گامِ کارِ پیشین که درست نبود") + (e.prior ? " (گامِ " + A.fa(e.prior) + ")" : "") : "");
         if (!e.ok && e.cause === "sys") { if (!fpid || String(e.pid || "") === fpid) CZ.sys.push({ id: "ev:" + s.id + ":" + (e.msg || "") + ":" + e.key, ph: byPh[e.ph], at: e.at, why: e.causeWhy || "کمبودِ ابزار در سامانه", sheet: e.sheet || "", pid: e.pid || "", sess: s.id }); return; }
         if (!e.ok && e.cause === "prereq") { if (!fpid || String(e.prePid || e.pid || "") === fpid) CZ.prereq.push({ id: "ev:" + s.id + ":" + (e.msg || "") + ":" + e.key, ph: byPh[e.ph], at: e.at, pre: e.pre || "", concept: e.preC || "", step: e.preStep || "", quote: e.preQ || "", pid: e.prePid || e.pid || "", sess: s.id, rec: e.preRec || "" }); return; }
         var cz22 = e.ok ? "" : e.src === "knot" ? "knot" : (e.cause === "knot" || e.cause === "skill" ? e.cause : "unk"), czw22 = e.ok ? "" : e.src === "knot" ? "گره‌ای که هنگامِ حل در غربال پیدا شد" : (e.causeWhy || "علت هنوز روشن نیست — پیش‌نیازِ کم‌شده‌ای دیده نشد و گره یا مهارت با شاهد گزارش نشد");
@@ -666,6 +667,11 @@
       R.acts.forEach(function (a) { if (a.rep > 1) a.fa += " (" + fa(a.rep) + " بار در همین روز — یک بار شمرده شد)"; });
       var ms = R.acts.filter(function (a) { return a.v != null; });
       R.last = ms.length ? ms[ms.length - 1].v : null; R.first = ms.length ? ms[0].v : null; R.nm = ms.length;
+      /* دورِ ۲۵ (P7، A21-11 s05 «ردیفِ T24 — (اندازه‌ای نیست)»): اندازهٔ پروندهٔ کالیبراسیون پیش‌بینی‌های داوری‌شدهٔ خودش است (اطمینان + سرانجام)، نه درصدِ بازیابی —
+         ردیف همان را می‌شمارد (هر 🎯 یک بار)؛ عددِ تازه‌ای ساخته نمی‌شود */
+      var cj = Object.keys(R.fcs || {}).map(function (id) { return R.fcs[id]; }).filter(function (f) { return f && /^(?:شد|نشد|درست|نادرست|yes|no)$/.test(String(f.outcome || "")); }).map(function (f) { return /^(?:شد|درست|yes)$/.test(String(f.outcome)); })
+        .concat(R.acts.filter(function (a) { return a.cal; }).map(function (a) { return !!a.cal.ok; }));
+      R.calN = cj.length; R.calK = cj.filter(Boolean).length;
       R.days = R.acts.length;
       var last = R.acts[R.acts.length - 1], stab = R.ev.filter(function (x) { return /^(stable|تثبیت)/.test(x.state); }).sort(byAt).pop();
       if (last && last.ok === false && ((stab && String(stab.at) <= String(last.at)) || R.acts.slice(0, -1).some(function (a) { return a.ok !== false; })))
@@ -710,7 +716,7 @@
             (R.off || []).map(function (w) { return h("div", { class: "small warnline mind-tech-off", "data-at": day(w.at) }, "«تثبیت شد»" + (w.was ? " (" + A.fdate(day(w.was)) + ")" : "") + " در " + A.fdate(day(w.at)) + " پس گرفته شد" + (w.why ? ": " + w.why : "")); }),
             R.decline ? h("div", { class: "small warnline mind-tech-decline", "data-at": day(R.decline.at) }, "افت در " + A.fdate(day(R.decline.at)) + (R.decline.after ? " (پس از «تثبیت شد» در " + A.fdate(day(R.decline.after)) + ")" : "") + (R.decline.why ? ": " + R.decline.why : "")) : null),
           h("td", {}, fa(R.days) + (R.pending ? " · " + fa(R.pending) + " در انتظار" : "")),
-          h("td", {}, R.nm ? (R.nm > 1 ? pf0(R.first) + " ← " + pf0(R.last) + " (" + fa(R.nm) + ")" : pf0(R.last) + " (۱)") : "— (اندازه‌ای نیست)"),
+          h("td", {}, R.nm ? (R.nm > 1 ? pf0(R.first) + " ← " + pf0(R.last) + " (" + fa(R.nm) + ")" : pf0(R.last) + " (۱)") : R.calN ? fa(R.calK) + " از " + fa(R.calN) + " پیش‌بینیِ داوری‌شده درست درآمد (جزئیات در 🎯)" : "— (اندازه‌ای نیست)"),
           h("td", { class: "mind-tech-dim" }, R.dim ? (dimFa[R.dim] || R.dim) + " — " + R.dimHow : UNMAPPED),
           h("td", { class: "small" }, techList(R.acts, "tech:" + R.key)));
       })))));

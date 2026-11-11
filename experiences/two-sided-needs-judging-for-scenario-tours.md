@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T07:00:00Z"
 created_at: "2026-10-17T07:00:00Z"
-updated_at: "2026-10-19T00:00:00Z"
+updated_at: "2026-11-11T00:00:00Z"
 merged_from: []
 ---
 
@@ -93,3 +93,22 @@ need maps, defects with severities), and a weaker judge fails silently: it marks
   other's drivers; the judge had to confirm every compared scenario was a clean final run.
 - **Result here:** the cheaper runner missed two S2 on byte-identical prompts, gave five wrong PASS verdicts and pasted one generic
   "upgrades needed" block everywhere. The strong model stayed; slower rounds are the cheaper risk.
+
+## Update 2026-11-11 — a waiting loop's verifier: weigh where each shared word came from, and keep every verdict reversible by the person
+The same loop passed all the negative arms written a round earlier and still declared an unfit build "arrived": the two shared words were one
+from the ticket's title and one from the name of an EXISTING feature that the ticket itself had cited as "not this". A second case matched on a
+stemming fragment and a field-wide word. And when the person then said "no, that is not it", the loop only understood a "no" while its own
+question was pending — after an announced arrival the objection was dropped and the step was marked resumed.
+- **Rule (evidence):** a ticket says "nothing that exists answers this", so a word that existing things already carry cannot tell the new build
+  apart from them. Give shared words three weights: none (stop-like vocabulary, stem fragments), low (field-wide words — measured by spread
+  across the registry's own groups, not by a tuned count — and words of existing names the ticket cites), full (the rest). Announce only on
+  full-weight words of the person's OWN step; the ticket's title and body are the filer's framing and can only support. Anything less: ask.
+- **Rule (one outcome):** while a question to the person is unanswered, the verifier issues no other verdict — not for a rival candidate, not
+  from a second source (registry vs reply).
+- **Rule (reversibility):** every state the loop can announce must have a way back driven by the person's own words: "not it" after an arrival
+  re-parks the step, reopens the ticket and says so where the arrival was announced; a mistaken "no" can be taken back; history keeps both.
+- **Tour rule:** besides the three arms of 2026-10-19, test (a) a build that overlaps only through the ticket's own framing, (b) two equal
+  candidates, (c) the person's "no" after each announced state, and (d) the "no"s that are NOT about the fit (time, how to use it, a coaching
+  question) — the negative arm of the new mechanism itself.
+- **How to apply elsewhere:** any matcher that turns textual overlap into a user-visible claim ("this is what you asked for") should ask
+  where each matching token came from before counting it, and should never let an announcement be the last word.
