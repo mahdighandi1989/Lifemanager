@@ -1728,7 +1728,10 @@
     var PQ22 = null; try { PQ22 = A.prereqTurnQ ? A.prereqTurnQ(r.p.id) : null; } catch (e) { PQ22 = null; }
     if (PQ22 && PQ22.q) { q = PQ22.q; src = "prereq-" + PQ22.st; }
     /* دورِ ۲۴ (R8، §۲۱): کارِ پیشینِ سنجیدهٔ همین مسئله ⇒ پرسشِ نوبت از نقطهٔ ازسرگیری (a45 A.STORY.priorTurnQ) تا کارِ تازه‌ای پس از آن حکم‌ها بیاید */
-    if (!q && o.turn && !sysT0(o)) { var PR24 = ""; try { PR24 = A.STORY && A.STORY.priorTurnQ ? A.STORY.priorTurnQ(null, r.p.id) : ""; } catch (e) { PR24 = ""; } if (PR24) { q = PR24; src = "prior-resume"; } }
+    /* دورِ ۲۵ (P1): ردِ حکم در همین پیام ⇒ دوباره‌سنجی پرسشِ نوبت است، حتی اگر پرسشِ دیگری آماده بود (a45 A.STORY.priorTurn؛ «نه، بس نیست!» رد نیست) */
+    if (o.turn && !sysT0(o)) { var PT25 = null; try { PT25 = A.STORY && A.STORY.priorTurn ? A.STORY.priorTurn(null, r.p.id, String(o.turn.text || "")) : null; } catch (e) { PT25 = null; }
+      if (PT25 && (/^(?:dispute|again)$/.test(PT25.id) || PT25.fixed || !q)) { q = PT25.q; src = "prior-" + PT25.id; }
+      else if (!q && !PT25 && !(o.turn.text && String(o.turn.text).trim())) { var PR24 = ""; try { PR24 = A.STORY && A.STORY.priorTurnQ ? A.STORY.priorTurnQ(null, r.p.id) : ""; } catch (e) { PR24 = ""; } if (PR24) { q = PR24; src = "prior-resume"; } } }
     /* (۱) کارِ همین نوبت */
     /* «…درسته؟» پس از یک مقدار حدس است، نه نتیجه (G1/G2 دورِ ۶، s02/s07/s09 — turn.guess از مربی) ⇒ «چطور می‌آزمایی‌اش؟» */
     if (act && onlyAnsNow(r, s, T, tx)) pick(Q_ONLYANS, "turn-onlyans");

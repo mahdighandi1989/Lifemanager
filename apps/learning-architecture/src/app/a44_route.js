@@ -578,8 +578,13 @@
     /* دورِ ۲۳ (Q3، C23-11/D23-21، بانکِ R23 #65): بی طرحِ صفحه، طرحِ سنجیدهٔ گفت‌وگو (A.STORY.plan) — «طرح هنوز نیست» فقط وقتی هیچ‌جا طرحی نیست */
     var cp = null; try { cp = A.STORY && A.STORY.plan ? A.STORY.plan(rid) : null; } catch (e) { cp = null; }
     if (cp && cp.src === "chat") return { n: cp.pieces.length, done: cp.done, chat: true, cur: cp.cur };
-    if (!rid.pid) return null; var pg = S.get("eprog_" + rid.pid), L = (pg && pg.solve && pg.solve.live) || {};
-    if (!(L.plan && txt(L.plan.t))) return { none: true };
+    if (!rid.pid) { var prS = null; try { prS = A.STORY && A.STORY.priorFor ? A.STORY.priorFor(S.get(rid.sess), "") : null; } catch (e) { prS = null; }
+      if (prS && prS.steps && prS.steps.length) { var rsS = prS.resume ? prS.steps[prS.resume - 1] : null; return { n: prS.steps.length, done: prS.steps.filter(function (x) { return x.verdict === "ok" && !x.stale && !((x.depStale || []).length); }).length, prior: true, cur: rsS ? rsS.step || rsS.quote : "" }; }
+      return null; } var pg = S.get("eprog_" + rid.pid), L = (pg && pg.solve && pg.solve.live) || {};
+    /* دورِ ۲۵ (P1، C25-16): بی طرح، ولی با دفترِ «کارِ پیشین» ⇒ «مانده» از همان گام‌ها (گام‌های درست رفته‌اند)، نه «طرح هنوز نیست» */
+    if (!(L.plan && txt(L.plan.t))) { var pr25 = null; try { pr25 = A.STORY && A.STORY.priorFor ? A.STORY.priorFor(null, rid.pid) : null; } catch (e) { pr25 = null; }
+      if (pr25 && pr25.steps && pr25.steps.length) { var rs25 = pr25.resume ? pr25.steps[pr25.resume - 1] : null; return { n: pr25.steps.length, done: pr25.steps.filter(function (x) { return x.verdict === "ok" && !x.stale && !((x.depStale || []).length); }).length, prior: true, cur: rs25 ? rs25.step || rs25.quote : "" }; }
+      return { none: true }; }
     var pcs = String(L.plan.t).split(/\n|؛|،?\s(?:سپس|بعد|بعدش|آنگاه|آن‌گاه|و\s*بعد|و\s*سپس)\s|[.]\s|،\s*(?=(?:بعد|سپس|آخر|در\s*آخر))/).map(txt).filter(function (x) { return x.length >= 3; });
     var done = (L.steps || []).filter(function (st) { return st && st.out && !st.out.auto && st.out.done === "yes"; }).length;
     return { n: pcs.length, done: done };
@@ -648,6 +653,10 @@
       if (e.k === "cplan23") { var pcs = (e.lines || []).slice(1).filter(function (l) { return /^گامِ /.test(l); }).map(function (l) { return l.replace(/^گامِ [۰-۹0-9]+:\s*/, ""); });
         if (pcs.length > 1) { pcs.forEach(function (pc, j) { var q0 = addPt({ k: "cplan23", at: e.at || "", title: "گامِ " + fa(j + 1) + " ِ طرح: " + pc, short: pc, lines: j ? [] : [(e.lines || [])[0] || ""], out: "", from: "از گفت‌وگو", cls: "main" });
           dets.forEach(function (dd) { if (dd.rejoin == null && !dd.open && dd.kind !== "pre" && dd.kind !== "sys") dd.rejoin = q0.i; }); lastMain = q0.i; }); return; } }
+      /* دورِ ۲۵ (P1، C25-16): کارِ پیشین ⇒ هر گامش یک نقطه روی خطِ اصلی با حکمِ خودش (گامِ درست گذشته، گامِ ازسرگیری نشان‌دار) — نه فقط یک نقطهٔ کناری */
+      if (e.k === "cprior" && !isBack) { var sl25 = (e.lines || []).filter(function (l) { return /^گامِ [۰-۹0-9]+ · /.test(l); });
+        if (sl25.length > 1 && /^کارِ پیشینِ تو:/.test((e.lines || [])[0] || "")) { sl25.forEach(function (l, j) { var q5 = addPt({ k: "cprior", at: e.at || "", title: "کارِ پیشین — " + clip(l, 110), short: l, lines: j ? [l] : [(e.lines || [])[0] || "", l], out: "", from: "از گفت‌وگو", cls: "main", verdict: /✓ درست/.test(l) ? "ok" : /✗/.test(l) ? "wrong" : /⚠️/.test(l) ? "incomplete" : "unchecked" });
+          dets.forEach(function (dd) { if (dd.rejoin == null && !dd.open && dd.kind !== "pre" && dd.kind !== "sys") dd.rejoin = q5.i; }); lastMain = q5.i; }); return; } }
       var q = addPt(Object.assign(base, { cls: isBack ? "back" : (e.k === "stmt" ? "origin" : "main") }));
       if (isBack) {
         var fr = fragOf(e), t = -1;
@@ -669,7 +678,7 @@
     var openD = dets.filter(function (d) { return d.open && d.kind !== "sys"; }), nowI = solvedNow ? -2 : openD.length ? openD[openD.length - 1].pts.slice(-1)[0] : lastMain;
     var st = D.stages || [], left = st.filter(function (x) { return !x.reached; }).length, cur = st.filter(function (x) { return x.now; })[0];
     var phNow = rid.pid ? D.phase : (ST.phaseSess ? ST.phaseSess(se0) : String(C0.ph || ""));
-    var pl = planLeft(rid), planTx = !pl ? "" : pl.none ? "نامعلوم — طرح هنوز نیست" : fa(Math.max(0, pl.n - pl.done)) + " گام از " + fa(pl.n) + " گامِ طرحت" + (pl.chat ? " (از گفت‌وگو" + (pl.cur && pl.done < pl.n ? "؛ گامِ کنونی: «" + clip(pl.cur, 40) + "»" : "") + ")" : "");
+    var pl = planLeft(rid), planTx = !pl ? "" : pl.none ? "نامعلوم — طرح هنوز نیست" : pl.prior ? fa(Math.max(0, pl.n - pl.done)) + " گام از " + fa(pl.n) + " گامِ کارِ پیشینت" + (pl.cur && pl.done < pl.n ? " (ازسرگیری: «" + clip(pl.cur, 40) + "»)" : "") : fa(Math.max(0, pl.n - pl.done)) + " گام از " + fa(pl.n) + " گامِ طرحت" + (pl.chat ? " (از گفت‌وگو" + (pl.cur && pl.done < pl.n ? "؛ گامِ کنونی: «" + clip(pl.cur, 40) + "»" : "") + ")" : "");
     /* «مانده» فقط آنچه مانده — «اکنون» جای خودش را دارد و در «مانده» تکرار نمی‌شود (A23-8، D23-21) */
     /* دورِ ۲۴ (R7، C24-17): پس از نتیجه (مرحلهٔ بازنگری، یا همهٔ مرحله‌ها رسیده) «طرح هنوز نیست» دروغ است — مانده فقط بازنگری است */
     var atBack24 = !solvedNow && (phNow === "b" || (st.length > 0 && left === 0));
