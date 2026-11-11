@@ -33697,7 +33697,7 @@ APP.goFromURL = function (q) {
     e_lib: { j: "ws", what: "کتابخانهٔ وقایعِ واقعی و مثال‌های جزوه که بک‌تست روی آن‌ها اجرا می‌شود.", why: "مادهٔ آزمون؛ صفِ تأییدِ وقایعِ تازه." },
     e_aut: { j: "ws", what: "جاهایی که کارخانه با واقعیت نخواند.", why: "تو می‌گویی ایراد از جزوه است یا از سازنده؛ زیرِ همان بخشِ جزوه ثبت می‌شود." },
     e_living: { j: "ws", what: "جزوهٔ زنده: هر قاعده و وضعش در آزمون‌ها.", why: "کدام قاعده آزموده و درست است، کدام زیرِ سؤال." },
-    kcases: { j: "untie", what: "گره‌گشا: موقعیت‌هایی که در آن‌ها گیر کردی.", why: "یک موقعیت ثبت کن تا تا ریشه، با شاهد، برسی.", next: [["kpractice", "ورزشِ گره‌ها"]] },
+    kcases: { j: "untie", what: "گره‌گشا: موقعیت‌هایی که در آن‌ها گیر کردی.", why: "یک موقعیت ثبت کن تا با شاهد به ریشه‌اش برسی.", next: [["kpractice", "ورزشِ گره‌ها"]] },
     kcase: { j: "untie", what: "یک موقعیتِ گیر: چه شد، چه انتظار داشتی، و پله‌پله تا ریشه.", why: "ریشه که پیدا شد، «گرهِ ذهنی» ساخته می‌شود و ورزش می‌گیرد.", next: [["kpractice", "ورزشِ گره‌ها"]] },
     knot: { j: "untie", what: "یک «گرهِ ذهنی»: الگوی گیرِ تکرارشونده‌ای که در چند موقعیت دیده شده.", why: "تا با ورزش و آزمایشِ واقعی بازش کنی.", next: [["kpractice", "ورزش"]] },
     kpractice: { j: "untie", what: "ورزشِ گره‌ها: نمونه‌های تازه با همان ساختارِ گیر، با فاصله و درهم.", why: "تا الگو را در ظاهرِ تازه هم بشناسی، نه فقط در همان موقعیت.", next: [["kmap", "نقشهٔ ذهن"]] },
@@ -35436,7 +35436,7 @@ APP.goFromURL = function (q) {
                 : AS.R25_QUARANTINE.noFieldTxt24)
               : ownN && ownN >= allN ? ". فیلدهای این صفحه همه «به قلمِ خودِ کاربر»اند (data-own): هیچ‌کدام را پر نکن — بگو خودش می‌نویسد و فقط جای نوشتن را نشان بده (هایلایت)؛ اگر دکمهٔ غیرِ تصمیمیِ لازمی هست بزن؛ reply خیلی کوتاه.]"
               : ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن" + (ownN ? " — فقط فیلدهایی که «به قلمِ خودِ کاربر — پر نکن» نیستند؛ آن‌ها را فقط هایلایت کن و بگو خودش می‌نویسد" : "") + " و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]";
-            return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "»" + (A.state.sub ? " (قدم/برگهٔ " + A.state.sub + ")" : "") + " باز شد" : res.changed ? "فرم تغییر کرد (فیلدهای تازه)" : "کارهایت انجام شد و صفحه دوباره خوانده شد — کارِ بعدی‌ای را که گفتی همین حالا انجام بده") +
+            return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "»" + (A.state.sub ? subFa25(A.state.sub) : "") + " باز شد" : res.changed ? "فرم تغییر کرد (فیلدهای تازه)" : "کارهایت انجام شد و صفحه دوباره خوانده شد — کارِ بعدی‌ای را که گفتی همین حالا انجام بده") +
               (goNote ? "؛ ⚠ " + goNote : "") +
               (nextOn && !res.moved && !res.changed && !promised && !said ? "؛ گفتی کارِ بعدی را انجام می‌دهی (next:true) — همین حالا انجامش بده" : "") +
               (said ? "؛ پیامِ صفحه پس از کارهایت: «" + res.toasts.join("» · «") + "» — بر پایهٔ همین پیام ادامه بده (حدس نزن)" : "") +
@@ -35636,6 +35636,10 @@ APP.goFromURL = function (q) {
   /* تورِ پولیا دورِ ۳ (A13، s18): رقمِ فارسی/عربی خنثی است، نه راست‌به‌چپ — «= ۲۴ cm/s» و «y→۰» در همان تکهٔ چپ‌به‌راست می‌مانند (پیش‌تر نتیجه بیرونِ <bdi> بود) */
   var RTL_CH = /[\u0590-\u065F\u066A-\u06EF\u06FA-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/, LTR_TOK = /[A-Za-z0-9\u0660-\u0669\u06F0-\u06F9π√∑∞=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ()\[\]→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/,
     LTR_OP = /[=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ√∑π→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/;
+  /* دورِ ۲۵ (P6، D23-35 «STILL» s33 p3): سطرِ پیگیری نامِ خودِ زبانهٔ باز را می‌گوید («🔭 مسئلهٔ حل‌نشدهٔ خودم»)، نه نامِ نمای مادر با کلیدِ خام («🧗 مسئله‌های بزرگ (قدم/برگهٔ live)») */
+  function subFa25(sub) { var t = ""; try { var el = document.querySelector('#main [role=tab][aria-selected="true"], #main .tab.on'); t = el ? String(el.textContent || "").replace(/\s+/g, " ").trim() : ""; } catch (e) { }
+    return t ? " — زبانهٔ «" + t.replace(/[«»]/g, "") + "»" : " (قدم/برگهٔ " + sub + ")"; }
+  AS.subFa25 = subFa25;
   var FACT25 = /(?:(?:^|[^A-Za-z])[A-Za-z]|\))!+$/;   // «n!»، «(n−k)!»، «2^n·n!» — فاکتوریل؛ «OK!»/«done!» (واژهٔ لاتینِ بلند) نه
   AS.FACT25 = FACT25;
   function bidiNodes(t) {
@@ -40288,12 +40292,17 @@ APP.goFromURL = function (q) {
     var out = "", d = 0, buf = "", st = -1, hit = false;
     for (var i = 0; i < l.length; i++) { var ch = l.charAt(i);
       if (ch === "«") { if (d === 0) { out += buf; buf = ""; st = i; } else buf += ch; d++; continue; }
-      if (ch === "»" && d > 0) { d--; if (d === 0) { var q2 = /[؟?]/.test(buf) && !hit ? oneQ25(buf) : buf; if (/[؟?]/.test(buf)) hit = true; out += "«" + q2 + "»"; buf = ""; } else buf += ch; continue; }
+      if (ch === "»" && d > 0) { d--; if (d === 0) { var q2 = /[؟?]/.test(buf) ? oneQ25(buf) : buf;   /* هر «…» ِ پرسشیِ سطحِ اول (نمونه‌های حرفِ او یک «؟» دارند و همان می‌مانند) */ if (/[؟?]/.test(buf)) hit = true; out += "«" + q2 + "»"; buf = ""; } else buf += ch; continue; }
       buf += ch; }
     out += (d > 0 ? "«" : "") + buf;
     if (!hit && bold) { var m = /^(.*\*\*پرسشِ این نوبت همین است:?\*\*\s*)([^]*)$/.exec(l); if (m) out = m[1] + oneQ25(m[2]); }
     return out; }
-  AS.finalFilter25 = function (outs) { return (outs || []).map(function (b) { return typeof b === "string" && /پرسشِ این نوبت همین است|در این نوبت فقط \*\*یک\*\* پرسش/.test(b) ? b.split("\n").map(tqLine25).join("\n") : b; }); };
+  /* همان پرسش در شکلِ «پیشنهادِ این نوبت: «…»» / «پرسشِ پیشنهادیِ این نوبت: «…»» (سطرِ مرحله، معلمِ حل) هم همان یک جمله می‌شود — وگرنه دو متن از یک پرسش در یک پرامپت می‌ماند */
+  var SUGQ25 = /((?:پیشنهادِ|پرسشِ پیشنهادیِ) این نوبت:\s*)«((?:[^«»]|«[^«»]*»)*)»/g;
+  AS.finalFilter25 = function (outs) { return (outs || []).map(function (b) { if (typeof b !== "string") return b;
+    if (/پرسشِ این نوبت همین است|در این نوبت فقط \*\*یک\*\* پرسش/.test(b)) b = b.split("\n").map(tqLine25).join("\n");
+    if (/(?:پیشنهادِ|پرسشِ پیشنهادیِ) این نوبت:/.test(b)) b = b.replace(SUGQ25, function (m, pre, q) { return pre + "«" + oneQ25(q) + "»"; });
+    return b; }); };
   AS.replyCheck = function (o, opts) {
     var s = AS._turnSession; if (!s || !o || typeof o.reply !== "string") return "";
     var um = lastUserMsg(s); if (!um || /^\[سامانه/.test(String(um.text || ""))) return "";
@@ -45496,8 +45505,12 @@ APP.goFromURL = function (q) {
   var ETHIC_RE = /درستش\s*(?:چیه|چیست)|کار\s*(?:ِ\s*)?درست\s*(?:چیه|چیست|کدام)|اخلاق|وجدان|شریک\s*(?:ِ\s*)?جرم|گزارش\s*(?:بدم|ندم|بدهم)|لو\s*(?:بدم|بدهم)|دروغ\s*(?:بگم|بگویم)|خیانت|قانون\s*چی\s*می\s*گه/;
   var QTY_Q = /(?:چقدر|چه\s*قدر|چه\s*اندازه|چند)\s*(?:تا\s*)?(?:بزرگ|کوچک|بلند|پهن|عمیق|حجم|جا|لیتر|متر|کیلو|گرم|پول|تومن|تومان|ظرفیت)/;
   var LIFE_RE = /(?:^|\s)[بن][ء-یپچژکگ]{1,12}م\s+یا\s+\S|[ء-یپچژکگ]{1,12}(?:م|یم)\s+یا\s+نه(?![ء-یپچژکگ])|تصمیم|شغل|ازدواج|مهاجرت|همسر|رابطه|پیشنهادِ?\s*کار|بمونم|بمانم/;
+  /* دورِ ۲۵ (classify P6، D23-30 «STILL» aD2 p1): «یه تصمیم دارم … کلاسِ تقویتیِ ریاضی … چیکار کنم؟» — نامِ یک درس/رشته («ریاضی»، «شطرنج»، «المپیاد») موضوعِ تصمیمِ اوست،
+     نه مسئلهٔ کامل‌بیان‌شده با پاسخِ عینی. قابِ تصمیمِ خودش (تصمیم/«چیکار کنم؟»/«برم یا نرم») بر واژهٔ نامِ درس مقدم است، مگر صورت نشانهٔ ریاضیِ دیگری هم داشته باشد
+     (نماد، «ثابت کنید»، «معادله»، «مثلث» …). قاعدهٔ پیشین: A.R25_QUARANTINE.natGuess24 */
+  var SUBJNAME25 = /ریاضی|هندسه|شطرنج|المپیاد|احتمال/g, DECFRAME25 = /تصمیم|(?:چی|چه)\s*کار\s*کنم|چیکار\s*کنم|(?:^|\s)[بن][ء-یپچژکگ]{1,12}م\s+یا\s+\S|کدوم\s*بهتر|کدام\s*بهتر/;
   function natGuess0(x) {
-    if (OBJ_W.test(x) || OBJ_SYM.test(x)) return "objective";
+    if (OBJ_W.test(x) || OBJ_SYM.test(x)) { if (DECFRAME25.test(x) && FIRST_S.test(x) && !OBJ_SYM.test(x) && !TEXT_IMP.test(x) && !OBJ_W.test(x.replace(SUBJNAME25, " "))) return "life"; return "objective"; }
     if (ETHIC_RE.test(x)) return "life";
     if (/\d/.test(x) && PRAC_W.test(x)) { if (STAKE_RE.test(x)) return "practical"; if (QUEST_RE.test(x) && !FIRST_S.test(x)) return "objective"; }
     if (TEXT_IMP.test(x) && !FIRST_S.test(x)) return "objective";
@@ -45526,6 +45539,7 @@ APP.goFromURL = function (q) {
   function typeGuess(t) { var x = norm(t); if (/اثبات\s*یا\s*رد/.test(x)) return "pod"; if (DECIDE_RE.test(x)) return ""; if (POD_CHAT.test(x)) return "pod"; if (LIFE_RE.test(x) || ETHIC_RE.test(x)) return ""; return POD_W.test(x) ? "pod" : PROVE_W.test(x) ? "prove" : ""; }
   A.liveTypeGuess = typeGuess;
   A.liveNatGuess = natGuess;
+  A.R25_QUARANTINE = Object.assign(A.R25_QUARANTINE || {}, { natGuess24: function (t) { var x = norm(t); return OBJ_W.test(x) || OBJ_SYM.test(x) ? "objective" : natGuess(t); } });
 
   /* ---------- «حکمتِ ضرب‌المثل‌ها» (تور ۱ ِ پولیا، s35): ثبت‌گاهِ کوچکِ گفته‌های اکتشافیِ خودِ کتاب — نقلِ ترجمه (sources/polya_how_to_solve_it/items.json،
      C151–C168)، هر کدام کنارِ همان پرسشی که پشتیبانی می‌کند و در همان مرحله؛ معادلِ فارسیِ عامیانه نه (وفاداری)، و همیشه با حدِ آن (C150: ضرب‌المثل

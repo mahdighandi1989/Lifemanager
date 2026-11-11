@@ -383,3 +383,12 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R24 R5 (never ISO to a person; one Jalali confirmation; register signs from verbs only).
 - **Status:** reachable, not called for person-facing text: `APP.AGE.faBoth` (exported for compatibility), `APP.ASSIST.R24_QUARANTINE.signSh`, `.signTo18`.
   Delete only with the owner's approval.
+## 2026-11-11 — blanket «press nothing» follow-up, paint-only register, two-question result prompt (learning-architecture, Pólya round 25, classify: P6)
+- **Files:** `apps/learning-architecture/src/app/a26_assist.js`, `a27_tour.js`, `a38_live.js`.
+- **What they did:** the follow-up after navigation to a field-less view said «چیزی پر نکن و دکمه‌ای نزن» even when her request needed a tab/button there;
+  `AS.regSys` skipped every «…» (page labels included) and was the only place the register was applied (stored text stayed «تو»); `A.liveReqSignals`
+  needed the words «ثبت/بساز»; the non-objective result turn question asked two questions; `natGuess0` called any text with a school-subject name objective.
+- **Why replaced:** DECISIONS_R25 P6 (C25-2, A23-14, D25-13, B24·D12, D23-30).
+- **Status:** reachable, not called: `APP.ASSIST.R25_QUARANTINE.noFieldTxt24` (still used for views with no button or no request), `.regSys24`,
+  `APP.R25_QUARANTINE.liveReqSignals24`, `.resultQ24`, `.natGuess24`. Delete only with the owner's approval.
+

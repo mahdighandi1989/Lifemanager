@@ -106,8 +106,12 @@
   var ETHIC_RE = /درستش\s*(?:چیه|چیست)|کار\s*(?:ِ\s*)?درست\s*(?:چیه|چیست|کدام)|اخلاق|وجدان|شریک\s*(?:ِ\s*)?جرم|گزارش\s*(?:بدم|ندم|بدهم)|لو\s*(?:بدم|بدهم)|دروغ\s*(?:بگم|بگویم)|خیانت|قانون\s*چی\s*می\s*گه/;
   var QTY_Q = /(?:چقدر|چه\s*قدر|چه\s*اندازه|چند)\s*(?:تا\s*)?(?:بزرگ|کوچک|بلند|پهن|عمیق|حجم|جا|لیتر|متر|کیلو|گرم|پول|تومن|تومان|ظرفیت)/;
   var LIFE_RE = /(?:^|\s)[بن][ء-یپچژکگ]{1,12}م\s+یا\s+\S|[ء-یپچژکگ]{1,12}(?:م|یم)\s+یا\s+نه(?![ء-یپچژکگ])|تصمیم|شغل|ازدواج|مهاجرت|همسر|رابطه|پیشنهادِ?\s*کار|بمونم|بمانم/;
+  /* دورِ ۲۵ (classify P6، D23-30 «STILL» aD2 p1): «یه تصمیم دارم … کلاسِ تقویتیِ ریاضی … چیکار کنم؟» — نامِ یک درس/رشته («ریاضی»، «شطرنج»، «المپیاد») موضوعِ تصمیمِ اوست،
+     نه مسئلهٔ کامل‌بیان‌شده با پاسخِ عینی. قابِ تصمیمِ خودش (تصمیم/«چیکار کنم؟»/«برم یا نرم») بر واژهٔ نامِ درس مقدم است، مگر صورت نشانهٔ ریاضیِ دیگری هم داشته باشد
+     (نماد، «ثابت کنید»، «معادله»، «مثلث» …). قاعدهٔ پیشین: A.R25_QUARANTINE.natGuess24 */
+  var SUBJNAME25 = /ریاضی|هندسه|شطرنج|المپیاد|احتمال/g, DECFRAME25 = /تصمیم|(?:چی|چه)\s*کار\s*کنم|چیکار\s*کنم|(?:^|\s)[بن][ء-یپچژکگ]{1,12}م\s+یا\s+\S|کدوم\s*بهتر|کدام\s*بهتر/;
   function natGuess0(x) {
-    if (OBJ_W.test(x) || OBJ_SYM.test(x)) return "objective";
+    if (OBJ_W.test(x) || OBJ_SYM.test(x)) { if (DECFRAME25.test(x) && FIRST_S.test(x) && !OBJ_SYM.test(x) && !TEXT_IMP.test(x) && !OBJ_W.test(x.replace(SUBJNAME25, " "))) return "life"; return "objective"; }
     if (ETHIC_RE.test(x)) return "life";
     if (/\d/.test(x) && PRAC_W.test(x)) { if (STAKE_RE.test(x)) return "practical"; if (QUEST_RE.test(x) && !FIRST_S.test(x)) return "objective"; }
     if (TEXT_IMP.test(x) && !FIRST_S.test(x)) return "objective";
@@ -136,6 +140,7 @@
   function typeGuess(t) { var x = norm(t); if (/اثبات\s*یا\s*رد/.test(x)) return "pod"; if (DECIDE_RE.test(x)) return ""; if (POD_CHAT.test(x)) return "pod"; if (LIFE_RE.test(x) || ETHIC_RE.test(x)) return ""; return POD_W.test(x) ? "pod" : PROVE_W.test(x) ? "prove" : ""; }
   A.liveTypeGuess = typeGuess;
   A.liveNatGuess = natGuess;
+  A.R25_QUARANTINE = Object.assign(A.R25_QUARANTINE || {}, { natGuess24: function (t) { var x = norm(t); return OBJ_W.test(x) || OBJ_SYM.test(x) ? "objective" : natGuess(t); } });
 
   /* ---------- «حکمتِ ضرب‌المثل‌ها» (تور ۱ ِ پولیا، s35): ثبت‌گاهِ کوچکِ گفته‌های اکتشافیِ خودِ کتاب — نقلِ ترجمه (sources/polya_how_to_solve_it/items.json،
      C151–C168)، هر کدام کنارِ همان پرسشی که پشتیبانی می‌کند و در همان مرحله؛ معادلِ فارسیِ عامیانه نه (وفاداری)، و همیشه با حدِ آن (C150: ضرب‌المثل

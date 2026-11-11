@@ -4585,12 +4585,17 @@
     var out = "", d = 0, buf = "", st = -1, hit = false;
     for (var i = 0; i < l.length; i++) { var ch = l.charAt(i);
       if (ch === "«") { if (d === 0) { out += buf; buf = ""; st = i; } else buf += ch; d++; continue; }
-      if (ch === "»" && d > 0) { d--; if (d === 0) { var q2 = /[؟?]/.test(buf) && !hit ? oneQ25(buf) : buf; if (/[؟?]/.test(buf)) hit = true; out += "«" + q2 + "»"; buf = ""; } else buf += ch; continue; }
+      if (ch === "»" && d > 0) { d--; if (d === 0) { var q2 = /[؟?]/.test(buf) ? oneQ25(buf) : buf;   /* هر «…» ِ پرسشیِ سطحِ اول (نمونه‌های حرفِ او یک «؟» دارند و همان می‌مانند) */ if (/[؟?]/.test(buf)) hit = true; out += "«" + q2 + "»"; buf = ""; } else buf += ch; continue; }
       buf += ch; }
     out += (d > 0 ? "«" : "") + buf;
     if (!hit && bold) { var m = /^(.*\*\*پرسشِ این نوبت همین است:?\*\*\s*)([^]*)$/.exec(l); if (m) out = m[1] + oneQ25(m[2]); }
     return out; }
-  AS.finalFilter25 = function (outs) { return (outs || []).map(function (b) { return typeof b === "string" && /پرسشِ این نوبت همین است|در این نوبت فقط \*\*یک\*\* پرسش/.test(b) ? b.split("\n").map(tqLine25).join("\n") : b; }); };
+  /* همان پرسش در شکلِ «پیشنهادِ این نوبت: «…»» / «پرسشِ پیشنهادیِ این نوبت: «…»» (سطرِ مرحله، معلمِ حل) هم همان یک جمله می‌شود — وگرنه دو متن از یک پرسش در یک پرامپت می‌ماند */
+  var SUGQ25 = /((?:پیشنهادِ|پرسشِ پیشنهادیِ) این نوبت:\s*)«((?:[^«»]|«[^«»]*»)*)»/g;
+  AS.finalFilter25 = function (outs) { return (outs || []).map(function (b) { if (typeof b !== "string") return b;
+    if (/پرسشِ این نوبت همین است|در این نوبت فقط \*\*یک\*\* پرسش/.test(b)) b = b.split("\n").map(tqLine25).join("\n");
+    if (/(?:پیشنهادِ|پرسشِ پیشنهادیِ) این نوبت:/.test(b)) b = b.replace(SUGQ25, function (m, pre, q) { return pre + "«" + oneQ25(q) + "»"; });
+    return b; }); };
   AS.replyCheck = function (o, opts) {
     var s = AS._turnSession; if (!s || !o || typeof o.reply !== "string") return "";
     var um = lastUserMsg(s); if (!um || /^\[سامانه/.test(String(um.text || ""))) return "";

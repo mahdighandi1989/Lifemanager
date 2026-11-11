@@ -5031,3 +5031,18 @@ dated stability, mind-card feed) under way.
 - FINDING: `500 POST /api/app-records/learning-architecture/reminders` روی هر بارِ تازه‌بازکردنِ `/apps/learning-architecture`. ریشه، رقابتِ SELECT-سپس-INSERT در `app_reminder_service.upsert` است: صفحه چند یادآور را هم‌زمان می‌فرستد و درخواستِ دوم برای کلیدِ تازه به قیدِ یکتایی می‌خورد. این خطا از page_map ِ ۲۰۲۶-۱۱-۰۱ در فایل بود ولی گزارش نشده بود.
 - CHANGE: `upsert` با `IntegrityError` rollback و یک بار دیگر تکرار می‌کند. رفتار برای حالتِ عادی بی‌تغییر است و شِما تغییری نکرده. تست: `tests/test_app_reminders.py::test_upsert_survives_a_concurrent_insert_of_the_same_key` (بی‌اصلاح قرمز). در مرورگر هم سنجیده شد: ۳ بار بازکردنِ تازه، بدونِ ۵۰۰.
 - FINDING: ۱۶ شاخهٔ `supervisor-pending/*` کهنه‌اند و محتوایشان روی main است. حذف در محیطِ روتین ممکن نشد ⇒ OPEN_ITEMS ‏۱۴. همچنین sys-territory شش دور جلو نرفته ⇒ OPEN_ITEMS ‏۱۵. جزئیات در `docs/supervisor/RUNLOG.md`. ناظرِ خودکار (Claude Code routine)
+
+## 2026-11-11 — CHANGE: Pólya tour round 25, fixer «classify» (P6: opening, classification, post-check, register)
+- **FINDING** Root causes (DECISIONS_R25 P6): the navigation follow-up banned every button on a field-less view (C25-2, S2); the intro stripper assumed
+  one fixed sentence shape (C25-11, A24-10); the register of page lines was applied only at paint time, so the stored session text kept «تو» (A23-14,
+  open for three rounds; U33; C25-3), quoted page labels were skipped, «توست» was missing (D25-23), the problem's own «ثابت کنید» and the generic «تو» of
+  her lesson counted as her register (pA1, D23-38); the post-check read a hypothetical «می‌گویی «…»», a real plural «دارید», a TeX quote of her formula
+  and «بازبینی؟» as slips (A25-17, D25-14); a request by meaning to pursue a conjecture as a real problem was refused (D25-13, S2); page turn questions
+  carried two or three «؟» and a failure-presupposing ladder rung repeated for nine turns (B24·D12, B25·D21); «n!» was cut/mirrored (A25-11, A25-12-b).
+- **CHANGE** `apps/learning-architecture/src/app/a26_assist.js`, `a27_tour.js`, `a38_live.js` (`liveReqSignals`, `resultQ`, ladder guard, `natGuess0`),
+  `a45_story.js` (three sentence splitters), `a21_orient.js` (one string); test `tests/test_tour1_r25_classify.js` (red on BASE25, green after) and the
+  independent bank `tests/variants/VARIANTS_R25.json` (all 29 P6 entries green). Previous rules stay reachable in `APP.ASSIST.R25_QUARANTINE` /
+  `APP.R25_QUARANTINE` (REMOVAL_CANDIDATES). WORKLOG (121), HANDBOOK §10/§12, handoff note `_pending_tour1_R25_classify_2026-11-11.md`.
+- **PROPOSAL** Not done, with reasons: A23-6 and A23-19 (turn-question/stage owners), one display for bracket sums vs MathML, register of fixed form
+  texts outside the chat (needs her own text marked in the DOM first).
+

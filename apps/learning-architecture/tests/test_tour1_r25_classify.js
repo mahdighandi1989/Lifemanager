@@ -3,7 +3,7 @@
 //           D25-14 (pwD2 p2)، D25-13 (pwD2 p7)، B24·D12 STILL (s13 p7، s19، aB3 p13)، B25·D21/B_s D10 (s19 p8–p16)، A25-11/A25-12-b (pwA1)، D23-38 (dp3 p10/p12)
 //  bank     همهٔ ورودی‌های P6 در بانکِ مستقلِ tests/variants/VARIANTS_R25.json (#187–#215)؛ آن‌چه برآورده نشد با دلیل در info.nc — هیچ ورودی‌ای بی‌صدا رد نمی‌شود.
 //  ساعتِ صفحه یخ زده است (APP.today = روزِ ثابت) — هیچ انتظاری به تاریخِ تقویم بسته نیست؛ سن‌ها از همان روزِ یخ‌زده حساب می‌شوند.
-// LLA_FILE = ساختِ دیگر؛ ONLY=nav,intro,reg,store,post,invent,oneq,ladder,fact,bank
+// LLA_FILE = ساختِ دیگر؛ ONLY=nav,intro,reg,store,post,invent,oneq,ladder,fact,still,bank
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
@@ -246,6 +246,20 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     for (const t of ['چه خوب!', 'نه!', 'آفرین!', 'شد 120!']) { const x = await bd(t); chk(x === t, 'control (bank #213): «' + t + '» keeps its exclamation outside any LTR run — ' + x); }
     const w = await ev(() => APP.ASSIST.wholeSaid('کلش اینه که باید نشون بدم توانِ ۲ تو n! حداکثر n−1 ـه. بعد می‌رم سراغِ گام‌ها.'));
     chk(/n! حداکثر n−1/.test(w) && !/بعد می‌رم/.test(w), 'A25-12-b pwA1: «کل در یک جمله» is not cut inside «n!» — ' + w);
+  });
+
+  // ================= مانده‌های دورهای پیش در همین پرونده‌ها: D23-30 (aD2 p1)، D23-35 (s33 p3)، A23-26 =================
+  await section('still', async () => {
+    const AD2 = 'سلام. یه تصمیم دارم که نمی‌دونم چیکار کنم. مدرسه‌مون تیم رباتیک زده و من خیلی دوست دارم برم، ولی جلسه‌هاش سه‌شنبه عصره، همون موقعی که کلاس تقویتی ریاضی دارم. بابام میگه ریاضی مهم‌تره. نمره ریاضیم ترم پیش ۱۵ از ۲۰ بود. چیکار کنم؟';
+    const g = await ev((m) => [APP.liveNatGuess(m), APP.R25_QUARANTINE.natGuess24(m), APP.liveNatGuess('معلم ریاضی‌مون گفته ثابت کنید جمعِ دو عددِ فرد زوجه. چیکار کنم؟'), APP.liveNatGuess('یه مسئلهٔ هندسه دارم: مثلثی با ضلع‌های ۳ و ۴ و ۵، مساحتش چنده؟')], AD2);
+    chk(g[0] === 'life' && g[1] === 'objective', 'D23-30 aD2 p1: a teen\'s decision that names a school subject is «life», not «پاسخِ عینی» (was ' + g[1] + ') — ' + g[0]);
+    chk(g[2] === 'objective' && g[3] === 'objective', 'control: a real maths task stays objective — ' + JSON.stringify(g.slice(2)));
+    await wipe(); await setB(await birthFor(14)); await fresh(); const u = await turn(AD2, 'خوب.');
+    chk(!/· پاسخِ عینی/.test(head(u.user).split('\n').filter(l => /^# مربیِ حل/.test(l))[0] || ''), 'D23-30: the coach header has no «· پاسخِ عینی» for her decision — ' + (head(u.user).split('\n').filter(l => /^# مربیِ حل/.test(l))[0] || '').slice(0, 200));
+    // D23-35: the follow-up names the open tab, not the parent view with a raw key
+    await wipe(); await fresh(); const r = await turn('می‌خوام یه مسئلهٔ تازه ثبت کنم', 'می‌برمت.', [{ do: 'go', view: 'e_prob', sub: 'live' }]); const t = String(follow(r).split('# نوبتِ تازه\n')[1] || '');
+    if (t) chk(!/قدم\/برگهٔ live/.test(t) && /زبانهٔ «🔭 مسئلهٔ حل‌نشدهٔ خودم»/.test(t), 'D23-35 s33 p3: the follow-up says the tab\'s own name, not «(قدم/برگهٔ live)» — ' + t.slice(0, 160)); else errors.push('D23-35: no follow-up fired for go e_prob/live');
+    const dbl = await ev(() => document.documentElement.innerHTML.indexOf('تا تا ریشه') >= 0); chk(!dbl, 'A23-26: «تا تا ریشه» is no longer in the bundle');
   });
 
   // ================= بانکِ مستقلِ R25 — همهٔ ورودی‌های P6 =================
