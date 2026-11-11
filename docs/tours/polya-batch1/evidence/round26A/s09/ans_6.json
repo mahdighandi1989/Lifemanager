@@ -1,0 +1,1 @@
+{"reply": "کل را خوب گفتی و دو داده هم آوردی: قیمتِ ۸۰۰ هزار و فروشِ ۳۵ تا. چه چیزهای دیگری داری — کدام هزینه‌ها اثرِ محسوس دارند؟", "status": "related", "next": false, "outside": "", "know": [], "actions": [{"do": "coach_state", "ph": "u", "said": ["u", "d"], "ans": ["u1"], "stuck": false, "fail": false, "role": "self", "nat": "practical"}]}
