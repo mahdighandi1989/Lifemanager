@@ -122,7 +122,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       chk(/پرسشِ پیشنهادیِ این نوبت: «قیاس را به کار بردی: کجا این شباهت می‌شکند/.test(info.f2hook), 'F2: the live hook suggests the analogy-limit question for that turn ' + (info.f2hook.match(/پرسشِ پیشنهادیِ این نوبت: «[^»]{0,60}/) || ['—'])[0]);
       // (۱) نوبت: نتیجه‌ای که کاربر گفت ⇒ «از راهِ دیگر؟ وارسی کن» پیش از ثبت در صفحه (s28)
       info.f2res = await p.evaluate(pid => { const c = APP.liveCoach(pid, { turn: { result: true } }); return { q: c.q, src: c.src, ph: c.ph }; }, PA);
-      chk(/راهِ دیگری/.test(info.f2res.q) && /وارسی|سنجیدی/.test(info.f2res.q) && info.f2res.src === 'turn-result' && info.f2res.ph === 'c', 'F2: a result stated this turn ⇒ the look-back question «از راهِ دیگر؟ نتیجه را وارسی کن» while the page is still in execution ' + JSON.stringify(info.f2res));
+      /* دورِ ۲۵ (classify P6، DECISIONS_R25 «the page's own two-question turn questions», B24·D12): پرسشِ نتیجهٔ مسئلهٔ غیرعینی یک پرسش است («با واقعیت سنجیدی‌اش؟»)؛
+         «از راهِ دیگری…؟» پرسشِ فرمِ بازنگری است — شرطِ «راهِ دیگری» فقط برای مسئلهٔ عینی می‌ماند */
+      chk((/راهِ دیگری/.test(info.f2res.q) || /با واقعیت سنجیدی/.test(info.f2res.q)) && /وارسی|سنجیدی/.test(info.f2res.q) && info.f2res.src === 'turn-result' && info.f2res.ph === 'c', 'F2: a result stated this turn ⇒ the look-back question «از راهِ دیگر؟ نتیجه را وارسی کن» while the page is still in execution ' + JSON.stringify(info.f2res));
       // امضای پیشین هنوز کار می‌کند
       chk(await p.evaluate(pid => { const c = APP.liveCoach(pid, { asked: [] }); return !!(c && c.q && c.list && c.list.length); }, PA), 'F2: the old call signature liveCoach(pid, {asked}) still works');
     });

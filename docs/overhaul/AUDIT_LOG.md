@@ -5071,3 +5071,17 @@ dated stability, mind-card feed) under way.
 - FINDING: ریشهٔ S1 (B25·D1 = D25-21) دو چیز در `apps/learning-architecture/src/app/a44_route.js` بود: `rank` همهٔ واژه‌های مشترک را هم‌وزن می‌شمرد (واژهٔ عنوانِ برگه، واژهٔ نامِ نمای موجود در متنِ خودِ برگه، واژهٔ عام و تکه‌واژهٔ «آر» ⇒ «رسید»)، و `PRE.sysFit` فقط پرسشِ بی‌جواب را می‌شناخت — «نه» ِ او پس از «ابزارِ لازم آمد» مدخل را «از سر گرفته شد» می‌کرد. S3ها: پرسش و حکم در یک گذر (دو راه)، خطِ ⏳ برای جوابِ بی‌نام، خطِ ⚠️ ِ بی‌دلیل، دو سطرِ انتظار پس از جابه‌جاییِ پشته، تکهٔ پس از بستن بی مدخل.
 - CHANGE: وزنِ واژه (صفر / کم‌وزن / کامل؛ «رسید» فقط با واژهٔ کاملِ خودِ گام + قاعدهٔ «دو واژه» ِ R6، وگرنه پرسش)، یک سرانجام در هر لحظه، `herNo`/`takeBack` (ردِ او پس از رسیدن ⇒ دوباره منتظر + یادداشت + «امروز»؛ برگشت‌پذیر با تاریخچه)، خطِ ⚠️ با دلیل، خطِ ⏳ فقط برای ساختهٔ نام‌برده، `evHome` (یک سطر)، مدخلِ `late`. آزمون: `apps/learning-architecture/tests/test_tour1_r25_loop.js` (red-first روی BASE25: بانک 12/31؛ پس از اصلاح 31/31) + بانکِ مستقلِ `VARIANTS_R25.json`. قرنطینه: `APP.PRE.R24_QUARANTINE.rank24`. جزئیات: `apps/learning-architecture/docs/WORKLOG.md` (125)؛ قراردادها برای اصلاح‌گرهای دیگر: `docs/overhaul/handoff-notes/_pending_tour1_R25_loop_2026-11-11.md`.
 - DECISION (گزارش‌شده، نه پنهان): C3 «آستانهٔ عددی نه» — قاعدهٔ «دو واژه» ِ R6 نگه داشته شد، چون با یک واژهٔ گام بازوی tB1y («سرگذشتِ فناوری‌ها») «رسید» می‌شد؛ همهٔ ورودی‌های بانک با همین سبزند.
+## 2026-11-11 — CHANGE: Pólya tour round 25, fixer «classify» (P6: opening, classification, post-check, register)
+- **FINDING** Root causes (DECISIONS_R25 P6): the navigation follow-up banned every button on a field-less view (C25-2, S2); the intro stripper assumed
+  one fixed sentence shape (C25-11, A24-10); the register of page lines was applied only at paint time, so the stored session text kept «تو» (A23-14,
+  open for three rounds; U33; C25-3), quoted page labels were skipped, «توست» was missing (D25-23), the problem's own «ثابت کنید» and the generic «تو» of
+  her lesson counted as her register (pA1, D23-38); the post-check read a hypothetical «می‌گویی «…»», a real plural «دارید», a TeX quote of her formula
+  and «بازبینی؟» as slips (A25-17, D25-14); a request by meaning to pursue a conjecture as a real problem was refused (D25-13, S2); page turn questions
+  carried two or three «؟» and a failure-presupposing ladder rung repeated for nine turns (B24·D12, B25·D21); «n!» was cut/mirrored (A25-11, A25-12-b).
+- **CHANGE** `apps/learning-architecture/src/app/a26_assist.js`, `a27_tour.js`, `a38_live.js` (`liveReqSignals`, `resultQ`, ladder guard, `natGuess0`),
+  `a45_story.js` (three sentence splitters), `a21_orient.js` (one string); test `tests/test_tour1_r25_classify.js` (red on BASE25, green after) and the
+  independent bank `tests/variants/VARIANTS_R25.json` (all 29 P6 entries green). Previous rules stay reachable in `APP.ASSIST.R25_QUARANTINE` /
+  `APP.R25_QUARANTINE` (REMOVAL_CANDIDATES). WORKLOG (126), HANDBOOK §10/§12, handoff note `_pending_tour1_R25_classify_2026-11-11.md`.
+- **PROPOSAL** Not done, with reasons: A23-6 and A23-19 (turn-question/stage owners), one display for bracket sums vs MathML, register of fixed form
+  texts outside the chat (needs her own text marked in the DOM first).
+

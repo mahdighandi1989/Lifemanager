@@ -204,7 +204,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     __calls.length = 0; __q.push(R({ reply: 'خوب.' }));
     await AS.send('جواب دادم');
     const u2 = __calls[0].user, m2 = /هم‌گام با صفحه[^«]*«([^»]+)»/.exec(u2);
-    out.q0 = q0; out.q1 = m2 && m2[1]; out.synced = !!m2 && m2[1] !== q0 && Q.indexOf(m2[1]) >= 0;
+    out.q0 = q0; out.q1 = m2 && m2[1]; /* دورِ ۲۵ (classify P6، DECISIONS_R25 «the page's own two-question turn questions»): پرسشِ نوبتِ صفحه در گذرگاهِ پایانی یک «؟» می‌گیرد — همان پرسشِ ثبت‌گاه، یک جملهٔ پرسشی */
+    out.synced = !!m2 && m2[1] !== q0 && Q.map(function (x) { return AS.oneQ25 ? AS.oneQ25(x) : x; }).indexOf(m2[1]) >= 0;
     // زندگی (داوری با واقعیت) ⇒ قابِ «هیچ‌کس از پیش نمی‌داند»؛ پس از ثبتِ نتیجه، پرسشِ همان گام دیگر نمی‌آید
     const r2 = APP.liveCreate('شغلِ دوم', 'بین ماندن در این کار و رفتن به شرکتِ تازه انتخاب کنم.', 'find'); r2.p.objective = false; S.put(r2);
     const pg2 = S.get('eprog_' + r2.p.id); pg2.solve.u = { 1: { done: true, one: 'ماندن یا رفتن', u: 'کدام', dl: [], c: '' } };

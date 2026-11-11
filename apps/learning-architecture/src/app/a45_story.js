@@ -42,12 +42,13 @@
       var pre = T.slice(0, m.index + j).replace(/\s+$/, ""), lw = (pre.split(/\s+/).pop() || "");
       if (pre && !/[.!؟?:：،,«\-–—]$/.test(pre) && !WHOLE_PRE_OK.test(lw.replace(/[ِ‌]+$/, ""))) return "";
     }
-    var body = m[1], end = body.search(/[.!؟?](?=\s|$)(?![^«]*»)/); if (end > 0) body = body.slice(0, end + (/[؟?]/.test(body[end]) ? 1 : 0));
+    var body = m[1], end = body.search(/(?:[.؟?]|(?<![A-Za-z)])!)(?=\s|$)(?![^«]*»)/);   /* دورِ ۲۵ (classify P6، A25-12-b): «… تو n! حداکثر …» — فاکتوریل پایانِ جمله نیست */ if (end > 0) body = body.slice(0, end + (/[؟?]/.test(body[end]) ? 1 : 0));
     body = txt(body).replace(/^[:：،\-–\s]+/, "");
     return toks(body).length >= 3 ? clip(body, 300) : "";
   }
   ST.wholeSaid = wholeSaid; AS.wholeSaid = wholeSaid;
-  function clauses(t) { return String(t || "").split(/[.!؟?؛;\n]+(?=\s|$)|،\s*|,\s+|\s+و\s+(?=(?:شرط|به\s*شرط))|\s+(?:ولی|اما)\s+/).map(txt).filter(Boolean); }
+  /* دورِ ۲۵ (classify P6، A25-12-b pwA1 «کل» بریده در «n!»): «!» ِ چسبیده به متغیرِ لاتین/پرانتز فاکتوریل است، نه پایانِ جمله (همان AS.FACT25 ِ a26) */
+  function clauses(t) { return String(t || "").split(/(?:(?<![A-Za-z)])!|[.؟?؛;\n])+(?=\s|$)|،\s*|,\s+|\s+و\s+(?=(?:شرط|به\s*شرط))|\s+(?:ولی|اما)\s+/).map(txt).filter(Boolean); }
   var COND_RE = /(?:شرط(?:ش|ها|‌ها|مون)?\s*(?:اینه|این\s*است|اینست)\s*(?:که)?|به\s*شرطِ?\s*(?:این[‌\s]*که)?|شرط(?:ها|‌ها)?\s*[:：])\s*([^.!؟?\n]{3,})/;
   function condOf(t) { var m = COND_RE.exec(String(t || "")); return m ? clip(txt(m[1]).replace(/[،,]\s*$/, ""), 200) : ""; }
   /* دورِ ۲۴ (R2، A24-7، B24·D22): دادهٔ مسئله نه تلاشِ ردشده‌اش است («اولی را امتحان کردم: ساعت ۸ صبح …»)، نه پیامِ اصلاحش («یه اشتباه کردم: حقوقم ۱۸ نیست»)،
@@ -94,7 +95,7 @@
       .map(function (x) { return txt(x).replace(/[.،,]+$/, ""); }).filter(function (x) { return toks(x).length >= 1 && x.length >= 2; }).slice(0, 8);
   };
   ST.planPieces = planPieces; ST.dataOf = dataOf; ST.condOf = condOf;
-  function sentences(t) { return String(t || "").split(/(?<=[.!؟?…])\s+|\n+/).map(txt).filter(Boolean); }
+  function sentences(t) { return String(t || "").split(/(?<=[.؟?…]|(?<![A-Za-z)])!)\s+|\n+/).map(txt).filter(Boolean); }   // دورِ ۲۵ (classify P6، A25-12-b): «n! حداکثر …» یک جمله است
   /* مجهول به حرفِ خودش: جمله‌ای از پیامش که بیشترین هم‌واژگی را با صورتِ همین مسئله دارد — نه جملهٔ کناری («ولی خب، ۵ منهای ۳ چرا نمیشه؟»)؛ بی صورت ⇒ همان unkPhrase ِ a27 */
   /* دورِ ۲۴ (R2، C24-11، D24-12): مجهول هرگز پرسشِ متا دربارهٔ سامانه/دستیار («… از کجا آوردی؟ یه قاعده‌ست تو سامانه؟»)، تلاش/طرح («فکر کردم دورش سه تا مثلث…»)،
      کمبودِ دانسته («مساحتِ مثلث رو نمی‌دونم») یا ترتیبِ کار («اول می‌خوام بفهمم…») نیست. نشانهٔ صریحِ مجهول («دنبالِ اینم که…»، «می‌خوام بدونم…»، «یعنی: …») مقدم است؛

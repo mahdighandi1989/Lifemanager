@@ -106,8 +106,12 @@
   var ETHIC_RE = /درستش\s*(?:چیه|چیست)|کار\s*(?:ِ\s*)?درست\s*(?:چیه|چیست|کدام)|اخلاق|وجدان|شریک\s*(?:ِ\s*)?جرم|گزارش\s*(?:بدم|ندم|بدهم)|لو\s*(?:بدم|بدهم)|دروغ\s*(?:بگم|بگویم)|خیانت|قانون\s*چی\s*می\s*گه/;
   var QTY_Q = /(?:چقدر|چه\s*قدر|چه\s*اندازه|چند)\s*(?:تا\s*)?(?:بزرگ|کوچک|بلند|پهن|عمیق|حجم|جا|لیتر|متر|کیلو|گرم|پول|تومن|تومان|ظرفیت)/;
   var LIFE_RE = /(?:^|\s)[بن][ء-یپچژکگ]{1,12}م\s+یا\s+\S|[ء-یپچژکگ]{1,12}(?:م|یم)\s+یا\s+نه(?![ء-یپچژکگ])|تصمیم|شغل|ازدواج|مهاجرت|همسر|رابطه|پیشنهادِ?\s*کار|بمونم|بمانم/;
+  /* دورِ ۲۵ (classify P6، D23-30 «STILL» aD2 p1): «یه تصمیم دارم … کلاسِ تقویتیِ ریاضی … چیکار کنم؟» — نامِ یک درس/رشته («ریاضی»، «شطرنج»، «المپیاد») موضوعِ تصمیمِ اوست،
+     نه مسئلهٔ کامل‌بیان‌شده با پاسخِ عینی. قابِ تصمیمِ خودش (تصمیم/«چیکار کنم؟»/«برم یا نرم») بر واژهٔ نامِ درس مقدم است، مگر صورت نشانهٔ ریاضیِ دیگری هم داشته باشد
+     (نماد، «ثابت کنید»، «معادله»، «مثلث» …). قاعدهٔ پیشین: A.R25_QUARANTINE.natGuess24 */
+  var SUBJNAME25 = /ریاضی|هندسه|شطرنج|المپیاد|احتمال/g, DECFRAME25 = /تصمیم|(?:چی|چه)\s*کار\s*کنم|چیکار\s*کنم|(?:^|\s)[بن][ء-یپچژکگ]{1,12}م\s+یا\s+\S|کدوم\s*بهتر|کدام\s*بهتر/;
   function natGuess0(x) {
-    if (OBJ_W.test(x) || OBJ_SYM.test(x)) return "objective";
+    if (OBJ_W.test(x) || OBJ_SYM.test(x)) { if (DECFRAME25.test(x) && FIRST_S.test(x) && !OBJ_SYM.test(x) && !TEXT_IMP.test(x) && !OBJ_W.test(x.replace(SUBJNAME25, " "))) return "life"; return "objective"; }
     if (ETHIC_RE.test(x)) return "life";
     if (/\d/.test(x) && PRAC_W.test(x)) { if (STAKE_RE.test(x)) return "practical"; if (QUEST_RE.test(x) && !FIRST_S.test(x)) return "objective"; }
     if (TEXT_IMP.test(x) && !FIRST_S.test(x)) return "objective";
@@ -136,6 +140,7 @@
   function typeGuess(t) { var x = norm(t); if (/اثبات\s*یا\s*رد/.test(x)) return "pod"; if (DECIDE_RE.test(x)) return ""; if (POD_CHAT.test(x)) return "pod"; if (LIFE_RE.test(x) || ETHIC_RE.test(x)) return ""; return POD_W.test(x) ? "pod" : PROVE_W.test(x) ? "prove" : ""; }
   A.liveTypeGuess = typeGuess;
   A.liveNatGuess = natGuess;
+  A.R25_QUARANTINE = Object.assign(A.R25_QUARANTINE || {}, { natGuess24: function (t) { var x = norm(t); return OBJ_W.test(x) || OBJ_SYM.test(x) ? "objective" : natGuess(t); } });
 
   /* ---------- «حکمتِ ضرب‌المثل‌ها» (تور ۱ ِ پولیا، s35): ثبت‌گاهِ کوچکِ گفته‌های اکتشافیِ خودِ کتاب — نقلِ ترجمه (sources/polya_how_to_solve_it/items.json،
      C151–C168)، هر کدام کنارِ همان پرسشی که پشتیبانی می‌کند و در همان مرحله؛ معادلِ فارسیِ عامیانه نه (وفاداری)، و همیشه با حدِ آن (C150: ضرب‌المثل
@@ -1571,9 +1576,12 @@
   function qOk(s, q, stuck) { var x = norm(q), o = openStep(s); if (B3_RE.test(x) && !planExists(s) && !stuck) return false; if (o && txt(o.pred) && PRED_Q.test(x)) return false; if (o && txt(o.when) && WHEN_Q.test(x)) return false; return true; }
   function resultQ(r, s) { var ty = typeOf(r, s), nat = natOf(s, r);
     /* دورِ ۲۳ (Q5، B·D12 s13 p7): دو جملهٔ پرسشی مثلِ همتای عینی‌اش، نه سه («سنجیدی؟ کدام…؟ و از راهِ دیگری…؟») — «کدام پیش‌بینی» پرسشِ بازنگریِ بعدی است */
-    return nat !== "objective" ? "نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟ از راهِ دیگری هم به همین می‌رسیدی؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
+    /* دورِ ۲۵ (P6، B24·D12 «STILL» s13 p7، s19 p5–p7/p15، aB3 p13): پرسشِ نوبتِ خودِ صفحه یک پرسش است — «با واقعیت سنجیدی‌اش؟». «از راهِ دیگری هم…؟» پرسشِ دومِ
+       پولیا و مالِ فرمِ بازنگری است (BACK_FIELDS ِ a36: other/glance) و در گفت‌وگو پس از وارسی می‌آید، نه هم‌زمان. متنِ دوپرسشیِ پیشین: A.R25_QUARANTINE.resultQ24 */
+    return nat !== "objective" ? "نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
       : ty === "prove" || ty === "pod" ? "برهانی گفتی — از راهِ دیگری هم به همین حکم می‌رسی؟ وارسی‌اش کن: هر بخشِ فرض کجا به کار رفت و نتیجه دقیقاً همان حکم است؟ (بعد در صفحه «✅ حل شد» و بازنگری)"
         : "نتیجه‌ای گفتی — از راهِ دیگری هم به همین می‌رسی؟ نتیجه را وارسی کن: در شرط بگذار یا با حالتی خاص بسنج. (بعد در صفحه «✅ حل شد» و بازنگری)"; }
+  A.R25_QUARANTINE = Object.assign(A.R25_QUARANTINE || {}, { resultQ24: "نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟ از راهِ دیگری هم به همین می‌رسیدی؟ (بعد در صفحه «✅ حل شد» و بازنگری)" });
   function presupBroken(s) { var lc = lastClosed(s), lo = lc && lc.out, u1 = uOf(s) || {}; if (openStep(s) || !lo || !u1.presup || !txt(u1.suffCirc)) return ""; var failed = lo.done === "no" || lo.prog === "نه" || lo.match === "no"; return failed || partNegated(lo.what, u1.suffCirc) ? u1.suffCirc : ""; }
   function guessRefuted(s) { var gg = s.g && s.g[1], lc = lastClosed(s); return !!((gg && gg.guess && (gg.hit === "نادرست بود" || guessCons(s).no)) || (lc && lc.out && lc.out.guess && lc.out.guess.rel === "refute")); }
   function asideList(s) { var asd = asideMap(s); return dataOf(s).filter(function (x) { return asd[x.id]; }).map(function (x) { return { t: x.t, why: asd[x.id] }; }); }
@@ -1805,11 +1813,19 @@
     /* (۴) کارتِ صفحه — موعدِ گامِ باز حتی اگر پیش‌تر پرسیده شده، چون صفحه هنوز همان را می‌پرسد */
     if (!q && pageQ && (ok(pageQ) || (ph === "c" && openStep(s)))) { q = pageQ; src = "page"; }
     /* (۵) نردبان */
-    if (!q && !own25none) { q = Q.filter(function (x) { return ok(x) && !(ph === "c" && !openStep(s) && STEP_BOUND.test(x)) && !(ph === "p" && (tut.plan || []).some(function (e) { return e && e.src === "live" && e.q === x && (e.text || e.skip); })); })[0] || ""; if (q) src = "ladder"; }
+    /* دورِ ۲۵ (P6، B25·D21/B_s D10 s19 p8–p16): «این گام جواب نداد؟ …» پیش‌فرضِ شکستِ گام دارد — در نردبان فقط وقتی آخرین گامِ بسته واقعاً نشد یا همین نوبت شکست گفت
+       (همان شرطِ c0 و «fail-restate» ِ بالا)؛ وگرنه نردبان نُه نوبت از کسی که پیش می‌رود می‌پرسید چرا گامش جواب نداد */
+    var lo25 = (lastClosed(s) || {}).out, failed25 = !!T.fail || !!(lo25 && (lo25.done === "no" || lo25.prog === "نه" || lo25.match === "no") && !restatedAfter(L, lo25));
+    /* بانکِ R25 #202 («the same live page question is not repeated turn after turn»): پله‌ای از نردبان که در نوبتِ دیگری پرسشِ نوبت بود دوباره پرسشِ نوبت نمی‌شود —
+       پلهٔ بعدی؛ همه پرسیده ⇒ پایانِ نردبان (ladderEnd، مدل از وضعِ همان لحظه می‌پرسد). چند فراخوانِ یک نوبت یک نوبت‌اند (turnKey). */
+    /* … و پس از همان نتیجهٔ گام فقط یک بار (L.c0Asked ِ همان نتیجه، در نوبتِ دیگر) */
+    var asked25 = function (x) { var k = String((lo25 && (lo25.at || lo25.d)) || ""), A0 = L.c0Asked || {}, T0c = L.c0Turn || {}; return !!k && A0[x] === k && !(tk25 && T0c[x] === tk25); };
+    var tk25 = o.turn && !sysT ? turnKey(tx) : "", LS25 = L.lad25 = L.lad25 || {}, lad25Put = false;
+    if (!q && !own25none) { q = Q.filter(function (x) { return ok(x) && !((!failed25 || asked25(x)) && /این[\s‌]*گام[\s‌]*جواب[\s‌]*نداد/.test(x)) && !(tk25 && LS25[x] && LS25[x] !== tk25) && !(ph === "c" && !openStep(s) && STEP_BOUND.test(x)) && !(ph === "p" && (tut.plan || []).some(function (e) { return e && e.src === "live" && e.q === x && (e.text || e.skip); })); })[0] || ""; if (q) { src = "ladder"; if (tk25 && !LS25[q]) { LS25[q] = tk25; lad25Put = true; } } }
     var rung = Q.length ? Q.indexOf(q) : 0; if (rung < 0) rung = Q.filter(isAsked).length;
     if (K && R && (stuckT || !R.st)) R.q = q;
     var c0Put = false; if (c0Mark && o.turn && !sysT && q && q === pageQ) { if (c0Mark.A[q] !== c0Mark.k) { c0Mark.A[q] = c0Mark.k; if (c0Mark.T && c0Mark.t) c0Mark.T[q] = c0Mark.t; } c0Put = true; }
-    if ((K && JSON.stringify([L.stk || null, L.ckHold || null]) !== R0) || c0Put) { try { S.put(pg); } catch (e) { } }
+    if ((K && JSON.stringify([L.stk || null, L.ckHold || null]) !== R0) || c0Put || lad25Put) { try { S.put(pg); } catch (e) { } }
     return { ph: ph, Q: Q, q: q, src: src, pageQ: pageQ, card: card, cardWhy: SC[0] ? SC[0].why : pageQ ? "page" : "", rung: rung, ladderEnd: !!Q.length && !q, stuckN: stuckN };
   }
   /* دورِ ۱۰ (J1، s38 p1): «فقط جواب رو بگو» بی تلاشِ دیدنی (نه در همین پیام، نه طرح/گامی در صفحه) ⇒ کارِ همین نوبت با بالاترین اولویت (پولیا: پیش از
@@ -5393,7 +5409,11 @@
     var REQ_REG = /(?:ثبت|یادداشت|اضافه|ذخیره)(?:شون|شان|ش|اش)?\s*(?:کن|بکن|کنید|بکنید|کنیم)|بنویس(?:ش|اش)?(?:\s|$)|بذار(?:ش|اش)?\s*(?:تو|برای|توی)|نگه(?:ش)?\s*دار|بساز(?:ش|اش)?(?:\s|$)|(?:یه|یک)\s*مسئله(?:‌ی|ی)?\s*(?:\S+\s*){0,3}(?:بساز|درست\s*کن|بده|باز\s*کن)|باز(?:ش)?\s*کن|می\s*خوام\s*(?:بعدا|بعداً)?\s*(?:حلش|روش)/;
     function ownTx(t) { return nz(String(t || "").replace(/«[^»]*»|"[^"]*"|“[^”]*”/g, " ")).replace(/[‌]/g, " "); }
     function lastUserText(se) { var U0 = umsgs(se); return U0.length ? U0[U0.length - 1].text : ""; }
-    A.liveReqSignals = function (t) { var x = ownTx(t); return { req: REQ_REG.test(x) || WORK_NOW.test(x), now: WORK_NOW.test(x) && !NOT_NOW.test(x), notNow: NOT_NOW.test(x) }; };
+    /* دورِ ۲۵ (P6، D25-13 pwD2 p7): خواستهٔ صریح به معنا، بی واژهٔ «ثبت/بساز» — «می‌خوام این رو مثلِ یه مسئلهٔ واقعی جدی پیگیری کنم، نه این‌که فقط یه یادداشت بشه» —
+       خواستِ ساختن و کار روی آن است (req + now)، نه «کاربر نخواسته بود». قاعدهٔ پیشین: A.R25_QUARANTINE.liveReqSignals24 */
+    var PURSUE25 = /(?:می\s*خوام|می\s*خواهم|دوست\s*دارم|می\s*خواستم)[^.؟?!\n]{0,70}?(?:پیگیری(?:ش)?|دنبال(?:ش)?|پی(?:ش)?)\s*(?:ب?کنم|کنیم|ب?گیرم|برم|بگیریم)|(?:مثل|مثلِ|به\s*عنوان|به\s*عنوانِ|به\s*شکل|به\s*شکلِ|جای|جایِ)\s*(?:یه|یک)\s*مسئله\S{0,2}\s*(?:واقعی|جدی|جدا|مستقل|درست\s*و\s*حسابی)|نه\s*این\s*که\s*فقط\s*(?:یه|یک)?\s*یادداشت|فقط\s*(?:یه|یک)?\s*یادداشت\s*(?:نشه|نشود|نمونه|نماند)|خودش\s*(?:یه|یک)\s*مسئله\S{0,2}\s*(?:جدا\s*)?(?:بشه|باشه|بشود)/;
+    A.liveReqSignals = function (t) { var x = ownTx(t), nn = NOT_NOW.test(x), pu = PURSUE25.test(x); return { req: REQ_REG.test(x) || WORK_NOW.test(x) || pu, now: (WORK_NOW.test(x) || pu) && !nn, notNow: nn, pursue: pu }; };
+    A.R25_QUARANTINE = Object.assign(A.R25_QUARANTINE || {}, { liveReqSignals24: function (t) { var x = ownTx(t); return { req: REQ_REG.test(x) || WORK_NOW.test(x), now: WORK_NOW.test(x) && !NOT_NOW.test(x), notNow: NOT_NOW.test(x) }; } });
     var OPEN_AFTER = "", ACT = null;
     function stampRec(r, se) {
       if (!r || !r.p || r.src || !se || !txt(r.p.statement)) return false;
