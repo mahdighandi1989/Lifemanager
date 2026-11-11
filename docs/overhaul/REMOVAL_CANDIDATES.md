@@ -383,3 +383,12 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R24 R5 (never ISO to a person; one Jalali confirmation; register signs from verbs only).
 - **Status:** reachable, not called for person-facing text: `APP.AGE.faBoth` (exported for compatibility), `APP.ASSIST.R24_QUARANTINE.signSh`, `.signTo18`.
   Delete only with the owner's approval.
+
+## 2026-11-11 — flat (equal-weight) scoring of the territory loop (learning-architecture, Pólya round 25, loop: P3)
+- **File:** `apps/learning-architecture/src/app/a44_route.js`.
+- **What it did:** `rank` (R24) counted every non-generic shared word the same and called a fit «clear» on any two of them with one in the step OR the sheet title. An unfit
+  area was declared «🛎 ابزارِ لازم آمد» on «ایده» (sheet title) + «جایگاه» (the existing view name «💡 جایگاهِ ایده» inside the sheet's own text) — B25·D1 — and on
+  «نویز، عدد، آر، پنجره» — D25-21 (the round's S1).
+- **Why replaced:** DECISIONS_R25 P3 + C2/C3 (words spread across the systems, words of an existing view/area name the sheet itself cites, and stem fragments cannot make an
+  arrival; a clear fit needs a full-weight word of HER step; anything less ⇒ ask her).
+- **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.rank24`. Delete only with the owner's approval.

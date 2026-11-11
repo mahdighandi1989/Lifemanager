@@ -282,6 +282,7 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
       ['این همون نیست؟', { sheet: 101, fit: false, quote: 'این همون نیست؟' }, 'a question, even when the model reports fit:false'],
       ['باشه ببینمش', { sheet: 101, fit: false, quote: 'به کارم نمیاد' }, 'a quote that is not in her message'],
       ['اگه به کارم نیاد چی؟', null, 'a hypothetical'],
+      ['مشکلم این نیست که بلد نیستم؛ وقت ندارم.', null, '«این نیست که…» about herself, not about the tool'],
       ['آره خوبه، بریم', { sheet: 101, fit: true, quote: 'آره خوبه' }, 'a yes after an arrival changes nothing'],
     ]) {
       await base(); const n0 = (await notes()).length;
