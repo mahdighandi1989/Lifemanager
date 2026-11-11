@@ -37799,7 +37799,7 @@ APP.goFromURL = function (q) {
   /* مرحلهٔ مربی برای سشن (مسئلهٔ فقط‌درگفت‌وگو یا پس از بستنِ مسئله): نگه‌داشته در s.coach، با گفته‌های خودِ کاربر جلو می‌رود */
   var PLAN_RE = /طرح(?:م)?\s*(?:اینه|این است)|نقشه(?:م)?\s*(?:اینه|این است)|ایده(?:‌ام|م)\s*(?:اینه|این است)|می[‌\s]?خوام\s+(?:اول|از)\s|(?:اول(?:ش)?|نخست)\s+[^.؟?\n]{2,60}?(?:،|\s(?:می[‌\s]?کنم|بعد|بعدش|سپس))|راهش\s*(?:اینه|این است)|فکر\s*کنم\s*باید|از\s*(?:آخر|جواب|خواسته|هدف)\s*(?:به\s*عقب|شروع\s*(?:می[‌\s]?کنم|کردم))|با\s*(?:استقرا|برهانِ?\s*خلف|خلف)\s*(?:ثابت|پیش|می[‌\s]?رم)/;
   var NEWPROB_RE = /(?:تموم\s*شد(?:ه)?|پیداش\s*کردم|پیدا\s*شد)(?:[^.!؟?\n]*[.!…])?[.!،؛…\s]*(?:و\s*)?(?:حالا|بریم\s*سراغِ?|مسئله(?:ٔ|ی|‌ی)?\s*بعدی?)[\s:：،.]+(?!(?:بازنگری|وارسی|مرور|درسش)(?![آ-ی]))(.{8,})/;   // دورِ ۷ (H1، s12): «پیداش کردم، … . حالا Y»
-  var NEWINTRO_RE = /(?:یه|یک)\s*(?:مسئله|مشکل|سؤال|سوال)(?:ٔ|ی|‌ی)?\s*(?:واقعی|تازه|جدید|دیگه|دیگر|کاری|عملی)?\s*(?:هم\s*)?(?:دارم|داریم)\s*[:：،.]\s*(.{8,})/;
+  var NEWINTRO_RE = /(?:یه|یک)\s*(?:مسئله|مشکل|سؤال|سوال)(?:ٔ|ی|‌ی)?\s*(?:واقعی|تازه|جدید|دیگه|دیگر|کاری|عملی)?\s*(?:هم\s*)?(?:دارم|داریم)(?:\s+که\s[^:：.!؟?\n]{0,90})?\s*[:：،.]\s*(.{8,})/;   // دورِ ۲۵ (P5، oB1 p22): «… دارم که به همین ربط داره ولی جداست: …»
   /* دورِ ۶ (G4، s11): «X رو حل کردم و یه مسئلهٔ تازه ساختم: Y» (حتی در سشنِ تازه) ⇒ Y از «فهم» با دفترِ خودش، و X بازنگری‌شده نام برده می‌شود */
   var MADEPROB_RE = /(?:حل\s*(?:ش\s*)?کردم|حلش\s*کردم|تموم\s*شد|ثابت(?:ش)?\s*کردم)[^.؟?!]{0,40}?(?:و\s*|،\s*)?(?:یه|یک)\s*مسئله(?:‌ی|ی|ٔ)?\s*(?:تازه|جدید|دیگه)(?:‌ای|ای)?\s*(?:ساختم|درست\s*کردم|طرح\s*کردم)[\s:：،]+(.{8,})/;
   /* کارِ خودش روی صورتِ چسبانده (G1، s08): «دارم امتحان می‌کنم: ۷+۷=۱۴…»، «هیچی جور نمیشه» */
@@ -37886,6 +37886,8 @@ APP.goFromURL = function (q) {
     /* تورِ پولیا (RM6c، B·D1 s11): «پس X = n» ِ الگو (RESULT_WEAK) به‌تنهایی مرحله را به بازنگری نمی‌برد — فرمول/عدد درونِ ادعا یا هنگامِ گفتنِ
        صورت نتیجه نیست؛ مرحله فقط با گزارشِ مدل (said:result) یا نتیجهٔ ثبت‌شده؛ الگو فقط پیشنهاد می‌کند (C.prev.weakRes ⇒ سطرِ زمینه) */
     var said = solvedSaid(mt, { intro: true }) && !OTHER18_RE.test(mt) && !guessNow(mt, teach) && !(teach && SELF_SOLVED_RE.test(mt)), uns = unsolvedNow(mt, ph0), stuck = STUCK_RE.test(mt) || NOTKNOW_RE.test(mt);
+    /* دورِ ۲۵ (P5، B25·D9 = U10 bp2 p5/p7، pwB1 p4): نتیجهٔ میانی (A.STORY.subRes — خودش گفت هنوز چه مانده، یا دفترِ کارِ پیشین/طرحش گامِ مانده دارد) کلِ مسئله را به «بازنگری» نمی‌برد */
+    try { if (said && A.STORY && A.STORY.subRes && A.STORY.subRes(s, "", mt)) said = false; } catch (e) { }
     var weakRes = !said && !intro && solvedSaid(mt, { stmt: C.stmt }) && !guessNow(mt, teach) && !uns && !/[؟?]/.test(ownText(mt)) && !CLAIM18_RE.test(mt);
     var pasted = (intro || pastedOf(mt, C.stmt)) && !(said && !uns);
     var ph = ph0, st = C.st = C.st || {}, sp = statedParts(mt, pasted);
@@ -38269,16 +38271,19 @@ APP.goFromURL = function (q) {
     /* جلو به طرح فقط با شاهدِ خودش — صورتِ چسبانده‌ای که پس از آن خوانده و رویش کار کرده هم «مجهولِ گفته» است (s08)؛ دورِ ۶ (G1): همچنین وقتی همان پیامِ چسبانده
        کارِ خودش را می‌گوید («دارم امتحان می‌کنم: ۷+۷=۱۴… هیچی جور نمیشه») و مدل گیر/شکست گزارش کرد — نه پیامی که فقط صورت را آورد */
     var fwd = cl === "p" && ORD[ph0] < ORD.p && (st.u || (!pasted && C.stmt) || (P && P.work && (stuck || fail)));
-    if (said.indexOf("result") >= 0) ph = "b";
+    /* دورِ ۲۵ (P5، B25·D9): همان داوریِ دفترِ داستان (a45 ST.subRes) — نتیجهٔ میانی مرحله را جابه‌جا نمی‌کند (پیش‌تر هر said:result ⇒ «بازنگری») */
+    var sub25 = false; try { sub25 = said.indexOf("result") >= 0 && !!(A.STORY && A.STORY.subRes && A.STORY.subRes(s, (P && P.live) || "", ut)); } catch (e) { }
+    if (said.indexOf("result") >= 0 && !sub25) ph = "b";
+    else if (sub25) ph = ph0;
     else if (fail) ph = fwd ? "p" : cl && ORD[cl] < ORD[ph0] ? cl : (ph0 === "b" || ph0 === "c" ? "c" : ph0);
     else if (said.indexOf("plan") >= 0 && ORD[ph0] < ORD.c) ph = "c";
     else if (cl && ORD[cl] < ORD[ph0]) ph = stuck || said.length ? cl : ph0;          // عقب: فقط با گیر یا حرفِ تازه
     else if (fwd) ph = "p";
     /* دورِ ۵ (F1، s31): نشانهٔ قوی‌ترِ پیشین (نتیجهٔ بی‌ابهامِ خودش) با گزارشِ مدل به عقب برنمی‌گردد، مگر مدل شکست گزارش کند */
-    if (P && P.strong && !fail && ORD[ph] < ORD[P.strong]) ph = P.strong;
+    if (P && P.strong && !fail && !sub25 && ORD[ph] < ORD[P.strong]) ph = P.strong;
     if (!(P && P.live)) { C.ph = ph; C.st = st; }
     /* دورِ ۵ (F2): نشانه‌های همین پیام برای نوبتِ بعد (A.liveCoach(pid,{turn})): گیر/شکست یک نوبت؛ «نتیجه گفت» برای مسئلهٔ زنده تا صفحه ثبتش کند یا شکستی بیاید */
-    C.rep = { key: key, stuck: stuck, fail: fail, result: said.indexOf("result") >= 0, pk: pk };
+    C.rep = { key: key, stuck: stuck, fail: fail, result: said.indexOf("result") >= 0 && !sub25, sub: sub25 || undefined, pk: pk };   // دورِ ۲۵: نتیجهٔ میانی پرسشِ «نتیجه‌ای گفتی ⇒ بازنگری» نمی‌گیرد
     /* دورِ ۲۳ (Q3 «گفت‌وگو ⇄ صفحه یک داستان»، C23-11/A23-35/B·D5): همان said/ans ِ سنجیدهٔ همین پیام برای دفترِ داستان (a45_story.js) — یک منبع، نه سنجشِ دوم */
     C.saidOk = { key: key, at: String(um.at || ""), said: said.slice(), ans: qs.slice(), pk: pk, live: (P && P.live) || "", real: !!real, pasted: !!pasted };
     if (C.resBy) delete C.resBy;   // دورِ ۶ (G1): «نتیجه» دیگر تا ثبتِ صفحه نمی‌ماند — فقط C.rep برای پیامِ بعد
@@ -40243,7 +40248,7 @@ APP.goFromURL = function (q) {
     var C = s.coach || {}, k = mkey(mt), edit = EDIT20.test(mt), real = !edit && !AS.notProblem(mt);
     /* MT1: «وضعِ کنونی» در یک سطر، بالای همهٔ بلوک‌ها */
     try { var pts = [], bl = AS.boundLive(s), PHN = { u: "فهمِ مسئله", p: "طرح", c: "اجرا", e: "اجرا", b: "بازنگری", done: "حل شد" };
-      if (bl && bl.r && bl.r.p) { var lph = ""; try { lph = A.livePhase ? A.livePhase(bl.pid) : ""; } catch (e) { } pts.push("مسئلهٔ زنده «" + clip(plainTx(bl.r.p.title), 60).replace(/[«»]/g, "") + "»" + (bl.done ? " (بسته شد)" : lph ? " · مرحله: " + (PHN[lph] || lph) : ""));
+      if (bl && bl.r && bl.r.p) { var lph = ""; try { lph = A.liveTurnPhase ? A.liveTurnPhase(bl.pid) : A.livePhase ? A.livePhase(bl.pid) : ""; } catch (e) { }   /* دورِ ۲۵ (P5، B25·D20، A25-19، C25-6): همان یک منبعِ مرحلهٔ بلوکِ «# مسئلهٔ زنده» و سرواژهٔ مربی (A.liveTurnPhase)، نه مرحلهٔ فرم */ pts.push("مسئلهٔ زنده «" + clip(plainTx(bl.r.p.title), 60).replace(/[«»]/g, "") + "»" + (bl.done ? " (بسته شد)" : lph ? " · مرحله: " + (PHN[lph] || lph) : ""));
         var op = lsteps(bl.pid).map(function (st, i) { return { st: st, i: i }; }).filter(function (x) { return x.st && !x.st.closed && !(x.st.out && !x.st.out.auto); }).pop(); if (op) pts.push("گامِ باز: " + fa(op.i + 1) + " «" + clip(plainTx(op.st.text), 50).replace(/[«»]/g, "") + "»"); }
       else if (AS.chatFocus(s)) pts.push("مسئلهٔ گفت‌وگو «" + clip(plainTx(C.stmt), 60).replace(/[«»]/g, "") + "»" + (C.ph ? " · مرحله: " + (PHN[C.ph] || C.ph) : ""));
       var nOp = 0; try { nOp = plansAll(s).filter(function (x) { return planSync(x) === "open"; }).length; } catch (e) { } if (nOp) pts.push(fa(nOp) + " برنامهٔ باز");
@@ -46938,7 +46943,10 @@ APP.goFromURL = function (q) {
        فرم با «از گفت‌وگو: … درست است؟» روی صفحه می‌ماند (دوباره پرسیده نمی‌شود) */
     var storyAhead23 = false; try { storyAhead23 = ph === "u" && !!(A.liveStoryAhead && A.liveStoryAhead(r.p.id)); } catch (e) { }
     if (ph === "u" && storyAhead23) pageQ = "";
-    else if (ph === "u") { var d = L.uDraft || {}; pageQ = wholeOpen(s) ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
+    /* دورِ ۲۵ (P5): (۱) C25-5 s25 p12 — مسئله‌ای که صورتش را خودش ساخت و حالا بیدار شد (ساختهٔ بازنگری: origin.lprob، یا r.woke) «کل» را به حرفِ خودش گفته است؛
+       u0 («کلِ مسئله را در یک جمله…») پرسشِ نوبتِ آن نیست. (۲) A23-35 s10 p5 — فهمی که دوباره باز شد (L.reU) و هنوز پیش‌نویسی ندارد همان فهمِ ثبت‌شده را پیشِ رو دارد
+       (فرم هم با همان پر می‌شود): پرسشِ نوبت از همان خوانده می‌شود، نه از پیش‌نویسِ خالی («مجهول چیست؟» برای مجهولی که ثبت است). */
+    else if (ph === "u") { var d = L.uDraft || (L.reU ? uOf(s) : null) || {}, own25 = !!(r.woke || (r.origin && r.origin.type === "lprob")); pageQ = wholeOpen(s) && !own25 ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
     else if (ph === "p" && Q.length) { var P = tut.plan || [], qi0 = tut.qi && tut.qi.lplan != null ? +tut.qi.lplan : 0;
       for (var k = 0; k < Q.length; k++) { var j = (qi0 + k) % Q.length; if (qOk(s, Q[j]) && !P.some(function (e) { return e && e.src === "live" && e.q === Q[j] && (e.text || e.skip); })) { pageQ = Q[j]; break; } } }
     else if (ph === "c") { var o0 = openStep(s); if (o0 && chatOut(o0)) pageQ = "";   // RN2a (دورِ ۱۹): نتیجه‌اش را در گفت‌وگو گفت و ثبت شد — دوباره پرسیده نمی‌شود
@@ -51578,7 +51586,7 @@ APP.goFromURL = function (q) {
   function chatPlans(se) { return ((se && se.plans) || []).filter(function (q) { return q && q.text; }); }
   function addSessEvents(add, se, opt) {
     opt = opt || {}; var pid = opt.pid || "";
-    var own23 = function (at) { try { return A.STORY && A.STORY.owns ? A.STORY.owns(se, pid, at) : chatScope(se, pid); } catch (e) { return chatScope(se, pid); } };
+    var own23 = function (at, ev) { try { return A.STORY && A.STORY.owns ? A.STORY.owns(se, pid, at, ev) : chatScope(se, pid); } catch (e) { return chatScope(se, pid); } };
     chatPlans(se).forEach(function (q) {
       var lk = q.step || q.will; if (pid && lk && lk.pid && lk.pid !== pid) return;   // پیوندِ برنامه ⇄ گامِ زنده (a41: q.step / q.will)
       /* دورِ ۲۱ (ADDENDUM R4+، A21-14 s03): برنامهٔ یک مسئله هرگز در پروندهٔ مسئلهٔ دیگر — مسئلهٔ برنامه = پیوندش، وگرنه مسئله‌ای که سشن در زمانِ برنامه به آن بسته بود */
@@ -51611,7 +51619,7 @@ APP.goFromURL = function (q) {
           return isRes ? { at: c.at, old: hv(String(c.old == null ? "" : c.old)) || "—", new: String(c["new"] || "").trim() ? hv(String(c["new"])) : "سرانجام کنار رفت — دوباره آزموده شود", why: c.note || "" } : { at: c.at, old: val(c.old), new: val(c["new"]), why: c.note || "" }; }),
         mind: g.res ? [{ row: "حدس/کالیبراسیون", sign: g.res === "confirmed" ? "+" : "−" }] : [] }); });
     (se.copyAsk || []).forEach(function (q) { if (pid && q.pid !== pid) return; if (q.state === "open") add({ k: "copyask", at: q.at, title: "پرسشِ صفحه: «این‌جا هم عوض شود؟»", lines: [q.label + ": " + askFa24(q.old, q.new)], out: "هنوز جواب نداده‌ای — همان «" + q.old + "» مانده" }); });
-    (se.evlog || []).forEach(function (e) { if (pid && e.pid && e.pid !== pid) return; if (pid && !e.pid && A.STORY && A.STORY.owns && !own23(e.at || "")) return; add(Object.assign({}, e, { k: e.k || "act" })); });
+    (se.evlog || []).forEach(function (e) { if (pid && e.pid && e.pid !== pid) return; if (pid && !e.pid && A.STORY && A.STORY.owns && !own23(e.at || "", e)) return;   /* دورِ ۲۵ (P5، A25-16): خودِ رویداد هم — تکهٔ پیامِ مرزی که مالِ مسئلهٔ پیشین است (e.not25) */ add(Object.assign({}, e, { k: e.k || "act" })); });
   }
 
   function nzk(t) { return String(t == null ? "" : t).replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 1776); }).replace(/[\s\u200c]+/g, " ").trim(); }
@@ -56125,8 +56133,9 @@ APP.goFromURL = function (q) {
   ST.pkWindow = function (se, pk) { return { from: pkStart(se, pk), to: pkEnd(se, pk) }; };
   function pidAt(se, at) { var L = (se && se.lprobLog) || [], o = ""; L.forEach(function (e) { if (e && e.p && String(e.at || "") <= String(at || "~")) o = e.p; }); return o || (L.length ? "" : (se && se.lprob) || ""); }
   /* رویدادِ گفت‌وگو در لحظهٔ at مالِ مسئلهٔ زندهٔ pid است اگر: سشن در آن لحظه به pid بسته بود، یا در پنجرهٔ مسئلهٔ گفت‌وگویی بود که بعدتر همین pid شد (chatImp) */
-  ST.owns = function (se, pid, at) {
+  ST.owns = function (se, pid, at, ev) {
     if (!se || !pid) return true; var a = String(at || "");
+    if (ev && ev.not25 && ev.not25.indexOf(pid) >= 0) return false;   // دورِ ۲۵ (P5، A25-16): تکه‌ای از پیامِ مرزی که مالِ مسئلهٔ پیشینِ همان گفت‌وگوست
     var pg = S.get("eprog_" + pid), I = (pg && pg.solve && pg.solve.live && pg.solve.live.chatImp) || null;
     if (I && I.sess === se.id && a >= String(I.from || "") && a <= String(I.to || "~")) return true;
     if (!a) return pidAt(se, "~") === pid;
@@ -56150,12 +56159,61 @@ APP.goFromURL = function (q) {
   ST.finRes = function (t) { return FIN24.test(String(t || "")); };
   function phaseOfItems(I) {
     var has = {}, pr = ""; (I || []).forEach(function (x) { has[x.k === "res" && x.fin === false ? "resMid" : x.k] = 1; if (x.k === "prior" && x.ph) pr = maxPh(pr, x.ph); });
-    if (has.res) return "b"; if (has.plan || has.step || has.resMid) return maxPh("c", pr);
+    /* دورِ ۲۵ (P5، C25-10 aC4 p4، A25-16 oA1): نتیجهٔ میانی به‌تنهایی مرحله را جابه‌جا نمی‌کند — «اجرا» فقط با طرح یا گامِ سنجیده (پیش‌تر: has.resMid ⇒ «اجرا»،
+       و مسئله‌ای که هنوز طرحی نداشت با آزمودنِ حدسِ نخستش «اجرای طرح» می‌شد). قاعدهٔ دورِ ۲۴: ST.phaseOfItemsR24 (REMOVAL_CANDIDATES). */
+    if (has.res) return "b"; if (has.plan || has.step) return maxPh("c", pr);
     if (pr) return pr;
     if (has.whole || (has.u && (has.c || has.d))) return "p";
     return has.u || has.c || has.d ? "u" : "";
   }
   ST.phaseOfItems = phaseOfItems;
+  ST.phaseOfItemsR24 = function (I) {   // قرنطینهٔ دورِ ۲۵ (REMOVAL_CANDIDATES): نتیجهٔ میانی ⇒ «اجرا» حتی بی طرح و گام — دیگر صدا زده نمی‌شود
+    var has = {}, pr = ""; (I || []).forEach(function (x) { has[x.k === "res" && x.fin === false ? "resMid" : x.k] = 1; if (x.k === "prior" && x.ph) pr = maxPh(pr, x.ph); });
+    if (has.res) return "b"; if (has.plan || has.step || has.resMid) return maxPh("c", pr);
+    if (pr) return pr; if (has.whole || (has.u && (has.c || has.d))) return "p"; return has.u || has.c || has.d ? "u" : "";
+  };
+  /* ---------- دورِ ۲۵ (P5 «یک مرحله، یک مسئله»، DECISIONS_R25؛ B25·D9 = U10 bp2 p5/p7 و pwB1 p4، A23-35 aA4 p5): نتیجهٔ کل یا نتیجهٔ میانی — یک داوری برای همه ----------
+     نتیجهٔ میانی (sub) = نتیجه‌ای که خودِ او یا دفترِ همین مسئله نشان می‌دهد هنوز کار مانده است:
+       (۱) در همان پیام می‌گوید چه چیزی را هنوز نمی‌داند یا بخشِ بعدی را می‌پرسد («ولی متر مکعب رو نمی‌دونم چند لیتره»، «حالا این چند لیتره؟»)؛
+       (۲) دفترِ «کارِ پیشینِ تو» هنوز گامی دارد که ✓ نیست و خودش درستش نکرده؛ (۳) طرحِ چندگامی‌اش هنوز گامِ مانده دارد.
+     نتیجهٔ کل (fin) = میانی نیست و: «جوابش … شد / حل شد» (FIN24)، یا پس از آخرین گامِ طرح، یا با فعلِ خودِ مجهولش جواب می‌دهد («چند متر پارچه بخرم؟» ⇐ «۵ متر می‌خرم»).
+     هیچ آستانهٔ عددی در کار نیست: فقط حرفِ خودش و دفترِ خودِ مسئله. */
+  var OPENLEFT25 = /(?:(?:رو|را|و)\s+|(?:^|[\s،.!؟?]))(?:دیگه\s+)?(?:واقعاً\s+|واقعا\s+|هنوز\s+)?نمی[‌\s]?(?:دونم|دانم)(?![آ-ی])|بلد\s*نیستم|یادم\s*نیست|(?:هنوز|فقط)\s[^.!؟?\n]{0,40}(?:مونده|مانده)(?![آ-ی])|(?:^|[.!؟?\n…]\s*)(?:خب\s*)?(?:حالا|بعدش)\s[^.!؟?\n]{0,60}(?:چند|چقدر|چطور|چجور|چگونه|کدوم|کدام|چی|چه)[^.!؟?\n]{0,40}[؟?]/;
+  var AUX25 = /^(?:شه|شد|شود|میشه|بشه|بشود|کنم|بکنم|کرد|کنه|کند|بود|هست|است|باشه|باشد|داره|دارم|دارد|بدونم|بدانم|ببینم|بفهمم|برسم|بیارم|درمیاد|میاد|میشن|بشن)$/;
+  function vcore(w) { return String(w || "").replace(/^(?:ب|ن)(?=[آ-ی]{3,})/, ""); }
+  function verbOf(q) { var T = toks(String(q || "")), v = T[T.length - 1] || ""; if (AUX25.test(v)) return ""; v = vcore(v); return v.length >= 3 && !AUX25.test(v) ? v : ""; }
+  function unkTexts(s, pid) {
+    var o = [], C = (s && s.coach) || {};
+    try { if (pid) { var pg = S.get("eprog_" + pid), so = (pg && pg.solve) || {}, L = so.live || {}, u = (so.u && so.u[1]) || L.uDraft || {}, r = A.liveRec && A.liveRec(pid);
+        o.push(u.u, L.chatUnk && L.chatUnk.t); (r ? String(r.p.statement || "").match(/[^.!؟?\n]*[؟?]/g) || [] : []).forEach(function (x) { o.push(x); }); }
+      var E = storyOf(s || {}, keyFor(s, pid)); o.push(E.unk && E.unk.t); E.items.forEach(function (x) { if (x.k === "u") o.push(x.t); });
+      if (!pid) { (String(C.stmtRaw24 || C.stmt || "").match(/[^.!؟?\n]*[؟?]/g) || []).forEach(function (x) { o.push(x); }); if (C.unkBy && C.pk) o.push(C.unkBy[C.pk]); } } catch (e) { }
+    return o.map(txt).filter(Boolean);
+  }
+  function ansUnk(s, pid, rx) {
+    if (!/[0-9]/.test(nz(rx))) return false; var R = toks(rx).map(vcore);
+    return unkTexts(s, pid).some(function (q) { var v = verbOf(q); return !!v && R.indexOf(v) >= 0; });
+  }
+  ST.openLeft = function (t) { return OPENLEFT25.test(String(t || "")); };
+  ST.subRes = function (s, pid, ut) {
+    if (OPENLEFT25.test(String(ut || ""))) return true;
+    try { var E = storyOf(s || {}, keyFor(s, pid)), pr = E.prior || null;
+      if (pid) { var pg = S.get("eprog_" + pid), L = (pg && pg.solve && pg.solve.live) || {}; if (L.prior) pr = L.prior; }
+      if (pr && (pr.steps || []).some(function (x) { return x.verdict !== "ok" && !x.fixed; })) return true;
+      var P1 = E.items.filter(function (x) { return x.k === "plan"; }).pop(), stN = P1 ? E.items.filter(function (x) { return x.k === "step" && String(x.at) >= String(P1.at); }).length : 0;
+      if (P1 && (P1.pieces || []).length > 1 && stN < P1.pieces.length - 1) return true; } catch (e) { }
+    return false;
+  };
+  ST.finOf = function (s, pid, ut, rx) {
+    if (ST.subRes(s, pid, ut)) return false;
+    var E = storyOf(s || {}, keyFor(s, pid)), P1 = E.items.filter(function (x) { return x.k === "plan"; }).pop(), stN = P1 ? E.items.filter(function (x) { return x.k === "step" && String(x.at) >= String(P1.at); }).length : 0;
+    return FIN24.test(String(rx || "")) || FIN24.test(String(ut || "")) || !!(P1 && (P1.pieces || []).length > 1 && stN >= P1.pieces.length - 1) || ansUnk(s, pid, rx) || ansUnk(s, pid, ut);
+  };
+  /* تعهدِ زمانی («تا پس‌فردا انجامش میدم»، D24-9 oD1 c40) طرح نیست: «کِی» دارد و «چه» ندارد — پس از برداشتنِ زمان و فعلِ جانشین («انجامش می‌دهم») واژهٔ معناداری نمی‌ماند */
+  var WHEN25 = /(?:^|\s)(?:تا|از|برای|همین|این|اون|آن|هر)?\s*(?:پس[‌\s]?فردا|فردا(?:\s*(?:صبح|ظهر|عصر|شب))?|امروز|امشب|امسال|آخرِ?\s*هفته|هفته(?:‌ی|ی|ٔ)?\s*(?:بعد|دیگه|دیگر|آینده)|ماهِ?\s*(?:بعد|دیگه|دیگر|آینده)|(?:یک|دو|سه|پنج|چهار)?[‌\s]?شنبه|جمعه|[0-9۰-۹]+\s*(?:روز|هفته|ماه|ساعت)\s*(?:دیگه|دیگر|بعد)?|بعداً|بعدا|زود)(?![آ-ی])/g;
+  var PROVERB25 = /(?:انجام(?:ش|شون)?|تموم(?:ش)?|تمام(?:ش)?|این\s*کار(?:و|\s*را|\s*رو)?|همین\s*کار(?:و|\s*را|\s*رو)?)\s*(?:می[‌\s]?(?:دم|دهم|کنم)|میدم|میکنم|بدم|بدهم|کنم)|بر[‌\s]?می[‌\s]?گردم|خبر(?:ت|تون)?\s*می[‌\s]?(?:دم|دهم)/g;
+  function planHasWhat(t) { return toks(String(t || "").replace(PROVERB25, " ").replace(WHEN25, " ")).length >= 1; }
+  ST.planHasWhat = planHasWhat;
   var EV_T = { whole: "کل در یک جمله (از گفت‌وگو)", u: "مجهول (از گفت‌وگو)", c: "شرط (از گفت‌وگو)", d: "داده (از گفت‌وگو)", plan: "طرح (از گفت‌وگو)", step: "گام (از گفت‌وگو)", res: "نتیجه (از گفت‌وگو)", lb: "بازنگری (از گفت‌وگو)", prior: "کارِ پیشینِ تو (از گفت‌وگو)", tried: "امتحانِ ردشده (از گفت‌وگو)" };
   var EV_K = { whole: "cwhole", u: "cunk", c: "ccond", d: "cdata", plan: "cplan23", step: "cstep", res: "cres", lb: "clb", prior: "cprior", tried: "ctried" };
   ST.EV_K = EV_K;
@@ -56195,13 +56253,12 @@ APP.goFromURL = function (q) {
         var pt = txtOf(a.plan); pt = pt && quoteIn(pt, ut) ? (A.PRE && A.PRE.herSpan ? A.PRE.herSpan(pt, ut) : pt) : planText(ut);
         var ms = stepsOf(a.plan, ut);   // دورِ ۲۴: گام‌های سنجیدهٔ مدل (هر نقل در پیامش) — نقلِ ناپیدا کنار می‌رود
         if (!toks(pt).length && ms.length >= 2) pt = ms.join(" · ");
-        if (toks(pt).length >= 2) I.push({ k: "plan", t: clip(pt, 400), pieces: ms.length >= 2 ? ms : planPieces(pt) });
+        if (toks(pt).length >= 2 && planHasWhat(pt)) I.push({ k: "plan", t: clip(pt, 400), pieces: ms.length >= 2 ? ms : planPieces(pt) });   // دورِ ۲۵ (D24-9): تعهدِ زمانیِ بی «چه» طرح نیست
       }
       if (said.indexOf("result") >= 0) { var rt = txtOf(a.result), rx = clip(rt && quoteIn(rt, ut) ? rt : ut, 300);
         /* نتیجه‌ای که فقط پرسش است («پس اصلاً تموم نمیشه؟») نتیجه نیست؛ نتیجهٔ کل (fin) یا میانی */
         if (!/[؟?]\s*$/.test(rx) || (rt && quoteIn(rt, ut) && !/[؟?]\s*$/.test(rt))) {
-          var E1 = storyOf(s, key), P1 = E1.items.filter(function (x) { return x.k === "plan"; }).pop(), stN = P1 ? E1.items.filter(function (x) { return x.k === "step" && String(x.at) >= String(P1.at); }).length : 0;
-          I.push({ k: "res", t: rx, fin: FIN24.test(rx) || FIN24.test(ut) || !!(P1 && (P1.pieces || []).length > 1 && stN >= P1.pieces.length - 1) });
+          I.push({ k: "res", t: rx, fin: ST.finOf(s, pid, ut, rx) });   // دورِ ۲۵ (P5): یک داوری (ST.finOf) — نتیجهٔ میانی هرگز fin نیست؛ جواب با فعلِ خودِ مجهول fin است
         }
       }
     }
@@ -56419,6 +56476,15 @@ APP.goFromURL = function (q) {
       if (base.length >= 3) { var UM = (s.msgs || []).filter(function (m) { return isUser(m) && String(m.at || "") >= String(win.from || ""); }), sc = UM.map(function (m) { return toks(m.text).filter(function (w, i, X) { return X.indexOf(w) === i && hit(w, base); }).length; }), mx = Math.max.apply(null, sc.concat([0]));
         var si = sc.indexOf(mx); if (si > 0 && mx >= Math.max(2, Math.ceil(base.length * 0.4)) && sc[0] * 2 < mx) { from24 = String(UM[si].at || from24); cut24 = true; } } } catch (e) { }
     var items24 = cut24 ? E.items.filter(function (x) { return !x.at || String(x.at) >= from24; }) : E.items;
+    /* دورِ ۲۵ (P5، A25-16 oA1 p6–p18، A23-32): پیامِ مرزی هر دو مسئله را دارد («برای n نفر: n(n−1)/2. ولی … یه پیشنهادِ کار دارم …») — کارِ سنجیدهٔ آن پیام که پیش از
+       نخستین جملهٔ مسئلهٔ تازه آمده مالِ مسئلهٔ پیشین است، نه دادهٔ این یکی (پیش‌تر نتیجهٔ دست‌دادن‌ها نقطهٔ نقشهٔ «پیشنهادِ کار» شد و مرحله‌اش را جلو برد) */
+    if (cut24) { try { var bm = UM[si], bt = String(bm.text || ""), bmid = mid(bm), S25 = sentences(bt), off25 = -1, pos25 = 0;
+        for (var q25 = 0; q25 < S25.length; q25++) { var ix25 = bt.indexOf(S25[q25].slice(0, 12), pos25); if (ix25 < 0) ix25 = pos25; pos25 = ix25;
+          if (toks(S25[q25]).some(function (w) { return hit(w, base); })) { off25 = ix25; break; } }
+        if (off25 > 0) { var all25 = items24; items24 = items24.filter(function (x) { if (x.mid !== bmid && String(x.at) !== String(bm.at || "")) return true; var ix = bt.indexOf(String(x.t || "").replace(/…$/, "").slice(0, 16)); return ix < 0 ? toks(x.t).some(function (w) { return hit(w, base); }) : ix >= off25; });
+          /* رویدادِ همان تکه‌های کنارگذاشته در دفترِ رویدادِ سشن نشان می‌خورد (not25) تا 📜 و 🧭 ِ این مسئله هم آن را از خودشان ندانند (ST.owns با خودِ رویداد) */
+          var kx = pk.replace(/[^\w]/g, "_"), dr25 = all25.filter(function (x) { return items24.indexOf(x) < 0; }).map(function (x) { return "st23_" + kx + "_" + x.k + "_" + x.n; });
+          if (dr25.length) (s.evlog || []).forEach(function (e) { if (e && dr25.indexOf(e.id) >= 0) { e.not25 = (e.not25 || []).concat([pid]); } }); if (dr25.length) { try { S.put(s); } catch (e2) { } } } } catch (e) { } }
     L.chatImp = { sess: s.id, pk: pk, from: from24, to: nowIso(), n: items24.length };
     if (cut24) L.chatImp.cut = win.from;
     L.chatImpItems = items24.map(function (x) { return { k: x.k, t: x.t, at: x.at, mid: x.mid, pieces: x.pieces, n: x.n, fin: x.fin, ph: x.ph }; });
@@ -56458,6 +56524,30 @@ APP.goFromURL = function (q) {
     AS.DO.coach_state._r23story = true;
   }
   AS.promptHooks = AS.promptHooks || [];
+  /* ---------- دورِ ۲۵ (P5 «یک مرحله، یک مسئله»، B25·D12 = U13 oB1 p22، بانکِ مالک #16): مسئلهٔ تازه وسطِ گفت‌وگوی یک مسئلهٔ زندهٔ باز ----------
+     ریشه: تا سشن به مسئلهٔ زندهٔ بازی بسته بود، هیچ پیامی «مسئلهٔ تازه» شمرده نمی‌شد (coachPhase0 ِ a27 همان اول برمی‌گشت) ⇒ «یه مسئله‌ی دیگه هم دارم … شام … خوابم
+     نمی‌بره» دادهٔ مسئلهٔ بیداری شد و «# وضعِ کنونی» همان مسئلهٔ کهنه را نشان داد. حالا: پیامی که خودش می‌گوید مسئلهٔ دیگری دارد سشن را از مسئلهٔ زنده باز می‌کند
+     (آن مسئله با نقشه، پرونده و مرحلهٔ خودش در 🔭 باز می‌ماند) و مسئلهٔ تازه با pk ِ خودش از «فهم» آغاز می‌شود — پیش از هر قلابِ دیگر (unshift)، تا همهٔ بلوک‌های
+     همین نوبت یک مسئله ببینند. */
+  var NEWPROB25 = /(?:یه|یک)\s*(?:مسئله|مساله|مشکل)(?:ٔ|ی|‌ی)?\s*(?:دیگه|دیگر|تازه|جدید|جدا)(?:‌ای|ای)?\s*(?:هم\s*)?(?:دارم|داریم|پیش\s*اومده|پیش\s*آمده)(?![آ-ی])/;
+  ST.newProbIntro = function (t) { return NEWPROB25.test(String(t || "")); };
+  function splitNote(s) {
+    var C = (s && s.coach) || {}, X = (C.split25 || []).filter(function (x) { return x && x.pk === C.pk; }).pop(); if (!X) return "";
+    var r = A.liveRec && A.liveRec(X.from); if (!r) return "";
+    return "# دو مسئله در این گفت‌وگو (صفحه جدا نگهشان می‌دارد)\n- زمینه (نه پرسشِ دوم): مسئلهٔ زندهٔ «" + clip(r.p.title, 60).replace(/[«»]/g, "") + "» سرِ جای خودش باز است — نقشهٔ مسیر، پرونده و مرحلهٔ خودش را دارد ({\"do\":\"go\",\"view\":\"route\",\"arg\":\"" + X.from + "\"}) و چیزی از مسئلهٔ تازه در آن نوشته نمی‌شود. "
+      + "مسئلهٔ تازه‌ای که آورد مسئلهٔ همین گفت‌وگوست و از «فهم» آغاز می‌شود؛ نقشه و پرونده‌اش مالِ همین گفت‌وگوست ({\"do\":\"go\",\"view\":\"route\",\"arg\":\"" + s.id + "\"}) و اگر خواست در 🔭 جدا ثبت می‌شود. کارنامهٔ ذهن یکی است و هر رویدادش نشانیِ مسئلهٔ خودش را دارد. هرگز دادهٔ یکی را به دیگری نسبت نده.";
+  }
+  AS.promptHooks.unshift(function (s, msg) {
+    try { var mt = String(msg || ""); if (!s || /^\s*\[/.test(mt)) return "";
+      var b = AS.boundLive ? AS.boundLive(s) : null;
+      if (b && !b.done && b.pid && NEWPROB25.test(mt) && A.liveUnbindSession) {
+        var C = s.coach = s.coach || {}; A.liveUnbindSession(s);
+        C.gen = (C.gen || 0) + 1; C.pk = "c:" + C.gen; C.ph = ""; C.st = {}; C.stmt = ""; C.stmtRaw24 = ""; C.inh = C.inh || "new"; delete C.prev;
+        (C.split25 = C.split25 || []).push({ from: b.pid, pk: C.pk, at: nowIso() }); try { S.put(s); } catch (e) { }
+      }
+      return splitNote(s);
+    } catch (e) { return ""; }
+  });
   AS.promptHooks.push(function (s) { try { var um = lastUser(s); if (um) pkLog(s, um.at); } catch (e) { } return ""; });
   AS.afterTurnHooks = AS.afterTurnHooks || [];
   AS.afterTurnHooks.push(function (s) { try { var um = lastUser(s); if (um) { pkLog(s, um.at); S.put(s); } } catch (e) { } });

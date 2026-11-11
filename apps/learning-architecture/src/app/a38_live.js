@@ -1697,7 +1697,10 @@
        فرم با «از گفت‌وگو: … درست است؟» روی صفحه می‌ماند (دوباره پرسیده نمی‌شود) */
     var storyAhead23 = false; try { storyAhead23 = ph === "u" && !!(A.liveStoryAhead && A.liveStoryAhead(r.p.id)); } catch (e) { }
     if (ph === "u" && storyAhead23) pageQ = "";
-    else if (ph === "u") { var d = L.uDraft || {}; pageQ = wholeOpen(s) ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
+    /* دورِ ۲۵ (P5): (۱) C25-5 s25 p12 — مسئله‌ای که صورتش را خودش ساخت و حالا بیدار شد (ساختهٔ بازنگری: origin.lprob، یا r.woke) «کل» را به حرفِ خودش گفته است؛
+       u0 («کلِ مسئله را در یک جمله…») پرسشِ نوبتِ آن نیست. (۲) A23-35 s10 p5 — فهمی که دوباره باز شد (L.reU) و هنوز پیش‌نویسی ندارد همان فهمِ ثبت‌شده را پیشِ رو دارد
+       (فرم هم با همان پر می‌شود): پرسشِ نوبت از همان خوانده می‌شود، نه از پیش‌نویسِ خالی («مجهول چیست؟» برای مجهولی که ثبت است). */
+    else if (ph === "u") { var d = L.uDraft || (L.reU ? uOf(s) : null) || {}, own25 = !!(r.woke || (r.origin && r.origin.type === "lprob")); pageQ = wholeOpen(s) && !own25 ? Q_WHOLE : Q[!txt(d.u) ? 0 : !(d.dl || []).some(function (x) { return txt(x.t); }) ? 1 : !txt(d.c) ? 2 : 3] || Q[0] || ""; }
     else if (ph === "p" && Q.length) { var P = tut.plan || [], qi0 = tut.qi && tut.qi.lplan != null ? +tut.qi.lplan : 0;
       for (var k = 0; k < Q.length; k++) { var j = (qi0 + k) % Q.length; if (qOk(s, Q[j]) && !P.some(function (e) { return e && e.src === "live" && e.q === Q[j] && (e.text || e.skip); })) { pageQ = Q[j]; break; } } }
     else if (ph === "c") { var o0 = openStep(s); if (o0 && chatOut(o0)) pageQ = "";   // RN2a (دورِ ۱۹): نتیجه‌اش را در گفت‌وگو گفت و ثبت شد — دوباره پرسیده نمی‌شود
