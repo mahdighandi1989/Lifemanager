@@ -3,6 +3,7 @@ round26B/bp1/DONE
 round26B/bp2/DONE
 round26B/bp3/DONE
 round26B/pwB1/DONE
+round26B/pwB2/DONE
 round26B/s11/DONE
 round26B/s12/DONE
 round26B/s13/DONE

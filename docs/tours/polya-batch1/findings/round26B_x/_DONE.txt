@@ -1,7 +1,10 @@
+round26B_x/aB1/DONE
+round26B_x/aB2/DONE
 round26B_x/bp1/DONE
 round26B_x/bp2/DONE
 round26B_x/bp3/DONE
 round26B_x/pwB1/DONE
+round26B_x/pwB1o/DONE
 round26B_x/pwB2/DONE
 round26B_x/s11/DONE
 round26B_x/s12/DONE
