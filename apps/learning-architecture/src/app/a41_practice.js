@@ -2435,18 +2435,18 @@
     if (w && W && W.src === "weekday" && WD25[w[1]] === dowOf(base) && d === add(base, 7)) return { date: d, amb: true, wd: WDFA25[WD25[w[1]]], src: "weekday" };
     return { date: d, src: (W && W.src) || "" };
   };
-  var HABIT25 = /شنبه[‌\s]*ها|جمعه[‌\s]*ها|(?:^|[\s،])(?:معمولاً|معمولا|همیشه|اغلب|بیشترِ?\s*وقت‌?ها|هر\s*(?:هفته|روز|ماه|سال|شنبه|یکشنبه|دوشنبه|سه[‌\s]?شنبه|چهارشنبه|پنج[‌\s]?شنبه|جمعه))(?![آ-ی])/;
-  var COMMIT25 = /(?:^|[\s‌،])(?:ن?می[‌\s]?[آ-ی]{1,12}م|ب[آ-ی]{2,12}م|[آ-ی]{2,}\s+دارم|دارم|باید|قراره|قرار\s*است|مهلت\S*|موعد\S*|نوبت\S*|امتحان\S*|آزمون\S*|تحویل\S*|جلسه\S*|وقت\s*دارم)(?![آ-ی])/;
+  var HABIT25 = /شنبه[‌\s]*ها|جمعه[‌\s]*ها|(?:^|[\s،])(?:معمولاً|معمولا|همیشه|اغلب|بیشترِ?\s*وقت‌?ها|به\s*خودم\s*می[‌\s]?گم|هر\s*(?:هفته|روز|ماه|سال|شب|بار|دفعه|صبح|شنبه|یکشنبه|دوشنبه|سه[‌\s]?شنبه|چهارشنبه|پنج[‌\s]?شنبه|جمعه))(?![آ-ی])/;
+  var COMMIT25 = /(?:^|[\s‌،])(?:ن?می[‌\s]?[آ-ی]{1,12}م|ب[آ-ی]{2,12}م|باید|قراره|قرار\s*است|مهلت\S*|موعد\S*|نوبت\S*|امتحان\S*|آزمون\S*|تحویل\S*|جلسه\S*|وقت\s*دارم)(?![آ-ی])/;
   var REL_OK25 = /فردا|(?:روز|هفته|ماه)\s*(?:ی\s*|ٔ\s*)?(?:دیگه|دیگر|بعد|آینده)|آخرِ?\s*(?:همین\s*)?هفته/;
-  var PAST25 = /(?:^|[\s،])(?:دیروز|پریروز|پیش|قبل|هفتهٔ?\s*(?:پیش|قبل|گذشته))(?![آ-ی])/;
+  var PAST25 = /(?:^|[\s،])(?:دیروز|پریروز|پیش|قبل|پارسال|قبلاً|قبلا|گفتم|گفته\s*بودم|هفتهٔ?\s*(?:پیش|قبل|گذشته))(?![آ-ی])/;
   /* تعهدهای تاریخ‌دارِ یک پیام: [{ what, date, amb, wd }] */
   PR.herDates = function (text) {
     var out = [];
     sentsOf25(text).forEach(function (st) {
       if (/[؟?]\s*$/.test(st) || /(?:^|[\s،])(?:اگه|اگر|شاید|کاش)(?![آ-ی])/.test(st) || HABIT25.test(st) || PRED_EXPL.test(st) || PR.predVerdictIn(st) || /پیش[‌\s]?بینی|(?:٪|%|درصد)\s*(?:مطمئن|احتمال|اطمینان)/.test(st)) return;
       var parts = st.split(/\s*[،؛]\s*|\s+و\s+(?=(?:[^\s]+\s+){0,2}?(?:[0-9۰-۹]{1,2}\s*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)|(?:یک|دو|سه[‌\s]?|چهار|پنج[‌\s]?)?شنبه|جمعه|فردا|پس[‌\s]?فردا))/);
-      var got = parts.map(function (c) { var I = PR.whenInfo(c); return I && I.date && I.date >= today() && !PAST25.test(c) && !(I.date === today() && !I.amb) ? { c: c.trim(), I: I } : null; }).filter(Boolean);
-      if (!got.length) { var I0 = PR.whenInfo(st); if (I0 && I0.date && I0.date > today() && !PAST25.test(st)) got = [{ c: st.trim(), I: I0 }]; }
+      var got = parts.map(function (c) { var I = PR.whenInfo(c); return I && I.date && I.src && I.date >= today() && !PAST25.test(c) && !(I.date === today() && !I.amb) ? { c: c.trim(), I: I } : null; }).filter(Boolean);
+      if (!got.length) { var I0 = PR.whenInfo(st); if (I0 && I0.date && I0.src && I0.date > today() && !PAST25.test(st)) got = [{ c: st.trim(), I: I0 }]; }
       got = got.filter(function (g) { var W = A.willWhen ? A.willWhen(dg(g.c).trim(), today()) : null; return !(W && W.src === "rel" && !REL_OK25.test(g.c)); });   // «دو هفته تمرین می‌کنم» مدت است، نه تاریخ
       got.forEach(function (g) { if (!COMMIT25.test(g.c) && !COMMIT25.test(st)) return; out.push({ what: clip(g.c.replace(/[.!\s]+$/, ""), 120), date: g.I.date, amb: !!g.I.amb, wd: g.I.wd || "" }); });
     });
@@ -2464,7 +2464,7 @@
     if (S.all("fcast", function (f) { return f && f.due === it.date && f.src && f.src.chat === s0.id && !f.outcome; }).some(function (f) { return ovS(f.q, it.what) >= 2; })) return true;
     return false;
   }
-  var NO25 = /^\s*(?:نه|نخیر|غلطه|اشتباهه)(?![آ-ی])/, YES25 = /^\s*(?:آره|آری|اره|بله|بلی|باشه|درسته|درست\s*است|همینه|اوکی|ok|چشم)(?![آ-ی])/i;
+  var NO25 = /^\s*(?:نه|نخیر|غلطه|اشتباهه)(?![آ-ی])/, YES25 = /^\s*(?:آره|آری|اره|بله|بلی|درسته|درست\s*است|همینه|دقیقاً|دقیقا)(?![آ-ی])/;   // «باشه/چشم» پذیرفتنِ حرفِ دستیار است، نه تأییدِ یک تاریخ
   PR.datePend = function (s0) {
     var U = userMsgs(s0), m = U[U.length - 1]; if (!m || !s0) return false; var t = String(m.text || ""), dirty = false, P0 = s0.datePend;
     /* الف) پاسخِ او به پرسشِ پیشینِ صفحه — یک بار */
@@ -2502,7 +2502,7 @@
   };
   if (AS && AS.promptHooks) AS.promptHooks.push(function (s0) {
     var P0 = s0 && s0.datePend; if (!P0 || P0.state !== "open") return "";
-    return "# پرسشِ صفحه دربارهٔ تاریخِ خودش (زمینه، نه پرسشِ دوم)\n- صفحه خودش از او پرسیده: " + (P0.items || []).map(function (z) { return z.amb ? "«" + clip(z.what, 60) + "»: همین امروز یا " + z.wd + (/ه$/.test(z.wd) ? "ٔ" : "ِ") + " بعد؟" : "«" + clip(z.what, 60) + "» — " + fdate(z.date) + "، درست است؟"; }).join(" · ") + "\n- پاسخش را خودِ صفحه می‌خواند و ثبت می‌کند؛ تو دوباره نپرس و برای همین تاریخ کنشِ deadline نده.";
+    return "# تاریخِ خودش — صفحه خودش پرسیده است (زمینه، نه پرسشِ دوم)\n- زمینه (نه پرسشِ دوم): صفحه همین حالا زیرِ پیامِ پیشینش تاریخِ این حرف را از خودِ او خواسته است: " + (P0.items || []).map(function (z) { return "«" + clip(z.what, 60) + "» (" + (z.amb ? "همین امروز یا " + z.wd + (/ه$/.test(z.wd) ? "ٔ" : "ِ") + " بعد" : fdate(z.date)) + ")"; }).join(" · ") + ". پاسخش را خودِ صفحه می‌خواند و ثبت می‌کند؛ تو این را دوباره طرح نکن و برای همین تاریخ کنشِ deadline نده.";
   });
 
   /* ---------- پس از هر نوبت: موعدِ گزارش‌شده، حدسِ آزموده، خواستهٔ عقب‌افتاده ---------- */

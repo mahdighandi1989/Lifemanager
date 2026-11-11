@@ -10,7 +10,7 @@ Base: eeb11d1f. Docs: WORKLOG (127), PROGRESS 126, HANDBOOK §10 row and §12 ro
 - `a41_practice.js`: `t24Judge`; `PR.bookPred`, `PR.predExplicit` (rewritten); new `PR.predVerdictIn`, `PR.predVerdict`, `PR.predFor`,
   `PR.predMark`, `PR.pctOf25`, `PR.whenInfo`, `PR.herDates`, `PR.datePend`; `PR.guessOwnTest` (new shapes); the a41 after-turn hook; one new
   prompt hook (page-built block, NOT `AS.SYS`).
-- `a27_tour.js`: `plan18` (date source only), `coachEv` (one guard + `AS.pureCmd25`), `retractApply` (one line before its return: the why).
+- `a27_tour.js`: `plan18` (date source only), `coachEv` (one guard + `AS.pureCmd25`), `retractApply` (the why of the two session-record pushes).
 - `a38_live.js`: `retractSess` — only the `why` of the deadline `fixHist` entry.
 - `a40_dossier.js`: `addSessEvents` (guess line), `A.dossierSess` inner (prediction events).
 - `a44_route.js`: `A.ROUTE.model` (dedup + `short` for chat points) and the list line of the view. No `sys*` function touched.
@@ -27,7 +27,7 @@ Base: eeb11d1f. Docs: WORKLOG (127), PROGRESS 126, HANDBOOK §10 row and §12 ro
 - **Dates.** `PR.whenInfo(text, from)` ⇒ `{date, amb?, wd?, src}`: «X ِ هفتهٔ بعد» = that weekday in the Sat–Fri week after today's; the
   same weekday said on that weekday ⇒ `amb:true` (nothing is booked; `PR.datePend` asks once). `PR.parseWhen` is unchanged.
   `s.datePend = {at, msg, d0, state: open|booked|dropped, items:[{what, date, amb, wd, pred?, plan?}]}`. The answer is read from the NEXT user
-  message only, matched by message identity (`msg`), never by time order. A yes books a `deadline` record `{by:"her-words", src, quote}`.
+  message only, matched by message identity (`msg`), never by time order. A yes («آره/بله/درسته/همینه/دقیقاً» — not «باشه/چشم», which accept the assistant's words) books a `deadline` record `{by:"her-words", src, quote}`.
   The page asks only when no deadline / plan / 🎯 of this session already carries that date.
 - **Plans (`plan18`).** No model date ⇒ `PR.whenInfo(plan text)`; else `planDate18` only when the text has `PLAN_WHEN` words or
   «امروز/امشب/آخرِ هفته»; else `"next-session"`. An ambiguous weekday ⇒ `"next-session"` + `q.whenAsk` (set to a date by her answer).
@@ -37,9 +37,10 @@ Base: eeb11d1f. Docs: WORKLOG (127), PROGRESS 126, HANDBOOK §10 row and §12 ro
   fraction; (8) «حدسم درسته / غلط بود» for the latest guess before that message; (9) a one-number guess and her own action with a result.
   `g.ground = {from, key}` = her reason in the guess message when there is no test; `g.res` stays empty and 📜 says
   «هنوز آزموده نشده — دلیلِ خودت در همان پیام: «…»». It still never touches `res`, `withdrawn`, `resRecheck` of a resolved guess.
-- **Correction why (correction / story touching a27, a38).** In `retractApply` every `changed[]` entry whose why is empty or the mechanical
-  «اصلاح شد ⇐ «old»» gets the turn's why («به گفتهٔ خودش: «…»» or «با ✏️ ِ خودش روی همان پیام»). Entries with `kind:"stale"` and special whys
-  («اصلاح شد ⇐ حکمِ …») are kept. A fixer who wants a different why must set a non-default text.
+- **Correction why (correction / story touching a27, a38).** In `retractApply` the changes of SESSION records (deadline, measure, card —
+  the `liveRetractSessApply` branch and the coach deadline line) carry the turn's why («به گفتهٔ خودش: «…»»; ✏️ ⇒ «با ✏️ ِ خودش روی همان پیام»)
+  instead of an empty why or the mechanical «اصلاح شد ⇐ «old»». Live-problem changes (`liveRes20`) are untouched: their «اصلاح شد ⇐» line is
+  asserted by the round-19b test. The deadline `fixHist.why` in a38 `retractSess` follows the same rule.
 - **Stuck (classify).** `coachEv(s, ph, "chat", text, false)` returns without booking when `AS.pureCmd25(text)` (a bare yes / «ثبتش کن» /
   «ادامه بده», ≤ 6 words).
 - **Route (loop).** Chat points (`cres, clb, cdata, cunk, ccond, cwhole, cstep, ctried`) carry `short` = «kind: first line»; a second event of the
