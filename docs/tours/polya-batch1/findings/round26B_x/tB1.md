@@ -16,6 +16,7 @@
 - [PASS] no duplicate waiting rows: 📜 has ONE «⏸ منتظرِ برگهٔ #۱۰۱» row (outcome «رسید (تأییدِ تو)») + one row per check (B25·D19 FIXED).
 - [FAIL S3] B26x·D25 after the take-back the sheet stays `open` (s28 `status:"open"`) though its own note says «این گام دیگر منتظرِ این برگه نیست» — the routine keeps an already-satisfied sheet in its queue.
 - [FAIL S3] B26x·D26 arrival text «سنجیدم که نیازِ گامِ … را جواب می‌دهد» (s23) rests on shared words only («جستوجو، پیشینه، اختراع، ثبت، واژهکلید، پایگاه»); the tool was never tried on her idea, and she found next turn that it «فقط یه فهرست کلی میده» (bank #39 still missing; wording overstates).
+- [FAIL S3] B25·D9 STILL (mild): p7 «# وضعِ کنونی … مرحله: بازنگری» after two sub-results; the model kept planning and p8 registered the live problem at «طرح», so no visible effect beyond the prompt.
 - [PASS] routing 11/11.
 
 ## نقشهٔ نیاز
@@ -39,6 +40,7 @@ Birth 1374-04-23 ⇒ 31, adult band; register plain «تو». ✓
 - B25·D1 FIXED (s17 ask instead of arrival; p9 «نه» ⇒ waiting again).
 - B25·D18 FIXED (s14/s15 mismatch lines give different reasons; no ask + reopen in the same pass).
 - B25·D19 FIXED (one waiting row in 📜).
+- B25·D9 STILL (p7 prompt stage, mild).
 
 ## Arithmetic
 | what she wrote | exact | page said | verdict |
@@ -62,5 +64,6 @@ Birth 1374-04-23 ⇒ 31, adult band; register plain «تو». ✓
 ## Defects
 - S3 B26x·D25 sheet left open after take-back.
 - S3 B26x·D26 arrival claims «سنجیدم» on word overlap only.
+- S3 B25·D9 STILL (mild).
 
-RESULT: FAIL (2 S3)
+RESULT: FAIL (3 S3)

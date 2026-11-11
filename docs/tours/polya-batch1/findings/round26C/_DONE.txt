@@ -1,4 +1,6 @@
 round26C/aC1/DONE
+round26C/aC2/DONE
+round26C/aC3/DONE
 round26C/oC1/DONE
 round26C/pwC1/DONE
 round26C/pwC2/DONE
