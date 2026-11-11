@@ -196,3 +196,20 @@ showed "no plan yet". Lessons:
 - **One decision, one place.** When a gate decides "refuse" and a later wrapper turns that into "kept", the reply pre-check still reads "refuse" and the model contradicts
   the page. Put the final decision in the gate both readers call.
 - **A model date needs her time words.** Without them use a dateless follow-up («جلسهٔ بعد»); a relative day she said («تا شنبه‌ی بعد») is computed by the page clock.
+## Update 2026-11-11 (round 25, correction) — "can be computed from" is not "was computed from"; propose only your own recomputation, otherwise ask
+- **A closure over arithmetic coincidences is not a dependency.** "One operation on the old value and any earlier number gives this number" is true of most small
+  numbers (her goal 8 = 16 ÷ 2, a list index 2 = 8 ÷ 4, a data percentage 10 = 20 − 10). Dependency needs *evidence in her own text*: the number stands in a result
+  position (after «= / یعنی / پس / سهمِ هر نفر», before «رسید / شد», in an explaining parenthesis, or is a one-number result record) **and** its relation is identified.
+- **Rank the evidence, let the best class decide.** Written expression that evaluates to the number → a word of the sentence that defines the formula («محیط», «مساحت»,
+  «جفت») → one operation with a number of the same sentence → one operation with an earlier number. Run the weaker class only after the stronger ones reached a fixed
+  point, or a coincidence found early (100 = 20 × 5) beats the written relation found later (10 × 10).
+- **Role comes from position, not from a word list.** An unmarked number in the statement/data form is a given (goal, measurement, bound) and so is every later
+  restatement; list indices, labels («گامِ ۳», «n=4»), years are never quantities; clock times and month days only subtract from their own kind.
+- **Dimensions cut most coincidences cheaply.** Add/subtract only like units; a ratio of two like quantities cannot carry that unit; percent is ÷100; when the unit
+  table has no unit, the noun after the number is its kind; a unit-less number inherits the unit of an equal number written with one; an old value without a unit
+  takes the unit from a record that states it — if none does, no value is computed.
+- **A proposed number must be the tool's own verified computation.** Show a new value only when every relation of the deciding class agrees and no operand is itself
+  "possibly stale"; otherwise ask «was this computed from it?» with no number. A wrong confident proposal is worse than a question.
+- **Set-asides follow the same basis rule.** A result/guess/verdict is set aside by a correction only if it rests on that value: not when the corrected value is a
+  time or date, not when her own written computation of that number does not contain it, not when the kinds differ. Keep the old presumption only for "unknown".
+- **Bank entries are user sentences: run them through the real validator.** Two entries failed only because the correction-cue check did not know «X ندارم، ۱۵ …».

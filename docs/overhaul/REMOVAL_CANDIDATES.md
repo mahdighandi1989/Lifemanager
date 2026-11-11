@@ -383,3 +383,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R24 R5 (never ISO to a person; one Jalali confirmation; register signs from verbs only).
 - **Status:** reachable, not called for person-facing text: `APP.AGE.faBoth` (exported for compatibility), `APP.ASSIST.R24_QUARANTINE.signSh`, `.signTo18`.
   Delete only with the owner's approval.
+## 2026-11-11 — one-operation coincidence scan for derived numbers (learning-architecture, Pólya round 25, correction: P4)
+- **Files:** `apps/learning-architecture/src/app/a38_live.js`.
+- **What it did:** `staleScan` (round 24) marked a number «کهنه پس از اصلاح» when one arithmetic operation on the old value (or an already stale number) and any earlier
+  number of the same problem produced it, and proposed the same operation with the new value.
+- **Why replaced:** DECISIONS_R25 P4 + C11 (only numbers actually derived; never goals, measured results, data percentages, deadline times, list indices, bounds;
+  every proposed value is the page's own correct recomputation, otherwise the page asks).
+- **Status:** reachable, not called: `APP.LIVE_R24_QUARANTINE_P4.staleScan`. Delete only with the owner's approval.
