@@ -174,6 +174,7 @@ const BANK = BF ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     const pid = await p.evaluate(() => { const pid = __live('الگوی ۱/(k(k+1)(k+2))', 'S(n) = ۱/(1·2·3) + ۱/(2·3·4) + … + ۱/(n(n+1)(n+2)). حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2)).', { origin: { type: 'lprob', id: 'pb_parent', share: 'method', why: 'همان تلسکوپی' }, dormant: '2099-01-01' });
       const r = APP.liveRec(pid); r.woke = new Date().toISOString(); APP.S.put(r); APP.liveBindSession(pid, __cur(), { force: true }); __liveSet(pid, () => {}); return pid; });
     const c = await lcq(pid, 'ببخشید، اشتباه تایپ کردم: جملهٔ دومِ الگو ۱/(2·3·4) بود، نه ۱/(2·3·5).');
+    info.wokeQ = c;
     chk(c.q !== WQ, 'C25-5 (s25 p12 u0 «کلِ مسئله را … می‌گویید؟» برای حدسی که خودش گفت): the woken, self-made problem is never asked the whole-first question :: ' + c.q);
     const t = await turn('n=4 رو هم حساب کردم: مستقیم جمع میشه ۷/۳۰، فرمولم هم ۱/۴ − ۱/۶۰ = ۷/۳۰ میده. این یکی هم خوند.', 'خوب.', [csn({ ph: 'u', said: [], nat: 'objective' })]);
     chk(head(t.user).indexOf(WQ) < 0, 'the prompt of the next turn does not carry u0 either :: ' + (head(t.user).match(/پرسشِ این نوبت[^\n]*/) || [''])[0].slice(0, 200));
@@ -238,11 +239,174 @@ const BANK = BF ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
 
   // ================= bank — VARIANTS_R25 (P5) =================
   await section('bank', async () => {
-    const mine = BANK.map((e, i) => [e, i]).filter(([e]) => /^P5(\b|[._-])/.test(String(e.rc || e.mech || e.mechanism || '')));
-    info.bankFile = BF || '(none yet)'; info.bankMine = mine.length;
+    const E = BANK; info.bankFile = BF || '(none)';
+    chk(E.length > 0, 'the independent bank VARIANTS_R25.json is present');
+    const mine = E.map((e, i) => i).filter(i => /^P5\./.test(String(E[i].rc)));
+    const T = (i, ok, x) => { info.bank[i] = !!ok; chk(ok, 'bank#' + i + ' [' + E[i].rc + '/' + E[i].kind + '] «' + E[i].text.slice(0, 70) + '» → ' + E[i].expect.slice(0, 110) + ' :: ' + String(JSON.stringify(x)).slice(0, 700)); };
+    const NC = (i, why) => { info.nc[i] = why; };
+    const SK = (l) => /بازنگری|حل شد/.test(l) ? 'b' : /اجرا/.test(l) ? 'c' : /طرح/.test(l) ? 'p' : /فهم/.test(l) ? 'u' : '';
+    const strip = (id) => p.evaluate((id) => { APP.go('home'); const g = document.querySelector('#main .rt-geo'); return g ? g.textContent : ''; }, id);
+    const POOL = 'استخرِ حیاط ۲٫۵ در ۴ متره و عمقش ۱٫۲ متره. پمپِ ما چند ساعته پرش می‌کنه؟';
+    const pool = async (withPlan) => { await wipe(); const sid = await fresh(); const pid = await bind('پر کردنِ استخر', POOL);
+      await turn('می‌خوام بدونم پمپ چند ساعته استخر رو پر می‌کنه؛ طول ۴، عرض ۲٫۵ و عمق ۱٫۲ متره.', 'خوب.', [csn({ ph: 'u', said: ['u', 'd'] })]);
+      if (withPlan) await turn('طرحم: ۱) حجم ۲) دبیِ پمپ ۳) تقسیم.', 'خوب.', [csn({ ph: 'p', said: ['plan'], plan: { text: 'طرحم: ۱) حجم ۲) دبیِ پمپ ۳) تقسیم', steps: ['حجم', 'دبیِ پمپ', 'تقسیم'] } })]);
+      return { sid, pid }; };
+
+    // #162 — chat holds unknown, data, a plan and one executed step ‖ live_new ‖ the next prompt: one stage everywhere
+    { await wipe(); const sid = await fresh();
+      await turn('می‌خوام بدونم برای دیوارِ ۳٫۲ در ۴٫۵ متری چند جعبه کاشی بخرم؛ هر جعبه ۱٫۴۴ متر مربعه.', 'خوب.', [csn({ ph: 'u', said: ['u', 'd'] })]);
+      await turn('طرحم: ۱) مساحتِ دیوار ۲) تقسیم بر مساحتِ هر جعبه ۳) ده درصد اضافه.', 'خوب.', [csn({ ph: 'p', said: ['plan'], plan: { text: 'طرحم: ۱) مساحتِ دیوار ۲) تقسیم بر مساحتِ هر جعبه ۳) ده درصد اضافه', steps: ['مساحتِ دیوار', 'تقسیم بر مساحتِ هر جعبه', 'ده درصد اضافه'] } })]);
+      await turn('گامِ اول رو رفتم: ۳٫۲ × ۴٫۵ = ۱۴٫۴ متر مربع.', 'خوب.', [csn({ ph: 'e', said: [], step: { quote: '۳٫۲ × ۴٫۵ = ۱۴٫۴ متر مربع', done: 'yes' } })]);
+      await turn('آره، ثبتش کن.', 'ثبت شد.', [{ do: 'live_new', title: 'کاشیِ دیوار', statement: 'برای دیوارِ ۳٫۲ در ۴٫۵ متری چند جعبه کاشی بخرم؟ هر جعبه ۱٫۴۴ متر مربعه.', nat: 'practical' }]);
+      const pid = await liveOf(sid); const t = await turn('خب، بعدش؟', 'خوب.', []); const M = await Mo(pid), st = await strip(pid);
+      const ks = [SK(stageOf(nowLine(t.user))), SK(stageOf(blockLine(t.user))), SK(String(M && M.now)), SK((/اکنون: ([^·]+)/.exec(st) || [])[1] || '')];
+      T(162, !!pid && ks.every(k => k === 'c'), [ks, nowLine(t.user), blockLine(t.user).slice(0, 100), M && M.now, st.slice(0, 120)]); }
+
+    // #163 — D0 solved and closed in chat ‖ D0+180 she returns to report
+    { await wipe(); const sid = await fresh(); const S1 = 'هفته‌ای سه روز ورزش کنم یا هر روز ده دقیقه؟ می‌خوام تصمیم بگیرم کدوم برام می‌مونه.';
+      await turn(S1, 'خوب.', [csn({ ph: 'u', said: ['u'], nat: 'life' })]);
+      await turn('تصمیمم شد: هر روز ده دقیقه، چون سه روزِ بلند رو همیشه جا می‌ندازم. حل شد.', 'ثبت شد.', [{ do: 'chat_solved', statement: S1, title: 'ورزش: سه روز یا هر روز', lesson: 'کوچکِ هر روزه می‌ماند', check: 'یک هفته آزمودم' }, csn({ ph: 'b', said: ['result'], result: 'هر روز ده دقیقه', nat: 'life' })]);
+      const pid = await liveOf(sid); await p.evaluate(() => { const d = new Date(window.__day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + 180); window.__day = d.toISOString().slice(0, 10); });
+      const t = await turn('برگشتم بگم چی شد: شش ماه هر روز ده دقیقه رو رفتم، فقط دو هفته‌ش افتاد.', 'خوب.', [csn({ ph: 'b', said: [], nat: 'life' })]);
+      const M = pid ? await Mo(pid) : null, st = await strip(pid), form = pid ? await p.evaluate((pid) => { APP.go('lprob', pid); return document.querySelector('#main').textContent; }, pid) : '';
+      const ks = [SK(stageOf(coachHead(t.user))), SK(stageOf(blockLine(t.user))), SK(String(M && M.now)), SK((/اکنون: ([^·]+)/.exec(st) || [])[1] || '')].filter(Boolean);
+      T(163, !!pid && ks.every(k => k === 'b') && !/گفت‌وگو تا «اجرا» جلو رفته/.test(form) && !/اکنون: اجرای طرح/.test(st), [ks, coachHead(t.user).slice(60, 160), M && M.now, st.slice(0, 120)]);
+      await p.evaluate((d) => { window.__day = d; }, T0); }
+
+    // #164 — sub-result with the next step named
+    { const { pid } = await pool(true);
+      const t0 = await turn('خب حجمِ استخر شد ۲٫۵ × ۴ × ۱٫۲ = ۱۲ مترمکعب. حالا باید ببینم پمپ چند ساعته پرش می‌کنه.', 'خوب.', [csn({ ph: 'b', said: ['result'], result: 'حجمِ استخر شد ۲٫۵ × ۴ × ۱٫۲ = ۱۲ مترمکعب' })]);
+      const its = await items('L:' + pid), ph = await sph(pid), M = await Mo(pid), c = await lcq(pid, 'باشه');
+      T(164, its.some(x => x.k === 'res' && x.fin === false && /۱۲ مترمکعب/.test(x.t)) && ph.turn === 'c' && !/بازنگری/.test(M.now) && c.src !== 'turn-result', [its.filter(x => x.k === 'res'), ph, M.now, c]); }
+
+    // #165 — a step result inside a prior-work problem
+    { await wipe(); await fresh(); const pid = await bind('آبِ باغ', 'برای باغ در هفته چند لیتر آب لازم است؟ ۴۰ درخت، هر کدام ۳ بار در هفته، هر بار ۲۶ لیتر، ۸ هفته.');
+      await turn('حسابِ خودم:\nگامِ ۱: ۴۰ × ۳ = ۱۲۰ نوبت.\nگامِ ۲: ۱۲۰ × ۲۶ = ۳۱۲۰ لیتر در هفته.\nگامِ ۳: هر ردیف ۹۰۰ لیتر، سه ردیف ۲۵۰۰ لیتر.\nگامِ ۴: ۲۵۰۰ × ۸ = ۲۰۰۰۰ لیتر.\nگامِ ۵: پس دو تانکرِ ده‌هزار لیتری بس است.', 'خوب.', [csn({ ph: 'e', said: [], prior: [
+        { step: 1, quote: '۴۰ × ۳ = ۱۲۰ نوبت', verdict: 'ok', why: 'درست' }, { step: 2, quote: '۱۲۰ × ۲۶ = ۳۱۲۰ لیتر در هفته', verdict: 'ok', why: 'درست' },
+        { step: 3, quote: 'هر ردیف ۹۰۰ لیتر، سه ردیف ۲۵۰۰ لیتر', verdict: 'wrong', why: 'سه تا ۹۰۰', cause: 'skill' }, { step: 4, quote: '۲۵۰۰ × ۸ = ۲۰۰۰۰ لیتر', verdict: 'wrong', why: 'وابسته به گامِ ۳', dep: [3], cause: 'skill' },
+        { step: 5, quote: 'پس دو تانکرِ ده‌هزار لیتری بس است', verdict: 'wrong', why: 'وابسته به گامِ ۴', dep: [4], cause: 'skill' }] })]);
+      await turn('گامِ ۳ درست شد: ۲۷۰۰ لیتر', 'خوب.', [csn({ ph: 'b', said: ['result'], result: 'گامِ ۳ درست شد: ۲۷۰۰ لیتر' })]);
+      const ph = await sph(pid), t = await turn('خب؟', 'خوب.', []);
+      T(165, ph.turn === 'c' && SK(stageOf(blockLine(t.user))) === 'c' && SK(stageOf(nowLine(t.user))) === 'c', [ph, blockLine(t.user).slice(0, 100), nowLine(t.user)]);
+      NC(165, 'part 2 («resume at گام ۴») is the prior ledger\'s resume point after her own fix (P1, fixer «prior»: C8) — the stage part («اجرا», never «بازنگری») asserted'); }
+
+    // #166 — a NEW problem raised mid-chat (problem 1 began in this chat and became live)
+    { await wipe(); const sid = await fresh();
+      await turn('قبضِ برقمون ماهی ۹۰۰ هزار تومن میاد؛ می‌خوام بدونم چطور نصفش کنم.', 'خوب.', [csn({ ph: 'u', said: ['u', 'd'] })]);
+      await turn('آره، ثبتش کن.', 'ثبت شد.', [{ do: 'live_new', title: 'نصف کردنِ قبضِ برق', statement: 'قبضِ برقمون ماهی ۹۰۰ هزار تومن میاد؛ چطور نصفش کنم؟', nat: 'practical' }]);
+      const pid = await liveOf(sid); await turn('کولرِ آبی روزی ۱۰ ساعت روشنه.', 'خوب.', [csn({ ph: 'u', said: ['d'] })]);
+      const t = await turn('یه مسئلهٔ دیگه هم دارم که ربطی به این نداره: می‌خوام بدونم برای جهیزیهٔ دخترم وام بگیرم یا طلا بفروشم.', 'خوب.', [csn({ ph: 'u', said: ['u'], nat: 'life' })]);
+      const M1 = await Mo(pid), M2 = await Mo(sid), C = await coach(), flat = (M) => M ? M.pts.map(q => [q.t].concat(q.lines || []).join(' ')).join(' ¦ ') + ' ' + M.origin + ' ' + M.dest : '';
+      const dos = await p.evaluate((sid) => { APP.go('dossier', sid); return document.querySelector('#main').textContent.length > 50; }, sid);
+      T(166, !!pid && !/جهیزیه|طلا/.test(flat(M1)) && /جهیزیه|طلا|وام/.test(flat(M2)) && !/کولر|قبض/.test(flat(M2)) && /^c:/.test(C.pk) && C.ph === 'u' && /جهیزیه/.test(nowLine(t.user)) && !/قبض/.test(nowLine(t.user)) && /# دو مسئله در این گفت‌وگو/.test(head(t.user)) && dos,
+        [flat(M1).slice(0, 200), flat(M2).slice(0, 200), C, nowLine(t.user)]);
+      NC(166, 'the second problem\'s record is the conversation\'s own problem (own pk, stage, 🧭 by session id, 📜 of the session) until she says «ثبتش کن» — the page never files a 🔭 record without her yes; so «the map shows two problems» = two separate 🧭 routes (asserted), not two 🔭 rows'); }
+
+    // #167 — the new problem must not inherit the old stage
+    { const { pid } = await pool(true);
+      await turn('گامِ ۱ رو رفتم: ۲٫۵ × ۴ × ۱٫۲ = ۱۲ مترمکعب.', 'خوب.', [csn({ ph: 'e', said: [], step: { quote: '۲٫۵ × ۴ × ۱٫۲ = ۱۲ مترمکعب', done: 'yes' } })]);
+      const t = await turn('حالا یه چیزِ تازه: مغازهٔ پدری رو اجاره بدم یا خودم بچرخونمش؟', 'خوب.', [csn({ ph: 'u', said: ['u'], nat: 'life' })]);
+      const C = await coach(), ph1 = await sph(pid);
+      T(167, C.ph === 'u' && /^c:/.test(C.pk) && !C.lprob && !/آنچه شد با پیش‌بینی‌ات/.test(head(t.user)) && !/اجرا/.test(stageOf(coachHead(t.user))) && !/اجرا/.test(nowLine(t.user)) && ph1.turn === 'c', [C, coachHead(t.user).slice(60, 150), nowLine(t.user), ph1]); }
+
+    // #168 — one message: the result of the old problem AND a new problem
+    { const { pid } = await pool(false);
+      await turn('اولی حل شد، جواب ۱۲ مترمکعبه. یه مسئلهٔ دیگه: دخترم می‌پرسه چرا ماه شکلش عوض میشه، چطور براش توضیح بدم؟', 'خوب.', [csn({ ph: 'u', said: ['result', 'u'], result: 'جواب ۱۲ مترمکعبه', nat: 'life' })]);
+      const i1 = await items('L:' + pid), C = await coach(), i2 = await items(C.pk), M1 = await Mo(pid);
+      T(168, i1.some(x => x.k === 'res' && /۱۲ مترمکعب/.test(x.t)) && !i1.some(x => /ماه/.test(x.t)) && !i2.some(x => /مترمکعب/.test(x.t)) && /^c:/.test(C.pk) && /ماه/.test(C.stmt) && !M1.pts.some(q => /ماه شکلش/.test([q.t].concat(q.lines || []).join(' '))), [i1.map(x => x.k + ':' + x.t), i2.map(x => x.k + ':' + x.t), C]); }
+
+    // #169 / #184 / #185 — switching back by her own naming; each problem keeps its own stage
+    { const { pid, sid } = await pool(true);
+      await turn('یه مسئلهٔ دیگه هم دارم: برای جهیزیهٔ دخترم وام بگیرم یا طلا بفروشم؟', 'خوب.', [csn({ ph: 'u', said: ['u'], nat: 'life' })]);
+      const Cb = await coach();
+      await turn('برگردیم به مسئلهٔ اول، پمپ ساعتی ۳ مترمکعب می‌کشه', 'خوب.', [csn({ ph: 'e', said: ['d'] })]);
+      const C1 = await coach(), i1 = await items('L:' + pid), i2 = await items(Cb.pk), ph1 = await sph(pid);
+      T(169, C1.lprob === pid && i1.some(x => x.k === 'd' && /۳ مترمکعب/.test(x.t)) && !i2.some(x => /مترمکعب/.test(x.t)) && ph1.turn === 'c', [C1, i1.map(x => x.k + ':' + x.t), i2.map(x => x.k + ':' + x.t), ph1]);
+      const M1 = await Mo(pid), st1 = await strip(pid);
+      await turn('برگردیم به مسئلهٔ دوم: طلا رو اگه بفروشم دیگه پشتوانه ندارم.', 'خوب.', [csn({ ph: 'u', said: ['d'], nat: 'life' })]);
+      const C2 = await coach(), M2 = await Mo(sid);
+      T(185, !C2.lprob && C2.pk === Cb.pk && C2.ph !== 'c' && SK(String(M1.now)) === 'c' && SK(String(M2 && M2.now)) !== 'c' && (await sph(pid)).turn === 'c', [C2, M1.now, M2 && M2.now, st1.slice(0, 80)]);
+      const t = await turn('توی اون مسئلهٔ استخر، عمق ۱٫۲ نیست ۱٫۵ ـه', 'خوب.', [csn({ ph: 'e', said: [], retract: { what: 'datum', from: '۱٫۲', to: '۱٫۵' } })]);
+      const C3 = await coach(), i3 = await items(Cb.pk);
+      T(184, C3.lprob === pid && /پر کردنِ استخر/.test(nowLine(t.user)) && !i3.some(x => /عمق|۱٫۵/.test(x.t)), [C3, nowLine(t.user), i3.map(x => x.k + ':' + x.t)]);
+      NC(184, 'writing the corrected value (۱٫۲ ⇒ ۱٫۵) is the correction engine (P4, fixer «correction»); here: the turn is bound to the problem she named and problem 2 is untouched — asserted'); }
+
+    // #170 — a woken problem whose statement and test she herself gave (elder, «شما»)
+    { await wipe(); await fresh();
+      const pid = await p.evaluate(() => { const pid = __live('فرمول برای هر چندضلعی', 'یه حدس: این فرمول برای هر چندضلعی هم جواب میده. با پنج‌ضلعی و شش‌ضلعی امتحانش می‌کنم.', { origin: { type: 'lprob', id: 'pb_parent', share: 'method', why: 'همان فرمول' }, dormant: '2099-01-01' });
+        const r = APP.liveRec(pid); r.woke = new Date().toISOString(); APP.S.put(r); APP.liveBindSession(pid, __cur(), { force: true }); __liveSet(pid, () => {}); return pid; });
+      const t = await turn('یه حدس: این فرمول برای هر چندضلعی هم جواب میده. با پنج‌ضلعی و شش‌ضلعی امتحانش می‌کنم.', 'خوب.', [csn({ ph: 'u', said: [], nat: 'objective' })]);
+      const c = await lcq(pid, 'با پنج‌ضلعی و شش‌ضلعی امتحانش می‌کنم.'), U1 = /مجهول(?: \(یا حکم(?:ی که باید ثابت شود)?\))? چیست/;
+      T(170, head(t.user).indexOf(WQ) < 0 && c.q !== WQ && !U1.test(c.q), [c]);
+      NC(170, 'part 2 (the question follows the test she named, in «شما») is the model\'s reply on the prompt and the register layer (P6) — here: no u0 and no «مجهول چیست؟» from the page for her own, woken statement — asserted'); }
+
+    // #171 — a day-7 use-report on an applied solution
+    { await wipe(); const sid = await fresh(); const S1 = 'شب‌ها دیر می‌خوابم؛ می‌خوام ساعت ۱۱ خواب باشم. چطور؟';
+      await turn(S1, 'خوب.', [csn({ ph: 'u', said: ['u'], nat: 'life' })]);
+      await turn('گوشی رو ساعت ۱۰ می‌ذارم بیرونِ اتاق. همین شد راهش، حل شد.', 'ثبت شد.', [{ do: 'chat_solved', statement: S1, title: 'خوابِ ساعت ۱۱', lesson: 'گوشی بیرونِ اتاق', check: 'یک شب آزمودم' }, csn({ ph: 'b', said: ['result'], result: 'گوشی رو ساعت ۱۰ می‌ذارم بیرونِ اتاق', nat: 'life' })]);
+      await p.evaluate(() => { const d = new Date(window.__day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + 7); window.__day = d.toISOString().slice(0, 10); });
+      const t = await turn('یه هفته اجراش کردم، سه روزش شد', 'خوب.', [csn({ ph: 'b', said: [], nat: 'life' })]);
+      T(171, head(t.user).indexOf(WQ) < 0 && !/پیشنهادِ این نوبت: «[^»]*مجهول[^»]*چیست/.test(head(t.user)) && !/پرسشِ این نوبت همین است:[^\n]*مجهول[^\n]*چیست/.test(head(t.user)), [(head(t.user).match(/پرسشِ این نوبت[^\n]*/) || [''])[0].slice(0, 200), (head(t.user).match(/پیشنهادِ این نوبت[^\n]*/) || [''])[0].slice(0, 200)]);
+      await p.evaluate((d) => { window.__day = d; }, T0); }
+
+    // #172 — a first guess tested, no plan yet (child 12)
+    { await wipe(); await fresh(); const pid = await bind('بسته‌های مداد', 'برای ۳۲ نفر کلاس، هر نفر ۴ مداد؛ بسته‌ها ۱۲ تایی‌اند. چند بسته بخریم؟');
+      await turn('حدسِ اولم ۸ بسته بود ولی شمردم دیدم ۱۱ بسته لازمه. هنوز نمی‌دونم از کجا شروع کنم.', 'خوب.', [csn({ ph: 'e', said: ['result'], fail: true, result: 'شمردم دیدم ۱۱ بسته لازمه' })]);
+      const ph = await sph(pid), M = await Mo(pid); T(172, ph.turn !== 'c' && ph.turn !== 'b' && !/اجرا/.test(M.now), [ph, M.now]); }
+
+    // #173 — an idea, not a plan carried out (teen 16)
+    { await wipe(); await fresh(); const pid = await bind('جمعِ دو فرد', 'ثابت کن جمعِ هر دو عددِ فرد زوج است.');
+      await turn('نمی‌تونم ثابتش کنم. فقط یه فکر دارم: شاید بشه عددها رو به زوج و فرد جدا کرد.', 'خوب.', [csn({ ph: 'e', said: ['plan'], stuck: true, nat: 'objective', plan: { text: 'شاید بشه عددها رو به زوج و فرد جدا کرد' } })]);
+      const ph = await sph(pid), M = await Mo(pid), st = await strip(pid);
+      T(173, ph.turn !== 'c' && ph.turn !== 'b' && !/اجرا/.test(M.now) && !/حل به نتیجه رسید/.test(st), [ph, M.now, st.slice(0, 120)]);
+      // the same on a chat-only problem
+      await wipe(); await fresh(); await turn('ثابت کن جمعِ هر دو عددِ فرد زوج است. من که بلد نیستم.', 'خوب.', [csn({ ph: 'u', said: [], nat: 'objective' })]);
+      await turn('نمی‌تونم ثابتش کنم. فقط یه فکر دارم: شاید بشه عددها رو به زوج و فرد جدا کرد.', 'خوب.', [csn({ ph: 'e', said: ['plan'], stuck: true, nat: 'objective', plan: { text: 'شاید بشه عددها رو به زوج و فرد جدا کرد' } })]);
+      const C = await coach(); T(173, info.bank[173] && C.ph !== 'c' && C.ph !== 'b', [C]); }
+
+    // #174 — a correction turn in the middle of «اجرا»
+    { const { pid } = await pool(true);
+      await p.evaluate((pid) => __liveSet(pid, (so, L) => { so.u = { 1: { done: true, at: new Date().toISOString(), one: 'می‌خواهم بدانم پمپ چند ساعته استخر را پر می‌کند', why: 'تابستان', u: 'زمانِ پر شدنِ استخر', dl: [{ id: 'd1', t: 'طول ۴ متر' }, { id: 'd2', t: 'عرض ۲٫۵ متر' }], c: 'تا لبه پر شود', sat: 'yes', suff: 'کافی است', suffWhy: 'حجم و دبی' } }; L.plan = { t: 'حجم، دبی، تقسیم', at: new Date().toISOString() }; }), pid);
+      const ph0 = await sph(pid);
+      const t = await turn('ببخشید طول ۴ متر نبود، ۵ متر بود', 'خوب.', [csn({ ph: 'e', said: [], retract: { what: 'datum', from: '۴', to: '۵' } })]);
+      const ph = await sph(pid), c = await lcq(pid, 'ببخشید طول ۴ متر نبود، ۵ متر بود'), U1 = /مجهول(?: \(یا حکم(?:ی که باید ثابت شود)?\))? چیست|به مجهول نگاه کن/;
+      T(174, ph0.turn === 'c' && ph.turn === 'c' && !U1.test(c.q) && c.q !== WQ && !/پرسشِ این نوبت همین است:[^\n]*مجهول[^\n]*چیست/.test(head(t.user)), [ph0, ph, c]);
+      NC(174, 'part 1 (the re-check question with the new value) is the correction engine\'s own turn question (P4, fixer «correction»); here: no fall back to «مجهول چیست؟»/u0 and no stage drop — asserted'); }
+
+    // #175 (neg) — the result answers the WHOLE unknown
+    { const { pid } = await pool(false);
+      await turn('پس پمپ ۴ ساعته استخر رو پر می‌کنه. همینه.', 'خوب.', [csn({ ph: 'b', said: ['result'], result: 'پس پمپ ۴ ساعته استخر رو پر می‌کنه' })]);
+      const ph = await sph(pid), M = await Mo(pid), t = await turn('خب؟', 'خوب.', []);
+      const ks = [ph.turn, SK(String(M.now)), SK(stageOf(blockLine(t.user))), SK(stageOf(nowLine(t.user)))];
+      T(175, ks.every(k => k === 'b'), [ks, M.now, blockLine(t.user).slice(0, 100), nowLine(t.user)]); }
+
+    // #176–#179, #181, #182 (neg) — never a second problem
+    for (const [i, msg] of [[176, 'یه سؤالِ دیگه دربارهٔ همین استخر: اگه دو تا پمپ بذارم چی؟'], [177, 'این منو یادِ مسئلهٔ قطارها می‌ندازه که پارسال حل کردیم'], [178, 'یه مشکلِ دیگه هم هست: پمپ برق‌کشیِ سه‌فاز می‌خواد و ما نداریم'], [179, 'اگه یه مسئلهٔ دیگه هم بیارم، نقشه‌ش جدا میشه یا قاطی میشن؟'], [181, 'راستی هوا امروز چقدر خوبه']]) {
+      const { pid } = await pool(true); const ph0 = await sph(pid); const n0 = await p.evaluate(() => APP.S.all('eprob').length);
+      const t = await turn(msg, 'خوب.', []); const C = await coach(), ph = await sph(pid), n1 = await p.evaluate(() => APP.S.all('eprob').length);
+      T(i, C.lprob === pid && n1 === n0 && ph.turn === ph0.turn && !/# دو مسئله در این گفت‌وگو/.test(head(t.user)), [C, ph0, ph, n0, n1]); }
+    { await wipe(); await fresh(); const t = await turn('یه مسئله دارم ولی نمی‌دونم چطور بگمش', 'خوب.', [csn({ ph: 'u', said: [], stuck: true })]);
+      const n = await p.evaluate(() => APP.S.all('eprob').length), C = await coach();
+      T(182, n === 0 && !(C.split25) && !/# دو مسئله/.test(head(t.user)), [n, C]);
+      NC(182, 'whether the page then asks for the whole in one sentence is the opening layer (P6, fixer «classify»); here: the «never u0» rule is only for self-made woken problems (control in section «woke») and nothing is split — asserted'); }
+
+    // #180 (neg) — a plan and then a step IS «اجرای طرح»
+    { await wipe(); await fresh(); const pid = await bind('پر کردنِ استخر', POOL);
+      await turn('طرحم: ۱) حجم ۲) دبیِ پمپ ۳) تقسیم. گامِ ۱ رو رفتم: ۱۲ مترمکعب', 'خوب.', [csn({ ph: 'e', said: ['plan', 'result'], result: 'گامِ ۱ رو رفتم: ۱۲ مترمکعب', plan: { text: 'طرحم: ۱) حجم ۲) دبیِ پمپ ۳) تقسیم', steps: ['حجم', 'دبیِ پمپ', 'تقسیم'] } })]);
+      const ph = await sph(pid), M = await Mo(pid); T(180, ph.turn === 'c' && /اجرا/.test(M.now), [ph, M.now]); }
+
+    // #183 (neg) — a plan offered as a question is «طرح»
+    { await wipe(); await fresh(); const pid = await bind('پر کردنِ استخر', POOL);
+      await turn('می‌خوام بدونم پمپ چند ساعته استخر رو پر می‌کنه؛ طول ۴، عرض ۲٫۵ و عمق ۱٫۲ متره.', 'خوب.', [csn({ ph: 'u', said: ['u', 'd'] })]);
+      await turn('اول حجم رو حساب کنم بعد ببینم پمپ چقدر می‌کشه؟', 'خوب.', [csn({ ph: 'p', said: ['plan'], plan: { text: 'اول حجم رو حساب کنم بعد ببینم پمپ چقدر می‌کشه' } })]);
+      const ph = await sph(pid), M = await Mo(pid); T(183, ph.turn === 'p' && !/اجرا/.test(M.now), [ph, M.now]); }
+
+    const done = mine.filter(i => i in info.bank), miss = mine.filter(i => !(i in info.bank));
+    chk(!miss.length, 'every P5 bank entry is run :: missing ' + JSON.stringify(miss));
+    console.log('bank P5: ' + done.filter(i => info.bank[i]).length + '/' + mine.length + ' pass; nc: ' + Object.keys(info.nc).length + ' ' + JSON.stringify(info.nc));
   });
 
-  console.log(JSON.stringify(info).slice(0, 4000));
+  if (process.env.INFO) console.log(JSON.stringify(info).slice(0, 4000));
   if (errors.length) { console.log('ERRORS (' + errors.length + '):\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
   await b.close();
 })();

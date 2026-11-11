@@ -1697,7 +1697,7 @@
   /* مسئلهٔ زندهٔ فعال: صفحهٔ خودش، یا مسئلهٔ بسته‌شده به این سشن (A.liveSessionPid) — **همیشه** (بی شرطِ هم‌واژگی؛ rerunA S2.1، rerunB S2.4) */
   function liveCtx(s, msg) {
     if (!A.liveRec) return null;
-    var st = A.state || {}, onPage = st.view === "lprob" || (st.view === "e_prob" && A.liveRec(st.arg)), bp = A.liveSessionPid ? A.liveSessionPid(s) : null, pid = onPage ? st.arg : bp, r = pid ? A.liveRec(pid) : null; if (!r) return null;
+    var st = A.state || {}, onPage = (st.view === "lprob" || (st.view === "e_prob" && A.liveRec(st.arg))) && !(A.STORY && A.STORY.keepSplit && A.STORY.keepSplit(s, st.arg)) /* دورِ ۲۵ (P5): پس از «یه مسئلهٔ دیگه هم دارم» صفحهٔ بازِ مسئلهٔ پیشین کانونِ نوبت نیست */, bp = A.liveSessionPid ? A.liveSessionPid(s) : null, pid = onPage ? st.arg : bp, r = pid ? A.liveRec(pid) : null; if (!r) return null;
     var ph = A.livePhase ? A.livePhase(pid) : ""; if (ph === "done") return null;
     return { pid: pid, r: r, ph: ph, onPage: onPage, bound: bp === pid };
   }
@@ -2201,7 +2201,7 @@
        صورت نتیجه نیست؛ مرحله فقط با گزارشِ مدل (said:result) یا نتیجهٔ ثبت‌شده؛ الگو فقط پیشنهاد می‌کند (C.prev.weakRes ⇒ سطرِ زمینه) */
     var said = solvedSaid(mt, { intro: true }) && !OTHER18_RE.test(mt) && !guessNow(mt, teach) && !(teach && SELF_SOLVED_RE.test(mt)), uns = unsolvedNow(mt, ph0), stuck = STUCK_RE.test(mt) || NOTKNOW_RE.test(mt);
     /* دورِ ۲۵ (P5، B25·D9 = U10 bp2 p5/p7، pwB1 p4): نتیجهٔ میانی (A.STORY.subRes — خودش گفت هنوز چه مانده، یا دفترِ کارِ پیشین/طرحش گامِ مانده دارد) کلِ مسئله را به «بازنگری» نمی‌برد */
-    try { if (said && A.STORY && A.STORY.subRes && A.STORY.subRes(s, "", mt)) said = false; } catch (e) { }
+    try { if (said && A.STORY && A.STORY.subRes && (A.STORY.subRes(s, "", mt) || (A.STORY.splitOff && A.STORY.splitOff(s, mt) > 0))) said = false; } catch (e) { }
     var weakRes = !said && !intro && solvedSaid(mt, { stmt: C.stmt }) && !guessNow(mt, teach) && !uns && !/[؟?]/.test(ownText(mt)) && !CLAIM18_RE.test(mt);
     var pasted = (intro || pastedOf(mt, C.stmt)) && !(said && !uns);
     var ph = ph0, st = C.st = C.st || {}, sp = statedParts(mt, pasted);
@@ -2586,11 +2586,11 @@
        کارِ خودش را می‌گوید («دارم امتحان می‌کنم: ۷+۷=۱۴… هیچی جور نمیشه») و مدل گیر/شکست گزارش کرد — نه پیامی که فقط صورت را آورد */
     var fwd = cl === "p" && ORD[ph0] < ORD.p && (st.u || (!pasted && C.stmt) || (P && P.work && (stuck || fail)));
     /* دورِ ۲۵ (P5، B25·D9): همان داوریِ دفترِ داستان (a45 ST.subRes) — نتیجهٔ میانی مرحله را جابه‌جا نمی‌کند (پیش‌تر هر said:result ⇒ «بازنگری») */
-    var sub25 = false; try { sub25 = said.indexOf("result") >= 0 && !!(A.STORY && A.STORY.subRes && A.STORY.subRes(s, (P && P.live) || "", ut)); } catch (e) { }
+    var sub25 = false; try { sub25 = said.indexOf("result") >= 0 && !!(A.STORY && A.STORY.subRes && (A.STORY.subRes(s, (P && P.live) || "", ut) || (A.STORY.splitOff && A.STORY.splitOff(s, ut) > 0))); } catch (e) { }
     if (said.indexOf("result") >= 0 && !sub25) ph = "b";
     else if (sub25) ph = ph0;
     else if (fail) ph = fwd ? "p" : cl && ORD[cl] < ORD[ph0] ? cl : (ph0 === "b" || ph0 === "c" ? "c" : ph0);
-    else if (said.indexOf("plan") >= 0 && ORD[ph0] < ORD.c) ph = "c";
+    else if (said.indexOf("plan") >= 0 && ORD[ph0] < ORD.c) ph = A.STORY && A.STORY.planIdea && A.STORY.planIdea(ut, txtOf(a.plan)) && !(a.plan && Array.isArray(a.plan.steps) && a.plan.steps.length >= 2) ? (ORD[ph0] < ORD.p ? "p" : ph0) : "c";   // دورِ ۲۵ (P5، بانکِ R25 #173/#183): ایده یا طرحِ پرسیده ⇒ «طرح»، نه «اجرا»
     else if (cl && ORD[cl] < ORD[ph0]) ph = stuck || said.length ? cl : ph0;          // عقب: فقط با گیر یا حرفِ تازه
     else if (fwd) ph = "p";
     /* دورِ ۵ (F1، s31): نشانهٔ قوی‌ترِ پیشین (نتیجهٔ بی‌ابهامِ خودش) با گزارشِ مدل به عقب برنمی‌گردد، مگر مدل شکست گزارش کند */
@@ -2692,7 +2692,7 @@
     if (document.body) startObs(); else document.addEventListener("DOMContentLoaded", startObs);
   }
   /* کاربر صفحهٔ مسئلهٔ زندهٔ دیگری را باز کرد و همان‌جا با دستیار حرف می‌زند ⇒ خودش عوض کرد (force) */
-  AS.promptHooks.push(function (s) { try { var st = A.state || {}; if (s && st.view === "lprob" && A.liveRec && A.liveRec(st.arg) && s.lprob !== st.arg) sessLink(s, st.arg, true); } catch (e) { } return ""; });
+  AS.promptHooks.push(function (s) { try { var st = A.state || {}; if (s && st.view === "lprob" && A.liveRec && A.liveRec(st.arg) && s.lprob !== st.arg && !(A.STORY && A.STORY.keepSplit && A.STORY.keepSplit(s, st.arg))) sessLink(s, st.arg, true);   /* دورِ ۲۵ (P5): مسئلهٔ تازه‌ای که خودش وسطِ همین گفت‌وگو آورد کانون می‌ماند — صفحهٔ بازِ مسئلهٔ پیشین سشن را بی‌صدا به آن برنمی‌گرداند */ } catch (e) { } return ""; });
   /* ادغامِ G1/G2: «bindGuard» (پوششِ دوم روی A.liveBindSession) و «todayFix» (لایهٔ متنیِ «امروز» روی A.dueList) برداشته شدند — هر دو تکرارِ درونیِ
      کاری بودند که حالا فقط بخشِ مسئله (a38) می‌کند: liveBindSession ِ بی سشن از AS.cur() و بی force پیوندِ بازِ دیگر را نگه می‌دارد، و متنِ «امروز»
      (شمار با فهرست، «دیروز»/«n روز پیش»، «ساخته‌شده در گفت‌وگو») در خودِ A.dueList ِ a38 درست است. یک منبع، بی سطرِ تکراری. */
