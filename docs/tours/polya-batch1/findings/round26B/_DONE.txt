@@ -15,4 +15,6 @@ round26B/s18/DONE
 round26B/s19/DONE
 round26B/s20/DONE
 round26B/tB1/DONE
+round26B/tB1x/DONE
+round26B/tB1y/DONE
 round26B/tB1z/DONE

@@ -3,6 +3,7 @@ round26B_x/aB2/DONE
 round26B_x/aB2f/DONE
 round26B_x/aB3/DONE
 round26B_x/aB3x/DONE
+round26B_x/aB4/DONE
 round26B_x/bp1/DONE
 round26B_x/bp2/DONE
 round26B_x/bp3/DONE

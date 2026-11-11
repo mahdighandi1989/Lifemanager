@@ -11,7 +11,7 @@ Page main 1f93c333 (round-25 fixes; `build.py --check` in sync). Harness round26
 - [PASS] arm «three new areas at once, the fitting one named last» (+1 d; scratch page with «نوشتنِ ادعاهای ثبتِ اختراع», «بررسیِ بازار و رقیبان», «جستجوی پیشینهٔ اختراع»): entry state arrived, how registry; check «… هم‌خوان است — واژه‌های مشترک: «پیشینه»، «اختراع»، «ثبت»، «پایگاه»، «محصول»، «واژه»»; chat line «🛎 ابزارِ لازم آمد: «جستجوی پیشینهٔ اختراع» (برگهٔ #۱۰۱) — سنجیدم که نیازِ گامِ … را جواب می‌دهد؛ همان گام را از سر می‌گیریم»; Today «🛎 ابزارِ لازم آمد … همان گام را از سر بگیر» (best fit, not first named — round-25 tB1z stays fixed).
 - [PASS] p9 prompt: «پرسشِ این نوبت همین است: (از سر گرفتنِ گامِ منتظرِ ابزار) …» with the place of the new area; her report of the step ⇒ 📜 «↩ گامِ «(۳) …» از سر گرفته شد — با ابزارِ «جستجوی پیشینهٔ اختراع» (برگهٔ #۱۰۱)»; one arrival event, one waiting row.
 - [PASS] routing 8/8 coaching + 1 second opinion.
-- note (not counted): her finding «دو محصولِ مشابه …» does not appear under the resumed step in 📜; my model reply sent it as a result with a step name — I could not tell whether the page or my reply shape dropped it (class d possible).
+- note (not counted): her finding «دو محصولِ مشابه …» does not appear under the resumed step in 📜; my model reply sent it as a result with a step name — my reply sent the result in the wrong shape (an object instead of the plain sentence the prompt asks for), so this is my mistake, not the page (class d).
 
 ## نقشهٔ نیاز
 Part (sheet loop): FOR choosing, among several builds, the one that answers THIS step, and saying why — met (shared words shown). Person: needed to be sent to the right tool without reading three descriptions — met.
