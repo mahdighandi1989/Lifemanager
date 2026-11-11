@@ -1,0 +1,1 @@
+{"reply": "این‌که حکم را به «بر ۸» و «بر ۳» شکستی گامِ خوبی است. گامِ بعدیِ تو چیست، و پیش از برداشتنش فکر می‌کنی چه می‌شود؟", "status": "related", "next": false, "outside": "", "know": [], "actions": [{"do": "coach_state", "ph": "u", "said": ["c"], "ans": ["u3"], "stuck": true, "fail": false, "role": "self", "nat": "objective"}]}

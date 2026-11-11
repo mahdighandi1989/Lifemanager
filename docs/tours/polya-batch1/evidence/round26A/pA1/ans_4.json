@@ -1,0 +1,1 @@
+{"reply": "نمونه‌های ۲۴ و ۴۸ را خودت درآوردی. از حکم به عقب برو: حکمِ ساده‌تری (لم) می‌شناسی که بخش‌پذیریِ p^2 − 1 از آن لازم بیاید؟", "status": "related", "next": false, "outside": "", "know": [], "actions": [{"do": "coach_state", "ph": "p", "said": [], "ans": [], "stuck": true, "fail": false, "role": "self", "nat": "objective"}]}
