@@ -5031,3 +5031,17 @@ dated stability, mind-card feed) under way.
 - FINDING: `500 POST /api/app-records/learning-architecture/reminders` روی هر بارِ تازه‌بازکردنِ `/apps/learning-architecture`. ریشه، رقابتِ SELECT-سپس-INSERT در `app_reminder_service.upsert` است: صفحه چند یادآور را هم‌زمان می‌فرستد و درخواستِ دوم برای کلیدِ تازه به قیدِ یکتایی می‌خورد. این خطا از page_map ِ ۲۰۲۶-۱۱-۰۱ در فایل بود ولی گزارش نشده بود.
 - CHANGE: `upsert` با `IntegrityError` rollback و یک بار دیگر تکرار می‌کند. رفتار برای حالتِ عادی بی‌تغییر است و شِما تغییری نکرده. تست: `tests/test_app_reminders.py::test_upsert_survives_a_concurrent_insert_of_the_same_key` (بی‌اصلاح قرمز). در مرورگر هم سنجیده شد: ۳ بار بازکردنِ تازه، بدونِ ۵۰۰.
 - FINDING: ۱۶ شاخهٔ `supervisor-pending/*` کهنه‌اند و محتوایشان روی main است. حذف در محیطِ روتین ممکن نشد ⇒ OPEN_ITEMS ‏۱۴. همچنین sys-territory شش دور جلو نرفته ⇒ OPEN_ITEMS ‏۱۵. جزئیات در `docs/supervisor/RUNLOG.md`. ناظرِ خودکار (Claude Code routine)
+
+## 2026-11-11 — FINDING + CHANGE: Pólya tour round 25, fixer «arith» (P2 — the page's arithmetic check; S1 D25-12)
+- FINDING: `arithChk` (round 24, `apps/learning-architecture/src/app/a45_story.js`) matched «expression = ONE number» with floats. A fraction sum on the right
+  («4/2 = 1/1 + 1/2 + 1/2», «7/1460 = 1/210 + 1/30660») was compared with its first fraction only, chained «a = b = c» with the first term, a running sum
+  («با ۱/۲۰ میشه ۴/۵») as «1/20 = 4/5», «۲ و خرده‌ای، یعنی ۲٫۵۷» as «2», «−۳ + ۴۲» as «3 + 42»; kJ ⇒ kWh and «یه متر صد میلی‌متره» were not read; «درست» stood beside ✗.
+  The page turned the coach's ✓ into ✗ on correct work (resume point, turn question and mind card followed).
+- CHANGE: new `apps/learning-architecture/src/app/a46_arith.js` replaces `A.STORY.arithChk`: a real parser reads both sides of every «=», chains link by link, running sums
+  only with the number right before them; exact rational arithmetic (BigInt); tolerance only from the digits she wrote (DECISIONS_R25 C9); ✗ only when no natural reading
+  holds, ambiguity ⇒ silence; units with dimensions (conversion, sums, stated factors, bare products with units from the same message), unreadable unit ⇒ «نسنجیده» (C10);
+  no «درست» beside ✗ (`A.STORY.arithNote`); page-built prompt block for later messages (nothing added to `AS.SYS`). `a45_story.js`: three lines in `priorOf`. `build.py`: file list.
+- CHANGE (quarantine): the round-24 check stays reachable as `A.STORY.arithChkR24` (REMOVAL_CANDIDATES).
+- TEST: `apps/learning-architecture/tests/test_tour1_r25_arith.js` (red first on eeb11d1f: 56 errors, bank 24/58; now bank P2 58/58); one R24 assertion replaced with a comment
+  (#160, «درست» beside ✗). WORKLOG (121), PROGRESS 120 (on this branch; the launch numbers 124/123 apply after the coordinator renumbers at merge — the docs gate demands 1..N without gaps), HANDBOOK §10 + §12 row 70, `experiences/exact-arithmetic-check-of-a-persons-written-work.md`,
+  handoff `docs/overhaul/handoff-notes/_pending_tour1_R25_arith_2026-11-11.md`. Claude Code (fixer «arith», round 25)

@@ -383,3 +383,11 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R24 R5 (never ISO to a person; one Jalali confirmation; register signs from verbs only).
 - **Status:** reachable, not called for person-facing text: `APP.AGE.faBoth` (exported for compatibility), `APP.ASSIST.R24_QUARANTINE.signSh`, `.signTo18`.
   Delete only with the owner's approval.
+
+## 2026-11-11 — one-number float arithmetic check of prior work (learning-architecture, Pólya round 25, arith: P2)
+- **File:** `apps/learning-architecture/src/app/a45_story.js` (`evalChain`, `tolOf`, `UNIT`, `unitOf`, `arithChk`).
+- **What they did:** one regular expression «expression = one number» evaluated with floats and a `1e-9` slack; units only length/mass/time with digit numbers.
+  The right-hand side of an equality was never an expression («4/2 = 1/1 + 1/2 + 1/2» compared with «1/1»; chained «a = b = c» with the first term), a leading
+  Unicode minus was dropped, «با ۱/۲۰ میشه ۴/۵» was read as «1/20 = 4/5».
+- **Why replaced:** DECISIONS_R25 P2 (S1 D25-12; C25-1, A25-8, B25·D5/D14, B_s D1) and C9/C10 — `a46_arith.js` (`A.STORY.arithChk`).
+- **Status:** reachable, not called: `APP.STORY.arithChkR24`. Delete only with the owner's approval.
