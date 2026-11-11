@@ -457,7 +457,7 @@
     var out = [], used = 0, all = skipLast ? s.msgs.slice(0, -1) : s.msgs, cap = budget == null ? HIST_CHARS : budget;
     for (var i = all.length - 1; i >= 0; i--) {
       var m = all[i];
-      var line = (m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + String(m.role === "sys" && AS.regSys ? AS.regSys(s, m.text) : (m.text || "")).slice(0, 4000) +   // دورِ ۲۳ (Q1): سطرِ صفحه به ضمیرِ گفت‌وگو
+      var line = (m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + String(m.role === "sys" && AS.regSys ? AS.regSys(s, AS.sysRaw25 ? AS.sysRaw25(m) : m.text) : (m.text || "")).slice(0, 4000) +   // دورِ ۲۳ (Q1): سطرِ صفحه به ضمیرِ گفت‌وگو
         (m.files && m.files.length ? " [پیوست: " + m.files.map(function (f) { return (f.id != null ? f.id + "=" : "") + f.name; }).join("، ") + "]" : "");
       if (used + line.length > cap && (out.length || cap < 200)) { out.unshift("(" + fa(i + 1) + " پیامِ قدیمی‌تر در «حافظهٔ سشن» خلاصه شده است)"); break; }
       out.unshift(line); used += line.length;
@@ -477,6 +477,7 @@
     var hookOut = []; AS._hookCtx = { s: s, msg: msg };
     try { (AS.promptHooks || []).forEach(function (fn) { try { var x = fn(s, msg); if (x) hookOut.push(x); } catch (e) { } });
       (AS.promptFilters || []).forEach(function (fn) { try { var y = fn(hookOut, s, msg); if (Array.isArray(y)) hookOut = y; } catch (e) { } });
+      try { if (AS.finalFilter25) { var y25 = AS.finalFilter25(hookOut, s, msg); if (Array.isArray(y25)) hookOut = y25; } } catch (e) { }   // دورِ ۲۵ (P6): گذرگاهِ پایانی — پرسشِ نوبتِ صفحه یک پرسش
       /* دورِ ۲۲ (P4): پس از همهٔ قلاب‌ها و پالایه‌ها — یک پرسشِ نوبت در کلِ پرامپت، و خودش یک پرسش (a27 AS.oneTurnQ22) */
       if (typeof AS.oneTurnQ22 === "function") { var y22 = AS.oneTurnQ22(hookOut); if (Array.isArray(y22)) hookOut = y22; } } finally { AS._hookCtx = null; }
     hookOut.forEach(function (x) { if (x) L.push("", x); });
@@ -907,7 +908,13 @@
             if (auto < MAX_AUTO) auto++; else nextX++;
             var ownN = document.querySelectorAll("#main [data-own] input:not([type=hidden]), #main [data-own] textarea, #main [data-own] select").length, allN = document.querySelectorAll("#main input:not([type=hidden]), #main textarea, #main select").length;
             /* دورِ ۲۴ (R7، A24-16): نمایی که هیچ فیلدی ندارد (🧭 نقشه، 📜 پرونده، کارنامه…) ⇒ «فیلدها را پر کن» نه — فقط یک جمله که آن‌جا چه می‌بیند */
-            var fillTxt = !allN ? ". این نما فیلدی برای پر کردن ندارد — چیزی پر نکن و دکمه‌ای نزن؛ در یک جمله بگو همین‌جا چه می‌بیند و به کدام پرسشش جواب می‌دهد؛ reply خیلی کوتاه.]"
+            /* دورِ ۲۵ (P6، C25-2 s21 p3): «دکمه‌ای نزن» فقط برای نمای خواندنی است. نمایی که فیلد ندارد ولی دکمه/زبانه‌ای دارد که خواستهٔ همین پیامِ او
+               («ثبتش کنیم»، «بسازش»، «بازش کن») از آن می‌گذرد (فهرستِ 🔭 با «＋ مسئلهٔ تازه»)، همان یک دکمه را می‌زند — وگرنه خواسته نیمه‌کاره می‌ماند.
+               متنِ پیشین: AS.R25_QUARANTINE.noFieldTxt24 */
+            var btnN25 = document.querySelectorAll("#main button:not([disabled]), #main [role=tab], #main a.btn").length, um25 = ""; try { for (var i25 = s.msgs.length - 1; i25 >= 0; i25--) { if (s.msgs[i25] && s.msgs[i25].role === "user" && !/^\[سامانه/.test(String(s.msgs[i25].text || ""))) { um25 = String(s.msgs[i25].text || ""); break; } } } catch (e) { }
+            var wantAct25 = !!btnN25 && AS.wantsAct25 && AS.wantsAct25(um25);
+            var fillTxt = !allN ? (wantAct25 ? ". این نما فیلدی برای پر کردن ندارد — چیزی پر نکن. خواستهٔ همین پیامِ کاربر («" + um25.replace(/[«»\n]/g, " ").slice(0, 80) + "») هنوز انجام نشده: اگر دکمه یا زبانه‌ای در همین نما به آن می‌رسد (ساختن/ثبت/باز کردن)، **همان یک دکمه** را بزن و هیچ دکمهٔ دیگری نه؛ اگر چنین دکمه‌ای نیست، در یک جمله بگو کجا انجام می‌شود؛ reply خیلی کوتاه.]"
+                : AS.R25_QUARANTINE.noFieldTxt24)
               : ownN && ownN >= allN ? ". فیلدهای این صفحه همه «به قلمِ خودِ کاربر»اند (data-own): هیچ‌کدام را پر نکن — بگو خودش می‌نویسد و فقط جای نوشتن را نشان بده (هایلایت)؛ اگر دکمهٔ غیرِ تصمیمیِ لازمی هست بزن؛ reply خیلی کوتاه.]"
               : ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن" + (ownN ? " — فقط فیلدهایی که «به قلمِ خودِ کاربر — پر نکن» نیستند؛ آن‌ها را فقط هایلایت کن و بگو خودش می‌نویسد" : "") + " و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]";
             return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "»" + (A.state.sub ? " (قدم/برگهٔ " + A.state.sub + ")" : "") + " باز شد" : res.changed ? "فرم تغییر کرد (فیلدهای تازه)" : "کارهایت انجام شد و صفحه دوباره خوانده شد — کارِ بعدی‌ای را که گفتی همین حالا انجام بده") +
@@ -1082,7 +1089,7 @@
       h("p", {}, "سلام. بگو چه می‌خواهی — یک موضوع برای فهمیدن، ادعایی برای سنجیدن، یا جایی که گیر کرده‌ای."),
       h("p", { class: "small muted" }, "می‌برمت به جای درست، فرم را از حرف‌هایت پر می‌کنم و باقی را نشانت می‌دهم. عکس و فایل هم می‌خوانم (بچسبان یا 📎).")));
     (s ? s.msgs : []).forEach(function (m) {
-      var mv = m.role === "sys" && AS.regSys ? Object.assign({}, m, { text: AS.regSys(s, m.text) }) : m;   // دورِ ۲۳ (Q1، A23-14): سطرِ خودِ صفحه به ضمیرِ گفت‌وگو
+      var mv = m.role === "sys" && AS.regSys ? Object.assign({}, m, { text: AS.regSys(s, AS.sysRaw25 ? AS.sysRaw25(m) : m.text) }) : m;   // دورِ ۲۳ (Q1، A23-14): سطرِ خودِ صفحه به ضمیرِ گفت‌وگو
       if (m.role === "ai" && A.faDates) mv = Object.assign({}, mv, { text: A.faDates(mv.text) });   // دورِ ۲۴ (R5، D24-6): هرگز «YYYY-MM-DD» به آدم — تاریخِ پاسخِ مدل هم شمسی نشان داده می‌شود
       log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx", dir: "rtl" }, richNodes(mv)),
         m.files && m.files.length ? h("div", { class: "as-fl" }, m.files.map(function (f) { return f.link ? h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name) : h("span", { class: f.err ? "bad" : "" }, "📄 " + f.name); })) : null,
@@ -1110,22 +1117,28 @@
   /* تورِ پولیا دورِ ۳ (A13، s18): رقمِ فارسی/عربی خنثی است، نه راست‌به‌چپ — «= ۲۴ cm/s» و «y→۰» در همان تکهٔ چپ‌به‌راست می‌مانند (پیش‌تر نتیجه بیرونِ <bdi> بود) */
   var RTL_CH = /[\u0590-\u065F\u066A-\u06EF\u06FA-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/, LTR_TOK = /[A-Za-z0-9\u0660-\u0669\u06F0-\u06F9π√∑∞=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ()\[\]→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/,
     LTR_OP = /[=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ√∑π→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/;
+  var FACT25 = /(?:(?:^|[^A-Za-z])[A-Za-z]|\))!+$/;   // «n!»، «(n−k)!»، «2^n·n!» — فاکتوریل؛ «OK!»/«done!» (واژهٔ لاتینِ بلند) نه
+  AS.FACT25 = FACT25;
   function bidiNodes(t) {
     var parts = String(t == null ? "" : t).split(/(\s+)/), out = [], buf = "", run = [];
     function flush() {
       if (!run.length) return; var tx = run.join(""); run = [];
       var lead = (tx.match(/^[«"'“]+/) || [""])[0], trail = (tx.match(/[.,،:؛!?؟»"'”…]+$/) || [""])[0], core = tx.slice(lead.length, tx.length - trail.length);
-      if (core && /[A-Za-z0-9]/.test(core) && (LTR_OP.test(core) || /\s/.test(core) || /[\u0660-\u0669\u06F0-\u06F9]/.test(core))) { out.push(buf + lead); buf = trail; out.push(h("bdi", { dir: "ltr", class: "as-ltr", style: "unicode-bidi:isolate;direction:ltr" }, core)); }
+      /* دورِ ۲۵ (P6، A25-11 pwA1 «n!» ⇒ «!n»): «!» ِ چسبیده به متغیرِ لاتین یا پرانتزِ بسته فاکتوریل است (عملگر)، نه نشانهٔ پایانِ جمله — درونِ همان تکهٔ چپ‌به‌راست می‌ماند */
+      var fx25 = /^!+/.exec(trail); if (fx25 && (FACT25.test(core + fx25[0]) || (/[0-9]$/.test(core) && /[=+\-−×÷·\/^!]/.test(core)))) { core += fx25[0]; trail = trail.slice(fx25[0].length); }
+      if (core && /[A-Za-z0-9]/.test(core) && (LTR_OP.test(core) || /\s/.test(core) || /[\u0660-\u0669\u06F0-\u06F9]/.test(core) || /[A-Za-z0-9)]!+$/.test(core))) { out.push(buf + lead); buf = trail; out.push(h("bdi", { dir: "ltr", class: "as-ltr", style: "unicode-bidi:isolate;direction:ltr" }, core)); }
       else buf += tx;
     }
-    parts.forEach(function (p) {
+    parts.forEach(function (p, pi25) {
       if (!p) return;
       if (/^\s+$/.test(p)) { if (run.length) run.push(p); else buf += p; return; }
       // نشانه‌گذاریِ پایانِ جمله («12:»، «dy/dt.») دنباله را می‌بندد: «y = 12: dy/dt» دو فرمولِ جداست
       /* تورِ پولیا دورِ ۴ (s18): «cm/s،» و «y→0،» — ویرگول/نقطه‌ویرگول/پرسشِ فارسی در دو سرِ تکه نویسهٔ راست‌به‌چپ است و تکه را از فرمول جدا می‌کرد؛
          داوری روی خودِ تکه بی نشانه‌گذاریِ دو سرش است (نشانه‌گذاری در flush بیرونِ <bdi> می‌ماند) */
       var pc = p.replace(/^[«"'“(]+|[.,،:؛!?؟…»"'”)]+$/g, "");
-      if (pc && !RTL_CH.test(pc) && LTR_TOK.test(pc)) { run.push(p); if (/[.,،:؛!?؟…]$/.test(p)) flush(); return; }
+      /* «5! = 120»، «n!/5!»: رقم + «!» وقتی فاکتوریل است که دنبالهٔ فرمول باشد (پس از آن عملگر بیاید یا درونِ تکهٔ فرمول باشد) — «شد 120!» ِ پایانِ جمله نه */
+      var nx25 = parts[pi25 + 2] || "", factD25 = /[0-9]!+$/.test(p) && (LTR_OP.test(nx25.charAt(0)) || /[=+\-−×÷·\/^]/.test(p.replace(/!+$/, "")));
+      if (pc && !RTL_CH.test(pc) && LTR_TOK.test(pc)) { run.push(p); if (/[.,،:؛!?؟…]$/.test(p) && !FACT25.test(p) && !factD25) flush(); return; }
       var ws = run.length && /^\s+$/.test(run[run.length - 1]) ? run.pop() : ""; flush(); buf += ws + p;
     });
     var ws2 = run.length && /^\s+$/.test(run[run.length - 1]) ? run.pop() : ""; flush(); buf += ws2;
@@ -1133,6 +1146,10 @@
     return out;
   }
   AS.bidiNodes = bidiNodes;
+  /* دورِ ۲۵ (P6، C25-2): خواستهٔ کنشیِ خودِ او در همین پیام — ثبت/ساختن/باز کردن/افزودن (نه پرسش از این‌که «کجاست/چیست») */
+  AS.wantsAct25 = function (t) { var x = String(t || "").replace(/«[^»]*»/g, " ");
+    return /(?:ثبت|ذخیره|اضافه|وارد|باز|شروع)(?:‌?ش|ِش)?[\s‌]*(?:ب?کن(?:یم|ید|م)?|می[‌\s]?کن(?:ی|ید|یم))(?![آ-ی])|(?:بساز|بسازش|بسازیم|بسازید|بنویسش|بذارش|بگذارش|ببرش|بیارش)(?![آ-ی])|می[‌\s]?خوا(?:م|هم)[^.؟?!\n]{0,40}(?:ثبت|بسازم|باز[\s‌]*کنم|شروع[\s‌]*کنم|پیگیری)/.test(x); };
+  AS.R25_QUARANTINE = Object.assign(AS.R25_QUARANTINE || {}, { noFieldTxt24: ". این نما فیلدی برای پر کردن ندارد — چیزی پر نکن و دکمه‌ای نزن؛ در یک جمله بگو همین‌جا چه می‌بیند و به کدام پرسشش جواب می‌دهد؛ reply خیلی کوتاه.]" });
   /* تورِ پولیا (RM2d، B·D11): نشانه‌گذاریِ سبکِ «**…**» در پاسخِ دستیار پررنگ نشان داده می‌شود (خودِ پرامپت ** دارد و مدلِ لفظی تکرارش می‌کند)؛
      فقط پیامِ دستیار (در پیامِ کاربر «**» می‌تواند توان باشد)؛ درونِ هر تکه همان فرمول و جداسازیِ چپ‌به‌راست. هیچ HTML ِ خامی ساخته نمی‌شود. */
   function inlineNodes(t) { return A.MATH ? A.MATH.nodes(t, bidiNodes) : bidiNodes(t); }
