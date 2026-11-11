@@ -1,6 +1,8 @@
 round26B/aB1/DONE
 round26B/aB2/DONE
 round26B/aB2f/DONE
+round26B/aB3/DONE
+round26B/aB4/DONE
 round26B/bp1/DONE
 round26B/bp2/DONE
 round26B/bp3/DONE

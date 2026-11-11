@@ -23,3 +23,4 @@ round26B_x/s20/DONE
 round26B_x/tB1/DONE
 round26B_x/tB1x/DONE
 round26B_x/tB1y/DONE
+round26B_x/tB1z/DONE
