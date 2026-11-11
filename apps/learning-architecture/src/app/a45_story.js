@@ -297,7 +297,8 @@
       var cv = parseFloat(mc[1]) * c1.f / c2.f, ct = tolOf(mc[3], false); out.push({ expr: mc[1] + " " + txt(mc[2]), said: mc[3], val: cv, ok: Math.abs(cv - parseFloat(mc[3])) <= ct + 1e-9, conv: true, unit: Math.abs(cv - parseFloat(mc[3])) <= ct + 1e-9 ? "" : "تبدیلِ " + txt(mc[2]) + " به " + txt(mc[4]) }); }
     return out;
   }
-  ST.arithChk = arithChk;
+  /* دورِ ۲۵ (P2): این نسخه قرنطینه است (A.STORY.arithChkR24 — REMOVAL_CANDIDATES)؛ حسابِ صفحه را a46_arith.js با عددِ گویا و خواندنِ هر دو سمتِ تساوی می‌سنجد و A.STORY.arithChk را جایگزین می‌کند */
+  ST.arithChkR24 = arithChk; ST.arithChk = arithChk;
   function fmtN(v) { var x = Math.round(v * 1000) / 1000; return fa(String(x).replace(".", "٫")); }
   function herMsgs(s, um) { return ((s && s.msgs) || []).filter(isUser).map(function (m) { return String(m.text || ""); }).concat(um ? [String(um.text || "")] : []); }
   function priorOf(s, a, um) {
@@ -308,15 +309,12 @@
       if (!q || !H.some(function (t) { return quoteIn(q, t); })) { rej++; return; }   // نقلِ ساختگی ⇒ کنار
       var hm = H.filter(function (t) { return quoteIn(q, t); }).pop(), span = A.PRE && A.PRE.herSpan ? A.PRE.herSpan(q, hm) : q;
       var v = /^(?:ok|incomplete|wrong|unchecked)$/.test(String(x.verdict)) ? String(x.verdict) : "unchecked", why = clip(txt(x.why || ""), 220), fix = clip(txt(x.fix || ""), 220);
-      var ck = arithChk(span), bad = ck.filter(function (c) { return !c.ok; }), chk = "";
-      /* chk برای خودش (عددِ درست لو نمی‌رود — بانکِ R24 #164)؛ chkM برای مربی (با مقدار، «لو نده») */
-      var chkM = "";
-      if (bad.length) { v = "wrong"; chk = bad.map(function (c) { return c.unit ? "واحد (" + c.unit + ") با عددِ نوشته‌شده نمی‌خواند" : "حسابِ «" + fa(c.expr) + "» با عددِ نوشته‌شده («" + fa(c.said) + "») نمی‌خواند"; }).join("؛ ");
-        chkM = bad.map(function (c) { return c.unit ? "واحد: " + c.unit + " — با تبدیل " + fmtN(c.val) + " می‌شود، نه " + fa(c.said) : "حسابِ صفحه: " + fa(c.expr) + " = " + fmtN(c.val) + "، نه " + fa(c.said); }).join("؛ ") + " (عددِ درست را لو نده)"; }
-      else if (ck.length) chk = chkM = "حسابِ عددی‌اش را صفحه سنجید: درست" + (v === "wrong" ? " — پس نادرستیِ این گام (اگر هست) از جای دیگری است (داوریِ مربی)" : "");
+      /* دورِ ۲۵ (P2، a46_arith.js): حساب با زمینهٔ همهٔ پیامش (عددی که خودش گرد کرده، واحدِ هر عدد)؛ chk برای خودش (عددِ درست لو نمی‌رود — بانکِ R24 #164)، chkM برای مربی؛ کنارِ «✗» هرگز «درست» */
+      var ck = ST.arithChk(span, hm), nt = ST.arithNote ? ST.arithNote(ck, v) : { bad: false, chk: "", chkM: "" }, chk = nt.chk, chkM = nt.chkM;
+      if (nt.bad) v = "wrong";
       var dep = (Array.isArray(x.dep) ? x.dep : x.dep != null ? [x.dep] : []).map(function (n) { return +digs(n) || 0; }).filter(function (n) { return n > 0; });
       var cause = /^(?:prereq|knot|skill|unknown)$/.test(String(x.cause || "")) ? String(x.cause) : "";
-      steps.push({ n: steps.length + 1, step: st || clip(span, 80), quote: clip(span, 300), verdict: v, why: why, fix: fix, chk: chk, chkM: chkM, dep: dep, said: ck.filter(function (c) { return !c.conv; }).map(function (c) { return c.said; }), cause: cause, her: "" });
+      steps.push({ n: steps.length + 1, step: st || clip(span, 80), quote: clip(span, 300), verdict: v, why: why, fix: fix, chk: chk, chkM: chkM, dep: dep, said: ST.arithSaid ? ST.arithSaid(ck) : ck.filter(function (c) { return !c.conv; }).map(function (c) { return c.said; }), cause: cause, her: "" });
     });
     if (!steps.length) return null;
     /* وابستگی: dep ِ مدل، یا عددِ نتیجهٔ گامِ نادرست در نقلِ گامِ بعد */
