@@ -1,0 +1,1 @@
+{"reply": "این نقشهٔ مسیرِ همین تصمیم است: مبدأ (صورت)، جایی که الان هستی، و مقصد (خواسته‌ات)؛ «مانده» تا وقتی طرحی نگفته‌ای نامعلوم می‌ماند.", "status": "related", "next": false, "outside": "", "know": [], "actions": [{"do": "coach_state", "ph": "u", "said": [], "ans": [], "stuck": false, "fail": false, "role": "self", "nat": "life", "register": "تو"}]}
