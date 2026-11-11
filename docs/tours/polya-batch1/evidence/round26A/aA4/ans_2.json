@@ -1,0 +1,1 @@
+{"reply":"کل را روشن گفتید: چند متر بخرید که نه کم بیاید نه زیاد. حالا داده‌ها را جدا کنید: از عددهایی که دارید، کدام روی طولِ هر تکه اثر دارد و کدام روی تعدادِ تکه‌ها؟","status":"related","next":false,"outside":"","know":[],"actions":[{"do":"coach_state","ph":"u","said":["u"],"ans":["u0","u1"],"stuck":false,"fail":false,"role":"self","nat":"practical","register":"شما"}]}
