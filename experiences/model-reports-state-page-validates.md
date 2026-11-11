@@ -196,3 +196,27 @@ showed "no plan yet". Lessons:
 - **One decision, one place.** When a gate decides "refuse" and a later wrapper turns that into "kept", the reply pre-check still reads "refuse" and the model contradicts
   the page. Put the final decision in the gate both readers call.
 - **A model date needs her time words.** Without them use a dateless follow-up («جلسهٔ بعد»); a relative day she said («تا شنبه‌ی بعد») is computed by the page clock.
+
+## Update 2026-11-11 (round 25, story) — one conversation can hold several problems; a "result" is whole only if nothing is left
+
+Three failures of one kind: the page had a single slot where the conversation had two things.
+
+- **A label is not a state.** The model reported `result`, and every result moved the problem to look-back. A result is *whole* only when
+  nothing is left: the person says in the same message what she still does not know, or the problem's own ledger (prior-work steps not yet
+  correct, plan steps not yet done) still has work. Judge it in ONE function and let every reader (stage machine, story ledger, turn
+  question) call it. Decide from her words and the ledger, never from a word-overlap threshold.
+- **Focus must be able to move.** While a session was bound to an open problem, no message could introduce another one, so the second
+  problem was filed as data of the first. Run the "is this a new problem?" check BEFORE every other prompt builder of the turn, so that
+  all blocks of one prompt see the same problem. Every place that derives "the problem of this turn" (bound record, page in view, cached
+  key) must honour the same decision; a fix in one of four places looks done and is not.
+- **The boundary message belongs to both.** "The first is solved, the answer is 12. Another problem: …" carries a result of the old
+  problem and the statement of the new one. Split it by sentence at the point where the new problem starts; attribute by position, and
+  mark what you excluded so later readers (dossier, route) do not re-attribute it by timestamp.
+- **Two readers, two stage sources** is the same bug again: when a second derived source appears (story ahead of the form), grep for
+  every reader of the first one.
+
+### How to Apply Elsewhere (this update)
+1. For any "done/result/solved" signal ask "what would still be open?" and read that from the user's own message and the record's ledger.
+2. When state is bound to "the current item", list every derivation of "current" and route them through one predicate.
+3. Put scope-changing detection first in the pipeline; let later stages only read it.
+4. For a message that closes one item and opens another, split at the opening sentence; keep an explicit exclusion mark on what you cut.
