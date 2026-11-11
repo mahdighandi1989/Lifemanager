@@ -5031,3 +5031,19 @@ dated stability, mind-card feed) under way.
 - FINDING: `500 POST /api/app-records/learning-architecture/reminders` روی هر بارِ تازه‌بازکردنِ `/apps/learning-architecture`. ریشه، رقابتِ SELECT-سپس-INSERT در `app_reminder_service.upsert` است: صفحه چند یادآور را هم‌زمان می‌فرستد و درخواستِ دوم برای کلیدِ تازه به قیدِ یکتایی می‌خورد. این خطا از page_map ِ ۲۰۲۶-۱۱-۰۱ در فایل بود ولی گزارش نشده بود.
 - CHANGE: `upsert` با `IntegrityError` rollback و یک بار دیگر تکرار می‌کند. رفتار برای حالتِ عادی بی‌تغییر است و شِما تغییری نکرده. تست: `tests/test_app_reminders.py::test_upsert_survives_a_concurrent_insert_of_the_same_key` (بی‌اصلاح قرمز). در مرورگر هم سنجیده شد: ۳ بار بازکردنِ تازه، بدونِ ۵۰۰.
 - FINDING: ۱۶ شاخهٔ `supervisor-pending/*` کهنه‌اند و محتوایشان روی main است. حذف در محیطِ روتین ممکن نشد ⇒ OPEN_ITEMS ‏۱۴. همچنین sys-territory شش دور جلو نرفته ⇒ OPEN_ITEMS ‏۱۵. جزئیات در `docs/supervisor/RUNLOG.md`. ناظرِ خودکار (Claude Code routine)
+
+## 2026-11-11 — FINDING + CHANGE + DECISION: learning-architecture, Pólya round 25, fixer «correction» (P4 stale-number mechanism, C11)
+- **FINDING** Root (round25{A,B,C,D}: A25-9, C25-4, C25-8, D25-18, D25-19, B25·D10): the round-24 derived-number scan called a number «computed from the corrected
+  value» whenever ONE arithmetic operation on the old value and ANY earlier number of the problem produced it, and proposed a «new value» from the same coincidence
+  (goal «۸ کیلو» = 16 ÷ 2 ⇒ «۸ ⇒ ۱۰»; list index «۲.»; data percentages; a metre value recomputed with 150 centimetres ⇒ «۴۶٫۸۷۵»), while really derived numbers with
+  several coincidental paths got no value. On the coach side «a numeric result recorded after the datum rests on all data» set aside a geometry proof after a
+  delivery-hour correction, a weigh-in after a week-count correction, and a guess outcome and a sufficiency verdict after a ✏️ on sugar and butter.
+- **CHANGE** `apps/learning-architecture/src/app/a38_live.js`: new engine `staleCore25` (records with zones; result-position evidence; structural numbers excluded;
+  written-expression parser `runs25`; word relations; one-operation relations with dimension checks; unit of a unit-less old value read from the records; chat results
+  and the prior-work ledger read too), `A.liveRestsOn`, mathematization-based sufficiency basis in `setAsideDeps`; `a27_tour.js`: two guards (`num24`, `byRes`),
+  `herTexts25`, one correction cue. See WORKLOG (121).
+- **DECISION** C11: a proposed value is shown only when every relation of the deciding evidence class gives the same number and no operand is uncertain; otherwise the
+  card asks «این عدد از … حساب شده بود؟». No numeric thresholds were introduced.
+- **Tests** `apps/learning-architecture/tests/test_tour1_r25_correction.js` (10 runner sentences + C11 guard, all red on eeb11d1f) and `tour1_r25_correction_bank.js`
+  (VARIANTS_R25 P4: 24/24; 13 red on base). No older assertion changed. Quarantine: `APP.LIVE_R24_QUARANTINE_P4.staleScan` (REMOVAL_CANDIDATES).
+  Open: HANDBOOK §12 row 67. Signed: Claude Code session (fixer «correction», round 25).

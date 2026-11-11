@@ -49658,7 +49658,7 @@ APP.goFromURL = function (q) {
       if (!mk && /\([\s‌]*$/.test(gap)) { mk = true; o.par = true; }                        // پرانتزِ توضیح
       if (!mk && pv && pv.par && pv.sent === o.sent && /^[\s‌]*(?:و|،|,)[\s‌]*$/.test(gap)) { mk = true; o.par = true; }   // «(۵۰ و ۴۸)»
       if (!mk) { var nx = O[i + 1], a2 = T.slice(ue, nx ? nx.s : (SN[o.sent] ? SN[o.sent][1] : T.length)); mk = POSTMARK25.test(a2.split(/[.،,؛;!؟?\n]/)[0] || ""); }
-      o.mark = mk; o.raw = o.raw || T.slice(o.s, o.e); o.cls = ""; if (!o.u && !o.pct && !o.kind) { var cw = /^[\s‌]*([آ-یء]{2,})/.exec(T.slice(o.e)); if (cw) { var w0 = canTok(nz(cw[1])).replace(/ی$/, ""); if (!CLSSTOP25.test(w0) && !CLSSTOP25.test(cw[1])) o.cls = w0; } }
+      o.mark = mk; o.raw = o.raw || T.slice(o.s, o.e); o.cls = ""; if (!o.u && !o.pct && !o.kind) { var cw = /^[\s‌]*([آ-یء]{2,})/.exec(T.slice(o.e)); if (cw) { var w0 = canTok(nz(cw[1]).replace(/ی$/, "")); if (!CLSSTOP25.test(w0) && !CLSSTOP25.test(cw[1])) o.cls = w0; } }
     });
     return O;
   }
@@ -49825,7 +49825,7 @@ APP.goFromURL = function (q) {
      مقدارِ اصلاح‌شده در آن حساب نیست (پایهٔ نوشته)، (۳) جنسِ عددهایش (واحد یا واژهٔ پس از عدد: «کیلو» ≠ «هفته»، «میلیون» ≠ «ماه») با مقدارِ اصلاح‌شده یکی نیست؛ unknown: هیچ‌کدام —
      فراخوان همان فرضِ پیشین («بر همهٔ داده‌ها بناست») را نگه می‌دارد. opt = { src: متنِ پیامی که مقدارِ پیشین در آن بود, ctx: نوشته‌های خودش (برای حسابِ نوشته) } */
   var CLSSTOP25 = /^(?:تا|تای|تایی|تاشو|و|در|از|که|است|هست|بود|بودیم|نبود|نیست|نه|هم|رو|را|با|به|یا|ولی|اما|پس|شد|میشه|می‌شه|می|بار|برابر|تقسیم|ضرب|ضربدر|منهای|بعلاوه|یعنی|برای|هر|این|آن|اون|دیگه|دیگر|بیشتر|کمتر|اضافه|کم|داریم|دارم|دارد|داره|گرفتم|کردم|زدم|می‌خواد|میخواد)$/;
-  function cls25(T, o) { var f = fam25(o); if (f) return f; var m = /^[\s‌]*([آ-یء]{2,})/.exec(String(T).slice(o.ue != null ? o.ue : o.e)); if (!m) return ""; var w = canTok(nz(m[1])).replace(/ی$/, ""); return CLSSTOP25.test(w) || CLSSTOP25.test(m[1]) ? "" : w; }
+  function cls25(T, o) { var f = fam25(o); if (f) return f; var m = /^[\s‌]*([آ-یء]{2,})/.exec(String(T).slice(o.ue != null ? o.ue : o.e)); if (!m) return ""; var w = canTok(nz(m[1]).replace(/ی$/, "")); return CLSSTOP25.test(w) || CLSSTOP25.test(m[1]) ? "" : w; }
   A.liveRestsOn = function (span, D, opt) { try { opt = opt || {}; span = String(span || ""); var src = String(opt.src || ""), ctx = String(opt.ctx || "");
       var RC = [{ k: "src", t: src, zone: "given" }, { k: "ctx", t: ctx, zone: "work" }, { k: "span", t: span, zone: "role" }].filter(function (x) { return txt(x.t); });
       var P = pairs25(D, []), P0 = numParts0(D); if (!P.length && !P0.some(function (p) { return numPair(p.o, p.n); })) return "unknown";
