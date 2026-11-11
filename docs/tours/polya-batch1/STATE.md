@@ -20,7 +20,7 @@
 
 **گام‌ها (هر کدام که تمام شد همین‌جا تیک می‌خورد):**
 - [ ] گیتِ پایه روی main f0e24f43 (پس از ۱۷ روز کارِ روتین‌ها)
-- [ ] بانکِ مستقلِ VARIANTS_R25
+- [x] بانکِ مستقلِ VARIANTS_R25 (۲۴۱ مورد؛ ابهام‌ها در «Clarifications» ِ DECISIONS_R25 تصمیم شد)
 - [ ] هفت اصلاح‌گر با `runners/FIX25.md`: correction، story، prior، arith، loop، classify، today
 - [ ] ادغام به ترتیبِ correction ⇐ story ⇐ prior ⇐ arith ⇐ loop ⇐ classify ⇐ today؛ گیت؛ **نتیجه پیش از push خوانده شود**؛ main
 - [ ] دورِ ۲۶ (Fable) + گروهِ شاهدِ Opus + داوری

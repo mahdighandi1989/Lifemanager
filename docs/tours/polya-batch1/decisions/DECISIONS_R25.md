@@ -172,3 +172,28 @@ Each binds as written.
 
 ## E-mails
 All runners sent their own e-mails this round: A 21, B 24, C 20, D 25, B_s 25. None was refused.
+
+## Clarifications (main session, 2026-11-11 — binding; answers to the bank writer's open points)
+Decided from the owner's recorded concerns: no conventional numbers, honesty over a confident guess, ask when it cannot be inferred.
+- C1 (P7) «تا جمعه» said ON a Friday: the page does not guess; it asks «همین امروز یا جمعهٔ بعد؟» once and books her answer. On any other
+  day it is the first Friday after today.
+- C2 (P3) A word that is in a view name / sheet frame AND in her step counts only if the routine's reply uses it about the built area
+  outside the frame text. An overlap that exists only through frame text ⇒ ask her.
+- C3 (P3) No numeric threshold. A fit is «clear» only when at least one word specific to her step (not generic, not frame, not a fragment)
+  matches the reply's description of the area; otherwise ask. Outcome-based, as the bank asserts.
+- C4 (P3) Lag line for a generic or ruled-out reply: it says a reply came that names no tool for this step and the step is still waiting;
+  it never says or implies arrival or fit.
+- C5 (P3, P1; owner question 38) A mistaken «نه» is reversible: «اشتباهی زدم / نه، همون بود» restores the previous state with history
+  (both the territory fit and a prior-work verdict). In scope for loop and prior.
+- C6 (P1) The dispute question is asked at most once after a re-check; a re-check whose result is unchanged says so with the evidence.
+- C7 (P1) «Long» is not a length: an OPENING that carries her own worked step (a computation, a derivation, a decision already made with
+  its reason) fires the prior block, even with one step. A bare problem statement does not.
+- C8 (P1/P2) Her own fix is applied only if the page's own check agrees where the step is computable. Model says valid + page computes
+  otherwise ⇒ not applied; the page shows its computation and asks.
+- C9 (P2) Rounding: her written value is accepted when the exact value rounds (or truncates) to it at the number of digits SHE wrote
+  (0.865 written as 0.87 or 0.86 is fine; 0.88 is not). No other tolerance.
+- C10 (P2) A unit factor the page cannot read ⇒ «نسنجیده», never «درست» and never ✗.
+- C11 (P4) Every value the correction card proposes must be the page's own correct recomputation; otherwise it asks instead of proposing.
+- C12 (P7) Her own stated date reaches «امروز» through the page: the page reads the date from her own sentence, shows «… درست است؟», and
+  books it on her yes (the model may report it in coach_state; the page validates the quote). No invented plan date.
+The earlier-round open items outside P1–P7 keep binding as written (no variants; the owning fixer proves each with its own test).
