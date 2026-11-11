@@ -383,3 +383,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R24 R5 (never ISO to a person; one Jalali confirmation; register signs from verbs only).
 - **Status:** reachable, not called for person-facing text: `APP.AGE.faBoth` (exported for compatibility), `APP.ASSIST.R24_QUARANTINE.signSh`, `.signTo18`.
   Delete only with the owner's approval.
+
+## 2026-11-11 — verdict rejection only by a leading «نه», and the replace-on-report prior ledger (learning-architecture, Pólya round 25, prior: P1)
+- **What:** `NO24` in `apps/learning-architecture/src/app/a45_story.js` (a rejection of a prior-work verdict was any message starting with «نه / نخیر / اشتباه نکردم …», applied
+  to every step number in the message) and the round-24 storage rule «a new `coach_state.prior` report replaces the ledger» (`E2.prior = pr24`, `LP.prior = cp`).
+- **Why replaced:** DECISIONS_R25 P1 + C5–C8: replies are read by meaning, per step (`readReply`); reports merge (`priorMerge`); «نه، بس نیست!» is not a dispute.
+- **Status:** `NO24` is kept and reachable as `APP.STORY.R25_QUARANTINE.NO24` (not called). The replace rule has no separate function to keep; the first report of a
+  problem still creates the ledger exactly as before. Delete only with the owner's approval.

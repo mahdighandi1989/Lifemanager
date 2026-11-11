@@ -196,3 +196,23 @@ showed "no plan yet". Lessons:
 - **One decision, one place.** When a gate decides "refuse" and a later wrapper turns that into "kept", the reply pre-check still reads "refuse" and the model contradicts
   the page. Put the final decision in the gate both readers call.
 - **A model date needs her time words.** Without them use a dateless follow-up («جلسهٔ بعد»); a relative day she said («تا شنبه‌ی بعد») is computed by the page clock.
+
+## Update 2026-11-11 (round 25, prior) — a ledger the model reports into is merged, never replaced; and the page asks its question before the model has reported
+
+- **A report is a delta, the record is the ledger.** When a model reports structured state turn after turn (judged steps), storing "the latest report" as the record
+  silently deletes everything the latest report did not repeat: her confirmations, a waiting step, the still-wrong step. Key every reported item (its number, or the same
+  quote) into ONE persistent ledger; a new item is appended only when the message itself qualifies (the opening, or she names it her earlier work); unmatched items on
+  ordinary turns are ignored. Recompute every derived field (resume point, dependency marks, stage, summary) from the ledger after each change — never carry them over.
+- **The turn question is built before the reply, so read the message yourself.** A contract that says "the model reports X, then the page asks about X" produces the wrong
+  question on the very turn that matters, because the prompt is assembled before the report exists. Give the page a pure reader of her message (opening with her own worked
+  step, dispute of a verdict, acceptance, a fix it can check itself) and use the SAME reader before the reply (to choose the turn instruction) and after it (to record).
+- **Per-item replies need per-clause reading.** «گامِ ۳ را قبول ندارم، چون … ولی گامِ ۴ را قبول دارم» is two states. Split on sentence ends and «ولی/اما», read each
+  clause's own polarity and step number; a leading «نه» decides nothing by itself («نه، بس نیست!» answers another question; «نه نه، درست میگی» is acceptance).
+- **Her fix lands only when the page's own check agrees.** If the step is computable, a "validated" model report is not enough: the page re-evaluates the new text against
+  what it computed for the old one; disagreement leaves the step as it was, shows the mismatch without the right value, and keeps the question.
+- **A question about a state must expire with the state.** «به چه دلیل؟» for a rejected verdict is asked once; a re-check (the model's report for that step, or the page's
+  own recomputation) writes its result on the record and ends it; a repeat without a new reason shows the recorded evidence instead of opening a new dispute.
+- **Coach-facing text and person-facing text are two fields from the start.** One line used for both the prompt and the event log leaks «don't give the answer away» and
+  the answer itself to the person. Build the person line from the person field; pass a flag for the coach variant; test every surface that renders the log.
+- **A reader that the gate filters is a reader that the screen needs.** The mind card ignored events whose source it did not list; the events existed and were never shown.
+  When adding an event source, grep every consumer's source filter.

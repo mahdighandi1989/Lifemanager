@@ -365,7 +365,7 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     T(13, !qs13.some(t => /دلیلِ تازه‌ات برای گامِ ۲|را رد کردی — به چه دلیل/.test(t)), qs13.map(t => t.slice(0, 80)));
     u = await turn('نه! من درست میگم', 'شاهد همان است.', [csn({ ph: 'e', said: [], nat: 'objective' })]);
     pr = await PR();
-    T(47, pr.steps[1].verdict === 'wrong' && pr.steps[1].her !== 'no' && /به کدام بخشِ آن شک داری/.test(bold(u.user)) && /8² = 64/.test(bold(u.user)), { st: st(pr), bold: bold(u.user).slice(0, 300) });
+    T(47, pr.steps[1].verdict === 'wrong' && pr.steps[1].her !== 'no' && /به کدام بخشِ شاهدِ دوباره‌سنجیِ گامِ ۲ شک داری/.test(bold(u.user)) && /8² = 64/.test(bold(u.user)), { st: st(pr), bold: bold(u.user).slice(0, 300) });
     // #12 she is right ⇒ the verdict changes on the page with the evidence
     await wipe(); await fresh();
     await ppr('می‌خوام فاصلهٔ ترمز رو حساب کنم. گام ۱: ۹۰ کیلومتر بر ساعت = ۲۵ متر بر ثانیه. گام ۲: زمانِ واکنش ۱ ثانیه‌ست پس ۲۵ متر می‌رم.', [{ step: 'تبدیل', quote: '۹۰ کیلومتر بر ساعت = ۲۵ متر بر ثانیه', verdict: 'wrong', why: 'تبدیل نادرست است' }, { step: 'واکنش', quote: 'زمانِ واکنش ۱ ثانیه‌ست پس ۲۵ متر می‌رم', verdict: 'ok', dep: [1] }], { cs: { nat: 'practical' } });
