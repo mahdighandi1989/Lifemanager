@@ -395,3 +395,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **What it did:** any intermediate chat result (`res` with `fin:false`) put the problem at «اجرا», even with no plan and no validated step.
 - **Why replaced:** DECISIONS_R25 P5 («the stage never jumps to «اجرا» before a plan»; C25-10 aC4 p4, A25-16 oA1).
 - **Status:** reachable as `APP.STORY.phaseOfItemsR24`, not called. Delete only with the owner's approval.
+
+## 2026-11-11 — verdict rejection only by a leading «نه», and the replace-on-report prior ledger (learning-architecture, Pólya round 25, prior: P1)
+- **What:** `NO24` in `apps/learning-architecture/src/app/a45_story.js` (a rejection of a prior-work verdict was any message starting with «نه / نخیر / اشتباه نکردم …», applied
+  to every step number in the message) and the round-24 storage rule «a new `coach_state.prior` report replaces the ledger» (`E2.prior = pr24`, `LP.prior = cp`).
+- **Why replaced:** DECISIONS_R25 P1 + C5–C8: replies are read by meaning, per step (`readReply`); reports merge (`priorMerge`); «نه، بس نیست!» is not a dispute.
+- **Status:** `NO24` is kept and reachable as `APP.STORY.R25_QUARANTINE.NO24` (not called). The replace rule has no separate function to keep; the first report of a
+  problem still creates the ledger exactly as before. Delete only with the owner's approval.
