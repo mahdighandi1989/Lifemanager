@@ -323,14 +323,20 @@ function strictScan(user) {
     await next('خوب است — یک مسئله در هفته. کدام مسئلهٔ هفتهٔ بعد برای این کار مناسب‌تر است؟');
     await say('شاگردام سر مسئله‌ها ساکت می‌مونن. از این هفته هر سه‌شنبه سرِ کلاس با پرسشِ کلی «چی رو می‌خوایم پیدا کنیم؟» شروع می‌کنم و امتحان می‌کنم.');
     const u = await lastUser();
-    const fl = head(u).split('\n').filter(l => /"deadline"|\\"deadline\\"/.test(l) && /2026-11-03/.test(l));
-    chk(fl.length === 1 && /^- زمینه \(نه پرسشِ دوم\)/.test(fl[0]), 'n6 (s15): her own recurring plan brings a context line offering a follow-up with the existing deadline action on the next Tuesday (2026-11-03) ' + JSON.stringify(head(u).split('\n').filter(l => /پیگیری/.test(l))).slice(0, 400));
+    /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 «بر هر دو مسیر»): سطرِ زمینه دیگر پیگیری با کنشِ deadline و تاریخِ ساختهٔ صفحه را پیشنهاد نمی‌دهد — گزارشِ برنامه را می‌خواهد و می‌گوید
+       روزش را خودِ صفحه از او می‌پرسد؛ انتظارِ دورِ ۱۶ («پیشنهادِ پیگیری با deadline روی 2026-11-03») با همان تصمیم عوض شد */
+    const fl = head(u).split('\n').filter(l => /پیگیری/.test(l) && /روزش را خودِ صفحه/.test(l) && !/"do":"deadline"|\\"do\\":\\"deadline\\"/.test(l));
+    chk(fl.length === 1 && /^- زمینه \(نه پرسشِ دوم\)/.test(fl[0]), 'n6 (s15): her own recurring plan brings a context line asking for the plan report; the page itself asks the day (no deadline offer with a page-made date) ' + JSON.stringify(head(u).split('\n').filter(l => /پیگیری/.test(l))).slice(0, 400));
     strict('n6 plan', u);
     const dl1 = await p.evaluate(() => APP.S.all('deadline').length);
     chk(dl1 === dl0, 'n6 control: offer only — no follow-up is created without the action');
     r.stage = 'yes';
     await next('ثبت شد؛ سه‌شنبه در «امروز» می‌آید.', [{ do: 'deadline', what: 'پیگیری: آزمایشِ پرسشِ کلی سرِ کلاس', date: '2026-11-03' }]);
     await say('آره، یادم بنداز.');
+    /* دورِ ۲۶ (DECISIONS_R26 Q5): کنشِ deadline ِ مدل بی «… درست است؟» ِ صفحه ثبت نمی‌شود — صفحه می‌پرسد و «آره» ِ او ثبت می‌کند */
+    r.asked = await p.evaluate(() => ({ dl: APP.S.all('deadline').length, q: ((APP.ASSIST.cur ? APP.ASSIST.cur() : APP.S.get(localStorage.getItem('lla.assist.cur'))).msgs || []).filter(m => m.role === 'sys' && /📅/.test(m.text) && /درست است؟/.test(m.text)).length }));
+    chk(r.asked.dl === dl0 && r.asked.q === 1, 'n6 (R26): the deadline reported by the model is not booked before her yes; the page asks once ' + JSON.stringify(r.asked));
+    await say('آره');
     r.today = await p.evaluate(() => (APP.dueList() || []).map(x => x.txt + ' ' + (x.sub || '')));
     chk(r.today.some(t => /پیگیری: آزمایشِ پرسشِ کلی/.test(t)), 'n6: «امروز» shows the follow-up ' + JSON.stringify(r.today).slice(0, 300));
     // کنترل: گزارشِ گذشته، نه برنامه

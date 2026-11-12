@@ -2559,6 +2559,8 @@
     var W0 = wdToks26(x), sat = add(base, 7 - ((bd + 1) % 7)), i, w;
     /* «آخرِ ماه» / «آخرِ همین ماه» = آخرین روزِ ماهِ شمسیِ همین روز (روزِ پیش از یکمِ ماهِ بعد) */
     if (/آخر ?(?:ی ?)?(?:همین ?|این ?)?ماه(?![آ-ی])/.test(x) && !new RegExp("ماه ?(?:ی ?)?" + NEXT26).test(x)) { var em = monthEnd26(base); if (em) return { date: em, src: "monthend" }; }
+    /* «ابتدای/اولِ ماهِ آینده» = یکمِ ماهِ شمسیِ بعد (نه «سی روز بعد») */
+    if (new RegExp("(?:ابتدا|اول|اوایل|آغاز|شروع) ?(?:ی ?)?ماه ?(?:ی ?)?" + NEXT26 + "(?![آ-ی])").test(x)) { var e0 = monthEnd26(base); if (e0) return { date: add(e0, 1), src: "monthstart" }; }
     var en = new RegExp("آخر(?:ای)? ?(?:ی ?)?(?:ماه ?(?:ی ?)?)?(" + JM26 + ")(?: ?(?:ماه)?)(?![آ-ی])").exec(x); if (en) { var e2 = monthEnd26(base, JM26.split("|").indexOf(en[1]) + 1); if (e2) return { date: e2, src: "monthend" }; }
     /* «آخرِ هفتهٔ بعد» = جمعهٔ هفتهٔ (شنبه تا جمعهٔ) پس از هفتهٔ امروز */
     if (new RegExp("آخر ?(?:ی ?)?هفته ?(?:ی ?)?" + NEXT26 + "(?![آ-ی])").test(x)) return { date: add(sat, 6), src: "nextweek" };
@@ -2568,10 +2570,11 @@
       if ((w.end <= nw.index && /^ ?(?:ی ?)?$/.test(x.slice(w.end, nw.index))) || (w.start >= nw.index + nw[0].length && /^[ ،,]{0,3}(?:روز ?(?:ی ?)?)?$/.test(x.slice(nw.index + nw[0].length, w.start)))) return { date: add(sat, (w.dow + 1) % 7), src: "nextweek", wd: w.name }; }
     /* «جمعهٔ بعد» = نخستین همان روز پس از امروز (در خودِ جمعه: هفت روز بعد — دوپهلو نیست، خودش «بعد» گفته) */
     for (i = 0; i < W0.length; i++) { w = W0[i]; if (new RegExp("^ ?(?:ی ?)?" + NEXT26 + "(?![آ-ی])").test(x.slice(w.end))) return { date: add(base, ((w.dow - bd + 7) % 7) || 7), src: "weekday-next", wd: w.name }; }
-    var d = parseWhen(x, base); if (!d) return null;
-    var W = A.willWhen ? A.willWhen(x, base) : null, src = (W && W.src) || "";
-    if (src === "weekday") { if (!W0.length) return null; w = W0[0]; var k = (w.dow - bd + 7) % 7;
+    var d = parseWhen(x, base), W = d && A.willWhen ? A.willWhen(x, base) : null, src = (W && W.src) || "";
+    /* روزِ هفته را خودِ این خواننده با واژه‌مرز می‌خواند: A.willWhen «تا شنبه» را نمی‌خواند («تا» + «شنبه» را پیشوندِ «…شنبه» می‌گیرد) و «جلسه شنبه» را سه‌شنبه می‌خواند */
+    if (src === "weekday" || (!d && W0.length) || ((!src || src === "time") && W0.length && !/\d{4} ?[\/\-.] ?\d{1,2} ?[\/\-.] ?\d{1,2}/.test(x))) { if (!W0.length) return null; w = W0[0]; var k = (w.dow - bd + 7) % 7;
       return k ? { date: add(base, k), src: "weekday", wd: w.name } : { date: add(base, 7), amb: true, wd: w.name, src: "weekday" }; }
+    if (!d) return null;
     /* مدت تاریخ نیست («۸ ماهه می‌خوام…»، «دو هفته تمرین می‌کنم»، «یه روز دیگه» ِ نامعین) مگر «… دیگه/بعد»، «تا/ظرفِ …» یا «… وقت دارم» */
     if (src === "rel" && !REL_FIX26.test(x) && DUR26.test(x)) { if (!DUR_OK26.test(x) || /(?:^| )(?:یه|یک) ?روز ?(?:ی ?)?(?:دیگه|دیگر)(?![آ-ی])/.test(x)) return null; }
     /* روزی که خوانندهٔ صفحه (A.willWhen) نخواند تاریخ نیست — مگر تاریخِ عددیِ کامل («۱۴۰۵/۹/۱۲»)؛ «۸ ماهه …» از پشتیبانِ کوتاهِ parseWhen می‌آمد */
@@ -2579,8 +2582,10 @@
     return { date: d, src: src || "date" };
   };
   /* روزِ یک برنامهٔ گزارش‌شده (a27 plan18): { when, amb?, pend?: { date, src: her|model } } — حرفِ خودش مقدم؛ هر روزی جز خودِ امروز پرسیده می‌شود */
-  PR.planWhen26 = function (pt, w, td, legacy) {
+  PR.planWhen26 = function (pt, w, td, legacy, ut) {
     var ns = /^next[-_ ]?session$/i.test(String(w || "")), real = /^\d{4}-\d\d-\d\d$/.test(String(w || "")), I = null; try { I = PR.whenInfo(pt, td); } catch (e) { }
+    /* نقلِ مدل روز را انداخته («ورزش صبح» از «از فردا ورزش صبح می‌کنم») ⇒ روز از همان جملهٔ خودش که برنامه را دارد */
+    if (!I && ut) { try { var np = norm(pt), hs = sentsOf25(ut).filter(function (x) { return np.length >= 4 && norm(x).indexOf(np) >= 0 && !/[؟?]\s*$/.test(x); })[0]; if (hs) I = PR.whenInfo(hs, td); } catch (e) { } }
     /* چند روز در یک برنامه («رباتیک سه‌شنبه، ریاضی پنجشنبه، و آخرِ آبان نمره‌ها …»): مدل می‌گوید کدام، صفحه می‌سنجد که همان روز در حرفِ خودش هست */
     if (real && w >= td && !(I && (I.date === w || I.src === "nextweek" || I.src === "weekday-next"))) { try { String(pt || "").replace(/(هفته[‌\s]*(?:ی|ٔ)?\s*(?:بعد|دیگه|دیگر|آینده))\s*[،,]\s*/g, "$1 ").split(/\s*[،؛]\s*|\s+و\s+/).forEach(function (c) { var J = PR.whenInfo(c, td); if (J && !J.amb && J.date === w) I = J; }); } catch (e) { } }
     if (I && I.amb) return { when: "next-session", amb: I.wd };
@@ -2639,6 +2644,8 @@
   function dlBook25(s0, it, m) {
     var what = clip(it.dl ? it.dl.what : it.what, 120), r = S.all("deadline", function (x) { return x && !x.done && x.what === what; })[0] || { id: A.uid("dl"), type: "deadline", what: what, done: false };
     r.date = it.date; r.sess = r.sess || s0.id; r.by = it.dl ? "her-yes" : "her-words"; r.src = { sess: s0.id, mid: m && A.liveMsgId ? A.liveMsgId(m) : "", at: String((m && m.at) || "") }; r.quote = clip(it.what, 200);
+    /* منبعِ کاملِ a38 (span = بندِ خودِ او در پیامِ تعهد — قراردادِ دورِ ۲۱ برای اصلاحِ بعدی)، وقتی در دسترس است */
+    try { if (m && A.liveSrc && A.liveMsgId) { var ls = A.liveSrc(s0.id, A.liveMsgId(m), "deadline", it.what); if (ls && ls.sess) r.src = Object.assign({ at: String(m.at || "") }, ls); } } catch (e) { }
     if (it.dl && /^\d{1,2}:\d{2}$/.test(String(it.dl.time || ""))) r.time = it.dl.time;
     if (!r.src20 && m && AS.msgId) r.src20 = { sess: s0.id, msg: AS.msgId(m), span: clip(it.what, 200), key: "deadline:" + r.id };   /* منبع = پیامِ خودِ تعهد، نه «آره» */
     S.put(r); try { if (AS.deadlineSync) AS.deadlineSync(r); } catch (e) { } return r;
@@ -2728,6 +2735,14 @@
     else { if (/^\d{4}-\d\d-\d\d$/.test(String(v))) { it.date = v; it.amb = false; } if (it.amb) return false; var l = bookItem26(s0, P0, it); if (l) sysLine25(s0, "✓ به گفتهٔ خودت (از «امروز») ثبت شد: " + l); }
     P0.items.splice(ii, 1); if (!P0.items.length) P0.state = v === "no" ? "dropped" : "booked"; S.put(s0); return true;
   };
+  /* «آره» به همهٔ پرسش‌های بازِ بی‌ابهامِ یک سشن — همان راهِ دکمهٔ «آره، همین» ِ «امروز» (برای آزمون‌ها و کارِ دسته‌ای) */
+  PR.dateYes = function (sid, reportedOnly) {   /* reportedOnly: فقط پرسش‌هایی که رکوردِ گزارش‌شدهٔ مدل (برنامه یا کنشِ deadline) پشتشان است */
+    var s0 = sid ? S.get(sid) : (AS && AS.cur ? AS.cur() : null); if (!s0) return 0; var n = 0, guard = 0;
+    while (guard++ < 50) { var L = pends26(s0), hit = false;
+      for (var pi = 0; pi < L.length && !hit; pi++) for (var ii = 0; ii < (L[pi].items || []).length && !hit; ii++) if (!L[pi].items[ii].amb && (!reportedOnly || L[pi].items[ii].plan || L[pi].items[ii].dl) && PR.dateResolve(s0.id, pi, ii, "yes")) { n++; hit = true; }
+      if (!hit) break; }
+    return n;
+  };
   /* ب) تاریخ‌های تازهٔ همین نوبت: حرفِ خودش، برنامهٔ گزارش‌شده (a27 plan18 ⇒ q.whenPend)، کنشِ deadline ِ مدل (s0._dq26) — یک کار، یک پرسش */
   PR.datePend = function (s0) {
     var U = userMsgs(s0), m = U[U.length - 1]; if (!m || !s0) return false; var t = String(m.text || ""), at = String(m.at || ""), dirty = false;
@@ -2737,6 +2752,12 @@
     /* (۹) پرسشِ روزِ پیش‌بینی‌ای که دیگر داوری شده یا 🎯 گرفته کنار می‌رود */
     pends26(s0).forEach(function (P) { var n0 = (P.items || []).length; P.items = (P.items || []).filter(function (z) { if (!z.pred) return true; var py = ((s0.coach || {}).preds || []).filter(function (y) { return y && String(y.at) === String(z.pred) && (!z.pk || y.key === z.pk); })[0]; return !!py && !py.fc && !py.out; }); if (P.items.length !== n0) { dirty = true; if (!P.items.length) P.state = "dropped"; } });
     try { own = PR.herDates(t, s0); (own.neg || []).forEach(function (d) { (s0.dateNo = s0.dateNo || []).push(d); }); } catch (e) { console.warn(e); own = []; }
+    /* پیامی که همین نوبت موعد یا برنامهٔ ثبت‌شده‌ای را اصلاح کرد («تحویل ۸ آبان نیست، ۱۰ آبانه» ⇒ همان رکورد جابه‌جا شد): روزِ درونِ آن، روزِ همان رکورد است — تعهدِ تازه نیست */
+    try { var R26 = (((s0.coach || {}).retracts) || []).slice(-1)[0]; if (R26 && R26.ok && norm(R26.key || "") === norm(t) && (R26.changes || []).some(function (c) { return /^(?:یادآور|برنامه|موعد)/.test(String(c)); })) own = []; } catch (e) { }
+    /* برنامه‌ای که روزش هنوز پرسیده است و متنش اصلاح شد («منظورم پنج‌شنبه بود») ⇒ پرسشِ روزِ پیشین کنار می‌رود و روزِ متنِ تازه پرسیده می‌شود */
+    pends26(s0).forEach(function (P) { (P.items || []).slice().forEach(function (z) { if (!z.plan || z.amb) return; var q = (s0.plans || []).filter(function (y) { return y && y.id === z.plan; })[0]; if (!q || !q.whenPend) return;
+      var I = null; try { I = PR.whenInfo(q.text); } catch (e) { }
+      if (I && !I.amb && I.date && I.date > today() && I.date !== z.date) { P.items.splice(P.items.indexOf(z), 1); if (!P.items.length) P.state = "dropped"; q.whenPend = { date: I.date, src: "her" }; items.push({ what: q.text, date: I.date, plan: q.id, src: "her", dl: z.dl }); dirty = true; } }); });
     var noD = s0.dateNo || [], askedD = [];
     pends26(s0).forEach(function (P) { (P.items || []).forEach(function (z) { askedD.push(z.date); }); });
     /* برنامهٔ همین پیام با روزِ خوانده/گزارش‌شده */
@@ -2784,6 +2805,11 @@
     if (wait.length) { wait.forEach(function (P) { P.told = true; }); out.push("- زمینه (نه پرسشِ دوم): پرسشِ تاریخِ صفحه هنوز بی‌جواب است و **ثبت نشده**: " + wait.map(say).join(" · ") + " — نگو ثبت شد؛ صفحه خودش یک سطر گفته و در «امروز» به‌شکلِ پرسش مانده است."); }
     return out.length ? "# تاریخِ خودش — صفحه خودش پرسیده است (زمینه، نه پرسشِ دوم)\n" + out.join("\n") : "";
   });
+  /* همین پیام تاریخِ کارِ خودش را دارد ⇒ مدل پیش از پاسخ می‌داند که صفحه خودش می‌پرسد (تا نگوید «یادآور گذاشتم») — بلوکِ ساختهٔ صفحه، نه AS.SYS */
+  if (AS && AS.promptHooks) AS.promptHooks.push(function (s0, msg) {
+    var t = String(msg || ""); if (!s0 || !t || /^\[سامانه/.test(t.trim())) return ""; var H = []; try { H = PR.herDates(t, s0); } catch (e) { H = []; } if (!H.length) return "";
+    return "# تاریخ در همین پیام (زمینه، نه پرسشِ دوم)\n- زمینه (نه پرسشِ دوم): در همین پیام روزِ کارِ خودش هست (" + H.slice(0, 3).map(function (z) { return "«" + clip(z.what, 50).replace(/[«»]/g, "") + "»"; }).join("، ") + "). صفحه خودش زیرِ پاسخِ تو آن را با «… درست است؟» از او می‌پرسد و فقط با «آره» ِ او به «امروز» می‌برد — نگو «ثبت شد / یادآور گذاشتم»؛ اگر برنامهٔ خودش است همان را گزارش کن (plan) و بس.";
+  });
   /* کنشِ deadline ِ مدل در نوبتِ گفت‌وگو (C12، مسیرِ دوم): تاریخ فقط با «آره» ِ او به «امروز» می‌رسد —
      (۱) همان کار که همین نوبت با «آره» ِ او ثبت شد ⇒ رکوردِ دوم نه (U50)؛ (۲) روزِ برنامه‌ای که خودش تأیید کرده ⇒ پیگیریِ همان برنامه (پیوند)؛
      (۳) «باشه/آره» ِ او به پیشنهادِ دستیار که همین تاریخ را داشت ⇒ ثبت، با یک سطر (D26-37)؛ (۴) وگرنه صفحه می‌پرسد «… درست است؟». بیرون از نوبتِ گفت‌وگو: همان که بود. */
@@ -2791,13 +2817,15 @@
     var M = s0.msgs || [], i = M.indexOf(m), ai = null; for (var j = i - 1; j >= 0; j--) { if (M[j] && M[j].role === "ai") { ai = M[j]; break; } if (M[j] && M[j].role === "user") break; }
     if (!ai) return false; var tx = String(ai.text || ""), base = (A.localDay && ai.at ? A.localDay(ai.at) : "") || today();
     if (nrm26(tx).indexOf(nrm26(fdate(D))) >= 0) return true;
-    return tx.split(/[.!؟?\n؛،:]+|\s+—\s+/).some(function (c) { var I = null; try { I = PR.whenInfo(c, base); } catch (e) { } return !!(I && !I.amb && I.date === D); });
+    return tx.split(/[.!؟?\n؛،:]+|\s+—\s+/).some(function (c) { return [base, today()].some(function (b1) { var I = null; try { I = PR.whenInfo(c, b1); } catch (e) { } return !!(I && !I.amb && I.date === D); }); });
   }
   if (rawDl26 && !rawDl26._r26) {
     AS.DO.deadline = function (a) {
       var s0 = AS._turnSession; if (!s0 || PR._dlRaw26) return rawDl26.apply(this, arguments);
       var U = userMsgs(s0), m = U[U.length - 1]; if (!m) return rawDl26.apply(this, arguments);
       var what = clip(a && a.what, 120), date = String((a && a.date) || "").trim(), at = String(m.at || "");
+      /* همان موعدِ باز دوباره (هم‌گام‌سازیِ اصلاح — a27 retractApply / a38 retractSess همین کنش را صدا می‌زنند) ⇒ راهِ پیشین، با همان تاریخِ فراخوان */
+      if (S.all("deadline", function (x) { return x && !x.done && x.what === what; }).length) return rawDl26.apply(this, arguments);
       try { var hd = AS.herDay24 ? AS.herDay24(m.text) : ""; if (hd && hd !== date) date = hd; } catch (e) { }
       /* تاریخی که خودِ صفحه در پیامش می‌خواند بر تاریخِ مدل مقدم است (یک تاریخِ یکتا) */
       try { var own = PR.herDates(m.text, s0).filter(function (o) { return !o.amb; }); if (own.length === 1 && own[0].date !== date && !own.some(function (o) { return o.date === date; })) date = own[0].date; } catch (e) { }
@@ -2810,14 +2838,14 @@
       var say = function (why) { sysLine25(s0, "✓ ثبت شد و در «امروز» می‌آید: ⏰ «" + clip(what, 60) + "» — " + WDFA25[dowOf(date)] + " " + fdate(date) + why); };
       var link = function () { try { var r = S.all("deadline", function (x) { return x && !x.done && x.what === what && x.date === date; })[0], one = (s0.plans || []).filter(function (q) { return q && q.when === date && q.state !== "done" && q.state !== "notdone"; }); if (r && one.length === 1 && !r.plan) { r.plan = { sess: s0.id, id: one[0].id }; S.put(r); } } catch (e) { } };
       /* (۲) روزِ برنامه‌ای که خودش تأیید کرده (یا همین امروز) */
-      if (mine.some(function (x) { return x.what === what; }) || (s0.plans || []).some(function (q) { return q && q.when === date; })) { var o2 = rawDl26.call(this, a2); if (!o2) { link(); say(""); } return o2; }
+      if ((s0.plans || []).some(function (q) { return q && q.when === date; })) { var o2 = rawDl26.call(this, a2); if (!o2) { link(); say(""); } return o2; }
       /* برنامهٔ همین نوبت که صفحه دارد روزش را می‌پرسد ⇒ همان یک پرسش */
       if ((s0.plans || []).some(function (q) { return q && String(q.at || "") === at && ((q.whenPend && q.whenPend.date === date) || q.whenAsk); }) ||
           pends26(s0).some(function (P) { return (P.items || []).some(function (i2) { return i2.plan && !i2.amb && i2.date === date; }); })) { (s0._dq26 = s0._dq26 || []).push({ at: at, what: what, date: date, time: (a && a.time) || "" }); return ""; }
       /* (۳) «باشه» ِ او به پیشنهادِ تاریخ‌دارِ دستیار */
       if ((YES25.test(String(m.text || "")) || OK26.test(String(m.text || ""))) && aiOffered26(s0, m, date)) { var o3 = rawDl26.call(this, a2); if (!o3) { link(); say(" (پیشنهادِ دستیار که خودت پذیرفتی)"); } return o3; }
       /* (۴) پرسشِ صفحه — فقط اگر این روز در حرفِ خودِ او هست (همین پیام یا دو پیامِ پیشینش)؛ تاریخی که او نگفته نه ثبت می‌شود نه پرسیده (C12، بانکِ R26 #161) */
-      var said26 = U.slice(-3).some(function (um) { var b0 = (A.localDay && um.at ? A.localDay(um.at) : "") || today(); return String(um.text || "").split(/[.!؟?\n؛،:]+|\s+—\s+/).some(function (c) { var I = null; try { I = PR.whenInfo(c, b0); } catch (e) { } return !!(I && I.date === date); }); });
+      var said26 = U.slice(-3).some(function (um) { var b0 = (A.localDay && um.at ? A.localDay(um.at) : "") || today(); return String(um.text || "").split(/[.!؟?\n؛،:]+|\s+—\s+/).some(function (c) { return [b0, today()].some(function (b1) { var I = null; try { I = PR.whenInfo(c, b1); } catch (e) { } return !!(I && I.date === date); }); }); });
       if (!said26) return "یادآور ثبت نشد: تاریخِ " + fdate(date) + " در حرفِ خودش نیست — صفحه روزی را که او نگفته به «امروز» نمی‌برد. اگر خودش روزی گفت همان را بده؛ وگرنه روزش را از خودش جویا شو.";
       (s0._dq26 = s0._dq26 || []).push({ at: at, what: what, date: date, time: (a && a.time) || "" });
       return "";
@@ -2868,7 +2896,7 @@
           if (!it.amb && it.date < today()) { items.push({ k: "dq", dq: se.id, txt: "📅 «" + clip(it.what, 70) + "» — " + fdate(it.date) + " گذشت و تأیید نشده بود؛ ثبت نشد.", sub: "پرسشِ تاریخِ بی‌جواب · سشنِ «" + clip(se.title || se.pinned || "گفت‌وگو", 40) + "»", acts: [{ t: "کنار بگذار", cls: "dopt dq-no", fn: tap("no", "کنار رفت.") }] }); return; }
           var acts = it.amb ? [{ t: "همان روز (" + fdate(P.d0) + ")", cls: "dopt dq-same", fn: tap(P.d0, "ثبت شد.") }, { t: it.wd + (/ه$/.test(it.wd) ? "ٔ" : "ِ") + " بعد (" + fdate(add(P.d0, 7)) + ")", cls: "dopt dq-next", fn: tap(add(P.d0, 7), "ثبت شد.") }, { t: "هیچ‌کدام", cls: "dopt dq-no", fn: tap("no", "باشد — ثبت نشد.") }]
             : [{ t: "آره، همین", cls: "dopt dq-yes", fn: tap("yes", "ثبت شد.") }, { t: "نه", cls: "dopt dq-no", fn: tap("no", "باشد — ثبت نشد.") }];
-          items.push({ k: "dq", dq: se.id, txt: "📅 " + itemLine26(it, P.d0) + (it.amb ? "؟" : " — هنوز تأیید نکرده‌ای؛ درست است؟"), sub: "تاریخی که صفحه از " + (it.src === "model" ? "گزارشِ دستیار" : "حرفِ خودت") + " خواند · تا «آره» نگویی ثبت نمی‌شود · سشنِ «" + clip(se.title || se.pinned || "گفت‌وگو", 40) + "»", acts: acts,
+          items.push({ k: "dq", dq: se.id, txt: "📅 " + itemLine26(it, P.d0) + (it.amb ? "؟" : " — هنوز تأیید نشده؛ درست است؟"), sub: "تاریخی که صفحه از حرفِ خودِ گفت‌وگو خواند · تا تأیید نشود ثبت نمی‌شود · سشنِ «" + clip(se.title || se.pinned || "گفت‌وگو", 40) + "»", acts: acts,
             go: function () { try { localStorage.setItem("lla.assist.cur", se.id); } catch (e) { } if (AS.toggle) AS.toggle(true); } }); }); }); });
         items = items.filter(function (it) { if (it.k !== "p" || !it.pid) return true; return !Object.keys(askPl).some(function (k) { return k.split(":").pop() === it.pid; }); }); } catch (e) { console.warn(e); }
       try { return PR.actMerge(items); } catch (e) { console.warn(e); return items; }

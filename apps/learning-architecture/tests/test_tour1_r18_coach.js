@@ -248,8 +248,10 @@ function devScan(sys, user) {
     const todayP = () => p.evaluate(() => APP.dueList().filter(x => /📌 برنامهٔ خودت/.test(x.txt)).map(x => x.txt + ' | ' + x.sub));
     const strip = (t) => String(t).replace(/^\([^)]*\)\s*/, '').replace(/[.!؟?。]+\s*$/, '').trim();
     const simple = async (i, when, extraCheck) => { await wipe(); await day(T0); await fresh(); const t = strip(E[i].text);
-      await turn(t, 'خوب است.', [cs({ plan: { text: t, when } })]); const st = await plans(); const u2 = await turn('باشه.'); const f = fup(u2);
-      return { st, f, ok: st.length === 1 && st[0].when === when && st[0].state === 'open' && (when === 'next-session' ? !f.length : f.length === 1 && f[0].indexOf(when) >= 0) }; };
+      /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 «بر هر دو مسیر»): روزِ برنامهٔ گزارش‌شده با «… درست است؟» ِ صفحه و «باشه/آره» ِ او می‌نشیند — تا آن وقت «جلسهٔ بعد» است؛ و چون همان پرسش
+         «در «امروز» بیاید؟» است، پیشنهادِ پیگیریِ دوم با کنشِ deadline دیگر نمی‌آید. انتظارِ دورِ ۱۸ (روز بی‌پرسش + پیشنهادِ deadline در نوبتِ بعد) با همان تصمیم عوض شد. */
+      await turn(t, 'خوب است.', [cs({ plan: { text: t, when } })]); const st0 = await plans(); const u2 = await turn('باشه.'); const st = await plans(); const f = fup(u2);
+      return { st0, st, f, ok: st.length === 1 && st[0].when === when && st[0].state === 'open' && !f.length && (when === 'next-session' || when === T0 || (st0.length === 1 && st0[0].when === 'next-session')) }; };
     let x;
     x = await simple(0, '2026-10-18'); T(0, x.ok, x);
     // 1 + 2 — موعدِ گذشته: یک بار «انجام شد؟»؛ plan_done ⇒ done؛ بی پاسخ ⇒ expired
@@ -281,9 +283,11 @@ function devScan(sys, user) {
     x = await simple(7, '2026-10-23'); T(7, x.ok, x);
     // 7b — بی when ِ مدل، «آخرِ همین هفته» ⇒ جمعه
     await wipe(); await fresh(); await turn('تا آخر همین هفته سه تا طرح اولیه می‌کشم', 'خوب.', [cs({ plan: { text: 'تا آخر همین هفته سه تا طرح اولیه می‌کشم' } })]);
-    chk((await plans())[0].when === '2026-10-23', 'RM5: «آخرِ همین هفته» without a model date ⇒ Friday 2026-10-23 ' + JSON.stringify(await plans()));
+    /* دورِ ۲۶ (DECISIONS_R26 Q5): همان روز (جمعه) خوانده می‌شود، ولی با «آره» ِ او می‌نشیند */ await turn('آره');
+    chk((await plans())[0].when === '2026-10-23', 'RM5: «آخرِ همین هفته» without a model date ⇒ Friday 2026-10-23 (after her yes) ' + JSON.stringify(await plans()));
     // 8 — پرسیده و بی پاسخ ⇒ expired؛ دیگر پرسیده نمی‌شود
     await wipe(); await day(T0); await fresh(); await turn('فردا ساعت ۷ میرم باشگاه', 'خوب.', [cs({ plan: { text: 'فردا ساعت ۷ میرم باشگاه', when: '2026-10-18' } })]);
+    /* دورِ ۲۶ (DECISIONS_R26 Q5): روزِ برنامه با «آره» ِ او می‌نشیند */ await turn('آره');
     await day('2026-10-19'); await fresh(); const a8 = await turn('سلام.'); await turn('یه مسئله‌ی دیگه.');
     await day('2026-10-25'); await fresh(); const c8 = await turn('سلام دوباره.'); const s8 = await plans(); const tp8 = await todayP();
     T(8, dueL(a8).length === 1 && !dueL(c8).length && s8[0].state === 'expired' && !tp8.length && !fup(c8).length, { a: dueL(a8), c: dueL(c8), s8, tp8 });
@@ -303,7 +307,9 @@ function devScan(sys, user) {
     await wipe(); await day(T0); await fresh(); await turn('به نظرم کار سرایداره', 'چطور می‌آزمایی؟', [cs({ guess: { text: 'کار سرایداره' } })]);
     await turn('دوربین رو دیدم، خودش بود. تأیید شد.', 'پس حدست درست درآمد.');
     await turn('پس فردا میرم باهاش حرف می‌زنم', 'خوب است.', [cs({ plan: { text: 'پس فردا میرم باهاش حرف می‌زنم', when: '2026-10-19' } })]);
-    const u18 = await turn('باشه.'); T(18, fup(u18).length === 1 && !lines(u18.user).some(l => /اول حدس را بیازما/.test(l)), lines(u18.user).filter(l => /پیگیری/.test(l)));
+    /* دورِ ۲۶ (DECISIONS_R26 Q5): «پیگیریِ عادی» حالا همان پرسشِ تاریخِ صفحه است («… در «امروز» بیاید؛ درست است؟») و با «باشه» ِ او روزِ برنامه می‌نشیند — نه پیشنهادِ deadline ِ دوم؛ آنچه این ورودی می‌سنجد («اول حدس را بیازما» نه) همان است */
+    const a18 = await p.evaluate(() => (APP.ASSIST.cur().msgs || []).filter(m => m.role === 'sys' && /📅/.test(m.text) && /درست است؟/.test(m.text)).length);
+    const u18 = await turn('باشه.'); const s18 = await plans(); T(18, a18 === 1 && s18.length === 1 && s18[0].when === '2026-10-19' && !fup(u18).length && !lines(u18.user).some(l => /اول حدس را بیازما/.test(l)), { a18, s18, l: lines(u18.user).filter(l => /پیگیری/.test(l)) });
     await day(T0);
   });
 

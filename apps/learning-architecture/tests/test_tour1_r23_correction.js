@@ -24,7 +24,7 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
     APP.callAI = async (sys, user, opts) => { __calls.push({ sys, user: String(user || ''), task: opts && opts.task }); let r = __q.shift(); if (typeof r === 'function') r = r(String(user || ''));
       const t = r === undefined ? { reply: 'باشه.', status: 'related', memory: 'm', actions: [] } : r; const text = typeof t === 'string' ? t : JSON.stringify(t); return opts && opts.withMeta ? { text, files: [] } : text; };
     window.R = (o) => Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, o);
-    window.__turn = async (text, reply, actions, extra) => { const n0 = __calls.length; __q.push(R(Object.assign({ reply: reply || 'باشه.', actions: actions || [] }, extra || {}))); await APP.ASSIST.send(text); __q.length = 0;
+    window.__turn = async (text, reply, actions, extra) => { const n0 = __calls.length; __q.push(R(Object.assign({ reply: reply || 'باشه.', actions: actions || [] }, extra || {}))); await APP.ASSIST.send(text); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 «بر هر دو مسیر»): هر تاریخ فقط با «آره» ِ او به رکورد و «امروز» می‌رسد. این آزمون پیش از دورِ ۲۶ نوشته شده و تاریخِ نشسته را فرض می‌کند؛ پس پس از هر نوبت، برای هر برنامه یا موعدی که مدل گزارش کرده، همان «آره، همین» ِ ردیفِ 📅 ِ «امروز» زده می‌شود (راهِ خودِ صفحه: PR.dateYes ⇒ PR.dateResolve) — خودِ انتظارها دست نخورده‌اند مگر جایی که جداگانه نوشته شده */ try { if (APP.PR && APP.PR.dateYes) APP.PR.dateYes(null, true); } catch (e26) { }  __q.length = 0;
       const all = __calls.slice(n0), c = all.filter(x => !/^\[سامانه/.test(String((x.user.split('# نوبتِ تازه\n')[1] || '')).trim()))[0] || {}; return { user: c.user || '', all: all.map(x => x.user) }; };
     window.__wipe = () => { ['achat', 'eprog', 'eprob', 'kcase', 'card', 'deadline', 'fcast', 'mlog'].forEach(t => APP.S.all(t).forEach(r => APP.S.del(r.id))); localStorage.removeItem('lla.assist.cur'); };
     window.__fresh = () => { APP.go('home'); localStorage.removeItem('lla.assist.cur'); const s = APP.ASSIST.newSession(); __q.length = 0; return s.id; };
@@ -165,7 +165,10 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
   await T('D23-6 s35 two-message deadline: the what-part follows «شهرداریِ منطقه», the date stays', async () => { await ev(() => { __wipe(); __fresh(); });
     await turn('طرحِ سوم رو باید کتبی به شورایاری بدم تا تصویبش کنن.', 'مهلتش؟');
     const d0 = (() => { const d = new Date(); d.setDate(d.getDate() + 18); return d.toISOString().slice(0, 10); })();
-    await turn('مهلتش هم ۱۵ آبانه.', 'ثبت شد.', [{ do: 'deadline', what: 'تحویلِ کتبیِ طرحِ سوم به شورایاری برای تصویب', date: d0 }]);
+    /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12): روزِ موعد را صفحه از حرفِ خودش می‌خواند و بر تاریخِ مدل مقدم می‌دارد. جملهٔ پیشینِ این آزمون («۱۵ آبانه») با تاریخِ مدلِ ساختگی‌اش (۱۸ روز بعد) نمی‌خواند؛
+       حالا جمله همان روز را می‌گوید (تاریخِ شمسیِ d0) — آنچه این آزمون می‌سنجد (بخشِ «چه» ِ موعد) همان است */
+    const fa0 = await ev((d) => APP.fdate(d).split(' ').slice(0, 2).join(' '), d0);
+    await turn('مهلتش هم ' + fa0 + 'ه.', 'ثبت شد.', [{ do: 'deadline', what: 'تحویلِ کتبیِ طرحِ سوم به شورایاری برای تصویب', date: d0 }]);
     await turn('یه چیز دیگه هم اشتباه گفتم: طرح رو باید به شهرداریِ منطقه بدم، نه شورایاری.', 'فرستادم.', RT({ msg: 'طرحِ سوم رو باید کتبی به شورایاری بدم تا تصویبش کنن', key: 'deadline:d1', what: 'fact', fix: 'شهرداریِ منطقه', old: 'شورایاری' }));
     const x = await ev(() => ({ d: APP.S.all('deadline').map(d => ({ what: d.what, date: d.date, h: (d.fixHist || []).length })), res: (__cur().coach.retNote || {}).res }));
     return { ok: x.d.length === 1 && /به شهرداریِ منطقه برای تصویب/.test(x.d[0].what) && x.d[0].date === d0 && x.d[0].h > 0 && x.res.changed.length > 0 && !/ثبت نشده بود/.test(x.res.note || ''), got: x }; });

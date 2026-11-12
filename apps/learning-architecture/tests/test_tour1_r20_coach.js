@@ -37,7 +37,7 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     window.R = (o) => Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, o);
     window.__turn = async (text, reply, actions, extra) => {
       const n0 = __calls.length; __q.push(R({ reply: reply || 'باشه.', actions: actions || [] })); (extra || []).forEach(x => __q.push(x));
-      await APP.ASSIST.send(text); __q.length = 0;
+      await APP.ASSIST.send(text); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 «بر هر دو مسیر»): هر تاریخ فقط با «آره» ِ او به رکورد و «امروز» می‌رسد. این آزمون پیش از دورِ ۲۶ نوشته شده و تاریخِ نشسته را فرض می‌کند؛ پس پس از هر نوبت، برای هر برنامه یا موعدی که مدل گزارش کرده، همان «آره، همین» ِ ردیفِ 📅 ِ «امروز» زده می‌شود (راهِ خودِ صفحه: PR.dateYes ⇒ PR.dateResolve) — خودِ انتظارها دست نخورده‌اند مگر جایی که جداگانه نوشته شده */ try { if (APP.PR && APP.PR.dateYes) APP.PR.dateYes(null, true); } catch (e26) { }  __q.length = 0;
       const all = __calls.slice(n0), c = all.filter(x => !/^\[سامانه/.test(String((x.user.split('# نوبتِ تازه\n')[1] || '')).trim()))[0] || {};
       return { sys: c.sys || '', user: c.user || '', n: all.length, all: all.map(x => x.user) };
     };

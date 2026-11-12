@@ -3387,7 +3387,7 @@
        بی «… درست است؟» ِ صفحه و «آره» ِ او به «امروز» نمی‌رسد: برنامه «جلسهٔ بعد» می‌ماند و q.whenPend روزِ پرسیده را نگه می‌دارد (a41 PR.datePend می‌پرسد و با «آره» همان را می‌نشاند).
        «امروز/امشب» روزِ خودِ امروز است و پرسش ندارد. مسیرِ دورِ ۲۵ (پایین) پشتیبانِ بی a41 است. */
     var leg26 = (PLAN_WHEN.test(String(pt || "")) || /(?:^|[\s،])(?:امروز|امشب|همین\s*الان)(?![آ-ی‌])|آخرِ?\s*(?:همین\s*)?هفته/.test(String(pt || ""))) ? planDate18(pt) : "";
-    var P26 = A.PR && A.PR.planWhen26 ? A.PR.planWhen26(pt, w, td, leg26) : null, pend26 = P26 && P26.pend ? P26.pend : null;
+    var P26 = A.PR && A.PR.planWhen26 ? A.PR.planWhen26(pt, w, td, leg26, ut24) : null, pend26 = P26 && P26.pend ? P26.pend : null;
     var I25 = !/^next[-_ ]?session$/i.test(w) && !realDate(w) && A.PR && A.PR.whenInfo ? A.PR.whenInfo(pt) : null, amb25 = I25 && I25.amb ? I25.wd : "";
     var when = P26 ? P26.when : /^next[-_ ]?session$/i.test(w) ? "next-session" : realDate(w) ? (w >= td ? w : "") : amb25 ? "next-session" : I25 && I25.date ? (I25.date >= td ? I25.date : "") : (PLAN_WHEN.test(String(pt || "")) || /(?:^|[\s،])(?:امروز|امشب|همین\s*الان)(?![آ-ی‌])|آخرِ?\s*(?:همین\s*)?هفته/.test(String(pt || ""))) ? planDate18(pt) : "next-session";
     if (P26) amb25 = P26.amb || "";
