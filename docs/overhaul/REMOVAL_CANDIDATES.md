@@ -428,3 +428,11 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Status:** reachable, not called: `APP.ASSIST.R25_QUARANTINE.noFieldTxt24` (still used for views with no button or no request), `.regSys24`,
   `APP.R25_QUARANTINE.liveReqSignals24`, `.resultQ24`, `.natGuess24`. Delete only with the owner's approval.
 
+## 2026-11-12 — Tour 1 round 26, fixer «story»: `A.STORY.R26_QUARANTINE`
+- **What:** in `apps/learning-architecture/src/app/a45_story.js` — `NEWPROB25` of round 25 (a new problem only as «یه مسئلهٔ دیگه (هم) دارم» with
+  nothing in between), `switchTo` (return by naming only to the last split, only to an open live problem), `qSentence` of round 25 (the last
+  question sentence of the statement is the destination, whatever it asks), and the unwrapped `A.PR.fcMatch` / `fcNarrow` / `predFor`
+  (a forecast candidate by a shared number or as «the only open one», even when the confidence she stated belongs to another forecast).
+- **Why replaced:** DECISIONS_R26 Q3 + Q6, C21 (U12, U13, U15, C26-12, A26-51, U32, D25-25).
+- **Status:** reachable, not called: `APP.STORY.R26_QUARANTINE.NEWPROB25`, `.switchTo`, `.qSentence`, `.fcMatch`, `.fcNarrow`, `.predFor`.
+  Delete only with the owner's approval.

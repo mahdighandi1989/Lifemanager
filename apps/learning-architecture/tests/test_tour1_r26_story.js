@@ -359,6 +359,15 @@ const BANK = BF ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     chk(rdy && /ثابت شد/.test(rdy.t), 'C26-25 (aC2 p3 مسئلهٔ ثبت‌شده در «فهمِ مسئله» باز شد؛ «✅ حل شد» نبود): the problem proved in chat opens with the «در گفت‌وگو به نتیجه رسیدی — ✅ حل شد» card :: ' + J([rdy, ph]));
     t = await turn('خب، حالا چی؟', 'خوب.', []);
     chk(!/مجهول \(یا حکمی که باید ثابت شود\) چیست|داده‌ها \(یا فرض\) چیست/.test((head(t.user).match(/پرسشِ این نوبت[^\n]*/g) || []).join(' ')), 'C26-25 (aC2 p6/p10 پرسشِ صفحه برای مسئلهٔ حل‌شده: «مجهول … چیست؟»، «داده‌ها … چیست؟»): no understanding question is the turn question :: ' + (head(t.user).match(/پرسشِ این نوبت[^\n]*/g) || []).join(' ¦ ').slice(0, 300));
+    // --- C26-25 با همان جمله‌های aC2 p1–p3 (برهانِ او در پیامِ نخست؛ «بیا ثبتش کنیم» در پیامِ دوم) ---
+    await wipe(); sid = await fresh();
+    await turn('سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد فرد یه «L» دورِ مربعِ قبلی می‌سازه و مربع یکی بزرگ‌تر میشه. معلممون گفت «حالا بازنگری کن». بازنگری دقیقاً یعنی چی؟ چی کار باید بکنم؟', 'خوب.',
+      [cs({ ph: 'b', said: ['result'], ans: [], stuck: false, fail: false, role: 'self', nat: 'objective', result: 'ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n²' })]);
+    await turn('فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش کنیم.', 'ثبت شد.',
+      [{ do: 'live_new', title: 'جمعِ عددهای فرد برابرِ n²', statement: 'ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد فرد یه «L» دورِ مربعِ قبلی می‌سازه و مربع یکی بزرگ‌تر میشه. معلممون گفت «حالا بازنگری کن».', nat: 'objective' },
+        cs({ ph: 'b', said: ['result'], ans: [], stuck: false, fail: false, role: 'self', nat: 'objective', result: 'با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد', check: { msgs: ['با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد'] } })]);
+    const pn = await pidOf(/عددهای فرد/), rdn = await p.evaluate((pid) => APP.STORY.chatSolvedReady(pid), pn), phn = (await live()).filter(x => x.pid === pn)[0];
+    chk(!!rdn && phn && phn.turn !== 'u', 'C26-25 (aC2 p3 — مسئلهٔ ثبت‌شده در «فهمِ مسئله» باز شد؛ «✅ حل شد» نبود؛ سرِ مربی «بازنگری (… صفحه هنوز «فهمِ مسئله»)»): with her own sentences the registered problem carries the chat result — card ready, stage not «فهم» :: ' + J([rdn, phn]));
     // --- C26-2: «حل شد» در 🧭/📜 فقط از بستنِ خودِ صفحه — حالتِ «در بازنگری — هنوز بسته نشده» «مقصد — حل شد ✓» نیست ---
     const ok = await p.evaluate((pid) => APP.STORY.chatSolvedClose(pid), pc);
     M = await Mo(pc); const cst = await p.evaluate((pid) => { try { return APP.liveClosure ? APP.liveClosure(pid) : null; } catch (e) { return null; } }, pc);
