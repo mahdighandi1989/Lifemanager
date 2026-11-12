@@ -382,7 +382,11 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     pid = await setup({ steps: [{ t: '(۳) عایقِ سقف — منتظرِ برگهٔ #۱۰۱', s: 'now' }] });
     await turn('فعلاً با پشمِ سنگ بستم؛ تمام.', 'خوب.', [cs({ ph: 'b', said: ['result'], result: 'پشمِ سنگ' })]);
     await p.evaluate((pid) => __liveSet(pid, (so, L) => { L.state = 'solved'; }), pid); await check();
-    const m9 = await one(101); await adv(3); await addArea('s_problem', A_passW); await check();
+    const m9 = await one(101);
+    // look-alike negative: an unrelated registry change after the closure tells her nothing
+    await adv(1); await addArea('s_decision', A_budget); await check(); const n9 = { e: await one(101), td: await todayAll() };
+    chk(n9.e.st === 'moot' && !n9.e.moot && !n9.td.some(t => /🛎/.test(t)), 'bank#190 neg: an unrelated new area after the closure gives no «🛎 … آمد» line :: ' + JSON.stringify(n9));
+    await adv(2); await addArea('s_problem', A_passW); await check();
     e = await one(101); td = await todayAll(); sy = await sysMsgs(); await turn('سلام', 'سلام.', [cs({})]);
     const st9 = await p.evaluate((pid) => (APP.S.get('eprog_' + pid).solve.live || {}).state, pid);
     T(9, !!m9 && m9.st === 'moot' && !!e && e.moot === 'pr_ins_pass_w' && td.some(t => /🛎 ابزارِ «سنجشِ ردشدنِ صدا از عایقِ سقفِ کارگاه» آمد/.test(t) && /بسته می‌ماند/.test(t)) && st9 === 'solved' && !(await steps()).some(t => /منتظرِ برگهٔ #۱۰۱/.test(t)), { m9, e, td, st9, steps: await steps() });
@@ -399,6 +403,13 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     const s11 = (await sysMsgs()).length; await setSt(101, 'closed'); await check(); await check();
     e = await one(101); sy = (await sysMsgs()).slice(s11); sh = await sheet(101);
     T(11, !!e && e.st === 'wait' && sy.length === 1 && /برگه بی هیچ ابزار یا جوابِ تازه‌ای برای این گام بسته شد/.test(sy[0]) && /منتظر می‌ماند/.test(sy[0]), { e, sy, sh });
+    // look-alike negatives of the bare close: her own tick is not reopened by the page; a status first seen as closed (no earlier reading) tells nothing
+    pid = await arrived(); await turn('نه، این همون نیست', 'باشه.', [cs({})]); await check();
+    const s11b = (await sysMsgs()).length, n11b = (await notes(101)).length; await setSt(101, 'approved'); await check();
+    e = await one(101); sy = (await sysMsgs()).slice(s11b);
+    chk(!!e && e.st === 'declined' && sy.length === 1 && /⛔ برگهٔ #۱۰۱ تأیید و بسته شد بی آن‌که ابزاری/.test(sy[0]) && (await notes(101)).length === n11b && (await sheet(101)).status === 'approved', 'bank#192 neg: her own tick on a waiting sheet ⇒ «⛔ … بی ساختن», told once, the page does not reopen what she closed :: ' + JSON.stringify({ e, sy }));
+    pid = await setup(); await setSt(101, 'closed'); const s11c = (await sysMsgs()).length; await check(); await check();
+    e = await one(101); chk(!!e && e.st === 'wait' && (await sysMsgs()).length === s11c, 'bank#192 neg: a status seen for the first time is only recorded — no line without a change :: ' + JSON.stringify(e));
     // 12 — five checks on five days: nothing, nothing, an unfit reply, an ask, an arrival ⇒ each line names what came that time
     pid = await setup(); await adv(1); await check(); await adv(1); await check();
     await adv(1); await reply(101, ['پاسخ به برگهٔ دستیار #101 — حوزهٔ «برآورد و مسئله‌های فرمی» (pr_estimation_fermi) کامل‌تر شد.']); await check();

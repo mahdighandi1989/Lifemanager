@@ -428,3 +428,12 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Status:** reachable, not called: `APP.ASSIST.R25_QUARANTINE.noFieldTxt24` (still used for views with no button or no request), `.regSys24`,
   `APP.R25_QUARANTINE.liveReqSignals24`, `.resultQ24`, `.natGuess24`. Delete only with the owner's approval.
 
+
+## 2026-11-12 — «most shared words wins» ranking of the territory loop (learning-architecture, Pólya round 26, loop: Q7)
+- **File:** `apps/learning-architecture/src/app/a44_route.js`.
+- **What it did:** `rank` (R25) declared the candidate with the most full-weight shared words «clear» unless another had exactly the same counts. Two
+  areas with the same description were split by a word of the sheet's own title («آشکارسازی») and one was declared «🛎 ابزارِ لازم آمد» without asking
+  or naming the other (D26-20).
+- **Why replaced:** DECISIONS_R26 Q7 + C20 (a real tie is asked naming both; a clear single best fit arrives). Now: one candidate that alone meets
+  the arrival condition arrives; several ⇒ ask naming all, unless the step or the sheet title carries the whole name of exactly one.
+- **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.rank25`. Delete only with the owner's approval.
