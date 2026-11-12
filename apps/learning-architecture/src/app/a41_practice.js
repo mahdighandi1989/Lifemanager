@@ -1987,7 +1987,7 @@
       try {
         PR.all(function (c) { return c.kind === "list" && own(c) && (c.items || []).length; }).forEach(function (c) {
           var L = LISTS[c.list] || {}, acts = [];
-          (c.items || []).forEach(function (x) { itemEvents(c, x, "").forEach(function (e) { acts.push({ id: "list:" + c.id + ":" + x.id + ":" + e.kind + ":" + e.d + ":" + acts.length, at: e.at, src: "list", kind: "list", rid: c.id, go: ["practice", c.id], ok: e.kind === "list:close" && (x.closed || {}).kind === "refuted" ? false : null, fa: e.title + " — " + e.lines.join(" · "), day: e.d }); }); });
+          (c.items || []).forEach(function (x) { itemEvents(c, x, "").forEach(function (e) { acts.push({ id: "list:" + c.id + ":" + x.id + ":" + e.kind + ":" + e.d + ":" + acts.length, at: e.at, src: "list", kind: "list", rid: c.id, go: ["practice", c.id], ok: e.kind === "list:close" && (x.closed || {}).kind === "refuted" ? (c.list === "assumptions" ? true : false) /* دورِ ۲۶ (Q9، U30 s13، بانکِ R26 #238 — سهمِ classify): فرضی که خودش آزمود و رد شد کارِ خودِ تکنیکِ «فهرستِ فرض‌ها» است، نه شکست */ : null, fa: e.title + " — " + e.lines.join(" · "), day: e.d }); }); });
           if (!acts.length) return;
           acts.sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
           var days = {}; acts.forEach(function (a) { days[a.day] = 1; });

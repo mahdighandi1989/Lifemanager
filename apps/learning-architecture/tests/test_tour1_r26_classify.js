@@ -268,6 +268,53 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     chk(/مجهول \(یا حکمی که باید ثابت شود\) چیست/.test(head(u3.user)), 'look-alike: an adult keeps the book wording');
   });
 
+  // ================= Q9 — کارنامهٔ ذهن: برچسبِ خوانا، ناقص ≠ شکست، فرضِ ردشده = کارِ تکنیک، پیامِ ✗ اعتبار نمی‌گیرد (U23، U24، U30، U46) =================
+  const mindActs = () => ev(() => { const Q = APP.MIND.phases(), o = []; (Q.rows || []).forEach(r => (r.acts || []).forEach(a => o.push({ ph: r.id, ok: a.ok, fa: a.fa, src: a.src }))); return o; });
+  const mindText = async () => { await ev(() => APP.go('mind')); await p.waitForTimeout(150); return ev(() => document.querySelector('#main').innerText); };
+  await section('mind', async () => {
+    await wipe(); await setB(''); await fresh();
+    await ev(() => { const s = __cur(), at = (i) => new Date(Date.UTC(2026, 9, 19, 8, i)).toISOString();
+      s.msgs.push({ role: 'user', text: 'کارِ خودم تا این‌جا: گام ۱: دو طرف رو ساده کردم. گام ۲: ۷٫۵ ÷ ۳ = ۲٫۲. گام ۳: ۴ × ۶ = ۲۴.', at: at(0) }, { role: 'ai', text: 'خوب.', at: at(1) });
+      const C = s.coach = s.coach || {}; C.pk = 'c:0'; C.stmt = 'یک مسئلهٔ آزمون با سه گام'; C.ph = 'c';
+      C.story = { 'c:0': { items: [], prior: { at: at(0), st: 'ask', steps: [
+        { n: 1, quote: 'دو طرف رو ساده کردم', verdict: 'incomplete', why: 'نگفته چطور', dep: [], bad: [] },
+        { n: 2, quote: '۷٫۵ ÷ ۳ = ۲٫۲', verdict: 'wrong', cause: 'skill', why: 'تقسیمِ اعشاری', dep: [], bad: ['2.2'] },
+        { n: 3, quote: '۴ × ۶ = ۲۴', verdict: 'ok', dep: [], bad: [] }] } } };
+      s.coachEv = [
+        { at: at(0), ph: 'c', ok: false, src: 'prior', key: 'prior|c|دو طرف رو ساده کردم', prior: 1, cause: 'unknown', causeWhy: 'نگفته چطور', msg: 't' + at(0) },
+        { at: at(0), ph: 'c', ok: false, src: 'prior', key: 'prior|c|۷٫۵ ÷ ۳ = ۲٫۲', prior: 2, cause: 'skill', causeWhy: 'تقسیمِ اعشاری', msg: 't' + at(0) },
+        { at: at(0), ph: 'c', ok: true, src: 'prior', key: 'prior|c|۴ × ۶ = ۲۴', prior: 3, msg: 't' + at(0) }];
+      APP.S.put(s); });
+    const A1 = (await mindActs()).filter(a => a.src === 'prior'), tx = await mindText();
+    chk(!/undefined/.test(tx), 'U23 (B26·D6): the string «undefined» never appears on the mind card — ' + (tx.match(/.{30}undefined.{30}/) || [''])[0]);
+    chk(/گامِ کارِ پیشین: ۱ از ۲/.test(tx), 'U23 / bank #236: the source cell has a readable label «گامِ کارِ پیشین: k از n» — ' + (tx.match(/[^\n]*کارِ پیشین:[^\n]*/) || [''])[0].slice(0, 120));
+    chk(!A1.some(a => /گامِ ۱/.test(a.fa)), 'U24 s11 / bank #237: an «ناقص» prior step is not booked as «− … درست نبود» — ' + JSON.stringify(A1).slice(0, 300));
+    const w2 = A1.filter(a => /گامِ ۲/.test(a.fa))[0];
+    chk(w2 && w2.ok === false && /درست نبود/.test(w2.fa), 'look-alike / bank #248: a really wrong step is still booked «−» — ' + JSON.stringify(w2));
+    const cz = await ev(() => { const Q = APP.MIND.phases(), o = []; Object.keys(Q.causes || {}).forEach(k => (Q.causes[k] || []).forEach(c => o.push(k + ':' + (c.why || '')))); return o; });
+    chk(cz.some(c => /^skill:.*تقسیمِ اعشاری/.test(c)) && !cz.some(c => /نگفته چطور/.test(c)), 'bank #248: … with its cause (and the incomplete step adds no failure cause) — ' + JSON.stringify(cz).slice(0, 200));
+    chk(A1.some(a => a.ok === true && /گامِ ۳/.test(a.fa)), 'the correct prior step is credited — ' + JSON.stringify(A1).slice(0, 300));
+    // U46: «+ نتیجه‌ای که گفت» only when the page's own reader did not mark the message ✗
+    await wipe(); await fresh();
+    await ev(() => { const s = __cur(), at = (i) => new Date(Date.UTC(2026, 9, 19, 9, i)).toISOString();
+      s.msgs.push({ role: 'user', text: 'حسابِ پول: ۲۱ × ۱۲ = ۲۴۲ پس جواب ۲۴۲ تومنه.', at: at(0) }, { role: 'ai', text: 'خوب.', at: at(1) }, { role: 'user', text: 'حسابِ دوم: ۲۱ × ۱۲ = ۲۵۲ پس جواب ۲۵۲ تومنه.', at: at(2) }, { role: 'ai', text: 'خوب.', at: at(3) });
+      s.coach = { pk: 'c:0', stmt: 'حسابِ پول', ph: 'b' };
+      s.coachEv = [{ at: at(0), ph: 'b', ok: true, src: 'chatok', how: 'res', key: 'chatok|b|res|حسابِ پول: ۲۱ × ۱۲ = ۲۴۲', msg: 't' + at(0) }, { at: at(2), ph: 'b', ok: true, src: 'chatok', how: 'res', key: 'chatok|b|res|حسابِ دوم: ۲۱ × ۱۲ = ۲۵۲', msg: 't' + at(2) }];
+      APP.S.put(s); });
+    const A2 = (await mindActs()).filter(a => /نتیجه‌ای که گفت/.test(a.fa));
+    chk(!A2.some(a => /۲۴۲/.test(a.fa)), 'U46 pwB2 / bank #239: no «+ نتیجه‌ای که گفت» for a message whose «۲۱ × ۱۲ = ۲۴۲» the page marked ✗ — ' + JSON.stringify(A2).slice(0, 300));
+    chk(A2.some(a => a.ok === true && /۲۵۲/.test(a.fa)), 'look-alike / bank #249: a result in a message the page read ✓ is credited — ' + JSON.stringify(A2).slice(0, 300));
+    // U30: a refuted assumption is the technique's work, not a failure; a refuted item of another list keeps its sign
+    await wipe(); await fresh();
+    const W = await ev(() => { const PR = APP.PR; PR.listAdd('assumptions', { text: 'اگه گزارش بدم حتماً اخراج میشه', load: true }); const x = PR.list('assumptions').items[0]; PR.itemClose('assumptions', x.id, 'پس اون فرضم غلط بود', null, 'refuted');
+      let other = null; try { const nm = Object.keys(PR.LISTS || {}).filter(k => k !== 'assumptions')[0]; if (nm) { PR.listAdd(nm, { text: 'یک موردِ دیگر برای آزمون' }); const y = PR.list(nm).items[0]; PR.itemClose(nm, y.id, 'رد شد', null, 'refuted'); other = nm; } } catch (e) { other = 'ERR ' + e.message; }
+      const T = APP.MIND.techWork(); return { other, rows: (T.rows || []).filter(r => r.src === 'list').map(r => ({ key: r.key, acts: (r.acts || []).filter(a => a.ok !== null).map(a => ({ ok: a.ok, fa: a.fa.slice(0, 80) })) })) }; });
+    const ra = (W.rows.filter(r => r.acts.some(a => /فهرستِ فرض‌ها/.test(a.fa)))[0] || { acts: [] }).acts;
+    chk(ra.length === 1 && ra[0].ok === true, 'U30 s13 / bank #238: a refuted assumption (T15) is credited to her checking, not booked «−» — ' + JSON.stringify(W).slice(0, 400));
+    if (W.other && !/^ERR/.test(W.other)) { const ro = (W.rows.filter(r => !r.acts.some(a => /فهرستِ فرض‌ها/.test(a.fa)))[0] || { acts: [] }).acts; chk(ro.length === 1 && ro[0].ok === false, 'look-alike: a refuted item of another list («' + W.other + '») keeps its sign — ' + JSON.stringify(ro).slice(0, 300)); }
+    else (info.note = info.note || {}).listOther = String(W.other);
+  });
+
   //SECTIONS
 
   console.log(JSON.stringify(info.summary || {}), JSON.stringify(info.nc), JSON.stringify(info.note || {}));

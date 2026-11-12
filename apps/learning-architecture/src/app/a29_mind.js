@@ -346,7 +346,11 @@
   var PH4 = [["und", "u", "فهمِ مسئله"], ["plan", "p", "طرح‌ریزی"], ["exec", "c", "اجرای طرح"], ["back", "b", "بازنگری"]];
   var PH_SRC = { ask: "پرسشِ همین لحظه / معلمِ حل (خودداوریِ «کمک کرد؟»)", sim: "شبیه‌ساز (درستیِ بار اولِ گام)", ucard: "کارتِ فهم (خودسنجی در برابرِ صورت)", live: "گام‌های واقعیِ مسئلهٔ زنده", lb: "بازنگری انجام و وارسی شد",
     chat: "گیر یا «حل نشد» ِ خودت در گفت‌وگو با مربی", knot: "گره‌ای که هنگامِ حل در غربال پیدا شد",
-    chatok: "پاسخ، گذر از مرحله یا «حل شد» ِ سنجیده در گفت‌وگو با مربی", lplan: "طرحِ ثبت‌شده، مسئلهٔ کمکی و دادهٔ به‌کاررفته در مسئلهٔ زنده" };
+    chatok: "پاسخ، گذر از مرحله یا «حل شد» ِ سنجیده در گفت‌وگو با مربی", lplan: "طرحِ ثبت‌شده، مسئلهٔ کمکی و دادهٔ به‌کاررفته در مسئلهٔ زنده",
+    /* دورِ ۲۶ (Q9، U23 — B26·D6 «undefined: k از n»): منبعِ «prior» از دورِ ۲۵ شمرده می‌شد ولی برچسب نداشت */
+    prior: "گامِ کارِ پیشین" };
+  /* هر منبعِ بی‌برچسب (منبعِ تازه‌ای که کسی بعداً می‌افزاید) هم خوانا می‌ماند — هرگز «undefined» یا کلیدِ خام */
+  function srcFa26(k) { return PH_SRC[k] || "منبعِ دیگر"; }
   var NO_DATA = "هنوز داده‌ای نیست";
   M.NO_DATA = NO_DATA;
   M.PHASES = PH4.map(function (x) { return { id: x[0], ph: x[1], fa: x[2] }; });
@@ -384,6 +388,14 @@
          مسئلهٔ زنده است کنار می‌رود (پیامد همان‌جا شمرده می‌شود)، و دو رویدادِ گفت‌وگو با یک شناسه و یک مرحله یکی‌اند */
       (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok" || e.src === "prior") || e.pend || e.wd) return;
         /* دورِ ۲۵ (P1، A25-6/B25·D11/C25-18): گامِ کارِ پیشین — درست ⇒ به حسابِ خودش (اجرا +)؛ نادرست/ناقص ⇒ با علتِ خودش؛ اصلاحِ خودش ⇒ موفقیت. پیش‌تر رویدادِ src «prior» اصلاً خوانده نمی‌شد */
+        /* دورِ ۲۶ (Q9، U24 s11 «− گامِ کارِ پیشین که درست نبود» برای گامِ «⚠️ ناقص»؛ بانکِ R26 #237): «درست نبود» فقط گامی است که دفترِ کارِ پیشین همین حالا «نادرست» می‌داند.
+           گامِ ناقص یا فقط «وابسته» شکست نیست و در کارنامه «−» نمی‌گیرد (نه + و نه −). حکم از خودِ دفتر (A.STORY.priorFor) خوانده می‌شود، نه از رویداد. */
+        if (e.src === "prior" && !e.ok && e.how !== "priorfix") { try { var pl26 = A.STORY && A.STORY.priorFor ? A.STORY.priorFor(s, e.pid || "") : null, st26 = pl26 && (pl26.steps || []).filter(function (x) { return x && x.n === e.prior; })[0];
+          if (st26 && st26.verdict !== "wrong") return; } catch (e26) { } }
+        /* دورِ ۲۶ (Q9، U46 pwB1/pwB2 «+ نتیجه‌ای که گفت» برای پیامی که صفحه خودش ✗ زده بود؛ بانکِ R26 #239): نتیجه‌ای که حسابِ صفحه در همان پیام نمی‌خواند اعتبار نمی‌گیرد
+           (خوانندهٔ حسابِ a46: A.STORY.arithChk + arithNote — نه نسخهٔ محلی) */
+        if (e.ok && e.how === "res" && e.msg) { try { var m26 = (s.msgs || []).filter(function (m) { return m && m.role === "user" && (String(m.id || "") === String(e.msg) || (m.seq != null && "u" + m.seq === String(e.msg)) || "t" + String(m.at || "") === String(e.msg)); })[0];
+          if (m26 && A.STORY && A.STORY.arithChk && A.STORY.arithNote) { var ck26 = A.STORY.arithChk(String(m26.text || "")); if (ck26 && ck26.length && A.STORY.arithNote(ck26).bad) return; } } catch (e27) { } }
         if (e.act) { if (liveActs[e.act]) return; var ak = e.act + "|" + e.ph + "|" + (e.ok ? 1 : 0); if (seenAct[ak]) return; seenAct[ak] = 1; }
         /* تورِ پولیا (R3g، دورِ ۲۱، B·D9/D·11): کلیدِ کارِ دوباره‌ثبت‌شده «…|rebook:u6» است — «از کجا؟» نقلِ حرفِ خودش را نشان می‌دهد، نه شناسهٔ خام */
         var kp = String(e.key || "").split("|").filter(function (x) { return x && !/^rebook:|^sc$/.test(x); }), q0 = e.rebook && e.src20 && e.src20.span ? String(e.src20.span) : (kp.pop() || ""), how = { selfcorr: "خودش حرفِ پیشینش را اصلاح کرد (بازنگری)", plan_done: "برنامه‌اش را انجام داد", solved: "«حل شد» در گفت‌وگو", own: "بازگوییِ خودش", res: "نتیجه‌ای که گفت", lesson: "درسی که گفت", plan: "طرحی که گفت", ans: "پاسخ به پرسشِ مرحله", pass: "گذر از مرحله", priorfix: "گامِ کارِ پیشین که خودش درست کرد" }[e.how] || (e.src === "prior" ? (e.ok ? "گامِ درستِ کارِ پیشینِ خودش" : "گامِ کارِ پیشین که درست نبود") + (e.prior ? " (گامِ " + A.fa(e.prior) + ")" : "") : "");
@@ -483,7 +495,7 @@
         h("tbody", {}, Q.rows.map(function (X) {
           if (X.none) return h("tr", { "data-ph": X.id, "data-none": "1" }, h("td", {}, X.fa), h("td", { class: "mind-php" }, NO_DATA), h("td", {}, "—"), h("td", { class: "mind-phw" }, "—"), h("td", { class: "small" }, "— (" + NO_DATA + ")"));
           return h("tr", { "data-ph": X.id }, h("td", {}, X.fa), h("td", { class: "mind-php" }, pf(X.p) + " (" + fa(X.n) + ")"), h("td", {}, fa(X.k) + " از " + fa(X.n)), h("td", { class: "mind-phw" }, Q.weakest ? pf(X.pWeak) : "—"),
-            h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return Q.src[s] + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)", fromList(X.acts, "ph:" + X.id)));
+            h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return (Q.src[s] || srcFa26(s)) + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)", fromList(X.acts, "ph:" + X.id)));
         })))),
       h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
         : Q.n && Q.ranked >= 2 ? M.NO_DISTINCT + " (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای شکستی ندارد یا مرحله‌ها برابرند؛ «ضعیف‌ترین» فقط وقتی نام برده می‌شود که مرحله‌ای شکست دارد و از همهٔ مرحله‌های دیگر به‌روشنی پایین‌تر است."
