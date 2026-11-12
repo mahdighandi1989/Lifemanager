@@ -4211,6 +4211,7 @@
         /* دورِ ۲۶ (Q2، U6/B26·D4 s17 ✏️ «۰.۸ ⇐ ۰.۷» ⇒ نتیجهٔ «۰.۷»): رویدادِ دوباره‌ثبت‌شده همان جملهٔ خودش است با مقدارِ درست («حساب نهایی ۲۴ × ۰.۷ = …»)، نه فقط تکهٔ اصلاح —
            وگرنه نتیجه‌ای به نامِ «۰.۷» می‌ماند که هر اصلاحِ بعدی آن را «نتیجهٔ کهنه» می‌خواند؛ فقط وقتی جای‌گزینی ممکن نیست همان مقدارِ درست */
         var sp26 = eS[i].span != null ? sub(String(eS[i].span), false) : null;
+        if ((sp26 == null || !String(sp26).trim()) && A.liveFragSent) { try { var fs26 = A.liveFragSent(R.edit ? fullNew21 : ownText(cu), R.fix); if (fs26 && String(fs26).trim()) sp26 = fs26; } catch (e26) { } }   // رویدادِ بی‌نقل ⇒ جملهٔ خودِ او که مقدارِ درست در آن است
         ne.src20 = { sess: s.id, msg: R.curId, span: clip(sp26 != null && String(sp26).trim() ? sp26 : R.fix, 300), key: k }; delete ne.wd;
         /* دورِ ۲۶ (Q2، بانکِ R26 #45 «کلاس ۲۸ نفره، گروه‌های ۴ نفره، پس ۷ گروه» ⇒ «کلاس ۳۲ نفره … پس ۷ گروه»): نتیجه‌ای که در همان جملهٔ داده بود و عددش از همان داده حساب شده، با دادهٔ تازه
            «نتیجهٔ درست» نیست — دوباره ثبت می‌شود ولی با نشانِ کهنه (حسابِ خودِ اوست؛ صفحه بازنویسی‌اش نمی‌کند) */
@@ -4234,9 +4235,9 @@
            موتورِ صفحه می‌سنجد (a38 A.liveRestsOn: yes / no / unknown) — «yes»: عددی از آن با رابطهٔ نوشتهٔ خودش از مقدارِ پیشین آمده یا خودِ همان داده را در همان نقش بازمی‌گوید؛ «no»: هر
            عددش حسابِ خودش را دارد یا کمیتِ دیگری است؛ «unknown» ⇒ صفحه حکم نمی‌دهد، می‌پرسد («از … حساب شده بود؟»). عددِ هم‌رقم به‌تنهایی شاهد نیست. اصلاحِ غیرِ عددی همان سنجهٔ پیشین. */
         var numD26 = /[0-9۰-۹]/.test(String(oV23)) && /[0-9۰-۹]/.test(String(nV23)), rel26 = numD26 && typeof A.liveRestsOn === "function" ? A.liveRestsOn(e.src20.span, D21 && D21.o ? D21 : { o: oV23, n: nV23 }, { src: R.src.text, ctx: herTexts25(s), clause: R.frag, results: (s.coachEv || []).filter(function (x) { return x && !x.wd && x.ok && x.how === "res" && x.src20 && x.src20.span && x !== e && String(x.at || "") < String(e.at || "~") && (!e.pk || !x.pk || x.pk === e.pk); }).map(function (x) { return String(x.src20.span); }) }) : "";
-        var hit26 = rel26 ? (rel26 === "yes" || (rel26 === "unknown" && (num24 || hasTok20(e.src20.span, oV23)))) : (hasTok20(e.src20.span, oV23) || num24);
+        var hit26 = rel26 ? (rel26 === "yes" || rel26 === "ask" || (rel26 === "unknown" && (num24 || hasTok20(e.src20.span, oV23)))) : (hasTok20(e.src20.span, oV23) || num24);
         if (!(hit26 && (!e.pk || !pk23.length || pk23.indexOf(e.pk) >= 0))) return;
-        var ask26 = rel26 === "unknown";
+        var ask26 = rel26 === "unknown" || rel26 === "ask";
         e.stale = { at: nowIso(), by: R.curId, from: R.srcId, old: clip(oV23, 60), "new": clip(nV23, 60), ask: ask26, why: ask26 ? "شاید بر «" + clip(oV23, 40) + "» بنا بود — اگر از آن حساب شده، با «" + clip(nV23, 40) + "» دوباره حساب شود" : "بر «" + clip(oV23, 40) + "» بنا بود — با «" + clip(nV23, 40) + "» دوباره حساب شود" };
         put("نتیجهٔ «" + clip(plainTx(e.src20.span), 60) + "»", e.src20.span, (ask26 ? "پرسیده شد — " : "کنار رفت — ") + e.stale.why, e.stale.why, ask26 ? "نتیجهٔ «" + clip(plainTx(e.src20.span), 60) + "»: از «" + clip(oV23, 40) + "» حساب شده بود؟ صفحه رابطه‌اش را نشناخت — اگر آری، با «" + clip(nV23, 40) + "» دوباره حساب شود" : "نتیجهٔ «" + clip(plainTx(e.src20.span), 60) + "» دیگر برقرار نیست — " + e.stale.why); }); } catch (e) { console.warn(e); }
     /* R3g (دورِ ۲۱، D·s38 نتیجهٔ درست‌شده دوباره ثبت نشد، B·D14 درس): نتیجه و درسِ درست‌شده هم از پیامِ کنونی دوباره ثبت می‌شوند (کارِ درست همان است) */
