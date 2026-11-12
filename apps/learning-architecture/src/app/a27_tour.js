@@ -3665,6 +3665,9 @@
   CORR19b = new RegExp(CORR19b.source + "|[^\\s،,.!؟?]+[\\s‌]+نیست(?:ن|ند|ه)?[\\s‌]*[،,][\\s‌]*(?:[0-9۰-۹]|بلکه|درستش|(?:[^\\s،,.!؟?]+[\\s‌]+){0,3}(?!(?:می|نمی))[^\\s،,.!؟?]{1,20}(?:ه|است|ست|بود)(?=[\\s.!،,]|$))|\\bnot\\s+\\S|\\bactually\\b|\\bI\\s+meant\\b", "i");
   /* دورِ ۲۵ (P4، بانکِ R25 #140 «۱۸ ماه وقت ندارم، ۱۵ ماهه»، #157 «۳ نفر نیستیم، ۴ نفریم»): «X ندارم/نیستیم، <عدد>» هم نشانهٔ اصلاحِ حرفِ خودش است (گزارشِ مدل + تکهٔ پیشینِ خودش همچنان لازم است) */
   CORR19b = new RegExp(CORR19b.source + "|[^\\s،,.!؟?]+[\\s‌]+(?:ندارم|نداریم|نداره|ندارد|نیستیم|نیستم|نبودیم|نبودم)[\\s‌]*[،,][\\s‌]*[0-9۰-۹]", "i");
+  /* دورِ ۲۶ (Q2، بانکِ R26 #44 «مسیر ۴۲۰ نیست، از جادهٔ جدید ۴۵۰ کیلومتره»، #49 «اول گفتم هفته‌ای دو بار؛ دفترم رو نگاه کردم، سه بار بوده»): «<عدد> نیست، … <عدد>» در همان بند، و روایتِ
+     «اول/قبلاً گفتم X؛ … Y بوده» هم نشانهٔ اصلاحِ حرفِ خودش‌اند (گزارشِ مدل + تکهٔ پیشینِ خودش + مقدارِ درست در همین پیام همچنان لازم است) */
+  CORR19b = new RegExp(CORR19b.source + "|[0-9۰-۹][^\\s،,.!؟?]*[\\s‌]+(?:[^\\s،,.!؟?]+[\\s‌]+)?نیست(?:ن|ند|ه)?[\\s‌]*[،,][^.!؟?\\n]{0,40}?[0-9۰-۹]|(?:اول(?:ش)?|قبلاً|قبلا|پیش‌?تر)[\\s‌]+(?:که[\\s‌]+)?(?:گفتم|نوشتم)(?![آ-ی])[^.!؟?\\n]{1,60}[؛;،,][^.!؟?\\n]{1,60}(?:بوده|بود|است)(?=[\\s.!،,]|$)", "i");
   AS.CORR_RE = CORR19b;
   /* بانکِ R19b (INF15 #15، #16): «اشتباه کردم» ِ تنها (کلید را جا گذاشتم، سرِ امتحان علامت را انداختم) اغلب کارِ بیرونی است، نه شکستِ مرحلهٔ همین حل —
      الگو آن را فقط «در انتظار» (pend) نگه می‌دارد تا گزارشِ مدل داوری کند (نامتقارن: شکستِ دروغ گران‌تر است)؛ «حل نشد/غلط بود» ِ دیگر مثلِ پیش */
@@ -3864,7 +3867,12 @@
     /* دورِ ۲۲ (P3، D s36 «ظرفِ اول ۳۰ لیتر بود، نه ۲۰ لیتر. پس جوابم عوض میشه؟»): داوری با بندی است که مقدارِ درست در آن آمده، نه با «؟» ِ پایانِ پیام */
     if (!edit && fixQ22(own, fix) && !CORR19b.test(own)) return { err: "پرسش است، نه اصلاح" };
     if (!edit && OTHER_ERR19b.test(own) && !/(?:اشتباه|غلط)[\s‌]*(?:گفتم|نوشتم)/.test(own)) return { err: "اصلاحِ اشتباهِ دستیار یا دیگری است، نه حرفِ خودش" };
-    if (!fix || !(quoteIn(fix, ut) || hasFrag(ut, fix) || hasTok20(ut, fix))) return { err: "مقدارِ درست در همین پیامِ او نیست" };
+    /* دورِ ۲۶ (Q2، A26-34 tA1 fix «دقیقه‌ای ۱٫۶ لیتر» برای «… ۱٫۶ لیتر شد، نه ۲»، بانکِ R26 #50 «۱٫۶ سانت» برای «قطرش ۱٫۶ شد نه ۲»): مدل مقدارِ درست را با یکا/نامِ تکهٔ پیشین بازنویسی می‌کند —
+       صفحه می‌سنجد: هر عددِ fix در همین پیامِ اوست و هر واژهٔ دیگرش یا در همین پیام است یا در تکهٔ پیشینِ خودش (یکا/نامی که با همان داده آمده بود). */
+    var fixOk26 = !!fix && (quoteIn(fix, ut) || hasFrag(ut, fix) || hasTok20(ut, fix));
+    if (!fixOk26 && fix) { var fn26 = nums19b(fix), fw26 = String(fix).replace(/[0-9۰-۹٠-٩.٫]+/g, " ").split(/[\s‌،,؛;:«»()]+/).filter(function (w) { return w.length >= 2; }), src26 = frag + " " + txtOf(x.old);
+      fixOk26 = fn26.length > 0 && fn26.every(function (n) { var r = numRe19b(n); return !!r && r.test(faDigits(ut).replace(/٫/g, ".")); }) && fw26.every(function (w) { return hasTok20(ut, w) || hasTok20(src26, w); }); }
+    if (!fixOk26) return { err: "مقدارِ درست در همین پیامِ او نیست" };
     var M = s.msgs || [], ui = M.indexOf(um), src = null, n = 0, i, one = tok20(frag).length <= 1;
     /* دورِ ۲۳ (Q4، C23-4 s23 ✏️ «۱» ⇐ «۱.۵»، «۱۰۰» ⇐ «۱۲۰»): ✏️ پیامِ اصلاح‌شده را می‌شناسد (mid) — تکهٔ کوتاه («۱») در تازه‌ترین پیام («۱.۷۵ برابر») جست‌وجو نمی‌شود */
     if (x.mid) { var mm0 = M.filter(function (y) { return isUser(y) && msgId19b(y) === String(x.mid); })[0]; if (mm0 && M.indexOf(mm0) < ui && [mm0.text].concat((mm0.textHist || []).map(function (h0) { return h0.text; })).some(function (t0) { return exactIn22(t0, frag) || hasTok20(t0, frag) || hasFrag(t0, frag); })) src = mm0; }
@@ -4150,7 +4158,10 @@
       if (sv != null && sv !== C.stmt && D21 && A.liveGrowGarble && A.liveGrowGarble(C.stmt, D21)) { var fs23 = (A.liveFragSent ? A.liveFragSent(ownText(cu), R.fix) : "") || R.fix; sv = String(C.stmt).replace(/[\s.!]+$/, "") + " (اصلاحِ خودم: " + String(fs23).trim().replace(/[.!]+$/, "") + ")."; }
       if (sv != null && sv !== C.stmt) { var stP = false; try { stP = !AS.notProblem(C.stmt) && (/[؟?0-9۰-۹=]/.test(C.stmt) || qToks(C.stmt).length >= 6) && (/[0-9۰-۹=+\-−×÷^√]/.test(R.frag + " " + R.fix) || qToks(R.frag).length >= 6 || R.what === "fact" || R.what === "ans"); } catch (e) { }
       C.stmtHist = (C.stmtHist || []).concat([{ at: nowIso(), old: C.stmt, note: "اصلاح شد ⇐ «" + clip(C.stmt, 120) + "»", by: R.curId }]); if (stP) put("صورتِ مسئلهٔ گفت‌وگو", C.stmt, sv); C.stmt = clip(sv, 400); } }
-    Object.keys(C.unkBy || {}).forEach(function (k) { var u = C.unkBy[k]; if (!u || !hasFrag(R.src.text, u) || over(u) === false) return; var v = sub(u, false); if (v == null || v === u) return; C.unkHist = (C.unkHist || []).concat([{ at: nowIso(), pk: k, old: u, note: "اصلاح شد ⇐ «" + clip(u, 120) + "»" }]); C.unkBy[k] = clip(v, 160); put("مجهول به حرفِ خودت", u, v); });
+    /* دورِ ۲۶ (Q2، U16 oB1 «دو روز ⇒ سه روز»: «چیزی برای عوض کردن نبود» در حالی که «مجهول به حرفِ خودت: … دو روز …» مانده؛ بانکِ R26 #49): مجهولی که از پیامِ **دیگری** ثبت شده ولی همان
+       واقعیت را دارد (همان مقدارِ پیشین + واژه‌ای مشترک با تکهٔ اصلاح‌شده) هم با تاریخچه درست می‌شود — «رکوردی نبود» فقط وقتی هیچ رکوردی مقدارِ پیشین را ندارد */
+    var oU26 = D21 && D21.o ? D21.o : R.old;
+    Object.keys(C.unkBy || {}).forEach(function (k) { var u = C.unkBy[k]; if (!u) return; var fromSrc26 = hasFrag(R.src.text, u); if (fromSrc26 ? over(u) === false : !(oU26 && hasTok20(u, oU26) && rel19b(String(u).replace(/[0-9۰-۹٠-٩]+/g, " "), String(R.frag).replace(/[0-9۰-۹٠-٩]+/g, " ")))) return; var v = sub(u, false); if (v == null || v === u) return; C.unkHist = (C.unkHist || []).concat([{ at: nowIso(), pk: k, old: u, note: "اصلاح شد ⇐ «" + clip(u, 120) + "»" }]); C.unkBy[k] = clip(v, 160); put("مجهول به حرفِ خودت", u, v); });
     /* شاهدِ پاسخ (ans/said): پاسخ‌دادن می‌ماند، محتوایش اصلاح می‌شود */
     if (/^(?:ans|said|fact)$/.test(R.what)) { var nA = 0; (C.ansLog || []).forEach(function (e) { if (!fromMsg(e, R) || !aff("ans", null, [])) return; corrPush(e, R.frag, R.fix, ctx); nA++; }); var nO = 0, PN = { u: "مجهول", d: "داده", c: "شرط" }, pn = []; (C.ownLog || []).forEach(function (e) { if (!fromMsg(e, R) || !aff("said:" + (e.p || []).join(""), null, [])) return; corrPush(e, R.frag, R.fix, ctx); nO++; (e.p || []).forEach(function (k) { if (PN[k] && pn.indexOf(PN[k]) < 0) pn.push(PN[k]); }); });
       var dO = D21 && D21.o && D21.n ? D21.o : R.frag, dN = D21 && D21.o && D21.n ? D21.n : R.fix;
@@ -4200,7 +4211,13 @@
         /* دورِ ۲۶ (Q2، U6/B26·D4 s17 ✏️ «۰.۸ ⇐ ۰.۷» ⇒ نتیجهٔ «۰.۷»): رویدادِ دوباره‌ثبت‌شده همان جملهٔ خودش است با مقدارِ درست («حساب نهایی ۲۴ × ۰.۷ = …»)، نه فقط تکهٔ اصلاح —
            وگرنه نتیجه‌ای به نامِ «۰.۷» می‌ماند که هر اصلاحِ بعدی آن را «نتیجهٔ کهنه» می‌خواند؛ فقط وقتی جای‌گزینی ممکن نیست همان مقدارِ درست */
         var sp26 = eS[i].span != null ? sub(String(eS[i].span), false) : null;
-        ne.src20 = { sess: s.id, msg: R.curId, span: clip(sp26 != null && String(sp26).trim() ? sp26 : R.fix, 300), key: k }; delete ne.wd; add.push(ne); nR++; } });
+        ne.src20 = { sess: s.id, msg: R.curId, span: clip(sp26 != null && String(sp26).trim() ? sp26 : R.fix, 300), key: k }; delete ne.wd;
+        /* دورِ ۲۶ (Q2، بانکِ R26 #45 «کلاس ۲۸ نفره، گروه‌های ۴ نفره، پس ۷ گروه» ⇒ «کلاس ۳۲ نفره … پس ۷ گروه»): نتیجه‌ای که در همان جملهٔ داده بود و عددش از همان داده حساب شده، با دادهٔ تازه
+           «نتیجهٔ درست» نیست — دوباره ثبت می‌شود ولی با نشانِ کهنه (حسابِ خودِ اوست؛ صفحه بازنویسی‌اش نمی‌کند) */
+        try { if (ne.how === "res" && eS[i].span != null && typeof A.liveRestsOn === "function" && A.liveRestsOn(String(eS[i].span), D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { src: "", ctx: "", clause: R.frag, derOnly: true }) === "yes") {
+          var oS26 = D21 && D21.o ? D21.o : R.old || R.frag, nS26 = D21 && D21.n ? D21.n : R.fix; ne.stale = { at: nowIso(), by: R.curId, from: R.srcId, old: clip(oS26, 60), "new": clip(nS26, 60), why: "بر «" + clip(oS26, 40) + "» بنا بود — با «" + clip(nS26, 40) + "» دوباره حساب شود" };
+          put("نتیجهٔ «" + clip(plainTx(String(eS[i].span)), 60) + "»", String(eS[i].span), "کنار رفت — " + ne.stale.why, ne.stale.why, "نتیجهٔ «" + clip(plainTx(String(eS[i].span)), 60) + "» دیگر برقرار نیست — " + ne.stale.why); } } catch (e26) { console.warn(e26); }
+        add.push(ne); nR++; } });
     /* همان ✏️ با چند جفت («۰.۸ ⇐ ۰.۷»، «۱۹.۲ ⇐ ۱۶.۸»): جفتِ بعدی روی رویدادی که جفتِ پیشینِ همین نوبت دوباره ثبت کرد هم می‌نشیند */
     EV.forEach(function (e) { if (!e || e.wd || !e.rebook || e.msg !== R.curId || e.rebook.from !== R.srcId || !e.src20 || e.src20.span == null || mine.indexOf(e) >= 0) return; var v26 = sub(String(e.src20.span), false); if (v26 != null && String(v26).trim() && v26 !== e.src20.span) e.src20.span = clip(v26, 300); });
     if (add.length) s.coachEv = EV.concat(add);
@@ -4216,7 +4233,7 @@
         /* دورِ ۲۶ (Q2، DECISIONS_R26 «Marking follows dependency, not equal digits»؛ U5 pwB1 «۱۸۰ ÷ ۱۲ = ۱۵ آمپر و کابل هم ۱۵ متر» کنارِ «ارتفاع ۱۵ ⇐ ۱۸ متر»): وابستگیِ یک نتیجهٔ عددی را
            موتورِ صفحه می‌سنجد (a38 A.liveRestsOn: yes / no / unknown) — «yes»: عددی از آن با رابطهٔ نوشتهٔ خودش از مقدارِ پیشین آمده یا خودِ همان داده را در همان نقش بازمی‌گوید؛ «no»: هر
            عددش حسابِ خودش را دارد یا کمیتِ دیگری است؛ «unknown» ⇒ صفحه حکم نمی‌دهد، می‌پرسد («از … حساب شده بود؟»). عددِ هم‌رقم به‌تنهایی شاهد نیست. اصلاحِ غیرِ عددی همان سنجهٔ پیشین. */
-        var numD26 = /[0-9۰-۹]/.test(String(oV23)) && /[0-9۰-۹]/.test(String(nV23)), rel26 = numD26 && typeof A.liveRestsOn === "function" ? A.liveRestsOn(e.src20.span, D21 && D21.o ? D21 : { o: oV23, n: nV23 }, { src: R.src.text, ctx: herTexts25(s), clause: R.frag }) : "";
+        var numD26 = /[0-9۰-۹]/.test(String(oV23)) && /[0-9۰-۹]/.test(String(nV23)), rel26 = numD26 && typeof A.liveRestsOn === "function" ? A.liveRestsOn(e.src20.span, D21 && D21.o ? D21 : { o: oV23, n: nV23 }, { src: R.src.text, ctx: herTexts25(s), clause: R.frag, results: (s.coachEv || []).filter(function (x) { return x && !x.wd && x.ok && x.how === "res" && x.src20 && x.src20.span && x !== e && String(x.at || "") < String(e.at || "~") && (!e.pk || !x.pk || x.pk === e.pk); }).map(function (x) { return String(x.src20.span); }) }) : "";
         var hit26 = rel26 ? (rel26 === "yes" || (rel26 === "unknown" && (num24 || hasTok20(e.src20.span, oV23)))) : (hasTok20(e.src20.span, oV23) || num24);
         if (!(hit26 && (!e.pk || !pk23.length || pk23.indexOf(e.pk) >= 0))) return;
         var ask26 = rel26 === "unknown";
@@ -4257,6 +4274,9 @@
     /* دورِ ۲۲ (P3، B·D16 s19، D s38): سشنِ بی مسئلهٔ زنده — موعد، اندازه‌ها و کارتِ همان پیام هم پیش از نوشتنِ نتیجه (نه پس از آن، با «چیزی ثبت نشده بود») */
     if (!Object.keys(pids).length && !R.edit && typeof A.liveRetractSessApply === "function") { try { var ls22 = A.liveRetractSessApply(s.id, R.srcId, { frag: R.frag, fix: R.fix, old: R.old, key: R.key || "", cur: cu });
       (ls22.changed || []).forEach(function (c) { var o0 = typeof c.old === "string" ? c.old : "", n0 = typeof c["new"] === "string" ? c["new"] : ""; chS.push({ rec: String(c.label || c.rec || "رکورد"), old: clip(plainTx(o0), 160), "new": clip(plainTx(n0), 160), why: !String(c.why || "").trim() || /^اصلاح شد ⇐ «/.test(String(c.why)) ? why23 : String(c.why) }); ch.push(o0 || n0 ? chLine20(String(c.label || c.rec || "رکورد"), o0, n0) : String(c.label || "")); }); } catch (e) { console.warn(e); } }
+    /* دورِ ۲۶ (Q2، C26-37 s23 p6 «یعنی ۱۰۰ دقیقه»، بانکِ R26 #52): مسئلهٔ گفت‌وگو (بی رکوردِ زنده) هم فهرستِ «عددهای حساب‌شده از …» ِ خودش را دارد — همان موتور، روی نوشته‌های همین سشن */
+    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId });
+      if (ss26 && !chS.some(function (c) { return c.rec === ss26.label; })) { chS.push({ rec: ss26.label, old: ss26.old, "new": ss26["new"], why: ss26.why }); ch.push(ss26.label + ": «" + ss26.old + "» — " + ss26["new"]); } } catch (e) { console.warn(e); } }
     /* دفترِ کارها: خودِ اصلاح یک کارِ تاریخ‌دار است (برای پرونده و کارنامه) */
     C.acts20 = (C.acts20 || []).concat([{ at: nowIso(), kind: "correction", sess: s.id, msg: R.curId, from: R.srcId, key: R.key || R.what, old: clip(R.frag, 160), "new": clip(R.fix, 160), changed: ch.length, edit: !!R.edit }]).slice(-80);
     if (!chS.length && !askS.length && !notes.length) notes.push("از آن بخشِ پیامت رکوردی ساخته نشده بود — چیزی برای عوض کردن نبود (فقط متنِ پیام اصلاح‌شده خوانده می‌شود)");
@@ -4406,7 +4426,9 @@
         if (run && run.res && run.res.R.what === "plan") delete a2.plan; if (run && run.res && run.res.R.what === "guess") delete a2.guess; }
       var out = rawCS19b.call(this, a2);
       try { recs19b(s).forEach(function (r) { if (r && typeof r === "object" && before.indexOf(r) < 0 && !r.src && mid) r.src = mid; });
-        if (run && run.res) { retractPost20(s, um, run); if (run.res.ch.length) info = "✓ اصلاح شد: " + run.res.ch.slice(0, 4).join(" · ") + askUser20(run.res.out);
+        if (run && run.res) { retractPost20(s, um, run); /* دورِ ۲۶ (Q2): سطرِ او هرگز «چه چیزی کهنه شد» را نمی‌بُرد — چهار تغییرِ نخست، سپس هر سطرِ کهنگی/دفتر، و شمارِ بقیه (صادقانه) */
+          if (run.res.ch.length) { var CH26 = run.res.ch, top26 = CH26.slice(0, 4), key26 = CH26.slice(4).filter(function (t) { return /^عددهای حساب‌شده|دیگر برقرار نیست|حساب شده بود؟|کهنه|^دفترِ «کارِ پیشینِ تو»|داوریِ/.test(String(t)); }), rest26 = CH26.length - top26.length - key26.length;
+            info = "✓ اصلاح شد: " + top26.concat(key26).join(" · ") + (rest26 > 0 ? " · و " + fa(rest26) + " تغییرِ دیگر" : "") + askUser20(run.res.out); }
           else info = askUser20(run.res.out, true); }
         else if (run && run.errs.length) info = s.coach && s.coach.retNote && s.coach.retNote.res && (s.coach.retNote.res.ask || []).some(function (q) { return q.field === "value"; }) ? "مقدارِ درست را نگفتی — چه بود؟ (چیزی عوض نشد.)" : "این اصلاح انجام نشد: " + plainErr20(run.errs[0]) + " — چیزی عوض نشد.";
         S.put(s); } catch (e) { console.warn(e); }
