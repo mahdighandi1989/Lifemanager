@@ -634,8 +634,20 @@
    "history": []
   },
   "a_evidentialism": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 37,
+     "at": "2026-11-12",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای «قرینه‌گرایی»: صورت‌بندیِ محوری (EVI: S در باورِ p در زمانِ t موجه است اگر و فقط اگر قرینه‌های S در t باورِ p را پشتیبانی کند — Feldman و Conee ۱۹۸۵)، اصلِ کلیفورد (۱۸۷۷)، و اشکال‌ها: قرینهٔ فراموش‌شده، پشتیبانیِ احتمالیِ نادیده، گردآوریِ قرینه، دلایلِ عملی (جیمز ۱۸۹۶) و شکاکیت.",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Internet Encyclopedia of Philosophy, «Evidentialism» (Daniel M. Mittag) — https://iep.utm.edu/evidentialism/",
+    "Stanford Encyclopedia of Philosophy, «The Ethics of Belief» (Andrew Chignell; rev. 2018) — https://plato.stanford.edu/entries/ethics-belief/"
+   ]
   },
   "a_reliabilism": {
    "stage": 0,
