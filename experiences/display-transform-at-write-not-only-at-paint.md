@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-11-11T12:00:00Z"
 created_at: "2026-11-11T12:00:00Z"
-updated_at: "2026-11-11T12:00:00Z"
+updated_at: "2026-11-12T12:00:00Z"
 merged_from: []
 ---
 
@@ -64,3 +64,23 @@ store.put = function (r) { if (r && r.type === "conversation") storeGate(r); ret
 
 ## 🔗 References
 - مرتبط: [soft-delete-tombstone-must-filter-every-read-path], [model-reports-state-page-validates]
+
+## Update 2026-11-12
+Two more places where «only at paint» failed, and what closed them.
+
+1. **Titles and labels built from a raw message.** A masking rule for personal data (a child's school name) ran where a
+   dossier quoted a message. Titles were built elsewhere — a held statement, a session title, a list of problems, a
+   breadcrumb — each by its own `clip(text)`. The name appeared in all of them. Fix: mask when the title field is
+   **written** (the store hook that already carried the register transform), keep the person's own message untouched, and
+   give every remaining «title from a message» site one function to call. A mask applied at one display site is a leak at
+   the next site someone adds.
+2. **Static view text.** The register transform covered system lines in the conversation and one list. The fixed text of
+   every other view was written in the informal form in its own file. Fix: one pass over the rendered view after every
+   render (and on later mutations), through the same gateway. The pass must never touch the person's own words: skip
+   quoted text, form values, the conversation panel, and any text node whose content is a substring of something the
+   person wrote. A marker that looks like «this is hers» may mean something else (here an attribute meant «only she may
+   fill this field»); check what a marker means before using it as a filter.
+
+Checklist addition: after adding a write-time transform, list every place that derives a display string from the same
+source and confirm each one reads the transformed field or calls the gateway.
+

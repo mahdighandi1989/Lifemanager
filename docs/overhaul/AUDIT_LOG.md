@@ -5111,3 +5111,17 @@ dated stability, mind-card feed) under way.
   is green. PROPOSAL: the collector should carry forward provenance it cannot recompute, the way it already keeps shrunken shards.
 - **FINDING (2026-11-12)** `docs/tours/polya-batch1/kit/checkpoint.sh` holds the owner's e-mail address as an escaped sed pattern
   (already in history). Not changed in this task; PROPOSAL: read the address from an environment variable.
+- **CHANGE (2026-11-12, learning-architecture, Pólya round 26, fixer «classify»: Q9 + Q10)** Root causes: (1) privacy masking ran only on
+  dossier events and only for minors, while titles and labels were built from the raw message — a child's school name became a chat-problem
+  title shown in 📜, «امروز» and the 🧭 strip (C26-22); (2) the second-person possessive «ـت» was converted only for hand-listed words and the
+  static text of the views never passed the register gateway; (3) the reply post-check read any «…ت + را/می‌شود», any «[بن]…ید/ین» and any
+  joined «می…ی» as register signs; (4) the mind card had no label for the prior-work source and booked an incomplete step, a refuted
+  assumption and a result the page itself marked ✗ with the wrong sign; (5) the follow-up after navigation always said «fill and build»,
+  the route read a prerequisite stack that had already moved to the live problem, and a late retrieval success jumped to the 21-day rung
+  while the line said «۱ از ۳». Fix: `A.AGE.privLabel/titleOf` applied when the title is WRITTEN (`privStore26` in the `S.put` hook) and in
+  the session dossier; page questions recognised from the view registry; `POSS26/NOTPOSS26` with a test that scans the page's own strings;
+  `regDom26` after every render; verb-stem based signs; `AS.HOLDS26`; `movedSess26`; the retrieval gap capped at the technique's own cycle
+  until its sequence is complete. C26-33 was not reproduced. Test `apps/learning-architecture/tests/test_tour1_r26_classify.js`
+  (bank Q9/Q10: 34 of 36 green, two with their reasons — #257 not built this round, #231 second half conflicts with the standing
+  one-page-question contract; 8 green on BASE26). Previous rules quarantined (`AS.R26_QUARANTINE`,
+  `PR.R26_QUARANTINE`). Lesson: `experiences/closed-word-list-vs-own-vocabulary-guard.md`.

@@ -2999,11 +2999,11 @@
     try { if (!root || typeof document === "undefined" || !document.createTreeWalker) return; var se = pageSess26(); if (!se || AS.convRegister(se, "", []) !== "shoma") return;
       var H = null, w = document.createTreeWalker(root, 4 /* TEXT */, null), nd, L = [];
       while ((nd = w.nextNode())) L.push(nd);
-      L.forEach(function (nd) { var t = nd.nodeValue; if (!t || !/[آ-ی]/.test(t) || !/[تیونشکرزدهآ]/.test(t)) return; var el = nd.parentNode; if (!el || !el.closest) return;
+      L.forEach(function (nd) { var t = nd.nodeValue; if (!t || nd.__r26 === t || !/[آ-ی]/.test(t) || !/[تیونشکرزدهآ]/.test(t)) return;   /* __r26: متنی که همین گذرگاه نوشت دوباره خوانده نمی‌شود (ناظرِ تغییر حلقه نمی‌زند) */ var el = nd.parentNode; if (!el || !el.closest) return;
         if (el.closest(".as-panel, textarea, input, script, style, [contenteditable], .math, math, svg")) return;
         var out = outMap25(se, t, toShoma); if (out === t) return;
         var key = t.replace(/\s+/g, " ").replace(/…\s*$/, "").trim(); if (key.length >= 6) { if (H == null) H = hersText26(); if (H.indexOf(key) >= 0) return; }
-        nd.nodeValue = out; });
+        nd.__r26 = out; nd.nodeValue = out; });
     } catch (e) { } }
   AS.regDom26 = regDom26;
   if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); } catch (e) { } return r; }; A.render._reg26 = true;
@@ -4699,20 +4699,10 @@
   function oneQ25(q) { var x = String(q || ""), d = 0, pd = 0, idx = [];
     for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); if (ch === "«") d++; else if (ch === "»" && d > 0) d--; else if (ch === "(") pd++; else if (ch === ")" && pd > 0) pd--; else if ((ch === "؟" || ch === "?") && !d && !pd) idx.push(i); }
     if (idx.length < 2) return x;
-    /* دورِ ۲۶ (Q9، U53، بانکِ R26 #231 «یک پرسش، نه دو پرسشِ چسبیده با ویرگول»): تکهٔ دومی که خودش یک پرسشِ کامل است (سه واژه یا بیشتر — «می‌توانی آن را در یک نگاه ببینی؟»)
-       پرسشِ دوم است، نه دنبالهٔ اولی ⇒ پرسشِ نوبت همان نخستین پرسشِ کامل است (کلی ⇐ خاص). دنباله‌های کوتاهِ حذفی («… کافی است؟ زائد؟ متناقض؟») مثلِ پیش با «،» یکی می‌شوند.
-       رفتارِ پیشین: AS.R26_QUARANTINE.oneQ25. */
-    for (var c = 0; c < idx.length - 1; c++) { var seg = x.slice(idx[c] + 1, idx[c + 1]).replace(/^[\s—–\-،:؛]+/, "").trim(); if (seg.split(/[\s‌]+/).filter(Boolean).length >= 3) { x = x.slice(0, idx[c] + 1); idx = idx.slice(0, c + 1); break; } }
-    if (idx.length < 2) return x;
     var out = "", last = idx[idx.length - 1];
     for (var j = 0; j < x.length; j++) { if (idx.indexOf(j) >= 0 && j !== last) { var nx = x.slice(j + 1).replace(/^\s+/, "").charAt(0); out += /[—–\-،:؛]/.test(nx) || !nx ? "" : "،"; continue; } out += x.charAt(j); }
     return out; }
   AS.oneQ25 = oneQ25;
-  AS.R26_QUARANTINE = Object.assign(AS.R26_QUARANTINE || {}, { oneQ25: function (q) { var x = String(q || ""), d = 0, pd = 0, idx = [];
-    for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); if (ch === "«") d++; else if (ch === "»" && d > 0) d--; else if (ch === "(") pd++; else if (ch === ")" && pd > 0) pd--; else if ((ch === "؟" || ch === "?") && !d && !pd) idx.push(i); }
-    if (idx.length < 2) return x; var out = "", last = idx[idx.length - 1];
-    for (var j = 0; j < x.length; j++) { if (idx.indexOf(j) >= 0 && j !== last) { var nx = x.slice(j + 1).replace(/^\s+/, "").charAt(0); out += /[—–\-،:؛]/.test(nx) || !nx ? "" : "،"; continue; } out += x.charAt(j); }
-    return out; } });
   function tqLine25(l) {
     if (/^- زمینه/.test(l)) return l;
     var bold = /\*\*پرسشِ این نوبت همین است:?\*\*/.test(l), one = /^- در این نوبت فقط \*\*یک\*\* پرسش/.test(l); if (!bold && !one) return l;

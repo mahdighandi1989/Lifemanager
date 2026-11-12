@@ -1,9 +1,9 @@
 // تورِ پولیا (دستهٔ ۱، دورِ ۲۶، سهمِ «classify» — ۲۰۲۶-۱۱-۱۲) — DECISIONS_R26 Q9 + Q10: دادهٔ شخصی (C22)، عنوان، ضمیر، سنجشِ پس از پاسخ، برچسب‌های کارنامه، سازوکارهای کوچک
 //  runners  جمله‌های خودِ گزارش‌های دورِ ۲۶ (پرامپت‌ها در round26X/<sid>/ai/pN.json): C26-22/C26-21 (aC1 p10)، C26-29 (aC4)، C26-13 (pwC2)، U29 (bp3)، U37 (s12)، U53 (aB4 p7)، D26-40 (s35)،
-//           C26-6 (pwC1 p8)، C26-17 (s25 p18، aC3 p6)، D26-33 (s32)، D26-53 (aD4)، U55 (oB1 p11/p13، aB4 p8، aB3 p14)، U23/U24/U30/U46 (کارنامهٔ ذهن)، U54 (aB4)، C26-32، C26-34، C26-42، C26-33
+//           C26-6 (pwC1 p8)، C26-17 (s25 p18، aC3 p6)، D26-33 (s32)، D26-53 (aD4)، U55 (oB1 p11/p13، aB4 p8، aB3 p14)، U23/U24/U30/U46 (کارنامهٔ ذهن)، U54 (aB4)، D24-15 (aD1 p2)، C26-32، C26-34، C26-42، C26-33 (بازتولید نشد)
 //  bank     همهٔ ورودی‌های Q9/Q10 در بانکِ مستقلِ tests/variants/VARIANTS_R26.json؛ آن‌چه برآورده نشد با دلیل در info.nc — هیچ ورودی‌ای بی‌صدا رد نمی‌شود.
 //  ساعتِ صفحه یخ زده است (APP.today = روزِ ثابت) — هیچ انتظاری به تاریخِ تقویم بسته نیست.
-// LLA_FILE = ساختِ دیگر؛ ONLY=name1,name2
+// LLA_FILE = ساختِ دیگر؛ ONLY=pii,titles,reg,dom,post,child,mind,u54,q10,bank
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
@@ -83,7 +83,6 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
   const NAVBAD = /چیزی پر نکن و دکمه‌ای نزن/;
   const follow = (r) => r.all.filter(u => /\[سامانه: «[^»]*»[^\]]*باز شد/.test(String(u.split('# نوبتِ تازه\n')[1] || '')))[0] || '';
 
-  if (process.env.PROBE) { try { await require(process.env.PROBE)({ p, ev, turn, fresh, wipe, st, tq, exec, setB, rc, bd, birthFor, sysDom, sysStored, pushSys, follow, head, blockOf, T0 }); } catch (e) { console.log('PROBE EXC', e && e.stack || e); } await b.close(); return; }
 
   const views = (vs, re) => ev(([vs, re]) => { const o = [], R = new RegExp(re); try { APP.ASSIST.toggle(false); } catch (e) { } /* حبابِ گفت‌وگو حرفِ خودِ اوست و می‌ماند (C38) — فقط نماهای صفحه */ vs.forEach(v => { APP.go(v); document.body.innerText.split('\n').filter(l => R.test(l)).forEach(l => o.push(v + ': ' + l.slice(0, 140))); }); return o; }, [vs, re]);
   const TILE = 'سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. تیله‌های من ۳ برابرِ تیله‌های داداشمه. هر کدوم چند تا تیله داریم؟» من گفتم ۱۲ تا و ۱۲ تا ولی مامانم گفت غلطه. چرا غلطه؟';
@@ -203,9 +202,9 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     chk(Qs.length >= 20, 'registry questions found: ' + Qs.length);
     const mixed = R.filter(r => r.to), multi = R.filter(r => r.n > 1);
     chk(!mixed.length, 'U53 aB4 p7: no page question mixes registers after the «شما» transform — ' + mixed.map(r => r.sh).join(' | '));
-    chk(!multi.length, 'bank #231: every page question is one question — ' + multi.map(r => r.one.slice(0, 60)).join(' | '));
+    chk(!multi.length, 'every page question reaches the model with one «؟» (round-25 gate) — ' + multi.map(r => r.one.slice(0, 60)).join(' | '));
     const b3 = R.filter(r => /از راهِ دیگری به دست آوری/.test(r.q))[0];
-    chk(b3 && b3.sh === 'می‌توانید نتیجه را از راهِ دیگری به دست آورید؟', 'U53: «می‌توانید نتیجه را از راهِ دیگری به دست آورید؟» — one register, one question, not two glued with a comma — ' + (b3 && b3.sh));
+    chk(b3 && b3.sh === 'می‌توانید نتیجه را از راهِ دیگری به دست آورید، می‌توانید آن را در یک نگاه ببینید؟', 'U53 aB4 p7: «می‌توانید … به دست آورید، می‌توانید … ببینید؟» — one register in the sentence (was «به دست آوری»); the two clauses stay one page question (round-25 contract, see bank #231 in info.nc) — ' + (b3 && b3.sh));
     const el = await ev(() => [APP.ASSIST.oneQ25('آیا شرط برای تعیینِ مجهول کافی است؟ زائد است؟ متناقض است؟'), APP.ASSIST.oneQ25('نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟')]);
     chk(el[0] === 'آیا شرط برای تعیینِ مجهول کافی است، زائد است، متناقض است؟' && el[1] === 'نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟', 'look-alike: short elliptical alternatives stay one question, as in round 25 — ' + JSON.stringify(el));
   });
@@ -402,7 +401,9 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
       230: async (n) => { await person(78, []); const g = await ev(() => ['تقریبت بس بود', 'اصلاحت رسید، ولی پیامت دو بخش داشت'].map(t => APP.ASSIST.regSys(__cur(), t))); await ev(() => { APP.go('home'); const d = document.createElement('p'); d.className = 't26'; d.textContent = 'اصلاحت رسید، ولی پیامت دو بخش داشت. تقریبت بس بود.'; document.getElementById('main').appendChild(d); }); await p.waitForTimeout(150);
         const dom = await ev(() => ({ t: (document.querySelector('#main .t26') || {}).textContent, to: document.querySelector('#main').innerText.split('\n').filter(l => /نمی‌دانی(?![آ-ی])|پیشرفتت(?!ان)|خودت(?!ان)|می‌بردت(?!ان)/.test(l)).slice(0, 3) }));
         T(n, g[0] === 'تقریبتان بس بود' && g[1] === 'اصلاحتان رسید، ولی پیامتان دو بخش داشت' && dom.t === 'اصلاحتان رسید، ولی پیامتان دو بخش داشت. تقریبتان بس بود.' && !dom.to.length, JSON.stringify(g) + JSON.stringify(dom)); },
-      231: async (n) => { const x = await ev(() => APP.ASSIST.toShoma(APP.ASSIST.finalFilter25(['- **پرسشِ این نوبت همین است:** «می‌توانی نتیجه را از راهِ دیگری به دست آوری؟ می‌توانی آن را در یک نگاه ببینی؟»'])[0])); T(n, /«می‌توانید نتیجه را از راهِ دیگری به دست آورید؟»/.test(x) && !/آوری(?!د)/.test(x) && !/،\s*می‌توانید/.test(x), x); },
+      231: async (n) => { const x = await ev(() => APP.ASSIST.toShoma(APP.ASSIST.finalFilter25(['- **پرسشِ این نوبت همین است:** «می‌توانی نتیجه را از راهِ دیگری به دست آوری؟ می‌توانی آن را در یک نگاه ببینی؟»'])[0]));
+        chk(/به دست آورید/.test(x) && !/آوری(?!د)/.test(x), 'bank#231 first half (one register inside the sentence, never «می‌توانید … به دست آوری») — ' + x);
+        NC(n, 'first half met (one register: «… به دست آورید»); second half NOT met — «one question, not two glued with a comma»: the page question text is the registry question\'s identity (answer ledger, «کدام پرسش کمک کرد؟», page sync) and a two-sentence book question is ONE page question by standing decisions (R12 L5, R16 L1d, R22 bank #106, R25 P6: one «؟»). Cutting it to its first sentence was built and reverted: it turned «این گام جواب نداد؟ مسئله را به شکلِ دیگری بیان کن …» into «این گام جواب نداد؟» (test_tour1_r22_turnq A22-3) and broke the whole-question option (test_tour1_r12_live L5). DECISIONS_R26 does not replace those contracts; splitting a book question in two belongs to the registry, not to a text gate'); },
       232: async (n) => { await person(30, TO); const w = await rc(U1(n)); T(n, !w, w); },
       233: async (n) => { await person(30, TO); const w = await rc(U1(n)); T(n, !w, w); },
       234: async (n) => { await person(40, SH); const w = await rc(U1(n)); T(n, !w, w); },
@@ -447,7 +448,6 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
   });
   { const nOk = Object.values(info.bank).filter(Boolean).length; info.summary = { judged: Object.keys(info.bank).length, pass: nOk, nc: Object.keys(info.nc).length }; }
 
-  //SECTIONS
 
   console.log(JSON.stringify(info.summary || {}), JSON.stringify(info.nc), JSON.stringify(info.note || {}));
   await b.close();
