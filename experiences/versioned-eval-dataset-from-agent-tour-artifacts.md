@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-18T00:00:00Z"
 created_at: "2026-10-18T00:00:00Z"
-updated_at: "2026-10-18T00:00:00Z"
+updated_at: "2026-11-12T00:00:00Z"
 merged_from: []
 ---
 
@@ -72,3 +72,11 @@ def split_prompt(text, store, min_bytes=1024):
 
 ## 🔗 References
 - Related: `paired-agent-live-campaign-for-an-in-page-ai`, `two-sided-needs-judging-for-scenario-tours`, `model-reports-state-page-validates`
+
+## Update 2026-11-12 — a rebuilt working tree silently loses provenance
+When the collector runs in a fresh machine whose working tree was rebuilt from version control, the sources of old runs are only
+partly there. A collector that keeps a shard «if the source shrank» still recomputes per-record metadata from what it can see: build
+commits became null and a per-record flag disappeared, while record counts stayed equal — so nothing looked wrong.
+- Monotonic must cover metadata, not only record counts: a field the collector cannot recompute is carried forward from the stored shard.
+- After any regeneration, diff a record of an OLD shard field by field before committing; an unchanged count proves nothing.
+- If hand repair is needed, restore the old shard bytes and re-hash the manifest entries, then run the dataset's own test.

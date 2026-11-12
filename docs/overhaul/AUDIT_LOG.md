@@ -5098,3 +5098,16 @@ dated stability, mind-card feed) under way.
   link `apps/learning-architecture/node_modules → /usr/local/lib/node_modules_global`. A backup push created a stray remote branch
   `claude/life-program-flow-diagram-q37jvr-merge25` (same content as the merge); deleting it from this environment was refused — the owner
   can delete it.
+- **FINDING (2026-11-12, tour batch 1, round 26)** Round 26 on main 1f93c333: 96 scenarios on Fable runners plus a blind Opus control of
+  group B. Strict zero-defect 4/96. Two S1 families in the exact-arithmetic reader: correct work marked ✗ beside a scale/unit word or a
+  condition number, and a false fraction identity marked ✓ through the rounding allowance. Both round-25 S1 are closed.
+- **DECISION (2026-11-12, runner model)** Blind comparison (`docs/tours/polya-batch1/decisions/COMPARE26_result.md`): by the letter of the
+  pre-set rule Fable fails (one missed S2); the rule did not count defects a run never exercised (Opus: six S2). Fable stays, as an open,
+  reversible deviation with three compensating requirements for round 27.
+- **DECISION (2026-11-12)** `DECISIONS_R26.md`: ten root families Q1–Q10, clarifications C15–C22, seven fixers, arith first.
+- **FINDING (2026-11-12, dataset collector)** Run in a restored container, `scripts/tours/collect_dataset.py` kept old shards' record
+  counts but dropped provenance whose source files were not restored (build commits of earlier runs, the flag
+  `reply_reused_from_prior_round`). The old shards and commits were kept by hand and the manifest re-hashed; `tests/test_tour_dataset.py`
+  is green. PROPOSAL: the collector should carry forward provenance it cannot recompute, the way it already keeps shrunken shards.
+- **FINDING (2026-11-12)** `docs/tours/polya-batch1/kit/checkpoint.sh` holds the owner's e-mail address as an escaped sed pattern
+  (already in history). Not changed in this task; PROPOSAL: read the address from an environment variable.
