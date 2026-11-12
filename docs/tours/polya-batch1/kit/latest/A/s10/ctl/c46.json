@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}
+{"shot": {"name": "dossier_full_1", "full": true}}

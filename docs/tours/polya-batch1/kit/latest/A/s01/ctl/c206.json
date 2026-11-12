@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval": "(()=>{const s=APP.ASSIST.cur();return APP.today()+\" \"+new Date().toString().slice(0,15)+\" | sess=\"+s.title+\" | \"+s.msgs.slice(-3).map(m=>m.role+\": \"+m.text.slice(0,200)).join(\" || \")+\" | DUE: \"+DUE()})()"}

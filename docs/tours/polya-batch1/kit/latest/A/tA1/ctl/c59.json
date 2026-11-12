@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"}
+{"eval": "(()=>{const m=APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-2).map(m=>(m.role||m.k||\"\")+\": \"+(m.text||\"\").slice(0,300));const e=APP.PRE.sysAll()[0].e;return JSON.stringify({m,e:{state:e.state,done:e.done,other:e.otherQuote,keys:Object.keys(e)},due:(APP.dueList()||[]).map(x=>x.txt)})})()"}

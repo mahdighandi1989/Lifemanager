@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('route','pb_l_mvb9wgpk7r4');const t=document.getElementById('main').innerText;const i=t.indexOf('اکنون:');return t.slice(i,i+1200)})()"}
+{"shot": {"name": "tA1_wait_lprob", "sel": ".lp-syscard", "full": true}}

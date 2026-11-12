@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.S.all(\"ex\").map(x=>({id:x.id,t:x.tid||x.tech,st:x.status,prc:x.prc,preds:(x.data||{}).preds})))"}
+{"eval": "JSON.stringify(APP.S.all(\"ex\").map(x=>({id:x.id,t:x.tid||x.tech,st:x.status,prc:x.prc,preds:(x.data||{}).preds})))"}

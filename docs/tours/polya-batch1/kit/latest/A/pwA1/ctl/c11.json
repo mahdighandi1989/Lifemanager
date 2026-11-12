@@ -1,1 +1,1 @@
-{"eval": "document.getElementById(\"main\").innerText.slice(0,3000)"}
+{"eval": "APP.go(\"route\",\"pb_l_mvaqmpsdnsx\")"}

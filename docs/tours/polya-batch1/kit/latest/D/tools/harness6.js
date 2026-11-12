@@ -1,13 +1,13 @@
 // Campaign harness: one scenario per directory. The page runs for real (dist bundle); every AI call ⇒ ai/pN.json, waits for ai/rN.txt;
 // the "user" drives via ctl/cN.json ({eval0}|{say}|{eval}|{click}|{fill}|{exit}); routines are simulated by editing sheets/<id>.json;
 // tour e-mail reports land in mail/mN.json (subject, html, text, images). inject.js (optional) runs before the stubs on every start.
-const { chromium } = require('/home/user/Lifemanager/apps/learning-architecture/node_modules/playwright');
+const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
 const D = process.argv[2];
 ['ai', 'ctl', 'out', 'sheets', 'mail', 'profile', 'drive', 'drive/files'].forEach(d => fs.mkdirSync(path.join(D, d), { recursive: true }));
 const wait = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
-  const ctx = await chromium.launchPersistentContext(path.join(D, 'profile'), { viewport: { width: 1360, height: 900 } });
+  const ctx = await chromium.launchPersistentContext((process.env.PROF||path.join(D,'profile_D26')), { viewport: { width: 1360, height: 900 } });
   const p = ctx.pages()[0] || await ctx.newPage();
   const log = []; p.on('pageerror', e => log.push('pageerror: ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) log.push('console: ' + m.text()); });
   let n = fs.readdirSync(path.join(D, 'ai')).filter(f => /^p\d+\.json$/.test(f)).length;

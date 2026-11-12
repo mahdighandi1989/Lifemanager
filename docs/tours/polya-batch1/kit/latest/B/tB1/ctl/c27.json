@@ -1,0 +1,1 @@
+{"eval": "(()=>{return JSON.stringify(__fx.fields().filter(f=>!/^lp(One|Why|U|D|C|Type|Nat)/.test(f)).slice(0,40))+\" ## \"+__fx.btns().filter(b=>/ثبت|حل شد|بازنگری/.test(b)).join(\" | \")})()"}

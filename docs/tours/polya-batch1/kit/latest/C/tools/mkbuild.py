@@ -1,6 +1,6 @@
 import json,re,shutil,os
 src='/home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'
-out='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25C/tC1_build/learning-architecture.html'
+out='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26C/tC1_build/learning-architecture.html'
 t=open(src).read()
 k='window.SYS_TERR = '; i=t.find(k)+len(k)
 dec=json.JSONDecoder(); obj,end=dec.raw_decode(t,i)

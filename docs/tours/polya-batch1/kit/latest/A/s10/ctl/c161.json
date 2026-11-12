@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({dp:s.datePend,plans:(s.plans||[]).map(p=>[p.text.slice(0,50),p.when,p.whenAsk,p.state]),sys:s.msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,300))})})()"}

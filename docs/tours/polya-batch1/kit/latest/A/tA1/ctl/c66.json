@@ -1,1 +1,1 @@
-{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"}
+{"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,(x.e.checks||[]).slice(-1).map(c=>c.reason).join(\"\")]),due:(APP.dueList()||[]).map(x=>x.txt),last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-3).map(m=>(m.text||\"\").slice(0,260))})"}

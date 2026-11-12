@@ -1,1 +1,1 @@
-{"eval": "(()=>{const c=(APP.PR&&APP.PR.all?APP.PR.all():[]);return JSON.stringify(c.map(x=>({id:x.id,tid:x.tid,topic:x.topic||x.title,st:x.state||x.st,next:x.next||x.due})))})()"}
+{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"}

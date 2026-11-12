@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();let pr=APP.STORY.priorFor(s,null);return JSON.stringify({sys:s.msgs.filter(m=>m.role==\"sys\").map(m=>m.text.slice(0,400)),sum:pr.sum,st:pr.st,s1:{v:pr.steps[0].verdict,chk:pr.steps[0].chk,re:pr.steps[0].re,her:pr.steps[0].her,retry:pr.steps[0].retry}})})()"}

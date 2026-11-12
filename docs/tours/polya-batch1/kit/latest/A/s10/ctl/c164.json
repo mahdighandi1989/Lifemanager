@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({dp:s.datePend&&[s.datePend.state,s.datePend.items],plans:(s.plans||[]).map(p=>[p.text.slice(0,40),p.when,p.state]),dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,50),x.date,x.by]),sys:s.msgs.filter(m=>m.role==\"sys\").slice(-1).map(m=>m.text.slice(0,300)),due:DUE().slice(0,500)})})()"}

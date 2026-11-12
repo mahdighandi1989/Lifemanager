@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('route','pb_l_mvbe8qoyvtz');const t=document.getElementById('main').innerText;return t})()"}
+{"eval": "(()=>{const all=(APP.dueAll?APP.dueAll():[]);return JSON.stringify({due:(APP.dueList()||[]).map(x=>(x.txt+\" | \"+(x.sub||\"\")).slice(0,170)),dl:APP.S.all(\"dl\",x=>x).concat(APP.S.all(\"deadline\",x=>x)).map(x=>[x.what||x.title,x.date,x.done]).slice(0,8)})})()"}

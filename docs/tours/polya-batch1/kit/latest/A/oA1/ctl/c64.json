@@ -1,1 +1,1 @@
-{"shot": {"name": "part_route23_end_2", "full": true}}
+{"eval": "(APP.ASSIST.cur().msgs.slice(-1).map(m=>m.text).join(\"\"))+\"\\n---\\n\"+DUE()"}

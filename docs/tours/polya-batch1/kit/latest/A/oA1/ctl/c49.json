@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','pb_l_mvdlim6t73j');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}
+{"eval": "JSON.stringify([\"برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶.\",\"جمعش ۱ + ۲ + … + ۱۱ = ۶۶. همون شد.\",\"حالا برگردیم به دست‌دادن‌ها: برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶.\"].map(t=>{try{const r=APP.STORY.arithChk(t);return (r||[]).map(x=>[x.ok,x.expr||x.raw||\"\",x.val||\"\"])}catch(e){return \"ERR \"+e}}))"}

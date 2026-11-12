@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+DUE()})()"}
+{"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.S.all(\"eprob\",r=>r&&r.live&&r.p)[0].p.id;const pr=APP.STORY.priorFor(s,pid)||{};return JSON.stringify({sum:pr.sum,steps:(pr.steps||[]).map(x=>[x.n,x.verdict,(x.fixed?x.fixed.t:x.quote).slice(0,60),x.her||\"\",x.re?1:0])})})()"}

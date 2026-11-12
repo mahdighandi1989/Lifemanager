@@ -1,1 +1,1 @@
-{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return JSON.stringify((r.src||r.p.src).parts.map(p=>[p.mid,p.vc]))})()"}
+{"eval": "(()=>{const r=APP.liveAll().find(r=>/ماهِ بعد/.test(r.p.title));return JSON.stringify({st:r.p.statement,src:r.src||r.p.src})})()"}

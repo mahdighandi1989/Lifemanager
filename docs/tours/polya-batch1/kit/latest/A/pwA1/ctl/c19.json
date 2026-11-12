@@ -1,1 +1,1 @@
-{"shot":{"name":"pw1_dossier_after_m1","full":true}}
+{"eval": "document.getElementById(\"main\").innerText.slice(document.getElementById(\"main\").innerText.indexOf(\"📜\"),4000)"}

@@ -1,0 +1,1 @@
+{"eval": "(async()=>{APP.go('mind');await new Promise(r=>setTimeout(r,1200));document.querySelectorAll('details').forEach(d=>d.open=true);const t=document.getElementById('main').innerText;const i=t.indexOf('چهار مرحلهٔ حل');return t.slice(i,i+1800)})()"}

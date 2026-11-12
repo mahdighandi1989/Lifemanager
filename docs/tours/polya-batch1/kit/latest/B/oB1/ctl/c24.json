@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",APP.ASSIST.cur().id,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}
+{"say": "حل‌شدن یعنی هفته‌ای دست‌کم ۵ شب تا ۱۱:۳۰ خوابم ببره. فکر کنم مشکل سنگینیِ شامه نه ساعتش. برای اینکه مطمئن شم می‌خوام ساعت هوشمندم که خوابم رو ثبت می‌کنه داده‌هاش رو بده به همین‌جا که دقیق ببینم هر شب کی خوابم برده. میشه داده‌ی ساعت رو اینجا وارد کرد؟"}

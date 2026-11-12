@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({dp:s.datePend&&{st:s.datePend.state,items:s.datePend.items},sys:s.msgs.filter(m=>m.role==\"sys\").slice(-4).map(m=>m.text.slice(0,260))})})()"}

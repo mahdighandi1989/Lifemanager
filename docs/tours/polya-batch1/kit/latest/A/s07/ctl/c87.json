@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();let ml=null;try{ml=APP.liveMeasLog?APP.liveMeasLog(s.id):\"nofn\"}catch(e){ml=\"ERR \"+e}const m=s.msgs[0];return JSON.stringify({ml,keys:Object.keys(m),pts:m.pts||null,mlog:s.mlog||null})})()"}
+{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,n:s.msgs.length,m:s.msgs.slice(0,3).map(m=>[APP.ASSIST.msgId(m),m.role,m.text.slice(0,60),!!m.pts])})))"}

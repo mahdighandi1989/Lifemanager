@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>{const t=document.querySelector('#main').innerText;r((t.match(/مسئله‌های این گفت‌وگو[^]{0,260}/)||['one problem'])[0].replace(/\\n/g,' | '))},900))})()"}

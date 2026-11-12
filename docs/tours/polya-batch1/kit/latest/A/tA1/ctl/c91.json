@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-3).map(m=>(m.text||\"\").slice(0,220)),pr:APP.S.all(\"eprob\",r=>r&&r.p).map(r=>[r.p.id,r.p.title,r.p.status||r.status,r.live?1:0]),due:(APP.dueList()||[]).map(x=>x.txt.slice(0,120))})"}

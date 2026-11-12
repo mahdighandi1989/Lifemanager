@@ -1,5 +1,5 @@
 // ev.js 'js' — fresh profile (temp), evaluate js on the dist page, print result
-const { chromium } = require('/home/user/Lifemanager/apps/learning-architecture/node_modules/playwright');
+const { chromium } = require('playwright');
 const fs=require('fs');
 (async()=>{const js=process.argv[2];const b=await chromium.launch();const p=await b.newPage();
 await p.route('**/fonts.googleapis.com/**',r=>r.abort());

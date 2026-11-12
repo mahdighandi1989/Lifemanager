@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"practice\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"}
+{"say": "پس پیش‌بینیم غلط درومده: گفته بودم ۵ روز با ۶۰ درصد اطمینان، شد ۴. کارنامه‌ی ذهنم کجا نشون میده که زیادی مطمئن بودم؟ الان که نگاه می‌کنم هنوز نوشته پیش‌بینیم درست بوده؟"}

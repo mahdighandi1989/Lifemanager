@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"}
+{"eval": "(()=>{const c=(APP.PR&&APP.PR.all?APP.PR.all():[]);return JSON.stringify(c.map(x=>({id:x.id,tid:x.tid,t:(x.topic||x.title||\"\").slice(0,60),st:x.state||x.st||x.status})))})()"}

@@ -1,1 +1,1 @@
-{"shot":{"name":"pw1_route_after_m1","full":true}}
+{"eval": "document.getElementById(\"main\").innerText.slice(0,3000)"}

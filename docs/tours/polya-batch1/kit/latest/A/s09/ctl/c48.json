@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.S.all(\"deadline\",x=>1).map(x=>[x.id,x.what,x.date,x.src&&x.src.span]))"}
+{"say": "سلام. یه کارِ تازه: باید تا ۱۵ آذر قیمتِ ماهِ بعد رو به سه تا کافه‌ای که ازم کیک می‌گیرن اعلام کنم. یادم بنداز."}

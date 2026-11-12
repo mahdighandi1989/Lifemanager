@@ -1,5 +1,5 @@
 // hover.js DIR id tag — route view of id (live pid or session id); hover one point of each kind; screenshot each with the tooltip
-const { chromium } = require('/home/user/Lifemanager/apps/learning-architecture/node_modules/playwright');
+const { chromium } = require('playwright');
 const path=require('path'),fs=require('fs');
 (async()=>{const [D,id,tag]=process.argv.slice(2);
 const ctx=await chromium.launchPersistentContext(path.join(D,'profile'),{viewport:{width:1360,height:900}});

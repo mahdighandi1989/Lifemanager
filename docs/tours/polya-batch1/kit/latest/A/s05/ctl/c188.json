@@ -1,0 +1,1 @@
+{"eval": "(()=>{const fc=APP.S.all(\"forecast\",x=>1).concat(APP.S.all(\"fc\",x=>1));const s=APP.ASSIST.cur();return JSON.stringify({fcN:fc.length,fc:fc.map(x=>[(x.text||x.q||x.what||\"\").slice(0,70),x.p,x.due,x.out||x.res||x.result||null,x.by,x.prc?1:0]),preds:(s.coach&&s.coach.preds||[]).map(p=>[p.text.slice(0,60),p.p,p.due,p.out&&p.out.res]),due:DUE()})})()"}

@@ -3,8 +3,8 @@
 import json, os, sys, re
 sys.path.insert(0, os.path.dirname(__file__))
 B = '/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid = sys.argv[1]; D = f'{B}/round25B/{sid}'
-src = sys.argv[3] if len(sys.argv) > 3 else os.environ.get('SRCS', sid); S = f'{B}/round24B/{src}'
+sid = sys.argv[1]; D = f'{B}/round26B/{sid}'
+src = sys.argv[3] if len(sys.argv) > 3 else os.environ.get('SRCS', sid); S = f'{B}/round26B/_src25/{src}'
 import importlib.util
 def pend():
     a = f'{D}/ai'; ps = sorted(int(f[1:-5]) for f in os.listdir(a) if re.match(r'p\d+\.json$', f))
@@ -31,7 +31,7 @@ am = json.load(open(f'{D}/amap.json')) if os.path.exists(f'{D}/amap.json') else 
 m = am.get(str(n))
 if m is None:
     used = set(am.values()); k = tk(u)
-    for f in sorted((int(x[1:-5]) for x in os.listdir(f'{S}/ai') if re.match(r'p\d+\.json$', x))):
+    for f in sorted((int(x[1:-5]) for x in (os.listdir(f'{S}/ai') if os.path.isdir(f'{S}/ai') else []) if re.match(r'p\d+\.json$', x))):
         if f in used: continue
         if tk(json.load(open(f'{S}/ai/p{f}.json'))['user']) == k: m = f; break
 print('heads:', ' | '.join(l[:70] for l in u.split('\n') if l.startswith('# ')))

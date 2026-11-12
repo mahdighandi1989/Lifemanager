@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go('mind');return new Promise(r=>setTimeout(()=>{const t=document.querySelector('#main').innerText;r((t.match(/[^\\n]*معما[^\\n]*/g)||[]).slice(0,4).join(' ## ')+' @@ '+(t.match(/[^\\n]*هنجار[^\\n]*/g)||[]).slice(0,2).join(' ## '))},900))})()"}

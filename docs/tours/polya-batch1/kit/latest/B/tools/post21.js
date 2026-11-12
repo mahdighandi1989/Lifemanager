@@ -1,5 +1,5 @@
 // post.js <scenarioDir> [advDays] : after {"exit":true}; opens the profile, shoots dossier per live problem (full page) + all-work index + parts
-const { chromium } = require('/home/user/Lifemanager/apps/learning-architecture/node_modules/playwright');
+const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
 const D = process.argv[2], adv = +(process.argv[3] || 0), O = path.join(D, 'out');
 const w = ms => new Promise(r => setTimeout(r, ms));
@@ -7,6 +7,8 @@ const w = ms => new Promise(r => setTimeout(r, ms));
   const ctx = await chromium.launchPersistentContext(path.join(D, 'profile'), { viewport: { width: 1360, height: 900 } });
   const p = ctx.pages()[0] || await ctx.newPage();
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
+  { const inj0 = path.join(D, 'inject.js'); const bf = path.join(D, 'base.txt'); const base = fs.existsSync(bf) ? +fs.readFileSync(bf, 'utf8') : 0;
+    if (fs.existsSync(inj0)) await ctx.addInitScript(fs.readFileSync(inj0, 'utf8') + ';window.__off=window.__off||(' + base + '*864e5);'); }
   await p.goto(process.env.PAGE || 'file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'); await p.waitForSelector('.nav');
   const inj = path.join(D, 'inject.js'); if (fs.existsSync(inj)) await p.evaluate(fs.readFileSync(inj, 'utf8'));
   await p.evaluate((a) => { APP.S.loaded = true; APP.HOST = APP.HOST || {}; APP.HOST.ai = async () => '{"reply":"(post)","actions":[]}'; if (a) __adv(a); try { APP.ASSIST.toggle(false) } catch (e) { } APP.render(); }, adv);

@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','pb_l_mvdlim6t73j');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}
+{"eval": "(()=>{APP.PRE.sysSweep(true);return JSON.stringify({due:(APP.dueList()||[]).map(x=>x.txt.slice(0,120)),last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-2).map(m=>(m.text||\"\").slice(0,260)),sys:APP.PRE.sysAll().length})})()"}

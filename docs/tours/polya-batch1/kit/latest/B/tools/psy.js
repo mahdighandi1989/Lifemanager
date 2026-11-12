@@ -1,5 +1,5 @@
 // psy.js <dir> : answer «🧩 معمای امروز» once (option 1 / text "1", conf 50) and read the mind card's same-age comparison
-const { chromium } = require('/home/user/Lifemanager/apps/learning-architecture/node_modules/playwright');
+const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'); const D = process.argv[2], O = path.join(D, 'out'); const w = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const ctx = await chromium.launchPersistentContext(path.join(D, 'profile'), { viewport: { width: 1360, height: 900 } });

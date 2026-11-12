@@ -1,0 +1,1 @@
+{"eval": "(async()=>{APP.go(\"today\");await new Promise(r=>setTimeout(r,900));const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"کارهای موعددار\");return t.slice(i,i+500)})()"}

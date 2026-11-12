@@ -1,1 +1,1 @@
-{"eval": "(async()=>{APP.go('mind');await new Promise(r=>setTimeout(r,1200));document.querySelectorAll('details').forEach(d=>d.open=true);const t=document.getElementById('main').innerText;return t.slice(0,4000)})()"}
+{"say": "نه، بس نیست! ۵۵ دقیقه هم دیگه بس نیست، باید از نو حساب کنم: ۳۸ ضربدر ۴۵ میشه ۱۷۱۰ ثانیه، یعنی حدودِ ۲۸٫۵ دقیقه؛ با ۳۳ دقیقهٔ مرور میشه ۶۱٫۵ دقیقه. پس شب‌ها ۲۲ دقیقه می‌ذارم، نه ۱۵. راستی اگه یه بار اشتباهی به یکی از حکم‌هات «نه» بگم، چطور پسش بگیرم؟"}

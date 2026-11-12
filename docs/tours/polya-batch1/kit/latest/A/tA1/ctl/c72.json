@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.step||\"\"]),pend:((APP.S.get(\"pre22\")||{}).sysPend||[]).map(x=>x.number)})"}
+{"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,(x.e.tool||{}).fa||\"\",(x.e.checks||[]).slice(-1).map(c=>c.reason).join(\"\").slice(0,300)]).slice(1),due:(APP.dueList()||[]).map(x=>x.txt),pend:((APP.S.get(\"pre22\")||{}).sysPend||[]).map(x=>x.number)})"}

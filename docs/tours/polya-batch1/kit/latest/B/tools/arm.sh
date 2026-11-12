@@ -1,6 +1,6 @@
 #!/bin/bash
 # arm.sh sid days : insert+run a ctl that advances the clock, opens Today, and reports the loop entries, sys lines, Today lines
-B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round25B; cd $B; s=$1; d=${2:-0}
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26B; cd $B; s=$1; d=${2:-0}
 python3 - "$d" <<'PY' | EL=4000 TMO=${TMO:-90} bash tools/ins.sh $s
 import json,sys
 d=sys.argv[1]

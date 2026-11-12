@@ -1,1 +1,1 @@
-{"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/🎯/.test(x.txt));if(x&&x.go)x.go();const s=[...document.querySelectorAll('#main select')].find(e=>/گلدانِ ۸ ساعت/.test((e.closest('label,li,div')||{}).textContent||''));if(!s)return 'NOSEL '+APP.state.view;s.value='نشد';s.dispatchEvent(new Event('change',{bubbles:true}));return 'set '+TT()})()"}
+{"shot": {"name": "part_today_t24_late", "full": true}}

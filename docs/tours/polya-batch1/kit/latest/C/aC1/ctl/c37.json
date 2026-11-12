@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>{const t=document.querySelector('#main').innerText;r('SCHOOL='+(/شهید بهشتی|کرج/.test(t))+' LIST='+(t.match(/مسئله‌های این گفت‌وگو[^]{0,200}/)||[''])[0].replace(/\\n/g,' | '))},900))})()"}

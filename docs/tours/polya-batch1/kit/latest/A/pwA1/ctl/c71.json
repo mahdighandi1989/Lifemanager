@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','achat_mvnlkwr423ljm');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}
+{"eval": "(()=>{document.querySelectorAll(\"#main details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+2500)})()"}

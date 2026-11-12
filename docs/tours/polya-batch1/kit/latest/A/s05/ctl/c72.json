@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('today');const d=(APP.dueList()||[]).map(x=>x.txt).join(' || ');APP.go('tech','24','ws:ex_mvqgpqzz2kkle');return d})()"}
+{"shot": {"name": "part_t24_persian_date", "sel": ".prc-t24"}}

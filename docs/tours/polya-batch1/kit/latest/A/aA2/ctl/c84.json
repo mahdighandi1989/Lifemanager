@@ -1,0 +1,1 @@
+{"eval": "(()=>{const c=APP.PR.all()[0];APP.go(\"practice\",c.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جلسه‌ها\");return JSON.stringify({st:c.state||c.status,stable:c.stable||c.stableAt,ses:(c.sessions||c.log||[]).map(x=>[x.d||x.date||x.at,x.ok,x.pct,x.by||x.src])})+\"\\n\"+t.slice(t.indexOf(\"تثبیت\"),t.indexOf(\"تثبیت\")+700)})()"}

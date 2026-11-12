@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# run.py SID FROM [TO] : replay round24A ctl cFROM..cTO into round25A with pid mapping; stops at AI request
+# run.py SID FROM [TO] : replay round26A/_old ctl cFROM..cTO into round26A with pid mapping; stops at AI request
 import sys,os,json,re,subprocess,glob
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R9=T+'/round25A'; R8=T+'/round24A'
+R9=T+'/round26A'; R8=T+'/round26A/_old'
 sid=sys.argv[1]; a=int(sys.argv[2]); b=int(sys.argv[3]) if len(sys.argv)>3 else 999
 D=R9+'/'+sid; MP=D+'/pidmap.json'
 PIDRE=re.compile(r'pb_l_[a-z0-9]{8,}')
@@ -56,7 +56,7 @@ for i in range(a,b+1):
             tf=D+'/_tmp.json'; open(tf,'w').write(tx); o=d('send','@'+tf); os.remove(tf)
             print('##### replay(ovr) c%d -> %s'%(i,json.dumps(x,ensure_ascii=False)[:160])); print(o[:1500])
         open(D+'/pos','w').write(str(i)); continue
-    t=open(f).read().replace('round24A','round25A')
+    t=open(f).read().replace('round25A','round26A')
     t=clockfix(t)
     need=[p for p in set(PIDRE.findall(t)) if p not in mp]
     if need:
@@ -66,6 +66,23 @@ for i in range(a,b+1):
             if 0<=k<len(nw): mp[p]=nw[k]
             else: print('!! cannot map',p,'old',OLD,'new',nw); sys.exit(2)
         json.dump(mp,open(MP,'w'))
+    if 'prc_' in t:
+        import re as _re
+        oldp=[]
+        for k in range(1,400):
+            g=R8+'/'+sid+'/ctl/c%d.json'%k
+            if not os.path.exists(g): continue
+            for x in _re.findall(r'prc_[a-z0-9]+',open(g).read()):
+                if x not in oldp: oldp.append(x)
+        js=json.dumps({'eval':"JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))"})
+        tf=D+'/_tmp.json'; open(tf,'w').write(js); o2=d('send','@'+tf); os.remove(tf)
+        m2=re.search(r'EVAL: (.*)',o2)
+        try: newp=json.loads(m2.group(1))
+        except Exception: newp=[]
+        for x in set(_re.findall(r'prc_[a-z0-9]+',t)):
+            k=oldp.index(x)
+            if k<len(newp): t=t.replace(x,newp[k]); print('PRCMAP',x,'->',newp[k])
+            else: print('!! PRC unmapped',x,newp)
     for o,n in mp.items(): t=t.replace(o,n)
     if json.loads(t).get('exit'): print('skip exit at',i); break
     tf=D+'/_tmp.json'; open(tf,'w').write(t)

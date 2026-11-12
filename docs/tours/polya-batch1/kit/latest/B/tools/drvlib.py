@@ -1,5 +1,5 @@
 import json, os, re, hashlib
-IDRE = re.compile(r'\b(?:pb_[a-z]_[a-z0-9]{6,}|prc_[a-z0-9]{6,}|prl_[a-z0-9]{6,}|achat_[a-z0-9]{6,}|dl_[a-z0-9]{6,})\b')
+IDRE = re.compile(r'\b(?:pb_[a-z]_[a-z0-9]{6,}|prc_[a-z0-9]{6,}|prl_[a-z0-9]{6,}|achat_[a-z0-9]{6,}|dl_[a-z0-9]{6,}|it\d+_[a-z0-9]{4})\b')
 RW = '[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ'
 FA = str.maketrans('۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩', '01234567890123456789')
 def ids(u):

@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"}
+{"eval": "(()=>{APP.go(\"today\");return JSON.stringify({d:APP.today(),due:(APP.dueList()||[]).map(x=>(x.txt+\" | \"+(x.sub||\"\")).slice(0,200)),last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-3).map(m=>(m.text||\"\").slice(0,300))})})()"}

@@ -36,7 +36,7 @@ def scen(d):
     fnd = os.path.join(d, 'findings.md')
     plain = ''
     if os.path.exists(fnd):
-        t = open(fnd).read()
+        t = open(fnd, encoding='utf-8', errors='replace').read()
         m = re.search(r'##\s*خلاصه[^\n]*\n(.*?)(?:\n##|\Z)', t, re.S)
         res = re.search(r'RESULT:\s*([^\n]+)', t)
         plain = (m.group(1).strip() if m else '') or ''

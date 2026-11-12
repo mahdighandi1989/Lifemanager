@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go('dossier','achat_mvaqlth6ey93h');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}

@@ -1,1 +1,1 @@
-{"eval": "[...document.querySelectorAll(\"#main [class*=lp-ph], #main [class*=chip], #main [role=tab], #main a\")].slice(0,30).map(x=>x.tagName+\".\"+x.className+\":\"+x.textContent.trim().slice(0,40)).join(\"\\n\")"}
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqmpsdnsx\",\"exec\");return [...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.className.split(\" \")[0]+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|گام|بازنگری|✅|ثبت/.test(x)).join(\"\\n\")+\"\\n---\\n\"+MT(\"۳)\",2500)})()"}

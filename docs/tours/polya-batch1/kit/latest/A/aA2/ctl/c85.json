@@ -1,0 +1,1 @@
+{"eval": "(()=>{const c=APP.PR.all()[0];return APP.today()+\" \"+JSON.stringify({n:APP.PR.all().length,st:c.state||c.status,keys:Object.keys(c).join(\",\"),ses:(c.sessions||c.log||c.ses||[]).map(x=>[x.d||x.date||x.at,x.ok,x.pct,x.by||x.src])})})()"}

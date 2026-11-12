@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();let pr=null;try{pr=APP.STORY.priorFor(s,null)}catch(e){pr=\"ERR \"+e}return JSON.stringify({sys:s.msgs.filter(m=>m.role==\"sys\").map(m=>m.text.slice(0,300)),prior:pr,plans:s.plans,datePend:s.datePend,panel:(document.querySelector(\".as-panel\")||{}).innerText.slice(-900)})})()"}

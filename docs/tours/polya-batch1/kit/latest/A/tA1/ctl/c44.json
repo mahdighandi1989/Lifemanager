@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.otherQuote||\"\"]))"}
+{"shot":{"name":"tA1_today_armFarm","full":true}}

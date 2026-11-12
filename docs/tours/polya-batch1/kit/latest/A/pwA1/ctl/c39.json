@@ -1,1 +1,1 @@
-{"eval": "[...document.querySelectorAll(\"#main summary, #main h3, #main h4\")].map(x=>x.textContent.trim().slice(0,50)).join(\" | \")"}
+{"eval": "[...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|طرح|بازنگری|✅/.test(x)).join(\"\\n\")"}

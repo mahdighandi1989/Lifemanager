@@ -1,1 +1,1 @@
-{"eval": "(()=>{return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/۴۱|بازیابی|پرونده|🧪|برگه سفید|مسئله/.test(t)))+\"\\nSCHED:\"+JSON.stringify((APP.SCHED.all(APP.today())||[]).filter(e=>/prac/.test(JSON.stringify(e))).slice(0,3))+\"\\nPR.due:\"+JSON.stringify(APP.PR.due(APP.today()))})()"}
+{"eval": "\"clock->2026-10-29\"", "clock": "2026-10-29"}

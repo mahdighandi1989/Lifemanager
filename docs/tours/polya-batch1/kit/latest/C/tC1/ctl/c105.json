@@ -1,1 +1,1 @@
-{"say": "آخرش بگو: با همین روشِ پولیا و ابزارهای الانِ سامانه، از یه ایده تا یه برنامهٔ مشخص رسیدیم یا جاهایی کم بود؟"}
+{"shot": {"name": "x_today_after_takeback", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('today',undefined);return 1})()"}}

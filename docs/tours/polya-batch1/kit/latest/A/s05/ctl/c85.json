@@ -1,1 +1,1 @@
-{"say": "آره، پنجشنبه ثبت‌نام کردم. 🎯 رو هم زدم «شد»."}
+{"eval": "JSON.stringify({fc:APP.S.all('fcast',x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,30),x.out||x.res||x.o,x.judged||x.at2]),prc:APP.PR.all().map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas,s.draft,s.src])})),ex:((APP.S.get('ex_mvqgpqzz2kkle').data||{}).preds||[]).slice(0,3).map(r=>[r.out,r.fc])})"}

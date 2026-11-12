@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=document.querySelector(\".as-askyes\");if(b)b.click();return \"clicked \"+!!b})()"}
+{"eval": "[...document.querySelectorAll(\"button\")].filter(b=>/بله، این‌جا هم/.test(b.textContent)).length"}

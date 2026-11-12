@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll(\".as-msg\")];return ms.slice(0,4).map((m,i)=>i+\":\"+m.querySelectorAll(\"svg\").length+\" \"+m.innerText.slice(0,50)).join(\" | \")})()"}
+{"eval": "(()=>{const s=APP.ASSIST.cur();let ml=null;try{ml=APP.liveMeasLog?APP.liveMeasLog(s.id):\"nofn\"}catch(e){ml=\"ERR \"+e}const m=s.msgs[0];return JSON.stringify({ml,keys:Object.keys(m),pts:m.pts||null,mlog:s.mlog||null})})()"}

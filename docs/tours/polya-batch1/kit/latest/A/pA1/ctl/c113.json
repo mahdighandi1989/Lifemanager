@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({age:APP.AGE.age(),reg:s.coach&&s.coach.reg,sys:s.msgs.filter(m=>m.role==\"sys\").map(m=>m.text.slice(0,130))})})()"}

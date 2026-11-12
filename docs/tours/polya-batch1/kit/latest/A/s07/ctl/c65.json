@@ -1,1 +1,1 @@
-{"eval": "APP.today()+' '+APP.state.view+' '+APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>r.p.id+':'+r.p.title+':'+(APP.liveClosure(r.p.id)||{}).state).join(' | ')+' sess:'+APP.ASSIST.cur().id+' lp:'+(APP.ASSIST.cur().lprob||'')"}
+{"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"}

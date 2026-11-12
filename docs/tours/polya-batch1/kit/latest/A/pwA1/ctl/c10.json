@@ -1,1 +1,1 @@
-{"eval":"APP.go(\"route\",\"pb_l_mvnlnc51v6a\")"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

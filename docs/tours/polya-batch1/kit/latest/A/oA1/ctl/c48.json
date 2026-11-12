@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}
+{"eval": "JSON.stringify([\"برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶.\",\"جمعش ۱ + ۲ + … + ۱۱ = ۶۶. همون شد.\",\"۱۲ × ۱۱ ÷ ۲ = ۶۶\"].map(t=>{try{return APP.STORY.arithChk(t)}catch(e){return \"ERR \"+e}}))"}

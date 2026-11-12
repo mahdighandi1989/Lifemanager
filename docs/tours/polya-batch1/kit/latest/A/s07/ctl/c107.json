@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=[...document.querySelectorAll('#main button')].find(b=>/اشتباهات/.test(b.textContent));if(b)b.click();return MT('پوشهٔ',1500)})()"}
+{"eval": "(()=>{APP.go('practice');return APP.state.view+'\\n'+MT('فهرست‌های جاری',700)})()"}

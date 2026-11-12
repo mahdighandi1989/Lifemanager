@@ -1,1 +1,1 @@
-{"clock": "2026-11-15", "eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()"}
+{"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({m:s.msgs.slice(-2).map(m=>m.role+': '+m.text.slice(0,300)),prc:APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late})),due:(APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||''))})})()"}

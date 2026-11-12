@@ -1,1 +1,1 @@
-{"exit": true}
+{"eval": "(async()=>{APP.ASSIST.toggle(false);APP.go(\"fcast\");await new Promise(r=>setTimeout(r,1500));return JSON.stringify({h:[...document.querySelectorAll(\"#main h3,#main h4\")].map(e=>e.innerText).slice(0,6),sel:[...document.querySelectorAll(\"#main select\")].map(s=>(s.getAttribute(\"aria-label\")||s.closest(\"label,div,li,tr\").innerText.slice(0,90))+\" => \"+(s.selectedOptions[0]||{}).text)})})()"}

@@ -1,1 +1,1 @@
-{"shot": {"name": "tA1_wait_lprob", "sel": ".lp-syscard", "full": true}}
+{"eval": "(()=>{APP.go('lprob','pb_l_mvaqmgi3aap');const t=document.getElementById('main').innerText;const i=t.indexOf('منتظر');return i<0?'NO منتظر':t.slice(Math.max(0,i-200),i+500)})()"}

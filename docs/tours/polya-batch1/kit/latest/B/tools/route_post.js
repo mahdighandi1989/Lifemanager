@@ -1,4 +1,4 @@
-const { chromium } = require('/home/user/Lifemanager/apps/learning-architecture/node_modules/playwright');
+const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'); const D = process.argv[2], O = path.join(D, 'out'); const w = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const ctx = await chromium.launchPersistentContext(path.join(D, 'profile'), { viewport: { width: 1360, height: 900 } });
