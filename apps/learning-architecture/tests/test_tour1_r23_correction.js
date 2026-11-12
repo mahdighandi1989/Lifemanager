@@ -112,7 +112,7 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
     const q = await ev(() => __asks()), g = (p0) => q.filter(a => a.path === p0)[0], one = g('u.one'), d1 = g('dl:d1'), st = g('stmt');
     if (st) await ev((id) => APP.liveCopyAnswer(__cur().id, id, true), st.id);
     const t = await ev((pid) => APP.S.get('eprob_' + pid).p.title, pid);
-    return { ok: !!one && /صفحهٔ ۸×۸ ِ بی دو گوشهٔ مقابل/.test(one.new) && !!d1 && d1.new === 'صفحهٔ ۸×۸ (۱۰۰ خانه)' && !!st && /۸×۸/.test(t) && !/۱۰×۱۰/.test(t), got: { q, t } }; });
+    return { ok: !!one && /صفحهٔ ۸×۸ ِ بی دو گوشهٔ مقابل/.test(one.new) && !!d1 && d1.new === 'صفحهٔ ۸×۸ (۶۴ خانه)' /* دورِ ۲۶ (DECISIONS_R26 Q2، U34/C11): پیشنهادِ نیمه‌کارهٔ «۸×۸ (۱۰۰ خانه)» جایگزین شد — حسابِ دقیقِ صفحه برای کلِ متن (۸×۸ = ۶۴) */ && !!st && /۸×۸/.test(t) && !/۱۰×۱۰/.test(t), got: { q, t } }; });
 
   // B·D3 s19 (S2): «s19 her page step outcome «یک کیلو اضافه شد» changed silently to «نیم» with no ask»
   await T('B·D3 s19 her typed step outcome is never changed silently: asked with «نیم کیلو»', async () => { await ev(() => { __wipe(); __fresh(); });

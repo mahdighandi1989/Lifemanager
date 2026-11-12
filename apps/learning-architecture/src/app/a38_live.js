@@ -4353,6 +4353,8 @@
     var ctxIds = [sid, L.chat && L.chat.sess, r && r.sess].filter(function (x, i, X) { return x && X.indexOf(x) === i; });
     try { ctxIds.forEach(function (id) { var se = S.get(id); if (!se || !r) return; var inW = null; try { inW = msgWin(se, r); } catch (e) { inW = null; }
         (se.msgs || []).forEach(function (m, i) { if (!m || m.role !== "user" || sysTurn(m.text) || (inW && !inW(i))) return; add("msg:" + id + ":" + msgId(m), "پیامِ خودت", m.text, "ctx"); }); }); } catch (e) { console.warn(e); }
+    /* دورِ ۲۶ (Q2، U6/B26·D4 s17 «مخزن بتنی ۱۷ مترمکعبی»، بانکِ R26 #46): برنامه‌ای که در گفت‌وگوی همین مسئله گفت هم رکوردِ این مسئله است (متنش تکه‌ای از پیامِ خودش) */
+    try { var CT = out.filter(function (x) { return x.zone === "ctx"; }).map(function (x) { return nz(x.t); }); ctxIds.forEach(function (id) { var se = S.get(id); ((se && se.plans) || []).forEach(function (q) { if (!q || q.done || !txt(q.text) || !CT.some(function (t) { return t.indexOf(nz(q.text)) >= 0; })) return; add("splan:" + id + ":" + q.id, "برنامه", q.text, "role"); }); }); } catch (e) { console.warn(e); }
     if (g) { add("g.guess", "حدس", g.guess, "t1"); add("g.test", "آزمونِ حدس", g.test); }
     if (L.prior && Array.isArray(L.prior.steps)) L.prior.steps.forEach(function (x, i) { var n = x.n || i + 1; if (x.fixed && txt(x.fixed.t) && txt(x.quote) && nz(x.quote) !== nz(x.fixed.t)) add("priorq:" + n, "گامِ " + fa(n) + " ِ کارِ پیشین (متنِ نخست)", x.quote, "ctx");
       add("prior:" + n, "گامِ " + fa(n) + " ِ کارِ پیشین", x.fixed && txt(x.fixed.t) ? x.fixed.t : x.quote); });
@@ -4405,13 +4407,13 @@
      قاعدهٔ پیشین: A.LIVE_R24_QUARANTINE_P4.staleScan (docs/overhaul/REMOVAL_CANDIDATES.md). */
   var D25 = "0-9۰-۹٠-٩";
   var MONTH25 = /^[\s‌]*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند|ژانویه|فوریه|مارس|آوریل|ژوئن|ژوئیه|جولای|اوت|آگوست|سپتامبر|اکتبر|نوامبر|دسامبر)(?![آ-یء])/;
-  var LABEL25 = /(?:گام|مرحله|قدم|شماره|ردیف|بند|سؤال|سوال|پرسش|جلسه|تمرین|فصل|بخش|صفحه|مسئله|حالت|شکل|جدول)[ِٔهی‌]{0,3}[\s‌]*$|(?:^|[^a-zA-Z])[nkijm]\s*=\s*$/;
+  var LABEL25 = /(?:گام|مرحله|قدم|شماره|ردیف|بند|سؤال|سوال|پرسش|جلسه|تمرین|فصل|بخش|صفحه|مسئله|حالت|شکل|جدول)[ِٔهی‌]{0,3}[\s‌]*$|(?:^|[^a-zA-Z])(?<![0-9۰-۹٠-٩][\s‌]*)[nkijm]\s*=\s*$/;   // دورِ ۲۶ (Q2): «0.12 m = 24» — حرفِ پس از عدد یکاست، نه برچسب
   var PREMARK25 = /[=≈≃≅⇒→⟹≤≥<>]|(?:^|[\s‌(،,:؛«])(?:یعنی|می‌?شه|میشه|می‌?شود|میشود|می‌?شد|پس(?![\s‌]*از(?![آ-ی]))|جمعاً|جمعا|مجموعاً|مجموعا|مجموع(?:ِ|ش)?|روی[\s‌]*هم|در[\s‌]*کل|در[\s‌]*مجموع|کلاً|حاصل(?:ش|ِ)?|جواب(?:ش|ِ)?|برابر(?:ِ|[\s‌]*با)?|مساوی(?:ِ|[\s‌]*با)?|سهم(?:ِ|ش)?|نفری|هر[\s‌]*(?:نفر|کدام|کدوم|کس|کی|یک|بچه|کدومشون|کدامشان)|ماهی|هفته‌ای|روزی|سالی|ساعتی|محیط(?:ِ|ش)?|مساحت(?:ِ|ش)?|حجم(?:ِ|ش)?)(?=[\s‌:،,(]|$)/g;
   var POSTMARK25 = /^[\s‌]*(?:[^\s‌.،,؛;!؟?()«»]+[\s‌]+){0,3}?(?:رسید|می‌?رسه|می‌?رسد|شد|می‌?شه|میشه|می‌?شود|درمیاد|در[\s‌]*می‌?آید|درآمد|دراومد|درومد|موند|ماند|می‌?مونه|می‌?ماند)(?=[\s‌.،,؛;!؟?)»]|$)/;
   var OPCH25 = "×*·⋅∙÷\\/+−–\\-^";
   var OPW25 = "ضرب[\\s‌]*در|ضربدر|تقسیم[\\s‌]*بر|به[\\s‌]*علاوه[ٔی]?|بعلاوه[ٔی]?|منهای|به[\\s‌]*توان[ِ]?";
   /* دورِ ۲۶ (Q2): نامِ یکا یا شمرده‌شده میانِ عدد و عملگر بخشی از همان عملوند است («۱۲۰ وات ÷ ۱۲ ولت»، «۱۱ میلیارد تقسیم بر ۴ نفر») — واژهٔ ربط یا فعل نه */
-  var WORDOP26 = /^([\s‌]*(?:[آ-یءًٌٍَُِّْٔ‌]+[\s‌]+){1,2})(?=[×*·⋅∙÷+]|ضرب[\s‌]*در(?![آ-ی])|ضربدر(?![آ-ی])|تقسیم[\s‌]*بر(?![آ-ی])|به[\s‌]*علاوه|بعلاوه|منهای(?![آ-ی]))/;
+  var WORDOP26 = /^([\s‌]*(?:[آ-یءًٌٍَُِّْٔ‌]+[\s‌]+){1,2})(?=[×*·⋅∙÷+]|[\/−–\-][\s‌]*[0-9۰-۹٠-٩]|ضرب[\s‌]*در(?![آ-ی])|ضربدر(?![آ-ی])|تقسیم[\s‌]*بر(?![آ-ی])|به[\s‌]*علاوه|بعلاوه|منهای(?![آ-ی]))/;
   var WORDLK26 = /^([\s‌]*(?:[آ-یءًٌٍَُِّْٔ‌]+[\s‌]*){1,2}?)(?=[\s‌]*(?:[=≈≃≅⇒→⟹]|(?:یعنی|می‌?شه|میشه|می‌?شود|میشود)(?![آ-ی])))/;
   var NOSKIP26 = /^(?:و|یا|که|پس|یعنی|می‌?شه|میشه|می‌?شود|میشود|است|هست|بود|شد|از|تا|با|در|را|رو|به|هم|ولی|اما|اگر|اگه|چون|برای|این|آن|اون|هر|بر|ضرب|تقسیم|منهای|بعلاوه)$/;
   /* دورِ ۲۶ (Q2، U7 s19 «پس ۳٫۵ کیلو کم کردم»، بانکِ R26 #62 «ترازو ۰٫۵ کیلو کمتر نشون داد»): عددی که خودش «سنجیده/دیده/انجام‌شده» گزارش کرده حاصلِ حساب نیست — فقط با عبارتِ نوشتهٔ خودش کهنه می‌شود */
@@ -4494,6 +4496,8 @@
       var L = lex(st), P = parse(L.tk); if (!P) return; var tk = L.tk.slice(0, P.n), nx = L.tk[P.n], lastT = tk[tk.length - 1], end = lastT.t === "n" ? lastT.e2 : lastT.s + 1;
       if (tk.some(function (t) { return t.bad; })) return;
       if (nx && /^[*\/+\-^fp(]$/.test(nx.t)) return;                                                       // عبارتِ ناتمام/نمادین
+      /* دورِ ۲۶ (Q2، U6 s17 «V = 200 m^2 × 0.12 m = 24 m^3»): یکای لاتینِ پس از آخرین عملوند (m، cm، kg، s، W …) یکاست، نه نماد */
+      var lu26 = lastT.t === "n" ? /^[\s‌]*(?:mm|cm|km|m|kg|mg|g|ml|lit|l|min|hr|h|s|kwh|kw|w|kj|j|v|a|hz|pa)(?:\^?[23]|[²³])?(?=[\s‌]*(?:[=≈≃≅⇒→⟹،,.؛;)]|$))/i.exec(T.slice(end)) : null; if (lu26) end += lu26[0].length;
       if (new RegExp("^[\\s‌]*(?:[a-zA-Zα-ωπ]|[" + OPCH25 + "])").test(T.slice(end)) || /[a-zA-Zα-ωπ=][\s‌]*$/.test(T.slice(0, st)) && /[a-zA-Zα-ωπ][\s‌]*$/.test(T.slice(0, st)) || new RegExp("[" + OPCH25 + "][\\s‌]*$").test(T.slice(0, st))) return;
       var ops = tk.filter(function (t) { return t.t === "n" && t.o; }).map(function (t) { return t.o; });
       var ev = function (sub) { var f = function (n) { if (!n) return NaN; if (n.k === "n") { var v = sub && n.t.o ? sub(n.t.o) : n.t.v; if (v == null) return NaN; return n.t.pct ? v / 100 : v; } if (n.k === "c") return n.v; if (n.k === "f") return Math.sqrt(f(n.a)); if (n.k === "neg") return -f(n.a);
@@ -4655,7 +4659,18 @@
       return res.filter(function (r, i, X) { return X.findIndex(function (y) { return y.re === r.re && y.name === r.name; }) === i; }); };
     /* رکوردی که خودش نتیجه است: فقط وقتی یک عدد دارد («۲٫۴ لیتر رب»، «۷۸ جفت نقطه») — پیامِ بلندِ نتیجه نشانِ حاصل می‌خواهد */
     var ROLE = function (o) { return o.zone === "role" && RC[o.ri].O.filter(function (q) { return !q.struct; }).length === 1; };
+    /* دورِ ۲۶ (Q2، A26-15 s07 «تفاضل‌ها ۵، ۴، ۳، ۱ شدن» پس از ✏️ ِ قدها؛ بانکِ R26 #47): واژهٔ خودش رابطه را نام برده — فهرستِ پس از «تفاضل/اختلاف» تفاضلِ دو عضوِ پیاپیِ فهرستی است که پیش‌تر
+       نوشته (هر جای مسئله). هر تفاضل فقط به دو عضوِ خودش وابسته است: عضوِ اصلاح‌شده ⇒ همان دو تفاضل، با حسابِ دقیق؛ تفاضلی که هیچ عضوش عوض نشد هرگز. */
+    var LSEP26 = /^[\s‌]*(?:[،,]|و)[\s‌]*$/, LISTS26 = []; RC.forEach(function (rc) { var cur = []; rc.O.forEach(function (o, i) { if (o.struct || o.word) { if (cur.length > 2) LISTS26.push(cur); cur = []; return; } var pv = cur[cur.length - 1];
+        if (pv && LSEP26.test(rc.t.slice(pv.e, o.s))) cur.push(o); else { if (cur.length > 2) LISTS26.push(cur); cur = [o]; } }); if (cur.length > 2) LISTS26.push(cur); });
+    var DIFFS26 = []; RC.forEach(function (rc) { var re = /تفاضل|اختلاف‌?ها|اختلافِ?[\s‌]*(?:هر|دو)/g, m; while ((m = re.exec(rc.t))) { var z = sents25(rc.t).filter(function (q) { return m.index >= q[0] && m.index < q[1]; })[0] || [0, rc.t.length], L = [];
+        rc.O.forEach(function (o) { if (o.s < m.index || o.s >= z[1] || o.struct || o.word) return; var pv = L[L.length - 1]; if (!pv || LSEP26.test(rc.t.slice(pv.ue != null && pv.ue > pv.e && !/[،,]/.test(rc.t.slice(pv.e, pv.ue)) ? pv.e : pv.e, o.s))) L.push(o); });
+        if (L.length < 2) continue; var src = null;
+        LISTS26.forEach(function (S0) { if (src || S0[0].pos >= L[0].pos || S0.length < L.length + 1) return; for (var k = 0; k + L.length < S0.length && !src; k++) { var ok = true; for (var j = 0; j < L.length && ok; j++) ok = veq(Math.abs(S0[k + j + 1].v - S0[k + j].v), L[j].v); if (ok) src = S0.slice(k, k + L.length + 1); } });
+        if (src) L.forEach(function (c, j) { c.diffOf = [src[j], src[j + 1]]; c.mark = true; DIFFS26.push(c); }); } });
     for (var pass = 0, grew = true, t4 = false; pass < 12 && (grew || !t4); pass++) { if (!grew) t4 = true; grew = false;
+      DIFFS26.forEach(function (c) { if (c.der || c.root) return; var a = c.diffOf[0], b = c.diffOf[1]; if (!isStaleOp(a) && !isStaleOp(b)) return; var na = newV(a), nb = newV(b), re = na == null || nb == null ? null : outV25(Math.abs(nb - na), c, false);
+        if (re != null && veq(re, c.v)) { c.given = true; return; } c.root = null; push(c, re, re == null, "تفاضلِ «" + a.raw + "» و «" + b.raw + "»", true); grew = true; });
       occ.forEach(function (c) {
         if (c.pos <= firstOld || c.root || c.struct || c.der) return;
         /* (الف) حاصلِ نوشتهٔ همین رکورد */
@@ -4668,6 +4683,7 @@
           /* دورِ ۲۶ (Q2): خارج‌قسمتِ صحیحِ نوشتهٔ خودش («۱۰۲ ÷ ۶۰ میشه ۱ و خرده‌ای») — همان عبارت، بخشِ صحیح */
           if (!c.pct && Number.isInteger(c.v) && isFinite(vOld) && veq(Math.floor(vOld + 1e-9), c.v)) { if (r.ops.some(isStaleOp)) { var vN2 = r.ev(newV), reF = isFinite(vN2) ? Math.floor(vN2 + 1e-9) : null; if (reF != null && veq(reF, c.v) || c.zone === "ctx") return; push(c, reF, reF == null, r.txt, false); grew = true; return; } c.given = true; return; } }
         /* (الف۳) دورِ ۲۶ (Q2): تبدیلِ واحدِ همان کمیت («6131 ثانیه، حدودِ ۱۰۲ دقیقه») — عددِ اول کهنه ⇒ این هم، با همان ضریب و همان گردکردنِ خودش */
+        if (c.diffOf) return;                                                                  // تفاضلِ نام‌برده: فقط با دو عضوِ خودش
         if (c.conv) { var cx = c.conv.x; if (dbg) dbg.push({ conv: c.raw, x: cx.raw, st: isStaleOp(cx) }); if (isStaleOp(cx)) { var nx26 = newV(cx), re26 = nx26 == null ? null : outV25(nx26 * c.conv.k, c, c.conv.rounded); if (re26 != null && veq(re26, c.v)) return; push(c, re26, re26 == null, "تبدیلِ واحدِ «" + cx.raw + "»", true); grew = true; return; } c.given = true; return; }
         if (c.twin || c.twinOf) return;                                                        // کمیتِ مستقلِ هم‌مقدار با دادهٔ اصلاح‌شده — هرگز کهنه
         if (c.meas) return;                                                                    // سنجیده/دیده — داده است، نه حاصل
@@ -4686,6 +4702,9 @@
         if (!cand.length && t4) { cand = implicit(c, 4).map(function (z) { return { re: z }; }); }
         if (dbg) dbg.push({ v: c.v, k: RC[c.ri].k, cand: cand });
         /* دورِ ۲۶ (Q2، D25-19 s36 «۰٫۱×۲۰ + ۰٫۲۵×ح = ۰٫۱۵(۲۰+ح) ⇒ ۰٫۱ح = ۱ ⇒ ح = ۱۰»): نتیجهٔ یک زنجیرهٔ «⇒» که معادلهٔ نمادینِ آغازش مقدارِ کهنه را دارد به آن وابسته است؛ صفحه جبر را حساب نمی‌کند ⇒ می‌پرسد */
+        /* دورِ ۲۶ (Q2، s17 «۲۴ × ۰.۷ = ۱۶.۸ مترمکعب، پس یه مخزن بتنی ۱۷ مترمکعبی»): عددِ صحیحی که گردِ بالا/پایینِ یک حاصلِ کهنهٔ هم‌جنس در همان پیام است از آن برداشته شده — انتخابِ خودِ اوست، صفحه عدد پیشنهاد نمی‌کند، می‌پرسد */
+        if (!cand.length && !c.pct && Number.isInteger(c.v) && famU25(c)) { var hm = homeOf(c.ri), src26 = occ.filter(function (q) { return q !== c && q.der && q.pos < (hm >= 0 ? Infinity : c.pos) && (q.ri === c.ri || q.ri === hm) && famU25(q) === famU25(c) && !Number.isInteger(q.v) && (veq(Math.ceil(q.v), c.v) || veq(Math.floor(q.v), c.v)); })[0];
+          if (src26) { push(c, null, true, "گردشدهٔ «" + src26.raw + "»", true); grew = true; return; } }
         if (!cand.length) return;
         if (cand.some(function (z) { return z.re != null && veq(z.re, c.v); })) return;                 // با مقدارِ درست همان می‌ماند ⇒ اثر نمی‌گیرد
         var one = cand.every(function (z) { return z.re != null && veq(z.re, cand[0].re); }) ? cand[0].re : null;
@@ -4727,7 +4746,25 @@
       if (C0.length && CO.every(Boolean) && !C0.some(function (c) { return CO.indexOf(c) >= 0; })) return "no";
       return "unknown"; } catch (e) { console.warn(e); return "unknown"; } };
   A.liveAnn25 = function (t) { var O = ann25(t); runs25(t, O); return O; };
+  A.liveRuns25 = function (t) { var O = ann25(t); return runs25(t, O).map(function (r) { return { txt: r.txt, val: r.val, res: r.res ? r.res.raw : null, s: r.s, e: r.e }; }); };
   A.liveStaleCore = function (RC, D, dbg, opt) { try { return staleCore25(RC || [], D, dbg, opt); } catch (e) { console.warn(e); return []; } };
+  /* دورِ ۲۶ (Q2، U4/U5/C25-15/D26-8): کدام گام‌های دفترِ «کارِ پیشین» از دادهٔ اصلاح‌شده حساب شده‌اند؟ — همان موتور (وابستگیِ نوشته‌شده، نه عددِ هم‌رقم). a45 ِ دفتر فقط همین را می‌پرسد.
+     o = { pid, sid, steps: [{n, t, q}], frag, fix, old, cur, stmt, msgs: [متنِ پیام‌های خودش] } ⇒ null (اصلاحِ غیرِ عددی/نامعلوم: سنجهٔ پیشینِ دفتر) یا { n: [{v, re, ask}] } */
+  A.livePriorStale = function (o) { try { o = o || {}; var D = txt(o.old) && txt(o.fix) ? (rolePair(o.old, o.fix, o.cur || "") || { o: txt(o.old), n: txt(o.fix) }) : coreDiff(o.frag, o.fix, o.cur || ""); if (!D || !isNumD(D)) return null;
+      var RC = [], ST0 = o.steps || [], add = function (k, lab, t, zone) { if (typeof t === "string" && txt(t)) RC.push({ k: k, lab: lab, t: t, zone: zone }); };
+      if (o.pid && rec(o.pid)) RC = staleRecs(o.pid, o.sid).filter(function (x) { return !/^prior/.test(x.k); }); else { add("stmt", "صورتِ مسئله", o.stmt, "given"); (o.msgs || []).forEach(function (t, i) { add("msg:m" + i, "پیامِ خودت", t, "ctx"); }); }
+      ST0.forEach(function (x) { if (txt(x.q) && nz(x.q) !== nz(x.t)) add("priorq:" + x.n, "", x.q, "ctx"); add("prior:" + x.n, "گامِ " + fa(x.n), x.t, "work"); });
+      RC = RC.filter(function (x) { return x.zone !== "ctx" || !RC.some(function (y) { return y.zone !== "ctx" && nz(y.t) === nz(x.t); }); });
+      var out = {}; staleCore25(RC, D, null, { clause: fragClause(String(o.src || o.frag || ""), D) || String(o.frag || ""), noCtx: true }).forEach(function (it) { var m = /^prior:(\d+)$/.exec(it.k); if (!m) return; (out[m[1]] = out[m[1]] || []).push({ v: it.v, re: it.re, ask: !!it.ask }); });
+      return out; } catch (e) { console.warn(e); return null; } };
+  /* دورِ ۲۶ (Q2، U31/B26·D2 s16، بانکِ R26 #45): نتیجه‌ای که پیش از اصلاحِ یک داده به دست آمده «حل به نتیجه رسید» ِ ساده نیست. rid = {pid?, sess?} ⇒ null یا {o, n, why}:
+     مسئلهٔ زنده: نشانِ کهنهٔ زنده (A.liveStale) یا نتیجهٔ کهنه‌شدهٔ گفت‌وگو؛ مسئلهٔ گفت‌وگو: صورتی که اصلاح شد و پس از آن هیچ نتیجهٔ تازه‌ای ثبت نشده، یا نتیجهٔ کهنه‌شده. */
+  A.liveCorrStale = function (rid) { try { rid = rid || {}; var se = rid.sess ? S.get(rid.sess) : null, C = (se && se.coach) || {};
+      if (rid.pid && rec(rid.pid)) { var X = A.liveStale(rid.pid).filter(function (x) { return !/^msg:/.test(x.k); }); if (X.length) return { o: X[0].from.o, n: X[0].from.n, why: "stale" }; }
+      var EV = ((se && se.coachEv) || []).filter(function (e) { return e && !e.wd && e.ok && e.how === "res" && (!rid.pid || !e.pk || String(e.pk) === "l:" + rid.pid); });
+      var st = EV.filter(function (e) { return e.stale; }).pop(); if (st && !EV.some(function (e) { return !e.stale && String(e.at || "") > String(st.stale.at || ""); })) return { o: st.stale.old || "", n: st.stale["new"] || "", why: st.stale.ask ? "ask" : "res" };
+      if (!rid.pid && se) { var H = (C.stmtHist || []).slice(-1)[0]; if (H && H.at && !((se.coachEv || []).some(function (e) { return e && !e.wd && e.ok && (e.how === "res" || e.how === "solved") && String(e.at || "") > String(H.at); }))) { var d = coreDiff(String(H.old || ""), String(C.stmt || ""), "") || {}; return { o: d.o || "", n: d.n || "", why: "stmt" }; } }
+      return null; } catch (e) { return null; } };
   A.liveStaleRecs = function (pid, sid) { try { return staleRecs(pid, sid); } catch (e) { console.warn(e); return []; } };
   A.LIVE_R24_QUARANTINE_P4 = { staleScan: staleScan24 };   // دورِ ۲۵ (P4) — docs/overhaul/REMOVAL_CANDIDATES.md
   /* نمایشِ مقدارِ تازه: حسابِ دقیقِ صفحه؛ اگر رقم‌های اعشارش از دو رقم بیش از نوشتهٔ خودش بگذرد با «≈» گرد نشان داده می‌شود (مقدارِ ذخیره‌شده همان دقیق است) */
@@ -4757,8 +4794,23 @@
       h("ul", {}, X.map(function (x) { return h("li", { "data-stale": x.k, "data-ask": x.re == null ? "1" : "0" }, x.lab + ": «" + x.raw + "»" + (x.re != null ? " ⇒ با مقدارِ درست می‌شود " + fmtRe25(x) + (x.rel ? " (از «" + clip(x.rel, 40) + "»)" : "") + " — درست است؟" : " — این عدد از «" + clip(x.from.o, 30) + "» حساب شده بود؟ اگر آری، دوباره حسابش کن (صفحه عددی پیشنهاد نمی‌کند)") + " (" + x.ctx + ")"); }))); }
   A.liveStaleCard = staleCard;
   /* مقدارِ نسخه‌ای از همان واقعیت (همان سنجهٔ copyCands): عددی ⇒ numCopy (مقدار+واحد+نقش)؛ واژه‌ای ⇒ جایگزینیِ کمینه وقتی همان واقعیت است */
+  /* دورِ ۲۶ (Q2، C11؛ U34 s11 «صفحهٔ ۸×۸ (۱۰۰ خانه)»، U38 s17 «۱۸۰ مترمربع × ۰٫۱۲ متر × ۰٫۸ = ۱۹ متر»، C26-35 s23 «ضرب در ۳۰ تقسیم بر ۲۰ یعنی ۱٫۷۵»، بانکِ R26 #51/#56/#57):
+     متنی که هم مقدارِ پیشین را دارد و هم عددی که در همان متن از آن حساب شده، نیمه‌کاره پیشنهاد نمی‌شود — یا حسابِ دقیقِ خودِ صفحه برای **کلِ** متن (همان موتورِ کهنگی، روی همان متن)،
+     یا هیچ پیشنهادی (عددِ وابسته‌ای که صفحه رابطه‌اش را نشناخت در «🕰 کهنه پس از اصلاح» پرسیده می‌شود). mk(V) = همان جایگزینیِ مقدار، روی متنِ V. */
+  function fullCopy26(v, nv, D, clause, mk) {
+    if (nv == null || !D || !isNumD(D)) return nv; var it = [];
+    try { it = staleCore25([{ k: "x", lab: "", t: String(v), zone: "work" }], D, null, { clause: clause || "", noCtx: true }); } catch (e) { return nv; }
+    it = it.filter(function (x) { return x.k === "x"; }); if (!it.length) return nv;
+    if (it.some(function (x) { return x.re == null || !/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(String(x.raw || "")); })) return null;
+    var V = String(v), bad = false;
+    it.slice().sort(function (a0, b0) { return b0.pos - a0.pos; }).forEach(function (x) { var s0 = x.pos % 1e6, raw = String(x.raw); if (V.slice(s0, s0 + raw.length) !== raw) { bad = true; return; }
+      var k = Math.pow(10, dec25(raw) + 2), r = Math.round(x.re * k) / k; if (!veq(r, x.re)) { bad = true; return; }
+      V = V.slice(0, s0) + fmtNum(r, { fa: /[۰-۹٠-٩]/.test(raw), sep: /٫/.test(raw) ? "٫" : /\./.test(raw) ? "." : "" }) + V.slice(s0 + raw.length); });
+    if (bad) return null; var nv2 = null; try { nv2 = mk(V); } catch (e2) { nv2 = null; }
+    return nv2 != null && nz(nv2) !== nz(v) ? nv2 : null;
+  }
   function copyVal24(v, D, oldClause, oldSent) { if (typeof v !== "string" || !txt(v)) return null; var nv = null;
-    if (isNumD(D)) nv = numCopy(v, D, oldClause, oldSent); else { nv = fixVal(v, D); if (nv != null && nz(nv) !== nz(v) && !sameFact(v, D, oldClause)) nv = null; }
+    if (isNumD(D)) { nv = numCopy(v, D, oldClause, oldSent); nv = fullCopy26(v, nv, D, oldClause, function (V) { return numCopy(V, D, oldClause, oldSent); }); } else { nv = fixVal(v, D); if (nv != null && nz(nv) !== nz(v) && !sameFact(v, D, oldClause)) nv = null; }
     return nv != null && nz(nv) !== nz(v) ? nv : null; }
   function chatDraftsFollow(L, D, oldMsg, base, ch) {
     if (!D) return; var oc = fragClause(oldMsg, D), os = fragSent(oldMsg, D), hit = false;
@@ -4888,6 +4940,20 @@
   /* مقداری که span ِ موعد از آن پیدا می‌شود: کار + روزِ هفته + روز و ماهِ خورشیدی + ساعت (بندِ خودِ او، نه عنوانِ موعد) */
   function dlVal(x) { var p = x.date ? jParts(x.date) : {}; return [x.what, x.date ? wdFa(x.date) : "", p.day ? p.day + " " + (FA_MON[p.month - 1] || "") : "", x.time || ""].join(" "); }
   A.liveDlVal = dlVal;
+  /* ---- دورِ ۲۶ (Q2، D26-38 s34 p9 / s38 📜، بانکِ R26 #53): رکوردی که صفحه «از گفت‌وگو» از **همان پیام** ثبت کرد (نتیجه، گام، طرح، داده، مجهول … — دفترِ یک‌داستانِ سشن و رویدادِ 📜) نقلِ
+     همان پیام است؛ ✏️ یا اصلاحِ همان پیام آن را هم تازه می‌کند (پیشین در تاریخچه: «اصلاح شد ⇐ …») — «از آن تکه هیچ رکوردی ساخته نشده بود» وقتی «نتیجه (از گفت‌وگو)» هنوز واژه‌های پیشین را دارد دروغ است. */
+  function storyFollow26(se, m, D, base, ch, oldMsg) {
+    var mid = msgId(m), C = se.coach || {}, T = C.story || {}, seen = {};
+    var fixT = function (t) { if (typeof t !== "string" || !txt(t)) return null; var nv = null; try { nv = fixVal(t, D, oldMsg); } catch (e) { nv = null; } if ((nv == null || nz(nv) === nz(t)) && D.alt) { try { nv = fixVal(t, D.alt, oldMsg); } catch (e2) { nv = null; } } return nv != null && nz(nv) !== nz(t) ? nv : null; };
+    var note = function (label, o0, n0) { var k = label + "|" + nz(o0); if (seen[k]) return; seen[k] = 1; ch.push({ kind: "story", label: label, old: o0, new: n0, why: "همان پیام را خودش اصلاح کرد" }); };
+    Object.keys(T).forEach(function (key) { ((T[key] && T[key].items) || []).forEach(function (it) { if (!it || it.mid !== mid || it.k === "prior") return; var nv = fixT(it.t); if (nv == null) return; (it.was = it.was || []).push({ t: it.t, at: base.at }); var o0 = it.t; it.t = nv;
+      if (Array.isArray(it.pieces)) it.pieces = it.pieces.map(function (p) { return fixT(p) || p; }); note("ثبتِ «از گفت‌وگو»", o0, nv); }); });
+    var evFix = function (L, put) { var hit = false; (L || []).forEach(function (e) { if (!e || !e.src || e.src.mid !== mid || (e.src.sess && e.src.sess !== se.id) || !/^c(?:res|step|plan23|data|unk|whole|cond|tried|lb)$/.test(String(e.k || "")) || !(e.lines || []).length) return;
+        var nv = fixT(e.lines[0]); if (nv == null) return; var o0 = e.lines[0]; e.lines = [nv].concat(e.lines.slice(1).map(function (l) { return /^اصلاح شد ⇐/.test(l) ? l : (fixT(l) || l); })).concat(["اصلاح شد ⇐ «" + clip(o0, 160) + "»"]); hit = true; note(String(e.title || "ثبتِ «از گفت‌وگو»"), o0, nv); }); if (hit && put) put(); };
+    evFix(se.evlog, null);
+    pidsOf(se).forEach(function (pid) { var pg = pgOf(pid); if (!pg) return; var L = live(solOf(pg)); evFix(L.evlog, function () { S.put(pg); });
+      var h2 = false; (L.chatImpItems || []).forEach(function (it) { if (!it || it.mid !== mid) return; var nv = fixT(it.t); if (nv == null) return; (it.was = it.was || []).push(it.t); it.t = nv; h2 = true; }); if (h2) S.put(pg); });
+  }
   function retractSess(se, m, D, o) {
     var mid = msgId(m), at = nowISO(), ch = [], dk = D ? nz(D.o) + "⇒" + nz(D.n) : "", oldMsg = o.full ? o.full.old : m.text;
     var base = { at: at, src: mid, sess: se.id, by: o.by || "user", corr: o.corr || "", d: dk };
@@ -4928,6 +4994,7 @@
       ["q", "a"].forEach(function (k) { var v = fixVal(x[k], D); if (v != null && v !== x[k]) { (x.fixHist = x.fixHist || []).push(Object.assign({}, base, { field: k, old: x[k], new: v, why: "اصلاح شد ⇐ «" + clip(x[k], 60) + "»" })); ch.push({ kind: "card", label: "کارتِ مرور", old: x[k], new: v }); x[k] = v; } });
       S.put(x);
     });
+    try { storyFollow26(se, m, D, base, ch, oldMsg); } catch (e) { console.warn(e); }
     return ch;
   }
   /* ---- دورِ ۲۰ (RO2): نسخه‌ای که خودش در صفحه نوشت (یا پس از پرکردنِ دستیار خودش ویرایش کرد) هرگز بی‌صدا عوض نمی‌شود: یک بار «این‌جا هم عوض شود؟» ---- */
@@ -5208,7 +5275,8 @@
       /* دورِ ۲۲ (P3): اصلاحِ عددی ⇒ فقط «همان واقعیت به معنا» (numCopy: مقدار + واحد، یا همسایهٔ مشترک) — نه جایگزینیِ نوشتاریِ عددِ تنها («بر ۴»)؛
          اصلاحِ واژه‌ای ⇒ جایگزینیِ کمینه + سنجشِ دو سو، و اگر تکه با یکی دو واژهٔ میانی آمده، همان بازه (subseqFix) */
       var nv = null, numD = isNumD(D);
-      if (numD) { nv = numCopy(v, D, oldClause, oldSent); if (nv == null && named) nv = fixVal(v, D); }   // مدل فیلد را نام برد ⇒ همان فیلد (حتی عددِ تنها)
+      if (numD) { nv = numCopy(v, D, oldClause, oldSent); if (nv == null && named) nv = fixVal(v, D);   // مدل فیلد را نام برد ⇒ همان فیلد (حتی عددِ تنها)
+        nv = fullCopy26(v, nv, D, oldClause, function (V) { var x = numCopy(V, D, oldClause, oldSent); if (x == null && named) x = fixVal(V, D); return x; }); }   // دورِ ۲۶ (Q2، C11)
       else { nv = fixVal(v, D); if (nv != null && nz(nv) !== nz(v) && !named && !sameFact(v, D, oldClause)) nv = null; if (nv == null || nz(nv) === nz(v)) nv = subseqFix(v, D); }
       if (nv == null || nz(nv) === nz(v)) return;
       out.push({ pid: pid, path: path, field: path, sig: sig || "", label: label, old: v, new: nv, named: named, d: { o: D.o, n: D.n, parts: D.parts || null } }); };
@@ -5227,7 +5295,7 @@
     var g0 = s.g && s.g[1];
     if (g0 && txt(g0.guess) && !g0.withdrawn && !gRefuted(g0, L) && !(cx.mid && (srcIs(g0.src, cx.sid, cx.mid) || g0.mid === cx.mid))) {
       var n0g = out.length; cand("g.guess", "حدس", g0, "guess", true, "lpGuess");
-      if (out.length === n0g && restsHas(cx.rests, "guess")) { var ng = restNum(g0.guess, D); if (ng != null) out.push({ pid: pid, path: "g.guess", field: "g.guess", sig: "lpGuess", label: "حدس", old: g0.guess, new: ng, named: true, d: { o: D.o, n: D.n, parts: D.parts || null } }); } }
+      if (out.length === n0g && restsHas(cx.rests, "guess")) { var ng = restNum(g0.guess, D); ng = fullCopy26(g0.guess, ng, D, oldClause, function (V) { return restNum(V, D); }); if (ng != null) out.push({ pid: pid, path: "g.guess", field: "g.guess", sig: "lpGuess", label: "حدس", old: g0.guess, new: ng, named: true, d: { o: D.o, n: D.n, parts: D.parts || null } }); } }
     L.steps.forEach(function (st, i) { cand("step:" + st.id, "گامِ " + fa(i + 1), st, "text", pageSrc(st.src), "lpStep");
       if (st.out && txt(st.out.what)) cand("out:" + st.id, "گامِ " + fa(i + 1) + " — «چه شد؟»", st.out, "what", st.out.from === "page" || !!st.out.chatPrev || !!st.out.edited, "lpOWhat"); });
     var w = s.will; ((w && w.steps) || []).forEach(function (stp) { cand("will:" + stp.id, "🌱 گامِ کوچک", stp, "step", true, "");
@@ -5247,6 +5315,7 @@
   function copyField(pid, path, se) {
     /* دورِ ۲۳ (Q4، A23-30 oA1، D23-9): نسخه‌های سطحِ سشن — خواستهٔ سنجاق‌شده و حدس‌های گفت‌وگو */
     if (!pid && se) { if (path === "sess.pinned") return { owner: se, obj: se, key: "pinned", put: se };
+      var sm = /^st:(.+):([a-z]+):(\d+)$/.exec(path); if (sm) { var it26 = ((((se.coach || {}).story || {})[sm[1]] || {}).items || []).filter(function (x) { return x && x.k === sm[2] && String(x.n) === sm[3]; })[0]; return it26 ? { owner: it26, obj: it26, key: "t", put: se, st26: { key: sm[1], k: sm[2], n: sm[3] } } : null; }
       var cg = /^cg:(.+)$/.exec(path); if (cg) { var G0 = ((se.coach || {}).guesses || []).filter(function (g) { return g && g.id === cg[1]; })[0]; return G0 ? { owner: G0, obj: G0, key: "text", put: se, cg: true } : null; } return null; }
     var r = rec(pid); if (!r) return null; var s = solOf(pgOf(pid)), L = live(s), u1 = s.u && s.u[1];
     if (path === "stmt") return { owner: r, obj: r.p, key: "statement", put: r };
@@ -5283,6 +5352,8 @@
           dep.push({ kind: "stmt", label: "عنوانِ مسئله", old: t0, new: nt0, why: "پیرو صورتِ مسئله (به تأییدِ خودت)" }); } } }
     /* دورِ ۲۳ (Q4، D23-9): حدسی که با «بله» پیروِ دادهٔ درست شد — سرانجامی که بر متنِ پیشینش داوری شده بود با دلیل کنار می‌رود */
     if (yes && f && q.path === "g.guess" && q.d) dep = dep.concat(setAsideDeps(q.pid, q.d, { at: at, mid: q.mid, by: "user", rests: ["guess"] }));
+    if (yes && f && f.st26) { try { var id26 = "st23_" + f.st26.key.replace(/[^\w]/g, "_") + "_" + f.st26.k + "_" + f.st26.n, fx26 = function (LG) { var h = false; (LG || []).forEach(function (e) { if (e && e.id === id26 && (e.lines || []).length) { e.lines = [q.new].concat(e.lines.slice(1)).concat(["اصلاح شد ⇐ «" + clip(q.old, 160) + "» (به تأییدِ خودت)"]); h = true; } }); return h; };
+        fx26(se.evlog); pidsOf(se).forEach(function (p0) { var pg0 = pgOf(p0); if (pg0 && fx26(live(solOf(pg0)).evlog)) S.put(pg0); }); } catch (e26) { console.warn(e26); } }
     if (yes && f && f.cg) { var C0 = se.coach || {}; if (C0.guess && nz(C0.guess.text) === nz(q.old)) C0.guess.text = q.new;
       if (f.obj.res) { var oR = f.obj.res; f.obj.resRecheck = { at: at, was: oR, by: q.mid || "" }; f.obj.res = ""; dep.push({ kind: "guess", label: "سرانجامِ حدس", old: oR === "confirmed" ? "تأیید شد" : "رد شد", new: "کنار رفت — با مقدارِ درست دوباره آزموده شود", why: "متنِ حدس پیروِ دادهٔ درست شد" }); } }
     /* دورِ ۲۲ (P3، D s38): درسِ بازنگری که با «بله» عوض شد — نسخهٔ درس‌ها و کارتِ «بازسازی» هم همان متنِ کاملِ تازه را می‌گیرند */
@@ -5307,9 +5378,15 @@
   function sessCands(se, D, srcT, R) {
     var sid = se.id, oc0 = fragClause(srcT, D), st0 = fragSent(srcT, D), numD = isNumD(D), out = [];
     var mk = function (path, label, v, alsoRests) { if (!txt(v)) return; var nv = numD ? numCopy(v, D, oc0, st0) : null; if (nv == null && !numD) { nv = fixVal(v, D); if (nv != null && !sameFact(v, D, oc0)) nv = null; }
-      if (nv == null && alsoRests && numD && restsHas(R.rests, "guess")) nv = restNum(v, D); if (nv == null || nz(nv) === nz(v)) return;
+      if (nv == null && alsoRests && numD && restsHas(R.rests, "guess")) nv = restNum(v, D);
+      if (numD) nv = fullCopy26(v, nv, D, oc0, function (V) { var x = numCopy(V, D, oc0, st0); if (x == null && alsoRests && restsHas(R.rests, "guess")) x = restNum(V, D); return x; });   // دورِ ۲۶ (Q2، C11؛ C26-35)
+      if (nv == null || nz(nv) === nz(v)) return;
       out.push({ pid: "", sid: sid, path: path, field: path, sig: "", label: label, old: v, new: nv, named: false, d: { o: D.o, n: D.n, parts: D.parts || null } }); };
     if (txt(se.pinned)) mk("sess.pinned", "خواستهٔ سنجاق‌شدهٔ سشن", se.pinned, false);
+    /* دورِ ۲۶ (Q2، U16 oB1 «دو روز ⇒ سه روز»: «چیزی برای عوض کردن نبود» در حالی که «مجهول (از گفت‌وگو): … دو روز …» مانده؛ بانکِ R26 #49): ثبتِ «از گفت‌وگو» که از پیامِ **دیگری** آمده و همان
+       واقعیت را دارد پرسیده می‌شود (ثبتِ همان پیام را storyFollow26 خودش تازه می‌کند) */
+    var ST26 = (se.coach || {}).story || {}, LB26 = { whole: "کل در یک جمله (از گفت‌وگو)", u: "مجهول (از گفت‌وگو)", c: "شرط (از گفت‌وگو)", d: "داده (از گفت‌وگو)", plan: "طرح (از گفت‌وگو)", step: "گام (از گفت‌وگو)", res: "نتیجه (از گفت‌وگو)" };
+    Object.keys(ST26).forEach(function (key) { ((ST26[key] && ST26[key].items) || []).forEach(function (it) { if (!it || !LB26[it.k] || !txt(it.t) || (R.mid && it.mid === R.mid)) return; mk("st:" + key + ":" + it.k + ":" + it.n, LB26[it.k], it.t, false); }); });
     ((se.coach || {}).guesses || []).forEach(function (g) { if (!g || !txt(g.text) || g.res === "refuted" || g.withdrawn || (R.mid && (g.src === R.mid || (g.src20 && g.src20.msg === R.mid)))) return; mk("cg:" + g.id, "حدسِ «" + clip(g.text, 40) + "»", g.text, true); });
     return out;
   }

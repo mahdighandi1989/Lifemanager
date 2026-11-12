@@ -4227,7 +4227,10 @@
       var le = { at: nowIso(), ph: "b", ok: true, src: "chatok", key: "lesson|rebook:" + R.curId, msg: R.curId, how: "lesson", pk: C.pk || "", rebook: { from: R.srcId, ev: "lesson" }, src20: { sess: s.id, msg: R.curId, span: clip(lessonFix["new"], 300), key: "lesson:" + lessonFix.pid } };
       add.push(le); s.coachEv = (s.coachEv || EV).concat([le]); nR++; nE = Math.max(nE, 1); }
     /* دورِ ۲۲ (P3، C22-7): سطرِ کارنامه در ساختارِ نتیجه خالی نیست — «پیشین ⇐ تازه» ِ خودش را دارد */
-    if (nE) { var kL = nR >= nE ? "همان کار با مقدارِ درست دوباره ثبت شد" : fa(nE - nR) + " رویدادِ کارنامه از همان بخش پس گرفته شد" + (nR ? " و " + fa(nR) + " کار با مقدارِ درست دوباره ثبت شد" : "");
+    /* دورِ ۲۶ (Q2، C26-37 s23 p6 «۱ رویدادِ کارنامه … پس گرفته شد» بی نام؛ بانکِ R26 #52): رویدادِ پس‌گرفته با نام و نقلِ خودش گفته می‌شود */
+    var KFA26 = { guess: "حدس", plan: "برنامه", promise: "قول", deadline: "موعد", step: "گام", result: "نتیجه", ans: "پاسخ", said: "بازگویی", datum: "داده", lesson: "درس", verdict: "«حل شد»", phase: "کارِ این مرحله", stuck: "گیر", pattern: "الگو", selfcorr: "خود-اصلاح" };
+    var wdN26 = mine.map(function (e, i) { if (!e.wd || e.wd.by !== R.curId || add.some(function (x) { return x.rebook && x.rebook.ev === (e.key || "") && x.at; }) && e.ok && REBOOK20.test(eS[i].k)) return ""; var kk = String(eS[i].k || "").split(":")[0].toLowerCase(), sp = eS[i].span != null ? String(eS[i].span) : ""; return (KFA26[kk] || "رویداد") + (sp.trim() ? " «" + clip(plainTx(sp), 50) + "»" : ""); }).filter(function (t, i, X) { return t && X.indexOf(t) === i; });
+    if (nE) { var kL = nR >= nE ? "همان کار با مقدارِ درست دوباره ثبت شد" : fa(nE - nR) + " رویدادِ کارنامه از همان بخش پس گرفته شد" + (wdN26.length ? " (" + wdN26.slice(0, 3).join("؛ ") + ")" : "") + (nR ? " و " + fa(nR) + " کار با مقدارِ درست دوباره ثبت شد" : "");
       put("کارنامه", fa(nE) + " رویداد از «" + clip(R.frag, 40) + "»", kL, "", "کارنامه: " + kL); }
     /* رکوردهای مسئلهٔ زنده (صورت، داده، حدس، گام، فیلدها) ⇐ بخشِ مسئله (A.liveRetract) */
     var pids = {}; try { var bl = AS.boundLive(s); if (bl && bl.pid) pids[bl.pid] = 1; } catch (e) { } if (s.lprob) pids[s.lprob] = 1; (s.lprobLog || []).forEach(function (e) { if (e && e.p) pids[e.p] = 1; });
@@ -4745,7 +4748,15 @@
     var hasRes21 = function (N) { var R = N.res || {}, recs = (R.changed || []).map(function (c) { return String((c && (c.rec || c.label || c.kind)) || ""); }).concat(N.ch || []);
       return recs.some(function (x) { return /حکمِ وارسی|«حل شد»|حل شد|سرانجامِ حدس|verdict|state|guess/.test(x); }) || (N.what === "ans" && recs.some(function (x) { return /کارنامه|نتیجه/.test(x); })); };
     var rechkNow22 = CHECKSAID21.test(ownText(mt)) || /(?:دوباره|باز|از\s*نو)[\s‌]*(?:حساب|چک|وارسی|امتحان|بررسی)[\s‌]*کردم|نتیجه[\s‌]*(?:همونه|همان[\s‌]*است|عوض[\s‌]*نشد|فرقی[\s‌]*نکرد)|(?:همون|همان)[\s‌]*(?:جواب|نتیجه)[\s‌]*(?:درمیاد|درمی[‌\s]?آد|شد|بود)/.test(ownText(mt));
-    try { var N = C.retNote; if (real && !rechkNow22 && N && N.shown === k && N.key !== k && (N.ch || []).some(function (x) { return /حکمِ وارسی|صورت|داده/.test(x); }) && /^(?:fact|ans|step|said)$/.test(N.what || "") && hasRes21(N)) {
+    /* دورِ ۲۶ (Q2، C26-36 s23 p12، بانکِ R26 #55/#72): پرسشِ «با مقدارِ اصلاح‌شده دوباره وارسی کن» تا وقتی خودش جوابش را نداده می‌ماند — نه فقط در نوبتِ پس از اصلاح. جواب = گزارشِ
+       بازوارسیِ خودش، «آره/باشه/نه» ِ رو به همان پرسش، یا نتیجه/حکمِ تازه‌ای که پس از آن ثبت شد؛ اصلاحِ تازه پرسشِ خودش را می‌آورد. */
+    try { var P26 = C.rechk26, own26 = ownText(mt).trim();
+      if (P26 && real && k !== P26.k && (rechkNow22 || /^(?:آره|اره|بله|باشه|اوکی|حتماً|حتما|نه|نمی‌?خوام|لازم[\s‌]*نیست)(?=[\s‌،,.!؟?]|$)/.test(own26) || /دوباره[\s‌]*(?:بسنج|حساب[\s‌]*کن|وارسی[\s‌]*کن|چک[\s‌]*کن)/.test(own26)
+        || (s.coachEv || []).some(function (e) { return e && !e.wd && !e.stale && e.ok && (e.how === "res" || e.how === "solved") && String(e.at || "") > String(P26.at || "~"); }))) { delete C.rechk26; P26 = null; try { S.put(s); } catch (e26) { } }
+    } catch (e) { }
+    try { var N = C.retNote, first26 = !!(N && N.shown === k && N.key !== k), again26 = !!(N && C.rechk26 && C.rechk26.fix === String(N.fix || ""));
+      if (real && !rechkNow22 && N && (first26 || again26) && (N.ch || []).some(function (x) { return /حکمِ وارسی|صورت|داده/.test(x); }) && /^(?:fact|ans|step|said)$/.test(N.what || "") && hasRes21(N)) {
+      if (first26 && !(C.rechk26 && C.rechk26.fix === String(N.fix || ""))) { C.rechk26 = { fix: String(N.fix || ""), at: nowIso(), k: k }; try { S.put(s); } catch (e27) { } }
       var ci = -1; out.forEach(function (x, j) { if (ci < 0 && /(?:^|\n)# مربیِ حل/.test(x)) ci = j; });
       var tq = "- **پرسشِ این نوبت همین است:** با مقدارِ اصلاح‌شده («" + String(N.fix || "").replace(/[«»]/g, "") + "») نتیجه را دوباره وارسی کند — هنوز همان جواب درمی‌آید؟ (کلِ مسئله یا سلیقه را این نوبت پیش نکش.)";
       /* R7 (دورِ ۲۱، D·s34 p13): یک پرسشِ نوبت در کلِ پرامپت — هر «پرسشِ این نوبت/پیشنهادِ این نوبت/در این نوبت فقط یک پرسش» ِ بلوک‌های دیگر زمینه می‌شود */
