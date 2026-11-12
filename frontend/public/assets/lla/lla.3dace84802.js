@@ -56897,6 +56897,7 @@ APP.goFromURL = function (q) {
   var SELF_K = { fix: 1 };
   function sysOpen(s, sc, g, r, um, fp) {
     var R = store(sc); if (!R) return null; if (SELF_K[g.kind]) return null;
+    if ((sc.late || closedProb(sc)) && !TERR_AREA.test(String(g.area || ""))) return null;   // دورِ ۲۶ (D26-54): برگهٔ خودِ صفحه تکهٔ هیچ مسئلهٔ بسته‌ای نیست (هر دو راهِ دامنه)
     var nk0 = stepNamedK(s, g), sn = stepNamingSheet(s, r.number);
     if (txt(g.step)) return sysEntry(s, sc, R, g, r, um, fp, g.step, "model");
     if (nk0) return sysEntry(s, sc, R, g, r, um, fp, nk0.t, "k#");
@@ -56984,7 +56985,10 @@ APP.goFromURL = function (q) {
     var CLS = String(m || "").split(/[،,؛;.!؟?\n|]+|\s(?:ولی|اما|بلکه)\s/).filter(function (cl) { return !!txt(cl); }), mark = function (o2, i, ng) { (ng ? o2.neg : o2.pos)[i] = 1; };
     var NM = { pos: {}, neg: {} }, OR = { pos: {}, neg: {} }, OTH = [];
     CLS.forEach(function (cl) {
-      var Z = zk(cl), T2 = toksOf(cl), ng = NEG_T.test(cl) || NOFIT.test(cl), said = ng || PICK_T.test(cl) || rawW(cl).length <= 3, any = false;
+      /* نفی فقط وقتی «ردِ همان نامزد» است که ریختِ رد دارد («به کارم نمیاد»، «همون نیست»…) یا بند کوتاه و نام‌بَر است («ایران نه») — فعلِ منفیِ اتفاقیِ یک جملهٔ
+         بلند («جهان رو که نمی‌شه یه‌شبه گشت») رد نیست */
+      var short = rawW(cl).length <= 3, ng = NOFIT.test(cl) || (short && NEG_T.test(cl)), said = ng || PICK_T.test(cl) || short, any = false;
+      var Z = zk(cl), T2 = toksOf(cl);
       C.forEach(function (c, i) {
         var whole = zk(c.fa).trim().length >= 2 && Z.indexOf(zk(c.fa)) >= 0 && !C.some(function (c2, j) { return j !== i && zk(c2.fa) === zk(c.fa); });
         if (whole || (said && own[i].length && own[i].some(function (w) { return T2.indexOf(w) >= 0; }))) { mark(NM, i, ng); any = true; }
