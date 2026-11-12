@@ -11,7 +11,7 @@ Files: `src/app/a46_arith.js` ONLY (no line of a45, a27, a29, a38, a26 was touch
 
 Functions changed in a46: `fmtV` (+ new `narrow`, `term10`, `fmtD`, `fmtLike`), `norm`, `tokens` (π), `parser` (`lit`, `factor`, `expr`, the
 returned record: `tl`, `mags`, `frac`), `okPrev`, `leadOf`, `trailOf` (the running-sum branch), `tolSaid`, `agree` (the single-number branch),
-`chains` (rewritten; + new `stripUW`, `scaledV`, `tailStart`, `headEnd`, `hasNum`, `hasOp`, `algebra`, `clock`, `pretty`), `units` (`CONN`, one
+`chains` (rewritten; + new `stripUW`, `scaledV`, `tailStart`, `headEnd`, `hasNum`, `hasOp`, `algebra`, `dateLike`, `endsNum`, `clock`, `pretty`), `okNext`, `units` (`CONN`, one
 look-ahead), `run`, `arithChk`, `ST.arithNote`, `ST.arithLines`, the prompt hook; new `ST.arithUnread`, `ST.arithContest` and their two hooks.
 Unchanged: `ST.arithSaid`, `ST.unitAt`, `quants`, the rational/interval helpers, `disowned`, `slashDec`.
 
@@ -85,4 +85,8 @@ re-check block below.
 ## Not done (HANDBOOK §12 row 74)
 Ellipsis sums are not expanded («نسنجیده»); «۳ متر در ۴ متر = ۱۲ مترمربع» (word «در» between quantities) is not read; the re-check re-runs
 the same reader on the same text — it cannot overrule a misreading the reader still has; no real-model run of the new blocks.
-C26-11 was not reproduced (the reader flags «۱۷۰۰ ÷ ۰٫۵ = ۳۰۹۱» on BASE26 as well).
+C26-11 reproduced only inside its own sentence («… توان ۱۷۰۰ / ۰٫۵ = ۳۰۹۱»: «توان» was read as a function name) and is fixed.
+
+## Evidence beyond the tests
+All 972 user messages of the round-26 runs were read with the base and the new reader: 16 false ✗ of the base gone, 8 new ✗ (all real
+slips the base passed), 3 «؟», 31 «نسنجیده» lines (sqrt, ln, «جذر», «نصفِ», implicit products of parentheses, ellipsis, number words).

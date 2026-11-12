@@ -2,7 +2,7 @@
 //  runners  جمله‌های خودِ گزارش‌های دورِ ۲۶ (پرامپت‌ها: T/round26X/<sid>/ai/pN.json):
 //           S1-a  A26-1 (s01 p15، s04 p14، s09 p4)، B_x D19 = U2 (pwB2 p9)، D26-16 (arD1 p6)، C26-9 (pwC1 p3)، C26-10 (pwC1 p15، aC3 p5)، C26-26 (aC2 p4)، C26-31 (pC1 p1)، A26-26 (aA2 p4)، D26-52 (aD3 p7)
 //           S1-b  B26·D20 = U1 (pwB1 p11)، D26-18 (arD1 p7)
-//           S2/S3 B26·D8 = B_x D8 (s18 π)، B_x D6 = U27 (s17 p8)، B_x D15 = U28 (pwB1 p13)، D26-24 (oD1 p9، s36 p3، aD1 p5، aD3 p9)، C26-11 (pwC1 — «not reproduced» در خواننده)، A26-20 (aA4 «ذرع»)
+//           S2/S3 B26·D8 = B_x D8 (s18 π)، B_x D6 = U27 (s17 p8)، B_x D15 = U28 (pwB1 p13)، D26-24 (oD1 p9، s36 p3، aD1 p5، aD3 p9)، C26-11 (pwC1 p16)، A26-20 (aA4 «ذرع»)
 //           block B26·D10/D35 = U26 (bp2 p9، aB4 p3)، A26-45 (oA1 p18)
 //           contest A26-2، A26-3 (s01 p15–p17) = بانک #25، #41، #42
 //  bank     همهٔ ۴۲ ورودیِ Q1.arith_reader در بانکِ مستقلِ tests/variants/VARIANTS_R26.json
@@ -94,6 +94,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     await want('۲ هزار و ۵۰۰ + ۵۰۰ = ۳ هزار', 'OK', '«۲ هزار و ۵۰۰» is one number (was read as «۵۰۰ + ۵۰۰» ⇒ a false ✗ on BASE26 too)');
     await want('۲ هزار و ۵۰۰ + ۵۰۰ = ۴ هزار', 'FLAG', 'neg: compound number, wrong sum');
     await want('۳ نفر بودیم، با ۲ ماشین میشه ۶ ساعت', ['UNCHECKED', 'SILENT'], 'neg: «با» between different things is no running sum — neither ✓ (3×2) nor ✗');
+    await want('خودم نشستم حساب کردم: ۳ × ۴۵ = ۱۳۵ و با ۲۰ تا میشه ۱۵۵', 'OK', 'a connective between the numbers is not a unit (bank R26 #117 leans on this)', r => r.c.length === 2);
+    await want('خودم نشستم حساب کردم: ۳ × ۴۵ = ۱۳۵ و با ۲۰ تا میشه ۱۶۵', 'FLAG', 'neg: … and the wrong running sum is ✗');
     await want('۱۵ درصدِ ۸۰ میشه ۱۲', 'OK', '«N درصدِ M»');
     await want('۱۵ درصدِ ۸۰ میشه ۱۸', 'FLAG', 'neg: «N درصدِ M» wrong');
     // ---- C18: عددِ شرط مقدارِ ادعاشده نیست ----
@@ -149,9 +151,23 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     await want('طولِ پارچه ۱۲ ذرع × ۱٫۰۴ = ۱۲٫۴۸ متر', 'OK', 'A26-20 («ذرع»): numbers read, unit told as unread', r => r.c[0].unitUnread && /واحدش نسنجیده/.test(r.lines[0]));
     await want('طولِ پارچه ۱۲ ذرع × ۱٫۰۴ = ۱۳٫۴۸ متر', 'UNCHECKED', 'neg: unknown unit beside disagreeing numbers ⇒ «نسنجیده», never ✗');
     await want('انرژی ۲۵ کیلووات‌ساعت × ۳٫۶ = ۸۰ مگاژول', 'FLAG', 'neg: known unit words do not hide a wrong number');
-    // ---- C26-11: «۱۷۰۰ ÷ ۰٫۵ = ۳۰۹۱» ----
-    r = await AC('۱۷۰۰ ÷ ۰٫۵ = ۳۰۹۱'); info.nc['C26-11'] = 'not reproduced in the reader: on BASE26 too «۱۷۰۰ ÷ ۰٫۵ = ۳۰۹۱» is ✗ (3400) — asserted here; the runner\'s table row has no pN with this line in pwC1/ai, so the silent turn could not be rebuilt';
-    chk(verdict(r) === 'FLAG', 'C26-11: the wrong division is flagged :: ' + J(r));
+    // ---- C26-11 pwC1 p16: «توان» (وات) نامِ تابع خوانده می‌شد و سطر بی‌صدا می‌ماند ----
+    await want('اگه راندمان ۵۰٪ بشه توان ۱۷۰۰ / ۰٫۵ = ۳۰۹۱', 'FLAG', 'C26-11 pwC1 p16 (the wrong division in its own sentence)', r => /۳۴۰۰/.test(r.c[0].valT));
+    await want('اگه راندمان ۵۰٪ بشه توان ۱۷۰۰ / ۰٫۵ = ۳۴۰۰', 'OK', 'neg C26-11: the right division');
+    await want('۲ به توان ۳ = ۹', ['UNCHECKED', 'SILENT'], 'neg C26-11: «به توانِ» is still a function word — not read as «۳ = ۹»');
+    // ---- جمله‌های واقعیِ دیگرِ همان اجراها که با خوانندهٔ تازه سنجیده شدند (پویشِ همهٔ ۹۷۲ پیامِ دورِ ۲۶) ----
+    await want('سودم (۹۰۰ − ۳۸۰) × ۳۲ = ۱۶ میلیون و ۶۴۰ میشه. هنوز به ۲۰ نمی‌رسه.', 'OK', 's09 p15: «۱۶ میلیون و ۶۴۰» (= ۱۶٬۶۴۰ هزار) is one compound number');
+    await want('سودم (۹۰۰ − ۳۸۰) × ۳۲ = ۱۷ میلیون و ۶۴۰ میشه', 'FLAG', 'neg s09 p15: compound number, wrong product');
+    await want('حدس زدم ۵ لیتر: ۲+۱.۲۵=۳.۲۵ از ۲۵ میشه ۱۳٪. کمه.', 'OK', 's36 p2: the number before «از» is the result of the previous «=»', r => r.c.length === 2);
+    await want('۸ لیتر رو هم امتحان کردم: ۲+۲=۴ از ۲۶ میشه ۲۵٪.', 'FLAG', 'neg s36 p3: wrong percent after a right sum', r => r.c[0].st === 'ok' && r.c[1].st === 'flag');
+    await want('با ۳۰ لیتر حساب کردم: ۰٫۱×۳۰ + ۰٫۲۵ح = ۰٫۱۵(۳۰+ح) ⇒ ۳ + ۰٫۲۵ح = ۴٫۵ + ۰٫۱۵ح ⇒ ۰٫۱ح = ۱٫۵ ⇒ ح = ۱۵ لیتر.', 'SILENT', 's36 p9: algebra with a Persian-letter unknown is outside the reader (no ✗ on «۳ + ۰٫۲۵ = ۴٫۵ + ۰٫۱۵»)');
+    await want('۶ و ۶ و ۶ میشه ۱۸', 'OK', 'aA1 p8: «و … و … میشه»');
+    await want('۱۲ تقسیم بر ۴ میشه ۳ تا ۴ تا، هیچی نمی‌مونه، پس ۳ روز.', 'OK', 'pwA2 p5: «۳ تا ۴ تا» is not the range «۳ تا ۴»');
+    await want('۰٫۳ تقسیم بر ۰٫۰۵ میشه ۶ برابرِ نویز.', 'OK', 'oD1 p4: «۶ برابرِ نویز» is a ratio');
+    await want('جمع ۴۳٫۷۵، وسط ۲۶٫۲۵. تقسیم بر ۷۰ میشه ۰٫۳۷۵ که همون ۳/۸ ـه!', 'OK', 'dp1 p8: a running division after a sentence end');
+    await want('۱ = ۱/۲ + ۱/۳ + ۱/۶ (پمپ، لوله، برق)', 'OK', 'pwB2 p9 (B_x D19 note): a remark in parentheses after the sum');
+    await want('قرارداد از ۱۴۰۵/۱/۱۵ شروع میشه و نمره‌ی ریاضیِ دخترم امسال ۱۸ شد', 'SILENT', 'pwB2 p9: a date is not arithmetic');
+    r = await want('۱۷۰۰ ثانیه یعنی ۱۷ دقیقه', 'FLAG', 'pwD1 p1: conversion value in her form', r => !/\//.test(r.c[0].valT) && /۲۸٫۳ دقیقه/.test(r.c[0].valT));
     // ---- قراردادِ دیگران: سه حالت، ck.unread، و یادداشتِ کنارِ گام ----
     r = await AC('۱۰۰ ÷ ۷ = ۱۴'); chk(r.note.bad === false && r.note.ask === true && /گرد شده؟/.test(r.note.chk) && !/درست/.test(r.note.chk), 'arithNote: an asked check is neither «درست» nor bad :: ' + JSON.stringify(r.note));
     r = await AC('۱ + ۲ + … + ۲۰ = ۲۱۰'); chk(r.note.bad === false && r.note.unread === true && /نسنجیده/.test(r.note.chk) && !/درست/.test(r.note.chk), 'arithNote: an unread operator line says «نسنجیده» :: ' + JSON.stringify(r.note));
@@ -248,6 +264,11 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     u = await turn('نه بابا درست حساب کردم، همون ۲۱۴ میشه', 'همان شاهد.', [csn({ ph: 'c', said: [] })]); sys = await sysOf();
     chk(!/# بازسنجیِ حسابِ صفحه/.test(head(u.user)) && sys.filter(t => /بازسنجیِ حسابِ صفحه/.test(t)).length === 1, '#41: the same contest is not re-checked again in a loop :: ' + sys.length + '/' + nSys);
     info.bank[40] = /حکم ماند/.test(B) && !!(pr && pr.steps[1].verdict === 'wrong');
+    // شبیهِ منفی: «حسابش رو درست کردم: …» اصلاحِ خودِ اوست (کارِ دفتر)، نه اعتراض — بازسنجی نمی‌شود
+    await wipe(); await fresh();
+    await ppr(M41, [{ step: 'ماهانه', quote: 'درآمد منهای خرج ۴۵ − ۲۸ = ۱۷ میلیون', verdict: 'ok' }, { step: 'سالانه', quote: 'در سال ۱۷ × ۱۲ = ۲۱۴ میلیون', verdict: 'ok', dep: [1] }], { cs: { nat: 'practical' } });
+    u = await turn('حسابش رو درست کردم: ۱۷ × ۱۲ = ۲۰۴ میلیون', 'آفرین.', [csn({ ph: 'c', said: [] })]);
+    chk(!/# بازسنجیِ حسابِ صفحه/.test(head(u.user)) && !(await sysOf()).some(t => /بازسنجیِ حسابِ صفحه/.test(t)), 'neg: her own fix of the step is not read as a contest of the ✗ :: ' + JSON.stringify(await sysOf()));
     // --- #42: «درست حساب کردم» بی هیچ «✗» ِ روی میز — هیچ بازسنجی
     await wipe(); await fresh();
     await ppr('خودم حساب کردم. گام ۱: ۴۵ − ۲۸ = ۱۷ میلیون. گام ۲: در سال ۱۷ × ۱۲ = ۲۰۴ میلیون.', [{ step: 'ماهانه', quote: '۴۵ − ۲۸ = ۱۷ میلیون', verdict: 'ok' }, { step: 'سالانه', quote: 'در سال ۱۷ × ۱۲ = ۲۰۴ میلیون', verdict: 'ok' }], { cs: { nat: 'practical' } });

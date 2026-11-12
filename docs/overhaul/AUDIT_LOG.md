@@ -5120,5 +5120,10 @@ dated stability, mind-card feed) under way.
   Now: scale and unit words are units (C15); exact rationals are exact, an integer for a non-integer value is asked (C16); an operator
   line the reader cannot parse is «نسنجیده» (C17); the claimed value follows the last «=»/«میشه» (C18); three states ✓ / ✗ / «؟»;
   `A.STORY.arithContest` re-runs a contested ✗ once, shows both computations and clears it everywhere when she is right (owner bank 36).
-  Proof: `tests/test_tour1_r26_arith.js` (95 errors on BASE26 ⇒ 0), independent bank R26 Q1 42/42, bank R25 P2 58/58. One round-25
-  guard changed with a comment (unit words between numbers are now read). Not reproduced: C26-11. Nothing deleted or quarantined.
+  Proof: `tests/test_tour1_r26_arith.js` (114 errors on BASE26 ⇒ 0), independent bank R26 Q1 42/42, bank R25 P2 58/58. One round-25
+  guard changed with a comment (unit words between numbers are now read). Nothing deleted or quarantined.
+- **FINDING (2026-11-12, fixer «arith»)** A scan of all 972 user messages of round 26 with the base and the new reader (the runs' own
+  prompts) was the strongest check: all 16 false ✗ of the base are gone, the 8 new ✗ are real slips the base passed silently, and the scan
+  exposed four more misreadings the runners had not reported (the word «توان» read as a function name — this is C26-11, which did not
+  reproduce outside its sentence; the compound number «۱۶ میلیون و ۶۴۰»; «… = ۳٫۲۵ از ۲۵ میشه ۱۳٪»; a Persian-letter unknown read as a
+  unit). PROPOSAL: keep such a corpus scan (base vs new, differences only) as a standing step for any change to a reader of people's text.
