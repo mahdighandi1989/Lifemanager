@@ -89,6 +89,13 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     // مقیاسی که خوانده نمی‌شود: نه ✓ نه ✗ (C15 «هرگز ✗ به‌خاطرِ واژه»)
     await want('۲۵۰ میلیون × ۲۳٪ = ۵۷٫۵ هزار', 'ASK', 'C15: only the scale differs ⇒ asked, never ✗', r => r.c[0].kind === 'scale');
     await want('۲۵۰ میلیون ضربدر ۲۳ درصد میشه ۵۷.۵ میلیون در سال، تقسیم بر ۱۲ میشه حدود ۴.۸', 'OK', 'B26·D35 aB3 p7 («میشه» + scale carried to the next link)', r => r.c.length === 2);
+    await want('۱۲۰۰ هزار ÷ ۴ = ۳۰۰', 'OK', 'C15: a bare result takes the scale of the operands');
+    await want('۱۲۰۰ هزار ÷ ۴ = ۴۰۰', 'FLAG', 'neg: … and a wrong one is still ✗');
+    await want('۲ هزار و ۵۰۰ + ۵۰۰ = ۳ هزار', 'OK', '«۲ هزار و ۵۰۰» is one number (was read as «۵۰۰ + ۵۰۰» ⇒ a false ✗ on BASE26 too)');
+    await want('۲ هزار و ۵۰۰ + ۵۰۰ = ۴ هزار', 'FLAG', 'neg: compound number, wrong sum');
+    await want('۳ نفر بودیم، با ۲ ماشین میشه ۶ ساعت', ['UNCHECKED', 'SILENT'], 'neg: «با» between different things is no running sum — neither ✓ (3×2) nor ✗');
+    await want('۱۵ درصدِ ۸۰ میشه ۱۲', 'OK', '«N درصدِ M»');
+    await want('۱۵ درصدِ ۸۰ میشه ۱۸', 'FLAG', 'neg: «N درصدِ M» wrong');
     // ---- C18: عددِ شرط مقدارِ ادعاشده نیست ----
     await want('با n = 4 میشه 1+3+5+7 = 16 = 4²', 'OK', 'C26-26 aC2 p4', r => r.c.every(c => c.said !== '4'));
     await want('x=4 و y=1 میشه 16−1=15', 'OK', 'C26-31 pC1 p1');
@@ -168,6 +175,13 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     // C17/C16 در پرامپت: «نسنجیده» و «؟» سطر دارند؛ مربی آن‌ها را درست/غلط اعلام نکند
     u = await turn('پس ۱ + ۲ + … + ۲۰ = ۲۱۰ و هر جعبه ۱۰۰ ÷ ۷ = ۱۴ تا', 'باشه.', [csn({ ph: 'c', said: [] })]); B = blockOf(u.user);
     chk(/— حسابِ «پس ۱ \+ ۲ \+ … \+ ۲۰ = ۲۱۰» را صفحه نسنجیده/.test(B) && /؟ «۱۰۰ \/ ۷» ≈ ۱۴٫۲۹ می‌شود/.test(B) && /نه درست‌اند نه نادرست/.test(B) && !/✓ «۱۰۰/.test(B), 'C17 + C16 reach the coach as their own lines :: ' + B.slice(0, 600));
+    // B26·D35 aB4 p3: مسئلهٔ گفت‌وگویی (ثبت‌نشده) که صورتش پیش از این پیام آمده — زنجیرهٔ درستِ او هم بلوک می‌گیرد
+    await wipe(); await fresh();
+    await turn('نوه‌م یه معما ازم پرسید که بلد نبودم: تو یه مزرعه مرغ و خرگوش هست، روی هم ۳۵ تا سر و ۹۴ تا پا. چند تا مرغ و چند تا خرگوش داریم؟', 'چه چیزی مجهول است؟', [csn({ ph: 'u', said: ['u', 'd'], nat: 'objective' })]);
+    const st0 = await p.evaluate(() => { const C = __cur().coach || {}; return [!!C.stmt, !!APP.ASSIST.boundLive(__cur())]; });
+    chk(st0[0] && !st0[1], 'setup: a chat problem (statement recorded, no live record) :: ' + JSON.stringify(st0));
+    u = await turn('یه حدس بزنم: تقریباً نصف نصف، مثلاً ۲۰ مرغ و ۱۵ خرگوش. پاها میشه ۲۰×۲ + ۱۵×۴ = ۴۰ + ۶۰ = ۱۰۰. زیاد شد، ما ۹۴ می‌خوایم.', 'باشه.', [csn({ ph: 'p', said: [], nat: 'objective' })]); B = blockOf(u.user);
+    chk(/✓ «۲۰×۲ \+ ۱۵×۴ = ۴۰ \+ ۶۰» می‌خواند/.test(B) && /✓ «۴۰ \+ ۶۰ = ۱۰۰» می‌خواند/.test(B) && !/✗ «/.test(B), 'B26·D35 aB4 p3: the correct chain of a chat problem reaches the coach :: ' + (B || head(u.user).slice(-300)).slice(0, 400));
     // بی مسئلهٔ زنده، بی دفتر، بی کارِ خودش: حسابِ درست بلوک نمی‌آورد (مثلِ دورِ ۲۵)؛ «✗»، «؟» و «نسنجیده» می‌آورند
     await wipe(); await fresh();
     u = await turn('راستی ۷ × ۸ = ۵۶ بود دیگه؟', 'بله.', [csn({ ph: 'u', said: [] })]);

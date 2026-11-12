@@ -5111,3 +5111,14 @@ dated stability, mind-card feed) under way.
   is green. PROPOSAL: the collector should carry forward provenance it cannot recompute, the way it already keeps shrunken shards.
 - **FINDING (2026-11-12)** `docs/tours/polya-batch1/kit/checkpoint.sh` holds the owner's e-mail address as an escaped sed pattern
   (already in history). Not changed in this task; PROPOSAL: read the address from an environment variable.
+- **CHANGE (2026-11-12, tour batch 1, round 26, fixer «arith» — Q1)** `apps/learning-architecture/src/app/a46_arith.js` only. Roots, each
+  reproduced red-first on BASE26 (23e351f6) from the runners' own sentences: a scale word («هزار/میلیون/میلیارد») was multiplied into the
+  written result (correct work shown ✗ — S1); the half-unit rounding allowance applied to integers turned 13/12 into «1» (false exact
+  identity shown ✓ — S1); «میشه» was cut like «=», so a condition number became the claimed value; a sentence period after a number hid
+  «یعنی 2.75»; π, «A از B میشه N٪», «N برابر», running sums with a unit and ellipsis sums were silent; every unit-bearing mismatch was
+  labelled a unit error; the page value was a raw fraction; the prompt block needed a prior ledger; nothing let her contest the page's ✗.
+  Now: scale and unit words are units (C15); exact rationals are exact, an integer for a non-integer value is asked (C16); an operator
+  line the reader cannot parse is «نسنجیده» (C17); the claimed value follows the last «=»/«میشه» (C18); three states ✓ / ✗ / «؟»;
+  `A.STORY.arithContest` re-runs a contested ✗ once, shows both computations and clears it everywhere when she is right (owner bank 36).
+  Proof: `tests/test_tour1_r26_arith.js` (95 errors on BASE26 ⇒ 0), independent bank R26 Q1 42/42, bank R25 P2 58/58. One round-25
+  guard changed with a comment (unit words between numbers are now read). Not reproduced: C26-11. Nothing deleted or quarantined.
