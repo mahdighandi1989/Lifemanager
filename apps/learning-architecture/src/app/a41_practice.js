@@ -214,7 +214,12 @@
     function uEvery(s) { var u = c.urhythm; return u && u.every && s.d > String(u.from || u.d || "") ? u.every : 0; }
     function role(s, r, x) { R.roles[s.d] = r; if (x != null) R.late[s.d] = x; }
     function resetTo(d) { anchor = d; i = 0; R.ev = []; cnt = 0; lastD = d; lastGap = 0; }
-    function extGap() { var g = lastGap || steps[steps.length - 1] || 1; return ladderNext(g); }
+    /* دورِ ۲۶ (Q10، C26-42 s29 p6 / s23 p9، C39، بانکِ R26 #255 — سهمِ classify): پس از یک شکست، یک بازیابیِ دیرِ موفق «۱ از ۳» است، ولی موعدِ بعد به پلهٔ بلندِ نردبانِ صفحه
+       («۲۱ روز») می‌پرید — فاصلهٔ پس از تثبیت، در حالی که دو موفقیتِ دیگر لازم بود. تا دنبالهٔ خودِ تکنیک کامل نشده (cnt < شمارِ پله‌ها، معیارِ «steps»)، فاصلهٔ بعد از بلندترین پلهٔ
+       **چرخهٔ خودِ تکنیک** بلندتر نمی‌شود (دیرِ موفق هنوز بلندترین فاصله‌ای را که چرخه دارد می‌گیرد — قاعدهٔ دورِ ۲۰ می‌ماند). هیچ عددِ تازه‌ای نیست: سقف همان آخرین پلهٔ steps است.
+       پس از «تثبیت شد» فاصلهٔ بلند مثلِ پیش. رفتارِ پیشین: PR.R26_QUARANTINE.extGap25. */
+    function capped26() { return pol.crit === "steps" && steps.length > 0 && cnt < steps.length; }
+    function extGap() { var g = lastGap || steps[steps.length - 1] || 1, nx = ladderNext(g); return capped26() ? Math.min(nx, steps[steps.length - 1]) : nx; }
     function stepDue() { return i < steps.length ? add(anchor, steps[i]) : add(lastD, extGap()); }
     function stepW() { return i < steps.length ? steps[i] - (i ? steps[i - 1] : 0) : Math.max(1, extGap() - (lastGap || steps[steps.length - 1] || 1)); }
     tl.forEach(function (it) {
@@ -286,7 +291,7 @@
     if (R.state === "closed" || R.state === "paused") { R.due = null; }
     else if (R.stable && R.stable.next) { R.due = R.stable.next; R.reason = "وارسیِ ماندگاری پس از «تثبیت شد» (" + fdate(R.stable.d) + ")"; }
     else if (R.due) { /* verdict/recur خودش گذاشت */ }
-    else if (pol.shape === "steps" && anchor != null) { R.due = stepDue(); R.until = add(R.due, stepW()); R.reason = i < steps.length ? stepReason(c, steps[i], i) : extReason(c, lastGap || steps[steps.length - 1], cnt, steps.length, pol); }
+    else if (pol.shape === "steps" && anchor != null) { R.due = stepDue(); R.until = add(R.due, stepW()); R.reason = i < steps.length ? stepReason(c, steps[i], i) : capped26() ? capReason26(c, extGap(), cnt, steps.length, pol) : extReason(c, lastGap || steps[steps.length - 1], cnt, steps.length, pol); }
     else if (pol.shape === "window" && anchor != null) { R.due = add(anchor, pol.win[0]); R.until = add(anchor, pol.win[1]); R.reason = "بازگشت برای سنجشِ نتیجهٔ راهبرد (" + pol.cite + ")"; }
     else if (pol.shape === "every" && anchor != null) { R.due = add(anchor, pol.every); R.reason = "نوبتِ بعد (" + pol.cite + ")"; }
     else if (pol.shape === "calib" && R.calibNext) { var oc = (R.crit || []).filter(function (x) { return !x.ok; })[0]; R.due = R.calibNext; R.reason = "نوبتِ بعدِ کالیبراسیون: پیش‌بینی‌های تازه در روزی جدا (" + pol.cite + ")" + (oc ? " — معیارِ باز: " + oc.t : ""); }
@@ -303,6 +308,8 @@
     return R;
   };
   /* دورِ ۲۱: پس از پله‌های خودِ تکنیک و پیش از کامل‌شدنِ دنباله (دیرِ موفق، یا معیارِ گره در T23) — فاصلهٔ بعد پلهٔ بعدیِ نردبانِ صفحه */
+  PR.R26_QUARANTINE = { extGap25: function (lastGap, steps) { return ladderNext(lastGap || steps[steps.length - 1] || 1); } };
+  function capReason26(c, g, n, need, pol) { return (c.tid === 23 ? "بازآزمایی" : c.tid === 41 ? "بازیابی" : "نوبتِ بعد") + " پس از " + fa(g) + " روز (بلندترین پلهٔ چرخهٔ خودِ تکنیک — تا دنباله کامل نشده فاصله از آن بلندتر نمی‌شود) · " + fa(n) + " از " + fa(need) + " بازیابیِ موفق پس از آخرین شکست (" + pol.cite + ")"; }
   function extReason(c, g, n, need, pol) { return (c.tid === 23 ? "بازآزمایی" : c.tid === 41 ? "بازیابی" : "نوبتِ بعد") + " پس از " + fa(ladderNext(g)) + " روز (فاصله‌ای بلندتر از " + fa(g) + " روزِ پیشین — پلهٔ بعدیِ نردبانِ صفحه)" + (pol.crit === "steps" ? " · " + fa(n) + " از " + fa(need) + " بازیابیِ موفق پس از آخرین شکست (" + pol.cite + ")" : ""); }
   function uniqDays(ev) { var o = {}; (ev || []).forEach(function (e) { o[e.d] = 1; }); return Object.keys(o).sort(); }
   function stepReason(c, st, i) { var nm = c.tid === 41 ? "بازیابی" : c.tid === 28 ? "بازنویسیِ بی‌منبع" : c.tid === 4 ? "بازکشیدنِ نقشه از حافظه" : c.tid === 26 ? "بازکشیدنِ نمودار از حافظه" : c.tid === 38 ? "بازسازیِ متن از تصویرِ ذهنی" : c.tid === 23 ? "بازآزمایی" : "نوبتِ بعد"; return nm + " — روزِ " + fa(st) + " (" + (P[c.tid] || {}).cite + ")"; }

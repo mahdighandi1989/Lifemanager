@@ -315,6 +315,68 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     else (info.note = info.note || {}).listOther = String(W.other);
   });
 
+  // ================= Q9 — U54 (B26·D38 aB4 p2): برچسبِ خودِ او («مجهول: … داده‌ها: … شرط: …») خوانده می‌شود =================
+  const unkItem = async (first, second) => { await wipe(); await setB(''); await fresh(); await turn(first, 'خوب.', [{ do: 'coach_state', ph: 'u', said: [], ans: [], nat: 'practical', role: 'self' }]);
+    await turn(second, 'خوب.', [{ do: 'coach_state', ph: 'u', said: ['u', 'd', 'c'], ans: ['u1', 'u2', 'u3'], nat: 'practical', role: 'self' }]);
+    return ev(() => { const C = __cur().coach || {}, o = []; Object.keys(C.story || {}).forEach(k => ((C.story[k] || {}).items || []).forEach(it => { if (it.k === 'u') o.push(it.t); })); return o; }); };
+  const HEN = 'نوه‌م یه معما ازم پرسید: «توی یه مزرعه مرغ و خرگوش هست؛ روی هم ۳۵ تا سر و ۹۴ تا پا دارن. چند تا مرغ و چند تا خرگوش؟» می‌خوام خودم حل کنم.';
+  await section('u54', async () => {
+    const a = await unkItem(HEN, 'مجهول: تعداد مرغ‌ها و تعداد خرگوش‌ها. داده‌ها: ۳۵ تا سر و ۹۴ تا پا. شرط: هر مرغ ۲ تا پا داره و هر خرگوش ۴ تا، و هر کدوم فقط یه سر.');
+    chk(a.length === 1 && /تعداد مرغ‌ها و تعداد خرگوش‌ها/.test(a[0]) && !/داده‌ها|سر و ۹۴/.test(a[0]), 'U54 aB4 p2: the unknown carried from the chat is his own «تعداد مرغ‌ها و تعداد خرگوش‌ها», not his data sentence — ' + JSON.stringify(a));
+    const b = await unkItem(HEN, 'دنبالِ اینم که چند تا مرغ و چند تا خرگوش هست. ۳۵ تا سر و ۹۴ تا پا داریم. هر مرغ ۲ تا پا داره و هر خرگوش ۴ تا.');
+    chk(b.length === 1 && /چند تا مرغ و چند تا خرگوش/.test(b[0]), 'look-alike: an unlabelled message keeps the round-24 reading («دنبالِ اینم که …») — ' + JSON.stringify(b));
+  });
+
+  // ================= Q10 — سازوکارهای کوچک: C26-32 (پیگیریِ «بازش کن»)، C26-34 (یک نقطهٔ پیش‌نیاز)، C26-42 (موعد = همان شمار)، C26-33 (بازتولید) =================
+  const PREQ = (c, q) => ({ concept: c, step: 'حسابِ مساحتِ زمین', quote: q, q: 'این را پیش‌تر دیده‌ای؟', topic: 'هندسه' });
+  const LAND = 'یه تیکه زمین مثلثی دارم که می‌خوام چمن بکارم. دو تا ضلعش هر کدوم ۱۳ متره، ضلع سوم ۱۰ متر. هر کیسه بذر برای ۱۰ متر مربع کافیه. چند کیسه بخرم؟ مستطیل رو بلدم طول ضرب در عرض، ولی این مثلثه.';
+  const goPrereq = async (withMap) => { await wipe(); await setB(''); await fresh();
+    await turn(LAND, 'خوب.', [{ do: 'coach_state', ph: 'u', said: ['u', 'd'], ans: [], stuck: true, nat: 'practical', role: 'self', prereq: withMap ? PREQ('مساحتِ مثلث (نصفِ قاعده × ارتفاع)', 'مستطیل رو بلدم طول ضرب در عرض، ولی این مثلثه') : undefined }]);
+    const n0 = await ev(() => APP.S.all('prereq').length); const r = await turn('آره، بازش کن.', 'باز می‌کنم.', [{ do: 'go', view: 'prereq' }]);
+    return { n0, t: String(follow(r).split('# نوبتِ تازه\n')[1] || ''), id: await ev(() => (APP.S.all('prereq')[0] || {}).id || '') }; };
+  const routePre = async (two) => { await wipe(); await setB(''); await fresh();
+    await turn(LAND, 'خوب.', [{ do: 'coach_state', ph: 'u', said: ['u', 'd'], ans: [], stuck: true, nat: 'practical', role: 'self', prereq: two ? [PREQ('جمعِ کسرها', 'مستطیل رو بلدم طول ضرب در عرض'), PREQ('مخرجِ مشترک', 'ولی این مثلثه')] : PREQ('مساحتِ مثلث (نصفِ قاعده × ارتفاع)', 'مستطیل رو بلدم طول ضرب در عرض، ولی این مثلثه') }]);
+    const ids = await ev(() => { const o = []; APP.S.all('prereq').forEach(r => (r.items || []).forEach(x => o.push(x.eid || x.id))); return o; });
+    await turn('نه، نمی‌دونم ارتفاعِ مثلث کدوم خطه؛ مساحتِ مثلث رو هیچ‌وقت حساب نکردم. ولی اول ثبتش کن.', 'ثبت می‌کنم.', [{ do: 'live_new', title: 'چند کیسه بذر برای زمینِ مثلثی', statement: 'یه تیکه زمین مثلثی دارم که می‌خوام چمن بکارم. دو تا ضلعش هر کدوم ۱۳ متره، ضلع سوم ۱۰ متر. هر کیسه بذر برای ۱۰ متر مربع کافیه. چند کیسه بخرم؟', nat: 'practical' },
+      { do: 'coach_state', ph: 'u', said: ['u'], ans: [], stuck: true, nat: 'practical', role: 'self', prereq_res: { id: ids[0] || 'pq1', diag: 'missing', quote: 'مساحتِ مثلث رو هیچ‌وقت حساب نکردم' } }]);
+    await turn('مستطیل ۸ در ۵ میشه ۴۰ و مثلث نصفشه: ۲۰. چون اگه مثلث رو تو مستطیلی با همون قاعده و ارتفاع بذارم، دو تیکهٔ بیرونی کنار هم اندازهٔ خود مثلث میشن.', 'خوب.', [{ do: 'coach_state', ph: 'p', said: [], ans: [], nat: 'practical', role: 'self', prereq_res: { id: ids[0] || 'pq1', mastery: 'yes', quote: 'مستطیل ۸ در ۵ میشه ۴۰ و مثلث نصفشه: ۲۰' } }]);
+    return ev(() => { const pid = (APP.liveAll()[0] || { p: {} }).p.id || ''; const M = pid ? APP.ROUTE.model(pid) : null; const items = []; APP.S.all('prereq').forEach(r => (r.items || []).forEach(x => items.push(x.state)));
+      APP.go('route', pid); const now = (document.querySelector('#main').innerText.split('\n').filter(l => /اکنون:/.test(l))[0] || '').slice(0, 140);
+      return { pid, items, pre: M ? (M.dets || []).filter(d => d.kind === 'pre').map(d => ({ c: String(d.concept || '').slice(0, 24), open: !!d.open })) : null, now }; }); };
+  const planForm = async () => { await wipe(); await fresh();
+    const pid = await ev(() => { const r = APP.liveCreate('معادلهٔ x² − y² = 15', 'معادلهٔ x² − y² = 15 چند تا جواب صحیح داره؟', 'find', { by: 'user' }); const pid = r.p.id; APP.liveBindSession(pid, __cur());
+      __liveSet(pid, (so, L) => { so.u = { 1: { done: true, u: 'همهٔ جواب‌های صحیح', dl: [{ t: 'x² − y² = 15' }], c: 'x و y صحیح‌اند', type: 'find' } }; }); return pid; });
+    await ev((pid) => APP.go('lprob', pid, 'plan'), pid); await p.waitForTimeout(200); const PL = 'نخست (x − y)(x + y) = 15 را می‌نویسم، سپس جفت‌های مقسوم‌علیهِ ۱۵ را می‌آزمایم.';
+    if (!(await ev(() => !!document.querySelector('#lpPlan') && !!document.querySelector('.lp-plansave') && !!document.querySelector('#lpMv')))) return { nf: true };
+    await p.fill('#lpPlan', PL); await p.click('.lp-plansave'); await p.waitForTimeout(80);
+    const a1 = await ev(() => ({ v: (document.querySelector('#lpPlan') || {}).value || '', miss: (document.querySelector('.lp-planmisswrap') || {}).innerText || '' }));
+    await p.selectOption('#lpMv', { index: 1 }); await p.waitForTimeout(100); await p.fill('#lpMvWhy', 'تجزیهٔ تفاضلِ دو مربع این‌جا مسئله را به جفت‌های عددی می‌شکند'); await p.click('.lp-mvadd'); await p.waitForTimeout(200);
+    const a2 = await ev(() => (document.querySelector('#lpPlan') || {}).value || '');
+    await p.click('.lp-plansave'); await p.waitForTimeout(200);
+    const a3 = await ev((pid) => ((((APP.S.get('eprog_' + pid) || {}).solve || {}).live || {}).plan || {}).t || '', pid);
+    return { PL, a1, a2, a3 }; };
+  const retr = (n) => ev(([n, T0]) => { const add = (k) => { const d = new Date(T0 + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + k); return d.toISOString().slice(0, 10); };
+    const S0 = [{ d: add(0), ok: true }, { d: add(1), ok: false }, { d: add(8), ok: true }]; if (n >= 2) S0.push({ d: add(15), ok: true }); if (n >= 3) S0.push({ d: add(22), ok: true });
+    const c = { id: 'prc_t', type: 'prc', tid: 41, start: add(0), sessions: S0, hist: [] }, R = APP.PR.eval(c), last = S0[S0.length - 1].d;
+    return { due: R.due, gap: R.due ? Math.round((new Date(R.due) - new Date(last)) / 864e5) : null, reason: R.reason || '', stable: !!R.stable, next: R.stable ? Math.round((new Date(R.stable.next) - new Date(last)) / 864e5) : null }; }, [n, T0]);
+  await section('q10', async () => {
+    const g1 = await goPrereq(true), g0 = await goPrereq(false);
+    chk(g1.n0 === 1 && !!g1.t && /همین‌جاست؛ همان را باز کن/.test(g1.t) && g1.t.indexOf('"arg":"' + g1.id + '"') > 0 && /دکمهٔ ساخت را نزن/.test(g1.t) && !/فیلدهای این صفحه را پر کن/.test(g1.t), 'C26-32 pC1 p12 / bank #250: the list already holds her map ⇒ the follow-up says open it (with its id), never «فیلدها را پر کن … دکمهٔ ساخت را بزن» — ' + g1.t.slice(0, 260));
+    chk(g0.n0 === 0 && !!g0.t && /فیلدهای این صفحه را پر کن/.test(g0.t) && !/همان را باز کن/.test(g0.t), 'look-alike / bank #251: no map for this problem ⇒ «build it» is the right follow-up — ' + g0.t.slice(0, 200));
+    const r1 = await routePre(false), r2 = await routePre(true);
+    chk(r1.pid && r1.pre && r1.pre.length === 1 && !r1.pre[0].open && r1.items.join() === 'learned', 'C26-34 pC3 🧭 / bank #252: a prerequisite diagnosed before registration is ONE point and closed once learned — ' + JSON.stringify(r1));
+    chk(!/اکنون: پیش‌نیازِ/.test(r1.now), 'C26-34: «اکنون» is not the learned prerequisite — ' + r1.now);
+    chk(r2.pre && r2.pre.length === 2 && r2.pre.filter(d => d.open).length === 1, 'look-alike / bank #253: two different prerequisites, one learned ⇒ two points, the second still open — ' + JSON.stringify(r2));
+    const t1 = await retr(1), t2 = await retr(2), t3 = await retr(3);
+    chk(/۱ از ۳/.test(t1.reason) && t1.gap === 7 && !/۲۱/.test(t1.reason), 'C26-42 s29 p6 / bank #255: after a failure, one late success («۱ از ۳») is not scheduled three weeks out — the gap stays within the technique\'s own cycle — ' + JSON.stringify(t1));
+    chk(/۲ از ۳/.test(t2.reason) && t2.gap === 7, 'C26-42: the same holds at «۲ از ۳» — ' + JSON.stringify(t2));
+    chk(t3.stable && t3.next >= 7, 'look-alike / bank #256: after three successes («تثبیت شد») the long interval is right — ' + JSON.stringify(t3));
+    const pf = await planForm();
+    if (pf.nf) (info.note = info.note || {}).c26_33 = 'plan form not reachable in the harness'; else {
+      (info.note = info.note || {}).c26_33 = 'not reproduced on BASE26: typed plan survives the refused «ثبتِ طرح» and an added move';
+      chk(/ابزارِ طرح/.test(pf.a1.miss) && pf.a1.v === pf.PL && pf.a2 === pf.PL && pf.a3 === pf.PL, 'C26-33 / bank #254 (reproduce first): the typed plan stays in the field after the refusal and after adding a move, and the second save stores it — ' + JSON.stringify(pf).slice(0, 300)); }
+  });
+
   //SECTIONS
 
   console.log(JSON.stringify(info.summary || {}), JSON.stringify(info.nc), JSON.stringify(info.note || {}));
