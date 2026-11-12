@@ -2001,6 +2001,8 @@
       var parts = m[2].split(/\s(?:ولی|اما|منتها|چون|چونکه|زیرا)(?![آ-ی‌])/), cl = parts[0].trim(), at = m.index + m[0].indexOf(m[1]);
       if (!cl || OPIN_LEAD.test(cl) || OPIN_SELF.test(" " + cl) || OPIN_BARE.test(cl) || OPIN_BARE2.test(cl)) continue;
       if (COND_BEFORE.test(t.slice(0, at)) || /^یعنی(?![آ-ی])/.test(cl)) continue;
+      /* دورِ ۲۶ (Q8، B25·D22 STILL oB1 p14): «درسم: وقتی فکر می‌کنم مشکل «اراده»ست، اول …» — «فکر می‌کنم» ِ درونِ بندِ زمانی («وقتی/هر وقت/هر بار …») عادتی را وصف می‌کند، حدسِ تازه نیست */
+      if (/(?:^|[\s،,:؛])(?:وقتی|هر\s*وقت|هر\s*بار|هر\s*دفعه|زمانی\s*که|موقعی\s*که)\s*(?:که\s*)?$/.test(t.slice(0, at))) continue;
       if (parts.length > 1 && /\s(?:ولی|اما|منتها)(?![آ-ی‌])/.test(m[2]) && OPIN_CANCEL.test(parts.slice(1).join(" "))) continue;
       var nxt = t.slice(m.index + m[0].length).split(/[.!؟?\n]/).slice(0, 2).join(" ");
       if (!VERB_IN.test(" " + cl) && PLAN_TIME.test(cl + " " + nxt)) continue;
@@ -3380,14 +3382,21 @@
     /* دورِ ۲۵ (P7، B_s·D7 = U15 «📌 برنامهٔ خودت … موعد: ۱۰ آبان» که او نگفت؛ بانکِ R25 #228/#240؛ C1/C12): بی تاریخِ مدل، روز فقط از حرفِ زمان‌دارِ خودِ برنامه
        خوانده می‌شود (A.PR.whenInfo: «۱۴ اسفند»، «سه‌شنبه»، «یه هفته دیگه»، «جمعهٔ هفتهٔ بعد») — پیش‌تر برنامهٔ بی‌زمان «هفت روز بعد» ِ ساختگی می‌گرفت (planDate).
        بی حرفِ زمان‌دار ⇒ «جلسهٔ بعد»؛ نامِ همین روزِ هفته در خودِ همان روز دوپهلوست ⇒ «جلسهٔ بعد» + whenAsk (a41 PR.datePend یک بار می‌پرسد). */
+    /* دورِ ۲۶ (Q5؛ DECISIONS_R26 C12 «بر هر دو مسیر»؛ U10، U20، B26·D11، B26·D24، C26-5، C26-19): روزِ برنامه را صفحه از حرفِ خودِ او می‌خواند و بر تاریخِ مدل مقدم می‌دارد
+       («هفته‌ی بعد، جمعه» = جمعهٔ هفتهٔ بعد، نه جمعهٔ همین هفتهٔ مدل؛ «تا جمعه» در خودِ جمعه دوپهلوست حتی اگر مدل تاریخِ امروز را بدهد) — و هیچ تاریخی، از حرفِ او یا از گزارشِ مدل،
+       بی «… درست است؟» ِ صفحه و «آره» ِ او به «امروز» نمی‌رسد: برنامه «جلسهٔ بعد» می‌ماند و q.whenPend روزِ پرسیده را نگه می‌دارد (a41 PR.datePend می‌پرسد و با «آره» همان را می‌نشاند).
+       «امروز/امشب» روزِ خودِ امروز است و پرسش ندارد. مسیرِ دورِ ۲۵ (پایین) پشتیبانِ بی a41 است. */
+    var leg26 = (PLAN_WHEN.test(String(pt || "")) || /(?:^|[\s،])(?:امروز|امشب|همین\s*الان)(?![آ-ی‌])|آخرِ?\s*(?:همین\s*)?هفته/.test(String(pt || ""))) ? planDate18(pt) : "";
+    var P26 = A.PR && A.PR.planWhen26 ? A.PR.planWhen26(pt, w, td, leg26) : null, pend26 = P26 && P26.pend ? P26.pend : null;
     var I25 = !/^next[-_ ]?session$/i.test(w) && !realDate(w) && A.PR && A.PR.whenInfo ? A.PR.whenInfo(pt) : null, amb25 = I25 && I25.amb ? I25.wd : "";
-    var when = /^next[-_ ]?session$/i.test(w) ? "next-session" : realDate(w) ? (w >= td ? w : "") : amb25 ? "next-session" : I25 && I25.date ? (I25.date >= td ? I25.date : "") : (PLAN_WHEN.test(String(pt || "")) || /(?:^|[\s،])(?:امروز|امشب|همین\s*الان)(?![آ-ی‌])|آخرِ?\s*(?:همین\s*)?هفته/.test(String(pt || ""))) ? planDate18(pt) : "next-session";
+    var when = P26 ? P26.when : /^next[-_ ]?session$/i.test(w) ? "next-session" : realDate(w) ? (w >= td ? w : "") : amb25 ? "next-session" : I25 && I25.date ? (I25.date >= td ? I25.date : "") : (PLAN_WHEN.test(String(pt || "")) || /(?:^|[\s،])(?:امروز|امشب|همین\s*الان)(?![آ-ی‌])|آخرِ?\s*(?:همین\s*)?هفته/.test(String(pt || ""))) ? planDate18(pt) : "next-session";
+    if (P26) amb25 = P26.amb || "";
     if (!when) return;   // تاریخِ گذشته هرگز پیشنهاد نمی‌شود
     var AP = plansAll(s), sm = o && o.same ? AP.filter(function (x) { return x.p.id === String(o.same); })[0] : null;
     if (sm) return;   // همان برنامه که دوباره گفت — نه برنامهٔ دوم، نه پیشنهادِ دوباره
     if (AP.some(function (x) { var q = x.p; return (q.d || "") === td && (qNorm(q.text) === qNorm(pt) || (x.s === s && (quoteIn(q.text, pt) || quoteIn(pt, q.text)))); })) return;   // همان متن در همان روز (در همین سشن: هر کدام درونِ دیگری)
     var PL = s.plans = s.plans || [], og = o && typeof o === "object" && (o.on_guess === true || o.on_guess === "true");
-    PL.push({ id: "pl" + (AP.length + 1), text: clip(pt, 300), when: when, at: at, d: td, key: key, done: false, state: "open", sess: s.id, onGuess: og || undefined, whenAsk: amb25 || undefined });
+    PL.push({ id: "pl" + (AP.length + 1), text: clip(pt, 300), when: when, at: at, d: td, key: key, done: false, state: "open", sess: s.id, onGuess: og || undefined, whenAsk: amb25 || undefined, whenPend: pend26 || undefined });
   }
   function planDoneR18(s, pd) {
     var id = typeof pd === "string" ? pd : pd && (pd.id || pd.plan), ok = !(pd && typeof pd === "object" && (pd.done === false || pd.done === "false"));
@@ -4508,6 +4517,8 @@
         /* MT1: نتیجه بی متن و صفحه در پیامش نتیجه‌ای نیافت ⇒ یک بار پرسشِ ساختاری؛ حدسی که نقل نشد ⇒ یک بار «عینِ عبارتش» */
         var gotRes = R1.ev.filter(isNew).some(function (e) { return e.how === "res"; }) || !!(C.rep && C.rep.key === mkey(ut) && C.rep.result);
         if (said0.indexOf("result") >= 0 && !rTx && (resAsk || !gotRes)) C.ask20 = { k: "result", key: mkey(ut), at: nowIso(), has: !resAsk };   // R6 (C21-15): has ⇒ پیامش نتیجه دارد، فقط متنش نیامد
+        /* دورِ ۲۶ (Q8، D26-23 oD1 p17): حدسی که عیناً در پیامش هست و صفحه آن را پیش‌بینی ثبت کرده («پیش‌بینیم: صفر یا یک هشدارِ اشتباه، ۸۰ درصد مطمئنم») «نقل‌نشده» نیست — صفحه به مدل نمی‌گوید «عیناً در پیامِ او نبود و ثبت نشد» */
+        else if (gTx && quoteIn(gTx, ut) && ((C.preds || []).some(function (x) { return x && (qNorm(String(x.text || "")).indexOf(qNorm(gTx)) >= 0 || qNorm(gTx).indexOf(qNorm(String(x.text || ""))) >= 0); }) || (AS.predTurn23 && AS.predTurn23(s, ut)))) { }
         else if (gTx && !R1.guess.some(function (g) { return g && (qNorm(g.text) === qNorm(gTx) || (g.src20 && g.src20.msg === mid)); }) && !(C.guess && qNorm(C.guess.text) === qNorm(gTx))) {
           var asked = (C.askLog20 || []).filter(function (x) { return x.k === "guess" && x.text === qNorm(gTx); }).length;
           if (!asked) { C.ask20 = { k: "guess", key: mkey(ut), text: clip(gTx, 120), at: nowIso() }; C.askLog20 = (C.askLog20 || []).concat([{ k: "guess", text: qNorm(gTx), at: nowIso() }]).slice(-30); }
