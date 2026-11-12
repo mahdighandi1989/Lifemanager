@@ -85,7 +85,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
 
   if (process.env.PROBE) { try { await require(process.env.PROBE)({ p, ev, turn, fresh, wipe, st, tq, exec, setB, rc, bd, birthFor, sysDom, sysStored, pushSys, follow, head, blockOf, T0 }); } catch (e) { console.log('PROBE EXC', e && e.stack || e); } await b.close(); return; }
 
-  const views = (vs, re) => ev(([vs, re]) => { const o = [], R = new RegExp(re); vs.forEach(v => { APP.go(v); document.body.innerText.split('\n').filter(l => R.test(l)).forEach(l => o.push(v + ': ' + l.slice(0, 140))); }); return o; }, [vs, re]);
+  const views = (vs, re) => ev(([vs, re]) => { const o = [], R = new RegExp(re); try { APP.ASSIST.toggle(false); } catch (e) { } /* حبابِ گفت‌وگو حرفِ خودِ اوست و می‌ماند (C38) — فقط نماهای صفحه */ vs.forEach(v => { APP.go(v); document.body.innerText.split('\n').filter(l => R.test(l)).forEach(l => o.push(v + ': ' + l.slice(0, 140))); }); return o; }, [vs, re]);
   const TILE = 'سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. تیله‌های من ۳ برابرِ تیله‌های داداشمه. هر کدوم چند تا تیله داریم؟» من گفتم ۱۲ تا و ۱۲ تا ولی مامانم گفت غلطه. چرا غلطه؟';
   const SCHOOL = 'من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تونم حلش کنم؟';
 
@@ -376,6 +376,76 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
       (info.note = info.note || {}).c26_33 = 'not reproduced on BASE26: typed plan survives the refused «ثبتِ طرح» and an added move';
       chk(/ابزارِ طرح/.test(pf.a1.miss) && pf.a1.v === pf.PL && pf.a2 === pf.PL && pf.a3 === pf.PL, 'C26-33 / bank #254 (reproduce first): the typed plan stays in the field after the refusal and after adding a move, and the second save stores it — ' + JSON.stringify(pf).slice(0, 300)); }
   });
+
+  // ================= بانکِ مستقلِ R26 — همهٔ ورودی‌های Q9 و Q10 (#222–#257) =================
+  await section('bank', async () => {
+    const E = {}; BANK.forEach((e, i) => { E[i + 1] = e; });
+    const T = (n, ok, got) => { info.bank[n] = !!ok; if (!ok) { info.bankWrong[n] = String(got == null ? '' : got).slice(0, 200); errors.push('bank#' + n + ' [' + E[n].kind + '] ' + E[n].text.slice(0, 70) + ' ⇒ ' + String(got == null ? '' : got).slice(0, 240)); } };
+    const NC = (n, why) => { info.nc[n] = why; };
+    const U1 = (n) => E[n].text.split('‖')[0].replace(/^\s*[UA]:\s*/, '').trim();
+    const A2 = (n) => E[n].text.split('‖').map(x => x.replace(/^\s*[UA]:\s*/, '').trim());
+    const labels = async (word) => { const s = await st(), seen = await views(['home', 'mind', 'e_prob'], word), d = await ev(() => { const D = APP.dossierSess(__cur().id); return [D && D.title].concat(((D && D.pks) || []).map(x => x.title)).join(' | '); }), ti = await ev(() => APP.ASSIST.sessTitle26(__cur(), null, 80));
+      const bub = (await ev(() => __msgs())).filter(m => m.role === 'user').pop().text; return { stmt: s.stmt, all: [s.stmt, d, ti].concat(seen).join(' ‖ '), bub }; };
+    const mindSetup = (fn) => ev(fn);
+    const H = {
+      222: async (n) => { await wipe(); await setB(await birthFor(10)); await fresh(); await turn(U1(n), 'خوب.'); const L = await labels('سروناز'); T(n, !/سروناز/.test(L.all) && /\[نامِ مدرسه\]/.test(L.stmt) && /کسرها/.test(L.stmt) && /سروناز/.test(L.bub), L.all); },
+      223: async (n) => { await wipe(); await setB(await birthFor(11)); await fresh(); const u = await turn(U1(n), 'خوب.'); const L = await labels('مهرپرور'), q = (await tq(u)).q; T(n, !/مهرپرور/.test(L.all + q) && /\[نامِ (?:معلم|شخص)\]/.test(L.stmt) && /ستونِ آخر/.test(L.stmt), L.all); },
+      224: async (n) => { await wipe(); await setB(await birthFor(40)); await fresh(); await turn(U1(n), 'خوب.'); const L = await labels('آفتابِ دانش'); T(n, !/آفتابِ دانش/.test(L.all) && /\[نامِ مدرسه\]/.test(L.stmt) && /برنامهٔ درسی/.test(L.stmt), L.all); },
+      225: async (n) => { await wipe(); await setB(await birthFor(40)); await fresh(); await turn(U1(n), 'خوب.'); const L = await labels('کیانفر'); T(n, !/کیانفر/.test(L.all) && /\[نامِ شخص\]/.test(L.stmt) && /دیوارِ مشترک/.test(L.stmt) && /کیانفر/.test(L.bub), L.all); },
+      226: async (n) => { await wipe(); await setB(''); await fresh(); const pid = await ev(() => { const r = APP.liveCreate('قضیهٔ فیثاغورس از حافظه', 'سه فرمول را از حافظه بنویس — صورتِ آزمون.', 'find', { by: 'user' }); APP.liveBindSession(r.p.id, __cur()); return r.p.id; });
+        await turn(U1(n), 'خوب.'); const g = await ev(() => ({ t: APP.ASSIST.sessTitle26(__cur(), null, 60), raw: __cur().title, d: (APP.dossierSess(__cur().id) || {}).title })); T(n, !/^سلام/.test(g.t) && g.t === 'قضیهٔ فیثاغورس از حافظه' && !/^سلام/.test(String(g.d)), JSON.stringify(g)); },
+      227: async (n) => { await wipe(); await setB(''); await fresh(); await turn(U1(n), 'خوب.'); const s = await st(), g = await ev(() => ({ t: APP.ASSIST.sessTitle26(__cur(), null, 60), d: (APP.dossierSess(__cur().id) || {}).title })); T(n, /^وقت کم میارم/.test(s.stmt) && /^وقت کم میارم/.test(g.t) && /^وقت کم میارم/.test(String(g.d)), s.stmt + ' | ' + JSON.stringify(g)); },
+      228: async (n) => { await wipe(); await setB(''); await fresh(); await turn('یه مسئله: ۱۲ سیب رو بین ۳ نفر مساوی تقسیم کنیم، به هر کی چند تا می‌رسه؟', 'خوب.'); const a = await ev(() => { const C = __cur().coach || {}; return { stmt: C.stmt, pk: C.pk, n: (C.pkLog || []).length }; });
+        await turn(A2(n).pop(), 'ثبت می‌شود.'); const b = await ev(() => { const C = __cur().coach || {}, D = APP.dossierSess(__cur().id); return { stmt: C.stmt, pk: C.pk, n: (C.pkLog || []).map(x => x.pk).filter((x, i, X) => X.indexOf(x) === i).length, pks: ((D && D.pks) || []).map(x => x.title), t: D && D.title, age: APP.AGE.age() }; });
+        const seen = await views(['home', 'mind', 'e_prob'], 'متولدِ'); T(n, b.stmt === a.stmt && b.pk === a.pk && b.n === 1 && !b.pks.length && !/متولد/.test(String(b.t)) && !seen.length && b.age > 50, JSON.stringify(b) + JSON.stringify(seen)); },
+      229: async (n) => { await wipe(); await setB(''); await fresh(); const u = await turn(U1(n), 'این دکمه نقشهٔ مسیر را نشان می‌دهد.'); const s = await st(), q = (await tq(u)).q, np = await ev((t) => APP.ASSIST.notProblem(t), U1(n)); T(n, np && !s.stmt && !/کلِ مسئله را در یک جمله/.test(q) && (await ev(() => APP.liveAll().length)) === 0, s.stmt + ' | ' + q); },
+      230: async (n) => { await person(78, []); const g = await ev(() => ['تقریبت بس بود', 'اصلاحت رسید، ولی پیامت دو بخش داشت'].map(t => APP.ASSIST.regSys(__cur(), t))); await ev(() => { APP.go('home'); const d = document.createElement('p'); d.className = 't26'; d.textContent = 'اصلاحت رسید، ولی پیامت دو بخش داشت. تقریبت بس بود.'; document.getElementById('main').appendChild(d); }); await p.waitForTimeout(150);
+        const dom = await ev(() => ({ t: (document.querySelector('#main .t26') || {}).textContent, to: document.querySelector('#main').innerText.split('\n').filter(l => /نمی‌دانی(?![آ-ی])|پیشرفتت(?!ان)|خودت(?!ان)|می‌بردت(?!ان)/.test(l)).slice(0, 3) }));
+        T(n, g[0] === 'تقریبتان بس بود' && g[1] === 'اصلاحتان رسید، ولی پیامتان دو بخش داشت' && dom.t === 'اصلاحتان رسید، ولی پیامتان دو بخش داشت. تقریبتان بس بود.' && !dom.to.length, JSON.stringify(g) + JSON.stringify(dom)); },
+      231: async (n) => { const x = await ev(() => APP.ASSIST.toShoma(APP.ASSIST.finalFilter25(['- **پرسشِ این نوبت همین است:** «می‌توانی نتیجه را از راهِ دیگری به دست آوری؟ می‌توانی آن را در یک نگاه ببینی؟»'])[0])); T(n, /«می‌توانید نتیجه را از راهِ دیگری به دست آورید؟»/.test(x) && !/آوری(?!د)/.test(x) && !/،\s*می‌توانید/.test(x), x); },
+      232: async (n) => { await person(30, TO); const w = await rc(U1(n)); T(n, !w, w); },
+      233: async (n) => { await person(30, TO); const w = await rc(U1(n)); T(n, !w, w); },
+      234: async (n) => { await person(40, SH); const w = await rc(U1(n)); T(n, !w, w); },
+      235: async (n) => { const X = A2(n); await person(30, TO); const w1 = await rc(X[0]); await person(30, TO); const w2 = await rc(X[1]); T(n, !w1 && !w2, w1 + ' | ' + w2); },
+      236: async (n) => { await wipe(); await setB(''); await fresh(); await mindSetup(() => { const s = __cur(), at = new Date(Date.UTC(2026, 9, 19, 8, 0)).toISOString(); s.msgs.push({ role: 'user', text: 'گام ۱: ۴ × ۶ = ۲۴. گام ۲: ۷٫۵ ÷ ۳ = ۲٫۲.', at });
+          s.coach = { pk: 'c:0', stmt: 'آزمون', ph: 'c', story: { 'c:0': { items: [], prior: { steps: [{ n: 1, quote: '۴ × ۶ = ۲۴', verdict: 'ok', dep: [], bad: [] }, { n: 2, quote: '۷٫۵ ÷ ۳ = ۲٫۲', verdict: 'wrong', cause: 'skill', why: 'تقسیمِ اعشاری', dep: [], bad: [] }] } } } };
+          s.coachEv = [{ at, ph: 'c', ok: true, src: 'prior', key: 'prior|c|a', prior: 1 }, { at, ph: 'c', ok: false, src: 'prior', key: 'prior|c|b', prior: 2, cause: 'skill', causeWhy: 'تقسیمِ اعشاری' }]; APP.S.put(s); });
+        const tx = await mindText(); T(n, !/undefined/.test(tx) && /گامِ کارِ پیشین: ۱ از ۲/.test(tx), (tx.match(/[^\n]*کارِ پیشین[^\n]*/) || [''])[0].slice(0, 160)); },
+      237: async (n) => { await wipe(); await setB(''); await fresh(); await mindSetup(() => { const s = __cur(), at = new Date(Date.UTC(2026, 9, 19, 8, 0)).toISOString(); s.msgs.push({ role: 'user', text: 'گام ۱: ساده کردم. گام ۲: ۴ × ۶ = ۲۴.', at });
+          s.coach = { pk: 'c:0', stmt: 'آزمون', ph: 'c', story: { 'c:0': { items: [], prior: { steps: [{ n: 1, quote: 'ساده کردم', verdict: 'incomplete', why: 'نگفته چطور', dep: [], bad: [] }, { n: 2, quote: '۴ × ۶ = ۲۴', verdict: 'ok', dep: [1], bad: [] }] } } } };
+          s.coachEv = [{ at, ph: 'c', ok: false, src: 'prior', key: 'prior|c|a', prior: 1, cause: 'unknown', causeWhy: 'نگفته چطور' }, { at, ph: 'c', ok: true, src: 'prior', key: 'prior|c|b', prior: 2 }]; APP.S.put(s); });
+        const A1 = (await mindActs()).filter(a => a.src === 'prior'); T(n, !A1.some(a => a.ok === false) && A1.length === 1, JSON.stringify(A1)); },
+      238: async (n) => { await wipe(); await fresh(); const W = await ev(() => { const PR = APP.PR; PR.listAdd('assumptions', { text: 'اگه گزارش بدم حتماً اخراج میشه', load: true }); const x = PR.list('assumptions').items[0]; PR.itemClose('assumptions', x.id, 'خودم پرسیدم و دیدم این‌طور نیست', null, 'refuted'); return ((APP.MIND.techWork().rows || []).filter(r => r.src === 'list')[0] || { acts: [] }).acts.filter(a => a.ok !== null).map(a => a.ok); }); T(n, W.length === 1 && W[0] === true, JSON.stringify(W)); },
+      239: async (n) => { await wipe(); await fresh(); await mindSetup(() => { const s = __cur(), at = new Date(Date.UTC(2026, 9, 19, 9, 0)).toISOString(); s.msgs.push({ role: 'user', text: 'با ۱۸ متر: ۳۵۳۱۶۰ ÷ ۴۸ = ۷۲۵۷ پس جواب همینه.', at }); s.coach = { pk: 'c:0', stmt: 'آزمون', ph: 'b' }; s.coachEv = [{ at, ph: 'b', ok: true, src: 'chatok', how: 'res', key: 'chatok|b|res|x', msg: 't' + at }]; APP.S.put(s); });
+        const A = (await mindActs()).filter(a => /نتیجه‌ای که گفت/.test(a.fa)); T(n, !A.length, JSON.stringify(A)); },
+      240: async (n) => { await wipe(); await setB(await birthFor(9)); await fresh(); const u = await turn('یه مسئله: ۱۲ تا مداد رو بین ۳ نفر مساوی تقسیم کنیم، به هر کی چند تا می‌رسه؟', 'خوب.'); const hd = head(u.user); T(n, /دنبالِ چی می‌گردیم؟/.test(hd) && !/مجهول \(یا حکمی که باید ثابت شود\) چیست/.test(hd), (hd.split('\n').filter(l => /پیشنهادِ این نوبت|پرسشِ این نوبت همین/.test(l))[0] || '').slice(-200)); },
+      241: async (n) => { await wipe(); await setB(await birthFor(45)); await fresh(); await turn(U1(n), 'خوب.'); const x = await ev((t) => [APP.AGE.privLabel(t), (__cur().coach || {}).stmt || ''], U1(n)); T(n, x[0] === U1(n) && !/\[نامِ/.test(x[1]), JSON.stringify(x)); },
+      242: async (n) => { await wipe(); await setB(''); await fresh(); await turn(U1(n), 'خوب.'); const s = await st(), t = await ev((t) => APP.AGE.titleOf(t), U1(n)); T(n, /فیثاغورس/.test(s.stmt) && /پولیا/.test(s.stmt) && t === U1(n), s.stmt + ' | ' + t); },
+      243: async (n) => { await wipe(); await setB(await birthFor(12)); await fresh(); const x = await ev((t) => [APP.AGE.privLabel(t), APP.ASSIST.notProblem(t)], U1(n)); T(n, x[0] === U1(n), JSON.stringify(x)); },
+      244: async (n) => { await wipe(); await setB(''); await fresh(); await turn(U1(n), 'خوب.'); const s = await st(), x = await ev((t) => [APP.ASSIST.statesProblem(t), APP.AGE.titleOf(t)], U1(n)); T(n, x[0] && /اتاقِ ۳ در ۴/.test(s.stmt) && /اتاقِ ۳ در ۴/.test(x[1]) && /موکت/.test(x[1]), s.stmt + ' | ' + JSON.stringify(x)); },
+      245: async (n) => { await wipe(); await setB(await birthFor(17)); await fresh(); await turn(U1(n), 'خوب.'); const s = await st(), x = await ev((t) => [APP.ASSIST.notProblem(t), APP.ASSIST.pageAsk26(t)], U1(n)); T(n, !x[0] && !x[1] && /کنکورم برنامه بریزم/.test(s.stmt), JSON.stringify(x) + s.stmt); },
+      246: async (n) => { await person(40, SH); const w = await rc(U1(n)); T(n, /دو ضمیر/.test(String(w)), w); },
+      247: async (n) => { await person(30, ['جواب رو پیدا کردم', 'بگو درسته؟']); const w = await rc(U1(n)); T(n, /نه در پیام‌های اوست/.test(String(w)), w); },
+      248: async (n) => { await wipe(); await setB(''); await fresh(); await mindSetup(() => { const s = __cur(), at = new Date(Date.UTC(2026, 9, 19, 8, 0)).toISOString(); s.msgs.push({ role: 'user', text: 'گام ۱: ۷٫۵ ÷ ۳ = ۲٫۲.', at });
+          s.coach = { pk: 'c:0', stmt: 'آزمون', ph: 'c', story: { 'c:0': { items: [], prior: { steps: [{ n: 1, quote: '۷٫۵ ÷ ۳ = ۲٫۲', verdict: 'wrong', cause: 'skill', why: 'تقسیمِ اعشاری', dep: [], bad: [] }] } } } }; s.coachEv = [{ at, ph: 'c', ok: false, src: 'prior', key: 'prior|c|b', prior: 1, cause: 'skill', causeWhy: 'تقسیمِ اعشاری' }]; APP.S.put(s); });
+        const A1 = (await mindActs()).filter(a => a.src === 'prior'), cz = await ev(() => ((APP.MIND.phases().causes || {}).skill || []).map(c => c.why)); T(n, A1.length === 1 && A1[0].ok === false && cz.some(c => /تقسیمِ اعشاری/.test(c)), JSON.stringify(A1) + JSON.stringify(cz)); },
+      249: async (n) => { await wipe(); await fresh(); await mindSetup(() => { const s = __cur(), at = new Date(Date.UTC(2026, 9, 19, 9, 0)).toISOString(); s.msgs.push({ role: 'user', text: 'حساب کردم: ۲۱ × ۱۲ = ۲۵۲ پس جواب ۲۵۲ تومنه.', at }); s.coach = { pk: 'c:0', stmt: 'آزمون', ph: 'b' }; s.coachEv = [{ at, ph: 'b', ok: true, src: 'chatok', how: 'res', key: 'chatok|b|res|حساب کردم: ۲۱ × ۱۲ = ۲۵۲', msg: 't' + at }]; APP.S.put(s); });
+        const A = (await mindActs()).filter(a => /نتیجه‌ای که گفت/.test(a.fa)); T(n, A.length === 1 && A[0].ok === true, JSON.stringify(A)); },
+      250: async (n) => { const g = await goPrereq(true); T(n, !!g.t && /همان را باز کن/.test(g.t) && /دکمهٔ ساخت را نزن/.test(g.t) && !/فیلدهای این صفحه را پر کن/.test(g.t), g.t.slice(0, 220)); },
+      251: async (n) => { const g = await goPrereq(false); T(n, !!g.t && /فیلدهای این صفحه را پر کن/.test(g.t) && !/همان را باز کن/.test(g.t), g.t.slice(0, 220)); },
+      252: async (n) => { const r = await routePre(false); T(n, r.pre && r.pre.length === 1 && !r.pre[0].open && !/اکنون: پیش‌نیازِ/.test(r.now), JSON.stringify(r)); },
+      253: async (n) => { const r = await routePre(true); T(n, r.pre && r.pre.length === 2 && r.pre.filter(d => d.open).length === 1, JSON.stringify(r)); },
+      254: async (n) => { const pf = await planForm(); if (pf.nf) return NC(n, 'the plan form was not reachable in the harness'); T(n, /ابزارِ طرح/.test(pf.a1.miss) && pf.a1.v === pf.PL && pf.a2 === pf.PL && pf.a3 === pf.PL, JSON.stringify(pf).slice(0, 240)); if (info.bank[n]) (info.note = info.note || {}).bank254 = 'C26-33 not reproduced on BASE26 — the entry passes on the base build as well'; },
+      255: async (n) => { const t = await retr(1); T(n, /۱ از ۳/.test(t.reason) && t.gap < 21 && !/۲۱/.test(t.reason), JSON.stringify(t)); },
+      256: async (n) => { const t = await retr(3); T(n, t.stable && t.next >= 7, JSON.stringify(t)); },
+      257: async (n) => NC(n, 'DECISIONS_R26 Q10: two people in one browser is not built this round and stays an open sheet (#101/#102); the honest answer is the model\'s reply — there is no page mechanism of this family to assert offline'),
+    };
+    const mine = Object.keys(E).map(Number).filter(n => /^Q(?:9|10)\./.test(E[n].rc));
+    for (const n of mine) { try { if (!H[n]) { NC(n, 'no handler'); continue; } await H[n](n); } catch (er) { errors.push('bank#' + n + ' exception: ' + String(er && er.stack || er).split('\n').slice(0, 2).join(' | ')); } }
+    chk(mine.length === 36, 'bank: 36 Q9/Q10 entries expected, got ' + mine.length);
+    const miss = mine.filter(n => !(n in info.bank) && !(n in info.nc)); chk(!miss.length, 'bank coverage: every Q9/Q10 entry judged or given a reason ' + JSON.stringify(miss));
+  });
+  { const nOk = Object.values(info.bank).filter(Boolean).length; info.summary = { judged: Object.keys(info.bank).length, pass: nOk, nc: Object.keys(info.nc).length }; }
 
   //SECTIONS
 
