@@ -1428,7 +1428,7 @@
     var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt);
     /* دورِ ۲۵ (P1، DECISIONS_R25): پیامِ آغازینِ کارِ پیشین ⇒ نقطهٔ ازسرگیری؛ ردِ حکم ⇒ دوباره‌سنجی با شاهد — بالاتر از «اول کل»، آزمونِ حدس و «خودت فکر می‌کنی چرا؟»
        (A25-1، B25·D2/D3، C25-12/13، D25-6؛ خوانش از a45 A.STORY.priorTurn) */
-    var pw25 = x.prior && /^(?:open|dispute|again)$/.test(x.prior.id) ? x.prior : null;
+    var pw25 = x.prior && /^(?:open|dispute|again|undo|which)$/.test(x.prior.id) ? x.prior : null;   // دورِ ۲۶ (Q4): پس گرفتنِ رد و «کدام گام؟» هم پرسشِ نوبتِ دفترند
     add("prior", !!pw25, pw25 ? pw25.q : "");
     add("A073", only && !pw25, ONLY_Q);
     /* دورِ ۲۵ (P1، A25-10): حدسی که خودش در همین پیام آزموده ⇒ پرسشِ برهان، نه «چطور می‌آزمایی‌اش؟»؛ آزمون و سپس برهانِ خودش ⇒ وارسیِ همان برهان */
