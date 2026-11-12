@@ -170,6 +170,37 @@ D24-15, A23-14.
 - **C21.** Return by naming: bind or ask; never file under the merely-live problem.
 - **C22.** Third-party personal names are shown as a placeholder («[نامِ مدرسه]») wherever the page writes a title or label.
 
+### Clarifications after the independent bank (C23–C39; answers to the bank writer's 17 ambiguities, same order)
+Principle for all: where the text itself does not decide, the page asks; no number or convention is invented.
+- **C23.** When the operands carry scale words too, the scales are part of the arithmetic: «۲ میلیون × ۳ = ۶ هزار» is ✗. C15's «never ✗
+  because of the word» is for a word that stands only beside the result.
+- **C24.** Mixed scales among operands («۳۰۰ + ۲۰ میلیون تقسیم بر ۴۰ = ۸۰۰ هزار»): if the standard reading (usual precedence, each scale
+  on its adjacent number) gives her result ⇒ ✓. If only another reading gives it ⇒ the page shows the reading that works and asks
+  «این‌طور حساب کردی؟». If none ⇒ ✗.
+- **C25.** C16's question is asked only when her integer is the rounding or the truncation of the exact value (۱۰۰ ÷ ۷ = ۱۴). Any other
+  integer is ✗.
+- **C26.** «۱۳/۱۲ = ۱» in fraction notation is an identity ⇒ ✗. With «÷ / تقسیم بر» it is a quotient ⇒ C25. Her «آره، گرد کردم» stores the
+  line as approximate and ✓; her «نه» leaves ✗.
+- **C27.** «۲٫۵ × ۳ = ۸» follows C25: 8 is the rounding of 7.5 ⇒ ask.
+- **C28.** «و … میشه N» (sum) and «N تا M … میشه K» (product) are word operators and are inside the reader, like «ضربدر». A sentence with no
+  operation word at all stays outside (C17).
+- **C29.** A contest where she is wrong: the ✗ stays and the page says it re-checked once; it points at the part that does not read
+  and never gives the right number.
+- **C30.** After a return by naming, later unnamed messages stay with the named problem until she names another or it closes.
+- **C31.** A problem named only as an analogy does not move the turn. If the same message carries a datum or result that could belong
+  to either, the page asks.
+- **C32.** «جمعهٔ بعد» said on a day other than Friday: the page asks, offering both dates.
+- **C33.** «آخرِ هفته / آخرِ هفتهٔ بعد / آخرِ همین هفته»: the page asks which day, offering Thursday and Friday.
+- **C34.** A deadline she states herself for her own action («تا بیستم باید تحویل بدهم») takes the C12 path. A date that is a fact about
+  someone else gets no ask (C19).
+- **C35.** A conditional future («اگه شنبه برم …») books nothing and asks nothing until she commits.
+- **C36.** A piece arriving after closure never reopens the closed problem by itself; the «امروز» line offers it and she decides.
+- **C37.** «پنجاه‌پنجاه» is 50٪ — it is a number in words. Vague words («احتمالاً», «فکر کنم») make no number; the page asks her number
+  once. «آخرِ ماه» is the last day of the current Jalali month, through «… درست است؟».
+- **C38.** C22 covers what the page writes: titles, labels, «امروز» lines, the strip and 🧭. Her own words in the chat record and in a data
+  row stay as she typed them. Placeholders by kind: «[نامِ مدرسه]», «[نامِ معلم]», «[نامِ شخص]».
+- **C39.** C26-42: no interval number is decided here; the line and the schedule must follow the same count by the existing spacing rule.
+
 ## Owner bank 1–41 (round 26)
 | # | verdict | # | verdict | # | verdict |
 |---|---|---|---|---|---|
