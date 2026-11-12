@@ -34913,7 +34913,10 @@ APP.goFromURL = function (q) {
     var s = { id: A.uid("achat"), type: TYPE, title: "", pinned: "", status: "", memory: "", msgs: [], steps: [], files: [], reports: [] }; S.put(s); store("cur", s.id); return s;
   };
   AS.cur = function () { var id = store("cur"), s = id && S.get(id); return s && s.type === TYPE ? s : null; };
-  function provisional(s, text) { return s.title || clip(text, 50) || "گفت‌وگوی تازه"; }
+  /* دورِ ۲۶ (Q9، U29 bp3 s28 «سلام! امروز برگه‌ی سفید…»): عنوانِ پشتیبانِ سشن از پیامِ خام ساخته می‌شد — حالا بی سلام/معرفی و بی نامِ شخصِ سوم (A.AGE.titleOf، a43) */
+  function title26(text) { try { return A.AGE && A.AGE.titleOf ? A.AGE.titleOf(text) : text; } catch (e) { return text; } }
+  AS.title26 = title26;
+  function provisional(s, text) { return s.title || clip(title26(text), 50) || "گفت‌وگوی تازه"; }
 
   /* ---------- پیام به هوش ---------- */
   var SYS = [
@@ -35691,7 +35694,7 @@ APP.goFromURL = function (q) {
       all.length ? h("ul", { class: "plain" }, all.map(function (s) {
         var pg = AS.progress ? AS.progress(s) : null;   // همان شمارِ کشوی تور و «امروز» (یک منبع)
         return h("li", { class: "as-li" + (cur && cur.id === s.id ? " on" : "") }, h("button", { class: "linkish", type: "button", onclick: function () { store("cur", s.id); ui.view = "chat"; AS.clearMarks(); paint(); } },
-          h("b", {}, s.title || clip((s.msgs[0] || {}).text, 40) || "گفت‌وگوی تازه"),
+          h("b", {}, s.title || clip(title26((s.msgs[0] || {}).text), 40) || "گفت‌وگوی تازه"),
           h("span", { class: "small muted" }, " · " + A.fdate(s.updated) + (pg ? " · " + pg.label + " " + fa(pg.done) + "/" + fa(pg.all) : "") + (s.reports && s.reports.length ? " · 🛎" + fa(s.reports.length) : ""))));
       })) : h("p", { class: "small muted" }, "هنوز سشنی نیست."));
   }
@@ -37479,8 +37482,23 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۴ (R4، A24-2 — پسرفتِ دورِ ۲۳): سکوت («...»، «…»، «؟») سلام/معرفی نیست — پیراستن چیزی برنمی‌داشت و نتیجهٔ خالی «فقط سلام» خوانده می‌شد ⇒ بلوکِ مربی و
        قاعدهٔ سکوت می‌افتاد. «فقط سلام/معرفی» یعنی پیراستن واقعاً بندی برداشته باشد. */
     if (t.replace(/[\s.!،,؟?؛:…]+/g, "") !== "" && stripIntro23(t, true).replace(/[\s.!،,؟?؛:…]+/g, "") === "") return true;   // دورِ ۲۳ (Q5، بانکِ R23 #142): فقط سلام/احوال‌پرسی/معرفی («سلام، خوبی؟»، «سلام من کیانم»)
+    if (pageAsk26(t)) return true;   // دورِ ۲۶ (Q9، C26-21)
     return NOT_PROB[1].test(t) && !PROB_HINT.test(t);
   };
+  /* دورِ ۲۶ (Q9، C26-21 aC1 p10 «اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تونم حلش کنم؟»): پرسش دربارهٔ بخشی از خودِ صفحه مسئلهٔ او نیست. ریشه —
+     فهرستِ منفی چند شکلِ جمله را می‌شناخت و واژهٔ «معما/حل» آن را خاموش می‌کرد؛ نامِ بخش‌های صفحه اما در ثبت‌گاهِ نماها هست (AS.views). پیامی که (۱) نامِ یک نما را
+     می‌برد، (۲) به خودِ صفحه/برنامه اشاره دارد، (۳) پرسش است و (۴) دادهٔ عددی یا رابطه ندارد ⇒ پرسش دربارهٔ صفحه. «معمای امروزِ روزنامه: ۸ سکه …؟» (بی اشاره به صفحه، با عدد)
+     مسئله می‌ماند. */
+  var PAGEREF26 = /(?:^|[\s‌«(،])(?:(?:تو|توی|در|روی|داخلِ?)[\s‌]+(?:این[\s‌]*)?(?:صفحه|برنامه|سامانه|اپ|سایت)|(?:این|همین|اون|آن)[\s‌]*(?:صفحه|برنامه|سامانه|اپ)|صفحه[‌]?(?:ست|ات|ت|تون|تان)|این[‌\s]?جا(?:ست)?[\s‌]*(?:هست|دار(?:ی|ید|ه))|منو|دکمه)/;
+  var viewLabels26 = null;
+  function pageAsk26(t) {
+    t = String(t || ""); if (!/[؟?]/.test(t) || !PAGEREF26.test(t)) return false;
+    var x = faDigits(t); if ((x.match(/\d+(?:[.٫]\d+)?/g) || []).length >= 1 || /[=<>≤≥]/.test(x)) return false;
+    try { if (!viewLabels26 || !viewLabels26.length) viewLabels26 = (AS.views ? AS.views() : []).map(function (v) { return String(v.label || "").replace(/[^آ-یءٔ‌ِa-zA-Z\s]/g, " ").replace(/\s+/g, " ").trim(); }).filter(function (l) { return l.length >= 6 && /\s/.test(l); }); } catch (e) { viewLabels26 = []; }
+    var n = t.replace(/[^آ-یءٔ‌ِa-zA-Z\s]/g, " ").replace(/\s+/g, " ");
+    return viewLabels26.some(function (l) { return n.indexOf(l) >= 0; });
+  }
+  AS.pageAsk26 = pageAsk26;
   /* ---------- تورِ پولیا (R1، دورِ ۲۱): «این پیام مسئله/تصمیمی را بیان می‌کند» — آشکارسازِ خودِ صفحه (همان‌ها که نوعِ مسئله را حدس می‌زنند:
      A.liveNatGuess / A.liveTypeGuess ِ بخشِ مسئله، صورتِ ثابت‌کردنی، فرمول، گیرِ دیرپا، تصمیم/قیمت/جا شدن، دلسردی، عادت) — نه فهرستِ تازه.
      یک منبع برای سه کار: مسیریابیِ نوبت (a26 AS.chatTask)، «مسئلهٔ گفت‌وگو» ِ «# وضعِ کنونی» (AS.chatFocus) و این‌که کدام پیام صورتِ مسئلهٔ گفت‌وگوست. ---------- */
@@ -38666,6 +38684,14 @@ APP.goFromURL = function (q) {
   AS.regStore25 = regStore25;
   AS.sysRaw25 = function (m) { return m && m.text0 != null && m.text === m.textR ? m.text0 : (m ? m.text : ""); };
   if (!S.put._reg25) { var put25 = S.put; S.put = function (r) { try { if (r && r.type === "achat") regStore25(r); } catch (e) { } return put25.apply(this, arguments); }; S.put._reg25 = true; }
+  /* دورِ ۲۶ (Q9، C22 — C26-22): عنوان‌ها و برچسب‌ها از «صورتِ نگه‌داشتهٔ مسئلهٔ گفت‌وگو» (C.stmt)، عنوانِ سشن و عنوانِ مسئلهٔ زنده ساخته می‌شوند (نوارِ 🧭، «امروز»، 📜، پشتهٔ 🧩).
+     نامِ مدرسه/معلم/شخصِ سوم هنگامِ **نوشتنِ** همین سه فیلد جایش را به «[نامِ …]» می‌دهد (A.AGE.privLabel، a43) — همان درسِ دورِ ۲۵: تبدیل هنگامِ ذخیره، نه فقط هنگامِ نقش بستن.
+     پیامِ خودش در گفت‌وگو (msgs) و «صورتِ خامِ گشایش» (C.stmtRaw24، ورودیِ آشکارساز) دست نمی‌خورد. */
+  function privStore26(r) { var P = A.AGE && A.AGE.privLabel; if (!P || !r) return;
+    if (r.type === "achat") { var C = r.coach; if (C && typeof C.stmt === "string" && C.stmt) { var m1 = P(C.stmt); if (m1 !== C.stmt) C.stmt = m1; } if (typeof r.title === "string" && r.title) { var m2 = P(r.title); if (m2 !== r.title) r.title = m2; } }
+    else if (r.p && typeof r.p.title === "string" && r.p.title && /^eprob/.test(String(r.type || r.id || ""))) { var m3 = P(r.p.title); if (m3 !== r.p.title) r.p.title = m3; if (typeof r.title === "string" && r.title) { var m4 = P(r.title); if (m4 !== r.title) r.title = m4; } } }
+  AS.privStore26 = privStore26;
+  if (!S.put._priv26) { var put26 = S.put; S.put = function (r) { try { privStore26(r); } catch (e) { } return put26.apply(this, arguments); }; S.put._priv26 = true; S.put._reg25 = true; }
   /* فقط متنِ گیومهٔ سطحِ اول (پرسشِ صفحه)؛ گیومهٔ درونی (حرفِ خودِ کاربر، عنوانِ مسئله‌اش) دست نمی‌خورد */
   function quoteMap(l, fn) {
     var out = "", d = 0, buf = "";
@@ -40695,11 +40721,15 @@ APP.goFromURL = function (q) {
   var AGEDATA25 = /سالش|سالشون|ساله[\s‌]*(?:است|ست|بود)|سن(?:م|ش|مون|ِ?[\s‌]*(?:من|او|ما))(?![آ-ی])|سال[\s‌]*(?:دیگه|دیگر|بعد|پیش|قبل)|چند[\s‌]*سال|سنِ[\s‌]|(?:این|اون|آن|همین)[\s‌]*سن(?![آ-ی])/;
   /* بانکِ R25 #189: پس از زنجیرهٔ معرفی، «مسئله‌م اینه که …» خودش آغازِ صورت را نام می‌برد — زمینهٔ بی‌عددِ پیش از آن («دو تا بچه دارم، تازه هم اسباب‌کشی کردیم») صورتِ مسئله نیست */
   var PROBMARK25 = /(?:^|[.!؟?؛\n،][\s‌]*)(?:مسئله|مساله|مشکل|سؤال|سوال|پرسش|گیر|دغدغه)(?:‌?ا?م|ِ?[\s‌]*من)[\s‌]*(?:اینه|این[\s‌]*است|اینجاست|این[\s‌]*جاست)[\s‌]*(?:که[\s‌]*)?[:：]?[\s‌]*/;
+  /* دورِ ۲۶ (Q9، C26-22 aC1 p10 «من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» …»): بندِ «کجا درس می‌خوانم» با نامِ مدرسه بندِ هویتی است (مثلِ پایه)، نه آغازِ صورتِ مسئله.
+     فقط وقتی که نامی در آن هست (پالایندهٔ a43 آن را می‌شناسد) — «من مدرسه می‌رم و هر روز ۲ ساعت تو راهم» دادهٔ مسئله است و می‌ماند. */
+  var SCHOOLCL26 = new RegExp("^(?:من[\\s‌]+)?(?:(?:توی?|در|به)[\\s‌]+)?(?:مدرسه|دبستان|دبیرستان|هنرستان|مهد)[^،,.!؟?؛\\n0-9۰-۹]{1,40}?[\\s‌](?:می[‌\\s]?رم|میرم|می[‌\\s]?روم|درس[\\s‌]*می[‌\\s]?خو(?:ا)?نم|هستم)" + TERM25);
+  function schoolCl26(rest) { var m = SCHOOLCL26.exec(rest); if (!m) return null; try { return A.AGE && A.AGE.privLabel && A.AGE.privLabel(m[0]) !== m[0] ? m : null; } catch (e) { return null; } }
   function idPrefix25(x, chained) {
     var rest = x, strong = 0, n = 0, m, guard = 0;
     while (guard++ < 8) {
       var sent = (/^[^.!؟?\n؛]*/.exec(rest) || [""])[0]; if (/[؟?]/.test((/^[^\n]*?[.!؟?؛\n]/.exec(rest) || [rest])[0].slice(-1))) break;
-      m = AGECL25.exec(rest) || BIRTHCL25.exec(rest) || GRADECL25.exec(rest) || NAMECL25.exec(rest); var st = !!m;
+      m = AGECL25.exec(rest) || BIRTHCL25.exec(rest) || GRADECL25.exec(rest) || NAMECL25.exec(rest) || schoolCl26(rest); var st = !!m;
       if (!m) { m = WEAKCL25.exec(rest); if (m) { var body = m[0].replace(/^من[\s‌]+/, ""), lw = body.split(/[\s]+/).pop(); if (PREP25.test(m[0]) || VERB25.test(lw.replace(/[ِٔ]/g, "")) || /^(?:ن?می)[‌\s]/.test(body)) m = null; } }
       if (!m && n) { m = ELLIP25.exec(rest); if (m) st = false; }   // «شصت و هفت ساله‌ام و بازنشسته.» — گزارهٔ بی‌فعلِ دنبالهٔ همان زنجیره
       if (!m || !m[0].trim()) break;
@@ -55344,10 +55374,15 @@ APP.goFromURL = function (q) {
     x = x.replace(/(کلاسِ?[\s‌]+(?:اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم|یازدهم|دوازدهم|[0-9۰-۹]{1,2}))(?:[\s‌]+([ا-هی]|الف)(?=[\s.،,!؟?؛:]|$)|\s*[\/\-]\s*[0-9۰-۹]{1,2})/g, "$1");
     return x;
   }
-  G.privText = function (t) {
-    var x = String(t == null ? "" : t), ag = G.age(); if (ag == null || !G.minor(ag)) return x;
+  /* دورِ ۲۶ (Q9، C22 — C26-22 aC1 p10 «من مدرسهٔ شهید بهشتیِ کرج می‌رم. …» عنوانِ مسئلهٔ گفت‌وگو شد و در 📜، «امروز» و نوارِ 🧭 ماند):
+     ریشه — پالایش فقط روی رویدادهای پرونده و فقط برای کم‌سال می‌نشست؛ عنوان‌ها و برچسب‌ها (صورتِ نگه‌داشتهٔ مسئلهٔ گفت‌وگو، عنوانِ سشن، فهرستِ مسئله‌های گفت‌وگو) از متنِ خامِ
+     پیام ساخته می‌شدند. حالا یک پالایندهٔ برچسب برای همهٔ سن‌ها: نامِ مدرسه (مالِ خودش یا فرزند/نوه‌اش)، نامِ معلم/مدیر (نامی که به نقش بسته است) و نامِ شخصِ سومی که
+     خودش «نام» خوانده («اسمِ دوستم …»، «… اسمش …»، «دوستی به اسمِ …») جایش را به «[نامِ …]» می‌دهد. نامِ شخصیتِ مسئله («علی ۳ سیب دارد»)، «مدرسه» ِ عام («تو مدرسه گفت»)
+     و «چیزی به اسمِ ک.م.م» دست نمی‌خورند. خودِ پیام در گفت‌وگو همان است که نوشت. */
+  var SCH_RE26 = new RegExp("(" + SCH + ")((?:[\\s‌]+(?:ما|مون|مان|من|شون))?(?:[\\s‌]+(?:اسمش|نامش)(?:[\\s‌]+(?:" + SCH + "))?)?)([\\s‌]+)([^\\s.،,!؟?؛:«»()]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()]+){0,2})", "g");
+  function privSchool(x) {
     x = priv25(x);
-    return x.replace(new RegExp("(" + SCH + ")((?:[\\s‌]+(?:ما|مون|مان|من|شون))?(?:[\\s‌]+(?:اسمش|نامش)(?:[\\s‌]+(?:" + SCH + "))?)?)([\\s‌]+)([^\\s.،,!؟?؛:«»()]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()]+){0,2})", "g"), function (all, w, mid, sp, name) {
+    return x.replace(SCH_RE26, function (all, w, mid, sp, name) {
       /* «مدرسه/مهد» ِ بی کسره و بی «اسمش» اسمِ عام است («تو مدرسه گفت»)؛ «دبستان/دبیرستان/هنرستان …» و «… اسمش …» نام می‌گیرند */
       if (/^(?:مدرسه|مهدکودک|مهد|آموزشگاه)$/.test(w) && !/(?:اسمش|نامش)/.test(mid)) return all;
       var ws = name.split(/[\s‌]+/), keep = [];
@@ -55356,6 +55391,32 @@ APP.goFromURL = function (q) {
       var rest = ws.slice(keep.length).join(" "), tail = /(?:‌ه|‌است|‌ام|‌ایم)$/.exec(keep[keep.length - 1]);
       return w + mid + sp + "[نامِ مدرسه]" + (tail ? tail[0] : "") + (rest ? " " + rest : "");
     });
+  }
+  var ROLE26 = "(?:معلم|دبیر|مدیر|ناظم|مربی|استاد|مشاور)", POSS26 = "(?:[‌]?(?:مون|مان|م|ام|ش|شون|شان|ت|تون|تان))?";
+  var HON26 = "(?:خانمِ?|آقایِ?|آقا|استادِ?)";
+  var KIN26 = "(?:دوست|رفیق|پسر|دختر|نوه|برادر|داداش|خواهر|آبجی|همکار|همسایه|شاگرد|هم[‌\\s]?کلاسی|بچه|مامان|بابا|مادر|پدر|همسر|شوهر|خانم|زن|عمو|دایی|خاله|عمه|پسرخاله|دخترخاله|پسرعمو|دخترعمو|رئیس|صاحب[‌\\s]?خانه|صاحبخونه)";
+  var PERSONN26 = "(?:" + KIN26 + "|" + ROLE26 + "|آقایی|خانمی|کسی|یکی|نفر|بچه‌ای|پسری|دختری|مردی|زنی|دوستی|همکاری|همسایه‌ای|معلمی|شاگردی)";
+  function nameSub26(label) { return function (all, w, sp, name) { if (/\[نامِ?/.test(name) || /\[نامِ?/.test(w)) return all; var c = nameCut25(name); if (!c) return all; return w + sp + (c.pre ? c.pre + " " : "") + label + c.tail + (c.rest ? " " + c.rest : ""); }; }
+  function privPeople(x) {
+    /* معلم/مدیر: «معلممون خانم احمدی»، «معلمِ ریاضی‌مون آقای رضایی»، «خانم احمدی معلمِ ما»، «اسمِ معلممون …»، «معلممون اسمش …» */
+    x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+[آ-یٔ‌ِ]{2,14}" + POSS26 + "){0,2}[\\s‌،,]+" + HON26 + ")([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
+    x = x.replace(new RegExp("((?:^|[\\s‌،,.!؟?؛:(«])" + HON26 + ")([\\s‌]+)" + NAME25 + "(?=[\\s‌،,]+" + ROLE26 + "(?![آ-ی]{3}))", "g"), function (all, w, sp, name) { if (/\[نامِ?/.test(name)) return all; var ws = name.split(/[\s‌]+/); if (SCH_STOP.test(ws[0])) return all; return w + sp + "[نامِ معلم]"; });
+    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
+    x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
+    /* شخصِ سوم که خودش «نام» خوانده: «اسمِ دوستم سارا ـه»، «دوستم اسمش سارا ـست»، «یه همکاری دارم به اسمِ کامران» */
+    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
+    x = x.replace(new RegExp("(" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
+    x = x.replace(new RegExp("(" + PERSONN26 + POSS26 + "[^.!؟?؛\\n«»]{0,30}?[\\s‌]به[\\s‌]+(?:اسمِ?|نامِ?))([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
+    return x;
+  }
+  /* برچسب/عنوان (همهٔ سن‌ها): هر جا صفحه عنوان یا برچسبی از حرفِ او می‌سازد */
+  G.privLabel = function (t) { var x = String(t == null ? "" : t); try { return privPeople(privSchool(x)); } catch (e) { return x; } };
+  /* عنوانِ خوانا از یک پیام: بی سلام/معرفی (AS.stripIntro23)، بی نامِ شخصِ سوم — برای عنوانِ سشن، فهرستِ «مسئله‌های این گفت‌وگو»، نوارِ «برگرد به» (U29، C26-13، C26-29) */
+  G.titleOf = function (t) { var x = String(t == null ? "" : t), y = x; try { if (A.ASSIST && A.ASSIST.stripIntro23) y = A.ASSIST.stripIntro23(x) || x; } catch (e) { y = x; } return G.privLabel(y); };
+  /* نقلِ پیام در پرونده (۲۴/R5): فقط کم‌سال — همان پالاینده */
+  G.privText = function (t) {
+    var x = String(t == null ? "" : t), ag = G.age(); if (ag == null || !G.minor(ag)) return x;
+    return G.privLabel(x);
   };
   G.privDossier = function (D) {
     try { var ag = G.age(); if (!D || ag == null || !G.minor(ag)) return D;
@@ -55364,9 +55425,19 @@ APP.goFromURL = function (q) {
       if (typeof D.statement === "string") D.statement = G.privText(D.statement); if (typeof D.title === "string") D.title = G.privText(D.title);
     } catch (e) { } return D;
   };
+  /* دورِ ۲۶ (Q9): عنوانِ پروندهٔ گفت‌وگو و فهرستِ «مسئله‌های این گفت‌وگو» از پیامِ خام ساخته می‌شد (clip(text, 60)) ⇒ سلام، معرفی، جملهٔ تولد یا نامِ مدرسه عنوان می‌شد.
+     عنوان از G.titleOf ِ همان پیام؛ برای همهٔ سن‌ها. */
+  G.titleDossier26 = function (D) {
+    try { if (!D) return D; var se = D.sid ? S.get(D.sid) : null, map = {}, cl = (A.ASSIST && A.ASSIST.clip) || function (x, n) { x = String(x == null ? "" : x).replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; };
+      if (se) (se.msgs || []).forEach(function (m) { if (!m || m.role !== "user" || typeof m.text !== "string") return; var k = cl(m.text, 60); if (!(k in map)) map[k] = cl(G.titleOf(m.text), 60); });
+      var fix = function (t) { return typeof t === "string" ? (map[t] != null ? map[t] : G.privLabel(t)) : t; };
+      if (Array.isArray(D.pks)) D.pks.forEach(function (x) { if (x && typeof x.title === "string") x.title = fix(x.title); });
+      if (typeof D.title === "string") D.title = fix(D.title);
+    } catch (e) { } return D;
+  };
   /* دورِ ۲۵ (P7، D25-22 aD1): «📜 پروندهٔ این گفت‌وگو» هم همان پرونده است — پیش‌تر فقط پروندهٔ مسئله پالوده می‌شد و نقلِ پیامِ کودک در پروندهٔ سشن عینی می‌ماند */
-  if (typeof A.dossierSess === "function" && !A.dossierSess._priv25) { var rawDosS = A.dossierSess; A.dossierSess = function () { return G.privDossier(rawDosS.apply(this, arguments)); }; A.dossierSess._priv25 = true; }
-  if (typeof A.dossier === "function" && !A.dossier._priv24) { var rawDos = A.dossier; A.dossier = function () { return G.privDossier(rawDos.apply(this, arguments)); }; A.dossier._priv24 = true; }
+  if (typeof A.dossierSess === "function" && !A.dossierSess._priv25) { var rawDosS = A.dossierSess; A.dossierSess = function () { return G.titleDossier26(G.privDossier(rawDosS.apply(this, arguments))); }; A.dossierSess._priv25 = true; }
+  if (typeof A.dossier === "function" && !A.dossier._priv24) { var rawDos = A.dossier; A.dossier = function () { var D0 = G.privDossier(rawDos.apply(this, arguments)); try { if (D0 && typeof D0.title === "string") D0.title = G.privLabel(D0.title); } catch (e) { } return D0; }; A.dossier._priv24 = true; }
 
   /* ---------- قلاب‌های دستیار ---------- */
   var AS = A.ASSIST;

@@ -1772,8 +1772,23 @@
     /* دورِ ۲۴ (R4، A24-2 — پسرفتِ دورِ ۲۳): سکوت («...»، «…»، «؟») سلام/معرفی نیست — پیراستن چیزی برنمی‌داشت و نتیجهٔ خالی «فقط سلام» خوانده می‌شد ⇒ بلوکِ مربی و
        قاعدهٔ سکوت می‌افتاد. «فقط سلام/معرفی» یعنی پیراستن واقعاً بندی برداشته باشد. */
     if (t.replace(/[\s.!،,؟?؛:…]+/g, "") !== "" && stripIntro23(t, true).replace(/[\s.!،,؟?؛:…]+/g, "") === "") return true;   // دورِ ۲۳ (Q5، بانکِ R23 #142): فقط سلام/احوال‌پرسی/معرفی («سلام، خوبی؟»، «سلام من کیانم»)
+    if (pageAsk26(t)) return true;   // دورِ ۲۶ (Q9، C26-21)
     return NOT_PROB[1].test(t) && !PROB_HINT.test(t);
   };
+  /* دورِ ۲۶ (Q9، C26-21 aC1 p10 «اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تونم حلش کنم؟»): پرسش دربارهٔ بخشی از خودِ صفحه مسئلهٔ او نیست. ریشه —
+     فهرستِ منفی چند شکلِ جمله را می‌شناخت و واژهٔ «معما/حل» آن را خاموش می‌کرد؛ نامِ بخش‌های صفحه اما در ثبت‌گاهِ نماها هست (AS.views). پیامی که (۱) نامِ یک نما را
+     می‌برد، (۲) به خودِ صفحه/برنامه اشاره دارد، (۳) پرسش است و (۴) دادهٔ عددی یا رابطه ندارد ⇒ پرسش دربارهٔ صفحه. «معمای امروزِ روزنامه: ۸ سکه …؟» (بی اشاره به صفحه، با عدد)
+     مسئله می‌ماند. */
+  var PAGEREF26 = /(?:^|[\s‌«(،])(?:(?:تو|توی|در|روی|داخلِ?)[\s‌]+(?:این[\s‌]*)?(?:صفحه|برنامه|سامانه|اپ|سایت)|(?:این|همین|اون|آن)[\s‌]*(?:صفحه|برنامه|سامانه|اپ)|صفحه[‌]?(?:ست|ات|ت|تون|تان)|این[‌\s]?جا(?:ست)?[\s‌]*(?:هست|دار(?:ی|ید|ه))|منو|دکمه)/;
+  var viewLabels26 = null;
+  function pageAsk26(t) {
+    t = String(t || ""); if (!/[؟?]/.test(t) || !PAGEREF26.test(t)) return false;
+    var x = faDigits(t); if ((x.match(/\d+(?:[.٫]\d+)?/g) || []).length >= 1 || /[=<>≤≥]/.test(x)) return false;
+    try { if (!viewLabels26 || !viewLabels26.length) viewLabels26 = (AS.views ? AS.views() : []).map(function (v) { return String(v.label || "").replace(/[^آ-یءٔ‌ِa-zA-Z\s]/g, " ").replace(/\s+/g, " ").trim(); }).filter(function (l) { return l.length >= 6 && /\s/.test(l); }); } catch (e) { viewLabels26 = []; }
+    var n = t.replace(/[^آ-یءٔ‌ِa-zA-Z\s]/g, " ").replace(/\s+/g, " ");
+    return viewLabels26.some(function (l) { return n.indexOf(l) >= 0; });
+  }
+  AS.pageAsk26 = pageAsk26;
   /* ---------- تورِ پولیا (R1، دورِ ۲۱): «این پیام مسئله/تصمیمی را بیان می‌کند» — آشکارسازِ خودِ صفحه (همان‌ها که نوعِ مسئله را حدس می‌زنند:
      A.liveNatGuess / A.liveTypeGuess ِ بخشِ مسئله، صورتِ ثابت‌کردنی، فرمول، گیرِ دیرپا، تصمیم/قیمت/جا شدن، دلسردی، عادت) — نه فهرستِ تازه.
      یک منبع برای سه کار: مسیریابیِ نوبت (a26 AS.chatTask)، «مسئلهٔ گفت‌وگو» ِ «# وضعِ کنونی» (AS.chatFocus) و این‌که کدام پیام صورتِ مسئلهٔ گفت‌وگوست. ---------- */
@@ -2959,6 +2974,14 @@
   AS.regStore25 = regStore25;
   AS.sysRaw25 = function (m) { return m && m.text0 != null && m.text === m.textR ? m.text0 : (m ? m.text : ""); };
   if (!S.put._reg25) { var put25 = S.put; S.put = function (r) { try { if (r && r.type === "achat") regStore25(r); } catch (e) { } return put25.apply(this, arguments); }; S.put._reg25 = true; }
+  /* دورِ ۲۶ (Q9، C22 — C26-22): عنوان‌ها و برچسب‌ها از «صورتِ نگه‌داشتهٔ مسئلهٔ گفت‌وگو» (C.stmt)، عنوانِ سشن و عنوانِ مسئلهٔ زنده ساخته می‌شوند (نوارِ 🧭، «امروز»، 📜، پشتهٔ 🧩).
+     نامِ مدرسه/معلم/شخصِ سوم هنگامِ **نوشتنِ** همین سه فیلد جایش را به «[نامِ …]» می‌دهد (A.AGE.privLabel، a43) — همان درسِ دورِ ۲۵: تبدیل هنگامِ ذخیره، نه فقط هنگامِ نقش بستن.
+     پیامِ خودش در گفت‌وگو (msgs) و «صورتِ خامِ گشایش» (C.stmtRaw24، ورودیِ آشکارساز) دست نمی‌خورد. */
+  function privStore26(r) { var P = A.AGE && A.AGE.privLabel; if (!P || !r) return;
+    if (r.type === "achat") { var C = r.coach; if (C && typeof C.stmt === "string" && C.stmt) { var m1 = P(C.stmt); if (m1 !== C.stmt) C.stmt = m1; } if (typeof r.title === "string" && r.title) { var m2 = P(r.title); if (m2 !== r.title) r.title = m2; } }
+    else if (r.p && typeof r.p.title === "string" && r.p.title && /^eprob/.test(String(r.type || r.id || ""))) { var m3 = P(r.p.title); if (m3 !== r.p.title) r.p.title = m3; if (typeof r.title === "string" && r.title) { var m4 = P(r.title); if (m4 !== r.title) r.title = m4; } } }
+  AS.privStore26 = privStore26;
+  if (!S.put._priv26) { var put26 = S.put; S.put = function (r) { try { privStore26(r); } catch (e) { } return put26.apply(this, arguments); }; S.put._priv26 = true; S.put._reg25 = true; }
   /* فقط متنِ گیومهٔ سطحِ اول (پرسشِ صفحه)؛ گیومهٔ درونی (حرفِ خودِ کاربر، عنوانِ مسئله‌اش) دست نمی‌خورد */
   function quoteMap(l, fn) {
     var out = "", d = 0, buf = "";
@@ -4988,11 +5011,15 @@
   var AGEDATA25 = /سالش|سالشون|ساله[\s‌]*(?:است|ست|بود)|سن(?:م|ش|مون|ِ?[\s‌]*(?:من|او|ما))(?![آ-ی])|سال[\s‌]*(?:دیگه|دیگر|بعد|پیش|قبل)|چند[\s‌]*سال|سنِ[\s‌]|(?:این|اون|آن|همین)[\s‌]*سن(?![آ-ی])/;
   /* بانکِ R25 #189: پس از زنجیرهٔ معرفی، «مسئله‌م اینه که …» خودش آغازِ صورت را نام می‌برد — زمینهٔ بی‌عددِ پیش از آن («دو تا بچه دارم، تازه هم اسباب‌کشی کردیم») صورتِ مسئله نیست */
   var PROBMARK25 = /(?:^|[.!؟?؛\n،][\s‌]*)(?:مسئله|مساله|مشکل|سؤال|سوال|پرسش|گیر|دغدغه)(?:‌?ا?م|ِ?[\s‌]*من)[\s‌]*(?:اینه|این[\s‌]*است|اینجاست|این[\s‌]*جاست)[\s‌]*(?:که[\s‌]*)?[:：]?[\s‌]*/;
+  /* دورِ ۲۶ (Q9، C26-22 aC1 p10 «من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» …»): بندِ «کجا درس می‌خوانم» با نامِ مدرسه بندِ هویتی است (مثلِ پایه)، نه آغازِ صورتِ مسئله.
+     فقط وقتی که نامی در آن هست (پالایندهٔ a43 آن را می‌شناسد) — «من مدرسه می‌رم و هر روز ۲ ساعت تو راهم» دادهٔ مسئله است و می‌ماند. */
+  var SCHOOLCL26 = new RegExp("^(?:من[\\s‌]+)?(?:(?:توی?|در|به)[\\s‌]+)?(?:مدرسه|دبستان|دبیرستان|هنرستان|مهد)[^،,.!؟?؛\\n0-9۰-۹]{1,40}?[\\s‌](?:می[‌\\s]?رم|میرم|می[‌\\s]?روم|درس[\\s‌]*می[‌\\s]?خو(?:ا)?نم|هستم)" + TERM25);
+  function schoolCl26(rest) { var m = SCHOOLCL26.exec(rest); if (!m) return null; try { return A.AGE && A.AGE.privLabel && A.AGE.privLabel(m[0]) !== m[0] ? m : null; } catch (e) { return null; } }
   function idPrefix25(x, chained) {
     var rest = x, strong = 0, n = 0, m, guard = 0;
     while (guard++ < 8) {
       var sent = (/^[^.!؟?\n؛]*/.exec(rest) || [""])[0]; if (/[؟?]/.test((/^[^\n]*?[.!؟?؛\n]/.exec(rest) || [rest])[0].slice(-1))) break;
-      m = AGECL25.exec(rest) || BIRTHCL25.exec(rest) || GRADECL25.exec(rest) || NAMECL25.exec(rest); var st = !!m;
+      m = AGECL25.exec(rest) || BIRTHCL25.exec(rest) || GRADECL25.exec(rest) || NAMECL25.exec(rest) || schoolCl26(rest); var st = !!m;
       if (!m) { m = WEAKCL25.exec(rest); if (m) { var body = m[0].replace(/^من[\s‌]+/, ""), lw = body.split(/[\s]+/).pop(); if (PREP25.test(m[0]) || VERB25.test(lw.replace(/[ِٔ]/g, "")) || /^(?:ن?می)[‌\s]/.test(body)) m = null; } }
       if (!m && n) { m = ELLIP25.exec(rest); if (m) st = false; }   // «شصت و هفت ساله‌ام و بازنشسته.» — گزارهٔ بی‌فعلِ دنبالهٔ همان زنجیره
       if (!m || !m[0].trim()) break;

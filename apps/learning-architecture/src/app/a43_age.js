@@ -265,10 +265,15 @@
     x = x.replace(/(کلاسِ?[\s‌]+(?:اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم|یازدهم|دوازدهم|[0-9۰-۹]{1,2}))(?:[\s‌]+([ا-هی]|الف)(?=[\s.،,!؟?؛:]|$)|\s*[\/\-]\s*[0-9۰-۹]{1,2})/g, "$1");
     return x;
   }
-  G.privText = function (t) {
-    var x = String(t == null ? "" : t), ag = G.age(); if (ag == null || !G.minor(ag)) return x;
+  /* دورِ ۲۶ (Q9، C22 — C26-22 aC1 p10 «من مدرسهٔ شهید بهشتیِ کرج می‌رم. …» عنوانِ مسئلهٔ گفت‌وگو شد و در 📜، «امروز» و نوارِ 🧭 ماند):
+     ریشه — پالایش فقط روی رویدادهای پرونده و فقط برای کم‌سال می‌نشست؛ عنوان‌ها و برچسب‌ها (صورتِ نگه‌داشتهٔ مسئلهٔ گفت‌وگو، عنوانِ سشن، فهرستِ مسئله‌های گفت‌وگو) از متنِ خامِ
+     پیام ساخته می‌شدند. حالا یک پالایندهٔ برچسب برای همهٔ سن‌ها: نامِ مدرسه (مالِ خودش یا فرزند/نوه‌اش)، نامِ معلم/مدیر (نامی که به نقش بسته است) و نامِ شخصِ سومی که
+     خودش «نام» خوانده («اسمِ دوستم …»، «… اسمش …»، «دوستی به اسمِ …») جایش را به «[نامِ …]» می‌دهد. نامِ شخصیتِ مسئله («علی ۳ سیب دارد»)، «مدرسه» ِ عام («تو مدرسه گفت»)
+     و «چیزی به اسمِ ک.م.م» دست نمی‌خورند. خودِ پیام در گفت‌وگو همان است که نوشت. */
+  var SCH_RE26 = new RegExp("(" + SCH + ")((?:[\\s‌]+(?:ما|مون|مان|من|شون))?(?:[\\s‌]+(?:اسمش|نامش)(?:[\\s‌]+(?:" + SCH + "))?)?)([\\s‌]+)([^\\s.،,!؟?؛:«»()]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()]+){0,2})", "g");
+  function privSchool(x) {
     x = priv25(x);
-    return x.replace(new RegExp("(" + SCH + ")((?:[\\s‌]+(?:ما|مون|مان|من|شون))?(?:[\\s‌]+(?:اسمش|نامش)(?:[\\s‌]+(?:" + SCH + "))?)?)([\\s‌]+)([^\\s.،,!؟?؛:«»()]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()]+){0,2})", "g"), function (all, w, mid, sp, name) {
+    return x.replace(SCH_RE26, function (all, w, mid, sp, name) {
       /* «مدرسه/مهد» ِ بی کسره و بی «اسمش» اسمِ عام است («تو مدرسه گفت»)؛ «دبستان/دبیرستان/هنرستان …» و «… اسمش …» نام می‌گیرند */
       if (/^(?:مدرسه|مهدکودک|مهد|آموزشگاه)$/.test(w) && !/(?:اسمش|نامش)/.test(mid)) return all;
       var ws = name.split(/[\s‌]+/), keep = [];
@@ -277,6 +282,32 @@
       var rest = ws.slice(keep.length).join(" "), tail = /(?:‌ه|‌است|‌ام|‌ایم)$/.exec(keep[keep.length - 1]);
       return w + mid + sp + "[نامِ مدرسه]" + (tail ? tail[0] : "") + (rest ? " " + rest : "");
     });
+  }
+  var ROLE26 = "(?:معلم|دبیر|مدیر|ناظم|مربی|استاد|مشاور)", POSS26 = "(?:[‌]?(?:مون|مان|م|ام|ش|شون|شان|ت|تون|تان))?";
+  var HON26 = "(?:خانمِ?|آقایِ?|آقا|استادِ?)";
+  var KIN26 = "(?:دوست|رفیق|پسر|دختر|نوه|برادر|داداش|خواهر|آبجی|همکار|همسایه|شاگرد|هم[‌\\s]?کلاسی|بچه|مامان|بابا|مادر|پدر|همسر|شوهر|خانم|زن|عمو|دایی|خاله|عمه|پسرخاله|دخترخاله|پسرعمو|دخترعمو|رئیس|صاحب[‌\\s]?خانه|صاحبخونه)";
+  var PERSONN26 = "(?:" + KIN26 + "|" + ROLE26 + "|آقایی|خانمی|کسی|یکی|نفر|بچه‌ای|پسری|دختری|مردی|زنی|دوستی|همکاری|همسایه‌ای|معلمی|شاگردی)";
+  function nameSub26(label) { return function (all, w, sp, name) { if (/\[نامِ?/.test(name) || /\[نامِ?/.test(w)) return all; var c = nameCut25(name); if (!c) return all; return w + sp + (c.pre ? c.pre + " " : "") + label + c.tail + (c.rest ? " " + c.rest : ""); }; }
+  function privPeople(x) {
+    /* معلم/مدیر: «معلممون خانم احمدی»، «معلمِ ریاضی‌مون آقای رضایی»، «خانم احمدی معلمِ ما»، «اسمِ معلممون …»، «معلممون اسمش …» */
+    x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+[آ-یٔ‌ِ]{2,14}" + POSS26 + "){0,2}[\\s‌،,]+" + HON26 + ")([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
+    x = x.replace(new RegExp("((?:^|[\\s‌،,.!؟?؛:(«])" + HON26 + ")([\\s‌]+)" + NAME25 + "(?=[\\s‌،,]+" + ROLE26 + "(?![آ-ی]{3}))", "g"), function (all, w, sp, name) { if (/\[نامِ?/.test(name)) return all; var ws = name.split(/[\s‌]+/); if (SCH_STOP.test(ws[0])) return all; return w + sp + "[نامِ معلم]"; });
+    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
+    x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
+    /* شخصِ سوم که خودش «نام» خوانده: «اسمِ دوستم سارا ـه»، «دوستم اسمش سارا ـست»، «یه همکاری دارم به اسمِ کامران» */
+    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
+    x = x.replace(new RegExp("(" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
+    x = x.replace(new RegExp("(" + PERSONN26 + POSS26 + "[^.!؟?؛\\n«»]{0,30}?[\\s‌]به[\\s‌]+(?:اسمِ?|نامِ?))([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
+    return x;
+  }
+  /* برچسب/عنوان (همهٔ سن‌ها): هر جا صفحه عنوان یا برچسبی از حرفِ او می‌سازد */
+  G.privLabel = function (t) { var x = String(t == null ? "" : t); try { return privPeople(privSchool(x)); } catch (e) { return x; } };
+  /* عنوانِ خوانا از یک پیام: بی سلام/معرفی (AS.stripIntro23)، بی نامِ شخصِ سوم — برای عنوانِ سشن، فهرستِ «مسئله‌های این گفت‌وگو»، نوارِ «برگرد به» (U29، C26-13، C26-29) */
+  G.titleOf = function (t) { var x = String(t == null ? "" : t), y = x; try { if (A.ASSIST && A.ASSIST.stripIntro23) y = A.ASSIST.stripIntro23(x) || x; } catch (e) { y = x; } return G.privLabel(y); };
+  /* نقلِ پیام در پرونده (۲۴/R5): فقط کم‌سال — همان پالاینده */
+  G.privText = function (t) {
+    var x = String(t == null ? "" : t), ag = G.age(); if (ag == null || !G.minor(ag)) return x;
+    return G.privLabel(x);
   };
   G.privDossier = function (D) {
     try { var ag = G.age(); if (!D || ag == null || !G.minor(ag)) return D;
@@ -285,9 +316,19 @@
       if (typeof D.statement === "string") D.statement = G.privText(D.statement); if (typeof D.title === "string") D.title = G.privText(D.title);
     } catch (e) { } return D;
   };
+  /* دورِ ۲۶ (Q9): عنوانِ پروندهٔ گفت‌وگو و فهرستِ «مسئله‌های این گفت‌وگو» از پیامِ خام ساخته می‌شد (clip(text, 60)) ⇒ سلام، معرفی، جملهٔ تولد یا نامِ مدرسه عنوان می‌شد.
+     عنوان از G.titleOf ِ همان پیام؛ برای همهٔ سن‌ها. */
+  G.titleDossier26 = function (D) {
+    try { if (!D) return D; var se = D.sid ? S.get(D.sid) : null, map = {}, cl = (A.ASSIST && A.ASSIST.clip) || function (x, n) { x = String(x == null ? "" : x).replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; };
+      if (se) (se.msgs || []).forEach(function (m) { if (!m || m.role !== "user" || typeof m.text !== "string") return; var k = cl(m.text, 60); if (!(k in map)) map[k] = cl(G.titleOf(m.text), 60); });
+      var fix = function (t) { return typeof t === "string" ? (map[t] != null ? map[t] : G.privLabel(t)) : t; };
+      if (Array.isArray(D.pks)) D.pks.forEach(function (x) { if (x && typeof x.title === "string") x.title = fix(x.title); });
+      if (typeof D.title === "string") D.title = fix(D.title);
+    } catch (e) { } return D;
+  };
   /* دورِ ۲۵ (P7، D25-22 aD1): «📜 پروندهٔ این گفت‌وگو» هم همان پرونده است — پیش‌تر فقط پروندهٔ مسئله پالوده می‌شد و نقلِ پیامِ کودک در پروندهٔ سشن عینی می‌ماند */
-  if (typeof A.dossierSess === "function" && !A.dossierSess._priv25) { var rawDosS = A.dossierSess; A.dossierSess = function () { return G.privDossier(rawDosS.apply(this, arguments)); }; A.dossierSess._priv25 = true; }
-  if (typeof A.dossier === "function" && !A.dossier._priv24) { var rawDos = A.dossier; A.dossier = function () { return G.privDossier(rawDos.apply(this, arguments)); }; A.dossier._priv24 = true; }
+  if (typeof A.dossierSess === "function" && !A.dossierSess._priv25) { var rawDosS = A.dossierSess; A.dossierSess = function () { return G.titleDossier26(G.privDossier(rawDosS.apply(this, arguments))); }; A.dossierSess._priv25 = true; }
+  if (typeof A.dossier === "function" && !A.dossier._priv24) { var rawDos = A.dossier; A.dossier = function () { var D0 = G.privDossier(rawDos.apply(this, arguments)); try { if (D0 && typeof D0.title === "string") D0.title = G.privLabel(D0.title); } catch (e) { } return D0; }; A.dossier._priv24 = true; }
 
   /* ---------- قلاب‌های دستیار ---------- */
   var AS = A.ASSIST;

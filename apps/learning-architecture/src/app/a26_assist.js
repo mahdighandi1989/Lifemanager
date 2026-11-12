@@ -394,7 +394,10 @@
     var s = { id: A.uid("achat"), type: TYPE, title: "", pinned: "", status: "", memory: "", msgs: [], steps: [], files: [], reports: [] }; S.put(s); store("cur", s.id); return s;
   };
   AS.cur = function () { var id = store("cur"), s = id && S.get(id); return s && s.type === TYPE ? s : null; };
-  function provisional(s, text) { return s.title || clip(text, 50) || "گفت‌وگوی تازه"; }
+  /* دورِ ۲۶ (Q9، U29 bp3 s28 «سلام! امروز برگه‌ی سفید…»): عنوانِ پشتیبانِ سشن از پیامِ خام ساخته می‌شد — حالا بی سلام/معرفی و بی نامِ شخصِ سوم (A.AGE.titleOf، a43) */
+  function title26(text) { try { return A.AGE && A.AGE.titleOf ? A.AGE.titleOf(text) : text; } catch (e) { return text; } }
+  AS.title26 = title26;
+  function provisional(s, text) { return s.title || clip(title26(text), 50) || "گفت‌وگوی تازه"; }
 
   /* ---------- پیام به هوش ---------- */
   var SYS = [
@@ -1172,7 +1175,7 @@
       all.length ? h("ul", { class: "plain" }, all.map(function (s) {
         var pg = AS.progress ? AS.progress(s) : null;   // همان شمارِ کشوی تور و «امروز» (یک منبع)
         return h("li", { class: "as-li" + (cur && cur.id === s.id ? " on" : "") }, h("button", { class: "linkish", type: "button", onclick: function () { store("cur", s.id); ui.view = "chat"; AS.clearMarks(); paint(); } },
-          h("b", {}, s.title || clip((s.msgs[0] || {}).text, 40) || "گفت‌وگوی تازه"),
+          h("b", {}, s.title || clip(title26((s.msgs[0] || {}).text), 40) || "گفت‌وگوی تازه"),
           h("span", { class: "small muted" }, " · " + A.fdate(s.updated) + (pg ? " · " + pg.label + " " + fa(pg.done) + "/" + fa(pg.all) : "") + (s.reports && s.reports.length ? " · 🛎" + fa(s.reports.length) : ""))));
       })) : h("p", { class: "small muted" }, "هنوز سشنی نیست."));
   }
