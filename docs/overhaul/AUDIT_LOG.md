@@ -5111,3 +5111,16 @@ dated stability, mind-card feed) under way.
   is green. PROPOSAL: the collector should carry forward provenance it cannot recompute, the way it already keeps shrunken shards.
 - **FINDING (2026-11-12)** `docs/tours/polya-batch1/kit/checkpoint.sh` holds the owner's e-mail address as an escaped sed pattern
   (already in history). Not changed in this task; PROPOSAL: read the address from an environment variable.
+- **FINDING (2026-11-12, tour 1 round 26, fixer «today»)** The round-25 date gate («… درست است؟» + her yes) covered only dated sentences
+  that no other writer had recorded; a plan date reported by the model and the `deadline` action still reached «امروز» unasked, the date
+  reader matched weekdays across word boundaries («جلسه شنبه» ⇒ «سه‌شنبه») and could not read «تا شنبه» or «۲۰ آبانه», and an
+  unanswered question was dropped silently. In the forecast ledger a percent inside the claim was read as the confidence and a verdict
+  with a stated 60 % landed on the open 90 % forecast.
+- **CHANGE (2026-11-12, tour 1 round 26, fixer «today»; DECISIONS_R26 Q5 + Q8, C12 on both paths, C19)** `apps/learning-architecture/src/app/`
+  `a41_practice.js` (date reader, clause-level «her own future action», one gate for every date writer, pending questions that stay and
+  are answerable in «امروز», plan ⇄ follow-up link, forecast booking / verdict / take-back with history), `a27_tour.js` (`plan18` date
+  source, two guards, three correction-cue shapes), `a40_dossier.js` (verdict history). `AS.SYS` untouched. Tests:
+  `tests/test_tour1_r26_today.js` (47 runner checks, 42 red on BASE26; bank Q5 + Q8 52/52). Old assertions replaced by the decision are
+  commented in place; correction tests confirm dates through the Today row (`PR.dateYes`). WORKLOG (134), PROGRESS 131, HANDBOOK §10 / §12-78,
+  handoff `docs/overhaul/handoff-notes/_pending_tour1_R26_today_2026-11-12.md`, lesson in `experiences/model-reports-state-page-validates.md`.
+- **FINDING (2026-11-12, same)** A26-46 did not reproduce on BASE26 with the runner's own messages, day and actions; kept as a guard.
