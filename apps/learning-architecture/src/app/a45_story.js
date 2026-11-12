@@ -732,6 +732,12 @@
     return R;
   }
   ST.priorRead = readReply;
+  /* ردِ حکمی که حسابِ خودِ صفحه پشتش است همان لحظه دوباره حساب می‌شود (گفت‌وگو و دکمهٔ 🔭 یکی): حکمِ «نادرست» ِ صفحه، و — دورِ ۲۶ (D26-11) — حکمِ «درست» ی که حسابش را صفحه خوانده */
+  function pageRe(x, at, why) {
+    var ck = ST.arithChk(curText(x)), bad = ck.filter(function (c) { return !c.ok; });
+    if (x.pageBad) { x.re = { at: at, by: "page", was: x.verdict, to: bad.length ? "wrong" : x.verdict, why: bad.length ? x.chk : "", her: why || "" }; if (bad.length) x.reAt = at; }
+    else if (x.verdict === "ok" && ck.length && ck.every(function (c) { return c.ok === true; })) { x.re = { at: at, by: "page", was: "ok", to: "ok", why: "حسابِ صفحه همان را می‌خواند: " + ck.map(function (c) { return "«" + fa(String(c.expr)) + " = " + fa(String(c.said)) + "»"; }).join("، "), her: why || "" }; x.reAt = at; }
+  }
   function ledger(s, key, pid) {
     var pg = pid ? S.get("eprog_" + pid) : null, L = pg && pg.solve && pg.solve.live, E = storyOf(s || {}, key);
     if (L) { if (!L.prior) { var p0 = E.prior || ST.priorFor(null, pid); if (p0) L.prior = JSON.parse(JSON.stringify(p0)); } return { pr: L.prior || null, pg: pg, L: L, E: E }; }
@@ -768,9 +774,7 @@
       /* دورِ ۲۶ (D26-11، A26-32): حکمِ «✓ درست» هم ردشدنی است — همان دوباره‌سنجی، همان «رد کردی»، همان راهِ پس گرفتن. (دورِ ۲۵: «حکمِ درست را رد نمی‌کند» — جایگزین شد) */
       (x.herHist = x.herHist || []).push({ her: x.her || "", at: x.herAt || "", noAt: at, v: x.verdict, why: x.why || "" }); x.her = "no"; x.herAt = at; x.turns = 0; delete x.reAt; if (x.re) { (x.reHist = x.reHist || []).push(x.re); delete x.re; } if (a.why) x.herWhy = a.why; else delete x.herWhy; pr.st = "no"; ch.push({ n: x.n, k: "no" });
       /* حکمی که حسابِ خودِ صفحه پشتش است همین حالا دوباره حساب می‌شود — نتیجه با شاهد روی صفحه: حکمِ «نادرست» ِ صفحه، و حکمِ «درست» ی که حسابش را صفحه خوانده */
-      var ck26 = ST.arithChk(curText(x)), bad = ck26.filter(function (c) { return !c.ok; });
-      if (x.pageBad) { x.re = { at: at, by: "page", was: x.verdict, to: bad.length ? "wrong" : x.verdict, why: bad.length ? x.chk : "", her: a.why || "" }; if (bad.length) x.reAt = at; }
-      else if (x.verdict === "ok" && ck26.length && !bad.length && ck26.every(function (c) { return c.ok === true; })) { x.re = { at: at, by: "page", was: "ok", to: "ok", why: "حسابِ صفحه همان را می‌خواند: " + ck26.map(function (c) { return "«" + fa(String(c.expr)) + " = " + fa(String(c.said)) + "»"; }).join("، "), her: a.why || "" }; x.reAt = at; } });
+      pageRe(x, at, a.why || ""); });
     if (ch.length) { relink(pr); pr.upAt2 = at; }
     if (G.pg) S.put(G.pg);
     return ch;
@@ -1264,7 +1268,9 @@
     if (!L.prior) { var p0 = ST.priorFor(null, pid); if (!p0) return; L.prior = JSON.parse(JSON.stringify(p0)); S.put(pg); }
     var r0 = A.liveRec && A.liveRec(pid), se0 = (r0 && r0.sess && S.get(r0.sess)) || S.all("achat", function (x) { return x && x.lprob === pid; }).pop() || null, R = function (t) { try { return AS.regSys ? AS.regSys(se0, t) : t; } catch (e) { return t; } };   // «شما» برای سالمند/کاربرِ «شما» (R5)
     var pr = markWait(null, pid, L.prior), closed = priorClosed(pid), sec = h("section", { class: "card soft lp-prior", dir: "rtl" }, h("h4", {}, R("کارِ پیشینِ تو — حکمِ هر گام")), h("p", { class: "small muted" }, R(closed ? pr.sum.replace(/\s*·\s*ازسرگیری از گامِ\s*[۰-۹]+/, "") + " · مسئله بسته شد — این دفتر تاریخچه است" : pr.sum) + " · صفحه فقط نقل، عدد و واحد را سنجید؛ درستیِ گامِ غیرعددی داوریِ مربی است."));
-    var set = function (x, v) { (x.herHist = x.herHist || []).push({ her: x.her || "", at: x.herAt || "", undoAt: v ? "" : nowIso() }); x.her = v; x.herAt = nowIso(); if (v === "no") { x.turns = 0; delete x.reAt; delete x.re; if (x.pageBad) { var bad = ST.arithChk(curText(x)).filter(function (c) { return !c.ok; }); x.re = { at: x.herAt, by: "page", was: x.verdict, to: x.verdict, why: x.chk, her: "" }; if (bad.length) x.reAt = x.herAt; } pr.st = "no"; } else { delete x.herWhy; delete x.turns; } S.put(pg); A.render(); };
+    var set = function (x, v) { var t0 = nowIso(), h0 = { her: x.her || "", at: x.herAt || "", undoAt: v ? "" : t0 }; if (v === "no") { h0.noAt = t0; h0.v = x.verdict; h0.why = x.why || ""; } (x.herHist = x.herHist || []).forEach(function (e) { if (!v && e.noAt && !e.undone) e.undone = t0; }); x.herHist.push(h0); x.her = v; x.herAt = t0;
+      if (v === "no") { x.turns = 0; delete x.reAt; delete x.re; pageRe(x, t0, ""); pr.st = "no"; }   // دورِ ۲۶ (D26-11): ردِ حکمِ ✓ هم همین‌جا دوباره حساب می‌شود
+      else { delete x.herWhy; delete x.turns; if (!v && x.re) { (x.reHist = x.reHist || []).push(Object.assign({ undone: t0 }, x.re)); delete x.re; delete x.reAt; } } S.put(pg); A.render(); };
     pr.steps.forEach(function (x) {
       var row = h("div", { class: "lp-prior-step small", "data-v": x.verdict, "data-n": String(x.n), "data-fixed": x.fixed ? "1" : "", "data-stale": x.stale || (x.depStale || []).length ? "1" : "" }, h("span", {}, R(stepLine(Object.assign({}, x, { her: "" }), false, 140)) + (x.n === pr.resume && !closed ? " · ⟵ ازسرگیری از این‌جا" : "")));
       if (closed) row.appendChild(h("span", { class: "muted" }, x.her === "ok" ? " · تأیید شد ✓" : ""));

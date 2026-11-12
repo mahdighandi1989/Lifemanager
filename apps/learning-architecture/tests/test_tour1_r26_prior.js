@@ -43,7 +43,7 @@ const RUNS = JSON.parse(fs.readFileSync(vfile('R26_prior_runs.json'), 'utf8'));
     };
     window.__fresh = (view) => { APP.go(view || 'home'); localStorage.removeItem('lla.assist.cur'); const s = APP.ASSIST.newSession(); __q.length = 0; return s.id; };
     window.__cur = () => APP.ASSIST.cur();
-    window.__wipe = () => { ['achat', 'eprog', 'eprob', 'kcase', 'pr', 'card', 'deadline', 'fcast', 'prereq', 'topic', 'wchain', 'case', 'practice', 'prc'].forEach(t => APP.S.all(t).forEach(r => APP.S.del(r.id))); localStorage.removeItem('lla.assist.cur'); };
+    window.__wipe = () => { ['achat', 'eprog', 'eprob', 'kcase', 'pr', 'card', 'deadline', 'fcast', 'prereq', 'topic', 'wchain', 'case', 'practice', 'prc'].forEach(t => APP.S.all(t).forEach(r => APP.S.del(r.id))); localStorage.removeItem('lla.assist.cur'); const st0 = APP.S.settings(); st0.profile = {}; APP.S.saveSettings(st0); };   // دورِ ۲۶: نمایه (سن/ضمیر) هم پاک می‌شود — سناریوی سالمند نباید «شما» را به بخشِ بعد ببرد
     window.__live = (title, st) => { const r = APP.liveCreate(title, st || (title + ' — صورتِ کاملِ مسئله برای آزمون.'), 'find', { by: 'user' }); return r.p.id; };
     window.__liveSet = (pid, fn) => { const pg = APP.S.get('eprog_' + pid) || { id: 'eprog_' + pid, type: 'eprog' }; pg.solve = pg.solve || {}; const L = pg.solve.live = pg.solve.live || {};
       ['steps', 'claims', 'moves', 'related', 'aux', 'knots'].forEach(k => { L[k] = L[k] || []; }); fn(pg.solve, L); APP.S.put(pg); };
@@ -97,12 +97,14 @@ const RUNS = JSON.parse(fs.readFileSync(vfile('R26_prior_runs.json'), 'utf8'));
     return out;
   };
   const liveQ = (u) => ((head(u).match(/در این نوبت فقط \*\*یک\*\* پرسش[^«]*«([^»]*(?:«[^»]*»[^»]*)*)»/) || [])[1] || '');
-  const tq = (u) => bold(u) + '\n' + liveQ(u);   // پرسشِ نوبت: سطرِ پررنگِ مربیِ گفت‌وگو، یا پرسشِ مسئلهٔ زنده
+  const tq = (u) => bold(u) + '\n' + liveQ(u) + '\n' + sugOf(u);   // پرسشِ نوبت: سطرِ پررنگِ مربیِ گفت‌وگو، پرسشِ مسئلهٔ زنده، یا «پیشنهادِ این نوبت»
+  const eng = (t) => p.evaluate((t) => { const c = APP.STORY.arithChk(t); return c.length > 0 && c.every(x => x.ok === true); }, t);   // موتورِ حسابِ صفحه (a46 — سهمِ «arith») این متن را ✓ می‌خواند؟
   const ctx = (u) => head(u).split('\n').filter(l => /^- زمینه \(نه پرسشِ دوم\): (?:همین پیام|پیامش حکمِ)/.test(l)).join('\n');
   const stp = (o, n) => (o && o.pr && o.pr.steps[n - 1]) || {};
   const line = (o, n) => (o.lines || []).filter(l => l.indexOf('گامِ ' + fa(n) + ' ·') === 0)[0] || '';
   const fa = (n) => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
   const NOREAD = /هنوز با حسابِ صفحه یا حکم نمی‌خواند/;
+  const okS = (x) => !!x && x.verdict === 'ok' && !x.stale && !((x.depStale || []).length) && !((x.depWrong || []).length);
 
   // ================= runners — جمله‌های خودِ گزارش‌های دورِ ۲۶ =================
   await section('pwB2', async () => {   // U8 (B25·D3 باقی‌مانده)، U18 = B26·D22، U9 = B26·D23
@@ -188,6 +190,209 @@ const RUNS = JSON.parse(fs.readFileSync(vfile('R26_prior_runs.json'), 'utf8'));
     chk(stp(o[2], 2).verdict === 'ok' && stp(o[2], 2).fixed && /۲۴۷۰/.test(stp(o[2], 2).fixed.t) && !NOREAD.test(o[2].lines.join('\n')), 'C26-8 (pwC1 p2 «با ۵۵٪ میشه ۱۳۶۰ ÷ ۰٫۵۵ ≈ ۲۴۷۰ وات», verdict ok ⇒ «متنِ تازه‌ات … نمی‌خواند»): her fix lands the same turn :: ' + line(o[2], 2).slice(0, 260));
   });
 
+
+  // ================= page — شبیه‌های منفیِ هر رفع، «کدام گام؟»، و کارتِ 🔭 =================
+  await section('page', async () => {
+    const W = 'سلام. می‌خوام بدونم ماهی چقدر برق مصرف می‌کنم؛ خودم تا یه جایی حساب کردم، ببین درست رفتم:\nگام ۱: بخاری ۲ کیلوواته و روزی ۳ ساعت روشنه: ۲ × ۳ = ۶ کیلووات‌ساعت در روز.\nگام ۲: ماهی ۶ × ۳۰ = ۱۶۰.\nگام ۳: هزینه ۱۶۰ × ۱٫۵ = ۲۴۰.\nگام ۴: پس ماهی ۲۴۰ هزار تومن میشه و به صرفه‌ست.';
+    const WP = [{ step: 'روزانه', quote: '۲ × ۳ = ۶ کیلووات‌ساعت در روز', verdict: 'ok' }, { step: 'ماهانه', quote: 'ماهی ۶ × ۳۰ = ۱۶۰', verdict: 'wrong', why: 'ضرب نمی‌خواند', cause: 'skill' }, { step: 'هزینه', quote: 'هزینه ۱۶۰ × ۱٫۵ = ۲۴۰', verdict: 'ok', dep: [2] }, { step: 'نتیجه', quote: 'پس ماهی ۲۴۰ هزار تومن میشه و به صرفه‌ست', verdict: 'incomplete', why: 'معیارِ «به صرفه» گفته نشده و بر گامِ ۳ بناست', dep: [3] }];
+    const led = async () => { await wipe(); await fresh(); return ppr(W, WP, { cs: { said: ['u', 'd'] } }); };
+    const say = (text, o) => turn(text, (o && o.reply) || 'باشه.', [csn(Object.assign({ ph: 'e', said: [] }, o && o.cs || {}))]);
+    const lines = () => p.evaluate(() => { const s = __cur(); const pr = APP.STORY.priorFor(s, ''); return pr ? APP.STORY.priorLines(pr) : []; });
+    let u, pr;
+    // C8 — زنجیره‌ای که یک حلقه‌اش نمی‌خواند، حتی با حکمِ «درست» ِ مدل، نمی‌نشیند (شبیهِ منفیِ U18)
+    await led(); u = await ppr('دوباره حساب کردم: ماهی ۶ × ۳۰ = ۱۵۰ + ۳۰ = ۱۹۰.', [{ n: 2, quote: 'ماهی ۶ × ۳۰ = ۱۵۰ + ۳۰ = ۱۹۰', verdict: 'ok', why: 'جمع' }]); pr = await PR();
+    chk(pr.steps[1].verdict === 'wrong' && !pr.steps[1].fixed && pr.steps[1].retry && pr.resume === 2 && /با حسابِ صفحه نمی‌خواند/.test((await lines())[2]) && !/۱۸۰/.test((await lines())[2]), 'look-alike of U18: a chain with a false link («۶ × ۳۰ = ۱۵۰ + ۳۰ = ۱۹۰») is refused although the model says ok — and the right number is not given away :: ' + (await lines())[2].slice(-200));
+    // زنجیرهٔ درست می‌نشیند
+    await led(); await ppr('دوباره حساب کردم: ماهی ۶ × ۳۰ = ۱۵۰ + ۳۰ = ۱۸۰.', [{ n: 2, quote: 'ماهی ۶ × ۳۰ = ۱۵۰ + ۳۰ = ۱۸۰', verdict: 'ok', why: 'جمع' }]); pr = await PR();
+    chk(pr.steps[1].verdict === 'ok' && pr.steps[1].fixed && pr.resume === 3 && (pr.steps[2].depStale || []).indexOf(2) >= 0, 'U18 (chain, each link judged): «۶ × ۳۰ = ۱۵۰ + ۳۰ = ۱۸۰» lands and its dependant waits for the new number :: ' + JSON.stringify(st(pr)));
+    const cal = await p.evaluate(() => ['۱۳۶۰ ÷ ۰٫۵۵ ≈ ۲۴۷۰', '۰٫۳×۹ + ۰٫۲×۸ = ۲٫۷ + ۱٫۶ = ۴٫۳', '۰٫۳×۹ + ۰٫۲×۸ = ۲٫۷ + ۱٫۶ = ۴٫۵', '۱۳۶۰ ÷ ۰٫۵۵ ≈ ۲۶۰۰'].map(t => APP.STORY.calcs25(t).map(c => [c.key, c.said, c.ok])));
+    chk(JSON.stringify(cal[0]) === '[["1360/0.55","2470",true]]' && cal[1].length === 2 && cal[1].every(c => c[2] === true) && cal[1][0][1] === '4.3' && cal[2].every(c => c[2] === false) && cal[3][0][2] === false, 'light reader: «≈» is a connective, a chain is judged link by link, a false last link fails every expression before it :: ' + JSON.stringify(cal));
+    // U43 — متنِ تازه‌ای که حسابِ خودِ صفحه در آن نمی‌خواند «بازنویسی» نمی‌شود (شبیهِ منفیِ بازنویسیِ ناقص)
+    await led(); await ppr('ماهی ۶ × ۳۰ = ۱۷۰ میشه.', [{ n: 2, quote: 'ماهی ۶ × ۳۰ = ۱۷۰ میشه', verdict: 'incomplete', why: 'هنوز نمی‌خواند' }]); pr = await PR();
+    chk(pr.steps[1].verdict === 'wrong' && !pr.steps[1].fixed && pr.steps[1].retry && /۱۶۰/.test(pr.steps[1].quote) && /با حسابِ صفحه نمی‌خواند/.test((await lines())[2]) && !/یا حکم/.test((await lines())[2]), 'look-alike of U43: a new text whose own arithmetic the page reads ✗ does not replace the step; the line names the page\'s check, not «یا حکم» :: ' + (await lines())[2].slice(-200));
+    // U8 — «چرا میگی …؟» که به دو گام می‌خورد و گامِ ازسرگیری میانشان نیست ⇒ صفحه می‌پرسد کدام
+    await wipe(); await fresh();
+    await ppr('سلام. می‌خوام بدونم کدوم گوشی رو بخرم؛ خودم تا یه جایی رفتم، ببین درست رفتم:\nگام ۱: بودجه‌م ۲۰ میلیونه.\nگام ۲: دوربین برام مهمه، پس گوشیِ الف.\nگام ۳: باتری هم مهمه، پس باز گوشیِ الف.\nگام ۴: پس الف رو می‌خرم.',
+      [{ step: 'بودجه', quote: 'بودجه‌م ۲۰ میلیونه', verdict: 'incomplete', why: 'سقف یا کف بودنش گفته نشده' }, { step: 'دوربین', quote: 'دوربین برام مهمه، پس گوشیِ الف', verdict: 'incomplete', why: 'مقایسه با گوشیِ ب نیامده' }, { step: 'باتری', quote: 'باتری هم مهمه، پس باز گوشیِ الف', verdict: 'incomplete', why: 'مقایسه با گوشیِ ب نیامده' }, { step: 'نتیجه', quote: 'پس الف رو می‌خرم', verdict: 'unchecked', dep: [2, 3] }], { cs: { nat: 'life', said: ['u'] } });
+    u = await say('چرا میگی مقایسه با گوشیِ ب نیامده؟'); pr = await PR();
+    chk(/حکمِ کدام گام را می‌گویی — گامِ ۲ یا گامِ ۳؟/.test(tq(u.user)) && !/خودت فکر می‌کنی چرا/.test(bold(u.user)) && !pr.steps.some(x => x.her === 'no'), 'U8 (tie, resume step not among the tied): the page asks which step — it does not guess and does not answer A073 :: ' + tq(u.user).slice(-260));
+    u = await say('چرا میگی سقف یا کف بودنش گفته نشده؟'); pr = await PR();
+    chk(pr.steps[0].her === 'no' && /گامِ ۱/.test(tq(u.user)) && /رد می‌کند/.test(tq(u.user) + ctx(u.user)), 'U8 (single match): «چرا میگی …؟» naming one step\'s reason is that step\'s dispute :: ' + tq(u.user).slice(0, 160));
+    // U3 / A26-7 — «کارِ خودم» در برابرِ روایتِ همین لحظه (خودِ واژه‌ها)
+    const calls = await p.evaluate(() => { const s = __cur(); const f = (t) => APP.STORY.priorAsk(s, '', t); return {
+      third: f('برای حالتِ دوم هم همین کار رو کردم، اینم کارِ خودمه، ببین: گامِ ۵: ۳ × ۴ = ۱۲. گامِ ۶: ۱۲ + ۵ = ۱۷.'), second: f('یه گزارشِ دوم از کارِ خودم: گامِ ۵ — مخزنِ ذخیره: برای ۲ روزِ ابری ۲ × ۱۲۵ = ۲۵۰ متر مکعب. گامِ ۶ — لوله: قطرِ ۶۳ میلی‌متر کافیه.'),
+      last: f('دیشب خودم نشستم حسابش رو کردم: ۳ × ۴ = ۱۲ و ۱۲ + ۵ = ۱۷.'), now: f('خودم حساب کردم: ۳ × ۴ = ۱۲ و ۱۲ + ۵ = ۱۷.'), sat: f('برای حراجِ بعدی هم نشستم حساب کردم: ۳ × ۴ = ۱۲ و ۱۲ + ۵ = ۱۷.'), other: f('همکارم این‌طوری حساب کرده بود: گام ۱: ۴ × ۲۴ = ۹۶. گام ۲: ۹۶ − ۸۰ = ۱۶.') }; });
+    chk(calls.third && calls.second && calls.last && !calls.now && !calls.sat && !calls.other, 'U3 / C26-7 / A26-7 / bank #127: «اینم کارِ خودمه»، «یه گزارشِ دوم از کارِ خودم»، «دیشب … حسابش رو کردم» are her prior work; «خودم حساب کردم»، «نشستم حساب کردم» mid-work and a colleague\'s steps are not :: ' + JSON.stringify(calls));
+    // 🔭 — کارتِ «کارِ پیشینِ تو» وضعِ تازه را نشان می‌دهد: «کنار گذاشته شد»، «بازنویسیِ خودش»، و ردِ حکمِ ✓ با دکمه همان‌جا دوباره حساب می‌شود
+    await wipe(); await fresh(); const pid = await bind('مصرفِ برقِ بخاری', 'ماهی چقدر برق مصرف می‌کنم؟ بخاری ۲ کیلوواته و روزی ۳ ساعت روشنه.');
+    await ppr(W, WP, { cs: { said: ['u', 'd'] } }); await say('گامِ ۴ رو کلاً گذاشتم کنار؛ فعلاً فقط مصرف رو می‌خوام.');
+    await ppr('ماهی ۶ × ۳۰ میشه یه چیزی نزدیکِ ۲۰۰، دقیقش رو باید ببینم.', [{ n: 2, quote: 'ماهی ۶ × ۳۰ میشه یه چیزی نزدیکِ ۲۰۰، دقیقش رو باید ببینم', verdict: 'incomplete', why: 'حاصلِ دقیق هنوز نوشته نشده' }]);
+    const card = await p.evaluate((pid) => { APP.go('lprob', pid); const R = [...document.querySelectorAll('#main .lp-prior-step')]; const no1 = R[0] && R[0].querySelector('.lp-prior-no'); if (no1) no1.click();
+      const R2 = [...document.querySelectorAll('#main .lp-prior-step')]; return { rows: R.map(r => r.textContent), after: R2.map(r => r.textContent), undo: !!(R2[0] && R2[0].querySelector('.lp-prior-undo')) }; }, pid);
+    chk(card.rows.length === 4 && /کنار گذاشته شد — به گفتهٔ خودت/.test(card.rows[3]) && !/ازسرگیری از این‌جا/.test(card.rows[3]) && /بازنویسیِ خودش — هنوز «درست» نیست/.test(card.rows[1]) && /ازسرگیری از این‌جا/.test(card.rows[1]), '🔭 card: set-aside step and her own rework are shown; the resume mark is on the reworked step, not on the set-aside one :: ' + JSON.stringify(card.rows.map(r => r.slice(0, 140))));
+    chk(/دوباره سنجیده شد \(حسابِ صفحه\): حکم ماند/.test(card.after[0] || '') && card.undo, '🔭 card (D26-11): pressing «✗ نه» on a ✓ step whose arithmetic the page read re-checks it on the spot, with «↩ پس می‌گیرم» :: ' + String(card.after[0]).slice(-200));
+  });
+
+  // ================= bank — همهٔ ورودی‌های Q4 ِ VARIANTS_R26.json (#99–#128)؛ متنِ هر نوبت عیناً از خودِ بانک (پس از «U: ») =================
+  await section('bank', async () => {
+    const U = (i) => E[i].text.split('U: ').pop().trim();
+    const LOAN = 'سلام. می‌خوام بدونم کدوم وام برام ارزون‌تره؛ خودم تا یه جایی حساب کردم، ببین درست رفتم (همهٔ عددها به میلیون تومنه):\nگام ۱: قسطِ بانکِ اول ماهی ۴٫۵ برای ۲۴ ماهه: ۴٫۵ × ۲۴ = ۱۰۸.\nگام ۲: سود = ۱۰۸ − ۸۰ = ۳۸.\nگام ۳: نسبت = ۳۸ ÷ ۸۰ = ۰٫۴۷۵.\nگام ۴: بانکِ دوم ۴۰ درصد سود می‌گیره، پس بانکِ دوم ارزون‌تره.';
+    const LOANP = [{ step: 'کلِ بازپرداخت', quote: '۴٫۵ × ۲۴ = ۱۰۸', verdict: 'ok', why: 'قسط × ماه' }, { step: 'سود', quote: 'سود = ۱۰۸ − ۸۰ = ۳۸', verdict: 'wrong', why: 'تفریق نمی‌خواند', cause: 'skill' },
+      { step: 'نسبت', quote: 'نسبت = ۳۸ ÷ ۸۰ = ۰٫۴۷۵', verdict: 'ok', why: 'تقسیم درست است ولی بر سودِ گامِ ۲ بنا شده', dep: [2] }, { step: 'نتیجه', quote: 'بانکِ دوم ۴۰ درصد سود می‌گیره، پس بانکِ دوم ارزون‌تره', verdict: 'incomplete', why: 'بر نسبتِ گامِ ۳ بنا شده', dep: [3] }];
+    const loan = async () => { await wipe(); await fresh(); return ppr(LOAN, LOANP, { cs: { said: ['u', 'd'] } }); };
+    const PROOF = 'می‌خوام ثابت کنم حاصل‌ضربِ دو عددِ فرد همیشه فرده، ولی یه جاش گیرم؛ کارِ خودم اینه. گام ۱: دو عددِ فرد رو 2a+1 و 2b+1 می‌گیرم. گام ۲: چون مجموعِ دو عددِ فرد زوجه، پس حاصل‌ضربشون هم زوجه. گام ۳: پس حکم ثابت نمیشه.';
+    const PROOFP = [{ step: 'نام‌گذاری', quote: 'دو عددِ فرد رو 2a+1 و 2b+1 می‌گیرم', verdict: 'ok' }, { step: 'زوج بودن', quote: 'چون مجموعِ دو عددِ فرد زوجه، پس حاصل‌ضربشون هم زوجه', verdict: 'wrong', why: 'از زوج بودنِ مجموع زوج بودنِ حاصل‌ضرب نتیجه نمی‌شود', cause: 'knot' }, { step: 'نتیجه', quote: 'پس حکم ثابت نمیشه', verdict: 'incomplete', why: 'بر گامِ ۲ بنا شده', dep: [2] }];
+    const proof = async () => { await wipe(); await fresh(); return ppr(PROOF, PROOFP, { cs: { said: ['u'], nat: 'objective' } }); };
+    const say = (text, o) => turn(text, (o && o.reply) || 'باشه.', [csn(Object.assign({ ph: 'e', said: [] }, o && o.cs || {}))]);
+    const ln = (pr, n) => { const x = pr.steps[n - 1]; return x ? [x.verdict, x.her || '', x.fixed ? 'F:' + x.fixed.t : '', x.retry ? 'RETRY' : '', x.re ? 'RE:' + x.re.by + ':' + x.re.was + '>' + x.re.to : '', x.drop ? 'DROP' : '', (x.depStale || []).join(), (x.depWrong || []).join()].join('|') : ''; };
+    const lines = () => p.evaluate(() => { const s = __cur(); const pr = APP.STORY.priorFor(s, ''); return pr ? APP.STORY.priorLines(pr) : []; });
+    const L = async (n) => (await lines()).filter(l => l.indexOf('گامِ ' + fa(n) + ' ·') === 0)[0] || '';
+    const DISP = /را رد می‌کند|رد کردی/;
+    let u, pr, pr0, l;
+
+    // #99 — a THIRD report she calls her own work
+    await loan();
+    await ppr('این هم ادامهٔ کارِ خودمه که دیشب نوشتم، ببین درسته: گامِ ۵: بانکِ دوم ماهی ۴٫۷ میلیون برای ۲۴ ماه: ۴٫۷ × ۲۴ = ۱۱۲٫۸. گامِ ۶: سودش ۱۱۲٫۸ − ۸۰ = ۳۲٫۸.', [{ step: 'بانکِ دوم', quote: '۴٫۷ × ۲۴ = ۱۱۲٫۸', verdict: 'ok' }, { step: 'سودِ دوم', quote: 'سودش ۱۱۲٫۸ − ۸۰ = ۳۲٫۸', verdict: 'ok' }]);
+    pr0 = await PR();
+    u = await ppr(U(99), [{ step: 'با کارمزد', quote: 'با کارمزد میشه ۱۰۸ + ۱٫۶ = ۱۰۹٫۶ میلیون', verdict: 'ok' }, { step: 'قسط', quote: 'ماهی ۱۰۹٫۶ ÷ ۲۴ ≈ ۴٫۵۷', verdict: 'ok' }]);
+    pr = await PR();
+    const e99 = (await eng('با کارمزد میشه ۱۰۸ + ۱٫۶ = ۱۰۹٫۶ میلیون')) && (await eng('ماهی ۱۰۹٫۶ ÷ ۲۴ ≈ ۴٫۵۷'));
+    T(99, pr0.steps.length === 6 && ask(u.user) && pr.steps.length === 8 && /۸ گام/.test(pr.sum) && pr.steps.slice(0, 6).every((x, k) => x.verdict === pr0.steps[k].verdict) && (!e99 || (pr.steps[6].verdict === 'ok' && pr.steps[7].verdict === 'ok')), { n0: pr0.steps.length, ask: ask(u.user), n: pr.steps.length, sum: pr.sum });
+    if (!e99) NC(99, 'merge, request and header count asserted (6 ⇒ 8 rows); the ✓ of گام ۷–۸ themselves («= ۱۰۹٫۶ میلیون», «≈ ۴٫۵۷») is the arithmetic reader\'s (Q1/C15, fixer «arith»): on this build a46 does not yet read both lines ✓ — asserted automatically once it does');
+
+    // #100 — her fix as ONE computation
+    await loan(); u = await say(U(100)); pr = await PR(); l = await L(2);
+    T(100, pr.steps[1].verdict === 'ok' && pr.steps[1].fixed && /۲۸/.test(pr.steps[1].fixed.t) && /۳۸/.test(pr.steps[1].fixed.was) && pr.resume === 3 && !NOREAD.test(l) && !/نمی‌خواند — گام همان می‌ماند/.test(l), { s2: ln(pr, 2), res: pr.resume, l: l.slice(0, 200) });
+
+    // #101 — her fix as a CHAIN covering the wrong step and its dependant
+    await loan(); u = await say(U(101)); pr = await PR();
+    T(101, pr.steps[1].verdict === 'ok' && pr.steps[1].fixed && okS(pr.steps[2]) && pr.steps[2].fixed && /۰٫۳۵/.test(pr.steps[2].fixed.t) && !(pr.steps[2].depStale || []).length && !(pr.steps[2].depWrong || []).length && pr.resume === 4, { s2: ln(pr, 2), s3: ln(pr, 3), res: pr.resume });
+
+    // #102 — ONE judged step made of two computations and a conclusion (state: after #101)
+    u = await ppr(U(102), [{ n: 4, quote: 'بانکِ اول = ۲۸ ÷ ۸۰ = ۰٫۳۵. بانکِ دوم = ۳۲ ÷ ۸۰ = ۰٫۴. پس بانکِ اول ارزون‌تره', verdict: 'ok', why: 'هر دو نسبت می‌خواند' }], { cs: { said: ['result'], result: 'پس بانکِ اول ارزون‌تره' } });
+    pr = await PR(); l = await L(4);
+    T(102, pr.steps[3].verdict === 'ok' && pr.steps[3].fixed && /بانکِ اول ارزون‌تره/.test(pr.steps[3].fixed.t) && /بانکِ دوم ارزون‌تره/.test(pr.steps[3].fixed.was) && pr.resume === 0 && !NOREAD.test(l) && !pr.steps[3].retry, { s4: ln(pr, 4), res: pr.resume });
+
+    // #126 — every row ✓: «همهٔ گام‌ها … درست» is legitimate here (state: after #102)
+    u = await say(U(126)); pr = await PR();
+    T(126, pr.steps.every(okS) && /همهٔ گام‌ها/.test(tq(u.user)) && /درست/.test(tq(u.user)), { q: tq(u.user).slice(0, 200), all: pr.steps.map(x => x.verdict).join() });
+
+    // #103 — a NON-numeric repair the model reports valid with her fresh quote
+    await proof(); u = await ppr(U(103), [{ n: 2, quote: 'حاصل‌ضربِ دو عددِ فرد فرده، چون (2a+1)(2b+1) = 2(2ab+a+b)+1', verdict: 'ok', why: 'اتحاد برقرار است' }]);
+    pr = await PR(); l = await L(2); const u103 = await say('خب، حالا چی؟');
+    T(103, pr.steps[1].verdict === 'ok' && pr.steps[1].fixed && /فرد فرده/.test(pr.steps[1].fixed.t) && /مجموعِ دو عددِ فرد/.test(pr.steps[1].fixed.was) && pr.resume !== 2 && !/مجموعِ دو عددِ فرد زوجه/.test(tq(u103.user)) && /اصلاح شد ⇐/.test(l), { s2: ln(pr, 2), res: pr.resume, q: tq(u103.user).slice(0, 160) });
+
+    // #104 — she confirms the non-numeric step was wrong, no new text yet
+    await proof(); u = await say(U(104)); pr = await PR(); l = await L(2);
+    T(104, pr.steps[1].verdict === 'wrong' && pr.steps[1].her === 'ok' && !pr.steps[1].fixed && !pr.steps[1].retry && pr.resume === 2 && !pr.steps[1].drop && !NOREAD.test(l) && !/نمی‌خواند/.test(l) && /تأییدِ تو/.test(l), { s2: ln(pr, 2), res: pr.resume, l: l.slice(-120) });
+
+    // #105 — a dispute BY MEANING of a ✓ verdict, the step named with an ordinal word
+    await loan(); u = await say(U(105)); pr = await PR(); l = await L(1);
+    T(105, /گامِ ۱/.test(tq(u.user)) && DISP.test(tq(u.user) + ctx(u.user)) && !/خودت فکر می‌کنی چرا/.test(bold(u.user)) && (pr.steps[0].her === 'no' || !!pr.steps[0].re) && /رد کردی|دوباره سنجیده شد/.test(l) && (pr.steps[0].herHist || []).some(h => h.noAt), { q: tq(u.user).slice(0, 220), s1: ln(pr, 1), l: l.slice(-160) });
+    u = await say('اشتباهی گفتم، حرفم رو پس می‌گیرم.'); pr = await PR(); l = await L(1);
+    chk(/رد ⇒ پس گرفته شد/.test(l) && pr.steps[0].her !== 'no' && !pr.steps[0].re, 'bank#105 (way to take it back): the dispute of step 1 is withdrawn from the chat :: ' + l.slice(-140));
+
+    // #106 — an explicit rejection of a ✓ verdict
+    await loan(); u = await say(U(106)); pr = await PR(); l = await L(1);
+    T(106, DISP.test(tq(u.user) + ctx(u.user)) && /گامِ ۱/.test(tq(u.user)) && pr.steps[0].verdict === 'ok' && pr.steps[0].re && pr.steps[0].re.by === 'page' && /۴[.٫]۵/.test(pr.steps[0].re.why) && /۱۰۸/.test(pr.steps[0].re.why) && /دوباره سنجیده شد \(حسابِ صفحه\): حکم ماند/.test(l), { q: tq(u.user).slice(0, 200), re: pr.steps[0].re, l: l.slice(-200) });
+
+    // #107 — a TAKE-BACK of a dispute, with «قبول ندارم» quoted inside it
+    await loan(); await ppr('حکمِ گامِ ۳ رو قبول ندارم، به نظرم نسبت همینه.', [{ n: 3, quote: 'نسبت = ۳۸ ÷ ۸۰ = ۰٫۴۷۵', verdict: 'incomplete', why: 'دوباره سنجیده شد: تقسیم می‌خواند ولی ۳۸ از گامِ ۲ می‌آید' }]);
+    pr0 = await PR(); u = await say(U(107)); pr = await PR(); l = await L(3);
+    T(107, pr0.steps[2].verdict === 'incomplete' && !!pr0.steps[2].re && !/را رد می‌کند/.test(tq(u.user) + ctx(u.user)) && /پس می‌گیرد/.test(tq(u.user) + ctx(u.user)) && /رد ⇒ پس گرفته شد/.test(l) && pr.steps[2].verdict === 'ok' && pr.steps[2].her !== 'no' && !pr.steps[2].re && (pr.steps[2].reHist || []).length === 1,
+      { before: ln(pr0, 3), after: ln(pr, 3), q: (tq(u.user) + ctx(u.user)).slice(0, 200), l: l.slice(-140) });
+
+    // #108 — a mixed reply whose «نه» comes at the END
+    await loan(); u = await say(U(108)); pr = await PR();
+    T(108, pr.steps[3].her === 'ok' && pr.steps[2].her !== 'ok' && (pr.steps[2].her === 'no' || !!pr.steps[2].re) && !/حکمِ گامِ ۳[^.]*پذیرفتی/.test(tq(u.user)) && /گامِ ۳/.test(tq(u.user) + ctx(u.user)) && DISP.test(tq(u.user) + ctx(u.user)), { s3: ln(pr, 3), s4: ln(pr, 4), q: tq(u.user).slice(0, 200) });
+
+    // #109 — acceptance first, rejection second, different verbs
+    await loan(); u = await say(U(109)); pr = await PR(); const u109 = await say('نه دیگه، همون ۳۸ درسته.'); const pr109 = await PR();
+    T(109, pr.steps[2].her === 'ok' && pr.steps[1].verdict === 'wrong' && pr.steps[1].re && pr.steps[1].re.by === 'page' && pr.steps[1].re.to === 'wrong' && !!pr.steps[1].reAt && /گامِ ۲/.test(tq(u.user)) && DISP.test(tq(u.user) + ctx(u.user)) && pr109.steps[1].verdict === 'wrong' && !/به چه دلیل درست است/.test(tq(u109.user)),
+      { s2: ln(pr, 2), s3: ln(pr, 3), q: tq(u.user).slice(0, 160), q2: tq(u109.user).slice(0, 160) });
+
+    // #110 — a fixed step that carried an old dispute reason
+    await loan(); await say('گامِ ۲ رو قبول ندارم، ۳۸ درسته.'); pr0 = await PR(); await say('آها دیدم، ۱۰۸ منهای ۸۰ میشه ۲۸، نه ۳۸'); pr = await PR(); l = await L(2);
+    const hist110 = (await items()).filter(x => x.k === 'prior').map(x => x.t).join(' ‖ ');
+    T(110, !!pr0.steps[1].re && pr.steps[1].verdict === 'ok' && pr.steps[1].fixed && !pr.steps[1].re && !/حکم ماند/.test(l) && !/دوباره سنجیده شد/.test(l) && (pr.steps[1].reHist || []).length >= 1 && /حکم رد شد/.test(hist110) && /اصلاح شد/.test(hist110), { l: l.slice(0, 260), hist: hist110.slice(0, 300) });
+
+    // #111 — her correct recomputation, result followed by a scale word
+    await loan(); u = await say(U(111)); pr = await PR(); l = await L(2);
+    T(111, pr.steps[1].verdict === 'ok' && pr.steps[1].fixed && /۲۸/.test(pr.steps[1].fixed.t) && !/۳۸/.test(pr.steps[1].fixed.t) && /۳۸/.test(pr.steps[1].fixed.was) && /اصلاح شد ⇐/.test(l) && !/نمی‌خواند/.test(l), { s2: ln(pr, 2), l: l.slice(0, 220) });
+
+    // #112 — a correct fix AND a new wrong line in one message
+    await loan(); u = await say(U(112)); pr = await PR(); l = await L(3);
+    T(112, pr.steps[1].verdict === 'ok' && pr.steps[1].fixed && /۲۸/.test(pr.steps[1].fixed.t) && !okS(pr.steps[2]) && pr.resume === 3 && !/همهٔ گام‌های پیشینت درست درآمد/.test(tq(u.user)) && /گامِ ۳/.test(tq(u.user)) && !/۰٫۳۵/.test(l), { s2: ln(pr, 2), s3: ln(pr, 3), res: pr.resume, q: tq(u.user).slice(0, 200), l: l.slice(-200) });
+
+    // #113 — she makes a step OBSOLETE
+    await loan(); u = await say(U(113)); pr = await PR(); l = await L(4);
+    await say('درستش کردم: سود = ۱۰۸ − ۸۰ = ۲۸. نسبت = ۲۸ ÷ ۸۰ = ۰٫۳۵، یعنی ۳۵ درصد'); const pr113 = await PR(); const u113 = await say('خب بعدش؟');
+    T(113, pr.steps[3].drop && pr.steps[3].drop.by === 'her' && /کنار گذاشته شد — به گفتهٔ خودت/.test(l) && pr.resume === 2 && pr113.resume === 0 && pr113.steps[3].drop && pr113.steps[3].verdict === 'incomplete' && !/گامِ ۴/.test(tq(u113.user)), { s4: ln(pr, 4), res: [pr.resume, pr113.resume], l: l.slice(-140), q: tq(u113.user).slice(0, 160) });
+
+    // #114 — re-reports of an unchanged ✓ step: credited once
+    await loan(); const ev0 = (await evs()).filter(e => e.prior === 1 && e.ok).length;
+    for (const t of ['کارِ خودم رو یه بار دیگه می‌نویسم: گام ۱: ۴٫۵ × ۲۴ = ۱۰۸. گام ۲: هنوز سرِ سودم.', 'باز هم کارِ خودم: گام ۱: ۴٫۵ × ۲۴ = ۱۰۸. گام ۲: سود رو بعداً می‌گم.', 'و برای بارِ سوم کارِ خودم: گام ۱: ۴٫۵ × ۲۴ = ۱۰۸. گام ۲: همون.'])
+      await ppr(t, [{ n: 1, quote: '۴٫۵ × ۲۴ = ۱۰۸', verdict: 'ok', why: 'قسط × ماه' }]);
+    pr = await PR(); const ev1 = (await evs()).filter(e => e.prior === 1 && e.ok).length, m114 = (await mind()).filter(x => /^\+/.test(x)).length;
+    T(114, ev0 === 1 && ev1 === 1 && pr.steps.length === 4 && m114 <= 2, { ev0, ev1, n: pr.steps.length, mind: m114 });
+
+    // #115 — take-back from chat of a mistaken ✗ on a ✓ verdict (button)
+    await loan(); await setHer(1, 'no'); u = await say(U(115)); pr = await PR(); l = await L(1); const u115 = await say('خب.');
+    T(115, pr.steps[0].her === 'ok' && pr.steps[0].verdict === 'ok' && (pr.steps[0].herHist || []).some(h => h.undoAt) && !pr.steps[0].re && !DISP.test(tq(u.user) + ctx(u.user)) && !/حکمِ گامِ ۱/.test(tq(u115.user)) && /رد ⇒ پس گرفته شد/.test(l), { s1: ln(pr, 1), q: tq(u.user).slice(0, 160), l: l.slice(-120) });
+
+    // #116 — mid-solution arithmetic with «خودم … حساب کردم» (live problem, execution stage)
+    await wipe(); await fresh(); let pid = await bind('چند جعبه کاشی', 'برای دیوارِ آشپزخانه چند جعبه کاشی بخرم؟ هر ردیف ۴۵ کاشی می‌خواهد و ۳ ردیف دارم؛ ۲۰ کاشی هم برای برش کنار می‌گذارم.');
+    await p.evaluate((pid) => __liveSet(pid, (S0, L0) => { S0.u = { whole: 'می‌خواهم شمارِ کاشی‌ها را پیدا کنم', unknown: 'شمارِ کاشی' }; L0.plan = { t: 'ردیف‌ها را ضرب می‌کنم و برش را اضافه می‌کنم', at: APP.nowISO() }; L0.steps.push({ t: 'ردیف‌ها را شمردم: ۳ ردیف', at: APP.nowISO(), ok: true }); }), pid);
+    u = await say(U(116), { cs: { said: ['result'], result: '۳ × ۴۵ = ۱۳۵ و با ۲۰ تا میشه ۱۵۵' } }); pr = await PR(pid);
+    T(116, !ask(u.user) && !/# کارِ پیشینِ تو/.test(head(u.user)) && !pr && !(await PR()), { ask: ask(u.user), pr: pr && pr.sum });
+
+    // #117 / #118 — post-closure arithmetic, and a mastery answer after the closure (the problem carried a ledger)
+    const closed = async () => { await wipe(); await fresh(); const id = await bind('کدام وام ارزان‌تر است', 'کدام وام برایم ارزان‌تر است؟ بانکِ اول ماهی ۴٫۵ میلیون برای ۲۴ ماه، بانکِ دوم ۴۰ درصد سود.');
+      await ppr(LOAN, LOANP, { cs: { said: ['u', 'd'] } }); await say('درستش کردم: سود = ۱۰۸ − ۸۰ = ۲۸. نسبت = ۲۸ ÷ ۸۰ = ۰٫۳۵، یعنی ۳۵ درصد');
+      await p.evaluate((id) => __liveSet(id, (S0, L0) => { L0.state = 'solved'; L0.solvedAt = APP.nowISO(); }), id); return id; };
+    pid = await closed(); pr0 = await PR(pid); u = await say(U(117)); pr = await PR(pid);
+    T(117, !!pr0 && !ask(u.user) && !/نقطهٔ ازسرگیری/.test(tq(u.user)) && pr.steps.length === pr0.steps.length && JSON.stringify(pr.steps.map(x => [x.verdict, x.her, !!x.fixed])) === JSON.stringify(pr0.steps.map(x => [x.verdict, x.her, !!x.fixed])) && !(await PR()), { ask: ask(u.user), n: [pr0.steps.length, pr.steps.length], chat: !!(await PR()) });
+    pid = await closed(); u = await say(U(118)); pr = await PR(pid);
+    T(118, !ask(u.user) && !/نقطهٔ ازسرگیری/.test(tq(u.user)) && !/"prior":\[\{"step"/.test(head(u.user)) && !(await PR()), { ask: ask(u.user), q: tq(u.user).slice(0, 120) });
+    NC(118, 'the mastery question itself (asked after chat_solved) and the routing of her answer to the mastery check are the practice/closure layers; here the Q4 half is asserted on a closed problem that carried a ledger: no report request, no prior contract, no new ledger');
+
+    // #119 — a practice-session report
+    await wipe(); await fresh(); u = await say(U(119));
+    T(119, !ask(u.user) && !/# کارِ پیشینِ تو/.test(head(u.user)) && !/کلِ مسئله را در یک جمله/.test(bold(u.user)) && !(await PR()), { ask: ask(u.user), b: bold(u.user).slice(0, 160) });
+    NC(119, '«booked as the practice session» is the practice layer (a35/a40); the Q4 half asserted: no prior block, no report request, no «کلِ مسئله را در یک جمله» turn question, no ledger');
+
+    // #120 — an intermediate result about something else
+    await loan(); u = await say(U(120), { cs: { said: ['result'], result: '۸۰ × ۰٫۰۲ = ۱٫۶ میلیون' } }); pr = await PR(); l = await L(2);
+    T(120, pr.steps[1].verdict === 'wrong' && !pr.steps[1].fixed && pr.steps[1].her !== 'ok' && !pr.steps[1].retry && pr.resume === 2 && !/تأییدِ تو/.test(l) && !/۱٫۶/.test(l), { s2: ln(pr, 2), l: l.slice(0, 200) });
+
+    // #121 — her «fix» is still wrong; the model calls it valid (C8)
+    await loan(); u = await ppr(U(121), [{ n: 2, quote: 'پس سود میشه ۲۹ میلیون', verdict: 'ok', why: 'تفریق' }], { cs: { said: ['result'], result: 'پس سود میشه ۲۹ میلیون' } }); pr = await PR(); l = await L(2); const u121 = await say('خب؟');
+    T(121, pr.steps[1].verdict === 'wrong' && !pr.steps[1].fixed && pr.steps[1].retry && pr.resume === 2 && /با حسابِ صفحه نمی‌خواند/.test(l) && !/۲۸/.test(l) && !/۲۸/.test(tq(u121.user)) && /گامِ ۲/.test(tq(u121.user)), { s2: ln(pr, 2), l: l.slice(-220), q: tq(u121.user).slice(0, 200) });
+
+    // #122 — looks like a take-back, but what she takes back is an ACCEPTANCE
+    await loan(); await say('گامِ ۳ رو قبول دارم.'); pr0 = await PR(); u = await say(U(122)); pr = await PR();
+    T(122, pr0.steps[2].her === 'ok' && pr.steps[2].her !== 'ok' && (pr.steps[2].her === 'no' || !!pr.steps[2].re) && DISP.test(tq(u.user) + ctx(u.user)) && /گامِ ۳/.test(tq(u.user)) && !/پس می‌گیرد/.test(tq(u.user) + ctx(u.user)), { before: ln(pr0, 3), after: ln(pr, 3), q: tq(u.user).slice(0, 200) });
+
+    // #123 — look-alike of the mixed reply, both accepted
+    await loan(); u = await say(U(123)); pr = await PR();
+    T(123, pr.steps[3].her === 'ok' && pr.steps[2].her === 'ok' && !pr.steps.some(x => x.her === 'no' || x.re) && !DISP.test(tq(u.user) + ctx(u.user)), { s3: ln(pr, 3), s4: ln(pr, 4) });
+
+    // #124 — «نه هنوز» about her time
+    await loan(); u = await say(U(124)); pr = await PR();
+    T(124, !pr.steps[2].her && !pr.steps[2].re && !(pr.steps[2].herHist || []).length && !DISP.test(tq(u.user) + ctx(u.user)), { s3: ln(pr, 3), q: tq(u.user).slice(0, 160) });
+
+    // #125 — postponing, not discarding
+    await loan(); u = await say(U(125)); pr = await PR();
+    T(125, !pr.steps[3].drop && pr.steps[3].verdict === 'incomplete' && pr.resume === 2 && !/کنار گذاشته/.test(await L(4)), { s4: ln(pr, 4), res: pr.resume });
+
+    // #127 — a report of SOMEONE ELSE's work
+    await loan(); const e127 = (await evs()).length; u = await ppr(U(127), [{ step: 'همکار', quote: '۴ × ۲۴ = ۹۶', verdict: 'ok' }]); pr = await PR();
+    T(127, !ask(u.user) && pr.steps.length === 4 && (await evs()).length === e127 && !/۹۶/.test((await lines()).join('\n')), { ask: ask(u.user), n: pr.steps.length });
+
+    // #128 — she restates a ✓ step
+    await loan(); const e128 = (await evs()).length; u = await say(U(128)); pr = await PR();
+    T(128, pr.resume === 2 && !pr.steps[0].her && !pr.steps[0].re && !pr.steps[0].fixed && (await evs()).length === e128 && !DISP.test(tq(u.user) + ctx(u.user)), { s1: ln(pr, 1), res: pr.resume });
+  });
 
   const ids = Object.keys(E).map(Number).filter(own), nb = ids.length, nbOk = ids.filter(i => info.bank[i]).length, miss = ids.filter(i => !(i in info.bank));
   if (!process.env.ONLY || process.env.ONLY.split(',').includes('bank')) { chk(!miss.length, 'bank: entries not exercised: ' + miss.join(','));
