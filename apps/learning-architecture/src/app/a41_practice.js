@@ -1483,6 +1483,9 @@
     var chatFc = function (judged) { return S.all("fcast", function (x) { return x && !x.sample && !x.prc && !x.live && (x.by === "chat" || (x.src && x.src.chat)) && (judged ? (x.outcome === "شد" || x.outcome === "نشد") : !x.outcome); }); };
     var bind = function (f) { if (f && !f.prc) { f.prc = c.id; if (f.tid == null) f.tid = 24; } return f; };
     var open = PR.linkedFcasts(c).filter(function (x) { return !x.outcome; }).concat(chatFc(false)), txt = (a.what || "") + " " + (a.quote || ""), out = ok ? "شد" : "نشد";
+    /* دورِ ۲۶ (story Q3، U15 = B26·D32 oB1 p31 «گفته بودم ۵ روز با ۶۰ درصد اطمینان، شد ۴» ⇒ 🎯 ِ شام (۹۰٪، پیش از موعد) «نشد»): اطمینانی که خودش همین حالا گفت نامِ
+       پیش‌بینی است — پیش‌بینیِ بازی که اطمینانِ دیگری دارد نامزدِ این گزارش نیست (هم‌واژگی یا عددِ مشترکِ اتفاقی کافی نیست)؛ آن‌گاه همان پیش‌بینیِ داوری‌شدهٔ هم‌اطمینان (پایین) */
+    if (pc != null) open = open.filter(function (x) { return x.p == null || x.p === pc; });
     var hit = open.filter(function (x) { return PR.sameAct(x.q, txt); }), due = open.filter(function (x) { return x.due && x.due <= today(); });
     /* دورِ ۲۲ (P6، A22-15): چند 🎯 ِ هم‌واژه («گلدانِ ۲۴ ساعت…»، «گلدانِ ۸ ساعت…») ⇒ با عددهای خودِ او: درصدی که گفت همان اطمینانِ
        پیش‌بینی است («اون پیش‌بینیِ ۶۰ درصدیم»)، و عددهای دیگرِ حرفش («۲۴ ساعت») در متنِ همان پیش‌بینی؛ هنوز چندتا ⇒ همان «کدام؟» */

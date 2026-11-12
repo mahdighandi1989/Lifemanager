@@ -684,6 +684,10 @@
     /* مسئلهٔ گفت‌وگویی که همین pk اش مسئلهٔ زنده شد و حل شد ⇒ مقصد رسیده (نه «اکنون: فهمِ مسئله» ِ کهنه — D23-21) */
     var livedP = rid.sess && ST.livedPk ? ST.livedPk(se0, pkNow) : "", livedPh = livedP && A.livePhase ? A.livePhase(livedP) : "";
     var solvedNow = /^حل شد/.test(D.state || "") || D.phase === "done" || livedPh === "done" || livedPh === "b";
+    /* دورِ ۲۶ (story Q6، C26-2 — s21، pC1–pC3: 🧭 «مقصد — حل شد ✓ · هیچ — به مقصد رسیدی» در حالی که صفحهٔ مسئله می‌گوید «در بازنگری — هنوز بسته نشده»): «حل شد» فقط از بستنِ
+       خودِ صفحه (A.liveClosure). «✅ حل شد» زده شده و بازنگری هنوز ثبت نشده ⇒ نقشه «بازنگری» می‌گوید، مقصد همان خواستهٔ اوست و مانده «فقط بازنگریِ خودت». */
+    var rev26 = false; try { var cp26 = rid.pid || livedP, cl26 = cp26 && A.liveClosure ? A.liveClosure(cp26) : null; rev26 = !!(cl26 && cl26.state === "review"); } catch (e) { }
+    if (rev26) solvedNow = false;
     var openW = dets.filter(function (d) { return d.open && d.kind === "sys"; });
     var openD = dets.filter(function (d) { return d.open && d.kind !== "sys"; }), nowI = solvedNow ? -2 : openD.length ? openD[openD.length - 1].pts.slice(-1)[0] : lastMain;
     var st = D.stages || [], left = st.filter(function (x) { return !x.reached; }).length, cur = st.filter(function (x) { return x.now; })[0];
@@ -691,10 +695,10 @@
     var pl = planLeft(rid), planTx = !pl ? "" : pl.none ? "نامعلوم — طرح هنوز نیست" : pl.prior ? fa(Math.max(0, pl.n - pl.done)) + " گام از " + fa(pl.n) + " گامِ کارِ پیشینت" + (pl.cur && pl.done < pl.n ? " (ازسرگیری: «" + clip(pl.cur, 40) + "»)" : "") : fa(Math.max(0, pl.n - pl.done)) + " گام از " + fa(pl.n) + " گامِ طرحت" + (pl.chat ? " (از گفت‌وگو" + (pl.cur && pl.done < pl.n ? "؛ گامِ کنونی: «" + clip(pl.cur, 40) + "»" : "") + ")" : "");
     /* «مانده» فقط آنچه مانده — «اکنون» جای خودش را دارد و در «مانده» تکرار نمی‌شود (A23-8، D23-21) */
     /* دورِ ۲۴ (R7، C24-17): پس از نتیجه (مرحلهٔ بازنگری، یا همهٔ مرحله‌ها رسیده) «طرح هنوز نیست» دروغ است — مانده فقط بازنگری است */
-    var atBack24 = !solvedNow && (phNow === "b" || (st.length > 0 && left === 0));
+    var atBack24 = !solvedNow && (rev26 || phNow === "b" || (st.length > 0 && left === 0));
     if (atBack24) planTx = "";
     var remain = solvedNow ? "هیچ — به مقصد رسیدی" : atBack24 ? ["فقط بازنگریِ خودت — حل به نتیجه رسید", openD.length ? fa(openD.length) + " پیش‌نیازِ باز تا برگشت به خط" : "", openW.length ? openW.map(function (d) { return "⏸ «" + clip(d.step, 40) + "» منتظرِ برگهٔ " + (d.sheet ? "#" + fa(d.sheet) : "محلی"); }).join("، ") : ""].filter(Boolean).join(" · ") : [planTx, st.length ? fa(left) + " مرحله از " + fa(st.length) : "", openD.length ? fa(openD.length) + " پیش‌نیازِ باز تا برگشت به خط" : "", openW.length ? openW.map(function (d) { return "⏸ «" + clip(d.step, 40) + "» منتظرِ برگهٔ " + (d.sheet ? "#" + fa(d.sheet) : "محلی"); }).join("، ") : ""].filter(Boolean).join(" · ");
-    var nowFa = solvedNow ? (livedPh === "b" ? "بازنگری — حل شد" : "مقصد — حل شد") : openD.length ? "پیش‌نیازِ «" + clip(openD[openD.length - 1].concept, 50) + "»" : (cur ? cur.fa.replace(/^[۰-۹0-9]\)\s*/, "") : PH_FA[phNow] || "");
+    var nowFa = solvedNow ? (livedPh === "b" ? "بازنگری — حل شد" : "مقصد — حل شد") : rev26 ? "بازنگری — هنوز بسته نشده" : openD.length ? "پیش‌نیازِ «" + clip(openD[openD.length - 1].concept, 50) + "»" : (cur ? cur.fa.replace(/^[۰-۹0-9]\)\s*/, "") : PH_FA[phNow] || "");
     return { id: id, kind: rid.pid ? "live" : "sess", title: rid.sess && originTx ? clip(originTx, 70) : D.title, origin: clip(originTx, 160), originEv: originEv, dest: solvedNow ? "حل شد ✓" : destOf(rid), destQ: destOf(rid), reached: solvedNow, now: nowI, nowFa: nowFa, remain: remain, pts: pts, dets: dets, backs: backs, state: D.state, phase: rid.pid ? D.phase : phNow };
   };
   /* شکلِ عمودی: مبدأ بالا، مقصد پایین، خطِ اصلی راست (RTL)، انحراف‌ها نقطه‌چین به چپ و برگشت به خط، پرشِ برگشت قوسِ خط‌چین سمتِ راست */

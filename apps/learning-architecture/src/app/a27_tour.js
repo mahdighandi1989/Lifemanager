@@ -2215,6 +2215,9 @@
     /* پس از بستن، آشکارسازِ مسئله بس نیست — گزارشِ نتیجه دربارهٔ همان مسئله («مثلث…»، عددها) هم آن را روشن می‌کند؛ مسئلهٔ تازه پرسشی از خودش دارد
        («…کجا برم؟»، «چطور…») یا گشایشِ هدف/گیر (OPEN22)، و گزارشِ نتیجه نیست */
     var afterClose23 = closedHere23 && !((/[؟?]/.test(ownText(mt)) || AS.open22(mt)) && statesProblem(mt) && !solvedSaid(mt));
+    /* دورِ ۲۶ (story Q3، C21 — oB1 p29/p31، B26x oB1 p25/p28): او با نام به مسئلهٔ بسته‌ای برگشته (a45 ST.namedClosed) ⇒ حرفِ این نوبت دربارهٔ همان مسئله است (اصلاح، نتیجهٔ
+       دیرآمده، سرانجامِ پیش‌بینی)، نه صورتِ یک مسئلهٔ تازهٔ گفت‌وگو — مسئلهٔ تازه فقط با معرفیِ خودش («یه مسئلهٔ دیگه دارم: …») */
+    try { if (closedHere23 && A.STORY && A.STORY.namedClosed && A.STORY.namedClosed(s)) afterClose23 = true; } catch (e) { }
     var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23;
     /* تورِ پولیا (RM6c، B·D1 s11): «پس X = n» ِ الگو (RESULT_WEAK) به‌تنهایی مرحله را به بازنگری نمی‌برد — فرمول/عدد درونِ ادعا یا هنگامِ گفتنِ
        صورت نتیجه نیست؛ مرحله فقط با گزارشِ مدل (said:result) یا نتیجهٔ ثبت‌شده؛ الگو فقط پیشنهاد می‌کند (C.prev.weakRes ⇒ سطرِ زمینه) */
@@ -2612,6 +2615,9 @@
     var fwd = cl === "p" && ORD[ph0] < ORD.p && (st.u || (!pasted && C.stmt) || (P && P.work && (stuck || fail)));
     /* دورِ ۲۵ (P5، B25·D9): همان داوریِ دفترِ داستان (a45 ST.subRes) — نتیجهٔ میانی مرحله را جابه‌جا نمی‌کند (پیش‌تر هر said:result ⇒ «بازنگری») */
     var sub25 = false; try { sub25 = said.indexOf("result") >= 0 && !!(A.STORY && A.STORY.subRes && (A.STORY.subRes(s, (P && P.live) || "", ut) || (A.STORY.splitOff && A.STORY.splitOff(s, ut) > 0))); } catch (e) { }
+    /* دورِ ۲۶ (Q6، U11 = B25·D9 STILL — tB1 p6، aB1 p3، aB3 p5، pwB1 p8؛ C26-4): همان یک داوریِ دفترِ داستان با شاهدِ مثبت (a45 ST.wholeRes) — «نتیجه» فقط وقتی
+       مسئله را به «بازنگری» می‌برد که جوابِ کل باشد؛ پیش‌تر هر نتیجه‌ای که «میانی» بودنش ثابت نمی‌شد جوابِ کل شمرده می‌شد */
+    try { if (!sub25 && said.indexOf("result") >= 0 && A.STORY && A.STORY.wholeRes && !A.STORY.wholeRes(s, (P && P.live) || "", ut, a)) sub25 = true; } catch (e) { }
     if (said.indexOf("result") >= 0 && !sub25) ph = "b";
     else if (sub25) ph = ph0;
     else if (fail) ph = fwd ? "p" : cl && ORD[cl] < ORD[ph0] ? cl : (ph0 === "b" || ph0 === "c" ? "c" : ph0);
