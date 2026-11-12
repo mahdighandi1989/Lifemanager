@@ -2,10 +2,11 @@
 //  جمله‌های خودِ اجراکننده‌ها (round26{A,B,B_x,C,D}/<sid>/ai/pN.json)، هر مثبت قرمز روی ساختِ پایه (BASE26 = 23e351f6):
 //   Q5 — B26·D24/D25 (pwB2 p11–p15) · B26·D11 (bp2 p11) · B26·D3 (s14 p5) · B26·D1 (s20) · B26·D14 (s19) · U21/U22 (B_x s19، oB1 s32) · A26-6 (s02 p11→12) · A26-12/-13 (s04) ·
 //        A26-21 (aA1، pwA2) · A26-49 (oA1 p26) · C26-19 (tC1 p12) · C26-28 (aC3) · C26-41 (s28 p4) · D26-37 (dp2 p9) · D26-41 (s35 p14) · D26-51 (dp3 p12–13)
+//        D23-10 STILL (oD1 p8، s35 p10، s36 p7)
 //   Q8 — A26-28 (aA3 p7–8، aA4 p8–9) · U49/U50 (aB3 p9–p14) · D26-14 (pwD1 p5–6) · B26·D32 (oB1 p31–32) · B25·D22 STILL (oB1 p14) · D26-23 (oD1 p17) · A26-46 (oA1 p16–17)
 //  و بانکِ مستقلِ VARIANTS_R26 (tests/variants/VARIANTS_R26.json): Q5 = #130–#162، Q8 = #203–#221.
 //  هیچ تاریخی در انتظارها نوشته نشده: همه از ساعتِ یخ‌زدهٔ T0 حساب می‌شوند.
-// LLA_FILE = ساختِ دیگر (قرمزِ اول)؛ ONLY=reader,ask,model,pred,bank5,bank8
+// LLA_FILE = ساختِ دیگر (قرمزِ اول)؛ ONLY=reader,ask,model,pred,corr,bank5,bank8
 const { chromium } = require('playwright');
 const path = require('path');
 const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'dist', 'learning-architecture.html'));
@@ -37,6 +38,8 @@ const HELPERS = () => {
   window.__dq = () => APP.dueList().filter(d => /^📅/.test(d.txt || ''));
   window.__ask = () => __sysLines().filter(x => /^📅/.test(x));
   window.__fa = (d) => APP.fdate(d);
+  /* تاریخِ گزارشِ مدل در ورودیِ آزمون نسبی است: «+N» = N روز پس از امروزِ صفحه */
+  window.__rel = (acts) => { (acts || []).forEach(a => { if (a && a.plan && /^\+\d+$/.test(String(a.plan.when))) a.plan.when = APP.addDays(APP.today(), +String(a.plan.when).slice(1)); }); return acts; };
 };
 
 (async () => {
@@ -294,19 +297,36 @@ const HELPERS = () => {
     X('A26-46 oA1 p16→p23: پس از «پس پیش‌بینیم غلط بود» همان یک 🎯 ِ ۷۰٪ «نشد» است و «امروز» دیگر «شد یا نشد؟» نمی‌پرسد', n2.fc.length === 1 && n2.fc[0].p === 70 && n2.fc[0].out === 'نشد' && n2.today.length === 0 && n3.length === 0, { n, n2, n3 });
   });
 
+  /* ===== D23-10 STILL (oD1 p8، s35 p10، s36 p7): بلوکِ «# اصلاحِ پیامِ پیشین (شاید)» برای سه شکلِ جاافتاده ===== */
+  await section('corr', async () => {
+    await fresh(0);
+    const r = await E(async () => { const o = {}, B = /# اصلاحِ پیامِ پیشین \(شاید\)/;
+      await __say('می‌خوام یه ترازو بسازم که بفهمه مادرم قرصش رو برداشته یا نه. هر قرص ۰٫۳ گرمه و نویزِ حسگر ۰٫۰۵ گرمه.', 'مجهول چیست؟', [__cs({ ph: 'u' })]);
+      o.oD1 = B.test(await __say('آره جدا ثبتش کن ولی بعداً. یه اشتباه هم کردم: اولش گفتم هر قرص ۰٫۳ گرمه؛ امروز با ترازو وزن کردم، قرص‌های مادرم ۰٫۲۵ گرمه.', 'اصلاحت را به صفحه می‌دهم.', [__cs({})]));
+      __freshChat(); await __say('می‌خوام تفکیکِ زبالهٔ محله جا بیفته. شنبه با مسئولای کوچه‌ها جلسه می‌ذارم.', 'خب.', [__cs({})]);
+      o.s35 = B.test(await __say('نه، شنبه نه — یکشنبه؛ شنبه مسجد مراسم داره.', 'اصلاحتان را می‌دهم.', [__cs({})]));
+      __freshChat(); await __say('۲۰ لیتر آب‌نمک ۱۰٪ داریم و ۵ لیتر آبِ خالص بهش اضافه می‌کنیم. غلظتِ تازه چند درصده؟', 'مجهول چیست؟', [__cs({ ph: 'u' })]);
+      o.s36 = B.test(await __say('یه لحظه! صورتِ مسئله رو دوباره از کتاب دیدم: ظرفِ اول ۳۰ لیتر بود، نه ۲۰ لیتر. پس جوابم عوض میشه؟', 'بله.', [__cs({ ph: 'u' })]));
+      o.neg = B.test(await __say('ظرفِ دوم ۵ لیتر بود و بعدش ۲ لیترِ دیگه هم ریختیم.', 'خب.', [__cs({ ph: 'u' })]));
+      return o; });
+    X('D23-10 STILL oD1 p8 «یه اشتباه هم کردم: اولش گفتم هر قرص ۰٫۳ گرمه؛ … ۰٫۲۵ گرمه» ⇒ بلوکِ «اصلاحِ پیامِ پیشین (شاید)» می‌آید', r.oD1, r);
+    X('D23-10 STILL s35 p10 «نه، شنبه نه — یکشنبه؛ …» ⇒ بلوک می‌آید', r.s35, r);
+    X('D23-10 STILL s36 p7 «ظرفِ اول ۳۰ لیتر بود، نه ۲۰ لیتر» ⇒ بلوک می‌آید؛ همانند: «ظرفِ دوم ۵ لیتر بود و بعدش ۲ لیترِ دیگه هم ریختیم» ⇒ نه', r.s36 && !r.neg, r);
+  });
+
   /* ===== بانکِ مستقل — Q5 (#130–#162) ===== */
   await section('bank5', async () => {
-    const ask1 = async (dayN, text, acts) => { await fresh(dayN); return E(async ([text, acts]) => { await __say(text, 'خب.', acts || []); return { ask: __ask(), pend: ((__cur().datePend || {}).items || []).map(x => ({ date: x.date, amb: !!x.amb })), dl: __dl(), pl: __pl(), today: __today().filter(x => /موعد|⏰/.test(x)), td: APP.today() }; }, [text, acts]); };
+    const ask1 = async (dayN, text, acts) => { await fresh(dayN); return E(async ([text, acts]) => { await __say(text, 'خب.', __rel(acts || [])); return { ask: __ask(), pend: ((__cur().datePend || {}).items || []).map(x => ({ date: x.date, amb: !!x.amb })), dl: __dl(), pl: __pl(), today: __today().filter(x => /موعد|⏰/.test(x)), td: APP.today() }; }, [text, acts]); };
     const plus = (r, n) => E(([d, n]) => APP.addDays(d, n), [r.td, n]);
     const yes = (t) => E(async (t) => { const n0 = __sysLines().length; await __say(t || 'آره', 'خب.', [__cs({})]); return { dl: __dl(), pl: __pl(), lines: __sysLines().slice(n0), ask: __ask(), pend: ((__cur().datePend || {}).items || []).map(x => ({ date: x.date, amb: !!x.amb })), state: (__cur().datePend || {}).state || '', dq: __dq().length }; }, t);
     let r, y, d;
     r = await ask1(2, 'شنبه میرم بانک و پرونده رو تحویل میدم'); d = await plus(r, 4); y = await yes('آره');
     BK(130, r.ask.length === 1 && /از حرفِ خودت/.test(r.ask[0]) && /درست است؟/.test(r.ask[0]) && r.pend.length === 1 && r.pend[0].date === d && r.dl.length === 0 && y.dl.length === 1 && y.dl[0].date === d, { r, y, d });
-    r = await ask1(5, 'تا جمعه فرمِ ثبت‌نام رو می‌فرستم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'تا جمعه فرمِ ثبت‌نام رو می‌فرستم', when: '2026-10-23' } }]); d = await plus(r, 7); y = await yes('جمعهٔ بعد');
+    r = await ask1(5, 'تا جمعه فرمِ ثبت‌نام رو می‌فرستم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'تا جمعه فرمِ ثبت‌نام رو می‌فرستم', when: '+0' } }]); d = await plus(r, 7); y = await yes('جمعهٔ بعد');
     BK(131, r.ask.length === 1 && /همین امروز یا جمعهٔ بعد/.test(r.ask[0]) && r.pl[0].when === 'next-session' && r.today.length === 0 && y.pl[0].when === d && y.lines.filter(x => /ثبت شد/.test(x)).length === 1, { r, y, d });
     r = await ask1(5, 'جمعه‌ی بعد شام رو ساعت ۸ می‌خوریم که زودتر بخوابم'); d = await plus(r, 7);
     BK(132, r.ask.length === 1 && /درست است؟/.test(r.ask[0]) && !/همین امروز یا/.test(r.ask[0]) && r.pend.length === 1 && r.pend[0].date === d && !r.pend[0].amb, { r, d });
-    r = await ask1(1, 'هفته‌ی بعد، جمعه میرم می‌خرمش', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'هفته‌ی بعد، جمعه میرم می‌خرمش', when: '2026-10-23' } }]); d = await plus(r, 11);
+    r = await ask1(1, 'هفته‌ی بعد، جمعه میرم می‌خرمش', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'هفته‌ی بعد، جمعه میرم می‌خرمش', when: '+4' } }]); d = await plus(r, 11);
     BK(133, r.ask.length === 1 && /درست است؟/.test(r.ask[0]) && r.pend.length === 1 && r.pend[0].date === d && r.pl[0].when === 'next-session' && r.dl.length === 0, { r, d });
     r = await ask1(0, 'آخرِ هفتهٔ بعد میرم شهرستان سراغش'); { const d11 = await plus(r, 11), d12 = await plus(r, 12); y = await yes('آره');
       BK(134, r.ask.length === 1 && r.pend.length === 1 && (r.pend[0].date === d11 || r.pend[0].date === d12) && r.dl.length === 0 && y.dl.length === 1, { r, y }); }
@@ -317,14 +337,14 @@ const HELPERS = () => {
     await fresh(0); await E(() => __birth('2009-06-01'));
     r = await E(async () => { const d = APP.addDays(APP.today(), 12); await __say('میان‌ترمم دوازده روزِ دیگه‌ست', 'خب.', [__cs({}), { do: 'deadline', what: 'میان‌ترم', date: d }]); return { d, ask: __ask(), dl: __dl(), pend: ((__cur().datePend || {}).items || []).map(x => x.date) }; }); y = await yes('آره');
     BK(137, r.dl.length === 0 && r.ask.length === 1 && /درست است؟/.test(r.ask[0]) && r.pend[0] === r.d && y.dl.length === 1 && y.dl[0].date === r.d && y.lines.some(x => /ثبت شد/.test(x)), { r, y });
-    r = await ask1(3, 'هفتهٔ بعد، جمعه جواب میدم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'هفتهٔ بعد، جمعه جواب میدم', when: '2026-10-23' } }]); d = await plus(r, 9);
+    r = await ask1(3, 'هفتهٔ بعد، جمعه جواب میدم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'هفتهٔ بعد، جمعه جواب میدم', when: '+2' } }]); d = await plus(r, 9);
     BK(138, r.pend.length === 1 && r.pend[0].date === d && r.pl[0].when === 'next-session' && /درست است؟/.test(r.ask.join(' ')), { r, d });
     await fresh(0); await E(() => { __birth('1954-03-01'); const st = APP.S.settings(); st.profile.reg = 'shoma'; APP.S.saveSettings(st); });
     r = await E(async () => { await __say('چهار روز دیگر نوبتِ دکتر دارم.', 'بسیار خوب.', []); return { ask: __ask() }; }); y = await yes('بله');
     BK(139, y.dl.length === 1 && y.lines.length === 1 && /ثبت شد/.test(y.lines[0]) && /خودتان/.test(y.lines[0]) && !/خودت(?!ان)/.test(y.lines[0]), { r, y });
     r = await ask1(6, 'سه‌شنبه نه، چهارشنبه میرم دکتر'); d = await plus(r, 4); { const tue = await plus(r, 3);
       BK(140, r.pend.length === 1 && r.pend[0].date === d && !r.pend.some(x => x.date === tue) && !/سه‌شنبه \S+ \S+ ۱۴۰۵/.test(r.ask.join(' ').replace(/«[^»]*»/g, '')), { r, d, tue }); }
-    r = await ask1(5, 'تا جمعه پیش‌نویس رو تموم می‌کنم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'تا جمعه پیش‌نویس رو تموم می‌کنم', when: '2026-10-30' } }]); y = await yes('همین امروز');
+    r = await ask1(5, 'تا جمعه پیش‌نویس رو تموم می‌کنم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'تا جمعه پیش‌نویس رو تموم می‌کنم', when: '+7' } }]); y = await yes('همین امروز');
     BK(141, r.ask.length === 1 && y.pl[0].when === r.td && y.ask.length === 1, { r, y });
     r = await ask1(2, 'تا جمعه گزارش رو می‌فرستم'); d = await plus(r, 3); y = await yes('آره');
     BK(142, r.ask.length === 1 && !/همین امروز یا/.test(r.ask[0]) && r.pend[0].date === d && y.dl.length === 1 && y.dl[0].date === d, { r, y });
@@ -354,16 +374,16 @@ const HELPERS = () => {
     r = await ask1(0, 'شنبه با مدیر جلسه دارم'); y = await yes('آره'); { const y2 = await E(async () => { const n0 = __ask().length; await __say('واسه همون جلسهٔ شنبه سؤال‌ها رو آماده می‌کنم', 'خب.', [__cs({})]); return { newAsk: __ask().length - n0, dl: __dl(), today: __today().filter(x => /📅/.test(x)) }; });
       BK(159, y.dl.length === 1 && y2.newAsk === 0 && y2.dl.length === 1 && y2.today.length === 0, { r, y, y2 }); }
     await neg(160, 0, 'دکترم گفت دوشنبه بیا آزمایشت رو تکرار کنیم');
-    r = await ask1(0, 'یه وقتی بهش زنگ می‌زنم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'یه وقتی بهش زنگ می‌زنم', when: '2026-10-21' } }]);
+    r = await ask1(0, 'یه وقتی بهش زنگ می‌زنم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'یه وقتی بهش زنگ می‌زنم', when: '+3' } }]);
     BK(161, r.ask.length === 0 && r.dl.length === 0 && r.pl.every(q => q.when === 'next-session') && r.today.length === 0, r);
-    r = await ask1(2, 'برنامه‌م اینه: شنبه میرم بانک', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'شنبه میرم بانک', when: '2026-10-24' } }]); d = await plus(r, 4); y = await yes('آره');
+    r = await ask1(2, 'برنامه‌م اینه: شنبه میرم بانک', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'شنبه میرم بانک', when: '+4' } }]); d = await plus(r, 4); y = await yes('آره');
     BK(162, r.ask.length === 1 && r.pend.length === 1 && y.ask.length === 1 && y.pl[0].when === d && y.dl.length === 0, { r, y });
   });
 
   /* ===== بانکِ مستقل — Q8 (#203–#221) ===== */
   await section('bank8', async () => {
-    const say1 = async (dayN, text, acts) => { await fresh(dayN); return E(async ([text, acts]) => { const pr = await __say(text, 'خب.', acts || [__cs({})]); return { preds: __preds(), fc: __fc(), ask: __ask(), pend: ((__cur().datePend || {}).items || []).map(x => x.date), td: APP.today(), guessNote: /همین پیام حدس است/.test(pr) }; }, [text, acts]); };
-    const then = (t, acts) => E(async ([t, acts]) => { const n0 = __sysLines().length; const pr = await __say(t, 'خب.', acts || [__cs({})]); return { preds: __preds(), fc: __fc(), lines: __sysLines().slice(n0), dl: __dl(), today: __today(), pr }; }, [t, acts]);
+    const say1 = async (dayN, text, acts) => { await fresh(dayN); return E(async ([text, acts]) => { const pr = await __say(text, 'خب.', __rel(acts || [__cs({})])); return { preds: __preds(), fc: __fc(), ask: __ask(), pend: ((__cur().datePend || {}).items || []).map(x => x.date), td: APP.today(), guessNote: /همین پیام حدس است/.test(pr) }; }, [text, acts]); };
+    const then = (t, acts) => E(async ([t, acts]) => { const n0 = __sysLines().length; const pr = await __say(t, 'خب.', __rel(acts || [__cs({})])); return { preds: __preds(), fc: __fc(), lines: __sysLines().slice(n0), dl: __dl(), today: __today(), pr }; }, [t, acts]);
     let r, y;
     r = await say1(0, 'هفتاد درصد مطمئنم تا آخرِ همین هفته فصلِ ۳ رو تموم می‌کنم'); { const fri = await E(() => __nextDow(5)); y = await then('آره');
       BK(203, r.preds.length === 1 && r.preds[0].p === 70 && r.pend.length === 1 && r.pend[0] === fri && y.fc.length === 1 && y.fc[0].p === 70 && y.fc[0].due === fri, { r, y, fri }); }
@@ -384,9 +404,9 @@ const HELPERS = () => {
     BK(209, !r.note && r.preds.length === 0 && r.fc.length === 0 && !r.later && r.guesses === 0, r);
     await fresh(0); r = await E(async () => { await __say('می‌خوام بدونم چند بار در هفته دیر می‌رسم سرِ کار.', 'حدست چیست؟', [__cs({})]); await __say('حدسم اینه: صفر یا یک بار در هفته دیر می‌رسم', 'خب.', [__cs({ said: ['guess'], guess: { text: 'صفر یا یک بار در هفته دیر می‌رسم' } })]); const pr = await __say('خب بعدش؟', 'خب.', [__cs({})]); const C = __cur().coach || {}; return { refused: /عیناً در پیامِ او نبود/.test(pr), g: (C.guesses || []).map(g => g.text), cg: (C.guess || {}).text || '' }; });
     BK(210, !r.refused && (r.g.some(x => /صفر یا یک بار/.test(x)) || /صفر یا یک بار/.test(r.cg)), r);
-    r = await say1(0, 'قول میدم تا پس‌فردا فرم رو پر کنم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'قول میدم تا پس‌فردا فرم رو پر کنم', when: '2026-10-20' } }]); y = await then('آره'); { await day(2); const t0 = await E(() => __today().filter(x => /فرم/.test(x))); const y2 = await then('فرم رو پر کردم', [{ do: 'coach_state', ph: 'e', said: ['result'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan_done: { id: 'pl1', done: true } }]); const t1 = y2.today.filter(x => /فرم/.test(x));
+    r = await say1(0, 'قول میدم تا پس‌فردا فرم رو پر کنم', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'قول میدم تا پس‌فردا فرم رو پر کنم', when: '+2' } }]); y = await then('آره'); { await day(2); const t0 = await E(() => __today().filter(x => /فرم/.test(x))); const y2 = await then('فرم رو پر کردم', [{ do: 'coach_state', ph: 'e', said: ['result'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan_done: { id: 'pl1', done: true } }]); const t1 = y2.today.filter(x => /فرم/.test(x));
       BK(211, r.ask.length === 1 && t0.length === 1 && t1.length === 0 && y2.dl.every(x => x.done), { r, y, t0, t1, dl: y2.dl }); }
-    r = await say1(0, 'پیش‌بینیم: گزارشِ مالیشون باثباته، حدودِ ۷۰٪ مطمئنم. تا سه‌شنبه گزارش رو می‌خونم.', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'life', guess: { text: 'گزارشِ مالیشون باثباته، حدودِ ۷۰٪ مطمئنم' }, plan: { text: 'تا سه‌شنبه گزارش رو می‌خونم', when: '2026-10-20', on_guess: true } }]); y = await then('آره'); { await day(2); const y2 = await then('گزارش رو خوندم: دو فصلِ آخر زیان دادن. پس پیش‌بینیم غلط بود.', [{ do: 'coach_state', ph: 'e', said: ['result'], ans: [], stuck: false, fail: false, role: 'self', nat: 'life', plan_done: { id: 'pl1', done: true }, result: 'دو فصلِ آخر زیان دادن' }]);
+    r = await say1(0, 'پیش‌بینیم: گزارشِ مالیشون باثباته، حدودِ ۷۰٪ مطمئنم. تا سه‌شنبه گزارش رو می‌خونم.', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'life', guess: { text: 'گزارشِ مالیشون باثباته، حدودِ ۷۰٪ مطمئنم' }, plan: { text: 'تا سه‌شنبه گزارش رو می‌خونم', when: '+2', on_guess: true } }]); y = await then('آره'); { await day(2); const y2 = await then('گزارش رو خوندم: دو فصلِ آخر زیان دادن. پس پیش‌بینیم غلط بود.', [{ do: 'coach_state', ph: 'e', said: ['result'], ans: [], stuck: false, fail: false, role: 'self', nat: 'life', plan_done: { id: 'pl1', done: true }, result: 'دو فصلِ آخر زیان دادن' }]);
       BK(212, y2.fc.length === 1 && y2.fc[0].out === 'نشد' && !y2.today.some(x => /🎯/.test(x)), { y, y2 }); }
     await fresh(0); r = await E(async () => { const out = [];
       for (const [t, v] of [['پیش‌بینیم: امروز جلسه سرِ وقت شروع میشه؛ ۸۰ درصد مطمئنم', 'پیش‌بینیم درست بود'], ['پیش‌بینیم: ناهار قبل از ۲ می‌رسه؛ ۷۰ درصد مطمئنم', 'پیش‌بینیم غلط بود'], ['پیش‌بینیم: گزارش امروز تموم میشه؛ ۶۰ درصد مطمئنم', 'پیش‌بینیم درست درومد']]) { __freshChat(); await __say(t, 'خب.', [__cs({})]); await __say(v, 'خب.', [__cs({})]); }

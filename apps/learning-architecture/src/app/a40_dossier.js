@@ -265,7 +265,9 @@
     try { var csP = (typeof cs === "object" && cs) || {}; (((se.coach || {}).preds) || []).forEach(function (x) { if (!x || !x.text) return; var f = x.fc ? S.get(x.fc) : null; if (f && f.prc && csP[f.prc]) return;
         var o = x.out && x.out.res ? x.out.res : f && f.outcome ? f.outcome : "", due = (f && f.due) || x.due || "", p = f && f.p != null ? f.p : x.p, sm = x.at ? (se.msgs || []).filter(function (m) { return m && m.role === "user" && String(m.at || "") === String(x.at); })[0] : null;
         add({ k: "fcast", at: x.at || "", title: "🎯 پیش‌بینی (از گفت‌وگو)", lines: [x.text].concat(p != null ? ["اطمینان: " + fa(p) + "٪"] : []).concat(due && !o ? ["موعدِ داوری: " + val(due)] : []),
-          out: o ? o + (x.out && x.out.quote ? " — به گفتهٔ خودت: «" + clip(x.out.quote, 120) + "»" : "") : due ? "هنوز داوری نشده" : "هنوز داوری نشده — موعدی نگفتی", src: sm && sm.text ? msgRef(sid, A.liveMsgId ? A.liveMsgId(sm) : "") : null }); }); } catch (e) { console.warn(e); }
+          /* دورِ ۲۶ (Q8، B26·D32): داوری‌ای که برگشت یا عوض شد تاریخچه‌اش را در 📜 دارد (a41 PR.reverdict26: f.verdictHist) */
+          hist: f && (f.verdictHist || []).length ? f.verdictHist.map(function (h0) { return { was: h0.was || "هنوز باز", at: h0.at || "", why: h0.why || "" }; }) : undefined,
+          out: o ? o + (x.out && x.out.quote ? " — به گفتهٔ خودت: «" + clip(x.out.quote, 120) + "»" : "") + (f && (f.verdictHist || []).length ? " (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : "") : f && (f.verdictHist || []).length ? "داوری برگشت — دوباره باز (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : due ? "هنوز داوری نشده" : "هنوز داوری نشده — موعدی نگفتی", src: sm && sm.text ? msgRef(sid, A.liveMsgId ? A.liveMsgId(sm) : "") : null }); }); } catch (e) { console.warn(e); }
     ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
     var title = se.title || (first ? clip(first.text, 60) : "گفت‌وگو");
     /* دورِ ۲۱ (R4، C21-13، bank #94): سشنی که مسئلهٔ زنده دارد ⇒ عنوانِ درست و پیوند به پروندهٔ همان مسئله */
