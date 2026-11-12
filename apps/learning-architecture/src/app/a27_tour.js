@@ -3911,8 +3911,18 @@
     var T = (A.liveMaskQ ? A.liveMaskQ(String(own || "")) : String(own || "")).trim(); fix = A.liveMaskQ && fix ? A.liveMaskQ(String(fix)) : fix;
     var S0 = T.split(/(?<=[.!؟?\n])\s*/).filter(function (x) { return x.trim(); });
     var hitS = fix ? S0.filter(function (x) { return hasTok20(x, fix) || hasFrag(x, fix) || quoteIn(fix, x); }) : [];
+    /* دورِ ۲۶ (Q2، A26-34 tA1 «… ۱٫۶ لیتر شد، نه ۲. … حالا اون بخشِ ۶: … چطوری بفهمم …؟» با fix ِ بازنویسی‌شدهٔ مدل «دقیقه‌ای ۱٫۶ لیتر»؛ بانکِ R26 #50/#59): پیامی که هم اصلاح دارد
+       و هم پرسش، اصلاحش ثبت می‌شود — داوری با **بندی** است که مقدارِ درست در آن آمده: (۱) اگر fix عیناً در پیام نیست، جمله‌ای که عددهای fix را دارد؛ (۲) در جمله‌ای که با «؟» تمام می‌شود،
+       بندِ دارای مقدار (جدا با «؛ ، :») فقط وقتی پرسش است که آخرین بندِ همان جمله باشد یا خودش واژهٔ پرسش داشته باشد («قطرش ۱٫۶ شد نه ۲؛ حالا چند تا بست لازم دارم؟» ⇒ بندِ اول خبری است). */
+    var nums26 = fix ? (faDigits(String(fix)).match(/[0-9۰-۹]+(?:[.٫][0-9۰-۹]+)?/g) || []).map(function (n) { return faDigits(n).replace(/٫/g, "."); }) : [];
+    var hasN26 = function (x) { var d = faDigits(String(x)).replace(/٫/g, "."); return nums26.length > 0 && nums26.every(function (n) { return new RegExp("(^|[^0-9.])" + n.replace(/\./g, "\\.") + "(?![0-9]|\\.[0-9])").test(d); }); };
+    if (!hitS.length && nums26.length) hitS = S0.filter(hasN26);
     if (!hitS.length) return /[؟?]\s*$/.test(T);
-    return hitS.every(function (x) { return /[؟?]\s*$/.test(x.trim()); });
+    var QW26 = /(?:^|[\s‌،؛:])(?:چند|چقدر|چه‌?قدر|چطور|چه‌?طور|چجوری|چه‌?جوری|چرا|آیا|کدوم|کدام|کجا|مگه|مگر|یا)(?=[\s‌،؛:؟?]|$)/;
+    return hitS.every(function (x) { x = x.trim(); if (!/[؟?]\s*$/.test(x)) return false;
+      var CL = x.split(/[؛;،,:]/).map(function (c) { return c.trim(); }).filter(Boolean), ci = -1; CL.forEach(function (c, i) { if (ci < 0 && (hasTok20(c, fix) || hasFrag(c, fix) || hasN26(c))) ci = i; });
+      if (ci < 0 || CL.length < 2 || ci === CL.length - 1) return true;
+      return QW26.test(CL[ci]) || /^(?:اگه|اگر)(?=[\s‌])/.test(CL[ci]); });
   }
   AS.fixQ22 = fixQ22;
   /* قرنطینه (دورِ ۲۲، P3 — REMOVAL_CANDIDATES): «؟» ِ پایانِ پیام = پرسش (D s36 رد شد)؛ تازه‌ترین هم‌خوانیِ واژه‌به‌واژه پیش از هم‌خوانیِ عینی (C22-6) */
@@ -4187,7 +4197,12 @@
     mine.forEach(function (e, i) { var k = eS[i].k; var hit = aff(k, eS[i].span, eS) || (/^verdict/.test(k) && verdictMoved.length);
       if (!hit) return; e.wd = { at: nowIso(), by: R.curId, why: "اصلاحِ همان بخش از پیامِ منبع («" + clip(R.frag, 40) + "»)" }; nE++;
       if (e.ok && REBOOK20.test(k)) { var ne = Object.assign({}, e, { at: nowIso(), msg: R.curId, wd: undefined, rebook: { from: R.srcId, ev: e.key || "" }, key: String(e.key || "") + "|rebook:" + R.curId });
-        ne.src20 = { sess: s.id, msg: R.curId, span: clip(R.fix, 300), key: k }; delete ne.wd; add.push(ne); nR++; } });
+        /* دورِ ۲۶ (Q2، U6/B26·D4 s17 ✏️ «۰.۸ ⇐ ۰.۷» ⇒ نتیجهٔ «۰.۷»): رویدادِ دوباره‌ثبت‌شده همان جملهٔ خودش است با مقدارِ درست («حساب نهایی ۲۴ × ۰.۷ = …»)، نه فقط تکهٔ اصلاح —
+           وگرنه نتیجه‌ای به نامِ «۰.۷» می‌ماند که هر اصلاحِ بعدی آن را «نتیجهٔ کهنه» می‌خواند؛ فقط وقتی جای‌گزینی ممکن نیست همان مقدارِ درست */
+        var sp26 = eS[i].span != null ? sub(String(eS[i].span), false) : null;
+        ne.src20 = { sess: s.id, msg: R.curId, span: clip(sp26 != null && String(sp26).trim() ? sp26 : R.fix, 300), key: k }; delete ne.wd; add.push(ne); nR++; } });
+    /* همان ✏️ با چند جفت («۰.۸ ⇐ ۰.۷»، «۱۹.۲ ⇐ ۱۶.۸»): جفتِ بعدی روی رویدادی که جفتِ پیشینِ همین نوبت دوباره ثبت کرد هم می‌نشیند */
+    EV.forEach(function (e) { if (!e || e.wd || !e.rebook || e.msg !== R.curId || e.rebook.from !== R.srcId || !e.src20 || e.src20.span == null || mine.indexOf(e) >= 0) return; var v26 = sub(String(e.src20.span), false); if (v26 != null && String(v26).trim() && v26 !== e.src20.span) e.src20.span = clip(v26, 300); });
     if (add.length) s.coachEv = EV.concat(add);
     /* دورِ ۲۳ (Q4، A23-30 oA1 «برای ۱۰ نفر: ۱۰ × ۹ ÷ ۲ = ۴۵» پس از «۱۲ نفره بود»): نتیجهٔ ثبت‌شده‌ای از پیامِ دیگرِ همان مسئله که مقدارِ پیشین را به کار برد بازنویسی نمی‌شود
        (۱۲ × ۹ ÷ ۲ نادرست است) — با دلیل کنار می‌رود («بر «۱۰» بنا بود — با «۱۲» دوباره حساب شود»)؛ رویداد پاک نمی‌شود، فقط کهنه نشان می‌خورد */
@@ -4198,9 +4213,15 @@
         var num24 = /[0-9۰-۹]/.test(String(oV23)) && /[0-9۰-۹]/.test(String(nV23)) && /[0-9۰-۹]/.test(String(e.src20.span)) && String(e.at || "") > String(R.src.at || "") && !hasTok20(e.src20.span, nV23) && (!R.rests || R.rests.indexOf("solved") >= 0);
         /* دورِ ۲۵ (P4، D25-18 s38 «تحویل ۱۰ صبحه، نه ۸» کنارِ برهانِ حجم؛ B25·D10 s19 «۱۸ هفته نه ۱۶» کنارِ «۳٫۵ کیلو کم کردم»): همان فرض، مگر نوشته‌های خودش خلافش را نشان دهد */
         if (num24 && !R.rests && typeof A.liveRestsOn === "function" && A.liveRestsOn(e.src20.span, D21 && D21.o ? D21 : { o: oV23, n: nV23 }, { src: R.src.text, ctx: herTexts25(s) }) === "no") num24 = false;
-        if (!((hasTok20(e.src20.span, oV23) || num24) && (!e.pk || !pk23.length || pk23.indexOf(e.pk) >= 0))) return;
-        e.stale = { at: nowIso(), by: R.curId, from: R.srcId, old: clip(oV23, 60), "new": clip(nV23, 60), why: "بر «" + clip(oV23, 40) + "» بنا بود — با «" + clip(nV23, 40) + "» دوباره حساب شود" };
-        put("نتیجهٔ «" + clip(plainTx(e.src20.span), 60) + "»", e.src20.span, "کنار رفت — " + e.stale.why, e.stale.why, "نتیجهٔ «" + clip(plainTx(e.src20.span), 60) + "» دیگر برقرار نیست — " + e.stale.why); }); } catch (e) { console.warn(e); }
+        /* دورِ ۲۶ (Q2، DECISIONS_R26 «Marking follows dependency, not equal digits»؛ U5 pwB1 «۱۸۰ ÷ ۱۲ = ۱۵ آمپر و کابل هم ۱۵ متر» کنارِ «ارتفاع ۱۵ ⇐ ۱۸ متر»): وابستگیِ یک نتیجهٔ عددی را
+           موتورِ صفحه می‌سنجد (a38 A.liveRestsOn: yes / no / unknown) — «yes»: عددی از آن با رابطهٔ نوشتهٔ خودش از مقدارِ پیشین آمده یا خودِ همان داده را در همان نقش بازمی‌گوید؛ «no»: هر
+           عددش حسابِ خودش را دارد یا کمیتِ دیگری است؛ «unknown» ⇒ صفحه حکم نمی‌دهد، می‌پرسد («از … حساب شده بود؟»). عددِ هم‌رقم به‌تنهایی شاهد نیست. اصلاحِ غیرِ عددی همان سنجهٔ پیشین. */
+        var numD26 = /[0-9۰-۹]/.test(String(oV23)) && /[0-9۰-۹]/.test(String(nV23)), rel26 = numD26 && typeof A.liveRestsOn === "function" ? A.liveRestsOn(e.src20.span, D21 && D21.o ? D21 : { o: oV23, n: nV23 }, { src: R.src.text, ctx: herTexts25(s), clause: R.frag }) : "";
+        var hit26 = rel26 ? (rel26 === "yes" || (rel26 === "unknown" && (num24 || hasTok20(e.src20.span, oV23)))) : (hasTok20(e.src20.span, oV23) || num24);
+        if (!(hit26 && (!e.pk || !pk23.length || pk23.indexOf(e.pk) >= 0))) return;
+        var ask26 = rel26 === "unknown";
+        e.stale = { at: nowIso(), by: R.curId, from: R.srcId, old: clip(oV23, 60), "new": clip(nV23, 60), ask: ask26, why: ask26 ? "شاید بر «" + clip(oV23, 40) + "» بنا بود — اگر از آن حساب شده، با «" + clip(nV23, 40) + "» دوباره حساب شود" : "بر «" + clip(oV23, 40) + "» بنا بود — با «" + clip(nV23, 40) + "» دوباره حساب شود" };
+        put("نتیجهٔ «" + clip(plainTx(e.src20.span), 60) + "»", e.src20.span, (ask26 ? "پرسیده شد — " : "کنار رفت — ") + e.stale.why, e.stale.why, ask26 ? "نتیجهٔ «" + clip(plainTx(e.src20.span), 60) + "»: از «" + clip(oV23, 40) + "» حساب شده بود؟ صفحه رابطه‌اش را نشناخت — اگر آری، با «" + clip(nV23, 40) + "» دوباره حساب شود" : "نتیجهٔ «" + clip(plainTx(e.src20.span), 60) + "» دیگر برقرار نیست — " + e.stale.why); }); } catch (e) { console.warn(e); }
     /* R3g (دورِ ۲۱، D·s38 نتیجهٔ درست‌شده دوباره ثبت نشد، B·D14 درس): نتیجه و درسِ درست‌شده هم از پیامِ کنونی دوباره ثبت می‌شوند (کارِ درست همان است) */
     if (lessonFix && !add.some(function (e) { return /^lesson/.test(String((e.src20 || {}).key || "")); }) && !EV.some(function (e) { return e && !e.wd && e.rebook && e.msg === R.curId && /^lesson/.test(String((e.src20 || {}).key || "")); })) {
       var le = { at: nowIso(), ph: "b", ok: true, src: "chatok", key: "lesson|rebook:" + R.curId, msg: R.curId, how: "lesson", pk: C.pk || "", rebook: { from: R.srcId, ev: "lesson" }, src20: { sess: s.id, msg: R.curId, span: clip(lessonFix["new"], 300), key: "lesson:" + lessonFix.pid } };
