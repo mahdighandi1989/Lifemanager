@@ -5098,3 +5098,9 @@ dated stability, mind-card feed) under way.
   link `apps/learning-architecture/node_modules → /usr/local/lib/node_modules_global`. A backup push created a stray remote branch
   `claude/life-program-flow-diagram-q37jvr-merge25` (same content as the merge); deleting it from this environment was refused — the owner
   can delete it.
+
+## 2026-11-11 — CHANGE + FINDING: بک‌تستِ پیوسته، دورِ ۳۶ (روتینِ backtest)
+- **CHANGE** `apps/learning-architecture/backtest/corpus/round-0036.json` (۴ موردِ تازه: «دنیای جیمی» ۱۹۸۰، استدلالِ یک‌در‌۲۵۰۰ ِ درشوویتز، AP و فلوریدا ۲۰۰۰، یک انتزاعی)، قلمرو `a_modal_anti_luck` گامِ ۴ (مرز)، `reviews/round-0036.json`، WORKLOG ِ صفحه. موتور هر چهار را درست داوری کرد؛ ممیزی و کنترل‌ها تمیز.
+- **FINDING** قضیهٔ پیشنهادیِ «بهترین از m آزمون» در بازبینیِ مستقل رد شد (از A0–A4 برنمی‌آید: نتیجه به سطحی که اصلِ تقارن بر آن گذاشته شود بسته است) ⇒ پیشنهادِ قاعده ثبت نشد؛ دو یافتهٔ r35 به «خطای رمزگذاری» بازتشخیص شد.
+- **PROPOSAL** `p_territory_verify_label` (شرطِ تثبیتِ حوزهٔ قلمرو فقط با وقایعی که برچسبشان همان ایستگاه را دارد) — منتظرِ مالک.
+- **FINDING** مسیرِ ۱: قابِ Ioannidis 2005 آغاز شد و افزوده نشد (جدولِ خام در دسترس نبود). `epi-decisions` همچنان ۴۰۱ از Render.

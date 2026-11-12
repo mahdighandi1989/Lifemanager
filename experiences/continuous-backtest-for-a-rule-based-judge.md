@@ -85,3 +85,17 @@ if (fresh.length >= 3 && fresh.every(ok)) finding.status = "verified";
 - **راه‌حل:** سقف را اول تعریف کن: «زبرینِ احتمالی که خودِ این راه توجیه می‌کند». سپس هر شرط را بپرس که *شرطِ صدقِ تصدیق* است یا *شرطِ نیروی راه*. اولی ⇒ ضعیف‌ترین حلقه؛ دومی ⇒ احتمالِ کل: q·r + (1−q)·½. یک ویژگیِ رمزگذاری («تصدیق دربارهٔ خودِ راه است؟») دو حالت را جدا می‌کند.
 - **نکته‌های حیاتی:** (۱) «بی‌داده ⇒ ½» فقط برای رده‌ای درست است که تعریفش دلیلی به هیچ سو نیست؛ «منبعِ معتبر» بی‌داده فقط «کمتر از یقین» است. (۲) کمینهٔ سقف‌ها وقتی دو شرطِ راه با r < ½ هم‌زمان‌اند زیرِ زبرین می‌افتد — پاسبان لازم است. (۳) صفحهٔ ورودیِ رمزگذارِ کور را خودت پاک کن: فهرستِ «جمله‌های حذف‌شده» همان نشتِ سرانجام است. (۴) معیارِ اعمال را پیش از دیدنِ اثر ثابت کن (دو خوانشِ کورِ هم‌رأی)، و اگر خوانش‌های دودستگی حکمِ درستی را خراب می‌کنند، اعمال‌نکردن را با دلیل ثبت کن، نه تنظیمِ عدد. (۵) Brier ِ سقفِ «زبرین» می‌تواند بدتر شود؛ این نشانهٔ خطا نیست، اگر سقف پیش‌بینی نیست — گزارشش کن.
 - **How to apply elsewhere:** in any rule engine that caps confidence, write the cap's definition (sup vs point forecast) next to the theorem list; classify every condition as truth-condition vs route-condition; give unmeasured base rates ½ only for definitionally neutral classes; keep a re-encode ledger with a fixed acceptance rule (two independent blind readings + reviewer) and a clean-input check for blind encoders.
+
+## Update 2026-11-11
+
+- **A derived "theorem" is a claim like any other — send the proof to an independent reviewer before filing the rule proposal.** A
+  multiple-testing cap (`1/(2 − (1−α)^m)`) looked like a clean consequence of the axioms, but the result depended on *where* the symmetry
+  axiom was applied (one global null vs. each effect separately — the latter gives `1/(1+α)` for any m). A number that changes with the
+  chosen partition is not a theorem of the system. The reviewer caught it; the proposal was not filed and the negative result was logged.
+- **Before calling something a "gap in the rules", check whether an existing rule would fire under a complete encoding.** The two
+  "analysis-freedom" cases were first attributed to a missing rule; an existing rule ("unproven premise") covers them once the encoder
+  writes the premise status. Diagnose encoding first, rules second.
+- **A detection that rests on the blind encoder's own judgement (e.g. "form: invalid") tests the encoder, not rule coverage** — say so in
+  the ledger instead of counting it as coverage of the fallacy.
+- **An unselected frame read only through a summarising fetch is not verified.** If the raw table cannot be read, add nothing (all or
+  nothing) and record the source and the blocker for the next round.

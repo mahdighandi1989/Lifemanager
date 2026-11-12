@@ -1,6 +1,6 @@
 {
  "updated": "2026-11-11",
- "round": 35,
+ "round": 36,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -79,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 55,
-    "freshOk": 37,
+    "fresh": 56,
+    "freshOk": 38,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 60,
-    "freshOk": 37,
+    "fresh": 62,
+    "freshOk": 39,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -448,8 +448,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 27,
-    "freshOk": 18,
+    "fresh": 29,
+    "freshOk": 20,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,8 +1154,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 18,
-    "freshOk": 10,
+    "fresh": 19,
+    "freshOk": 11,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1327,8 +1327,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 18,
-    "freshOk": 10,
+    "fresh": 19,
+    "freshOk": 11,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1444,8 +1444,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 18,
-    "freshOk": 10,
+    "fresh": 19,
+    "freshOk": 11,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1627,7 +1627,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1640,8 +1640,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 19,
-    "freshOk": 11,
+    "fresh": 20,
+    "freshOk": 12,
     "ids": [
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
@@ -1727,7 +1727,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1740,8 +1740,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 9,
-    "freshOk": 4,
+    "fresh": 10,
+    "freshOk": 5,
     "ids": [
      "r23_wirecard_trust_accounts_2019",
      "r23_ariane5_501_1996",
@@ -1751,7 +1751,8 @@
      "r27_tonkin_aug4_1964",
      "r27_abs_intrusion_storm",
      "r34_chicago_tribune_election_1948",
-     "r34_wire_buyout_abstract"
+     "r34_wire_buyout_abstract",
+     "r36_jimmys_world_1980"
     ]
    },
    "kind": "missed",
@@ -1814,7 +1815,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1852,7 +1853,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1894,7 +1895,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1943,7 +1944,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1975,7 +1976,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -2009,7 +2010,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2058,7 +2059,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2098,7 +2099,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2128,7 +2129,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2162,7 +2163,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2194,7 +2195,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2232,7 +2233,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2260,7 +2261,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2319,13 +2320,14 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 4,
-    "freshOk": 3,
+    "fresh": 5,
+    "freshOk": 4,
     "ids": [
      "r31_bre_x_busang_1996",
      "r34_chicago_tribune_election_1948",
      "r34_wire_buyout_abstract",
-     "r35_millerite_date_1843"
+     "r35_millerite_date_1843",
+     "r36_jimmys_world_1980"
     ]
    },
    "kind": "missed",
@@ -2390,7 +2392,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2444,13 +2446,14 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 4,
-    "freshOk": 3,
+    "fresh": 5,
+    "freshOk": 4,
     "ids": [
      "r31_bre_x_busang_1996",
      "r34_chicago_tribune_election_1948",
      "r34_wire_buyout_abstract",
-     "r35_millerite_date_1843"
+     "r35_millerite_date_1843",
+     "r36_jimmys_world_1980"
     ]
    },
    "kind": "missed",
@@ -2602,7 +2605,7 @@
     "s19",
     "s22"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r27_frege_basic_law_v_1893",
@@ -2637,7 +2640,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 35,
+   "lastSeenRound": 36,
    "resolved": "2026-11-02",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
    "reopened": "2026-11-02"
@@ -2673,7 +2676,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r28_surgisphere_lancet_2020",
@@ -2706,7 +2709,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r29_abs_pilot_supplier",
@@ -2738,7 +2741,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r29_wakefield_lancet_1998",
@@ -2770,7 +2773,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2786,8 +2789,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 42,
-    "freshOk": 27,
+    "fresh": 45,
+    "freshOk": 30,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -2865,7 +2868,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r31_bre_x_busang_1996",
@@ -2898,7 +2901,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r31_dreyfus_bordereau_1894",
@@ -2980,7 +2983,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r32_madoff_trackrecord_2005",
@@ -3015,7 +3018,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r33_beringer_lying_stones_1725",
@@ -3095,9 +3098,11 @@
    },
    "retest": {
     "since": 35,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 1,
+    "freshOk": 1,
+    "ids": [
+     "r36_jimmys_world_1980"
+    ]
    },
    "kind": "missed",
    "title": "سرتیتر روزنامه شبِ انتخابات ریاست‌جمهوری آمریکا ۱۹۴۸",
@@ -3123,8 +3128,8 @@
    "opened": "2026-11-10",
    "openedRound": 35,
    "status": "diagnosed",
-   "attribution": "خلأ جزوه (ملاکی ندارد)",
-   "note": "مسیرِ ۲: جزوه برای آزمون‌های چندگانه/آزادیِ انتخابِ تحلیل پس از دیدنِ داده ملاکِ صریح ندارد (truth.why ِ خودِ پرونده). موتور خطا را دید ولی به دلیلی دیگر: رمزگذارِ کور hidden_ctrl=false و راه=استقراء نوشت ⇒ st_tajrobe/st_istiqra (s51 «عاملِ پنهانِ کنترل‌نشده»، s50) که با «آزادیِ انتخابِ تحلیل» هم‌معنا نیست. برچسب پس از حکم ویرایش نشد. پیشنهادِ «فراتر از جزوه» (قضیهٔ احتمالِ دست‌کم یک «معنادار» در m آزمون، با برهان از اصول و سنجشِ اثر روی کلِ پیکره) به دورِ بعد سپرده شد. برای همین پروندهٔ انتزاعی: truth.right خودش به s51 ارجاع می‌دهد، پس برچسبِ {st_aql|st_tajrobe} پیش از حکم هم دفاع‌پذیر بود — برچسب عوض نشد.",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "مسیرِ ۲: جزوه برای آزمون‌های چندگانه/آزادیِ انتخابِ تحلیل پس از دیدنِ داده ملاکِ صریح ندارد (truth.why ِ خودِ پرونده). موتور خطا را دید ولی به دلیلی دیگر: رمزگذارِ کور hidden_ctrl=false و راه=استقراء نوشت ⇒ st_tajrobe/st_istiqra (s51 «عاملِ پنهانِ کنترل‌نشده»، s50) که با «آزادیِ انتخابِ تحلیل» هم‌معنا نیست. برچسب پس از حکم ویرایش نشد. پیشنهادِ «فراتر از جزوه» (قضیهٔ احتمالِ دست‌کم یک «معنادار» در m آزمون، با برهان از اصول و سنجشِ اثر روی کلِ پیکره) به دورِ بعد سپرده شد. برای همین پروندهٔ انتزاعی: truth.right خودش به s51 ارجاع می‌دهد، پس برچسبِ {st_aql|st_tajrobe} پیش از حکم هم دفاع‌پذیر بود — برچسب عوض نشد. — دورِ ۳۶: قضیهٔ «بهترین از m آزمون» نوشته و به بازبینِ مستقل داده شد؛ بازبین نشان داد عددِ ۱/(۲−(۱−α)^m) از A0–A4 برنمی‌آید (به سطحی که A4 بر آن گذاشته شود بسته است؛ با A4 روی هر اثرِ جدا همان ۱/(۱+α) می‌شود) ⇒ پیشنهادِ قاعده ثبت نشد. تشخیصِ بازنگری‌شده: قاعدهٔ موجودِ r_aql_matter_unproven (s40) همین خطا را می‌گیرد اگر matter=«مقدمه اثبات‌نشده» رمز شود؛ رمزگذارِ کور matter را ننوشته بود ⇒ علت «خطای رمزگذاری پرونده»، نه خلأ جزوه. بازرمزگذاریِ کورِ مستقل در دورِ بعد.",
    "fix": null,
    "retest": null,
    "kind": "mislocated",
@@ -3151,7 +3156,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r35_bible_codes_genesis_1994",
@@ -3159,8 +3164,8 @@
    "opened": "2026-11-10",
    "openedRound": 35,
    "status": "diagnosed",
-   "attribution": "خلأ جزوه (ملاکی ندارد)",
-   "note": "مسیرِ ۲: جزوه برای آزمون‌های چندگانه/آزادیِ انتخابِ تحلیل پس از دیدنِ داده ملاکِ صریح ندارد (truth.why ِ خودِ پرونده). موتور خطا را دید ولی به دلیلی دیگر: رمزگذارِ کور hidden_ctrl=false و راه=استقراء نوشت ⇒ st_tajrobe/st_istiqra (s51 «عاملِ پنهانِ کنترل‌نشده»، s50) که با «آزادیِ انتخابِ تحلیل» هم‌معنا نیست. برچسب پس از حکم ویرایش نشد. پیشنهادِ «فراتر از جزوه» (قضیهٔ احتمالِ دست‌کم یک «معنادار» در m آزمون، با برهان از اصول و سنجشِ اثر روی کلِ پیکره) به دورِ بعد سپرده شد.",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "مسیرِ ۲: جزوه برای آزمون‌های چندگانه/آزادیِ انتخابِ تحلیل پس از دیدنِ داده ملاکِ صریح ندارد (truth.why ِ خودِ پرونده). موتور خطا را دید ولی به دلیلی دیگر: رمزگذارِ کور hidden_ctrl=false و راه=استقراء نوشت ⇒ st_tajrobe/st_istiqra (s51 «عاملِ پنهانِ کنترل‌نشده»، s50) که با «آزادیِ انتخابِ تحلیل» هم‌معنا نیست. برچسب پس از حکم ویرایش نشد. پیشنهادِ «فراتر از جزوه» (قضیهٔ احتمالِ دست‌کم یک «معنادار» در m آزمون، با برهان از اصول و سنجشِ اثر روی کلِ پیکره) به دورِ بعد سپرده شد. — دورِ ۳۶: قضیهٔ «بهترین از m آزمون» نوشته و به بازبینِ مستقل داده شد؛ بازبین نشان داد عددِ ۱/(۲−(۱−α)^m) از A0–A4 برنمی‌آید (به سطحی که A4 بر آن گذاشته شود بسته است؛ با A4 روی هر اثرِ جدا همان ۱/(۱+α) می‌شود) ⇒ پیشنهادِ قاعده ثبت نشد. تشخیصِ بازنگری‌شده: قاعدهٔ موجودِ r_aql_matter_unproven (s40) همین خطا را می‌گیرد اگر matter=«مقدمه اثبات‌نشده» رمز شود؛ رمزگذارِ کور matter را ننوشته بود ⇒ علت «خطای رمزگذاری پرونده»، نه خلأ جزوه. بازرمزگذاریِ کورِ مستقل در دورِ بعد.",
    "fix": null,
    "retest": null,
    "kind": "mislocated",
@@ -3187,7 +3192,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 35
+   "lastSeenRound": 36
   },
   {
    "id": "f_r4_redfield_arsenic",
