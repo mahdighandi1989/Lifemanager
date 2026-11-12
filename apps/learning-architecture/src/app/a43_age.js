@@ -271,7 +271,19 @@
      خودش «نام» خوانده («اسمِ دوستم …»، «… اسمش …»، «دوستی به اسمِ …») جایش را به «[نامِ …]» می‌دهد. نامِ شخصیتِ مسئله («علی ۳ سیب دارد»)، «مدرسه» ِ عام («تو مدرسه گفت»)
      و «چیزی به اسمِ ک.م.م» دست نمی‌خورند. خودِ پیام در گفت‌وگو همان است که نوشت. */
   var SCH_RE26 = new RegExp("(" + SCH + ")((?:[\\s‌]+(?:ما|مون|مان|من|شون))?(?:[\\s‌]+(?:اسمش|نامش)(?:[\\s‌]+(?:" + SCH + "))?)?)([\\s‌]+)([^\\s.،,!؟?؛:«»()]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()]+){0,2})", "g");
-  function privSchool(x) {
+  /* نامِ مدرسه فقط وقتی دادهٔ یک کودک یا شخصِ سوم است (C22؛ بانکِ R26 #224 «پسرم که دبیرستانِ … میره» ⇒ پالوده؛ #241 «من معلمِ ریاضیِ دبیرستانِ …‌ام» ⇒ همان که نوشت):
+     گوینده کم‌سال است؛ یا جمله مدرسه را به خویشاوند/شخصِ سوم می‌بندد؛ یا سن هنوز معلوم نیست و جمله «مدرسه رفتنِ» خودِ گوینده است. محلِ کارِ خودِ بزرگسال و نامِ عمومی می‌ماند. */
+  var KINLINK26 = /(?:پسر|دختر|نوه|بچه|فرزند|برادر|داداش|خواهر|آبجی|شاگرد|دوست|همسایه|خواهرزاده|برادرزاده)(?:‌?ها)?(?:ی|ِ)?[‌]?(?:م|ام|مون|مان|ش|شون|ت)(?![آ-ی])|(?:^|[\s‌])(?:می[‌\s]?ره|میره|می[‌\s]?رود|می[‌\s]?رن|میرن|می[‌\s]?روند|درس[\s‌]*می[‌\s]?خو(?:ا)?ن(?:ه|د|ن|ند))(?![آ-ی])/;
+  var STUDENT26 = /(?:^|[\s‌])(?:می[‌\s]?رم|میرم|می[‌\s]?روم|درس[\s‌]*می[‌\s]?خو(?:ا)?نم)(?![آ-ی])|(?:کلاس|پایهٔ?)[\s‌]*(?:اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم|یازدهم|دوازدهم)|دانش[‌\s]?آموز/;
+  var STAFF26 = /(?:معلم|دبیر|مدیر|ناظم|معاون|مربی|مشاور|کارمند|سرایدار)(?:ِ|‌ی|ی)?[\s‌]|درس[\s‌]*می[‌\s]?د(?:م|هم)|کار[\s‌]*می[‌\s]?کنم|تدریس/;
+  function schoolIsPrivate(sent) { var ag = G.age(); if (ag != null && G.minor(ag)) return true; if (KINLINK26.test(sent)) return true; return ag == null && STUDENT26.test(sent) && !STAFF26.test(sent); }
+  /* ctx (اختیاری): پیام‌های خودِ او — عنوانی که مدل داد («شهریهٔ دبستانِ …») بافتِ «پسرم» را ندارد؛ اگر همان نام در جمله‌ای از حرفِ او دادهٔ کودک/شخصِ سوم بود، در عنوان هم پالوده می‌شود */
+  function privSchool(t, ctx) {
+    var cs = ctx ? String(ctx).split(/(?<=[.!؟?؛\n])/).filter(schoolIsPrivate) : [];
+    return String(t).split(/(?<=[.!؟?؛\n])/).map(function (x) {
+      if (!schoolIsPrivate(x)) { if (!cs.length) return x; var hit = false, re = new RegExp(SCH_RE26.source, "g"), m;
+        while ((m = re.exec(x))) { var n0 = m[4].split(/[\s‌]+/)[0].replace(/[ِٔ]$/, ""); if (n0.length >= 2 && !SCH_STOP.test(n0) && cs.some(function (c) { return c.indexOf(n0) >= 0 && privSchool1(c) !== c; })) hit = true; }
+        if (!hit) return x; }
     x = priv25(x);
     return x.replace(SCH_RE26, function (all, w, mid, sp, name) {
       /* «مدرسه/مهد» ِ بی کسره و بی «اسمش» اسمِ عام است («تو مدرسه گفت»)؛ «دبستان/دبیرستان/هنرستان …» و «… اسمش …» نام می‌گیرند */
@@ -281,13 +293,15 @@
       if (!keep.length) return all;
       var rest = ws.slice(keep.length).join(" "), tail = /(?:‌ه|‌است|‌ام|‌ایم)$/.exec(keep[keep.length - 1]);
       return w + mid + sp + "[نامِ مدرسه]" + (tail ? tail[0] : "") + (rest ? " " + rest : "");
-    });
+    }); }).join("");
   }
+  function privSchool1(c) { return privSchool(c); }
   var ROLE26 = "(?:معلم|دبیر|مدیر|ناظم|مربی|استاد|مشاور)", POSS26 = "(?:[‌]?(?:مون|مان|م|ام|ش|شون|شان|ت|تون|تان))?";
-  var HON26 = "(?:خانمِ?|آقایِ?|آقا|استادِ?)";
+  var HON26 = "(?:خانمِ?|آقایِ?|استادِ?)";
   var KIN26 = "(?:دوست|رفیق|پسر|دختر|نوه|برادر|داداش|خواهر|آبجی|همکار|همسایه|شاگرد|هم[‌\\s]?کلاسی|بچه|مامان|بابا|مادر|پدر|همسر|شوهر|خانم|زن|عمو|دایی|خاله|عمه|پسرخاله|دخترخاله|پسرعمو|دخترعمو|رئیس|صاحب[‌\\s]?خانه|صاحبخونه)";
   var PERSONN26 = "(?:" + KIN26 + "|" + ROLE26 + "|آقایی|خانمی|کسی|یکی|نفر|بچه‌ای|پسری|دختری|مردی|زنی|دوستی|همکاری|همسایه‌ای|معلمی|شاگردی)";
   function nameSub26(label) { return function (all, w, sp, name) { if (/\[نامِ?/.test(name) || /\[نامِ?/.test(w)) return all; var c = nameCut25(name); if (!c) return all; return w + sp + (c.pre ? c.pre + " " : "") + label + c.tail + (c.rest ? " " + c.rest : ""); }; }
+  var HONSTOP26 = new RegExp("^(?:" + ROLE26 + "|" + KIN26 + "|دکتر|مهندس|فروشنده|راننده|پلیس|منشی|پرستار|مسئول|کارمند|محترم|عزیز|جان|بزرگ|پیر|جوان|مسن|خانه[‌]?دار|خونه|خانه|راهنما|اجازه|ها|های|هایی|ی|ای|یی|و|که|رو|را|هم|گفت|گفته)(?:ِ|‌ی|ی|ه)?$");
   function privPeople(x) {
     /* معلم/مدیر: «معلممون خانم احمدی»، «معلمِ ریاضی‌مون آقای رضایی»، «خانم احمدی معلمِ ما»، «اسمِ معلممون …»، «معلممون اسمش …» */
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+[آ-یٔ‌ِ]{2,14}" + POSS26 + "){0,2}[\\s‌،,]+" + HON26 + ")([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
@@ -295,13 +309,19 @@
     x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
     /* شخصِ سوم که خودش «نام» خوانده: «اسمِ دوستم سارا ـه»، «دوستم اسمش سارا ـست»، «یه همکاری دارم به اسمِ کامران» */
-    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
-    x = x.replace(new RegExp("(" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
-    x = x.replace(new RegExp("(" + PERSONN26 + POSS26 + "[^.!؟?؛\\n«»]{0,30}?[\\s‌]به[\\s‌]+(?:اسمِ?|نامِ?))([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
+    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ شخص]"));
+    x = x.replace(new RegExp("(" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ شخص]"));
+    x = x.replace(new RegExp("(" + PERSONN26 + POSS26 + "[^.!؟?؛\\n«»]{0,30}?[\\s‌]به[\\s‌]+(?:اسمِ?|نامِ?))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ شخص]"));
+    /* نامِ پس از عنوانِ احترام («خانمِ مهرپرور گفته …»، «همسایه‌مون آقای کیانفر …» — بانکِ R26 #223/#225): فقط خودِ نام (و دنبالهٔ اضافه‌اش)، نه واژه‌های بعد.
+       «خانم معلم»، «آقای دکتر»، «خانمِ همسایه» نام نیستند. */
+    x = x.replace(new RegExp("((?:^|[\\s‌،,.!؟?؛:(«])" + HON26 + ")([\\s‌]+)([^\\s.،,!؟?؛:«»()\\[\\]]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()\\[\\]]+){0,2})", "g"), function (all, w, sp, name) {
+      var ws = name.split(/[\s]+/), keep = [];
+      for (var i = 0; i < ws.length; i++) { var b0 = ws[i].replace(/[ِٔ]$/, ""); if (!i && (SCH_STOP.test(b0) || HONSTOP26.test(b0) || /^[0-9۰-۹]/.test(b0) || b0.length < 2)) return all; keep.push(ws[i]); if (!/[ِٔ]$/.test(ws[i])) break; if (i + 1 < ws.length && (SCH_STOP.test(ws[i + 1]) || HONSTOP26.test(ws[i + 1].replace(/[ِٔ]$/, "")))) break; }
+      var rest = ws.slice(keep.length).join(" "); return w + sp + "[نامِ شخص]" + (rest ? " " + rest : ""); });
     return x;
   }
   /* برچسب/عنوان (همهٔ سن‌ها): هر جا صفحه عنوان یا برچسبی از حرفِ او می‌سازد */
-  G.privLabel = function (t) { var x = String(t == null ? "" : t); try { return privPeople(privSchool(x)); } catch (e) { return x; } };
+  G.privLabel = function (t, ctx) { var x = String(t == null ? "" : t); try { return privPeople(privSchool(x, ctx)); } catch (e) { return x; } };
   /* عنوانِ خوانا از یک پیام: بی سلام/معرفی (AS.stripIntro23)، بی نامِ شخصِ سوم — برای عنوانِ سشن، فهرستِ «مسئله‌های این گفت‌وگو»، نوارِ «برگرد به» (U29، C26-13، C26-29) */
   G.titleOf = function (t) { var x = String(t == null ? "" : t), y = x; try { if (A.ASSIST && A.ASSIST.stripIntro23) y = A.ASSIST.stripIntro23(x) || x; } catch (e) { y = x; } return G.privLabel(y); };
   /* نقلِ پیام در پرونده (۲۴/R5): فقط کم‌سال — همان پالاینده */
@@ -323,12 +343,26 @@
       if (se) (se.msgs || []).forEach(function (m) { if (!m || m.role !== "user" || typeof m.text !== "string") return; var k = cl(m.text, 60); if (!(k in map)) map[k] = cl(G.titleOf(m.text), 60); });
       var fix = function (t) { return typeof t === "string" ? (map[t] != null ? map[t] : G.privLabel(t)) : t; };
       if (Array.isArray(D.pks)) D.pks.forEach(function (x) { if (x && typeof x.title === "string") x.title = fix(x.title); });
-      if (typeof D.title === "string") D.title = fix(D.title);
+      if (typeof D.title === "string") { var lt = ""; try { if (se && !se.title && map[D.title] != null && !Array.isArray(D.pks) && se.lprob && A.liveRec) { var lr = A.liveRec(se.lprob); lt = lr && lr.p ? lr.p.title || "" : ""; } } catch (e2) { }
+        D.title = lt || fix(D.title); }
     } catch (e) { } return D;
   };
   /* دورِ ۲۵ (P7، D25-22 aD1): «📜 پروندهٔ این گفت‌وگو» هم همان پرونده است — پیش‌تر فقط پروندهٔ مسئله پالوده می‌شد و نقلِ پیامِ کودک در پروندهٔ سشن عینی می‌ماند */
   if (typeof A.dossierSess === "function" && !A.dossierSess._priv25) { var rawDosS = A.dossierSess; A.dossierSess = function () { return G.titleDossier26(G.privDossier(rawDosS.apply(this, arguments))); }; A.dossierSess._priv25 = true; }
   if (typeof A.dossier === "function" && !A.dossier._priv24) { var rawDos = A.dossier; A.dossier = function () { var D0 = G.privDossier(rawDos.apply(this, arguments)); try { if (D0 && typeof D0.title === "string") D0.title = G.privLabel(D0.title); } catch (e) { } return D0; }; A.dossier._priv24 = true; }
+
+  /* دورِ ۲۶ (Q9، D24-15 «STILL» ِ سه دور — aD1 p2: پیشنهادِ نوبتِ صفحه برای کودکِ ۹ ساله «مجهول (یا حکمی که باید ثابت شود) چیست؟»): «# مخاطب» به مدل می‌گوید ساده بگو، ولی
+     خودِ پرسشِ صفحه با واژه‌های فنیِ بزرگسال به او داده می‌شد. پرسش‌های «فهمِ مسئله» برای گروه‌های early/child واژه‌بندیِ کودکانهٔ خودشان را دارند (همان پرسش، همان شناسهٔ u1…u5 در
+     فهرست؛ فقط متنِ رو به مدل). نوجوان و بزرگسال همان متنِ کتاب. */
+  G.CHILD_Q = [
+    ["مجهول (یا حکمی که باید ثابت شود) چیست؟", "دنبالِ چی می‌گردیم؟"],
+    ["داده‌ها (یا فرض) چیست؟", "چه چیزهایی را می‌دانیم؟"],
+    ["شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟", "مسئله چه گفته که باید همان‌طور باشد؟"],
+    ["آیا شرط برای تعیینِ مجهول کافی است؟ زائد است؟ متناقض است؟", "با چیزهایی که می‌دانیم می‌شود جواب را پیدا کرد؟"],
+    ["شکلی بکش یا نام‌گذاریِ مناسبی بکن؛ مسئله را به زبانِ خودت دوباره بگو.", "شکلش را بکش و مسئله را با حرفِ خودت دوباره بگو."]
+  ];
+  G.childBand = function () { try { var ag = G.age(), b = ag != null && G.band(ag); return !!b && (b.id === "early" || b.id === "child"); } catch (e) { return false; } };
+  G.childQ = function (t) { var x = String(t == null ? "" : t); if (!G.childBand()) return x; G.CHILD_Q.forEach(function (p) { if (x.indexOf(p[0]) >= 0) x = x.split(p[0]).join(p[1]); }); return x; };
 
   /* ---------- قلاب‌های دستیار ---------- */
   var AS = A.ASSIST;

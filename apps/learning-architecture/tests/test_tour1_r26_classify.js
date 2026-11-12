@@ -135,8 +135,8 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     chk(/دبستانِ \[نامِ مدرسه\]/.test(L[0]) && !/رجایی/.test(L[0]) && /۴۰ میلیون/.test(L[0]), 'C22: a child\'s school name ⇒ «[نامِ مدرسه]» (parent speaking) — ' + L[0]);
     chk(/خانم \[نامِ معلم\]/.test(L[1]) && !/احمدی/.test(L[1]) && /۱۲ سیب/.test(L[1]), 'C22: teacher name after the role ⇒ «[نامِ معلم]» — ' + L[1]);
     chk(/\[نامِ معلم\]/.test(L[2]) && !/کریمی/.test(L[2]), 'C22: teacher name before the role ⇒ «[نامِ معلم]» — ' + L[2]);
-    chk(/\[نام\]/.test(L[3]) && !/سارا/.test(L[3]) && /۵ تا سیب/.test(L[3]), 'C22: a third party she names («اسمِ دوستم …») ⇒ «[نام]» — ' + L[3]);
-    chk(/\[نام\]/.test(L[4]) && !/کامران/.test(L[4]), 'C22: «همکاری به اسمِ …» ⇒ «[نام]» — ' + L[4]);
+    chk(/\[نامِ شخص\]/.test(L[3]) && !/سارا/.test(L[3]) && /۵ تا سیب/.test(L[3]), 'C22: a third party she names («اسمِ دوستم …») ⇒ «[نامِ شخص]» — ' + L[3]);
+    chk(/\[نامِ شخص\]/.test(L[4]) && !/کامران/.test(L[4]), 'C22: «همکاری به اسمِ …» ⇒ «[نامِ شخص]» — ' + L[4]);
     chk(L[5] === 'علی ۳ تا سیب داره و مریم ۵ تا؛ روی هم چند تا؟', 'look-alike: characters of a problem stay — ' + L[5]);
     chk(L[6] === 'تو مدرسه معلم گفت این مسئله رو حل کنیم: ۲۴ تقسیم بر ۴', 'look-alike: common nouns «مدرسه/معلم» stay — ' + L[6]);
     chk(/ک\.م\.م/.test(L[7]) && !/\[نام/.test(L[7]), 'look-alike: «یه چیزی به اسمِ ک.م.م» (a thing, not a person) stays — ' + L[7]);
@@ -175,6 +175,97 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     const d2 = await ev(() => { const D = APP.dossierSess(__cur().id, 'c:2'), D1 = APP.dossierSess(__cur().id, 'c:1'); return { pks: (D.pks || []).map(x => x.title), t2: D.title, t1: D1.title }; });
     chk(d2.pks.length === 2 && !d2.pks.some(t => /^سلام|مریمم|متولد/.test(t)), 'C26-13 / C26-29: the «مسئله‌های این گفت‌وگو» list shows neither greeting, introduction nor birth sentence — ' + JSON.stringify(d2.pks));
     chk(!/متولد/.test(d2.t2) && !/مریمم/.test(d2.t1), 'C26-29: the dossier title of each chat problem (the «برگرد به» strip) likewise — ' + d2.t1 + ' | ' + d2.t2);
+  });
+
+  const person = async (age, msgs) => { await wipe(); await setB(age ? await birthFor(age) : ''); await fresh(); await ev((msgs) => { const s = __cur(); let i = 0; const now = () => new Date(Date.UTC(2026, 9, 19, 8, i++)).toISOString(); (msgs || []).forEach(t => { s.msgs.push({ role: 'user', text: t, at: now() }, { role: 'ai', text: 'خوب.', at: now() }); }); s.msgs.push({ role: 'user', text: 'خب', at: now() }); s.coach = s.coach || {}; s.coach.prev = { key: 'خب' }; APP.S.put(s); }, msgs || []); };
+  const TO = ['بگو از کجا شروع کنم.', 'به نظرت این راه درسته؟ نگاه کن ببین چی کم داره.'], SH = ['ممکن است بفرمایید از کجا شروع کنم؟', 'به نظرِ شما این راه درست است؟ لطفاً بگویید چه کم دارد.'];
+
+  // ================= Q9 — ضمیر: «…ت» ِ ملکی از واژگانِ خودِ صفحه؛ پرسشِ صفحه یک ضمیر و یک پرسش (D26-40 s35، U53 aB4 p7، U37 s12) =================
+  await section('reg', async () => {
+    const P = [['اصلاحت رسید، ولی پیامت دو بخش داشت', 'اصلاحتان رسید، ولی پیامتان دو بخش داشت'], ['تقریبت بس بود', 'تقریبتان بس بود'], ['پیشرفتت اینجاست', 'پیشرفتتان اینجاست'],
+      ['نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت', 'نمی‌دانید از کجا شروع کنید؟ دوره قدم‌به‌قدم می‌بردتان'], ['مانده: فقط بازنگریِ خودت', 'مانده: فقط بازنگریِ خودتان'],
+      ['می‌توانی نتیجه را از راهِ دیگری به دست آوری؟', 'می‌توانید نتیجه را از راهِ دیگری به دست آورید؟'], ['کارهایت و فکرهایت را بنویس', 'کارهایتان و فکرهایتان را بنویسید'],
+      // look-alikes: words that end in «ت» and are not second person
+      ['ثبتِ درست در کارتِ بازسازی؛ حالتِ خاص و وضعیتِ نوبت', 'ثبتِ درست در کارتِ بازسازی؛ حالتِ خاص و وضعیتِ نوبت'], ['صورتِ مسئله و سلامتِ حساب', 'صورتِ مسئله و سلامتِ حساب'], ['یادآوریِ فردا و جمع‌آوریِ داده', 'یادآوریِ فردا و جمع‌آوریِ داده']];
+    const got = await ev((P) => P.map(p => APP.ASSIST.toShoma(p[0])), P);
+    P.forEach((p, i) => chk(got[i] === p[1], 'register: «' + p[0] + '» ⇒ «' + p[1] + '» — got «' + got[i] + '»'));
+    // the page's own vocabulary is the source: every «stem + ت» form in the page's strings is either converted or listed as not second person
+    const dir = path.join(__dirname, '..', 'src', 'app'); let src = '';
+    fs.readdirSync(dir).filter(f => /^a\d+_.*\.js$/.test(f)).sort().forEach(f => { src += fs.readFileSync(path.join(dir, f), 'utf8') + '\n'; });
+    src = src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
+    const words = {}; (src.match(/[آ-یٔ‌]+/g) || []).forEach(w => { words[w] = (words[w] || 0) + 1; });
+    const cand = Object.keys(words).filter(w => ['ت', '‌ات', 'هایت', '‌هایت'].some(sf => w.endsWith(sf) && w.length > sf.length + 1 && words[w.slice(0, -sf.length)] && w.slice(0, -sf.length).length >= 2));
+    const un = await ev((C) => C.filter(w => APP.ASSIST.toShoma(w) === w && (APP.ASSIST.NOTPOSS26 || []).indexOf(w) < 0), cand);
+    chk(cand.length > 100 && !un.length, 'register vocabulary guard: every «…ت» form of the page\'s strings is classified (POSS26 ⇒ «…تان», or NOTPOSS26) — unclassified: ' + un.join(' '));
+    // U53 / bank #231: the page's own questions in a «شما» talk — one register, one question
+    const Qs = await ev(() => { const out = []; const K = APP.LIVE_QK || {}; Object.keys(K).forEach(k => Object.keys(K[k] || {}).forEach(ph => (K[k][ph] || []).forEach(q => out.push(q)))); const TQ = APP.ASSIST.tutorQuestions || {}; Object.keys(TQ).forEach(k => (TQ[k].qs || []).forEach(q => out.push(q))); return out; });
+    const R = await ev((Q) => Q.map(q => { const one = APP.ASSIST.oneQ25(q), sh = APP.ASSIST.toShoma(one), g = APP.ASSIST.regSigns(sh); let d = 0, pd = 0, c = 0; for (const ch of one) { if (ch === '«') d++; else if (ch === '»' && d) d--; else if (ch === '(') pd++; else if (ch === ')' && pd) pd--; else if ((ch === '؟' || ch === '?') && !d && !pd) c++; } return { q, one, sh, to: g.to && g.sh, n: c }; }), Qs);
+    chk(Qs.length >= 20, 'registry questions found: ' + Qs.length);
+    const mixed = R.filter(r => r.to), multi = R.filter(r => r.n > 1);
+    chk(!mixed.length, 'U53 aB4 p7: no page question mixes registers after the «شما» transform — ' + mixed.map(r => r.sh).join(' | '));
+    chk(!multi.length, 'bank #231: every page question is one question — ' + multi.map(r => r.one.slice(0, 60)).join(' | '));
+    const b3 = R.filter(r => /از راهِ دیگری به دست آوری/.test(r.q))[0];
+    chk(b3 && b3.sh === 'می‌توانید نتیجه را از راهِ دیگری به دست آورید؟', 'U53: «می‌توانید نتیجه را از راهِ دیگری به دست آورید؟» — one register, one question, not two glued with a comma — ' + (b3 && b3.sh));
+    const el = await ev(() => [APP.ASSIST.oneQ25('آیا شرط برای تعیینِ مجهول کافی است؟ زائد است؟ متناقض است؟'), APP.ASSIST.oneQ25('نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟')]);
+    chk(el[0] === 'آیا شرط برای تعیینِ مجهول کافی است، زائد است، متناقض است؟' && el[1] === 'نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟', 'look-alike: short elliptical alternatives stay one question, as in round 25 — ' + JSON.stringify(el));
+  });
+
+  // ================= Q9 — متن‌های ثابتِ نماها به ضمیرِ او (U37 s12، A23-14 🔭، بانکِ #230)؛ حرفِ خودش هرگز =================
+  await section('dom', async () => {
+    const HER = 'ثابت کن که مجموعِ دو عددِ فرد زوج است.';
+    const run = async (age) => { await wipe(); await setB(await birthFor(age)); await fresh(); await turn('سلام. یک مسئله دارم: ' + HER + ' از کجا شروع کنم؟', 'خوب.');
+      const pid = await ev((HER) => { const r = APP.liveCreate('جمعِ دو عددِ فرد', HER, 'prove', { by: 'user' }); APP.liveBindSession(r.p.id, __cur()); return r.p.id; }, HER); const o = {};
+      for (const a of [['home'], ['lprob', pid], ['route', pid], ['e_prob']]) { await ev((a) => { APP.go.apply(APP, a); }, a); await p.waitForTimeout(120);
+        o[a[0]] = await ev(() => document.querySelector('#main').innerText.split('\n').map(l => l.trim()).filter(Boolean)); }
+      return o; };
+    const E = await run(78), Y = await run(30);
+    const STAT = /نمی‌دانی(?![آ-ی])|پیشرفتت(?!ان)|می‌بردت(?!ان)|خودت(?!ان)|می‌خواهی(?![آ-ی])|برایت(?!ان)/;
+    const young = [].concat(Y.home, Y.lprob, Y.route).filter(l => STAT.test(l));
+    chk(young.length >= 3, 'control: for a «تو» adult the static lines are in «تو» (the strings exist in the views) — ' + young.length);
+    const left = [].concat(E.home, E.lprob, E.route).filter(l => STAT.test(l));
+    chk(!left.length, 'U37 / A23-14 / bank #230: for a «شما» elder no static page line stays in «تو» — ' + JSON.stringify(left.slice(0, 4)).slice(0, 400));
+    const sh = [].concat(E.lprob).filter(l => /چرا می‌خواهید حلش کنید|صورتِ خودتان|برایتان مهم/.test(l));
+    chk(sh.length >= 2, 'the same lines are there in «شما» — ' + JSON.stringify(sh).slice(0, 200));
+    const hers = [].concat(E.lprob, E.route, E.e_prob).filter(l => /مجموعِ ?دو ?عددِ فرد زوج/.test(l));
+    chk(hers.length >= 2 && hers.every(l => /ثابت کن که/.test(l) && !/ثابت کنید/.test(l)), 'look-alike: her own statement («ثابت کن که …») is shown as she wrote it on every view — ' + JSON.stringify(hers).slice(0, 300));
+  });
+
+  // ================= Q9 — سنجشِ پس از پاسخ: مثبتِ کاذب نه، لغزشِ واقعی آری (C26-6، C26-17، D26-33، D26-53، U55) =================
+  await section('post', async () => {
+    const PASS = [
+      [82, [], 'برای ثبت به صفحه فرستادم: صورتِ معما، وارسیِ خودتان و راهِ «اگر همه مرغ بودند». در «🔭 مسئله‌های من» می‌ماند و فردا از همان‌جا بازش می‌کنید؛ نتیجهٔ ثبت را صفحه زیرِ همین پیام می‌گوید.', 'U55 aB4 p8 («نتیجهٔ ثبت را»)'],
+      [70, [], 'در این یکی، جمعِ «۱/۶ + ۱/۱۲» با آنچه نوشته‌اید نمی‌خواند (و عددِ بعدی هم بر همان بنا شده). عددِ درست را نمی‌گویم؛ همان جمع را با مخرجِ مشترک خودتان دوباره حساب می‌کنید؟', 'C26-17 s25 p18 («عددِ درست را»)'],
+      [70, [], 'جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌خواند. ولی دو جمع با نوشته‌تان نمی‌خواند. عددِ درست را نمی‌گویم؛ اولی را خودتان دوباره جمع می‌زنید؟', 'C26-17 aC3 p6'],
+      [70, [], 'حسابِ وارسی را با عددهای واقعی کردید: پیش‌بینیِ ۷۰ درصدی‌تان درست درآمد، و خرجِ درمانِ ۱۲ میلیونی هم از همان ۵۰ میلیونِ دمِ دست پرداخت شد. از این شش ماه چه آموختید که در حسابِ بعدی به کار ببرید؟', 'U55 B_x aB3 p15 («۱۲ میلیونی»)'],
+      [40, SH, 'حسابتان می‌خواند: سه طبقه با دو برش ۲۴۰ و ۶ دهم سانت می‌شود و از تختهٔ ۲۴۰ درنمی‌آید. حالا پنج تخته حدسِ تازهٔ شماست. اگر نقشهٔ برشِ هر پنج تخته را جداجدا بکشید چه می‌بینید؟', 'D26-53 aD4 p4 («سانت می‌شود»)'],
+      [30, TO, 'مقایسه‌ات درست حساب شده و خودت دیدی که ۷۵٪ اطمینانت از سقف بالاتر بود. شیراز که تبلیغ ندید ۲۶٪ رشد کرد و شهرهای دارای تبلیغ ۳۱٪. پیشنهادت دربارهٔ بودجه را با همین عدد بنویس.', 'D26-33 s32 p6 («ندید»)'],
+      [30, TO, 'می‌خواهی اطمینانت را با واقعیت بسنجی؛ در کاربرگش هر پیش‌بینی را خودت می‌نویسی. نخستین پیش‌بینی‌ات دربارهٔ این چند هفته چیست؟', 'A s05 p12 («نخستین»)'],
+      [30, TO.concat(['اون دو روز شکست، شبش مهمونی بودیم.']), 'نتیجهٔ خودت: ۵ روز از ۷ پیش از ۶:۳۰ بیدار شدی. دو روزِ شکست را هم گفتی: شبش مهمانی بودید. مهمانی علتِ تازه‌ای است یا همان علتِ قبلی؟', 'U55 oB1 p11 (real plural: «مهمونی بودیم» ⇒ «بودید»)'],
+      [30, TO, 'اگر خانمت با همین مرورگر کار کند، داده‌ها قاطی می‌شوند — برای جدا ماندن باید هر کدام نمایهٔ جدای مرورگر داشته باشید. از این راه‌حل چه درسی برمی‌داری؟', 'U55 B_x oB1 p13 («هر کدام … داشته باشید»)'],
+      [38, TO, 'صادقانه: نه به آن معنا. وقتی چیزی ساخته شود، صفحه فقط می‌سنجد که توصیفِ آن به گامِ تو می‌خورد یا نه؛ این‌که «روی دادهٔ واقعی آزموده شده» را امروز جایی نمی‌بیند و نمی‌گوید.', 'C26-6 pwC1 p8 (guillemets round a proposition)'],
+      [30, TO, 'این بخش را «گامِ میانی» می‌نامیم تا گم نشود.', 'bank #232'], [30, TO, 'او نقشه را ندید و برای همین مسیر را اشتباه رفت.', 'bank #233'], [40, SH, 'حاصلِ این برش ۶ دهم سانت می‌شود؛ خودتان اندازه بگیرید.', 'bank #234'],
+      [30, TO, 'نمی‌گویم راهت غلط است؛ فقط یک گام را دوباره ببین.', 'bank #235a'], [30, TO, 'شبِ قبلش همه مهمانی بودید؟', 'bank #235b']];
+    for (const [age, msgs, r, name] of PASS) { await person(age, msgs); const w = await rc(r); chk(!w, name + ': no rewrite call — ' + String(w).slice(0, 150)); }
+    const CATCH = [
+      [70, [], 'شما می‌توانید از همین‌جا ادامه بدهید، فقط اول عددت رو دوباره نگاه کن.', /دو ضمیر/, 'bank #246: a real mix is still caught'],
+      [30, ['جواب رو پیدا کردم', 'بگو درسته؟'], 'گفتی «جواب ۱۲ میشه» ولی من چنین چیزی در پیامت نمی‌بینم.', /نه در پیام‌های اوست/, 'bank #247: a false quotation of her is still caught'],
+      [30, TO, 'بفرمایید ادامه بدهید و نتیجه را بنویسید.', /«تو» بنویس/, 'look-alike: a real «شما» imperative in a «تو» talk is still caught'],
+      [40, SH, 'جوابت را بنویس و بعد عددت را نگاه کن.', /«شما» بنویس/, 'look-alike: «جوابت را … عددت را» (known possessives) are still «تو» signs'],
+      [30, TO, 'خودت گفتی «همیشه ریاضی‌ام ضعیف بوده و هیچ‌وقت درست نمی‌شود».', /نه در پیام‌های اوست/, 'look-alike: an attributed long quote she never wrote is still caught'],
+      [30, TO, 'نتیجه را دیدید و نوشتید؛ حالا خودت بگو کدام گام مانده.', /دو ضمیر/, 'look-alike: «دیدید» (second person plural) in a «تو» talk is still a mix']];
+    for (const [age, msgs, r, re, name] of CATCH) { await person(age, msgs); const w = await rc(r); chk(re.test(String(w)), name + ' — ' + String(w).slice(0, 150)); }
+  });
+
+  // ================= Q9 — D24-15 (aD1 p2، بانکِ #240): پرسشِ فهمِ صفحه برای کودک به واژه‌های خودش =================
+  await section('child', async () => {
+    const OPEN = 'یه مسئله: ۱۲ تا مداد رو بین ۳ نفر مساوی تقسیم کنیم، به هر کی چند تا می‌رسه؟';
+    await wipe(); await setB(await birthFor(9)); await fresh(); const u = await turn(OPEN, 'خوب.'); const hd = head(u.user);
+    chk(!/مجهول \(یا حکمی که باید ثابت شود\) چیست/.test(hd), 'D24-15 aD1 p2: no «مجهول (یا حکمی که باید ثابت شود) چیست؟» in the prompt of a 9-year-old');
+    chk(/دنبالِ چی می‌گردیم؟/.test(hd), 'D24-15: the understanding question is in child wording («دنبالِ چی می‌گردیم؟») — ' + (hd.split('\n').filter(l => /پیشنهادِ این نوبت|پرسشِ این نوبت همین/.test(l))[0] || '').slice(-160));
+    await wipe(); await setB(await birthFor(15)); await fresh(); const u2 = await turn(OPEN, 'خوب.');
+    chk(/مجهول \(یا حکمی که باید ثابت شود\) چیست/.test(head(u2.user)) && !/دنبالِ چی می‌گردیم/.test(head(u2.user)), 'look-alike: a teen keeps the book wording');
+    await wipe(); await setB(await birthFor(35)); await fresh(); const u3 = await turn(OPEN, 'خوب.');
+    chk(/مجهول \(یا حکمی که باید ثابت شود\) چیست/.test(head(u3.user)), 'look-alike: an adult keeps the book wording');
   });
 
   //SECTIONS

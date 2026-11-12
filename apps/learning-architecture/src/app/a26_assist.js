@@ -397,7 +397,10 @@
   /* دورِ ۲۶ (Q9، U29 bp3 s28 «سلام! امروز برگه‌ی سفید…»): عنوانِ پشتیبانِ سشن از پیامِ خام ساخته می‌شد — حالا بی سلام/معرفی و بی نامِ شخصِ سوم (A.AGE.titleOf، a43) */
   function title26(text) { try { return A.AGE && A.AGE.titleOf ? A.AGE.titleOf(text) : text; } catch (e) { return text; } }
   AS.title26 = title26;
-  function provisional(s, text) { return s.title || clip(title26(text), 50) || "گفت‌وگوی تازه"; }
+  /* بانکِ R26 #226: سشنِ روزِ دومِ یک مسئلهٔ زنده و بی عنوان از مدل ⇒ عنوانِ همان مسئله؛ وگرنه پیامِ پیراسته */
+  function liveTitle26(s) { try { var pid = s && (s.lprob || (A.liveSessionPid && A.liveSessionPid(s))), r = pid && A.liveRec && A.liveRec(pid); return r && r.p && r.p.title ? r.p.title : ""; } catch (e) { return ""; } }
+  AS.sessTitle26 = function (s, text, n) { return (s && s.title) || clip(liveTitle26(s) || title26(text != null ? text : (((s && s.msgs) || []).filter(function (m) { return m && m.role === "user"; })[0] || {}).text), n || 50); };
+  function provisional(s, text) { return AS.sessTitle26(s, text, 50) || "گفت‌وگوی تازه"; }
 
   /* ---------- پیام به هوش ---------- */
   var SYS = [
@@ -1175,7 +1178,7 @@
       all.length ? h("ul", { class: "plain" }, all.map(function (s) {
         var pg = AS.progress ? AS.progress(s) : null;   // همان شمارِ کشوی تور و «امروز» (یک منبع)
         return h("li", { class: "as-li" + (cur && cur.id === s.id ? " on" : "") }, h("button", { class: "linkish", type: "button", onclick: function () { store("cur", s.id); ui.view = "chat"; AS.clearMarks(); paint(); } },
-          h("b", {}, s.title || clip(title26((s.msgs[0] || {}).text), 40) || "گفت‌وگوی تازه"),
+          h("b", {}, AS.sessTitle26(s, null, 40) || "گفت‌وگوی تازه"),
           h("span", { class: "small muted" }, " · " + A.fdate(s.updated) + (pg ? " · " + pg.label + " " + fa(pg.done) + "/" + fa(pg.all) : "") + (s.reports && s.reports.length ? " · 🛎" + fa(s.reports.length) : ""))));
       })) : h("p", { class: "small muted" }, "هنوز سشنی نیست."));
   }

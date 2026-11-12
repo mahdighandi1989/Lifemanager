@@ -34916,7 +34916,10 @@ APP.goFromURL = function (q) {
   /* دورِ ۲۶ (Q9، U29 bp3 s28 «سلام! امروز برگه‌ی سفید…»): عنوانِ پشتیبانِ سشن از پیامِ خام ساخته می‌شد — حالا بی سلام/معرفی و بی نامِ شخصِ سوم (A.AGE.titleOf، a43) */
   function title26(text) { try { return A.AGE && A.AGE.titleOf ? A.AGE.titleOf(text) : text; } catch (e) { return text; } }
   AS.title26 = title26;
-  function provisional(s, text) { return s.title || clip(title26(text), 50) || "گفت‌وگوی تازه"; }
+  /* بانکِ R26 #226: سشنِ روزِ دومِ یک مسئلهٔ زنده و بی عنوان از مدل ⇒ عنوانِ همان مسئله؛ وگرنه پیامِ پیراسته */
+  function liveTitle26(s) { try { var pid = s && (s.lprob || (A.liveSessionPid && A.liveSessionPid(s))), r = pid && A.liveRec && A.liveRec(pid); return r && r.p && r.p.title ? r.p.title : ""; } catch (e) { return ""; } }
+  AS.sessTitle26 = function (s, text, n) { return (s && s.title) || clip(liveTitle26(s) || title26(text != null ? text : (((s && s.msgs) || []).filter(function (m) { return m && m.role === "user"; })[0] || {}).text), n || 50); };
+  function provisional(s, text) { return AS.sessTitle26(s, text, 50) || "گفت‌وگوی تازه"; }
 
   /* ---------- پیام به هوش ---------- */
   var SYS = [
@@ -35694,7 +35697,7 @@ APP.goFromURL = function (q) {
       all.length ? h("ul", { class: "plain" }, all.map(function (s) {
         var pg = AS.progress ? AS.progress(s) : null;   // همان شمارِ کشوی تور و «امروز» (یک منبع)
         return h("li", { class: "as-li" + (cur && cur.id === s.id ? " on" : "") }, h("button", { class: "linkish", type: "button", onclick: function () { store("cur", s.id); ui.view = "chat"; AS.clearMarks(); paint(); } },
-          h("b", {}, s.title || clip(title26((s.msgs[0] || {}).text), 40) || "گفت‌وگوی تازه"),
+          h("b", {}, AS.sessTitle26(s, null, 40) || "گفت‌وگوی تازه"),
           h("span", { class: "small muted" }, " · " + A.fdate(s.updated) + (pg ? " · " + pg.label + " " + fa(pg.done) + "/" + fa(pg.all) : "") + (s.reports && s.reports.length ? " · 🛎" + fa(s.reports.length) : ""))));
       })) : h("p", { class: "small muted" }, "هنوز سشنی نیست."));
   }
@@ -37494,6 +37497,8 @@ APP.goFromURL = function (q) {
   function pageAsk26(t) {
     t = String(t || ""); if (!/[؟?]/.test(t) || !PAGEREF26.test(t)) return false;
     var x = faDigits(t); if ((x.match(/\d+(?:[.٫]\d+)?/g) || []).length >= 1 || /[=<>≤≥]/.test(x)) return false;
+    /* بانکِ R26 #229 «این دکمهٔ 🧭 بالای صفحه دقیقاً چی رو نشون میده؟»: اشاره به یک جزءِ صفحه (دکمه/منو/زبانه/نوار/نماد) + پرسشِ «چی/چه/کجا/برای چی» */
+    if (/(?:^|[\s‌«(،])(?:این|اون|آن|همین)[\s‌]*(?:دکمه|منو|زبانه|نوار|نماد|علامت|آیکون)(?:ٔ|‌ی|ی|ِ)?(?![آ-ی])/.test(t) && /(?:^|[\s‌])(?:چی|چیه|چیست|چه|کجا|کجاست)(?![آ-ی])/.test(t)) return true;
     try { if (!viewLabels26 || !viewLabels26.length) viewLabels26 = (AS.views ? AS.views() : []).map(function (v) { return String(v.label || "").replace(/[^آ-یءٔ‌ِa-zA-Z\s]/g, " ").replace(/\s+/g, " ").trim(); }).filter(function (l) { return l.length >= 6 && /\s/.test(l); }); } catch (e) { viewLabels26 = []; }
     var n = t.replace(/[^آ-یءٔ‌ِa-zA-Z\s]/g, " ").replace(/\s+/g, " ");
     return viewLabels26.some(function (l) { return n.indexOf(l) >= 0; });
@@ -38626,7 +38631,7 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۳ (Q1، A23-14 «می‌کنید … مطمئنی»، B·D9 «تولدت») */ "مطمئنی": "مطمئنید", "تولدت": "تولدتان", "پیامت": "پیامتان", "حرفت": "حرفتان", "سنت": "سنتان", "دادی": "دادید", "بودی": "بودید", "موافقی": "موافقید", "آماده‌ای": "آماده‌اید",
     /* دورِ ۲۵ (P6، D25-23 aD3 c9 «خودتان آزمودید … نتیجهٔ تازهٔ توست»): یک ضمیر در هر جمله — صورت‌های چسبیدهٔ «تو» که از قلم افتاده بود */ "توست": "شماست", "توئه": "شماست", "مجهولت": "مجهولتان", "پاسخت": "پاسختان", "دلیلت": "دلیلتان", "نظرت": "نظرتان", "منظورت": "منظورتان", "هدفت": "هدفتان", "گامت": "گامتان", "برات": "برایتان", "بهت": "به شما", "ازت": "از شما", "باهات": "با شما", "خودتو": "خودتان را", "نوشتی": "نوشتید" };
   /* دورِ ۱۷ (B·D5): ستاک‌های حالِ فعل — یک فهرست برای التزامی («بزنی» ⇒ «بزنید») و امری («بزن» ⇒ «بزنید»، «نزن»، «بزنش») — نه واژه‌به‌واژه */
-  var STEMS = "زن|کن|گو|گوی|بین|دان|نویس|سنج|یاب|یازما|یازمای|پرس|شمار|ساز|گیر|خواه|کش|بر|ده|آور|یاور|رس|خوان|گرد|یندیش|گذار|ذار|فرست|یاموز|کوش|گشا|شنو|پوش|ریز|پذیر|ران|بند|چین|یفزا|توان|رو|خور|شو|یا|ینداز|نشان|سپار|بخش|پرداز|شناس";
+  var STEMS = "زن|کن|گو|گوی|بین|دان|نویس|سنج|یاب|یازما|یازمای|پرس|شمار|ساز|گیر|خواه|کش|بر|ده|آور|یاور|رس|خوان|گرد|یندیش|گذار|ذار|فرست|یاموز|کوش|گشا|شنو|پوش|ریز|پذیر|ران|بند|چین|یفزا|توان|رو|خور|شو|یا|ینداز|نشان|سپار|بخش|پرداز|شناس|فهم";
   var SUBJ = STEMS;
   function impSh(w, pre, st, cl) { return pre + st + (/ا$/.test(st) || st === "گو" ? "یید" : "ید") + (cl || ""); }
   var B0 = "(?<![آ-ی‌])", E0 = "(?![آ-ی‌])";
@@ -38643,6 +38648,17 @@ APP.goFromURL = function (q) {
     [new RegExp(B0 + "(" + Object.keys(SH_POS).join("|") + ")" + E0, "g"), function (w) { return SH_POS[w]; }],
     [new RegExp(B0 + "(" + Object.keys(SH_IMP).join("|") + ")" + E0, "g"), function (w) { return SH_IMP[w]; }]
   ];
+  /* دورِ ۲۶ (Q9، D26-40 s35 «اصلاحت رسید، ولی … پیامتان»، «تقریبت بس بود»؛ U37 s12 «پیشرفتت اینجاست»، «می‌بردت»؛ U53 aB4 «می‌توانید … به دست آوری»):
+     ریشه — ضمیرِ پیوستهٔ «ـت» فقط برای واژه‌هایی برگردانده می‌شد که کسی دستی در SH_POS نوشته بود؛ صفحه نزدیکِ دویست صورتِ «…ت» دارد و هر سطرِ تازه یکی را جا می‌انداخت.
+     حالا واژگانِ خودِ صفحه منبع است: هر واژهٔ «ستاک + ت» ِ متن‌های صفحه یا ملکی است (POSS26 ⇒ «…تان») یا نه (NOTPOSS26: «درست»، «حالت»، «کارت» …). آزمونِ
+     test_tour1_r26_classify (بخشِ reg) متن‌های src را می‌خواند و هر صورتِ رده‌بندی‌نشده را خطا می‌گیرد — سطرِ تازه بی رده نمی‌ماند. */
+  var POSS26 = ("پیشرفت|موضوع|همکار|اطمینان|چشم|ادعای|توضیح|قلم|پوست|بدن|برداشت|نزدیک|دوست|سر|جلوی|جدول|آزمون|خطای|سنجش|راه‌حل|ابزار|دانش|ببرد|بی‌پاسخ|تصمیم|متن|دست|می‌برم|نشان|توان|فهم|نزدیک‌تر|برهان|کنار|اصلاح|پیشین|تلاش|اول|" +
+    "کالیبراسیون|وقت|بزرگ‌تر|نقض|حرکت|دستاورد|رقیب|دقیق|تقریب|کمک|کوتاه|فرمول|روی|دوم|صورت|فرض|نمودار|شکل|پیاپی|آغاز|کوچک|شواهد|رد|استدلال|شهود|قانون|میل|می‌برد|تسلط|پیشنهاد|گوگل|امروز|باور|اسم|فکر|سؤال|سوال|مشکل|حساب|عدد").split("|");
+  var NOTPOSS26 = "هست|است|درست|کارت|حالت|وضعیت|شیت|کجاست|قطعیت|واقعیت|موافقت|کاشت|سلامت|صفت|نیت|منزلت|شدت|مشت|پرت|نفرت|کمیت|هشت|مخالفت|بلیت|استوارت|بست|احتمالات|رسمیت|حکمت|دمت|تاست|‌هایت|کشت|علّیت|جدیت|اوت|کلیت|فعالیت|بهشت|وات|هایت|جمعیت".split("|");
+  AS.POSS26 = POSS26; AS.NOTPOSS26 = NOTPOSS26;
+  SH_RX.push([new RegExp(B0 + "(" + POSS26.join("|") + ")ت" + E0, "g"), "$1تان"]);
+  SH_RX.push([new RegExp("([آ-ی])هایت" + E0, "g"), "$1هایتان"]);   // «کارهایت»، «فکرهایت» (بی نیم‌فاصله)
+  SH_RX.push([new RegExp(B0 + "(به[\\s‌]+دست|به[\\s‌]+یاد|پدید|فراهم|بیرون|به[\\s‌]+شمار|به[\\s‌]+جا)([\\s‌]+)آوری" + E0, "g"), "$1$2آورید"]);   // التزامیِ بی «ب»: «به دست آوری» (U53)
   function toShoma(t) { var x = String(t || ""); SH_RX.forEach(function (p) { x = x.replace(p[0], p[1]); }); return x; }
   AS.toShoma = toShoma;
   /* دورِ ۲۳ (Q1، A23-14، B·D9، D23-17): سطرهای خودِ صفحه (پیام‌های «سامانه»، کارتِ تولد، پرسش‌های دکمه‌دار) به ضمیرِ همین گفت‌وگو — «شما» ⇒ صورت‌های «شما»
@@ -38660,7 +38676,9 @@ APP.goFromURL = function (q) {
       if (d === 0) buf += ch; else out += ch; }
     return out + fn(buf); }
   /* سطرِ صفحه بیرون از گفت‌وگو («امروز»): ضمیرِ تازه‌ترین سشنِ او (یا درخواستِ صریحش در نمایه) */
-  AS.regPage = function (t) { var last = null, lt = ""; try { S.all("achat").forEach(function (x) { var M = (x && x.msgs) || [], a = String((M[M.length - 1] || {}).at || x.at || ""); if (M.some(isUser) && a >= lt) { lt = a; last = x; } }); } catch (e) { } return AS.regSys(last, t); };
+  function pageSess26() { var last = null, lt = ""; try { S.all("achat").forEach(function (x) { var M = (x && x.msgs) || [], a = String((M[M.length - 1] || {}).at || x.at || ""); if (M.some(isUser) && a >= lt) { lt = a; last = x; } }); } catch (e) { } return last; }
+  AS.pageSess26 = pageSess26;
+  AS.regPage = function (t) { return AS.regSys(pageSess26(), t); };
   /* دورِ ۲۴ (R5، D24-6): همین گذرگاهِ یگانهٔ سطرهای صفحه هر «YYYY-MM-DD» را هم شمسی می‌کند (A.faDates ِ a43؛ بیرون از «…») */
   /* دورِ ۲۵ (P6، A23-14 aA3 ««سلیقه‌ات» هم ثبت شد»): «…» ِ کوتاهی که حرفِ خودِ او نیست برچسبِ خودِ صفحه است (نامِ فیلد/دکمه) و مثلِ باقیِ سطر ضمیر می‌گیرد؛ حرفِ خودش و
      عنوان‌هایش (هر چه در پیام‌هایش هست) و نقلِ بلند دست نمی‌خورد */
@@ -38682,13 +38700,36 @@ APP.goFromURL = function (q) {
       var raw = m.text0 != null && m.text === m.textR ? m.text0 : m.text, out = AS.regSys(se, raw);
       if (out !== raw) { m.text0 = raw; m.text = out; m.textR = out; } else if (m.text0 != null) { m.text = raw; delete m.text0; delete m.textR; } } }
   AS.regStore25 = regStore25;
+  /* دورِ ۲۶ (Q9، U37 s12 «نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت»، «مانده: فقط بازنگریِ خودت» کنارِ «با فکرِ خودتان»؛ A23-14 🔭؛ بانکِ R26 #230): ضمیرِ او فقط روی سطرهای
+     «سامانه» و فهرستِ «امروز» می‌نشست؛ متن‌های ثابتِ نماها (سرخط‌ها، نوارِ 🧭، برچسبِ فرم‌ها) هر کدام در پروندهٔ خودشان «تو» نوشته شده‌اند. یک گذرگاه برای همهٔ نماها: پس از هر
+     نقش بستن (A.render) و هر تغییرِ بعدیِ همان نما (MutationObserver)، گره‌های متنیِ #main و نوارِ بالا از همان AS.regSys می‌گذرند — فقط وقتی ضمیرِ او «شما» است.
+     حرفِ خودِ او هرگز: درونِ «…»، فیلدهای فرم، هر عنصرِ data-own، حبابِ گفت‌وگو (.as-panel)، و هر گره‌ای که متنش در نوشته‌های خودِ او هست (پیام‌ها و رکوردهایش). */
+  var hers26 = { n: -1, t: "" };
+  function hersText26() { var n = 0, parts = []; try { S.all("achat").forEach(function (x) { (x.msgs || []).forEach(function (m) { if (isUser(m)) { n++; parts.push(String(m.text || "")); } }); if (x.title) parts.push(x.title); });
+      ["eprob", "idea", "case", "kcase", "topic"].forEach(function (ty) { S.all(ty).forEach(function (r) { n++; var p = r.p || r; [p.title, p.statement, r.title, r.text, r.note].forEach(function (v) { if (typeof v === "string" && v) parts.push(v); }); }); }); } catch (e) { }
+    if (n !== hers26.n) { hers26.n = n; hers26.t = parts.join("\n").replace(/\s+/g, " "); } return hers26.t; }
+  function regDom26(root) {
+    try { if (!root || typeof document === "undefined" || !document.createTreeWalker) return; var se = pageSess26(); if (!se || AS.convRegister(se, "", []) !== "shoma") return;
+      var H = null, w = document.createTreeWalker(root, 4 /* TEXT */, null), nd, L = [];
+      while ((nd = w.nextNode())) L.push(nd);
+      L.forEach(function (nd) { var t = nd.nodeValue; if (!t || !/[آ-ی]/.test(t) || !/[تیونشکرزدهآ]/.test(t)) return; var el = nd.parentNode; if (!el || !el.closest) return;
+        if (el.closest(".as-panel, textarea, input, script, style, [contenteditable], .math, math, svg")) return;
+        var out = outMap25(se, t, toShoma); if (out === t) return;
+        var key = t.replace(/\s+/g, " ").replace(/…\s*$/, "").trim(); if (key.length >= 6) { if (H == null) H = hersText26(); if (H.indexOf(key) >= 0) return; }
+        nd.nodeValue = out; });
+    } catch (e) { } }
+  AS.regDom26 = regDom26;
+  if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); } catch (e) { } return r; }; A.render._reg26 = true;
+    try { if (typeof MutationObserver !== "undefined") { var mo26 = new MutationObserver(function (ms) { try { var seen = []; ms.forEach(function (m) { var el = m.target && m.target.nodeType === 3 ? m.target.parentNode : m.target; var mn = el && el.closest ? el.closest("#main") : null; if (mn && seen.indexOf(mn) < 0) seen.push(mn); }); seen.forEach(regDom26); } catch (e) { } });
+      var arm26 = function () { var mn = document.getElementById("main"); if (mn) mo26.observe(mn, { childList: true, subtree: true, characterData: true }); else setTimeout(arm26, 300); }; arm26(); } } catch (e) { } }
   AS.sysRaw25 = function (m) { return m && m.text0 != null && m.text === m.textR ? m.text0 : (m ? m.text : ""); };
   if (!S.put._reg25) { var put25 = S.put; S.put = function (r) { try { if (r && r.type === "achat") regStore25(r); } catch (e) { } return put25.apply(this, arguments); }; S.put._reg25 = true; }
   /* دورِ ۲۶ (Q9، C22 — C26-22): عنوان‌ها و برچسب‌ها از «صورتِ نگه‌داشتهٔ مسئلهٔ گفت‌وگو» (C.stmt)، عنوانِ سشن و عنوانِ مسئلهٔ زنده ساخته می‌شوند (نوارِ 🧭، «امروز»، 📜، پشتهٔ 🧩).
      نامِ مدرسه/معلم/شخصِ سوم هنگامِ **نوشتنِ** همین سه فیلد جایش را به «[نامِ …]» می‌دهد (A.AGE.privLabel، a43) — همان درسِ دورِ ۲۵: تبدیل هنگامِ ذخیره، نه فقط هنگامِ نقش بستن.
      پیامِ خودش در گفت‌وگو (msgs) و «صورتِ خامِ گشایش» (C.stmtRaw24، ورودیِ آشکارساز) دست نمی‌خورد. */
   function privStore26(r) { var P = A.AGE && A.AGE.privLabel; if (!P || !r) return;
-    if (r.type === "achat") { var C = r.coach; if (C && typeof C.stmt === "string" && C.stmt) { var m1 = P(C.stmt); if (m1 !== C.stmt) C.stmt = m1; } if (typeof r.title === "string" && r.title) { var m2 = P(r.title); if (m2 !== r.title) r.title = m2; } }
+    if (r.type === "achat") { var C = r.coach, ctx = ""; if ((C && C.stmt) || r.title) ctx = (r.msgs || []).filter(isUser).map(function (m) { return String(m.text || ""); }).join("\n");
+      if (C && typeof C.stmt === "string" && C.stmt) { var m1 = P(C.stmt, ctx); if (m1 !== C.stmt) C.stmt = m1; } if (typeof r.title === "string" && r.title) { var m2 = P(r.title, ctx); if (m2 !== r.title) r.title = m2; } }
     else if (r.p && typeof r.p.title === "string" && r.p.title && /^eprob/.test(String(r.type || r.id || ""))) { var m3 = P(r.p.title); if (m3 !== r.p.title) r.p.title = m3; if (typeof r.title === "string" && r.title) { var m4 = P(r.title); if (m4 !== r.title) r.title = m4; } } }
   AS.privStore26 = privStore26;
   if (!S.put._priv26) { var put26 = S.put; S.put = function (r) { try { privStore26(r); } catch (e) { } return put26.apply(this, arguments); }; S.put._priv26 = true; S.put._reg25 = true; }
@@ -38851,7 +38892,13 @@ APP.goFromURL = function (q) {
   /* دورِ ۲۴ (R5، C24-15): «ـید/ـین» پس از ستاکِ گذشته فقط وقتی ستاک به پایانِ گذشته ختم شود (ـاد/ـید/ـود/ـرد/ـند/ـزد/ـشد/ـمد، ـست/ـشت/ـخت/ـفت) — اسمِ «روتین»، «لاتین»، «کراتین» فعل نیست.
      الگوی پیشین: AS.R24_QUARANTINE.signSh */
   var SIGN_SH_R23 = /(?:^|[^آ-ی‌])(?:شما|خودتان|خودتون|جنابعالی|حضرتعالی|سرکار|(?:ن?می[‌\s][آ-ی]{2,10}|[بن][آ-ی]{1,10}|[آ-ی]{2,10}[دت])(?:ید|ین))(?![آ-ی‌])/;
-  var SIGN_SH = /(?:^|[^آ-ی‌])(?:شما|خودتان|خودتون|جنابعالی|حضرتعالی|سرکار|(?:ن?می[‌\s][آ-ی]{2,10}|[بن][آ-ی]{1,10}|[آ-ی]{1,9}(?:[اویرنزشم]د|[سشخف]ت))(?:ید|ین))(?![آ-ی‌])/;
+  var SIGN_SH_R25 = /(?:^|[^آ-ی‌])(?:شما|خودتان|خودتون|جنابعالی|حضرتعالی|سرکار|(?:ن?می[‌\s][آ-ی]{2,10}|[بن][آ-ی]{1,10}|[آ-ی]{1,9}(?:[اویرنزشم]د|[سشخف]ت))(?:ید|ین))(?![آ-ی‌])/;
+  /* دورِ ۲۶ (Q9، D26-33 s32 «شیراز که تبلیغ ندید»، A s05 p12 «نخستین پیش‌بینی‌ات»، بانکِ R26 #233): «[بن] + هر چیز + ید/ین» فعلِ دومِ‌شخصِ جمع نیست — «ندید» سوم‌شخصِ گذشته است،
+     «نخستین»، «بنابراین»، «بازدید»، «بعید» فعل نیستند. پس از «بـ/نـ» فقط ستاکِ حالِ فعل (همان فهرستِ ستاک‌های مبدلِ «شما» + چند ستاکِ پرکاربرد) شاهدِ «شما» است.
+     الگوی پیشین: AS.R26_QUARANTINE.signSh25. */
+  var STEMS_SH26 = STEMS + "|فرما|فرمای|مان|مون|خر|فروش|پر|چرخ|نشین|شین|ایست|ترس|خند|دو|پز|شوی|خواب|مال|پیچ|دوز|چسب|کوب|تراش|چش|فهم|پاش|شکن|فشار|آزما|آزمای|آی|یای|جوی|جو|شمر|سپر|افزای|فزای|کاه|گذر|بخشای|نگر|آموز|یاموز|اندیش|ندیش";
+  var SIGN_SH = new RegExp("(?:^|[^آ-ی‌])(?:شما|خودتان|خودتون|جنابعالی|حضرتعالی|سرکار|(?:ن?می[‌\\s][آ-ی]{2,10}|[بن](?:" + STEMS_SH26 + ")ی?|[آ-ی]{1,9}(?:[اویرنزشم]د|[سشخف]ت))(?:ید|ین))(?![آ-ی‌])");
+  AS.R26_QUARANTINE = Object.assign(AS.R26_QUARANTINE || {}, { signSh25: SIGN_SH_R25 });
   /* قرنطینه (تورِ پولیا RM6a — docs/overhaul/REMOVAL_CANDIDATES.md): فهرستِ بستهٔ دورِ ۱۷ ِ نشانه‌های «تو» (فقط امرِ پیشونددار؛ «ثبت کن»، «کمک کن»،
      «باورت»، «میگی» بی نیم‌فاصله و «مطمئنی» را نمی‌شناخت و گزارشِ درستِ مدل را رد می‌کرد) */
   var SIGN_TO21 = /(?:^|[^آ-ی‌])(?:تو(?!\s*(?:این|اون|آن|همین|همون|کتاب|خونه|کلاس|ذهنم|دلم))|خودت|نظرت|راهت|حدست|جوابت|برات|بهت|ازت|باهات|داری|هستی|ن?می[‌\s][آ-ی]{2,10}ی|[بن](?:گو|بین|کن|زن|ده|یا|رو|خوان|نویس|گیر|شین)|وایسا)(?![آ-ی‌])/;   // قرنطینه (دورِ ۲۲، D·dp3): «تو» ِ تنها با فهرستِ بستهٔ استثنا — در R22_QUARANTINE.signTo21
@@ -38862,14 +38909,20 @@ APP.goFromURL = function (q) {
     return x.replace(/«[^»]*»|"[^"\n]*"|“[^”]*”/g, " ").replace(/(?:^|[\s.،!؟?\n])(?:سؤال|سوال|صورتِ?[\s‌]*(?:مسئله|سؤال|سوال)|متنِ?[\s‌]*(?:سؤال|سوال|مسئله)|مسئله|تمرین|کتاب\s*نوشته|صورت)[\s‌]*[:：][^.!؟?\n]*[.!؟?\n]?/g, " "); }
   /* R7/R7+ (دورِ ۲۱، B·D10 s14، D·s38، A21-1 «باید/نباید/بیاید/می‌گوید/بیشترین»): سوم‌شخص، فعلِ کمکی، صفتِ عالی («ـترین») و امرِ مفردِ «ببین/بنشین» یا فعلِ کمکی است، نه «شما» — «ـید» ِ دومِ‌شخصِ جمع پس از ستاکِ واکه‌دار «ـیید» است
      («می‌گویید»، «می‌آیید»)؛ واژه‌ای که به «ـوید/ـاید» ِ بی «ی» ِ پیشین ختم می‌شود شاهدِ «شما» نیست */
-  function no3sg21(o) { return String(o || "").replace(/(^|[^آ-ی‌])[آ-ی‌]*?[وا]ید(?![آ-ی‌])/g, "$1 ").replace(/(^|[^آ-ی‌])[آ-ی‌]*?ترین(?![آ-ی‌])/g, "$1 ").replace(/(^|[^آ-ی‌])(?:ن?می[‌\s]?|[بن])?(?:بین|شین|چین)(?![آ-ی‌])/g, "$1 "); }
+  function no3sg21(o) { return String(o || "").replace(/(^|[^آ-ی‌])[آ-ی‌]*?[وا]ید(?![آ-ی‌])/g, "$1 ").replace(/(^|[^آ-ی‌])[آ-ی‌]*?ترین(?![آ-ی‌])/g, "$1 ").replace(/(^|[^آ-ی‌])(?:نخستین|راستین|آستین|پوستین)(?![آ-ی‌])/g, "$1 ").replace(/(^|[^آ-ی‌])(?:ن?می[‌\s]?|[بن])?(?:بین|شین|چین)(?![آ-ی‌])/g, "$1 "); }
   function regSignsR17(t) { var o = unq18(t), o3 = no3sg21(o); return { sh: SIGN_SH.test(o3), to: SIGN_TO.test(o) || TO_PRON22.test(o) }; }
   /* RM6a: نشانه‌های ضمیر از ساختِ واژه، نه فهرستِ بسته — «تو»: فعلِ دومِ‌شخصِ مفرد (می‌…ی، «میگی» بی نیم‌فاصله)، صفت/اسم + «ی» ِ پرسشی («مطمئنی؟»)،
      ضمیرِ پیوستهٔ «ـت/ـات» پیش از فعل («باورت میشه»)، امرِ بی «ـید» از ستاکِ فعل (همان ستاک‌های مبدلِ «شما»)، امرِ مرکب («ثبتش کن»، «کمک کن»)؛
      «شما»: «ـید/ـین» ِ دومِ‌شخصِ جمع (بی پیشوند هم: «ثبت کنید»، «کمکم کنین»). متنِ نقل‌شده («…») و حرفِ خودِ دستیار هرگز شاهد نیست. */
   var IMP_V = "کن|بکن|بده|بزن|بگیر|بگو|بنویس|بفرست|بساز|بخون|بخوان|بیار|بذار|بگذار|ببین|بکش|بپرس|بیا|برو|بمون|بچین";
   var SIGN_TO18_R23 = new RegExp("(?:^|[^آ-ی‌])(?:ن?می[‌\\s]?[آ-ی]{1,10}ی|[آ-ی]{2,}ی(?=\\s*[؟?])|[آ-ی]{2,}(?:‌ات|ت)(?=\\s+(?:ن?می[‌\\s]?شه|ن?می[‌\\s]?شود|چیه|چیست|کجاست|رو\\s|را\\s))|[بن](?:" + STEMS + "|نداز)(?:ش|م|مون|شون)?|[آ-ی]{2,}(?:ش|م|مون)?\\s+(?:" + IMP_V + ")(?:ش)?)(?![آ-ی‌])");
-  var SIGN_TO18 = new RegExp("(?:^|[^آ-ی‌])(?:ن?می[‌\\s]?[آ-ی]{1,10}ی|[آ-ی]{2,}ی(?=\\s*[؟?])|[آ-ی]{2,}(?:‌ات|ت)(?=\\s+(?:ن?می[‌\\s]?شه|ن?می[‌\\s]?شود|چیه|چیست|کجاست|رو\\s|را\\s))|[بن](?:" + STEMS + "|نداز)(?:ش|شون)?|[آ-ی]{2,}(?:ش|م|مون)?\\s+(?:" + IMP_V + ")(?:ش)?)(?![آ-ی‌])");
+  /* دورِ ۲۶ (Q9، D26-53 aD4 «۶ دهم سانت می‌شود»، U55 aB4 p8 «نتیجهٔ ثبت را»، C26-17 s25 p18 / aC3 p6 «عددِ درست را نمی‌گویم»، بانکِ R26 #234): «هر واژهٔ مختوم به ت + را/می‌شود»
+     ضمیرِ پیوسته نیست («ثبت»، «درست»، «سانت»، «نوبت»، «صورت» …). ضمیرِ «ـت» فقط وقتی شاهدِ «تو» است که صفحه بتواند آن را بشناسد: «…‌ات» (با نیم‌فاصله) یا ستاکِ ملکیِ
+     شناخته (واژگانِ خودِ صفحه POSS26 و SH_POS)؛ جای دیگر داوری نمی‌کند. الگوی پیشین: AS.R26_QUARANTINE.signTo18_25. */
+  var CLIT26 = "(?:[آ-ی]{2,}‌ات|(?:" + POSS26.concat(Object.keys(SH_POS).filter(function (w) { return /[^و]ت$/.test(w) && !/\s/.test(w); }).map(function (w) { return w.slice(0, -1); })).join("|") + ")ت)";
+  /* B_x aB3 p15 «خرجِ درمانِ ۱۲ میلیونی»: «می» ِ چسبیده (بی نیم‌فاصله) فقط با ستاکِ فعل نشانهٔ «تو» است («میگی»، «میدونی») — «میلیونی»، «میانی»، «میزی» فعل نیستند */
+  var JOINED26 = "(?:" + STEMS + "|گ|ر|دون|خوا|تون|ش|د|ا|خون|مون|ار|خر|فهم|مان|آی|خند|ترس|پر|چرخ|شین|نشین|خواب|دو)";
+  var SIGN_TO18 = new RegExp("(?:^|[^آ-ی‌])(?:ن?می(?:[‌\\s][آ-ی]{1,10}|" + JOINED26 + ")ی|[آ-ی]{2,}ی(?=\\s*[؟?])|" + CLIT26 + "(?=\\s+(?:ن?می[‌\\s]?شه|ن?می[‌\\s]?شود|چیه|چیست|کجاست|رو\\s|را\\s))|[بن](?:" + STEMS + "|نداز)(?:ش|شون)?|[آ-ی]{2,}(?:ش|م|مون)?\\s+(?:" + IMP_V + ")(?:ش)?)(?![آ-ی‌])");
   /* دورِ ۲۴ (R5، C24-10): «ببینم/بگم» اول‌شخص است، نه امر — «ـم/ـمون» پس از ستاک دیگر نشانهٔ «تو» نیست (الگوی پیشین: AS.R24_QUARANTINE.signTo18).
      B24·D11: امرِ کارِ ماشینی به خودِ صفحه («ثبتش کن»، «ذخیره کن»، «پاکش کن») نشانهٔ ضمیرِ او با آدم نیست */
   var MACH24 = /(^|[^آ-ی‌])(?:ثبت|ذخیره|یادداشت|پاک|حذف|اضافه|کپی|چاپ|آپلود|سیو)(?:ش|شون|شان)?[\s‌]*(?:بکن|نکن|کن|کنی)(?![آ-ی‌])/g;
@@ -38879,7 +38932,7 @@ APP.goFromURL = function (q) {
   var SIGN_SH18 = /(?:^|[^آ-ی‌])(?:(?:ن?می[‌\s]?|[بن])?(?:کن|ده|گ|زن|گیر|بین|خوان|نویس|فرما|فرمای|دار|کش|ساز|فرست|گذار|ذار|یار)(?:ید|ین))(?![آ-ی‌])/;
   /* دورِ ۲۵ (P6، بانکِ R25 #198 «خوب. بازبینی؟»): «…ی؟» فقط وقتی نشانهٔ «تو» است که صفت/حالت + «ی» ِ دوم‌شخص باشد («مطمئنی؟») — اسمِ مصدر از ستاکِ حال
      («بازبینی، بررسی، ارزیابی، نتیجه‌گیری، جمع‌بندی») و واژه‌های «ـی»‌دارِ غیرِفعلی («بعدی؟»، «کافی؟»، «چی؟») نه. همین پالایه پیش از SIGN_TO18 در هر دو خواننده (پاسخ و پیامِ او) */
-  var NOUNYI25 = new RegExp("(^|[^آ-ی‌])(?:[آ-ی]+[‌]?(?:بین|رس|یاب|نگر|گیر|بند|ریز|ساز|گذار|آور|رو|خوان|نویس|سنج|شمار|کار|دار|یاد|آموز|پرس|گو|جو|شناس|نما|پذیر|ده|کش|زن)ی|چی|کی|یکی|بعدی|قبلی|کافی|اصلی|کلی|خالی|عددی|واقعی|بعضی|خیلی|حتی|ولی|یعنی|چیزی|جوری|طوری|راهی|کسی|وقتی|جایی|دیگری|همگی|تقریبی|نهایی|قطعی|منفی|بازی|زندگی|معنی|آمادگی|سادگی)(?=[\\s‌]*[؟?])", "g");
+  var NOUNYI25 = new RegExp("(^|[^آ-ی‌])(?:[آ-ی]+[‌]?(?:بین|رس|یاب|نگر|گیر|بند|ریز|ساز|گذار|آور|رو|خوان|نویس|سنج|شمار|کار|دار|یاد|آموز|پرس|گو|جو|شناس|نما|پذیر|ده|کش|زن)ی|چی|کی|یکی|بعدی|قبلی|کافی|اصلی|کلی|خالی|عددی|واقعی|بعضی|خیلی|حتی|ولی|یعنی|چیزی|جوری|طوری|راهی|کسی|وقتی|جایی|دیگری|همگی|تقریبی|نهایی|قطعی|منفی|بازی|زندگی|معنی|آمادگی|سادگی|فرضی|عملی|علمی|ذهنی|عینی|جزئی|فرعی|منطقی|ریاضی|هندسی|تصادفی|اضافی|تکراری|ضروری|کافی|خاصی|دیگری|مساوی|موازی|مثبتی|درستی|نادرستی)(?=[\\s‌]*[؟?])", "g");   // دورِ ۲۶: صفت‌های «ـی» ِ پرسش‌های خودِ صفحه («… واقعی‌اند و کدام فرضی؟»، «کامل‌بیان‌شده یا عملی؟»)
   function noNounYi25(t) { return String(t || "").replace(NOUNYI25, "$1 "); }
   AS.noNounYi25 = noNounYi25;
   function regSigns(t) { t = noNounYi25(unMach24(t)); var o = unq18(t), r = regSignsR17(t); return { sh: r.sh || SIGN_SH18.test(no3sg21(o)), to: r.to || SIGN_TO18.test(o) }; }
@@ -40344,7 +40397,13 @@ APP.goFromURL = function (q) {
   AS.claimText21 = claimText21;
   var PLUR25 = /(?:^|[\s‌،(])(?:تو[\s‌]+و[\s‌]+[آ-ی]|[آ-ی‌]{2,}(?:ت|‌ات)[\s‌]+و[\s‌]+(?:خودت|تو)(?![آ-ی‌])|[آ-ی‌]{2,}[\s‌]+و[\s‌]+(?:خودت|تو)(?![آ-ی‌])|(?:خودت|تو)[\s‌]+(?:با|همراهِ?)[\s‌]+[آ-ی‌]{2,}|هر[\s‌]*دو(?:ی)?(?:تان|تون)|دو[\s‌]*(?:نفری|تایی)|دوتایی|شما[\s‌]+(?:دو|سه|چند)[\s‌]*(?:نفر|تا))/;
   var TOPOS25 = new RegExp("(?:^|[^آ-ی‌])(?:" + Object.keys(SH_POS).filter(function (w) { return /(?:ت|تو)$/.test(w) && w !== "تو" && w !== "توست"; }).join("|") + "|توست|[آ-ی]{2,}‌ات)(?![آ-ی‌])");
-  function noPlural25(t) { var to = false, out = String(t || "").split(/(?<=[.!؟?؛\n])/).map(function (x) { if (PLUR25.test(unq18(x))) { to = true; return " "; } return x; }).join(""); return { t: out, to: to }; }
+  /* دورِ ۲۶ (Q9، U55 oB1 p11 «دو روزِ شکست را هم گفتی: شبش مهمانی بودید»، oB1 p13 «باید هر کدام نمایهٔ جدا داشته باشید»، بانکِ R26 #235 «شبِ قبلش همه مهمانی بودید؟»):
+     جمعِ واقعی (او و خانواده‌اش) «شما» ِ احترام نیست. دو نشانه که صفحه می‌تواند ببیند: واژهٔ گروه در همان جمله («همه»، «هر کدام»، «هر دو») یا همان فعل به اول‌شخصِ جمع در
+     حرفِ خودش («مهمونی بودیم» ⇒ «بودید»). چنین جمله‌ای شاهدِ «شما» نیست؛ شاهدِ «تو» هم نمی‌سازد (برخلافِ «تو و …»). */
+  var GROUP26 = /(?:^|[\s‌،(])(?:همه|همگی|هر[\s‌]*کدام|هر[\s‌]*یک|هر[\s‌]*دو|خانوادگی|دسته[‌\s]?جمعی)(?![آ-یٔ‌ِ])|(?:همه|هر[\s‌]*دو|هر[\s‌]*کدام)[‌]?(?:تان|تون)(?![آ-ی])/;
+  function plural26(x, hers) { var u = unq18(x); if (!/(?:ید|ین)(?![آ-ی‌])/.test(u)) return false; if (GROUP26.test(u)) return true; if (!hers) return false;
+    var W = u.match(/[آ-ی‌]{3,}(?:ید|ین)(?![آ-ی‌])/g) || []; return W.some(function (w) { var st = w.replace(/(?:ید|ین)$/, ""); return st.length >= 2 && new RegExp("(?:^|[^آ-ی‌])" + st + "یم(?![آ-ی‌])").test(hers); }); }
+  function noPlural25(t, hers) { var to = false, out = String(t || "").split(/(?<=[.!؟?؛\n])/).map(function (x) { if (PLUR25.test(unq18(x))) { to = true; return " "; } if (plural26(x, hers)) return " "; return x; }).join(""); return { t: out, to: to }; }
   AS.noPlural25 = noPlural25;
   /* دورِ ۲۵ (P6، B24·D12 «STILL»، بانکِ R25 #201): پرسشِ نوبتی که خودِ صفحه می‌سازد **یک** پرسش است (یک «؟» بیرون از پرانتز و «…» ِ درونی). ریشه: پرسش‌های کتاب
      («… کافی است؟ زائد؟ متناقض؟»، «انجامش دادی؟ آنچه شد … چه فاصله‌ای داشت؟») با دو/سه «؟» به مدل داده می‌شد در حالی که سنجشِ پس از پاسخ «دو پرسش» را رد می‌کند.
@@ -40352,10 +40411,21 @@ APP.goFromURL = function (q) {
      و فقط «؟» ِ پایانی می‌ماند. متنِ خودِ فرم‌ها و کارت‌های صفحه دست نمی‌خورد. */
   function oneQ25(q) { var x = String(q || ""), d = 0, pd = 0, idx = [];
     for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); if (ch === "«") d++; else if (ch === "»" && d > 0) d--; else if (ch === "(") pd++; else if (ch === ")" && pd > 0) pd--; else if ((ch === "؟" || ch === "?") && !d && !pd) idx.push(i); }
-    if (idx.length < 2) return x; var out = "", last = idx[idx.length - 1];
+    if (idx.length < 2) return x;
+    /* دورِ ۲۶ (Q9، U53، بانکِ R26 #231 «یک پرسش، نه دو پرسشِ چسبیده با ویرگول»): تکهٔ دومی که خودش یک پرسشِ کامل است (سه واژه یا بیشتر — «می‌توانی آن را در یک نگاه ببینی؟»)
+       پرسشِ دوم است، نه دنبالهٔ اولی ⇒ پرسشِ نوبت همان نخستین پرسشِ کامل است (کلی ⇐ خاص). دنباله‌های کوتاهِ حذفی («… کافی است؟ زائد؟ متناقض؟») مثلِ پیش با «،» یکی می‌شوند.
+       رفتارِ پیشین: AS.R26_QUARANTINE.oneQ25. */
+    for (var c = 0; c < idx.length - 1; c++) { var seg = x.slice(idx[c] + 1, idx[c + 1]).replace(/^[\s—–\-،:؛]+/, "").trim(); if (seg.split(/[\s‌]+/).filter(Boolean).length >= 3) { x = x.slice(0, idx[c] + 1); idx = idx.slice(0, c + 1); break; } }
+    if (idx.length < 2) return x;
+    var out = "", last = idx[idx.length - 1];
     for (var j = 0; j < x.length; j++) { if (idx.indexOf(j) >= 0 && j !== last) { var nx = x.slice(j + 1).replace(/^\s+/, "").charAt(0); out += /[—–\-،:؛]/.test(nx) || !nx ? "" : "،"; continue; } out += x.charAt(j); }
     return out; }
   AS.oneQ25 = oneQ25;
+  AS.R26_QUARANTINE = Object.assign(AS.R26_QUARANTINE || {}, { oneQ25: function (q) { var x = String(q || ""), d = 0, pd = 0, idx = [];
+    for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); if (ch === "«") d++; else if (ch === "»" && d > 0) d--; else if (ch === "(") pd++; else if (ch === ")" && pd > 0) pd--; else if ((ch === "؟" || ch === "?") && !d && !pd) idx.push(i); }
+    if (idx.length < 2) return x; var out = "", last = idx[idx.length - 1];
+    for (var j = 0; j < x.length; j++) { if (idx.indexOf(j) >= 0 && j !== last) { var nx = x.slice(j + 1).replace(/^\s+/, "").charAt(0); out += /[—–\-،:؛]/.test(nx) || !nx ? "" : "،"; continue; } out += x.charAt(j); }
+    return out; } });
   function tqLine25(l) {
     if (/^- زمینه/.test(l)) return l;
     var bold = /\*\*پرسشِ این نوبت همین است:?\*\*/.test(l), one = /^- در این نوبت فقط \*\*یک\*\* پرسش/.test(l); if (!bold && !one) return l;
@@ -40370,6 +40440,7 @@ APP.goFromURL = function (q) {
   /* همان پرسش در شکلِ «پیشنهادِ این نوبت: «…»» / «پرسشِ پیشنهادیِ این نوبت: «…»» (سطرِ مرحله، معلمِ حل) هم همان یک جمله می‌شود — وگرنه دو متن از یک پرسش در یک پرامپت می‌ماند */
   var SUGQ25 = /((?:پیشنهادِ|پرسشِ پیشنهادیِ) این نوبت:\s*)«((?:[^«»]|«[^«»]*»)*)»/g;
   AS.finalFilter25 = function (outs) { return (outs || []).map(function (b) { if (typeof b !== "string") return b;
+    try { if (A.AGE && A.AGE.childQ) b = A.AGE.childQ(b); } catch (e) { }   // دورِ ۲۶ (Q9، D24-15): پرسشِ فهمِ صفحه برای کودک به واژه‌بندیِ خودش
     if (/پرسشِ این نوبت همین است|در این نوبت فقط \*\*یک\*\* پرسش/.test(b)) b = b.split("\n").map(tqLine25).join("\n");
     if (/(?:پیشنهادِ|پرسشِ پیشنهادیِ) این نوبت:/.test(b)) b = b.replace(SUGQ25, function (m, pre, q) { return pre + "«" + oneQ25(q) + "»"; });
     return b; }); };
@@ -40404,11 +40475,12 @@ APP.goFromURL = function (q) {
     /* ضمیر: فقط وقتی شاهدِ خودش روشن است (دست‌کم دو پیامِ خودش با همان ضمیر و هیچ پیامی با ضمیرِ دیگر) و پاسخ فقط ضمیرِ دیگر را دارد */
     try { var regN = { shoma: 0, to: 0 }; (s.msgs || []).forEach(function (m) { if (isUser(m) && !EDIT20.test(String(m.text || "").trim())) { var g = fbSigns(m.text); if (g) regN[g]++; } });
       var reg = regN.to >= 2 && !regN.shoma ? "to" : regN.shoma >= 2 && !regN.to ? "shoma" : "";
+      var hers26p = (s.msgs || []).filter(isUser).slice(-4).map(function (m) { return String(m.text || ""); }).join(" \n ");
       if (reg === "to" && elder24() && regOf(s, "", []) === "shoma") reg = "";   // دورِ ۲۴ (R5، B24·D11): به سالمند هرگز «تو» تحمیل نمی‌شود
-      if (!reg && elder24() && regOf(s, "", []) === "shoma") { var npE = noPlural25(rp), sgE = regSigns(npE.t), toE25 = sgE.to || TOPOS25.test(unq18(npE.t));
+      if (!reg && elder24() && regOf(s, "", []) === "shoma") { var npE = noPlural25(rp, hers26p), sgE = regSigns(npE.t), toE25 = sgE.to || TOPOS25.test(unq18(npE.t));
         if (sgE.sh && toE25) why.push("دو ضمیر در یک پاسخ («شما» و «تو») — کاربر سالمند است و گفت‌وگو با «شما» است؛ همه را «شما» بنویس"); else if (toE25 && !sgE.sh) why.push("کاربر سالمند است و گفت‌وگو با «شما» است — «شما» بنویس، نه «تو»"); }   // دورِ ۲۴ (R5، بانکِ R24 #138)
       /* دورِ ۲۵ (P6، A25-17 oA1 p25→p26): «پسرت و تو … دارید» جمعِ واقعی است (او و یک نفرِ دیگر)، نه «شما» ِ احترام — جملهٔ دارای مخاطبِ جمع شاهدِ «شما» نیست و «تو»/«ـت» ِ همان جمله شاهدِ «تو» است */
-      if (reg) { var np25 = noPlural25(rp), sg = regSigns(np25.t); if (np25.to) sg.to = true; /* دورِ ۲۵ (P6، D25-23، بانکِ R25 #206/#208): یک ضمیر در هر پاسخ — «شما دارید … گامِ بعدی‌ات»، «تولدت مبارک! حالا بفرمایید» دو ضمیر است (بیرون از «…» و جملهٔ مخاطبِ جمع) */
+      if (reg) { var np25 = noPlural25(rp, hers26p), sg = regSigns(np25.t); if (np25.to) sg.to = true; /* دورِ ۲۵ (P6، D25-23، بانکِ R25 #206/#208): یک ضمیر در هر پاسخ — «شما دارید … گامِ بعدی‌ات»، «تولدت مبارک! حالا بفرمایید» دو ضمیر است (بیرون از «…» و جملهٔ مخاطبِ جمع) */
         var toP25 = sg.to || TOPOS25.test(unq18(np25.t));
         if (sg.sh && toP25) why.push(reg === "to" ? "دو ضمیر در یک پاسخ («شما» و «تو») — او با تو «تو» حرف می‌زند؛ همه را «تو» بنویس" : "دو ضمیر در یک پاسخ («شما» و «تو») — گفت‌وگو با «شما» است؛ همه را «شما» بنویس");
         else if (reg === "to" && sg.sh && !sg.to) why.push("او با تو «تو» حرف می‌زند — «تو» بنویس، نه «شما»"); else if (reg === "shoma" && sg.to && !sg.sh) why.push("او «شما» به کار می‌برد — «شما» بنویس"); } } catch (e) { }
@@ -40810,6 +40882,10 @@ APP.goFromURL = function (q) {
       /* دورِ ۲۵ (P6، A25-17 tA1 p9→p10): «… آن‌وقت می‌گویی «پس نمی‌سازم»؟» — «می‌گویی/بگویی» در جملهٔ شرطی یا پرسشی حرفِ فرضیِ آیندهٔ اوست، نه نقلِ گفته‌اش
          (نقلِ گفته: «گفتی/نوشتی/حرفت») */
       if (at > 0 && hypoQuote25(pre, RP.slice(at + q.length + 2))) return false;
+      /* دورِ ۲۶ (Q9، C26-6 pwC1 p8 «این‌که «روی دادهٔ واقعی آزموده شده» را امروز جایی نمی‌بیند»، بانکِ R26 #232 «این بخش را «گامِ میانی» می‌نامیم»): گیومهٔ دورِ یک گزاره یا برچسب
+         («این‌که «…»»، «یعنی «…»»، «به نامِ «…»»، «… را «…» می‌نامیم») نقلِ حرفِ او نیست — مگر همان جمله آن را به او نسبت دهد */
+      if (at > 0 && (/(?:این[‌\s]?که|یعنی|به[\s‌]*معن(?:ی|ای)ِ?|به[\s‌]*(?:نام|اسم)ِ?|برچسبِ?|عبارتِ?|واژهٔ?|اصطلاحِ?|عنوانِ?)[\s‌]*$/.test(pre) || /^[\s‌]*(?:می[‌\s]?نامیم|می[‌\s]?نامند|نام[\s‌]*(?:می[‌\s]?گذاریم|دارد)|می[‌\s]?گوییم|می[‌\s]?خوانیم)/.test(RP.slice(at + q.length + 2))) &&
+        !/گفتی|گفتید|نوشتی|نوشتید|گفته‌?ای|گفته‌?اید|می[‌\s]?گویی|حرفت|حرفتان|حرفِ?[\s‌]*خودت|جمله‌?ات|به[\s‌]*قولِ?[\s‌]*خود/.test(pre)) return false;
       if (at > 0 && /(?:^|[\s‌،—(])(?:مثلاً|مثلا|برای[\s‌]*مثال|به[\s‌]*شکلِ?|شبیهِ?|فرض[\s‌]*کن(?:یم)?)(?![آ-ی])[^«»]{0,40}$/.test(pre) && !/گفتی|نوشتی|گفته‌?ای|می[‌\s]?گویی|حرفت|حرفِ?[\s‌]*خودت|جمله‌?ات|به[\s‌]*قولِ?[\s‌]*خودت|ثبت/.test(pre)) return false;
       /* بازگفتِ نزدیک («هر دو خانهٔ ناهم‌رنگ کافی است» ⇐ «هر دو خونه‌ای که رنگشون فرق داره کافیه») رواست؛ فقط نقلی که تقریباً هیچ واژه‌اش در گفت‌وگو نیست (کمتر از یک‌سوم) */
       if (U.some(function (u) { return quoteIn(q, u); })) return false;
@@ -40819,6 +40895,7 @@ APP.goFromURL = function (q) {
   AS.quotesNotHers23 = quotesNotHers23;
   /* قرنطینهٔ دورِ ۲۳ (REMOVAL_CANDIDATES): قاعده‌های پیشین، دست‌یافتنی برای مقایسه */
   AS.R24_QUARANTINE = Object.assign(AS.R24_QUARANTINE || {}, { signSh: SIGN_SH_R23, signTo18: SIGN_TO18_R23 });
+  AS.R26_QUARANTINE = Object.assign(AS.R26_QUARANTINE || {}, { signTo18_25: new RegExp(SIGN_TO18.source.replace(CLIT26, "[آ-ی]{2,}(?:‌ات|ت)").replace("ن?می(?:[‌\\s][آ-ی]{1,10}|" + JOINED26 + ")ی", "ن?می[‌\\s]?[آ-ی]{1,10}ی")) });
   AS.R23_QUARANTINE = Object.assign(AS.R23_QUARANTINE || {}, {
     corr19b22: function (t) { return CORR19b_R22.test(String(t || "")); },
     inPage22: function (seg, PT) { return inPage22R22(seg, PT); },
@@ -55380,7 +55457,19 @@ APP.goFromURL = function (q) {
      خودش «نام» خوانده («اسمِ دوستم …»، «… اسمش …»، «دوستی به اسمِ …») جایش را به «[نامِ …]» می‌دهد. نامِ شخصیتِ مسئله («علی ۳ سیب دارد»)، «مدرسه» ِ عام («تو مدرسه گفت»)
      و «چیزی به اسمِ ک.م.م» دست نمی‌خورند. خودِ پیام در گفت‌وگو همان است که نوشت. */
   var SCH_RE26 = new RegExp("(" + SCH + ")((?:[\\s‌]+(?:ما|مون|مان|من|شون))?(?:[\\s‌]+(?:اسمش|نامش)(?:[\\s‌]+(?:" + SCH + "))?)?)([\\s‌]+)([^\\s.،,!؟?؛:«»()]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()]+){0,2})", "g");
-  function privSchool(x) {
+  /* نامِ مدرسه فقط وقتی دادهٔ یک کودک یا شخصِ سوم است (C22؛ بانکِ R26 #224 «پسرم که دبیرستانِ … میره» ⇒ پالوده؛ #241 «من معلمِ ریاضیِ دبیرستانِ …‌ام» ⇒ همان که نوشت):
+     گوینده کم‌سال است؛ یا جمله مدرسه را به خویشاوند/شخصِ سوم می‌بندد؛ یا سن هنوز معلوم نیست و جمله «مدرسه رفتنِ» خودِ گوینده است. محلِ کارِ خودِ بزرگسال و نامِ عمومی می‌ماند. */
+  var KINLINK26 = /(?:پسر|دختر|نوه|بچه|فرزند|برادر|داداش|خواهر|آبجی|شاگرد|دوست|همسایه|خواهرزاده|برادرزاده)(?:‌?ها)?(?:ی|ِ)?[‌]?(?:م|ام|مون|مان|ش|شون|ت)(?![آ-ی])|(?:^|[\s‌])(?:می[‌\s]?ره|میره|می[‌\s]?رود|می[‌\s]?رن|میرن|می[‌\s]?روند|درس[\s‌]*می[‌\s]?خو(?:ا)?ن(?:ه|د|ن|ند))(?![آ-ی])/;
+  var STUDENT26 = /(?:^|[\s‌])(?:می[‌\s]?رم|میرم|می[‌\s]?روم|درس[\s‌]*می[‌\s]?خو(?:ا)?نم)(?![آ-ی])|(?:کلاس|پایهٔ?)[\s‌]*(?:اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم|یازدهم|دوازدهم)|دانش[‌\s]?آموز/;
+  var STAFF26 = /(?:معلم|دبیر|مدیر|ناظم|معاون|مربی|مشاور|کارمند|سرایدار)(?:ِ|‌ی|ی)?[\s‌]|درس[\s‌]*می[‌\s]?د(?:م|هم)|کار[\s‌]*می[‌\s]?کنم|تدریس/;
+  function schoolIsPrivate(sent) { var ag = G.age(); if (ag != null && G.minor(ag)) return true; if (KINLINK26.test(sent)) return true; return ag == null && STUDENT26.test(sent) && !STAFF26.test(sent); }
+  /* ctx (اختیاری): پیام‌های خودِ او — عنوانی که مدل داد («شهریهٔ دبستانِ …») بافتِ «پسرم» را ندارد؛ اگر همان نام در جمله‌ای از حرفِ او دادهٔ کودک/شخصِ سوم بود، در عنوان هم پالوده می‌شود */
+  function privSchool(t, ctx) {
+    var cs = ctx ? String(ctx).split(/(?<=[.!؟?؛\n])/).filter(schoolIsPrivate) : [];
+    return String(t).split(/(?<=[.!؟?؛\n])/).map(function (x) {
+      if (!schoolIsPrivate(x)) { if (!cs.length) return x; var hit = false, re = new RegExp(SCH_RE26.source, "g"), m;
+        while ((m = re.exec(x))) { var n0 = m[4].split(/[\s‌]+/)[0].replace(/[ِٔ]$/, ""); if (n0.length >= 2 && !SCH_STOP.test(n0) && cs.some(function (c) { return c.indexOf(n0) >= 0 && privSchool1(c) !== c; })) hit = true; }
+        if (!hit) return x; }
     x = priv25(x);
     return x.replace(SCH_RE26, function (all, w, mid, sp, name) {
       /* «مدرسه/مهد» ِ بی کسره و بی «اسمش» اسمِ عام است («تو مدرسه گفت»)؛ «دبستان/دبیرستان/هنرستان …» و «… اسمش …» نام می‌گیرند */
@@ -55390,13 +55479,15 @@ APP.goFromURL = function (q) {
       if (!keep.length) return all;
       var rest = ws.slice(keep.length).join(" "), tail = /(?:‌ه|‌است|‌ام|‌ایم)$/.exec(keep[keep.length - 1]);
       return w + mid + sp + "[نامِ مدرسه]" + (tail ? tail[0] : "") + (rest ? " " + rest : "");
-    });
+    }); }).join("");
   }
+  function privSchool1(c) { return privSchool(c); }
   var ROLE26 = "(?:معلم|دبیر|مدیر|ناظم|مربی|استاد|مشاور)", POSS26 = "(?:[‌]?(?:مون|مان|م|ام|ش|شون|شان|ت|تون|تان))?";
-  var HON26 = "(?:خانمِ?|آقایِ?|آقا|استادِ?)";
+  var HON26 = "(?:خانمِ?|آقایِ?|استادِ?)";
   var KIN26 = "(?:دوست|رفیق|پسر|دختر|نوه|برادر|داداش|خواهر|آبجی|همکار|همسایه|شاگرد|هم[‌\\s]?کلاسی|بچه|مامان|بابا|مادر|پدر|همسر|شوهر|خانم|زن|عمو|دایی|خاله|عمه|پسرخاله|دخترخاله|پسرعمو|دخترعمو|رئیس|صاحب[‌\\s]?خانه|صاحبخونه)";
   var PERSONN26 = "(?:" + KIN26 + "|" + ROLE26 + "|آقایی|خانمی|کسی|یکی|نفر|بچه‌ای|پسری|دختری|مردی|زنی|دوستی|همکاری|همسایه‌ای|معلمی|شاگردی)";
   function nameSub26(label) { return function (all, w, sp, name) { if (/\[نامِ?/.test(name) || /\[نامِ?/.test(w)) return all; var c = nameCut25(name); if (!c) return all; return w + sp + (c.pre ? c.pre + " " : "") + label + c.tail + (c.rest ? " " + c.rest : ""); }; }
+  var HONSTOP26 = new RegExp("^(?:" + ROLE26 + "|" + KIN26 + "|دکتر|مهندس|فروشنده|راننده|پلیس|منشی|پرستار|مسئول|کارمند|محترم|عزیز|جان|بزرگ|پیر|جوان|مسن|خانه[‌]?دار|خونه|خانه|راهنما|اجازه|ها|های|هایی|ی|ای|یی|و|که|رو|را|هم|گفت|گفته)(?:ِ|‌ی|ی|ه)?$");
   function privPeople(x) {
     /* معلم/مدیر: «معلممون خانم احمدی»، «معلمِ ریاضی‌مون آقای رضایی»، «خانم احمدی معلمِ ما»، «اسمِ معلممون …»، «معلممون اسمش …» */
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+[آ-یٔ‌ِ]{2,14}" + POSS26 + "){0,2}[\\s‌،,]+" + HON26 + ")([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
@@ -55404,13 +55495,19 @@ APP.goFromURL = function (q) {
     x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
     /* شخصِ سوم که خودش «نام» خوانده: «اسمِ دوستم سارا ـه»، «دوستم اسمش سارا ـست»، «یه همکاری دارم به اسمِ کامران» */
-    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
-    x = x.replace(new RegExp("(" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
-    x = x.replace(new RegExp("(" + PERSONN26 + POSS26 + "[^.!؟?؛\\n«»]{0,30}?[\\s‌]به[\\s‌]+(?:اسمِ?|نامِ?))([\\s‌]+)" + NAME25, "g"), nameSub26("[نام]"));
+    x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ شخص]"));
+    x = x.replace(new RegExp("(" + KIN26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ شخص]"));
+    x = x.replace(new RegExp("(" + PERSONN26 + POSS26 + "[^.!؟?؛\\n«»]{0,30}?[\\s‌]به[\\s‌]+(?:اسمِ?|نامِ?))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ شخص]"));
+    /* نامِ پس از عنوانِ احترام («خانمِ مهرپرور گفته …»، «همسایه‌مون آقای کیانفر …» — بانکِ R26 #223/#225): فقط خودِ نام (و دنبالهٔ اضافه‌اش)، نه واژه‌های بعد.
+       «خانم معلم»، «آقای دکتر»، «خانمِ همسایه» نام نیستند. */
+    x = x.replace(new RegExp("((?:^|[\\s‌،,.!؟?؛:(«])" + HON26 + ")([\\s‌]+)([^\\s.،,!؟?؛:«»()\\[\\]]+(?:[\\s‌]+[^\\s.،,!؟?؛:«»()\\[\\]]+){0,2})", "g"), function (all, w, sp, name) {
+      var ws = name.split(/[\s]+/), keep = [];
+      for (var i = 0; i < ws.length; i++) { var b0 = ws[i].replace(/[ِٔ]$/, ""); if (!i && (SCH_STOP.test(b0) || HONSTOP26.test(b0) || /^[0-9۰-۹]/.test(b0) || b0.length < 2)) return all; keep.push(ws[i]); if (!/[ِٔ]$/.test(ws[i])) break; if (i + 1 < ws.length && (SCH_STOP.test(ws[i + 1]) || HONSTOP26.test(ws[i + 1].replace(/[ِٔ]$/, "")))) break; }
+      var rest = ws.slice(keep.length).join(" "); return w + sp + "[نامِ شخص]" + (rest ? " " + rest : ""); });
     return x;
   }
   /* برچسب/عنوان (همهٔ سن‌ها): هر جا صفحه عنوان یا برچسبی از حرفِ او می‌سازد */
-  G.privLabel = function (t) { var x = String(t == null ? "" : t); try { return privPeople(privSchool(x)); } catch (e) { return x; } };
+  G.privLabel = function (t, ctx) { var x = String(t == null ? "" : t); try { return privPeople(privSchool(x, ctx)); } catch (e) { return x; } };
   /* عنوانِ خوانا از یک پیام: بی سلام/معرفی (AS.stripIntro23)، بی نامِ شخصِ سوم — برای عنوانِ سشن، فهرستِ «مسئله‌های این گفت‌وگو»، نوارِ «برگرد به» (U29، C26-13، C26-29) */
   G.titleOf = function (t) { var x = String(t == null ? "" : t), y = x; try { if (A.ASSIST && A.ASSIST.stripIntro23) y = A.ASSIST.stripIntro23(x) || x; } catch (e) { y = x; } return G.privLabel(y); };
   /* نقلِ پیام در پرونده (۲۴/R5): فقط کم‌سال — همان پالاینده */
@@ -55432,12 +55529,26 @@ APP.goFromURL = function (q) {
       if (se) (se.msgs || []).forEach(function (m) { if (!m || m.role !== "user" || typeof m.text !== "string") return; var k = cl(m.text, 60); if (!(k in map)) map[k] = cl(G.titleOf(m.text), 60); });
       var fix = function (t) { return typeof t === "string" ? (map[t] != null ? map[t] : G.privLabel(t)) : t; };
       if (Array.isArray(D.pks)) D.pks.forEach(function (x) { if (x && typeof x.title === "string") x.title = fix(x.title); });
-      if (typeof D.title === "string") D.title = fix(D.title);
+      if (typeof D.title === "string") { var lt = ""; try { if (se && !se.title && map[D.title] != null && !Array.isArray(D.pks) && se.lprob && A.liveRec) { var lr = A.liveRec(se.lprob); lt = lr && lr.p ? lr.p.title || "" : ""; } } catch (e2) { }
+        D.title = lt || fix(D.title); }
     } catch (e) { } return D;
   };
   /* دورِ ۲۵ (P7، D25-22 aD1): «📜 پروندهٔ این گفت‌وگو» هم همان پرونده است — پیش‌تر فقط پروندهٔ مسئله پالوده می‌شد و نقلِ پیامِ کودک در پروندهٔ سشن عینی می‌ماند */
   if (typeof A.dossierSess === "function" && !A.dossierSess._priv25) { var rawDosS = A.dossierSess; A.dossierSess = function () { return G.titleDossier26(G.privDossier(rawDosS.apply(this, arguments))); }; A.dossierSess._priv25 = true; }
   if (typeof A.dossier === "function" && !A.dossier._priv24) { var rawDos = A.dossier; A.dossier = function () { var D0 = G.privDossier(rawDos.apply(this, arguments)); try { if (D0 && typeof D0.title === "string") D0.title = G.privLabel(D0.title); } catch (e) { } return D0; }; A.dossier._priv24 = true; }
+
+  /* دورِ ۲۶ (Q9، D24-15 «STILL» ِ سه دور — aD1 p2: پیشنهادِ نوبتِ صفحه برای کودکِ ۹ ساله «مجهول (یا حکمی که باید ثابت شود) چیست؟»): «# مخاطب» به مدل می‌گوید ساده بگو، ولی
+     خودِ پرسشِ صفحه با واژه‌های فنیِ بزرگسال به او داده می‌شد. پرسش‌های «فهمِ مسئله» برای گروه‌های early/child واژه‌بندیِ کودکانهٔ خودشان را دارند (همان پرسش، همان شناسهٔ u1…u5 در
+     فهرست؛ فقط متنِ رو به مدل). نوجوان و بزرگسال همان متنِ کتاب. */
+  G.CHILD_Q = [
+    ["مجهول (یا حکمی که باید ثابت شود) چیست؟", "دنبالِ چی می‌گردیم؟"],
+    ["داده‌ها (یا فرض) چیست؟", "چه چیزهایی را می‌دانیم؟"],
+    ["شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟", "مسئله چه گفته که باید همان‌طور باشد؟"],
+    ["آیا شرط برای تعیینِ مجهول کافی است؟ زائد است؟ متناقض است؟", "با چیزهایی که می‌دانیم می‌شود جواب را پیدا کرد؟"],
+    ["شکلی بکش یا نام‌گذاریِ مناسبی بکن؛ مسئله را به زبانِ خودت دوباره بگو.", "شکلش را بکش و مسئله را با حرفِ خودت دوباره بگو."]
+  ];
+  G.childBand = function () { try { var ag = G.age(), b = ag != null && G.band(ag); return !!b && (b.id === "early" || b.id === "child"); } catch (e) { return false; } };
+  G.childQ = function (t) { var x = String(t == null ? "" : t); if (!G.childBand()) return x; G.CHILD_Q.forEach(function (p) { if (x.indexOf(p[0]) >= 0) x = x.split(p[0]).join(p[1]); }); return x; };
 
   /* ---------- قلاب‌های دستیار ---------- */
   var AS = A.ASSIST;
