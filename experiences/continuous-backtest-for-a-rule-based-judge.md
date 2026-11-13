@@ -99,3 +99,7 @@ if (fresh.length >= 3 && fresh.every(ok)) finding.status = "verified";
   the ledger instead of counting it as coverage of the fallacy.
 - **An unselected frame read only through a summarising fetch is not verified.** If the raw table cannot be read, add nothing (all or
   nothing) and record the source and the blocker for the next round.
+
+## Update 2026-11-12
+- **Finding-state is computed by the tool at run time — never annotate a finding after the run and ship.** Adding a `fix` note to a finding *after* `run` left it in a "verified on fresh cases" state that the tool had reached by the no-fix path, counting three unrelated new cases as confirmation. An independent reviewer caught it by re-running on a copy. Rule: any manual edit to findings/corpus ⇒ `run --rerun` before commit, and "verified" only counts if the fresh cases actually exercise the rule the fix touched.
+- **Second chances must be symmetric.** Blind re-encoding only the cases that failed (after a diagnosis already said which key decides them) is an asymmetric second chance; pair it with blind re-encoding of a random set of passing cases and report verdict stability.

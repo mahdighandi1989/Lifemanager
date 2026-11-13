@@ -1,6 +1,6 @@
 {
- "round": 36,
- "at": "2026-11-11",
+ "round": 37,
+ "at": "2026-11-13",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 288,
+    "ok": 295,
     "health_alarm": 0,
     "missed": 29,
-    "mislocated": 12
+    "mislocated": 10
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 271,
+    "ok": 274,
     "health_alarm": 0,
-    "missed": 41,
-    "mislocated": 17
+    "missed": 42,
+    "mislocated": 18
    },
    "changed": [
     {
@@ -1252,24 +1252,48 @@
      "t": "کرک بلادزورث و شاهدانِ عینی (بالتیمور، ۱۹۸۵)",
      "from": "ok",
      "to": "missed"
+    },
+    {
+     "id": "r35_bible_codes_genesis_1994",
+     "t": "آزمونِ «رمزهای سفرِ پیدایش» در مجلهٔ Statistical Science (۱۹۹۴)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r35_abs_food_diary_pvalue",
+     "t": "دفترچهٔ خوراک و سردرد",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r37_fisher_plateau_1929",
+     "t": "«فلاتِ بلندِ ماندگار» ِ اروینگ فیشر (اکتبرِ ۱۹۲۹)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r37_abs_rent_plateau_loan",
+     "t": "سناریوی انتزاعی: چهار سالِ بالا رفتنِ اجاره و وامِ خانهٔ دوم",
+     "from": "ok",
+     "to": "mislocated"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 288,
+    "ok": 295,
     "health_alarm": 0,
     "missed": 29,
-    "mislocated": 12
+    "mislocated": 10
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 271,
+    "ok": 274,
     "health_alarm": 0,
-    "missed": 41,
-    "mislocated": 17
+    "missed": 42,
+    "mislocated": 18
    },
    "changed": [
     {
@@ -1373,6 +1397,30 @@
      "t": "کرک بلادزورث و شاهدانِ عینی (بالتیمور، ۱۹۸۵)",
      "from": "ok",
      "to": "missed"
+    },
+    {
+     "id": "r35_bible_codes_genesis_1994",
+     "t": "آزمونِ «رمزهای سفرِ پیدایش» در مجلهٔ Statistical Science (۱۹۹۴)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r35_abs_food_diary_pvalue",
+     "t": "دفترچهٔ خوراک و سردرد",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r37_fisher_plateau_1929",
+     "t": "«فلاتِ بلندِ ماندگار» ِ اروینگ فیشر (اکتبرِ ۱۹۲۹)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r37_abs_rent_plateau_loan",
+     "t": "سناریوی انتزاعی: چهار سالِ بالا رفتنِ اجاره و وامِ خانهٔ دوم",
+     "from": "ok",
+     "to": "mislocated"
     }
    ]
   }
@@ -1535,8 +1583,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 166,
-   "fullAfter": 166
+   "fullBefore": 172,
+   "fullAfter": 172
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1545,8 +1593,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 166,
-   "fullAfter": 166
+   "fullBefore": 172,
+   "fullAfter": 172
   },
   "p_found_scope": null
  },

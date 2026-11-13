@@ -1796,8 +1796,8 @@
    ],
    "verify": {
     "since": 13,
-    "fresh": 7,
-    "ok": 2,
+    "fresh": 9,
+    "ok": 6,
     "ids": [
      "r14_kahneman_flight_instructors",
      "r17_dewey_1948",
@@ -1805,7 +1805,9 @@
      "r29_wakefield_lancet_1998",
      "r29_abs_pilot_supplier",
      "r35_bible_codes_genesis_1994",
-     "r35_abs_food_diary_pvalue"
+     "r35_abs_food_diary_pvalue",
+     "r37_fisher_plateau_1929",
+     "r37_abs_rent_plateau_loan"
     ]
    }
   },
@@ -3194,6 +3196,6 @@
    "bookOnly": true
   }
  },
- "round": 36,
- "updated": "2026-11-11"
+ "round": 37,
+ "updated": "2026-11-13"
 }

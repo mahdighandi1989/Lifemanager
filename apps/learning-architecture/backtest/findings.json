@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-11",
- "round": 36,
+ "updated": "2026-11-13",
+ "round": 37,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,8 +25,8 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 29,
-    "freshOk": 16,
+    "fresh": 31,
+    "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -79,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 56,
-    "freshOk": 38,
+    "fresh": 58,
+    "freshOk": 40,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -138,8 +138,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 32,
-    "freshOk": 18,
+    "fresh": 34,
+    "freshOk": 20,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -190,8 +190,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 29,
-    "freshOk": 24,
+    "fresh": 31,
+    "freshOk": 28,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -242,8 +242,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 29,
-    "freshOk": 16,
+    "fresh": 31,
+    "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -292,8 +292,8 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 29,
-    "freshOk": 16,
+    "fresh": 31,
+    "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 62,
-    "freshOk": 39,
+    "fresh": 64,
+    "freshOk": 43,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -400,8 +400,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 29,
-    "freshOk": 16,
+    "fresh": 31,
+    "freshOk": 18,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -448,8 +448,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 29,
-    "freshOk": 20,
+    "fresh": 31,
+    "freshOk": 24,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,8 +1154,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 19,
-    "freshOk": 11,
+    "fresh": 20,
+    "freshOk": 12,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1327,8 +1327,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 19,
-    "freshOk": 11,
+    "fresh": 20,
+    "freshOk": 12,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1444,8 +1444,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 19,
-    "freshOk": 11,
+    "fresh": 20,
+    "freshOk": 12,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1505,15 +1505,16 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 6,
-    "freshOk": 6,
+    "fresh": 7,
+    "freshOk": 7,
     "ids": [
      "r21_meselson_stahl_1958",
      "r27_hpylori_nih_1994",
      "r28_goldberger_pellagra_1916",
      "r28_pasteur_swan_neck_1861",
      "r33_lind_scurvy_trial_1747",
-     "r34_snow_broad_street_1854"
+     "r34_snow_broad_street_1854",
+     "r35_bible_codes_genesis_1994"
     ]
    },
    "kind": "health_alarm",
@@ -1627,7 +1628,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1640,8 +1641,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 20,
-    "freshOk": 12,
+    "fresh": 21,
+    "freshOk": 13,
     "ids": [
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
@@ -1727,7 +1728,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1740,8 +1741,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 10,
-    "freshOk": 5,
+    "fresh": 11,
+    "freshOk": 6,
     "ids": [
      "r23_wirecard_trust_accounts_2019",
      "r23_ariane5_501_1996",
@@ -1752,7 +1753,8 @@
      "r27_abs_intrusion_storm",
      "r34_chicago_tribune_election_1948",
      "r34_wire_buyout_abstract",
-     "r36_jimmys_world_1980"
+     "r36_jimmys_world_1980",
+     "r37_abs_rent_plateau_loan"
     ]
    },
    "kind": "missed",
@@ -1815,7 +1817,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1853,7 +1855,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1895,7 +1897,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1944,7 +1946,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1976,7 +1978,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -2010,7 +2012,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2059,7 +2061,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2099,7 +2101,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2129,7 +2131,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2163,7 +2165,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2195,7 +2197,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2233,7 +2235,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2261,7 +2263,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2274,15 +2276,16 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 6,
-    "freshOk": 2,
+    "fresh": 7,
+    "freshOk": 5,
     "ids": [
      "r26_ltcm_models_1998",
      "r26_abs_lender_boom_model",
      "r29_wakefield_lancet_1998",
      "r29_abs_pilot_supplier",
-     "r35_bible_codes_genesis_1994",
-     "r35_abs_food_diary_pvalue"
+     "r35_abs_food_diary_pvalue",
+     "r37_fisher_plateau_1929",
+     "r37_abs_rent_plateau_loan"
     ]
    },
    "kind": "missed",
@@ -2320,14 +2323,15 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 5,
-    "freshOk": 4,
+    "fresh": 6,
+    "freshOk": 5,
     "ids": [
      "r31_bre_x_busang_1996",
      "r34_chicago_tribune_election_1948",
      "r34_wire_buyout_abstract",
      "r35_millerite_date_1843",
-     "r36_jimmys_world_1980"
+     "r36_jimmys_world_1980",
+     "r37_donation_constantine_1054"
     ]
    },
    "kind": "missed",
@@ -2392,7 +2396,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2446,14 +2450,15 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 5,
-    "freshOk": 4,
+    "fresh": 6,
+    "freshOk": 5,
     "ids": [
      "r31_bre_x_busang_1996",
      "r34_chicago_tribune_election_1948",
      "r34_wire_buyout_abstract",
      "r35_millerite_date_1843",
-     "r36_jimmys_world_1980"
+     "r36_jimmys_world_1980",
+     "r37_donation_constantine_1054"
     ]
    },
    "kind": "missed",
@@ -2497,14 +2502,15 @@
    "fix": null,
    "retest": {
     "since": 26,
-    "fresh": 5,
-    "freshOk": 1,
+    "fresh": 6,
+    "freshOk": 4,
     "ids": [
      "r26_ltcm_models_1998",
      "r29_wakefield_lancet_1998",
      "r29_abs_pilot_supplier",
-     "r35_bible_codes_genesis_1994",
-     "r35_abs_food_diary_pvalue"
+     "r35_abs_food_diary_pvalue",
+     "r37_fisher_plateau_1929",
+     "r37_abs_rent_plateau_loan"
     ]
    },
    "kind": "missed",
@@ -2542,14 +2548,15 @@
    "fix": null,
    "retest": {
     "since": 26,
-    "fresh": 5,
-    "freshOk": 1,
+    "fresh": 6,
+    "freshOk": 4,
     "ids": [
      "r26_abs_lender_boom_model",
      "r29_wakefield_lancet_1998",
      "r29_abs_pilot_supplier",
-     "r35_bible_codes_genesis_1994",
-     "r35_abs_food_diary_pvalue"
+     "r35_abs_food_diary_pvalue",
+     "r37_fisher_plateau_1929",
+     "r37_abs_rent_plateau_loan"
     ]
    },
    "kind": "missed",
@@ -2605,7 +2612,7 @@
     "s19",
     "s22"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r27_frege_basic_law_v_1893",
@@ -2640,7 +2647,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 36,
+   "lastSeenRound": 37,
    "resolved": "2026-11-02",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
    "reopened": "2026-11-02"
@@ -2676,7 +2683,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r28_surgisphere_lancet_2020",
@@ -2709,7 +2716,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r29_abs_pilot_supplier",
@@ -2741,7 +2748,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r29_wakefield_lancet_1998",
@@ -2773,7 +2780,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2789,8 +2796,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 45,
-    "freshOk": 30,
+    "fresh": 47,
+    "freshOk": 34,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -2868,7 +2875,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r31_bre_x_busang_1996",
@@ -2901,7 +2908,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r31_dreyfus_bordereau_1894",
@@ -2983,7 +2990,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r32_madoff_trackrecord_2005",
@@ -3018,7 +3025,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 37
   },
   {
    "id": "f_r33_beringer_lying_stones_1725",
@@ -3098,10 +3105,11 @@
    },
    "retest": {
     "since": 35,
-    "fresh": 1,
-    "freshOk": 1,
+    "fresh": 2,
+    "freshOk": 2,
     "ids": [
-     "r36_jimmys_world_1980"
+     "r36_jimmys_world_1980",
+     "r37_abs_rent_plateau_loan"
     ]
    },
    "kind": "missed",
@@ -3127,11 +3135,19 @@
    "case": "r35_abs_food_diary_pvalue",
    "opened": "2026-11-10",
    "openedRound": 35,
-   "status": "diagnosed",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "مسیرِ ۲: جزوه برای آزمون‌های چندگانه/آزادیِ انتخابِ تحلیل پس از دیدنِ داده ملاکِ صریح ندارد (truth.why ِ خودِ پرونده). موتور خطا را دید ولی به دلیلی دیگر: رمزگذارِ کور hidden_ctrl=false و راه=استقراء نوشت ⇒ st_tajrobe/st_istiqra (s51 «عاملِ پنهانِ کنترل‌نشده»، s50) که با «آزادیِ انتخابِ تحلیل» هم‌معنا نیست. برچسب پس از حکم ویرایش نشد. پیشنهادِ «فراتر از جزوه» (قضیهٔ احتمالِ دست‌کم یک «معنادار» در m آزمون، با برهان از اصول و سنجشِ اثر روی کلِ پیکره) به دورِ بعد سپرده شد. برای همین پروندهٔ انتزاعی: truth.right خودش به s51 ارجاع می‌دهد، پس برچسبِ {st_aql|st_tajrobe} پیش از حکم هم دفاع‌پذیر بود — برچسب عوض نشد. — دورِ ۳۶: قضیهٔ «بهترین از m آزمون» نوشته و به بازبینِ مستقل داده شد؛ بازبین نشان داد عددِ ۱/(۲−(۱−α)^m) از A0–A4 برنمی‌آید (به سطحی که A4 بر آن گذاشته شود بسته است؛ با A4 روی هر اثرِ جدا همان ۱/(۱+α) می‌شود) ⇒ پیشنهادِ قاعده ثبت نشد. تشخیصِ بازنگری‌شده: قاعدهٔ موجودِ r_aql_matter_unproven (s40) همین خطا را می‌گیرد اگر matter=«مقدمه اثبات‌نشده» رمز شود؛ رمزگذارِ کور matter را ننوشته بود ⇒ علت «خطای رمزگذاری پرونده»، نه خلأ جزوه. بازرمزگذاریِ کورِ مستقل در دورِ بعد.",
-   "fix": null,
-   "retest": null,
+   "fix": {
+    "what": "بازرمزگذاریِ کورِ مستقل (زیرعاملِ جدا، فقط داستان/کنشگر/متن، همهٔ کلیدها از نو) با فرمانِ recode؛ رمزگذارِ تازه matter=«مقدمه اثبات‌نشده» نوشت و r_aql_matter_unproven (s40) ایستگاهِ st_aql را گرفت. برچسبِ truth دست نخورد.",
+    "round": 37
+   },
+   "retest": {
+    "since": 37,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "mislocated",
    "title": "دفترچهٔ خوراک و سردرد",
    "tier": "abstract",
@@ -3156,18 +3172,29 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 36,
+   "resolved": "2026-11-12",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
+   "verified": "2026-11-12"
   },
   {
    "id": "f_r35_bible_codes_genesis_1994",
    "case": "r35_bible_codes_genesis_1994",
    "opened": "2026-11-10",
    "openedRound": 35,
-   "status": "diagnosed",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "مسیرِ ۲: جزوه برای آزمون‌های چندگانه/آزادیِ انتخابِ تحلیل پس از دیدنِ داده ملاکِ صریح ندارد (truth.why ِ خودِ پرونده). موتور خطا را دید ولی به دلیلی دیگر: رمزگذارِ کور hidden_ctrl=false و راه=استقراء نوشت ⇒ st_tajrobe/st_istiqra (s51 «عاملِ پنهانِ کنترل‌نشده»، s50) که با «آزادیِ انتخابِ تحلیل» هم‌معنا نیست. برچسب پس از حکم ویرایش نشد. پیشنهادِ «فراتر از جزوه» (قضیهٔ احتمالِ دست‌کم یک «معنادار» در m آزمون، با برهان از اصول و سنجشِ اثر روی کلِ پیکره) به دورِ بعد سپرده شد. — دورِ ۳۶: قضیهٔ «بهترین از m آزمون» نوشته و به بازبینِ مستقل داده شد؛ بازبین نشان داد عددِ ۱/(۲−(۱−α)^m) از A0–A4 برنمی‌آید (به سطحی که A4 بر آن گذاشته شود بسته است؛ با A4 روی هر اثرِ جدا همان ۱/(۱+α) می‌شود) ⇒ پیشنهادِ قاعده ثبت نشد. تشخیصِ بازنگری‌شده: قاعدهٔ موجودِ r_aql_matter_unproven (s40) همین خطا را می‌گیرد اگر matter=«مقدمه اثبات‌نشده» رمز شود؛ رمزگذارِ کور matter را ننوشته بود ⇒ علت «خطای رمزگذاری پرونده»، نه خلأ جزوه. بازرمزگذاریِ کورِ مستقل در دورِ بعد.",
-   "fix": null,
-   "retest": null,
+   "fix": {
+    "what": "بازرمزگذاریِ کورِ مستقل (زیرعاملِ جدا، فقط داستان/کنشگر/متن، همهٔ کلیدها از نو) با فرمانِ recode؛ رمزگذارِ تازه matter=«مقدمه اثبات‌نشده» نوشت و r_aql_matter_unproven (s40) ایستگاهِ st_aql را گرفت. برچسبِ truth دست نخورد.",
+    "round": 37
+   },
+   "retest": {
+    "since": 37,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "mislocated",
    "title": "آزمونِ «رمزهای سفرِ پیدایش» در مجلهٔ Statistical Science (۱۹۹۴)",
    "tier": "real",
@@ -3192,7 +3219,10 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 36
+   "lastSeenRound": 36,
+   "resolved": "2026-11-12",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
+   "verified": "2026-11-12"
   },
   {
    "id": "f_r4_redfield_arsenic",
@@ -3253,8 +3283,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 30,
-    "freshOk": 15,
+    "fresh": 31,
+    "freshOk": 18,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
@@ -3308,8 +3338,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 30,
-    "freshOk": 15,
+    "fresh": 31,
+    "freshOk": 18,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",

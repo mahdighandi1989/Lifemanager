@@ -5765,6 +5765,181 @@
     "staleFindings": [],
     "alarms": []
    }
+  },
+  {
+   "round": 37,
+   "at": "2026-11-13",
+   "note": "دورِ ۳۷ (پس از بازبینی): فیشر ۱۹۲۹، کانت و اصلِ توازی، فرمانِ کنستانتین (لئوی نهم ۱۰۵۳–۱۰۵۴) و ردِ والا ۱۴۴۰، انتزاعیِ اجاره؛ بازرمزگذاریِ کورِ دو موردِ r35؛ قلمرو: قرینه‌گرایی گامِ ۱",
+   "corpus": {
+    "n": 334,
+    "tiers": {
+     "real": 219,
+     "booklet": 51,
+     "problem": 26,
+     "abstract": 38
+    },
+    "new": 5,
+    "files": 27
+   },
+   "books": {
+    "mesbah": {
+     "n": 334,
+     "sound": 104,
+     "healthAlarms": 0,
+     "failures": 230,
+     "detected": 201,
+     "located": 191,
+     "fullyLocated": 172,
+     "controls": {
+      "agree": 0.848,
+      "negAgree": 0.237,
+      "negOk": true,
+      "posDetect": 1,
+      "posOk": true
+     }
+    }
+   },
+   "findings": {
+    "open": 40,
+    "fixed": 17,
+    "resolved": 16,
+    "verified": 5
+   },
+   "coverage": {
+    "rulesTested": 58,
+    "rules": 80,
+    "sectionsTested": 55,
+    "sections": 72,
+    "domains": 12,
+    "untested": [
+     "r_truth_narrow",
+     "r_badihi_wijdani_other",
+     "r_shohud_misrouted",
+     "r_naql_unreliable_corrob",
+     "r_naql_mubham_q",
+     "r_istiqra_small_n",
+     "r_yad_orig_t1",
+     "r_yad_orig_t2",
+     "r_yad_orig_t3",
+     "r_yad_orig_t4",
+     "r_yad_orig_t5",
+     "r_yad_undoc_t4",
+     "r_yad_undoc_t3",
+     "r_yad_undoc_t2",
+     "r_yad_undoc_t1",
+     "r_grade_false_zero",
+     "r_r_sanad_ahad",
+     "r_expert_pop_econ",
+     "r_expert_pop_psych",
+     "r_expert_pop_socsci",
+     "r_expert_pop_unknown",
+     "r_aql_conseq"
+    ],
+    "byDomain": {
+     "پزشکی": 38,
+     "علم": 31,
+     "ریاضی": 30,
+     "فناوری و مهندسی": 27,
+     "زندگی روزمره": 26,
+     "دین": 27,
+     "فلسفه": 25,
+     "تاریخ و سیاست": 26,
+     "مالی و بانکی": 26,
+     "بازار و معامله": 25,
+     "حقوق و قضا": 26,
+     "رسانه و خبر": 27
+    }
+   },
+   "brier": {
+    "claims": 233,
+    "ceil": 0.29731
+   },
+   "foundation": {
+    "classes": {
+     "B": 25,
+     "S": 20,
+     "O": 8,
+     "X": 0,
+     "?": 0
+    },
+    "modes": {
+     "num": {
+      "ok": 295,
+      "health_alarm": 0,
+      "missed": 29,
+      "mislocated": 10,
+      "changed": 0
+     },
+     "deg": {
+      "ok": 274,
+      "health_alarm": 0,
+      "missed": 42,
+      "mislocated": 18,
+      "changed": 21
+     },
+     "derived": {
+      "ok": 295,
+      "health_alarm": 0,
+      "missed": 29,
+      "mislocated": 10,
+      "changed": 0
+     },
+     "both": {
+      "ok": 274,
+      "health_alarm": 0,
+      "missed": 42,
+      "mislocated": 18,
+      "changed": 21
+     }
+    },
+    "baseMeasured": 3,
+    "baseTotal": 11,
+    "baseval": {
+     "p_thiqa": 99.9,
+     "p_zahir": 99.9,
+     "p_mubham_q": 99.9,
+     "p_sense_unctrl": 74.95,
+     "p_hidden_inf": 74.95,
+     "p_expert_bias": 50,
+     "p_hidden_factor": 74.95,
+     "p_expert_econ_lab": 60,
+     "p_expert_psych08": 36.4,
+     "p_expert_socsci_ns": 60.9,
+     "p_mem": 50
+    },
+    "samples": 3,
+    "conventional": 0,
+    "audit": 0,
+    "baseChanges": []
+   },
+   "territory": {
+    "areas": 108,
+    "groups": 14,
+    "byStage": [
+     63,
+     7,
+     0,
+     2,
+     35,
+     1
+    ],
+    "bookOnly": 33,
+    "score": 158,
+    "scoreBookOnly": 132,
+    "scoreEvidenced": 26,
+    "max": 540,
+    "moved": [
+     "a_evidentialism"
+    ]
+   },
+   "routine": {
+    "newEvents": 5,
+    "newSamples": 0,
+    "staleFindings": [],
+    "alarms": [
+     "بازبینیِ دورِ 36 مشکلِ اصلاح‌نشده دارد"
+    ]
+   }
   }
  ]
 }
