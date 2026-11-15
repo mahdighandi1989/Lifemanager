@@ -15,9 +15,9 @@ fixtures `tests/fixtures/r26_correction/*.json`; cases + checks `tests/tour1_r26
   `numCopy23` (rate clash), `fieldKey`, `copyCands` (inner `cand`, `pageSrc`; guess skipped on `guessRateOff26`), `copyField`, `A.liveCopyAnswer`,
   `A.liveSessCopies`, the `res.changes` line builder in the live-retract result. New: `rate26`, `rateClash26`, `RATE26`, `guessRateOff26`, `fullCopy26`,
   `sameDatum26`, `msgInWin26`, `storyFollow26`, `A.livePriorStale`, `A.liveSessStale`, `A.liveCorrStale`, `A.liveStaleRecs`.
-- `a27_tour.js`: `retractCheck` (correction + question; ZWNJ words whole), `fixQ22`, `planR17`, `chLine20` (diff window for long single runs), inside
+- `a27_tour.js`: `retractCheck` (correction + question; ZWNJ words whole), `fixQ22` (a clause opening with «فرض کن / اگه» is hypothetical), `planR17`, `chLine20` (diff window for long single runs), inside
   `retractApply`: `put` (window for long texts), rebook stale judged on the final text, `hasN26`, `inWin`, `hasRes21`; `AS.DO.coach_state` wrapper.
-- `a45_story.js`: `priorTurn25` (the stale step comes from `A.livePriorStale`), `AS.DO.coach_state` wrapper (the ledger line enters the model's result block).
+- `a45_story.js`: `priorTurn25` (the stale step comes from `A.livePriorStale`; later steps using its result get `dep` as before), `AS.DO.coach_state` wrapper (the ledger line enters the model's result block).
 - `a44_route.js`: the «مانده» of `A.ROUTE.model` (reads `A.liveCorrStale`). `a39_math.js`: `decorate` (no series chart on `.sys` messages).
 
 ## Contracts for the other fixers
@@ -35,3 +35,6 @@ fixtures `tests/fixtures/r26_correction/*.json`; cases + checks `tests/tour1_r26
 - A26-15 s07: the fixture has no ✏️ turn for the heights (the round-26 control did not record it) — not reproducible by replay; mechanism green in bank #47.
 - C25-15 pwC2: unwritten percent-of-population chain; partial marking would print a wrong exact value for «۹۸٫۱» (C11).
 - «ρgQH» with «(۱۲٫۵/۳۶۰۰)» and the two-step rounded «۳ وات‌ساعت» are not read (neither marked nor asked).
+
+## Suite
+All 140 page tests run one at a time: 139 green; `test_polya_fix5.js` fails only on 2026-11-15 because it hard-codes «۲۵ آبان» and tomorrow is that day (pre-existing calendar coincidence, not touched).
