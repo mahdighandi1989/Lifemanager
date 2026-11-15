@@ -5111,3 +5111,13 @@ dated stability, mind-card feed) under way.
   is green. PROPOSAL: the collector should carry forward provenance it cannot recompute, the way it already keeps shrunken shards.
 - **FINDING (2026-11-12)** `docs/tours/polya-batch1/kit/checkpoint.sh` holds the owner's e-mail address as an escaped sed pattern
   (already in history). Not changed in this task; PROPOSAL: read the address from an environment variable.
+- **CHANGE (2026-11-15, Pólya round-26 fixer «correction», Q2 + C11)** One stale engine (`a38` `staleCore25`) now serves the prior-work ledger
+  (`A.livePriorStale`), chat-only problems (`A.liveSessStale`), the strip (`A.liveCorrStale`, read by `a44`), copies (`fullCopy26`: a proposal is the
+  page's exact recomputation of the whole text or nothing) and the result block the model reads (one voice, D26-8). Marking follows written dependency,
+  not equal digits: an independent equal quantity, a measured number, or a number in a clause with another time rate («روزی» vs «دقیقه‌ای») is never
+  the corrected datum; written-result chains in her own message, unit conversions (new unit «هکتار» = 10,000 m²; roots are read in their own unit),
+  rounding and named difference lists are followed. `a27`: a correction plus a question is recorded; a ZWNJ word stays one word in the fix check; a
+  rebooked ✏️ result is judged on its final text; long change lines show the changed window. `a39`: page notices carry no data chart.
+  Tests replay the runners' own turns (`tests/tour1_r26_replay.js`, `tests/fixtures/r26_correction/`): 17 green, 2 reported not done (s07 fixture lacks
+  the edit; pwC2 needs a multi-hop population model — partial marking would print a wrong exact value). Bank VARIANTS_R26 Q2: 29/30, #48 reported
+  (today's area). WORKLOG 130 / PROGRESS 127 on this branch (assigned 131/128; renumbered at merge).
