@@ -5245,3 +5245,27 @@ dated stability, mind-card feed) under way.
   Tests replay the runners' own turns (`tests/tour1_r26_replay.js`, `tests/fixtures/r26_correction/`): 17 green, 2 reported not done (s07 fixture lacks
   the edit; pwC2 needs a multi-hop population model — partial marking would print a wrong exact value). Bank VARIANTS_R26 Q2: 29/30, #48 reported
   (today's area). WORKLOG 136 / PROGRESS 133 on this branch (assigned 131/128; renumbered at merge).
+
+## 2026-11-11 — CHANGE + FINDING: بک‌تستِ پیوسته، دورِ ۳۶ (روتینِ backtest)
+- **CHANGE** `apps/learning-architecture/backtest/corpus/round-0036.json` (۴ موردِ تازه: «دنیای جیمی» ۱۹۸۰، استدلالِ یک‌در‌۲۵۰۰ ِ درشوویتز، AP و فلوریدا ۲۰۰۰، یک انتزاعی)، قلمرو `a_modal_anti_luck` گامِ ۴ (مرز)، `reviews/round-0036.json`، WORKLOG ِ صفحه. موتور هر چهار را درست داوری کرد؛ ممیزی و کنترل‌ها تمیز.
+- **FINDING** قضیهٔ پیشنهادیِ «بهترین از m آزمون» در بازبینیِ مستقل رد شد (از A0–A4 برنمی‌آید: نتیجه به سطحی که اصلِ تقارن بر آن گذاشته شود بسته است) ⇒ پیشنهادِ قاعده ثبت نشد؛ دو یافتهٔ r35 به «خطای رمزگذاری» بازتشخیص شد.
+- **PROPOSAL** `p_territory_verify_label` (شرطِ تثبیتِ حوزهٔ قلمرو فقط با وقایعی که برچسبشان همان ایستگاه را دارد) — منتظرِ مالک.
+- **FINDING** مسیرِ ۱: قابِ Ioannidis 2005 آغاز شد و افزوده نشد (جدولِ خام در دسترس نبود). `epi-decisions` همچنان ۴۰۱ از Render.
+
+## 2026-11-12 — CHANGE + FINDING: بک‌تستِ پیوسته، دورِ ۳۷ (روتینِ backtest)
+- **CHANGE** `apps/learning-architecture/backtest/corpus/round-0037.json` (۵ موردِ تازه: فیشر ۱۹۲۹، کانت/اصلِ توازی، لئوی نهم و فرمانِ کنستانتین، والا ۱۴۴۰، یک انتزاعی)؛ بازرمزگذاریِ کورِ دو موردِ r35؛ قلمرو `a_evidentialism` گامِ ۱. پیکره پیش از `run` جدا کامیت شد.
+- **FINDING** هر پنج درست داوری شد؛ دو یافتهٔ r35 «fixed» (منتظرِ تأیید با وقایعِ تازهٔ مرتبط). بازبینیِ مستقل: ۵ مشکل، ۴ اصلاح؛ باز: آزمونِ تقارنِ بازرمزگذاری.
+- **FINDING** درس: افزودنِ `fix` پس از `run` وضع را «verified» ِ کاذب می‌گذاشت ⇒ همیشه پس از هر ویرایشِ یافته `run --rerun` (experiences/continuous-backtest-for-a-rule-based-judge.md).
+- **FINDING** مسیرِ ۱ (Ioannidis 2005) افزوده نشد؛ `epi-decisions` همچنان ۴۰۱.
+- **FINDING** گیت: `x_about_route` ِ رمزگذارِ کور روی دو موردِ r37 (فقط از پروتکلِ دوخوانشی مجاز است، test_found_mixture.js) برداشته شد؛ حکم‌ها بی تغییر.
+
+## 2026-11-14 — CHANGE + FINDING + PROPOSAL: بک‌تستِ پیوسته، دورِ ۳۸ (روتینِ backtest)
+- **CHANGE** `apps/learning-architecture/backtest/corpus/round-0038.json` (۸ موردِ تازه: زینوویف، گریسِ بیرمنگام، داو ۳۶٬۰۰۰، شیلر، رهوی، شامپولیون، دو انتزاعی)؛ قلمرو `a_evidentialism` گامِ ۲؛ `reviews/round-0038.json`.
+- **FINDING** ۷/۸ درست؛ یک هشدارِ سلامت (شامپولیون) که پس از بازبینی «اختلاف بر سرِ برچسب» ماند — تغییرِ برچسبِ پس از حکم برگردانده شد و پرونده تا بازرمزگذاریِ کورِ دوم excluded شد. آزمونِ تقارنِ بازرمزگذاری: حکم ۴/۴، ایستگاه‌ها ۲/۴.
+- **PROPOSAL** `p_field_ml2` (قابِ Many Labs 2 آماده، منتظرِ جمعیتِ تازه) و `p_retest_exclude_post_edit` — منتظرِ مالک. `epi-decisions` همچنان ۴۰۱.
+
+## 2026-11-15 — CHANGE + FINDING: ناظرِ عمومی (دورِ کامل)
+- **CHANGE** قلمروِ `sys-territory`: `ln_sleep` و `dc_goal_setting` از گامِ ۰ به ۳، هر کدام با منبعِ دومِ وارسی‌شده (Diekelmann & Born 2010 doi:10.1038/nrn2762؛ Epton et al. 2017 doi:10.1037/ccp0000260 — Crossref + PubMed). `apps/learning-architecture/territory/`، WORKLOG ‏(۲۰۲۶-۱۱-۱۵).
+- **CHANGE** `apps/learning-architecture/norms/norms.json`: `retrieved` ⇒ 2026-11-15 پس از جستجوی وب؛ هیچ عددی افزوده نشد (هیچ نامزدی شرط‌ها را نداشت)؛ جستجوها و نامزدهای آینده در `refresh_log`.
+- **FINDING** `page_map`: `/brain` در اجرای کامل «اندازه‌گیری نشد» (ناوبری به نشانیِ مطلق گزارش شد) ولی `--only /brain` بی‌خطا اندازه گرفت ⇒ ناپایداریِ ابزار، نه نقصِ محصول (همان الگوی 2026-11-01).
+- **FINDING + CHANGE** گیتِ قانونِ ۴ روی `main` ِ دست‌نخورده قرمز بود: `apps/learning-architecture/tests/test_polya_fix5.js` (M3) هر سال فقط در ۲۴ آبان شکست می‌خورد، چون «۲۵ آبان» ِ ثابتِ آزمون همان «فردا» بود و شرطِ «تاریخِ کاربر بیاید، فردا نیاید» با خودش تناقض داشت. آزمون حالا در این حالت «۲۷ آبان» را برمی‌دارد؛ کدِ محصول دست نخورد.

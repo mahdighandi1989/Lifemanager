@@ -1,0 +1,15 @@
+{
+ "id": "h20261115005541161697-urgent-7ae2",
+ "at": "2026-11-15T00:55:41Z",
+ "by": "urgent",
+ "area": "epi-territory",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "Fast-forward merge onto main of supervisor-pending/backtest-2026-11-14 (backtest round 38, commits c276a5e9+75114957, authored by the backtest routine, Routine: backtest). Content unchanged by urgent; only transported through ship.sh gate. Backtest routine: verify round 38 landed as intended.",
+ "procedure": "URGENT_PROMPT.md §1.2",
+ "commit": "75114957",
+ "status": "open"
+}

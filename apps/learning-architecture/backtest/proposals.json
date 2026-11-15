@@ -458,6 +458,207 @@
    "why": "در r27_frege رمزگذارِ کور badihi=اولی (ادعای فرگه) نوشت و r_badihi_pseudo فعال نشد؛ با «نظری» می‌شد (s39–s40). تعریفِ epi_feat.js «بدیهی یا نظری» مبهم است. پیشنهاد: توضیحِ ویژگی بگوید «ماهیتِ تصدیق با دو آزمونِ s39 از متن (نه ادعای کنشگر)»، و رمزگذار در تردید ننویسد. تغییرِ دستورِ رمزگذاری است نه قاعده.",
    "evidence": "r27_frege_basic_law_v_1893 (دو رمزگذاریِ کور، دو نتیجهٔ متفاوت). پیش/پس فقط روی وقایعِ تازه؛ خطر: بدیهی‌نماهای واقعاً بدیهی نظری رمز شوند.",
    "finding": "f_r27_frege_basic_law_v_1893"
+  },
+  {
+   "id": "p_territory_verify_label",
+   "title": "تثبیتِ حوزهٔ قلمرو (گامِ ۵) فقط با وقایعی که برچسبِ حقیقتشان همان ایستگاهِ حوزه را دارد",
+   "why": "ابزار در دورِ ۳۶ حوزهٔ a_defeasibility_theory را به گامِ ۵ برد چون سه واقعهٔ تازه (r31_dreyfus، r35_millerite، r36_jimmys) قاعدهٔ r_conflict_ignored را به کار انداختند و حکمِ کلِ پرونده درست بود؛ ولی برچسبِ حقیقتِ هیچ‌کدام st_conflict ندارد — پرچمِ این ایستگاه فقط «افزوده» بود. این شاهدِ سازگاری است، نه تأییدِ قاعدهٔ حوزه. پیشنهاد: شرطِ تثبیت در territoryRound این شود که truth.fail ِ واقعهٔ تازه دست‌کم یکی از ایستگاه‌های قاعده‌های حوزه را داشته باشد. تغییرِ معیارِ قبولی است ⇒ تصمیمِ مالک.",
+   "evidence": "backtest/territory.json (a_defeasibility_theory.verify.ids) و برچسب‌های همان پرونده‌ها؛ بازبینیِ مستقلِ دورِ ۳۶ (reviews/round-0036.json). اثر: با شرطِ تازه این حوزه در گامِ ۴ می‌ماند؛ هیچ حکمِ پرونده‌ای عوض نمی‌شود.",
+   "by": "روتینِ بک‌تست، دورِ ۳۶",
+   "at": "2026-11-11",
+   "source": "routine"
+  },
+  {
+   "id": "p_field_ml2",
+   "title": "جمعیتِ تازه برای مقدارِ پایهٔ کارشناس: «یافته‌های کلاسیک و معاصرِ روان‌شناسیِ اجتماعی/شناختی که Many Labs 2 از پیش برگزید» (۲۸ مورد، ۱۴ تکرار‌شده)",
+   "why": "مسیرِ ۱ ِ دستورِ بک‌تست هر دور قابی بی‌گزینش می‌خواهد. قابِ Many Labs 2 (Klein et al. 2018, AMPPS 1(4):443–490, doi:10.1177/2515245918810225) کامل شد: ۲۸ یافته پیش از هر تکرار با پروتکلِ داوری‌شده ثابت شد (selected_by_outcome=false) و جدولِ ۵ ِ مقاله سرانجامِ هر کدام را می‌دهد. ولی این جمعیت با هیچ مقدارِ x_field ِ موجود یکی نیست (نه یک مجله و نه یک سال؛ یافته‌های ۱۹۷۷ تا ۲۰۱۴ از مجله‌های گوناگون، برگزیدهٔ تیمِ پروژه)، و افزودنش بی x_field آن را در مقدارهای پایهٔ دیگر (مثلاً p_thiqa) می‌ریخت ⇒ جمعیتِ نامربوط عدد را جعل می‌کرد. افزودنِ مقدارِ تازه به x_field و BASE (p_expert_ml2) و قاعدهٔ همتایِ r_expert_pop_* تغییرِ طرح/قاعده است ⇒ تصمیمِ مالک (s49: اعتبارِ روش و صلاحیت؛ T_pop).",
+   "evidence": "قابِ آماده (این‌جا، frame): هر ۲۸ ردیفِ جدولِ ۵ ِ نسخهٔ پذیرفته‌شدهٔ مقاله (https://researchonline.lse.ac.uk/id/eprint/91159/1/Kappes_Many-labs-2.pdf، ص. ۹۷؛ ستونِ «replication sample size, p < .0001»، که ملاکِ سخت‌گیرانهٔ خودِ پروژه است: ۱۴/۲۸ = ۵۰٪؛ با ملاکِ p<.05 ۱۵/۲۸، تنها تفاوت Inbar et al. 2009 با p=0.024). دو جفت (False consensus ۱/۲ و Trolley ۱/۲) از یک مقاله‌اند ⇒ grp ِ مشترک. اثرِ پیش‌بینی‌شده با (k+1)/(n+2): ۱۵/۳۰ = ۵۰ (برابرِ «نمی‌دانیم»). پس از پذیرش: متنِ هر یافته از مقالهٔ اصلی، رمزگذاریِ کورِ جدا، `sample` + `field`.",
+   "frame": {
+    "id": "klein2018_ml2",
+    "criterion": "p < .0001 در نمونهٔ تکرار، هم‌جهت با یافتهٔ اصلی (جدولِ ۵)",
+    "items": [
+     {
+      "n": 1,
+      "effect": "Correspondence bias",
+      "original": "Miyamoto & Kitayama 2002",
+      "replicated_p0001": true
+     },
+     {
+      "n": 2,
+      "effect": "Intentional side effects",
+      "original": "Knobe 2003",
+      "replicated_p0001": true
+     },
+     {
+      "n": 3,
+      "effect": "Trolley dilemma (1)",
+      "original": "Hauser et al. 2007",
+      "replicated_p0001": true
+     },
+     {
+      "n": 4,
+      "effect": "False consensus (1)",
+      "original": "Ross, Greene & House 1977",
+      "replicated_p0001": true
+     },
+     {
+      "n": 5,
+      "effect": "Moral typecasting",
+      "original": "Gray & Wegner 2009",
+      "replicated_p0001": true
+     },
+     {
+      "n": 6,
+      "effect": "False consensus (2)",
+      "original": "Ross, Greene & House 1977",
+      "replicated_p0001": true
+     },
+     {
+      "n": 7,
+      "effect": "Intuitive reasoning",
+      "original": "Norenzayan et al. 2002",
+      "replicated_p0001": true
+     },
+     {
+      "n": 8,
+      "effect": "Less is better",
+      "original": "Hsee 1998",
+      "replicated_p0001": true
+     },
+     {
+      "n": 9,
+      "effect": "Framing",
+      "original": "Tversky & Kahneman 1981",
+      "replicated_p0001": true
+     },
+     {
+      "n": 10,
+      "effect": "Direction & SES",
+      "original": "Huang et al. 2014",
+      "replicated_p0001": true
+     },
+     {
+      "n": 11,
+      "effect": "Moral foundations",
+      "original": "Graham et al. 2009",
+      "replicated_p0001": true
+     },
+     {
+      "n": 12,
+      "effect": "Trolley dilemma (2)",
+      "original": "Hauser et al. 2007",
+      "replicated_p0001": true
+     },
+     {
+      "n": 13,
+      "effect": "Tempting fate",
+      "original": "Risen & Gilovich 2008",
+      "replicated_p0001": true
+     },
+     {
+      "n": 14,
+      "effect": "Priming consumerism",
+      "original": "Bauer et al. 2012",
+      "replicated_p0001": true
+     },
+     {
+      "n": 15,
+      "effect": "Disgust & homophobia",
+      "original": "Inbar et al. 2009",
+      "replicated_p0001": false
+     },
+     {
+      "n": 16,
+      "effect": "Incidental anchors",
+      "original": "Critcher & Gilovich 2008",
+      "replicated_p0001": false
+     },
+     {
+      "n": 17,
+      "effect": "Position & power",
+      "original": "Giessner & Schubert 2007",
+      "replicated_p0001": false
+     },
+     {
+      "n": 18,
+      "effect": "Direction & similarity",
+      "original": "Tversky & Gati 1978",
+      "replicated_p0001": false
+     },
+     {
+      "n": 19,
+      "effect": "Moral cleansing",
+      "original": "Zhong & Liljenquist 2006",
+      "replicated_p0001": false
+     },
+     {
+      "n": 20,
+      "effect": "Structure & goal pursuit",
+      "original": "Kay et al. 2014",
+      "replicated_p0001": false
+     },
+     {
+      "n": 21,
+      "effect": "Social value orientation",
+      "original": "Van Lange et al. 1997",
+      "replicated_p0001": false
+     },
+     {
+      "n": 22,
+      "effect": "Incidental disfluency",
+      "original": "Alter et al. 2007",
+      "replicated_p0001": false
+     },
+     {
+      "n": 23,
+      "effect": "Priming warmth",
+      "original": "Zaval et al. 2014",
+      "replicated_p0001": false
+     },
+     {
+      "n": 24,
+      "effect": "SMS & well-being",
+      "original": "Anderson et al. 2012",
+      "replicated_p0001": false
+     },
+     {
+      "n": 25,
+      "effect": "Assimilation & contrast",
+      "original": "Schwarz et al. 1991",
+      "replicated_p0001": false
+     },
+     {
+      "n": 26,
+      "effect": "Affect & risk",
+      "original": "Rottenstreich & Hsee 2001",
+      "replicated_p0001": false
+     },
+     {
+      "n": 27,
+      "effect": "Choosing or rejecting",
+      "original": "Shafir 1993",
+      "replicated_p0001": false
+     },
+     {
+      "n": 28,
+      "effect": "Actions are choices",
+      "original": "Savani et al. 2010",
+      "replicated_p0001": false
+     }
+    ]
+   },
+   "by": "روتینِ بک‌تست، دورِ ۳۸",
+   "at": "2026-11-14",
+   "source": "routine"
+  },
+  {
+   "id": "p_retest_exclude_post_edit",
+   "title": "پرونده‌ای که برچسبش پس از حکم ویرایش شده، در retest ِ یافته‌ها و تثبیتِ قلمرو «تازه» شمرده نشود",
+   "why": "تأییدِ یک اصلاح فقط با وقایعِ تازه‌ای معتبر است که برچسبشان پیش از حکم ثابت بوده؛ برچسبی که پس از دیدنِ حکمِ موتور عوض شده، دیگر گواهِ مستقلِ موتور نیست (همان منطقِ «برون‌نمونه» ِ دستور). در دورِ ۳۸ r38_abs_home_drug_test (ایستگاهِ برچسب پس از حکم st_expert ⇒ st_hiss) در retest ِ f_r34_chicago_tribune_election_1948 به‌عنوانِ freshOk شمرده شد. تغییرِ معیارِ قبولی است ⇒ تصمیمِ مالک.",
+   "evidence": "بازبینیِ مستقلِ دورِ ۳۸ (reviews/round-0038.json)؛ f_r34_chicago_tribune_election_1948 بی این پرونده هم ۴ از ۴ است و verified می‌ماند ⇒ اثرِ امروز بر هیچ حکمی نیست؛ پیشنهاد: پرونده‌های دارای edits با round برابرِ round ِ افزودن و تغییرِ truth.ok/fail از fresh/freshOk و verify ِ قلمرو بیرون بمانند.",
+   "by": "روتینِ بک‌تست، دورِ ۳۸",
+   "at": "2026-11-14",
+   "source": "routine"
   }
  ]
 }
