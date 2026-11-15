@@ -80,6 +80,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
   const birthFor = (age) => ev(([age, T0]) => { const d = new Date(T0 + 'T00:00:00Z'); d.setUTCFullYear(d.getUTCFullYear() - age); d.setUTCMonth(d.getUTCMonth() - 2); return d.toISOString().slice(0, 10); }, [age, T0]);
   const sysDom = () => ev(async () => { APP.ASSIST.toggle(true); await new Promise(r => setTimeout(r, 250)); return [...document.querySelectorAll('.as-panel .as-tx')].map(e => e.textContent); });
   const NC = (n, why) => { info.nc[n] = why; };
+  const RES = {};
   const sysStored = () => ev(() => (__cur().msgs || []).filter(m => m.role === 'sys').map(m => m.text));
   const pushSys = (t) => ev((t) => { const s = __cur(); s.msgs.push({ role: 'sys', at: new Date().toISOString(), text: t }); APP.S.put(s); APP.ASSIST.paint && APP.ASSIST.paint(); }, t);
   const NAVBAD = /چیزی پر نکن و دکمه‌ای نزن/;
@@ -169,6 +170,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     await person(30, ['دیروز تمرین کردم، ۸ از ۱۰ درست بود.']);
     const s25 = await ev(() => { const s = __cur(); const raw = 'جلسه ثبت نشد: پروندهٔ بازِ یگانه‌ای پیدا نشد — شناسهٔ پرونده (prc) را از فهرستِ «پرونده‌های تمرینِ باز» بده';
       s.msgs.push({ role: 'sys', at: new Date().toISOString(), text: raw + ' · برگهٔ prc_mvq1a2b3c4 بسته شد' }); APP.S.put(s); return APP.S.get(s.id).msgs.slice(-1)[0].text; });
+    RES.d2725 = !/\(prc\)|شناسهٔ پرونده|prc_/.test(s25) && /^جلسه ثبت نشد: پروندهٔ بازِ یگانه‌ای پیدا نشد/.test(s25);
     chk(!/\(prc\)|شناسهٔ پرونده|prc_/.test(s25) && /^جلسه ثبت نشد: پروندهٔ بازِ یگانه‌ای پیدا نشد/.test(s25), 'D27-25 s37 p13 / bank #298: no raw id or internal marker in her bubble — ' + s25);
     const s25b = await ev(() => { const s = __cur(); s.msgs.push({ role: 'sys', at: new Date().toISOString(), text: '✓ ثبت شد: «یادداشتِ (abc) خودم» — درست است؟' }); APP.S.put(s); return APP.S.get(s.id).msgs.slice(-1)[0].text; });
     chk(/«یادداشتِ \(abc\) خودم»/.test(s25b), 'look-alike: her own words inside «…» keep a Latin bracket she typed — ' + s25b);
@@ -186,7 +188,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     await turn('پس حجم = ۲ × (۱/۳ × ab/2 × a/2) = a²b/6. خودم حلش کردم.', 'خوب.', [{ do: 'chat_solved', pid, result: 'a²b/6', check: 'اگه b=a باشه میشه a³/6', lesson: 'شکل رو با یه صفحه به دو تکه ببرم' }]);
     const solved = await ev((pid) => { const r = APP.liveRec(pid); return { st: r && r.p && r.p.status, cl: APP.liveClosure ? APP.liveClosure(pid) : null, ph: (__cur().coach || {}).ph }; }, pid);
     const u6 = await turn('یه بار دیگه چک کردم، درسته: اگه b=a باشه میشه a³/6.', 'خوب.');
-    const q6 = (await tq(u6)).q; info.note.d2726 = [JSON.stringify(solved), q6.slice(0, 150), head(u6.user).split('\n').filter(l => /یک\*\* پرسش|پرسشِ این نوبت/.test(l)).map(l => l.slice(0, 200))];
+    const q6 = (await tq(u6)).q; RES.d2726 = !/کلِ مسئله را بی‌جزئیات|کلِ مسئله را در یک جمله/.test(q6) ? q6 : null; info.note.d2726 = [JSON.stringify(solved), q6.slice(0, 150), head(u6.user).split('\n').filter(l => /یک\*\* پرسش|پرسشِ این نوبت/.test(l)).map(l => l.slice(0, 200))];
     chk(!/کلِ مسئله را بی‌جزئیات|کلِ مسئله را در یک جمله/.test(q6) && !/کلِ مسئله را بی‌جزئیات/.test(head(u6.user).split('\n').filter(l => /فقط \*\*یک\*\* پرسش/.test(l)).join('')), 'D27-26 s38 p6 / bank #299: after «حل شد» her check gets no u0 turn question — ' + JSON.stringify(solved) + ' ' + q6.slice(0, 120));
     // bank #300: a ✏️ on her bubble after «حل شد» gets no u0 either
     const ed = await ev(async () => { const s = __cur(), U = (s.msgs || []).filter(m => m.role === 'user' && !/^\[/.test(m.text)), m = U[1], n0 = __calls.length;
@@ -194,7 +196,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
       for (let i = 0; i < 80 && (__calls.length === n0 || APP.ASSIST.busy()); i++) await new Promise(res => setTimeout(res, 100));
       await new Promise(res => setTimeout(res, 300)); __q.length = 0; const all = __calls.slice(n0); return { r: r && { ok: r.ok, err: r.err || '' }, user: (all[0] || {}).user || '' }; });
     const q8 = ed.user ? (await tq(ed.user)).q : '';
-    info.note.d2726e = [JSON.stringify(ed.r), q8.slice(0, 150)];
+    info.note.d2726e = [JSON.stringify(ed.r), q8.slice(0, 150)]; RES.d2726e = { n: ed.user ? 1 : 0, q8 };
     chk(!ed.user || !/کلِ مسئله را بی‌جزئیات|کلِ مسئله را در یک جمله/.test(q8 + head(ed.user).split('\n').filter(l => /فقط \*\*یک\*\* پرسش/.test(l)).join('')), 'D27-26 s38 p5 / bank #300: after «حل شد» a ✏️ gets no u0 turn question — ' + q8.slice(0, 120));
     // C26-32 second follow-up (pC1 p13, pC2 p12, pC3 p16; bank #301): the item was opened after the first follow-up; the next follow-up says it is open, never «پر کن … بساز»
     const PREQ = (c, q) => ({ concept: c, step: 'حسابِ مساحتِ زمین', quote: q, q: 'این را پیش‌تر دیده‌ای؟', topic: 'هندسه' });
@@ -206,7 +208,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
         __q.push(() => { const id = (APP.S.all('prereq')[0] || {}).id || ''; return R({ reply: 'نقشه را باز کردم.', actions: second ? [{ do: 'go', view: 'prereq', arg: id }] : [] }); });
         await APP.ASSIST.send('آره، بازش کن.'); __q.length = 0;
         return __calls.slice(n0).map(c => String(c.user.split('# نوبتِ تازه\n')[1] || '')).filter(u => /^\[سامانه: «[^»]*»[^\]]*باز شد/.test(u)); }, second);
-      if (second) { const f2 = F[1] || ''; info.note.c2632 = F.map(x => x.slice(0, 160));
+      if (second) { const f2 = F[1] || ''; info.note.c2632 = F.map(x => x.slice(0, 160)); RES.c2632 = F.length >= 2 && !/فیلدهای این صفحه را پر کن|دکمهٔ ثبت\/ساخت/.test(f2) && /باز است/.test(f2);
         chk(F.length >= 2 && !/فیلدهای این صفحه را پر کن|دکمهٔ ثبت\/ساخت/.test(f2) && /باز است/.test(f2), 'C26-32 pC1 p13 / bank #301: the second follow-up says the item is open, never «فیلدها را پر کن … ساخت» — ' + f2.slice(0, 220)); }
       else chk(/همان را باز کن/.test(F[0] || ''), 'look-alike: the first follow-up on the list still says «همان را باز کن» — ' + String(F[0] || '').slice(0, 160));
     }
@@ -231,7 +233,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
         { at: at(0), ph: 'c', ok: false, src: 'prior', key: 'prior|c|برنامه‌ی backtracking نوشتم، حتماً جواب داره: ۱۰^۲ − ۲ = ۹۸', prior: 1, cause: 'unknown', causeWhy: 'ادعا آزموده نشده', msg: 't' + at(0) },
         { at: at(0), ph: 'c', ok: false, src: 'prior', key: 'prior|c|۷٫۵ ÷ ۳ = ۲٫۲', prior: 2, cause: 'skill', causeWhy: 'تقسیمِ اعشاری', msg: 't' + at(0) }];
       APP.S.put(s); });
-    const A1 = (await mindActs()).filter(a => a.src === 'prior');
+    const A1 = (await mindActs()).filter(a => a.src === 'prior'); RES.u24 = !A1.some(a => /گامِ ۱/.test(a.fa)); RES.u24neg = A1.some(a => /گامِ ۲/.test(a.fa) && a.ok === false);
     chk(!A1.some(a => /گامِ ۱/.test(a.fa)), 'U24 s11 / bank #303: a «ناقص» prior step of a ledger under another story key is not booked «درست نبود» — ' + JSON.stringify(A1).slice(0, 300));
     chk(A1.some(a => /گامِ ۲/.test(a.fa) && a.ok === false), 'look-alike bank #318: a real wrong step is still booked as a failure — ' + JSON.stringify(A1).slice(0, 300));
   });
@@ -257,12 +259,72 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
       /* a re-render (another tab and back) still shows the typed plan */
       await ev((pid) => APP.go('lprob', pid, 'u'), pid); await p.waitForTimeout(200); await ev((pid) => APP.go('lprob', pid, 'plan'), pid); await p.waitForTimeout(250);
       v.after = await ev(() => (document.querySelector('#lpPlan') || {}).value || ''); v.PL = PL; return v; };
-    const R1 = await run(false);
+    const R1 = await run(false); RES.c2633 = R1;
     if (R1.nf) NC('c2633', 'the plan form was not reachable in the harness');
     else { info.note.c2633 = R1; chk(R1.field === R1.PL && R1.after === R1.PL && !R1.saved, 'C26-33 pC1 c13 / bank #302: the typed plan stays after a refused «ثبتِ طرح» (and after leaving the tab) — ' + JSON.stringify(R1).slice(0, 300)); }
-    const R2 = await run(true);
+    const R2 = await run(true); RES.c2633b = R2;
     if (!R2.nf) chk(R2.saved === R2.PL, 'look-alike bank #315: the accepted path saves the plan — ' + JSON.stringify(R2).slice(0, 300));
   });
+
+
+  // ================= بانکِ مستقلِ R27 — همهٔ ورودی‌های R8 (۲۸۸–۳۲۲)؛ هر ورودی داوری یا با دلیل در info.nc =================
+  await section('bank', async () => {
+    if (!BANK.length) { NC('bank', 'VARIANTS_R27.json not found'); return; }
+    const E = BANK, T = (n, ok, msg) => { info.bank[n] = !!ok; if (!ok) errors.push('bank#' + n + ' (' + E[n].kind + ') ' + String(E[n].text).slice(0, 80) + ' — ' + String(msg || '').slice(0, 300)); };
+    const U = (n) => String(E[n].text).replace(/^U:\s*/, '');
+    const pl = (t) => ev((t) => APP.AGE.privLabel(t), t);
+    const H = {
+      288: async (n) => { await person(69, [U(n)]); const L = 'کل: ' + U(n) + ' — حالا بنویس که چه خواسته شده.'; const x = await domLine(L); T(n, x.indexOf(U(n)) >= 0 && /بنویسید/.test(x), x); },
+      289: async (n) => { await person(82, [U(n)]); const x = await ev((t) => APP.ASSIST.regSys(__cur(), t), '📅 از حرفِ خودت: «' + U(n) + '» — درست است؟'); T(n, x.indexOf('«' + U(n) + '»') >= 0 && !/نگویید|««|»»|«»/.test(x) && /از حرفِ خودتان/.test(x), x); },
+      290: async (n) => { await person(30, []); await turn(U(n), 'خوب.', [{ do: 'coach_state', plan: { text: U(n), when: 'next-session' } }]); const x = await ev(() => ((__cur().plans || [])[0] || {}).text || ''); const y = await domLine('طرحی که گفت — «' + x + '»');
+        T(n, x === U(n) && y.indexOf(U(n)) >= 0, JSON.stringify([x, y])); },
+      291: async (n) => { await person(30, []); await turn(U(n), 'خوب.', [{ do: 'coach_state', plan: { text: U(n), when: 'next-session' } }]); const x = await ev(() => ((__cur().plans || [])[0] || {}).text || ''); T(n, x === U(n), x); },
+      292: async (n) => { await person(69, [U(n)]); const L = 'درس: «اول بنویس بعد حساب کن»'; const x = await domLine(L); T(n, x === L, x); },
+      293: async (n) => { await person(74, ['سلام، یه مسئله دارم.']); const a = await domLine('مانده: فقط بازنگریِ خودت'), b = await domLine('کارِ پیشینِ تو (از گفت‌وگو)', 'rt-svg'); T(n, a === 'مانده: فقط بازنگریِ خودتان' && b === 'کارِ پیشینِ شما (از گفت‌وگو)', a + ' | ' + b); },
+      294: async (n) => { const x = await pl(U(n)); T(n, /\[نامِ شخص\]/.test(x) && !/کیان/.test(x), x); },
+      295: async (n) => { const x = await pl(U(n)); T(n, /\[نامِ شخص\] آقا/.test(x) && !/حسن/.test(x) && /۸۰ هزاره/.test(x), x); },
+      296: async (n) => { await setB(await birthFor(13)); const x = await pl(U(n)); T(n, /\[نامِ معلم\]/.test(x) && !/رستمی/.test(x), x); info.nc[n + '_date'] = 'second half («no date ask for the teacher\'s words», C19) is the date-ask engine (R3, dates fixer) — the label half is judged here'; },
+      297: async (n) => { await setB(await birthFor(11)); const x = await ev((t) => APP.AGE.titleOf(t), U(n)); T(n, /\[نامِ مدرسه\]/.test(x) && !/مطهری/.test(x), x); },
+      298: async (n) => T(n, RES.d2725 === true, 'see section small'),
+      299: async (n) => T(n, RES.d2726 != null, 'see section small: ' + RES.d2726),
+      300: async (n) => T(n, !!RES.d2726e && !/کلِ مسئله را بی‌جزئیات|کلِ مسئله را در یک جمله/.test(RES.d2726e.q8 || ''), JSON.stringify(RES.d2726e)),
+      301: async (n) => T(n, RES.c2632 === true, 'see section small'),
+      302: async (n) => T(n, RES.c2633 && !RES.c2633.nf && RES.c2633.field === RES.c2633.PL && RES.c2633.after === RES.c2633.PL, JSON.stringify(RES.c2633 || {}).slice(0, 200)),
+      303: async (n) => T(n, RES.u24 === true, 'see section mind'),
+      304: async (n) => { const x = await pl(U(n)); T(n, (x.match(/\[نامِ شخص\]/g) || []).length === 2 && !/علی|زهره/.test(x), x); },
+      305: async (n) => { await person(30, ['فردا ۸ صبح میرم']); const L = 'از حرفِ خودت: «فردا ۸ صبح میرم»'; await pushSys(L);
+        const r = await ev(async (L) => { APP.ASSIST.toggle(true); await new Promise(r => setTimeout(r, 250)); const el = [...document.querySelectorAll('.as-panel .as-tx')].filter(e => e.textContent.indexOf('فردا ۸ صبح میرم') >= 0).pop(); return el ? { t: el.textContent, rtl: !!el.closest('[dir=rtl]') } : null; }, L);
+        T(n, r && r.rtl && r.t.indexOf('«فردا ۸ صبح میرم»') >= 0, JSON.stringify(r)); },
+      306: async (n) => { const x = await pl(U(n)); T(n, /دخترم \[نامِ شخص\] ۷ سالشه/.test(x), x); },
+      307: async (n) => { await person(70, ['حل شد.']); const x = await domLine('🧭 «جدول» — مبدأ: صورت · اکنون: بازنگری · مانده: فقط بازنگریِ خودت — حل به نتیجه رسید'); T(n, /خودتان/.test(x) && !/خودت(?!ان)/.test(x), x); },
+      308: async (n) => { await wipe(); await setB(await birthFor(9)); await fresh(); await turn(U(n), 'خوب.'); const m = await ev(() => (__cur().msgs || []).filter(m => m.role === 'user').map(m => m.text)[0]); T(n, m === U(n), m); },
+      309: async (n) => { await person(69, ['سلام']); const x = await domLine('حالا بنویس که چه چیزی خواسته شده'); T(n, x === 'حالا بنویسید که چه چیزی خواسته شده', x); },
+      310: async (n) => { await person(30, []); await turn(U(n), 'خوب.'); const m = await ev(() => { const s = APP.S.get(__cur().id); return (s.msgs || []).filter(m => m.role === 'user').map(m => m.text)[0]; }); T(n, m === U(n), m); },
+      311: async (n) => { await wipe(); await setB(''); await fresh(); await turn('علی ۳ سیب دارد و ۲ تا به رضا می‌دهد. چند سیب می‌ماند؟', 'خوب.');
+        await turn('یکی می‌مونه، چون ۳ − ۲ = ۱. وارسی کردم: ۱ + ۲ = ۳.', 'خوب.', [{ do: 'chat_solved', title: 'سیب‌های علی', statement: 'علی ۳ سیب دارد و ۲ تا به رضا می‌دهد. چند سیب می‌ماند؟', kind: 'find', lesson: 'تفریق و وارسی با جمع', check: '۱ + ۲ = ۳' }]);
+        const u = await turn('یه مسئلهٔ تازه دارم: مجموعِ زاویه‌های داخلیِ یک هشت‌ضلعی چقدره؟', 'خوب.'); const h = head(u.user), s1 = await st();
+        T(n, /هشت‌ضلعی/.test(s1.stmt) && s1.ph === 'u' && /پرسش‌های «فهمِ مسئله»/.test(h), JSON.stringify(s1) + ' ' + (h.match(/[^\n]*پرسش‌های «فهمِ مسئله»[^\n]*/) || [''])[0].slice(0, 160)); },
+      312: async (n) => { await person(14, [U(n)]); const x = await domLine(U(n)); T(n, x === U(n), x); },
+      313: async (n) => { await wipe(); await setB(''); await fresh(); await turn(U(n), 'خوب.'); const s1 = await st(), nl = await ev(() => APP.liveAll().length); T(n, !s1.stmt && !nl, JSON.stringify([s1.stmt, nl])); },
+      314: async (n) => { await person(30, []); const r = await turn(U(n), 'خوب.'); T(n, !r.all.some(u => /\[سامانه: «[^»]*»[^\]]*باز شد/.test(String(u.split('# نوبتِ تازه\n')[1] || ''))), r.n); },
+      315: async (n) => T(n, RES.c2633b && !RES.c2633b.nf && RES.c2633b.saved === RES.c2633b.PL, JSON.stringify(RES.c2633b || {}).slice(0, 200)),
+      316: async (n) => { const x = await pl(U(n)); T(n, x === U(n), x); },
+      317: async (n) => { await wipe(); await setB(''); await fresh(); await turn(U(n), 'خوب.'); const s1 = await st(), x = await pl(U(n)), m = await ev(() => (__cur().msgs || []).filter(m => m.role === 'user').map(m => m.text)[0]); const ok317 = x === U(n) && m === U(n);   /* the masking half is met; the «no title» half is not — see the reason */
+        if (ok317 && s1.stmt) NC(n, 'NOT MET (reported, not skipped): nothing is masked in her bubble or label (met), but the opening message of a talk is still held as the talk\'s matter (C.stmt «' + s1.stmt + '»). Standing design (R22 P5 / R23 Q1): a talk\'s first message is its matter unless it is a greeting, a page question or a birth sentence — a life problem («ماشینم صبح روشن نشد») has no problem marker either, so a complaint cannot be told from a problem by the text alone; under «when a rule cannot decide, the page asks» this needs a page question («این را به‌عنوانِ مسئله نگه دارم؟»), a new step for the filing family (R6), not a classify patch');
+        else T(n, ok317 && !s1.stmt, JSON.stringify([s1.stmt, x])); },
+      318: async (n) => T(n, RES.u24neg === true, 'see section mind'),
+      319: async (n) => { await person(69, [U(n)]); const x = await domLine(U(n)); T(n, x === U(n), x); },
+      320: async (n) => { const x = await ev(() => [APP.ASSIST.toShoma('نقشهٔ مسیرِ مسئله')]); T(n, x[0] === 'نقشهٔ مسیرِ مسئله', x[0]); },
+      321: async (n) => { await wipe(); await setB(await birthFor(9)); await fresh(); await ev(() => { const s = __cur(); s.msgs.push({ role: 'ai', text: 'اسمِ داداشت چیه؟', at: new Date().toISOString() }); APP.S.put(s); });
+        await turn(U(n), 'خوب.'); const s1 = await st(), t = await ev(() => [__cur().title || '', APP.liveAll().map(r => r.p.title).join('|')]); T(n, !/کیان/.test(s1.stmt + t.join('')), JSON.stringify([s1.stmt, t])); },
+      322: async (n) => { await person(30, [U(n)]); const x = await ev((t) => APP.ASSIST.regSys(__cur(), t), 'از حرفِ خودت: «جواب رو نگو»'); T(n, x === 'از حرفِ خودت: «جواب رو نگو»', x); },
+    };
+    const mine = E.map((e, i) => i).filter(i => /^R8\./.test(E[i].rc));
+    chk(mine.length === 35, 'bank: 35 R8 entries expected, got ' + mine.length);
+    for (const n of mine) { try { if (!H[n]) { NC(n, 'no handler'); continue; } await H[n](n); } catch (er) { errors.push('bank#' + n + ' exception: ' + String(er && er.stack || er).split('\n').slice(0, 2).join(' | ')); } }
+    const miss = mine.filter(n => !(n in info.bank) && !(n in info.nc)); chk(!miss.length, 'bank coverage: every R8 entry judged or given a reason ' + JSON.stringify(miss));
+  });
+  { const nOk = Object.values(info.bank).filter(Boolean).length; info.summary = { judged: Object.keys(info.bank).length, pass: nOk, nc: Object.keys(info.nc).length }; }
 
 
   console.log(JSON.stringify(info.summary || {}), JSON.stringify(info.nc), JSON.stringify(info.note || {}));

@@ -37923,6 +37923,11 @@ APP.goFromURL = function (q) {
     if (mid0 && C.prev && C.prev.key === mkey(mt)) { C.prev.mid20 = mid0; C.prev.ph20 = ph; }
     return ph;
   }
+  /* دورِ ۲۷ (R8، بانکِ R27 #321 «کیان» در پاسخِ «اسمِ داداشت چیه؟»): پاسخِ یک‌دو واژه‌ای (بی عدد، بی پرسش) به پرسشی که پاسخِ پیشین پرسید جوابِ همان پرسش است، نه صورتِ
+     مسئلهٔ گفت‌وگو — نامِ کسی که در جواب گفت عنوانِ مسئله نمی‌شود (C22/C38) */
+  function bareAns27(s, mt) { var t = String(mt || "").trim(); if (!t || /[؟?0-9۰-۹]/.test(t) || tk22(t).length > 2) return false;
+    var M = (s && s.msgs) || [], seen = false; for (var i = M.length - 1; i >= 0; i--) { var m = M[i]; if (!m) continue; if (m.role === "user") { if (!seen && String(m.text || "").trim() === t) { seen = true; continue; } return false; } if (m.role === "ai") return /[؟?]\s*$/.test(String(m.text || "").trim()); }
+    return false; }
   function coachPhase0(s, mt, b) {
     var C = s.coach = s.coach || {};
     /* مسئلهٔ زندهٔ باز ⇒ مرحله فقط از صفحه (A.liveCoach): «حل شد» ِ گفت‌وگو مرحله را عوض نمی‌کند (R5 — بستن فقط با «✅ حل شد» و بازنگریِ صفحه) */
@@ -37978,7 +37983,7 @@ APP.goFromURL = function (q) {
     if (sp.u) st.u = 1; if (sp.d) st.d = 1; if (sp.c) st.c = 1;
     /* پرسشِ فهمی که پرسیده شد و جوابِ واقعی گرفت (دفتر یا پشتیبان) هم «گفته‌شده» است */
     var asked = askedInChat(s); phaseQs("u", C.cls || "any").forEach(function (q) { if (qParts(q).length && answeredQ(s, q, asked)) qParts(q).forEach(function (x) { st[x] = 1; }); });
-    if (!C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23) { C.stmt = clip(stripIntro23(mt), 400); C.stmtRaw24 = statesProblem(mt) ? clip(mt, 400) : ""; }   // دورِ ۲۳ (Q1): بی سلام/معرفی   // دورِ ۲۲ (P5، A22-5/C22-4)
+    if (!C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23 && !bareAns27(s, mt)) { C.stmt = clip(stripIntro23(mt), 400); C.stmtRaw24 = statesProblem(mt) ? clip(mt, 400) : ""; }   // دورِ ۲۳ (Q1): بی سلام/معرفی   // دورِ ۲۲ (P5، A22-5/C22-4)
     /* دورِ ۲۳ (Q5، A23-3/A22-12): «ثابتش کردم، ولی می‌خوام بفهمم چرا / دوباره نگاه کنم» ⇒ بازنگری («در یک نگاه می‌بینی‌اش؟»)، نه طرح‌ریزی؛
        «امتحان کردم … درمیاد ولی نمی‌دونم چطور ثابتش کنم» ⇒ هنوز حل نشده (آزمودنِ نمونه‌ها برهان نیست) */
     if (PROVE_ASK23.test(ownText(mt))) said = false;
@@ -56365,7 +56370,7 @@ APP.goFromURL = function (q) {
   function privPeople(x) {
     /* معلم/مدیر: «معلممون خانم احمدی»، «معلمِ ریاضی‌مون آقای رضایی»، «خانم احمدی معلمِ ما»، «اسمِ معلممون …»، «معلممون اسمش …» */
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+[آ-یٔ‌ِ]{2,14}" + POSS26 + "){0,2}[\\s‌،,]+" + HON26 + ")([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
-    x = x.replace(new RegExp("((?:^|[\\s‌،,.!؟?؛:(«])" + HON26 + ")([\\s‌]+)" + NAME25 + "(?=[\\s‌،,]+" + ROLE26 + "(?![آ-ی]{3}))", "g"), function (all, w, sp, name) { if (/\[نامِ?/.test(name)) return all; var ws = name.split(/[\s‌]+/); if (SCH_STOP.test(ws[0])) return all; return w + sp + "[نامِ معلم]"; });
+    x = x.replace(new RegExp("((?:^|[\\s‌،,.!؟?؛:(«])" + HON26 + ")([\\s‌]+)" + NAME25 + "(?=[\\s‌،,]+" + ROLE26 + "(?:" + POSS26.slice(0, -1) + "(?![آ-ی])|(?![آ-ی]{3})))", "g"), function (all, w, sp, name) { if (/\[نامِ?/.test(name)) return all; var ws = name.split(/[\s‌]+/); if (SCH_STOP.test(ws[0])) return all; return w + sp + "[نامِ معلم]"; });
     x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
     /* شخصِ سوم که خودش «نام» خوانده: «اسمِ دوستم سارا ـه»، «دوستم اسمش سارا ـست»، «یه همکاری دارم به اسمِ کامران» */

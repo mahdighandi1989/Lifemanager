@@ -305,7 +305,7 @@
   function privPeople(x) {
     /* معلم/مدیر: «معلممون خانم احمدی»، «معلمِ ریاضی‌مون آقای رضایی»، «خانم احمدی معلمِ ما»، «اسمِ معلممون …»، «معلممون اسمش …» */
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+[آ-یٔ‌ِ]{2,14}" + POSS26 + "){0,2}[\\s‌،,]+" + HON26 + ")([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
-    x = x.replace(new RegExp("((?:^|[\\s‌،,.!؟?؛:(«])" + HON26 + ")([\\s‌]+)" + NAME25 + "(?=[\\s‌،,]+" + ROLE26 + "(?![آ-ی]{3}))", "g"), function (all, w, sp, name) { if (/\[نامِ?/.test(name)) return all; var ws = name.split(/[\s‌]+/); if (SCH_STOP.test(ws[0])) return all; return w + sp + "[نامِ معلم]"; });
+    x = x.replace(new RegExp("((?:^|[\\s‌،,.!؟?؛:(«])" + HON26 + ")([\\s‌]+)" + NAME25 + "(?=[\\s‌،,]+" + ROLE26 + "(?:" + POSS26.slice(0, -1) + "(?![آ-ی])|(?![آ-ی]{3})))", "g"), function (all, w, sp, name) { if (/\[نامِ?/.test(name)) return all; var ws = name.split(/[\s‌]+/); if (SCH_STOP.test(ws[0])) return all; return w + sp + "[نامِ معلم]"; });
     x = x.replace(new RegExp("((?:اسمِ?|نامِ?)[\\s‌]+" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+هم)?)([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "[\\s‌]+(?:هم[\\s‌]+)?(?:اسمش|نامش))([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));
     /* شخصِ سوم که خودش «نام» خوانده: «اسمِ دوستم سارا ـه»، «دوستم اسمش سارا ـست»، «یه همکاری دارم به اسمِ کامران» */
