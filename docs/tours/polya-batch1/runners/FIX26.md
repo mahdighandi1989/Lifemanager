@@ -40,7 +40,7 @@ Keep your edits local to your mechanism's functions and say in the handoff note 
 Before the final commit, merge the latest finished sibling fixer branch the coordinator names (if any), rebuild, rerun.
 Save progress often: commit after every mechanism that is green (a session may stop at any moment; a half-done fixer is re-run from its last commit).
 Commit trailers exactly:
-Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01LTrqtGrkuTiy1ttSUpLVCd
 Final reply: commits, root causes (file:line), tests, bank results with reasons, suite result, not-done.
 
