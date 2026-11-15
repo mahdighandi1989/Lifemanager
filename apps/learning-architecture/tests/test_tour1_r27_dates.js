@@ -298,6 +298,45 @@ const HELPERS = () => {
     X('C27-17 / U50 pwC2 p21: «باشه» ⇒ یک برنامه با پیگیریِ چسبیده؛ روزِ شنبه در «امروز» یک سطر، نه 📌 و ⏰ ِ جدا', r.pl[0].when === r.sat && r.dl.filter(x => !x.done).length <= 1 && r.l.filter(x => /ثبت شد/.test(x)).length === 1 && !r.l.some(x => /ثبت شد[^]*⏰/.test(x) && !/📌/.test(x)) && r.rows.length <= 1 && r2.rows.length === 1, { r, r2 });
   });
 
+  /* ===== DECISIONS_R27 «Clarifications» C69–C73 (پس از بانکِ مستقل) ===== */
+  await section('clar', async () => {
+    const dayWhere = async (re, from, span) => { for (let k = from; k < from + span; k++) { await day(k); const f = await E(() => APP.fdate(APP.today())); if (new RegExp(re).test(f)) return k; } return -1; };
+    /* C69: پرسش در خودِ روزش هنوز باز است */
+    await fresh(1);
+    await E(async () => { await __say('فردا میرم بانک.', 'خب.', [__cs({})]); });
+    await day(2);
+    let r = await E(async () => { const o = { td: APP.today() }; await __say('آره', 'باشه.', [__cs({})]); o.dl = __dl(); return o; });
+    X('C69: «آره» در خودِ روزِ پرسیده (روزش هنوز تمام نشده) ⇒ ثبت می‌شود', r.dl.length === 1 && r.dl[0].date === r.td, r);
+    /* C70 «سرِ برج» در روزِ یکم ⇒ «امروز یا یکمِ ماهِ بعد؟» */
+    let k = await dayWhere('^۱ ', 1, 40); await E(() => { __wipe(); __freshChat(); });
+    r = await E(() => { const t = APP.today(), w = APP.PR.whenInfo('سرِ برج اجاره رو می‌ریزم'); let nf = ''; for (let i = 1; i < 40; i++) { const d = APP.addDays(t, i); if (/^۱ /.test(APP.fdate(d))) { nf = d; break; } } return { t, w, nf, w2: APP.PR.whenInfo('اولِ ماه اجاره رو می‌ریزم') }; });
+    X('C70 «سرِ برج»/«اولِ ماه» در روزِ یکم ⇒ دو گزینه: امروز یا یکمِ ماهِ بعد', k >= 0 && r.w && r.w.amb && r.w.opts && r.w.opts[0] === r.t && r.w.opts[1] === r.nf && r.w2 && r.w2.amb, r);
+    await day(3); r = await E(() => { const t = APP.today(); let nf = ''; for (let i = 1; i < 40; i++) { const d = APP.addDays(t, i); if (/^۱ /.test(APP.fdate(d))) { nf = d; break; } } return { nf, w: APP.PR.whenInfo('اولِ ماه اجاره رو می‌ریزم'), v: APP.PR.whenInfo('وسطِ ماه اجاره رو می‌ریزم'), a: APP.PR.whenInfo('آخرِ سالِ تحصیلی کارنامه رو می‌گیرم') }; });
+    X('C70 «اولِ ماه» در روزی جز یکم = «سرِ برج»', r.w && !r.w.amb && r.w.date === r.nf, r);
+    X('C70 «وسطِ ماه» و «آخرِ سالِ تحصیلی» واقعیتِ تقویم نیستند ⇒ پرسشِ «کدام روز؟» بی عدد', r.v && r.v.free && r.a && r.a.free, r);
+    k = await dayWhere('^۲۹ اسفند|^۳۰ اسفند', 140, 30);
+    r = await E(() => { const t = APP.today(), n = APP.fdate(APP.addDays(t, 1)); return { t, last: /^۱ فروردین/.test(n), w: APP.PR.whenInfo('آخرِ سال حساب رو می‌بندم') }; });
+    if (!r.last) { k = await dayWhere('^۳۰ اسفند', 140, 30); r = await E(() => { const t = APP.today(); return { t, last: /^۱ فروردین/.test(APP.fdate(APP.addDays(t, 1))), w: APP.PR.whenInfo('آخرِ سال حساب رو می‌بندم') }; }); }
+    X('C70 «آخرِ سال» در آخرین روزِ اسفند ⇒ همین امروز', r.last && r.w && r.w.date === r.t, r);
+    k = await dayWhere('^۵ فروردین', 140, 40);
+    r = await E(() => { const w = APP.PR.whenInfo('عید میرم شیراز'); return { w, f: APP.fdate(w ? w.date : ''), t: APP.fdate(APP.today()) }; });
+    X('C70 «عید» پس از ۱ فروردینِ امسال ⇒ ۱ فروردینِ سالِ بعد (همان را «… درست است؟» نام می‌برد)', r.w && /^۱ فروردین/.test(r.f) && r.f.slice(-4) !== r.t.slice(-4), r);
+    /* C71: روزِ نفی‌شده بی جایگزین ⇒ چیزی ثبت نمی‌شود؛ صفحه می‌پرسد کدام روز */
+    await fresh(1);
+    r = await E(async () => { const o = { fri: __nextDow(5) }; await __say('جمعه کتاب‌ها رو پس میدم.', 'خب.', [__cs({})]); const n0 = __sysLines().length; await __say('این جمعه نه.', 'باشه.', [__cs({})]); o.l = __sysLines().slice(n0); o.dl = __dl(); o.pend = __pend(); o.dq = __dq(); return o; });
+    X('C71 «این جمعه نه» ⇒ هیچ ثبت؛ صفحه «کدام روز؟» می‌پرسد و جمعه را پیشنهاد نمی‌کند', r.dl.length === 0 && r.l.some(x => /کدام روز/.test(x)) && r.pend.length === 1 && r.pend[0].free && !r.dq.some(x => /جمعه/.test(x) && /درست است/.test(x)), r);
+    /* C72: «بله، پس‌فردا» به پرسشِ «فردا» ⇒ روزِ خودش، یک بار با تاریخش */
+    await fresh(1);
+    r = await E(async () => { const o = { d1: APP.addDays(APP.today(), 1), d2: APP.addDays(APP.today(), 2) }; await __say('فردا میرم آزمایش.', 'خب.', [__cs({})]); const n0 = __sysLines().length; await __say('بله، پس‌فردا', 'باشه.', [__cs({})]); o.l = __sysLines().slice(n0); o.dl = __dl(); o.pend = __pend(); await __say('آره', 'باشه.', [__cs({})]); o.dl2 = __dl(); return o; });
+    X('C72 «بله، پس‌فردا» به پرسشِ «فردا» ⇒ فردا ثبت نمی‌شود؛ پس‌فردا یک بار با تاریخش پرسیده و با «آره» ثبت می‌شود', r.dl.length === 0 && r.pend.length === 1 && r.pend[0].date === r.d2 && r.l.filter(x => /^📅/.test(x)).length === 1 && r.dl2.length === 1 && r.dl2[0].date === r.d2, r);
+    /* C73: یادآورِ روزِ دیگر برای همان برنامه ⇒ یک رکورد با دو تاریخ (پیوسته به 📌)، و با «انجام شد» ِ برنامه بسته می‌شود */
+    await fresh(1);
+    r = await E(async () => { const o = { thu: __nextDow(4), fri: __nextDow(5) }; await __say('جمعه قرارداد رو امضا می‌کنم.', 'خب.', [__cs({ said: ['plan'], plan: { text: 'جمعه قرارداد رو امضا می‌کنم', when: o.fri } })]); await __say('آره', 'باشه.', [__cs({})]);
+      await __say('پنجشنبه یادم بنداز که مدارکِ امضا رو آماده کنم.', 'یادآور را می‌پرسم.', [{ do: 'deadline', what: 'یادآور: آماده‌کردنِ مدارکِ امضا', date: o.thu }, __cs({})]); await __say('آره', 'باشه.', [__cs({})]);
+      o.dl = APP.S.all('deadline').filter(d => !d.done).map(d => ({ date: d.date, plan: !!d.plan })); o.pl = __pl(); return o; });
+    X('C73: یادآورِ پنجشنبه برای امضای جمعه ⇒ یک کار با دو تاریخ (یادآور به همان 📌 پیوسته)', r.pl.length === 1 && r.pl[0].when === r.fri && r.dl.length === 1 && r.dl[0].date === r.thu && r.dl[0].plan, r);
+  });
+
   await b.close();
   const R = Object.values(info.runners);
   console.log(JSON.stringify({ runners: R.length, runnersOk: R.filter(Boolean).length, red: Object.keys(info.runners).filter(k => !info.runners[k]).length }));

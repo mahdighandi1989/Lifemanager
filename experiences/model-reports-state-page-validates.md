@@ -390,3 +390,17 @@ Round 26 of the same tour showed two more forms of the same failure.
 When a user edits a value that other records were computed from, keep a dependency graph from what the user actually wrote (expressions,
 conversions, roundings) and use it for marking, proposals and the assistant's summary alike; treat unit, rate and provenance as part of a value's
 identity; and when the graph has a hole, ask rather than recompute.
+
+## Update 2026-11-15 — a "yes" belongs to one question; a stored sentence is never re-read against a new today
+- A confirmation word answers the newest question the page asked under its last reply, wherever it stands in the message («…، بله، لطفاً فردا …»);
+  older unanswered questions need an explicit reference ("the date is right", a button, or restating the same act). Otherwise a yes meant for the
+  assistant's other question silently books a stale date.
+- Relative dates are facts about the moment they were said. Store the anchor day with the question and never recompute "tomorrow" from a later
+  today; a question closes when its day ends or when the user reports the act done — it is never re-asked with a shifted (or next-year) date.
+- An edit turn that quotes the old text is not an answer: re-derive from the corrected text, close the old question as "replaced" (keep history),
+  and ask once for the new day. A negated day is excluded everywhere (booking, offers, answers to other questions).
+
+### How to Apply Elsewhere
+Bind every confirmation to exactly one pending question (the newest under the last reply); keep the anchor time of every relative expression and
+never re-evaluate stored text against a new clock; close stale questions instead of re-deriving them; treat edit/correction turns as data changes
+that replace questions, never as answers.

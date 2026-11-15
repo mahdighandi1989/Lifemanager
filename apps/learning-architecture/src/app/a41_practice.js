@@ -2777,6 +2777,9 @@
       return "📌 «" + clip(q.text, 60) + "» — " + fdate(it.date) + ex26; }
     var r = dlBook25(s0, it, src);
     try { var one = (s0.plans || []).filter(function (q) { return q && q.when === it.date && q.state !== "done" && q.state !== "notdone"; }); if (r && one.length === 1) { r.plan = { sess: s0.id, id: one[0].id }; S.put(r); } } catch (e) { }
+    /* دورِ ۲۷ (C73): یادآوری در روزی جز روزِ برنامه («پنجشنبه یادم بنداز» برای امضای جمعه) یک رکورد با دو تاریخ است — به همان 📌 می‌پیوندد (r.plan، q.remind) و با بسته‌شدنِ برنامه بسته می‌شود */
+    try { if (r && !r.plan) { var rel73 = (s0.plans || []).filter(function (q) { return q && /^\d{4}-\d\d-\d\d$/.test(String(q.when || "")) && q.when !== it.date && q.state !== "done" && q.state !== "notdone" && (ovD27(q.text, (it.dl && it.dl.what) || it.what) >= 1 || ovD27(q.text, r.what) >= 1); });
+      if (rel73.length === 1) { r.plan = { sess: s0.id, id: rel73[0].id }; S.put(r); rel73[0].remind = it.date; return "⏰ یادآورِ «" + clip(rel73[0].text, 50) + "» — " + fdate(it.date) + " (همان 📌 ِ " + fdate(rel73[0].when) + "؛ یک کار، دو تاریخ)"; } } } catch (e) { }
     return "⏰ «" + clip(r ? r.what : it.what, 60) + "» — " + fdate(it.date);
   }
   /* الف) پاسخِ او به پرسش‌های بازِ صفحه — هر پیام یک بار (از کنشِ deadline ِ همان نوبت هم صدا زده می‌شود، پیش از قلابِ پس از نوبت) */
