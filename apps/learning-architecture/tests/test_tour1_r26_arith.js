@@ -87,7 +87,10 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     r = await want('انرژیِ روزانه = ۲۴۷۰ × ۸ ≈ ۱۸٫۸ کیلووات‌ساعت', 'FLAG', 'neg: unit prefix does not shield a slip', r => /۱۹٫۷۶ کیلووات/.test(r.c[0].valT));
     await want('۳۵ × ۱٫۴ = ۴۸ کیلوگرم', 'FLAG', 'neg: unit word, wrong product');
     // مقیاسی که خوانده نمی‌شود: نه ✓ نه ✗ (C15 «هرگز ✗ به‌خاطرِ واژه»)
-    await want('۲۵۰ میلیون × ۲۳٪ = ۵۷٫۵ هزار', 'ASK', 'C15: only the scale differs ⇒ asked, never ✗', r => r.c[0].kind === 'scale');
+    // DECISIONS_R26 C23 (پس از بانک) جای این انتظار را گرفت: وقتی عملوند هم واژهٔ مقیاس دارد، مقیاس جزوِ حساب است ⇒ ✗ (پیش‌تر ASK). پرسشِ مقیاس فقط برای واژهٔ تنها کنارِ نتیجه است:
+    await want('۲۵۰ میلیون × ۲۳٪ = ۵۷٫۵ هزار', 'FLAG', 'C23: the operand carries a scale word too ⇒ the scale is arithmetic, ✗');
+    await want('۲۵۰ × ۲۳٪ = ۵۷٫۵ هزار', 'OK', 'C15: a scale word only beside the result is its unit ⇒ ✓');
+    await want('۲۵۰ میلیون × ۲۳٪ = ۵۷۵۰۰', 'ASK', 'C15/C23: a scale word only among the operands and only the power differs ⇒ asked, never ✗', r => r.c[0].kind === 'scale');
     await want('۲۵۰ میلیون ضربدر ۲۳ درصد میشه ۵۷.۵ میلیون در سال، تقسیم بر ۱۲ میشه حدود ۴.۸', 'OK', 'B26·D35 aB3 p7 («میشه» + scale carried to the next link)', r => r.c.length === 2);
     await want('۱۲۰۰ هزار ÷ ۴ = ۳۰۰', 'OK', 'C15: a bare result takes the scale of the operands');
     await want('۱۲۰۰ هزار ÷ ۴ = ۴۰۰', 'FLAG', 'neg: … and a wrong one is still ✗');
@@ -135,7 +138,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     await want('۴ از ۲۶ میشه ۱۵٪', 'OK', 'D26-24 s36 p3');
     await want('۴ از ۲۶ میشه ۲۵٪', 'FLAG', 'neg: «A از B میشه N٪» wrong', r => /٪/.test(r.c[0].valT));
     await want('۱۶ و ۱۲ میشه ۲۸', 'OK', 'D26-24 aD1 p5');
-    await want('۱۶ و ۱۲ میشه ۱۴', ['UNCHECKED'], 'neg: «و … میشه» that is not a sum is «نسنجیده», never ✗');
+    // DECISIONS_R26 C28 جای این انتظار را گرفت: «و … میشه N» عملگرِ جمع است (پیش‌تر UNCHECKED)
+    await want('۱۶ و ۱۲ میشه ۱۴', 'FLAG', 'C28: «و … میشه» is a sum ⇒ a wrong sum is ✗');
     await want('۱ + ۲ + … + ۲۰ = ۲۱۰', 'UNCHECKED', 'C17: ellipsis sum');
     await want('۱۰۰ − ۲۰٪ = ۸۰', 'UNCHECKED', 'C17: «درصدِ چه؟» is told as unread, not left silent');
     await want('۱/۲ + ۱/۳ = ۲/۵', 'UNCHECKED', 'C17: two readings ⇒ unread, not silent');
@@ -257,9 +261,10 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     pr = await PR(); chk(pr && pr.steps[0].verdict === 'ok' && pr.steps[1].verdict === 'wrong' && pr.steps[1].pageBad, 'setup (#41 / bank #5): 45 − 28 = 17 ✓, 17 × 12 = 214 ✗ :: ' + JSON.stringify(pr && pr.steps.map(x => [x.n, x.verdict, x.chk])));
     info.bank[4] = !!(pr && pr.steps[0].verdict === 'ok' && pr.steps[1].verdict === 'wrong' && !/۲۰۴/.test(pr.steps[1].chk));
     u = await turn('نه بابا درست حساب کردم، همون ۲۱۴ میشه', 'بیایید کنارِ هم ببینیم.', [csn({ ph: 'c', said: [] })]); B = blockOf(u.user, '# بازسنجیِ حسابِ صفحه'); pr = await PR(); sys = await sysOf();
-    chk(/بازسنجی شد ⇒ حکم ماند: گامِ ۲/.test(B) && /۱۷ × ۱۲ = ۲۱۴ میلیون/.test(B) && /حسابِ صفحه: ۱۷ × ۱۲ = ۲۰۴ میلیون/.test(B) && /کوتاه بیا/.test(B), '#41: verdict stayed, the page\'s computation is the evidence, no caving :: ' + B.slice(0, 500));
+    // DECISIONS_R26 C29 جای «عددِ صفحه شاهد است» را گرفت: حکم می‌ماند، «یک بار» دوباره سنجیده شد، تکهٔ ناخوانا نشان داده می‌شود و عددِ درست هرگز گفته نمی‌شود
+    chk(/بازسنجی شد \(یک بار\) ⇒ حکم ماند: گامِ ۲/.test(B) && /۱۷ × ۱۲ = ۲۱۴ میلیون/.test(B) && /همین تکه/.test(B) && !/۲۰۴/.test(B) && /کوتاه بیا/.test(B), '#41 (C29): verdict stayed, re-checked once, the part pointed at, no right number, no caving :: ' + B.slice(0, 500));
     chk(pr && pr.steps[1].verdict === 'wrong' && pr.steps[1].pageBad && pr.steps[1].re && pr.steps[1].re.by === 'page' && pr.steps[1].re.to === 'wrong' && !!pr.steps[1].reAt && (await mindFail()).includes(2), '#41: nothing is cleared; the contest is recorded as re-checked :: ' + JSON.stringify(pr && pr.steps[1].re));
-    chk(sys.some(t => /حکم ماند/.test(t) && /۲۰۴ میلیون/.test(t)), '#41: she is told the verdict stayed, with the page\'s computation :: ' + JSON.stringify(sys));
+    chk(sys.some(t => /حکم ماند/.test(t) && /یک بار/.test(t) && /۱۷ × ۱۲/.test(t)) && !sys.some(t => /۲۰۴/.test(t)), '#41 (C29): she is told the verdict stayed after one re-check, with the part that does not read and without the right number :: ' + JSON.stringify(sys));
     const nSys = sys.length;
     u = await turn('نه بابا درست حساب کردم، همون ۲۱۴ میشه', 'همان شاهد.', [csn({ ph: 'c', said: [] })]); sys = await sysOf();
     chk(!/# بازسنجیِ حسابِ صفحه/.test(head(u.user)) && sys.filter(t => /بازسنجیِ حسابِ صفحه/.test(t)).length === 1, '#41: the same contest is not re-checked again in a loop :: ' + sys.length + '/' + nSys);
@@ -281,7 +286,71 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     u = await turn('پس ۲۱ × ۱۲ = ۲۴۲ میشه', 'باشه.', [csn({ ph: 'u', said: [] })]);
     chk(/✗ «۲۱ × ۱۲» را «۲۴۲» نوشته/.test(blockOf(u.user)), 'setup: a chat ✗ with no ledger :: ' + blockOf(u.user).slice(0, 200));
     u = await turn('ولی من با ماشین‌حساب زدم، درسته', 'ببینیم.', [csn({ ph: 'u', said: [] })]); B = blockOf(u.user, '# بازسنجیِ حسابِ صفحه');
-    chk(/حکم ماند: «۲۱ × ۱۲ = ۲۴۲»/.test(B) && /حسابِ صفحه: ۲۱ × ۱۲ = ۲۵۲/.test(B) && (await sysOf()).some(t => /۲۵۲/.test(t)), 'chat ✗ contested without a ledger: both computations, verdict stayed :: ' + B.slice(0, 300));
+    chk(/حکم ماند: «۲۱ × ۱۲ = ۲۴۲»/.test(B) && /همین تکه/.test(B) && !/۲۵۲/.test(B) && !(await sysOf()).some(t => /۲۵۲/.test(t)) && (await sysOf()).some(t => /حکم ماند/.test(t)), 'chat ✗ contested without a ledger (C29): verdict stayed, the part pointed at, no right number :: ' + B.slice(0, 300));
+  });
+
+  // ================= clar — DECISIONS_R26 «Clarifications after the independent bank» C23–C29 (افزوده پس از وقفه؛ هر مثبت کنارِ شبیهِ منفی‌اش) =================
+  await section('clar', async () => {
+    const lineOf = (r) => r.lines.join(' | ');
+    // C23: مقیاسِ عملوندها جزوِ حساب است
+    await want('۲ میلیون × ۳ = ۶ هزار', 'FLAG', 'C23: operand and result scales differ ⇒ ✗');
+    await want('۲ میلیون × ۳ = ۶ میلیون', 'OK', 'neg C23: the same scale on both sides');
+    await want('۲ میلیون × ۳ = ۶۰۰۰ هزار', 'OK', 'neg C23: another scale word, the same quantity');
+    // C24: مقیاس‌های گوناگون میانِ عملوندها — خوانشِ معمول ✓؛ فقط خوانشِ دیگر ⇒ نشان بده و بپرس؛ هیچ‌کدام ⇒ ✗
+    await want('۳۰۰ + ۲۰ میلیون تقسیم بر ۴۰ = ۵۰۰۳۰۰', 'OK', 'C24: the standard reading (each scale on its own number) gives her result ⇒ ✓');
+    let r = await want('۳۰۰ + ۲۰ میلیون تقسیم بر ۴۰ = ۸۰۰ هزار', 'ASK', 'C24: only the one-scale reading gives it ⇒ the reading is shown and asked', r => r.c[0].kind === 'reading');
+    chk(/«۳۰۰» را هم «هزار» بخوانی/.test(lineOf(r)) && /این‌طور حساب کردی/.test(lineOf(r)) && /این‌طور حساب کردی/.test(r.note.chk || ''), 'C24: the coach line and her own line show the reading that works and ask «این‌طور حساب کردی؟» :: ' + lineOf(r) + ' // ' + r.note.chk);
+    await want('۳۰۰ + ۲۰ میلیون تقسیم بر ۴۰ = ۹۰۰ هزار', 'FLAG', 'C24: no reading gives it ⇒ ✗');
+    // C25 / C27: پرسش فقط برای گرد شده یا بریده
+    await want('۱۰۰ ÷ ۷ = ۱۴', 'ASK', 'C25: 14 is the rounding and the truncation of 14.28…');
+    await want('۱۰۰ ÷ ۷ = ۱۵', 'FLAG', 'C25: 15 is neither ⇒ ✗');
+    await want('۱۰۰ ÷ ۷ = ۱۷', 'FLAG', 'C25: any other integer ⇒ ✗');
+    await want('۲٫۹ × ۳ = ۸', 'ASK', 'C25: 8 is the truncation of 8.7 ⇒ ask');
+    await want('۲٫۹ × ۳ = ۷', 'FLAG', 'C25: 7 is neither the rounding nor the truncation of 8.7 ⇒ ✗');
+    await want('۲٫۵ × ۳ = ۸', 'ASK', 'C27: 8 is the rounding of 7.5 ⇒ ask');
+    await want('۲٫۵ × ۳ = ۹', 'FLAG', 'neg C27: 9 ⇒ ✗');
+    // C26: نمادِ کسر تساوی است؛ «÷ / تقسیم بر» خارج‌قسمت
+    await want('۱۳/۱۲ = ۱', 'FLAG', 'C26: «۱۳/۱۲ = ۱» in fraction notation is an identity ⇒ ✗', r => !/باقی‌مانده/.test(r.c[0].valT));
+    await want('۱۳ ÷ ۱۲ = ۱', 'ASK', 'C26: with «÷» it is a quotient ⇒ C25 ask');
+    await want('۱۳÷۱۲ = ۱', 'ASK', 'C26: «÷» without spaces is still a quotient (never a fraction or a decimal point)');
+    await want('۱۳ تقسیم بر ۱۲ = ۱', 'ASK', 'C26: «تقسیم بر» ⇒ C25 ask');
+    await want('۲۶/۱۲ = ۱۳/۶', 'OK', 'neg C26: a true fraction identity stays ✓');
+    // C28: «و … میشه» جمع و «N تا M … میشه K» ضرب
+    await want('۳ و ۴ میشه ۸', 'FLAG', 'C28: «و … میشه» is a sum');
+    await want('۳ و ۴ میشه ۷', 'OK', 'neg C28: the right sum');
+    await want('۳ تا بستهٔ ۸۰ تومنی میشه ۲۴۰ تومن', 'OK', 'C28: «N تا … M … میشه K» is a product');
+    await want('۳ تا بستهٔ ۸۰ تومنی میشه ۲۵۰', 'FLAG', 'C28: a wrong product ⇒ ✗');
+    await want('۳ تا ۴ تومنی میشه ۱۳', 'FLAG', 'C28: «N تا M تومنی» (the bank\'s shape) ⇒ product, wrong ⇒ ✗');
+    await want('۳ تا ۴ تومنی میشه ۱۲', 'OK', 'neg C28: the right product');
+    await want('۲ تا ۳ روز دیگه میشه ۱۵', 'SILENT', 'neg C28: «N تا M روز» is a range, not a product — never ✗');
+    await want('بین ۳ تا ۴ ساعت میشه ۵', 'SILENT', 'neg C28: «بین N تا M» is a range');
+    await want('روی هم سه تا بسته خریدم هر کدوم هشتاد تومن، دویست و چهل دادم', 'SILENT', 'neg C28 / C17: no operation word at all stays outside');
+    // C26: جوابِ او به «؟» — «آره، گرد کردم» ⇒ تقریبی و ✓؛ «نه» ⇒ ✗ (بی عددِ درست)؛ جوابِ بی‌ربط ⇒ چیزی ثبت نمی‌شود
+    const askOf = () => p.evaluate(() => JSON.parse(JSON.stringify((__cur().coach || {}).arithAsk || [])));
+    const badOf = () => p.evaluate(() => JSON.parse(JSON.stringify((__cur().coach || {}).arithBad || [])));
+    await wipe(); await fresh();
+    let u = await turn('هر جعبه ۱۰۰ ÷ ۷ = ۱۴ تا', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    chk(/؟ «۱۰۰ \/ ۷»/.test(blockOf(u.user)) && (await askOf()).length === 1, 'C26 setup: the page asks about «۱۰۰ ÷ ۷ = ۱۴» and keeps the question open :: ' + blockOf(u.user).slice(0, 300));
+    u = await turn('آره، گرد کردم', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    let B = blockOf(u.user, '# جوابِ او به «؟» ِ صفحه'), A0 = await askOf();
+    chk(/✓ به گفتهٔ خودش گرد کرده بود: «۱۰۰ \/ ۷ ≈ ۱۴»/.test(B) && /تقریبی و درست/.test(B) && A0[0] && A0[0].re && A0[0].re.to === 'ok' && A0[0].re.apx, 'C26: «آره، گرد کردم» stores the line as approximate and ✓ :: ' + B + ' :: ' + JSON.stringify(A0));
+    u = await turn('آره', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    chk(!/# جوابِ او به «؟»/.test(head(u.user)), 'C26: an answered question is not answered again');
+    await wipe(); await fresh();
+    await turn('هر جعبه ۱۰۰ ÷ ۷ = ۱۴ تا', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    u = await turn('نه، همین ۱۴ رو می‌خواستم', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    B = blockOf(u.user, '# جوابِ او به «؟» ِ صفحه'); let Bd = await badOf();
+    chk(/✗ به گفتهٔ خودش گرد نکرده بود: «۱۰۰ \/ ۷ = ۱۴» نمی‌خواند/.test(B) && !/۱۴٫۲|۱۴\.۲|باقی‌مانده/.test(B) && Bd.some(b => b.ask && b.said === '14'), 'C26: her «نه» leaves ✗ — without the right number, and on the table for a contest :: ' + B + ' :: ' + JSON.stringify(Bd));
+    u = await turn('ولی من درست حساب کردم', 'ببینیم.', [csn({ ph: 'u', said: [] })]); B = blockOf(u.user, '# بازسنجیِ حسابِ صفحه');
+    chk(/حکم ماند/.test(B) && !/درست: «/.test(B), 'C26 + C29: contesting that ✗ re-checks once and the ✗ stays (the exact value is still not 14) :: ' + B.slice(0, 300));
+    await wipe(); await fresh();
+    await turn('هر جعبه ۱۰۰ ÷ ۷ = ۱۴ تا', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    u = await turn('بریم سراغ بخشِ بعدی', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    chk(!/# جوابِ او به «؟»/.test(head(u.user)) && !(await askOf()).some(a => a.re), 'neg C26: a reply that is neither yes nor no records nothing');
+    await wipe(); await fresh();
+    await turn('۲ × ۳ = ۶', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    u = await turn('آره', 'باشه.', [csn({ ph: 'u', said: [] })]);
+    chk(!/# جوابِ او به «؟»/.test(head(u.user)), 'neg C26: «آره» with no open question is nothing');
   });
 
   // ================= bank — Q1.arith_reader (۴۲ ورودی) =================
