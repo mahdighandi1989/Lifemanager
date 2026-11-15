@@ -55139,6 +55139,8 @@ APP.goFromURL = function (q) {
     /* بازه: «از امشب تا جمعه …» — موعد پایانِ بازه است، نه آغازش */
     var rg = /(?:^| )از (.{1,40}?) تا (.+)$/.exec(x); if (rg) { var a0 = PR.whenInfo(rg[1], base), b0 = a0 ? PR.whenInfo(rg[2], base) : null; if (a0 && b0) return b0; }
     var W0 = wdToks26(x), sat = add(base, 7 - ((bd + 1) % 7)), i, w;
+    /* «سه‌شنبه‌ی پیش/قبل/گذشته» روزی گذشته است، نه سه‌شنبهٔ پیشِ رو (بانکِ RM5 #13 ِ دورِ ۱۸) */
+    var Wp26 = W0.filter(function (z) { return /^ ?(?:ی ?)?(?:پیش(?! ?(?:نویس|بینی|نهاد|فرض|پرداخت|خرید|ثبت|زمینه|شرط|نیاز|رو|دستی|غذا|دبستان|دانشگاه|کش|قدم|تر))|قبل|گذشته)(?![آ-ی])/.test(x.slice(z.end)); }); if (Wp26.length) { W0 = W0.filter(function (z) { return Wp26.indexOf(z) < 0; }); if (!W0.length) return null; }
     /* «آخرِ ماه» / «آخرِ همین ماه» = آخرین روزِ ماهِ شمسیِ همین روز (روزِ پیش از یکمِ ماهِ بعد) */
     if (/آخر ?(?:ی ?)?(?:همین ?|این ?)?ماه(?![آ-ی])/.test(x) && !new RegExp("ماه ?(?:ی ?)?" + NEXT26).test(x)) { var em = monthEnd26(base); if (em) return { date: em, src: "monthend" }; }
     /* «ابتدای/اولِ ماهِ آینده» = یکمِ ماهِ شمسیِ بعد (نه «سی روز بعد») */

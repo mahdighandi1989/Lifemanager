@@ -320,3 +320,7 @@ matched nouns («برادرم»), so a retracted day, a brother's schedule and a
   once the user's words win, make the fixture consistent rather than weakening the rule.
 - Keep the question's identity (which message asked it) on the pending record, and stamp the booked record's source with the message
   that made the commitment, not the message that said yes — later corrections look for the commitment.
+- (2026-11-15) An ambiguous reading should carry its candidates, not a default plus an "ambiguous" flag whose alternative is implied
+  by one hard-wired rule («today or a week later»). When new ambiguities arrived («next Friday» said on a Sunday; «the weekend» =
+  Thursday or Friday) the hard-wired alternative was wrong for both; storing `opts: [a, b]` on the pending item let the question text,
+  the answer reader and the buttons all follow the same two dates, with the old rule as the fallback when no options are stored.

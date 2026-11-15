@@ -97,7 +97,48 @@ first (the handbook gate reports the numbering gap on this branch alone).
   page's date question); no entry was edited or skipped.
 - A 🎯 whose forecast is corrected through a datum correction (B26·D31) and the practice-session text «(درست)» — correction family.
 - A forecast is not bound to a problem record (Q3).
-- «آخرِ سال», «عید», «سرِ برج» and ordinal days without a month («بیستم») are not read; nothing is asked for them.
+- «آخرِ سال», «عید», «سرِ برج» are not read; nothing is asked for them.
 - A confirmed date that later passes unanswered stays as a 📅 row saying it passed; it books nothing.
 - The new prompt blocks («# تاریخ در همین پیام», «# 🎯 داوری‌های این گفت‌وگو») and `fcast_verdict` were not run against a real model.
 - U40 / R25 #224 second half (a child's message three times in the dossier) — still not touched.
+
+## Resume after the pause (2026-11-15): DECISIONS_R26 C32–C37
+The WIP snapshot (f56da378) held only docs; it was reviewed and kept. C23–C39 were re-read; C32, C33, C34, C35, C37 touch this family:
+- **C32** «جمعهٔ بعد» on another weekday ⇒ `PR.whenInfo` returns `{date: first, amb: true, wd, opts: [first, first+7], src: "weekday-next"}`
+  and the page asks «کدام روز: جمعه … یا جمعه …؟». On that weekday itself it stays +7 and is not ambiguous (bank #131/#132 unchanged).
+- **C33** «آخرِ هفته / آخرِ همین هفته» ⇒ `{amb, opts: [Thursday, Friday] of this week, src: "weekend"}` (only Friday left on a Friday ⇒ not
+  ambiguous); «آخرِ هفتهٔ بعد» ⇒ `opts` = Thursday/Friday of the next Sat–Fri week (`src: "nextweek"`). «آخرِ هفته‌ها» is a habit, no ask.
+  `date` stays Friday for compatibility; an `amb` item is never booked without her pick.
+- **C34** an ordinal day without a month («تا بیستم باید تحویل بدهم», «مهلتِ … بیستمه») is read only right after «تا/مهلت/موعد/سررسید/تحویل/
+  تاریخ/ددلاین/قبل از/پیش از» (or before «همین/این ماه») as the next such day of the Jalali calendar (`src: "monthday"`) and then goes
+  through C19 (a third party's deadline gets no ask) and C12. «جلسه دوم» is not a day.
+- **C35** already held (a condition clause is never asked); now covered by a test with its positive look-alike.
+- **C37** «پنجاه‌پنجاه» / «فیفتی‌فیفتی» = 50 %. A new prediction with a vague word («احتمالاً», «فکر کنم», …) and no number gets ONE line
+  «… چند درصد مطمئنی؟» (`pred.pAsk = true`); a short «۷۰ درصد» in the next message sets that prediction's confidence (and its 🎯's).
+  «آخرِ ماه» = last day of the current Jalali month through «… درست است؟» (already so).
+
+**Generalised ambiguous item (contract for everyone who reads `datePend`).** An `amb` item may carry `opts: [dateA, dateB]`; without it
+the two options are still «the same day / the same weekday next week» (C1). Helpers in a41: `ambO26(item, d0)` (the two dates),
+`ambLab26`, `ambPick26` (her answer ⇒ 0/1/−1: a date she says, a weekday name when the two differ, «اولی/دومی», else «همین/بعد»),
+`ambHint26`. Carriers: `herDates` items, `predDue().amb.opts` ⇒ `pred.dueAmb.opts`, `planWhen26().ambO` ⇒ `q.whenAskO = {date, opts}`
+(a27 `plan18`, one field added). The 📅 row of «امروز» shows one button per option.
+
+Functions changed in this resume: a41 `PR.whenInfo` (C32/C33/C34 branches), new `ordDay26`, `jParts26`, `monthDay26`, `dateSpan26`
+(ordinal span), `PR.herDates` (opts), `predDue`, `PR.planWhen26`, `itemLine26` + new `ambO26/ambLab26/ambPick26/ambHint26`,
+`PR.dateAnswer` (amb branch, hint), `PR.datePend` (plan/pred amb items, ask line), the date prompt hook (`say`), the 📅 row buttons,
+`wpct` (C37 words), `PR.bookPred` (number ask), `PR.predExplicit` (short percent answer). a27: `plan18` (field `whenAskO`).
+
+Bank entries that the clarifications changed (the entry is not edited; the check follows the clarification, with a comment):
+- **#134** «آخرِ هفتهٔ بعد میرم شهرستان سراغش» + «آره»: by C33 the page asks Thursday or Friday, so a plain «آره» books nothing (one
+  line says which to write); «جمعه» then books D0+12 — inside the entry's D0+11…D0+12 range.
+- **#203** «هفتاد درصد مطمئنم تا آخرِ همین هفته …» + «آره»: same reason; answered «جمعه», the 🎯 is 70 % due Friday as the entry asks.
+Tests: `test_tour1_r26_today.js` section `clar` (16 checks, every positive with its look-alike); 63/63 runner checks, bank 52/52.
+
+Found while running the whole suite after the resume:
+- `PR.whenInfo` read «سه‌شنبه‌ی پیش/قبل/گذشته» as the coming Tuesday, so a past-dated model plan («… دوباره می‌رم», R18 RM5 bank #13)
+  got a date question. A weekday followed by «پیش/قبل/گذشته» is now dropped as a past day (compounds such as «پیش‌نویس», «پیش‌بینی» are
+  not «پیش»). This was already red before the resume (the WIP snapshot had not run the suite).
+- `tests/test_polya_fix5.js` M3 hard-coded «۲۵ آبان», which on 2026-11-15 equals the page's next-day review date; the page was right.
+  The test now uses today + 10 days written as «D month» (no hard-coded calendar date, FIX26).
+- Old assertions changed by C33, with a comment: `test_tour1_r17_coach` (rc1plan «آخر هفته …» answered «جمعه»; the ask may be «کدام روز»),
+  `test_tour1_r18_coach` (RM5 #8 and 7b answered «جمعه»).

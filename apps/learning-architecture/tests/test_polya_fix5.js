@@ -127,8 +127,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(!info.concrete.length, 'concrete steps accepted ' + JSON.stringify(info.concrete));
     info.when = await p.evaluate(() => ['بعدا', 'یه وقتی', '', '۲ روز پیش'].map(w => APP.willStepCheck({ desire: 'want', hope: 'yes', step: 'فصل ۳ را بخوانم', when: w }, null, 'x').ok));
     chk(info.when.every(x => x === false), 'a «when» that is not a time (or missing) is rejected ' + JSON.stringify(info.when));
-    // تبدیلِ مستقلِ شمسی (Intl، تقویمِ persian) برای «۲۵ آبان»
-    const jal = await p.evaluate(() => { const f = new Intl.DateTimeFormat('en-u-ca-persian-nu-latn', { month: 'numeric', day: 'numeric' }); for (let i = 1; i < 400; i++) { const d = APP.addDays(APP.today(), i), q = d.split('-'); if (f.format(new Date(+q[0], +q[1] - 1, +q[2], 12)) === '8/25') return d; } return null; });
+    // تبدیلِ مستقلِ شمسی (Intl، تقویمِ persian): «کِی» ِ کاربر = روزِ ده روز بعد به‌صورتِ «D ماه» (دورِ ۲۶: پیش‌تر «۲۵ آبان» ِ ثابت بود و در ۲۴ آبان با «فردا» ِ صفحه یکی می‌شد —
+    // FIX26: هیچ تاریخِ تقویمیِ ثابتی در انتظارِ آزمون؛ ده روز بعد هرگز «فردا» نیست)
+    const { jal, jw } = await p.evaluate(() => { const d = APP.addDays(APP.today(), 10), q = d.split('-'), f = new Intl.DateTimeFormat('en-u-ca-persian-nu-latn', { month: 'numeric', day: 'numeric' }).format(new Date(+q[0], +q[1] - 1, +q[2], 12)).split('/');
+      const M = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+      return { jal: d, jw: String(+f[1]).replace(/\d/g, c => '۰۱۲۳۴۵۶۷۸۹'[c]) + ' ' + M[+f[0] - 1] }; });
     const PRS = await p.evaluate(() => APP.probs().filter(x => x.set === 'book4' || x.set === 'practice').slice(0, 3).map(x => x.id));
     const willOn = async (pid, step, when) => {
       await open(pid, 1, 1); await p.click('main .simcard .sv-cpbtn'); await W(60); await sel('#svCpP', 'نه'); await W(40);
@@ -142,9 +145,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(/زمان نیست/.test(r.out) && !(r.st && r.st.steps.length), '«بعدا» rejected in the UI ' + r.out.slice(-200));
     r = await willOn(PRS[0], 'سعی می‌کنم بهتر باشم', 'فردا');
     chk(/آرزوست/.test(r.out), 'intent-only step rejected in the UI');
-    r = await willOn(PRS[0], 'دو مسئلهٔ فصلِ کسرها را روی کاغذ حل کنم', '۲۵ آبان، ۱۰ دقیقه');
+    r = await willOn(PRS[0], 'دو مسئلهٔ فصلِ کسرها را روی کاغذ حل کنم', jw + '، ۱۰ دقیقه');
     info.m3a = r.st && r.st.steps[0];
-    chk(info.m3a && info.m3a.due === jal && info.m3a.dueFrom === 'when' && /از همان «کِی»/.test(r.out), 'M3: «۲۵ آبان» ⇒ check on that (gregorian) day ' + JSON.stringify([jal, info.m3a, r.out.slice(-160)]));
+    chk(info.m3a && info.m3a.due === jal && info.m3a.dueFrom === 'when' && /از همان «کِی»/.test(r.out), 'M3: «' + jw + '» ⇒ check on that (gregorian) day ' + JSON.stringify([jal, jw, info.m3a, r.out.slice(-160)]));
     await open(PRS[0], 1, 1); await p.click('main .simcard .sv-cpbtn'); await W(60); await sel('#svCpP', 'نه'); await W(40);
     info.cur = await p.evaluate(() => (document.querySelector('main .sv-cpwill .sv-willcur') || {}).textContent || '');
     info.curDates = await p.evaluate(([t, d]) => [APP.fdate(t), APP.fdate(d)], [T.d1, jal]);

@@ -111,9 +111,11 @@ function modalityConflicts(text) {
          (ثبتِ بی‌پرسش با تاریخِ مدل + پیشنهادِ deadline) با همان تصمیم عوض شد. «ابتدای ماهِ آینده» را صفحه یکمِ ماهِ شمسیِ بعد می‌خواند (نه 2026-11-01 ِ میلادیِ بانک). */
       const x26 = await p.evaluate((when) => { const td = APP.today(); let ms = td; for (let i = 1; i < 40; i++) { const d = APP.addDays(td, i); if (/^۱ /.test(APP.fdate(d))) { ms = d; break; } }
         let fr = td; for (let i = 1; i < 8; i++) { const d = APP.addDays(td, i), p = d.split('-'); if (new Date(+p[0], +p[1] - 1, +p[2]).getDay() === 5) { fr = d; break; } }
-        return { td, ms, fr, asked: (__cur().msgs || []).filter(m => m.role === 'sys' && /📅/.test(m.text) && /درست است؟/.test(m.text)).length }; }, when);
+        return { td, ms, fr, asked: (__cur().msgs || []).filter(m => m.role === 'sys' && /📅/.test(m.text) && /درست است؟|کدام روز/.test(m.text)).length }; }, when);
       const exp26 = /ابتدای ماه آینده/.test(e.text) ? x26.ms : /^آخر هفته/.test(e.text) ? x26.fr /* «آخرِ هفته» = جمعه (RM5 ِ دورِ ۱۸)؛ بانکِ دورِ ۱۷ «22/23» می‌گوید */ : when, today26 = exp26 === x26.td;
-      const u2 = await turn('باشه.');
+      /* دورِ ۲۶ C33 (DECISIONS_R26، روشن‌سازی پس از بانک): «آخرِ هفته» یک روز نیست — صفحه «کدام روز: پنجشنبه … یا جمعه …؟» می‌پرسد (بانکِ دورِ ۱۷ هم «22/23» گفته بود)؛
+         «باشه» هیچ‌کدام را برنمی‌گزیند، پس پاسخِ او این‌جا «جمعه» است و انتظار همان جمعه می‌ماند */
+      const u2 = await turn(/^آخر هفته/.test(e.text) ? 'جمعه.' : 'باشه.');
       const st2 = await p.evaluate(() => (__cur().plans || []).map(x => ({ text: x.text, when: x.when })));
       const ln = lines(u2.user).filter(l => /deadline/.test(l) && /پیگیری/.test(l) && /"do":"deadline"|\\"do\\":\\"deadline\\"/.test(l));
       const ok = st.length === 1 && st[0].when === (today26 ? exp26 : 'next-session') && (today26 ? x26.asked <= 1 /* «…، فردا بهت خبر می‌دم» خودش یک تعهدِ تاریخ‌دار است */ : x26.asked === 1) && st2.length === 1 && st2[0].when === exp26 && (today26 || ln.length === 0);
