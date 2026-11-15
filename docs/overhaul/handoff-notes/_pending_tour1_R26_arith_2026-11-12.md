@@ -90,3 +90,33 @@ C26-11 reproduced only inside its own sentence («… توان ۱۷۰۰ / ۰٫۵
 ## Evidence beyond the tests
 All 972 user messages of the round-26 runs were read with the base and the new reader: 16 false ✗ of the base gone, 8 new ✗ (all real
 slips the base passed), 3 «؟», 31 «نسنجیده» lines (sqrt, ln, «جذر», «نصفِ», implicit products of parentheses, ellipsis, number words).
+
+## Update 2026-11-15 (resumed after the pause) — clarifications C23–C29
+Commit `fix(lla): round-26 arith — clarifications C23–C29 …`. Files: `src/app/a46_arith.js` and `tests/test_tour1_r26_arith.js` only.
+Functions changed in a46: `norm` («÷» ⇒ « / », never a tight fraction or decimal slash), `parser` (`tsl` count; new record flag `fr1`), `agree`
+(C23 scale guard, C24 `"reading<g>"` result, C25 truncation via new `truncF`, C26 `fr1`), `chains` (`kind: "reading"`, `rdW`, `rdN`, per-message
+scale context), `trailOf` (C28 «N تا … M» product run; run records carry `llits`/`xlits`), new `rdNums`, `askT`, `bothT`, both prompt hooks;
+new export `ST.arithAnswer`. Names and signatures of all earlier exports unchanged.
+
+### Contract changes other fixers must respect
+- **`arithChk` entries:** a fourth `kind` of the «؟» state: `kind: "reading"` (C24) with `rdW` (the scale word, e.g. «هزار») and `rdN` (the raw numbers
+  the reading scales). Still `ok: true, ask: true` — consumers that book «درست» keep testing `c.ok && !c.ask`.
+- **C23:** «۲ میلیون × ۳ = ۶ هزار» is now `ok: false` (was `ask`/`scale`). `kind: "scale"` remains only when the scale word stands on one side.
+- **C25/C26:** `ask`/`round` only for the rounding or truncation; «۱۳/۱۲ = ۱» (tight slash, two integers) is `ok: false` with `valT` «۱۳/۱۲».
+- **C28:** «۳ و ۴ میشه ۸» is `ok: false` (`kind: "run"`; was an unread line); «N تا … M … میشه K» entries are `kind: "run"`, expr «۳ تا بستهٔ ۸۰».
+- **C29 — prior / story:** a kept contest no longer carries the page's number anywhere: `x.re.why`, the coach line («✗ بازسنجی شد (یک بار) ⇒ حکم ماند …
+  بازسنجیِ صفحه: همین تکه — «expr» در برابرِ «said» — نمی‌خواند (عددِ درست را لو نده)»), her «🧮» line and the 📜 lines. a45's ledger view prints
+  `x.re.why` as before — it simply has no number now. Please do not re-add the page's value to a «حکم ماند» text.
+- **New `A.STORY.arithAnswer(s, msg)` (C26)** ⇒ `null` or `{yes:[], no:[], lines:[]}`, once per `s.seq`. Open questions live in
+  `s.coach.arithAsk = [{seq, text, expr, said, saidT, kind, re?}]` (kinds `round` and `reading`; written by a46's prompt hook); only the message
+  `seq + 1` can answer. «آره/بله/گرد کردم/تقریبی» ⇒ `re = {to:"ok", apx:true}`; «نه/گرد نکردم/همین رو می‌خواستم» ⇒ `re.to = "wrong"` and an entry
+  `{…, ask: true}` in `s.coach.arithBad` (so `arithContest` can re-check it; a re-check keeps it ✗ while the value is still not her integer).
+  The block «# جوابِ او به «؟» ِ صفحه» is emitted by a46's first prompt hook (before «# بازسنجیِ حسابِ صفحه»). **classify (post-check):** in that
+  block a «✓ … گرد کرده بود» line is a supported verdict; the «✗ … گرد نکرده بود» line carries no number, so stating the exact value there is a leak.
+- **prior:** the answer does not change a «کارِ پیشین» ledger step by itself (HANDBOOK §12 row 74-چ). If you want the ledger to follow it, read
+  `s.coach.arithAsk[].re` — the field names above are stable.
+
+### Bank R26 against C23–C39 (re-run after the pause)
+Q1 42/42 still pass. No Q1 entry contradicts C23–C29. Two readings recorded, not edited: banks #3 and #28 («۱۴۰ هزار … با ۶۵ میشه ۲۰۵ …») stay ✓ because it
+has one scale word only (C15's consistent reading; C24 applies to two different scale words); bank #41's «with its computation as evidence» is
+met in C29's sense — the re-check is shown as evidence by naming the link that does not read, never by the page's number (C29 is later and binding).

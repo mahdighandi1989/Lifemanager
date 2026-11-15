@@ -5127,3 +5127,11 @@ dated stability, mind-card feed) under way.
   exposed four more misreadings the runners had not reported (the word «توان» read as a function name — this is C26-11, which did not
   reproduce outside its sentence; the compound number «۱۶ میلیون و ۶۴۰»; «… = ۳٫۲۵ از ۲۵ میشه ۱۳٪»; a Persian-letter unknown read as a
   unit). PROPOSAL: keep such a corpus scan (base vs new, differences only) as a standing step for any change to a reader of people's text.
+- **CHANGE (2026-11-15, fixer «arith», resumed after the pause)** DECISIONS_R26 clarifications C23–C29 applied to `a46_arith.js`
+  (`agree`, `chains`, `trailOf`, `parser`/`norm`, `askT`, `bothT`, the prompt hooks; new `ST.arithAnswer`, `truncF`, `rdNums`): an operand's
+  scale word is arithmetic (C23); with two different scale words the one-scale reading is shown and asked instead of ✓, unless she wrote
+  those numbers with that scale elsewhere in the same message (C24); «؟» only for the rounding or truncation of the exact value (C25/C27);
+  tight «۱۳/۱۲ = ۱» is a fraction identity ⇒ ✗, «÷»/«تقسیم بر» ⇒ «؟», and her next-message «آره، گرد کردم»/«نه» is stored as ✓-approximate / ✗
+  (C26); «و … میشه» is a sum and «N تا … M … میشه K» a product, ranges excluded (C28); a contest where she is wrong now says «re-checked
+  once», points at the link that does not read and never gives the page's number (C29 — replaces «both computations» of 2026-11-12).
+  Proof: new section `clar` of `tests/test_tour1_r26_arith.js` (13 errors on 77e74000 ⇒ 0), bank R26 Q1 42/42, page suite one test at a time.

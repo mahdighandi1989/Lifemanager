@@ -106,3 +106,13 @@ for (i = 1; i < segs.length; i++) {
 - برای هر سنجشِ خودکار سه خروجی طراحی کن: تأیید، رد، و «داوری نکردم». خروجیِ سوم باید دیده شود.
 - حکمی که ماشین می‌دهد یک راهِ بازسنجی و یک جای واحد برای برداشتن می‌خواهد؛ وگرنه گفت‌وگو و دفتر دو روایت می‌شوند.
 - پیش از ادغام، نسخهٔ پیشین و تازه را روی همهٔ متن‌های واقعیِ موجود اجرا کن و تفاوت‌ها را یکی‌یکی بخوان.
+
+## Update 2026-11-15
+- **A reading the reader had to invent is a question, not a ✓.** Reading every unscaled number "in the same scale" made «۳۰۰ + ۲۰ میلیون ÷ ۴۰ = ۸۰۰ هزار»
+  agree, but only by a reading the text does not state. Rule that held: the standard reading (each word on its own number) decides ✓/✗; a reading
+  that only works by moving a word is shown and asked — unless the person wrote that very number with that word elsewhere in the same message.
+- **"Neither ✓ nor ✗" must be narrow, or it hides slips.** The question state is only for an integer that is the rounding or the truncation of
+  the exact value; any other integer is ✗. A fraction written as a fraction («۱۳/۱۲ = ۱») is an identity, so ✗; the same numbers with «÷» are a quotient.
+- **A question needs a place for its answer.** Store the open question with the message number; read only the next message's yes/no; record
+  the answer (approximate ✓, or ✗ that can itself be contested). A reply that is neither leaves the question open and records nothing.
+- **A re-check that upholds a ✗ must still not leak the answer:** say it was re-checked once and point at the link that does not read.
