@@ -422,3 +422,7 @@ identity; and when the graph has a hole, ask rather than recompute.
 Bind every confirmation to exactly one pending question (the newest under the last reply); keep the anchor time of every relative expression and
 never re-evaluate stored text against a new clock; close stale questions instead of re-deriving them; treat edit/correction turns as data changes
 that replace questions, never as answers.
+## Update 2026-11-15 (tour 1 round 27, «story»)
+- **A short name is a title word, never any statement word.** Binding a message to a problem by a bare word at its head («مهره‌ها رو …») must match only the problem's *title*, only a word unique to one problem, and never a time/general word («هفته»، «داده»، «نتیجه»). Matching the statement bound «مهم‌ترین داده:» to a problem that said «دست داده», and «یه هفته گذشت:» to «… هفته‌ای دو بار».
+- **Drop the clipped tail of a display title before tokenising it.** A title shortened for display («… تو یه مه…») yields a fragment token («مه») that equals the stem of unrelated words («مهم» ⇒ «مه»).
+- **One record, two states:** when a record must exist at once but gains a field later (a 🎯 before its date), keep a separate pointer for the incomplete state (`fc0`) so every old check of «complete» (`fc`) keeps its meaning, and route every creation through one function that reuses the incomplete record.

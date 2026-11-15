@@ -1260,7 +1260,7 @@
       var q = el.querySelector && el.querySelector("#fcQ"), btn = q && q.closest("section") && q.closest("section").querySelector("button.btn");
       if (q && btn) {
         var note = h("p", { class: "small warnline prc-dupfc hidden", dir: "rtl" }); q.parentNode.insertBefore(note, q.nextSibling);
-        var check = function () { var d = PR.dupFcast(q.value) || PR.chatFcastOf(q.value); note.classList.toggle("hidden", !d); note.textContent = d ? "این پیش‌بینی پیش‌تر ثبت شده" + (d.tid === 24 ? " (از کاربرگِ ۲۴)" : "") + ": «" + d.q + "» — " + (d.p != null ? fa(d.p) + "٪ · " : "") + "موعد " + fdate(d.due) + (d.outcome ? " · نتیجه: " + d.outcome : "") + ". همان رکورد را به‌روز کن، دومی ساخته نمی‌شود." : ""; return d; };
+        var check = function () { var d = PR.dupFcast(q.value) || PR.chatFcastOf(q.value); note.classList.toggle("hidden", !d); note.textContent = d ? "این پیش‌بینی پیش‌تر ثبت شده" + (d.tid === 24 ? " (از کاربرگِ ۲۴)" : "") + ": «" + d.q + "» — " + (d.p != null ? fa(d.p) + "٪ · " : "") + (d.due ? "موعد " + fdate(d.due) : "بی موعد") + (d.outcome ? " · نتیجه: " + d.outcome : "") + ". همان رکورد را به‌روز کن، دومی ساخته نمی‌شود." : ""; return d; };
         q.addEventListener("input", check);
         btn.addEventListener("click", function (e) { var d = check(); if (d) { e.stopImmediatePropagation(); e.preventDefault();
           /* دورِ ۲۴ (R7، D24-14): همان پیش‌بینیِ گفت‌وگو ⇒ همان رکورد؛ اطمینان/موعدی که این فرم دارد و آن رکورد نداشت روی همان می‌نشیند (یک پیش‌بینی، یک 🎯، یک بار در کالیبراسیون) */
@@ -2380,7 +2380,7 @@
   /* سرانجامِ پیش‌بینیِ گفت‌وگو روی رکوردِ خودِ سشن (برای 📜) — هر جا 🎯 اش داوری شد */
   PR.predMark = function (s0, fc, out, quote) {
     var hitP = false; S.all("achat", function (x) { return x && x.coach && (x.coach.preds || []).length; }).forEach(function (se) { var ch = false, me = s0 && se.id === s0.id ? s0 : se;
-      (me.coach.preds || []).forEach(function (x) { if (x && x.fc === fc.id && !x.out) { x.out = { res: out, at: nowISO(), quote: clip(quote, 200), sess: s0 && s0.id }; ch = true; hitP = true; } });
+      (me.coach.preds || []).forEach(function (x) { if (x && (x.fc === fc.id || x.fc0 === fc.id) && !x.out) { x.out = { res: out, at: nowISO(), quote: clip(quote, 200), sess: s0 && s0.id }; ch = true; hitP = true; } });
       if (ch && me !== s0) S.put(me); });
     return hitP;
   };
@@ -2396,12 +2396,37 @@
     if (!due) { pl = ((s0.plans || []).filter(function (q) { return q && !q.done && q.state !== "done" && q.state !== "notdone" && /^\d{4}-\d\d-\d\d$/.test(String(q.when || "")) && q.when >= today() && ((at && String(q.at || "") === String(at)) || ovS(q.text, text) >= 2); }).slice(-1))[0] || null; if (pl) due = pl.when; }
     return { due: due || "", pl: pl, own: !!(I && due && !pl) };
   }
+  /* دورِ ۲۷ (story R5، C53): مسئلهٔ همان نوبت (کانونِ a45: مسئلهٔ زنده یا مسئلهٔ گفت‌وگو) — 🎯 زیرِ همان مسئله می‌نشیند */
+  function probOf27(s0, tx) { var f = ""; try { f = A.STORY && A.STORY.focus26 ? A.STORY.focus26(s0) : ""; } catch (e) { }
+    /* پیش‌بینی‌ای که با واژهٔ خودش مسئلهٔ دیگرِ همین گفت‌وگو را نام می‌برد («احتمالِ دو قرمز …» در نوبتی که کانون «تاس» است) ⇒ همان مسئله — فقط با واژه‌ای یکتا */
+    try { var P = tx && A.STORY && A.STORY.probs26 ? A.STORY.probs26(s0) : []; if (P.length >= 2) { var ws = stoks(tx).filter(function (w) { return w.length >= 3; }), T = P.map(function (z) { return stoks(z.title + " " + z.stmt); });
+        var H = P.filter(function (z, i) { return ws.some(function (w) { return T[i].some(function (v) { return sameW(w, v); }) && !T.some(function (o, j) { return j !== i && o.some(function (v) { return sameW(w, v); }); }); }); });
+        if (H.length === 1) f = H[0].id; } } catch (e) { }
+    if (!f) { if (s0 && s0.lprob) f = s0.lprob; else return null; } return /^c:/.test(String(f)) ? { sess: s0.id, pk: String(f) } : { sess: s0.id, pid: String(f) }; }
+  PR.probOf27 = probOf27;
+  /* یک پیش‌بینی، یک 🎯: رکوردِ بی‌موعدی که پیش‌تر ساخته شد (x.fc0) همان است که موعد می‌گیرد — هرگز رکوردِ دوم */
+  function fc27(s0, x, due, tx) {
+    var f = (x.fc && S.get(x.fc)) || (x.fc0 && S.get(x.fc0)) || null, q = clip(tx || x.text, 200);
+    if (!f) { f = { id: A.uid("fc"), type: "fcast", q: q, p: x.p != null ? x.p : null, due: due || "", dim: "s_decision", created: nowISO(), src: { chat: s0.id, quote: q }, by: "chat" }; if (f.p == null) f.est = true; if (x.prob) f.prob = x.prob; }
+    else { if (due && !f.outcome && !f.due) f.due = due; if (x.p != null && f.p == null && !f.outcome) { f.p = x.p; delete f.est; } }
+    S.put(f); return f;
+  }
+  PR.fc27 = fc27;
+  /* 🎯 ِ یک پیش‌بینیِ گفت‌وگو: موعددار (x.fc) یا بی‌موعد (x.fc0) */
+  function fcOf27(x) { return x ? ((x.fc && S.get(x.fc)) || (x.fc0 && S.get(x.fc0)) || null) : null; }
+  PR.predFc = fcOf27;
   PR.bookPred = function (s0, text, at, key, by) {
     if (!s0 || !text) return null; var C = s0.coach = s0.coach || {}, PD = C.preds = C.preds || [];
     /* کلیدِ «…#n» = یکی از چند پیش‌بینیِ یک پیام (بانکِ R25 #230): با زمانِ پیام یکی نمی‌شود */
     var multi = /#\d+$/.test(String(key || ""));
     var ex = PD.filter(function (x) { return (key && x.key === key) || (!multi && at && x.at === at && !/#\d+$/.test(String(x.key || ""))) || norm(x.text) === norm(text); })[0];
     /* همان پیش‌بینی که پیش‌تر بی موعد ثبت شد (نقلِ مدل پیش از برنامهٔ همان پیام رسید) ⇒ موعدش همین‌جا کامل می‌شود، نه رکوردِ دوم */
+    /* دورِ ۲۷ (C77؛ بانکِ R27 #217): همان پیش‌بینی با عددِ تازه ⇒ همان 🎯 عددِ تازه را می‌گیرد و عددِ پیشین در تاریخچه می‌ماند — هرگز دو 🎯 ِ باز برای یک پیش‌بینی */
+    if (!ex && !multi) { var cn27 = claimN27(text), sm27 = cn27.length >= 6 ? PD.filter(function (y) { return y && !y.out && claimN27(y.text) === cn27; })[0] : null;
+      if (sm27) { var np27 = confPct26(text); if (np27 != null && np27 <= 100 && np27 !== sm27.p) { (sm27.pHist = sm27.pHist || []).push({ p: sm27.p, at: nowISO(), why: clip(text, 120) }); var was27 = sm27.p; sm27.p = np27;
+          var sf27 = fcOf27(sm27); if (sf27 && !sf27.outcome) { (sf27.pHist = sf27.pHist || []).push({ p: sf27.p, at: nowISO() }); sf27.p = np27; delete sf27.est; S.put(sf27); } else if (!sf27) { var nf27 = fc27(s0, sm27, ""); sm27.fc0 = nf27.id; }
+          sysLine25(s0, "🎯 «" + clip(sm27.text, 60) + "» — اطمینان: " + fa(np27) + "٪ (اصلاح شد ⇐ " + (was27 != null ? fa(was27) + "٪" : "بی عدد") + "؛ همان پیش‌بینی، رکوردِ دوم ساخته نشد)."); }
+        return sm27; } }
     if (ex && (ex.due || ex.fc || ex.out)) return ex;
     var tx = ex ? ex.text : text, D = predDue(s0, tx, at), due = D.due, pl = D.pl; if (ex && D.amb && !ex.dueAmb) ex.dueAmb = D.amb; if (ex && (!due || (D.own && ex.duePend))) return ex;
     var pc = confPct26(tx);   /* دورِ ۲۶ (D26-14): اطمینان = درصدِ کنارِ «مطمئنم/احتمال/اطمینان»، نه نخستین درصدِ خودِ ادعا («حدودِ ۸ درصد درمیاد، ۶۰ درصد مطمئنم») */
@@ -2411,8 +2436,12 @@
     /* دورِ ۲۶ (C12 بر هر دو مسیر؛ بانکِ R26 #203): روزی که صفحه از جملهٔ خودش خواند اول «… درست است؟» می‌گیرد (PR.datePend)؛ روزِ برنامه‌ای که خودش تأیید کرده، یا خودِ امروز، نه */
     if (due && D.own && due !== today()) { x.duePend = due; due = ""; }
     x.due = due || ""; if (pc != null && pc <= 100) x.p = pc; if (D.amb) x.dueAmb = D.amb;
-    if (due && PR.dupFcast(clip(tx, 200), false)) { x.fc = PR.dupFcast(clip(tx, 200), false).id; due = ""; }
-    if (due) { var f = { id: A.uid("fc"), type: "fcast", q: clip(tx, 200), p: pc, due: due, dim: "s_decision", created: nowISO(), src: { chat: s0.id, quote: clip(tx, 200) }, by: "chat" }; if (pc == null) f.est = true; if (pl) f.plan = { sess: s0.id, id: pl.id }; S.put(f); x.fc = f.id; }
+    if (!ex) { var pb27 = probOf27(s0, tx); if (pb27) x.prob = pb27; }
+    if (due && PR.dupFcast(clip(tx, 200), false)) { var dp27 = PR.dupFcast(clip(tx, 200), false); if (!dp27.due && !dp27.outcome) { dp27.due = due; if (pl) dp27.plan = { sess: s0.id, id: pl.id }; S.put(dp27); } x.fc = dp27.id; delete x.fc0; due = ""; }
+    if (due) { var f = fc27(s0, x, due, tx); if (pl) f.plan = { sess: s0.id, id: pl.id }; S.put(f); x.fc = f.id; delete x.fc0; }
+    /* دورِ ۲۷ (story R5، C53؛ C27-20 pwC2، U49 aB3/bp2/oB1، A27-12 s05): اطمینانِ عددی کنارِ پیامدی در آینده همان لحظه یک 🎯 می‌سازد — زیرِ مسئلهٔ همان نوبت (x.prob)،
+       حتی بی موعد (موعد بعدتر روی همان رکورد می‌نشیند: fc27). پیش‌تر 🎯 فقط با موعد ساخته می‌شد و پیش‌بینیِ بی‌موعد هیچ‌جا جز پروندهٔ گفت‌وگو نبود. واژهٔ مبهم بی عدد (C37) 🎯 نمی‌سازد. */
+    else if (!x.fc && !x.fc0 && x.p != null) { var f0 = fc27(s0, x, "", tx); x.fc0 = f0.id; }
     if (!ex) { PD.push(x);
       /* C37: پیش‌بینیِ تازه با واژهٔ مبهم و بی عدد ⇒ یک بار عددش پرسیده می‌شود (پاسخِ «… درصد» در پیامِ بعد کنارِ همین می‌نشیند — PR.predExplicit) */
       if (x.p == null && VAGUE37.test(dg(tx)) && !x.pAsk) { x.pAsk = true; sysLine25(s0, "🎯 «" + clip(tx, 60) + "» — چند درصد مطمئنی؟ «احتمالاً» یا «فکر کنم» عدد نیست؛ عددِ خودت را بگو («… درصد») تا کنارِ همین پیش‌بینی بنشیند — بی آن، پیش‌بینی بی اطمینان ثبت می‌ماند."); } }
@@ -2422,13 +2451,32 @@
      (۱) اطمینانِ گفته‌شده («هفتاد درصد مطمئنم»، «۷۰ درصد مطمئنم …») خودش نشانهٔ پیش‌بینی است — پیش‌تر فقط با واژهٔ «پیش‌بینی» یا تاریخ در همان جمله ثبت می‌شد؛
      (۲) درصدی که درونِ خودِ ادعاست («حدودِ ۸ درصد درمیاد») اطمینان نیست و تکه‌ای که فقط اطمینان است («۶۰ درصد مطمئنم») پیش‌بینیِ جدا نیست — یک پیش‌بینی، یک 🎯؛
      (۳) جمله‌ای که به پیش‌بینیِ پیشین برمی‌گردد («از پیش‌بینیم خیلی بیشتر»، «درست همان که پیش‌بینی کرده بودم») پیش‌بینیِ تازه نیست: داوری است یا پرسشِ «شد یا نشد؟». */
-  var CONFX26 = /\d{1,3}\s*(?:٪|%|درصد)\s*(?:مطمئنم|مطمئن[‌\s]*(?:ام|هستم)|احتمال\s*(?:میدم|می[‌\s]?دم|می[‌\s]?دهم|داره|دارد)|اطمینان(?:\s*دارم)?)|(?:با|به)\s*(?:احتمالِ?|اطمینانِ?)\s*\d{1,3}\s*(?:٪|%|درصد)|احتمالش\s*\d{1,3}\s*(?:٪|%|درصد)|\(\s*\d{1,3}\s*(?:٪|%)\s*\)/;
+  var CONFX26 = /\d{1,3}\s*(?:٪|%|درصد)\s*(?:مطمئنم|مطمئن[‌\s]*(?:ام|هستم)|احتمال\s*(?:میدم|می[‌\s]?دم|می[‌\s]?دهم|داره|دارد)|اطمینان(?:\s*دارم)?)|(?:با|به)\s*(?:احتمالِ?|اطمینانِ?)\s*\d{1,3}\s*(?:٪|%|درصد)|احتمالش\s*\d{1,3}\s*(?:٪|%|درصد)|\(\s*\d{1,3}\s*(?:٪|%)\s*\)|مطمئنم[،,\s]+\d{1,3}\s*(?:٪|%|درصد)|(?<=احتمالِ?[^.!؟?\n]{0,60}?)\d{1,3}\s*(?:٪|%|درصد)\s*می[‌\s]?د(?:و|ا)نم/;   /* دورِ ۲۷ (بانکِ R27 #192 «مطمئنم، نود درصد، که …»، #202 «احتمالِ … رو ۲۰ درصد می‌دونم») */
   function confPct26(t) { var w = wpct(t), m = CONFX26.exec(w), n = m ? /\d{1,3}/.exec(m[0]) : null; if (n) return +n[0] <= 100 ? +n[0] : null; return pctOf(t); }
   function pureConf26(x) { var w = wpct(x); return CONFX26.test(w) && toks(w.replace(CONFX26, " ")).length < 2; }
+  /* تکه‌ها: جمله‌ها، «—»، «؛» و «،»؛ هر تکهٔ اطمینان (CONFX26) پیش‌بینیِ خودش است — اگر فقط اطمینان است، ادعایش تکهٔ پیش از آن است. شمارنده‌ها («یک،» «دو،» «اولی:») و
+     سرِ پیام تا «پیش‌بینی …:» جزوِ متن نیستند؛ پرسش نیست. خروجی فقط وقتی به کار می‌رود که دست‌کم دو پیش‌بینی بدهد (یک پیش‌بینی همان راهِ پیشین است). */
+  var ENUM27 = /^(?:و\s+)?(?:یک|یکی|دو|دومی|سه|سومی|اول(?:ی|ش)?|دوم(?:ی|ش)?|سوم(?:ی|ش)?|[0-9۰-۹]{1,2}\s*[).\-–])\s*(?:[،,:)\-–]\s*|$)/;
+  function multi27(t) {
+    var w = String(t || ""), ii = /پیش[‌\s]?بینی[^:.!؟?\n]{0,30}:\s*/.exec(w), body = ii ? w.slice(ii.index + ii[0].length) : w;
+    var ch = body.split(/(?<=[.!؟?])\s+|\n+|\s+[—–-]\s+|\s*[؛،,]\s*/).map(function (x) { return x.replace(/^[\s.]+|[\s.!]+$/g, "").replace(ENUM27, "").replace(/^و\s+/, "").trim(); }).filter(function (x) { return x && !ENUM27.test(x + "،"); });
+    var out = [], used = -1;
+    var anyC27 = ch.some(function (x) { return CONFX26.test(wpct(x)); });
+    ch.forEach(function (x, i) { var wx = wpct(x); /* «… شصت درصد» ِ خالی پس از ادعا، در پیامی که اطمینان را با «مطمئنم» گفته (بانکِ R27 #194) */ if (anyC27 && /^\s*\d{1,3}\s*(?:٪|%|درصد)\s*$/.test(wx) && i > 0) x = x + " مطمئنم", wx = wx + " مطمئنم"; if (!CONFX26.test(wx) || /[؟?]\s*$/.test(x)) return;
+      if (pureConf26(x)) { var j = i - 1; if (j <= used || j < 0) return; var c0 = ch[j]; if (CONFX26.test(wpct(c0)) || /[؟?]\s*$/.test(c0) || toks(c0).length < 2) return; out.push(c0 + "؛ " + x); used = i; }
+      else { out.push(x); used = i; } });
+    return out.filter(function (x) { return !past27(x); });
+  }
+  PR.multi27 = multi27;
   PR.predExplicit = function (s0) {
     var U = userMsgs(s0), m = U[U.length - 1]; if (!m) return null; var t = String(m.text || ""), at = String(m.at || "");
+    /* دورِ ۲۷ (C75): اطمینانی که از کسِ دیگری نقل کرد («مربی گفت ۷۰ درصد») پیش‌بینیِ او نیست — تکهٔ «کارِ دیگری» (a45 ST.otherWork27) خوانده نمی‌شود */
+    try { var OW75 = A.STORY && A.STORY.otherWork27 ? A.STORY.otherWork27(t) : null; if (OW75) t = t.slice(0, OW75.from) + " " + t.slice(OW75.to); } catch (e) { }
+    /* دورِ ۲۷ (story R5، C53؛ C27-20 pwC2 p27، D27-31 arD2 p7): چند اطمینانِ عددی در یک پیام، هر کدام کنارِ ادعای خودش ⇒ هر کدام یک پیش‌بینی (یک 🎯).
+       پیش‌تر بُرش در «،» با تکه‌ای که فقط اطمینان است («۶۰ درصد مطمئنم») کنار گذاشته می‌شد و همهٔ پیام یک پیش‌بینی می‌شد، یا شمارندهٔ بعدی («… مطمئنم. دو») به متن می‌چسبید. */
+    var M27 = multi27(t); if (M27.length >= 2) { var last27 = null; M27.forEach(function (x, i) { last27 = PR.bookPred(s0, x, at, at + "#" + (i + 1), "page") || last27; }); return last27; }
     /* چند پیش‌بینی در یک پیام («دو تا پیش‌بینی دارم: … (۶۰٪)، و … (۳۰٪)») ⇒ هر کدام رکوردِ خودش (قاعدهٔ «یک 🎯» برای هر پیش‌بینی است) */
-    var intro = /پیش[‌\s]?بینی[^:.!؟?\n]{0,24}:\s*/.exec(t);
+    var intro =/پیش[‌\s]?بینی[^:.!؟?\n]{0,24}:\s*/.exec(t);
     if (intro) { var raw = t.slice(intro.index + intro[0].length).split(/\s*[،؛]\s*(?:و\s+)?|\s+و\s+(?=تا\s)/).map(function (x) { return x.replace(/[.!\s]+$/, "").trim(); }).filter(Boolean);
       var parts = raw.some(pureConf26) ? [] : raw.filter(function (x) { return pctOf(x) != null && toks(x).length >= 2; });
       if (parts.length >= 2) { var last = null; parts.forEach(function (x, i) { last = PR.bookPred(s0, x, at, at + "#" + (i + 1), "page") || last; }); return last; } }
@@ -2439,17 +2487,20 @@
     /* پیش‌بینیِ بی واژهٔ «پیش‌بینی»: جملهٔ خودش با اطمینانِ خودش (بانکِ R25 #219؛ دورِ ۲۶: بی تاریخ هم) — جمله‌ای که فقط اطمینان است ادعایش جملهٔ پیشینِ همان پیام است */
     /* C37: پاسخِ کوتاهِ «۷۰ درصد» به پرسشِ عددِ صفحه (پیامِ پیشین) = اطمینانِ همان پیش‌بینی */
     var pu37 = U[U.length - 2], lp37 = pu37 ? (((s0.coach || {}).preds || []).filter(function (y) { return y && y.pAsk && y.p == null && !y.out && String(y.at) === String(pu37.at || ""); }).pop()) : null, pv37 = lp37 && toks(t).length <= 4 ? pctOf(t) : null;
-    if (lp37 && pv37 != null) { lp37.p = pv37; var lf37 = lp37.fc ? S.get(lp37.fc) : null; if (lf37 && !lf37.outcome) { lf37.p = pv37; delete lf37.est; S.put(lf37); } sysLine25(s0, "🎯 «" + clip(lp37.text, 50) + "» — اطمینان: " + fa(pv37) + "٪ (به گفتهٔ خودت)."); return lp37; }
+    if (lp37 && pv37 != null) { lp37.p = pv37; var lf37 = fcOf27(lp37) || (lp37.p != null ? fc27(s0, lp37, "") : null); if (lf37 && !lp37.fc) lp37.fc0 = lf37.id; if (lf37 && !lf37.outcome) { lf37.p = pv37; delete lf37.est; S.put(lf37); } sysLine25(s0, "🎯 «" + clip(lp37.text, 50) + "» — اطمینان: " + fa(pv37) + "٪ (به گفتهٔ خودت)."); return lp37; }
     var S0 = sentsOf25(t), ci = -1; S0.forEach(function (x, i) { if (ci < 0 && !/[؟?]\s*$/.test(x) && !/(?:^|[\s،])(?:اگه|اگر|شاید|کاش)(?![آ-ی])/.test(x) && CONFX26.test(wpct(x))) ci = i; });
     if (ci < 0) return null;
     var cs = S0[ci].replace(/[.!\s]+$/, "");
     if (pureConf26(cs)) {
       /* پیامی که فقط اطمینان است («هشتاد درصد مطمئنم») اطمینانِ پیش‌بینیِ پیامِ پیشینِ خودش است — نه پیش‌بینیِ دوم (بانکِ R26 #205) */
       if (!ci) { var pu = U[U.length - 2], lp = pu ? (((s0.coach || {}).preds || []).filter(function (y) { return y && String(y.at) === String(pu.at || "") && y.p == null && !y.out; }).pop()) : null, pv = pctOf(cs);
-        if (lp && pv != null) { lp.p = pv; var lf = lp.fc ? S.get(lp.fc) : null; if (lf && !lf.outcome) { lf.p = pv; delete lf.est; S.put(lf); } return lp; } return null; }
+        if (lp && pv != null) { lp.p = pv; var lf = fcOf27(lp) || (lp.p != null ? fc27(s0, lp, "") : null); if (lf && !lp.fc) lp.fc0 = lf.id; if (lf && !lf.outcome) { lf.p = pv; delete lf.est; S.put(lf); } return lp; } return null; }
       if (/[؟?]\s*$/.test(S0[ci - 1])) return null; cs = S0[ci - 1].replace(/[.!\s]+$/, "") + "؛ " + cs; }
+    if (past27(cs)) return null;   /* دورِ ۲۷ (C53؛ بانکِ R27 #210/#220): اطمینان دربارهٔ گذشته («… دیروز قفل کردم»، «… کرده بودم … درست بود») پیش‌بینی نیست */
     return PR.bookPred(s0, cs, at, "", "page");
   };
+  function claimN27(x) { return norm(wpct(String(x || "")).replace(new RegExp(CONFX26.source, "g"), " ").replace(/(?:^|\s)(?:مطمئنم|که|پیش‌بینیم|پیش بینیم)(?=\s|$)/g, " ").replace(/^پیش[‌\s]?بینی[^:]{0,20}:/, " ")); }
+  function past27(x) { var d = dg(String(x || "").replace(CONFX26, " ").replace(/مطمئن\s*بودم/g, " بود ")); return PAST27.test(d) && !FUT27.test(d) || /کرده\s*بودم|بودم(?![آ-ی])/.test(d); }
   /* داوریِ یک 🎯 عوض می‌شود (یا باز می‌شود: out = "") و داوریِ پیشین در تاریخچه می‌ماند — رکوردِ 🎯 و پیش‌بینی‌های گفت‌وگو که به آن بسته‌اند */
   PR.reverdict26 = function (fc, out, quote, s0, kind) {
     if (!fc) return false; var was = fc.outcome || ""; if (was === out) return false;
@@ -2457,14 +2508,15 @@
     if (out) { fc.outcome = out; fc.outcomeAt = nowISO(); fc.judgedBy = { kind: kind || "her-words", sess: s0 && s0.id, quote: clip(quote, 200), d: today() }; } else { delete fc.outcome; delete fc.outcomeAt; delete fc.judgedBy; }
     S.put(fc);
     S.all("achat", function (x) { return x && x.coach && (x.coach.preds || []).length; }).forEach(function (se) { var me = s0 && se.id === s0.id ? s0 : se, ch = false;
-      (me.coach.preds || []).forEach(function (y) { if (y && y.fc === fc.id) { (y.outHist = y.outHist || []).push(y.out || { res: "" }); if (out) y.out = { res: out, at: nowISO(), quote: clip(quote, 200), sess: s0 && s0.id }; else delete y.out; ch = true; } });
+      (me.coach.preds || []).forEach(function (y) { if (y && (y.fc === fc.id || y.fc0 === fc.id)) { (y.outHist = y.outHist || []).push(y.out || { res: "" }); if (out) y.out = { res: out, at: nowISO(), quote: clip(quote, 200), sess: s0 && s0.id }; else delete y.out; ch = true; } });
       if (ch && me !== s0) S.put(me); });
     return true;
   };
   function predApply26(s0, x, out, quote) {
-    var fc = x && x.fc ? S.get(x.fc) : null;
+    var fc = fcOf27(x);
     if (fc && fc.outcome) { if (!x.out) x.out = { res: fc.outcome, at: fc.outcomeAt || nowISO(), quote: clip(quote, 200), sess: s0.id }; return x; }
     if (!fc && predPct(x) != null) { fc = { id: A.uid("fc"), type: "fcast", q: clip(x.text, 200), p: predPct(x), due: today(), dim: "s_decision", created: x.at || nowISO(), src: { chat: s0.id, quote: clip(x.text, 200) }, by: "chat" }; x.fc = fc.id; }
+    if (fc && !fc.due) fc.due = today();   /* دورِ ۲۷ (C53): 🎯 ِ بی‌موعد روزِ داوری را موعد می‌گیرد — همان که پیش‌تر 🎯 ِ ساخته‌شده هنگامِ داوری داشت */
     if (fc) { fc.outcome = out; fc.outcomeAt = nowISO(); fc.judgedBy = { kind: "her-words", sess: s0.id, quote: clip(quote, 200), d: today() }; S.put(fc); PR.predMark(s0, fc, out, quote); }
     if (!x.out) x.out = { res: out, at: nowISO(), quote: clip(quote, 200), sess: s0.id };
     return x;
@@ -2474,22 +2526,93 @@
      پیش‌بینیِ بی‌موعدی که اطمینان داشت ⇒ یک 🎯 ِ داوری‌شده (دادهٔ کالیبراسیون: اطمینانِ خودش + سرانجام)؛ بی اطمینان ⇒ فقط سرانجام در 📜. صفحه حدس نمی‌زند.
      دورِ ۲۶ (Q8؛ B26·D32، D26-14، پرسشِ ۴۴ ِ بانکِ مالک): اطمینانی که گفت همان پیش‌بینی را نام می‌برد — هرگز روی پیش‌بینیِ بازی با اطمینانِ دیگر نمی‌نشیند؛ اگر مالِ پیش‌بینیِ
      داوری‌شده است، همان داوری با تاریخچه عوض می‌شود. چند پیش‌بینیِ باز و بی نشانه ⇒ صفحه یک بار می‌پرسد «کدام؟»؛ ارجاعِ بی داوری ⇒ یک بار «شد یا نشد؟». */
+  /* دورِ ۲۷ (story R5، C53): «گزارشی روشن از سرانجام که با دقیقاً یک 🎯 ِ باز جور است آن را می‌بندد؛ اگر دو تا جور است صفحه می‌پرسد».
+     جمله‌ای از پیامِ او (نه پرسش، نه شرط، نه آینده) که دست‌کم دو واژهٔ محتوایی با یک پیش‌بینیِ باز دارد (بیشینهٔ یکتا) و گزارشِ گذشته است:
+       • «درست درومد/بود» ⇒ شد؛ «درست درنیومد/غلط بود» ⇒ نشد؛
+       • فعلِ گذشتهٔ همان کار («تأیید کرد»، «ثبت‌نام کرد») ⇒ شد؛ منفی‌اش («تأیید نکرد») ⇒ نشد؛
+       • عددِ دیگری جز عددِ تقریبیِ پیش‌بینی («حدودِ ۱۰ بار» ⇐ «۱۱ بار») ⇒ صفحه قاعده‌ای برای «حدود» ندارد ⇒ یک بار می‌پرسد «شد یا نشد؟»؛
+       • «حل شد/تموم شد/ثبت شد» فقط سرانجامِ پیش‌بینی‌ای است که دربارهٔ همان کار است.
+     after = پس از پاسخِ پرسشِ «کدام؟» در همان پیام: فقط یک پیش‌بینیِ بازِ دیگر و نامِ آن با «شد/نشد» ِ صریح (واژهٔ مشترکِ یکتا بس است). */
+  var LIGHT27 = "(?:کرد|کردن|کردند|کردم|کردیم|شد|شدن|شدند|شدم|داد|دادن|دادند|دادم|گرفت|گرفتن|گرفتم|زد|زدم|رسید|رسیدم|اومد|اومدن|اومدم|آمد|آمدند|آمدم|موند|موندم|ماند)";
+  var PAST27 = new RegExp("(?:^|[\\s‌])ن?" + LIGHT27 + "(?=$|[\\s.!،؛:)»])|(?:^|[\\s‌])ن?(?:انداختم|خریدم|خرید|فروخت|نوشتم|نوشت|پذیرفت|آورد|آوردم|درومد|دراومد|درآمد|درنیومد|درنیامد|بود|نبود)(?=$|[\\s.!،؛:)»])");
+  var FUT27 = /(?:^|[\s‌])(?:می[‌\s]?(?:کنه|کند|کنن|کنند|شه|شود|ده|دهد|گیره|گیرد|یاد|آید|رسه|رسد|مونه|ماند|زنه|زند|خوره|زنم|کنم|شم|دم)|میشه|میاد|میده|خواهد|قراره)(?=$|[\s.!،؛:)»])/;
+  var DONEW27 = /(?:^|[\s،«])(حل|تموم|تمام|بسته|باز|ثبت|عوض|اصلاح|انجام|معلوم|روشن|شروع|پیدا|قطعی|تعطیل)\s*(?:هم\s*)?(ن?شد)(?![آ-ی])/g;
+  /* کارِ پیش‌بینی‌شده: واژهٔ پیش از فعلِ سبکِ آینده («تأیید می‌کنه» ⇐ «تأیید»، «تموم میشه» ⇐ «تموم»، «ثبت‌نام می‌کنه» ⇐ «ثبت‌نام») */
+  function act27(py) { var m = /([آ-ی‌]{2,})\s+(?:می[‌\s]?(?:کنه|کند|کنن|کنند|کنم|شه|شود|شم|ده|دهد|دم|گیره|گیرد|گیرم|زنه|زند)|میشه|میشم|میده|میدم)(?=$|[\s.!،؛:)»(])/.exec(py); return m ? m[1].replace(/‌/g, "") : ""; }
+  /* فعلِ آیندهٔ پیش‌بینی ⇐ گذشتهٔ همان («میاد» ⇐ «اومد/آمد»، «میشم» ⇐ «شدم») — ستاک‌های گذشته، با «ن» ِ منفی */
+  var FV27 = [[/می[‌\s]?(?:یاد|آید|یان|آیند)|میاد/, "(?:اومد|آمد)"], [/می[‌\s]?(?:ره|رود|رم)|میره|میرم/, "(?:رفت)"], [/می[‌\s]?(?:شه|شود|شم|شیم)|میشه|میشم/, "(?:شد)"], [/می[‌\s]?(?:کنه|کند|کنم|کنیم|کنن)/, "(?:کرد)"],
+    [/می[‌\s]?(?:ده|دهد|دم|دن)|میده|میدم/, "(?:داد)"], [/می[‌\s]?(?:گیره|گیرد|گیرم|گیریم)/, "(?:گرفت)"], [/می[‌\s]?(?:دوم|دود|دوه)/, "(?:دوید)"], [/می[‌\s]?(?:رسه|رسد|رسم)/, "(?:رسید)"], [/می[‌\s]?(?:مونه|ماند|مونم)|می[‌\s]?مونه/, "(?:موند|ماند)"], [/می[‌\s]?(?:خوابم|خوابه)/, "(?:خوابید)"], [/می[‌\s]?(?:خورم|خوره)/, "(?:خورد)"], [/می[‌\s]?(?:فروشیم|فروشه|فروشم)/, "(?:فروخت)"]];
+  function fv27(py, x) { for (var k = 0; k < FV27.length; k++) if (FV27[k][0].test(py)) { var m = new RegExp("(?:^|[\\s‌])(ن?)" + FV27[k][1] + "(?:م|ی|یم|ید|ن|ند)?(?=$|[\\s.!،؛:)»])").exec(x); if (m) return m[1] ? "no" : "yes"; } return ""; }
+  /* «بیشتر از / بالای / دست‌کم N» و «کمتر از / زیرِ N» ⇐ عددِ گزارش (یک عدد) — مقایسهٔ حسابی، نه قرارداد */
+  function cmp27(py, x) { var m = /(بیشتر\s*از|بالای|بالاتر\s*از|دست[‌\s]?کم|حداقل|کمتر\s*از|زیرِ?|پایین[‌\s]?ترِ?\s*از|حداکثر)\s*(\d+(?:\.\d+)?)/.exec(py); if (!m) return ""; var nx = nums27(x).filter(function (k) { return k !== m[2]; }).map(Number); if (nx.length !== 1) return "";
+    var v = nx[0], N = +m[2], up = /بیشتر|بالا|دست|حداقل/.test(m[1]); return up ? (/دست|حداقل/.test(m[1]) ? v >= N : v > N) ? "شد" : "نشد" : (/حداکثر/.test(m[1]) ? v <= N : v < N) ? "شد" : "نشد"; }
+  var GPAST27 = /(?:^|[\s‌])ن?[آ-ی]{2,}(?:یدم|یدیم|یدن|ادم|ادیم|ردم|ردیم|فتم|فتیم|ستم|ستیم|شتم|ندم|ودم|ختم|ختیم|اومد|آمد|رسید|شدم|شدیم|شد|کرد|گرفت|داد)(?=$|[\s.!،؛:)»])/;
+  function nums27(t) { return (dg(t).match(/\d+(?:[.٫/]\d+)?/g) || []).map(function (n) { return n.replace("٫", "."); }); }
+  function probHit27(y, x) { try { var pb = y.prob; if (!pb || !A.STORY || !A.STORY.probs26) return 0; var se = S.get(pb.sess); if (!se) return 0; var P = A.STORY.probs26(se), me = P.filter(function (z) { return z.id === (pb.pid || pb.pk); })[0]; if (!me) return 0;
+      var ws = stoks(x), mine = stoks(me.title + " " + me.stmt), oth = stoks(P.filter(function (z) { return z !== me; }).map(function (z) { return z.title + " " + z.stmt; }).join(" "));
+      return ws.some(function (w) { return w.length >= 3 && mine.some(function (v) { return sameW(w, v); }) && !oth.some(function (v) { return sameW(w, v); }); }) ? 1 : 0; } catch (e) { return 0; } }
+  function outcome27(s0, t, open, after) {
+    if (!open.length) return null; var best = null, tie = false, bestN = 0, S0 = sentsOf25(t), units = S0.length > 1 ? S0.concat([S0.join(" ")]) : S0;
+    units.forEach(function (x) { if (/[؟?]\s*$/.test(x) || /(?:^|[\s،])(?:اگه|اگر|شاید|کاش)(?![آ-ی])/.test(x)) return;
+      var d = dg(x); if (!PAST27.test(d) && !GPAST27.test(d) && !/(?:^|[\s،«])ن?شد(?![آ-ی])/.test(d)) return; if (FUT27.test(d) && !PAST27.test(d) && !GPAST27.test(d)) return;
+      open.forEach(function (y) { var py = y.text.replace(CONFX26, " "), nP = nums27(py), n = ovS(py, x) + nums27(x).filter(function (k) { return nP.indexOf(k) >= 0; }).length + probHit27(y, x) + (fv27(dg(py), d) ? 1 : 0) + (ovS(py, x) && cmp27(dg(py), d) ? 1 : 0);
+        if (after ? n < 1 : n < 2) return; if (n > bestN) { bestN = n; best = { y: y, x: x }; tie = false; } else if (n === bestN && best && best.y !== y) tie = true; else if (n === bestN && best && best.y === y) best.x = x; }); });   /* هم‌امتیاز برای همان پیش‌بینی ⇒ واحدِ بزرگ‌تر (کلِ پیام: «… ۳۰٪. درست درومد.») */
+    /* «خبرِ خوب: درست درومد!» بی واژه‌ای از هیچ‌کدام (بانکِ R27 #196): یک پیش‌بینیِ باز ⇒ همان؛ چند تا ⇒ «کدام؟» */
+    if (!best && !after) { var xv = sentsOf25(t).filter(function (x) { return !/[؟?]\s*$/.test(x) && /(?:^|[\s،:!])(?:درست\s*(?:درومد|دراومد|درآمد|درنیومد|درنیامد)|غلط\s*(?:بود|درومد|دراومد))(?![آ-ی])/.test(dg(x)); })[0];
+      if (xv) { var ov27 = /درنیومد|درنیامد|غلط/.test(xv) ? "نشد" : "شد";
+        if (open.length === 1) { predApply26(s0, open[0], ov27, xv); sysLine25(s0, "🎯 " + predLab26(open[0]) + " ⇐ " + ov27 + " — به گفتهٔ خودت: «" + clip(xv, 80) + "»."); return open[0]; }
+        s0.predAsk = { kind: "which", msg: String((userMsgs(s0).slice(-1)[0] || {}).at || ""), out: ov27, sent: clip(xv, 200), state: "open" };
+        sysLine25(s0, "🎯 کدام پیش‌بینی؟ — " + open.slice(0, 4).map(predLab26).join(" · ") + ". درصدش یا چند واژه‌اش را بگو تا «" + ov27 + "» روی همان بنشیند — تا نگویی چیزی داوری نمی‌شود."); return s0.predAsk; } }
+    if (!best) return null;
+    if (after && open.length !== 1) return null;
+    var lastAt = String((userMsgs(s0).slice(-1)[0] || {}).at || "");
+    if (tie) { if (after) return null; s0.predAsk = { kind: "which", msg: lastAt, out: "", sent: clip(best.x, 200), state: "open" };
+      sysLine25(s0, "🎯 کدام پیش‌بینی؟ — " + open.slice(0, 4).map(predLab26).join(" · ") + ". درصدش یا چند واژه‌اش را بگو تا نتیجه روی همان بنشیند — تا نگویی چیزی داوری نمی‌شود."); return s0.predAsk; }
+    var y = best.y, py = dg(y.text.replace(CONFX26, " ")), x = dg(best.x).replace(DONEW27, function (m0, w0) { return new RegExp(w0).test(py) ? m0 : " "; });
+    var out = "", ask = false;
+    if (/درست\s*(?:درنیومد|درنیامد|نبود|نشد)|غلط\s*(?:بود|درومد|دراومد|درآمد|از\s*آب)|اشتباه\s*(?:بود|درومد|دراومد)/.test(x)) out = "نشد";
+    else if (/درست\s*(?:درومد|دراومد|درآمد|بود|از\s*آب)|(?:همین|همون|همان)\s*شد(?![آ-ی])/.test(x)) out = "شد";
+    else if (after && /(?:^|[\s،«])نشد(?![آ-ی])/.test(x)) out = "نشد"; else if (after && /(?:^|[\s،«])شد(?![آ-ی])/.test(x)) out = "شد";
+    else { var nP = nums27(py), nX = nums27(x), ac = act27(py), cp27 = cmp27(py, x), fv = fv27(py, x), ng27 = /(?:^|[\s‌])ن(?:کرد|شد|داد|گرفت|اومد|آمد|رسید|زد|رفت|دوید|خرید|فروخت|موند|ماند|خوابید)/.test(x);
+      if (cp27) out = cp27;   /* «بیشتر از ۱۲» ⇐ «۱۴ کیلو» ⇒ شد؛ «بالای ۳۰۰» ⇐ «۲۸۰» ⇒ نشد */
+      /* عددِ دیگر (نه همان عددِ پیش‌بینی) ⇒ «حدود»/تفاوت را صفحه داوری نمی‌کند — می‌پرسد */
+      else if (nP.length && nX.some(function (k) { return nP.indexOf(k) < 0; }) && nP.some(function (k) { return nX.indexOf(k) < 0; })) ask = true;
+      else if (fv) out = fv === "no" ? "نشد" : "شد";   /* «لوله‌کش تا شنبه میاد» ⇐ «لوله‌کش اومد»؛ «قبول میشم» ⇐ «قبول نشدم» */
+      else if (nP.length && nP.every(function (k) { return nX.indexOf(k) >= 0; }) && GPAST27.test(x)) out = ng27 ? "نشد" : "شد";   /* همان عددها، گزارشِ گذشته («۵ کیلومتر رو دویدم») */
+      else if (ac) { var xs = x.replace(/‌/g, ""), at0 = xs.indexOf(ac);
+        if (at0 >= 0) { var tail = xs.slice(at0 + ac.length, at0 + ac.length + 14); if (new RegExp("^\\s*ن" + LIGHT27).test(tail)) out = "نشد"; else if (new RegExp("^\\s*" + LIGHT27).test(tail)) out = "شد"; else ask = true; } else ask = true; }
+      else ask = true; }
+    if (ask || !out) { if (after) return null; s0.predAsk = { kind: "res", msg: lastAt, pred: String(y.at), sent: clip(best.x, 200), state: "open" };
+      sysLine25(s0, "🎯 " + predLab26(y) + " — از حرفت («" + clip(best.x, 60) + "») برمی‌آید نتیجه‌اش معلوم شده: شد یا نشد؟"); return s0.predAsk; }
+    predApply26(s0, y, out, best.x); sysLine25(s0, "🎯 " + predLab26(y) + " ⇐ " + out + " — به گفتهٔ خودت: «" + clip(best.x, 80) + "»."); return y;
+  }
+  PR.outcome27 = outcome27;
   PR.predVerdict = function (s0) {
     var U = userMsgs(s0), m = U[U.length - 1]; if (!m) return null; var t = String(m.text || ""), at = String(m.at || ""), C = (s0 && s0.coach) || {};
     var all = (C.preds || []).filter(function (y) { return y && y.text && String(y.at || "") !== at; }), Q = s0.predAsk, did = null;
     var pick = function (said, pc) { var keep = C.preds; C.preds = all; var r = null; try { r = PR.predFor(s0, said, pc, false); } catch (e) { } C.preds = keep; return r; };
     /* پاسخ به پرسشِ پیشینِ صفحه */
     if (Q && Q.state === "open" && Q.msg !== at) { Q.state = "closed"; did = Q;
-      var d0 = dg(t), no = /(?:^|[\s،«])(?:نشد|غلط|اشتباه|نادرست|رد\s*شد|درست\s*(?:نبود|درنیومد|درنیامد|نشد))(?![آ-ی])/.test(d0), ok = !no && /(?:^|[\s،«])(?:شد|درست|تأیید|تایید)(?![آ-ی])/.test(d0);
+      /* دورِ ۲۷ (story R5، C53؛ D27-13 pwD1 p7): «… حل شد» / «تموم شد» / «ثبت شد» سرانجامِ کارِ دیگری است، نه «شد» ِ این پیش‌بینی — مگر خودِ پیش‌بینی دربارهٔ همان کار باشد
+         (پیش‌تر «به نظرم این دیگه حل شد» 🎯 ِ «درصدِ فراموشی حدودِ ۸ درصد» را «شد» بست؛ واقعیت ۱۵٪ بود) */
+      var qx27 = Q.kind === "res" ? (all.filter(function (y) { return String(y.at) === String(Q.pred); })[0] || {}).text || "" : all.map(function (y) { return y.text; }).join(" ");
+      var t27 = dg(t).replace(/(?:^|[\s،«])(حل|تموم|تمام|بسته|باز|ثبت|عوض|اصلاح|انجام|حساب|معلوم|روشن|شروع|خراب|پیدا|قطعی|تعطیل)\s*(?:هم\s*)?(ن?شد)(?![آ-ی])/g, function (m0, w0) { return new RegExp(w0).test(dg(qx27)) ? m0 : " "; });
+      var d0 = t27, no =/(?:^|[\s،«])(?:نشد|غلط|اشتباه|نادرست|رد\s*شد|درست\s*(?:نبود|درنیومد|درنیامد|نشد))(?![آ-ی])/.test(d0), ok = !no && /(?:^|[\s،«])(?:شد|درست|تأیید|تایید)(?![آ-ی])/.test(d0);
       var px = Q.kind === "res" ? all.filter(function (y) { return String(y.at) === String(Q.pred) && !y.out; })[0] : pick(t, pctOf(t)), res = Q.kind === "res" ? (ok ? "شد" : no ? "نشد" : "") : Q.out || (ok ? "شد" : no ? "نشد" : "");
-      if (px && res) { predApply26(s0, px, res, Q.kind === "res" ? t : Q.sent); sysLine25(s0, "🎯 " + predLab26(px) + " ⇐ " + res + " — به گفتهٔ خودت."); return px; }
-      if (!PR.predVerdictIn(t) && !PR.predRefIn(t)) { sysLine25(s0, "🎯 پرسشِ داوری بی‌جواب ماند — چیزی داوری نشد؛ هر وقت گفتی «پیش‌بینیِ … شد/نشد» یا در «🎯 دفترِ پیش‌بینی» زدی، همان می‌نشیند."); return Q; } }
+      if (px && res) { predApply26(s0, px, res, Q.kind === "res" ? t : Q.sent); sysLine25(s0, "🎯 " + predLab26(px) + " ⇐ " + res + " — به گفتهٔ خودت.");
+        /* دورِ ۲۷ (C53؛ A27-11 s05 p19 «رضا رو میگم، ۴۰ درصدیه. مال مدیر هم که گفتم شد.»): سرانجامِ روشنِ پیش‌بینیِ دیگری در همان پیام هم می‌نشیند */
+        try { outcome27(s0, t, all.filter(function (y) { return !y.out && y !== px; }), true); } catch (e) { console.warn(e); } return px; }
+      if (!PR.predVerdictIn(t) && !PR.predRefIn(t)) { sysLine25(s0, "🎯 پرسشِ داوری بی‌جواب ماند — چیزی داوری نشد؛ هر وقت گفتی «پیش‌بینیِ … شد/نشد» یا در «🎯 دفترِ پیش‌بینی» زدی، همان می‌نشیند.");
+        /* دورِ ۲۷ (C53؛ C27-20 pwC2 p29): پیامی که پاسخِ آن پرسش نبود ممکن است سرانجامِ روشنِ پیش‌بینیِ دیگری باشد («تاس رو ۶۰ بار انداختم، ۱۱ بار …») */
+        var oc27 = null; try { oc27 = outcome27(s0, t, all.filter(function (y) { return !y.out && !(Q.kind === "res" && String(y.at) === String(Q.pred)); }), false); } catch (e) { console.warn(e); } return oc27 || Q; } }
     /* (۷) پس‌گرفتنِ داوری‌ای که همین حالا به حرفِ خودش نشست: «اشتباه گفتم، در واقع شد» ⇒ همان 🎯، با تاریخچه (بانکِ R26 #208؛ «نه، همون نشد درست بود» ⇒ هیچ: #220) */
     var pu7 = U[U.length - 2], lastJ = all.filter(function (y) { return y.out && y.out.sess === s0.id && pu7 && String(y.out.at || "") >= String(pu7.at || ""); }).sort(function (a, b) { return String(a.out.at).localeCompare(String(b.out.at)); }).pop();
     if (lastJ && /(?:^|[\s،])(?:اشتباه\s*(?:گفتم|کردم|زدم)|در\s*واقع|راستش|اتفاقاً|برعکس)(?![آ-ی])/.test(t) && !PR.predVerdictIn(t)) { var d7 = dg(t), no7 = /(?:^|[\s،«])نشد(?![آ-ی])/.test(d7), ok7 = !no7 && (/(?:در\s*واقع|راستش|اتفاقاً|برعکس)\s*(?:هم\s*)?شد(?![آ-ی])|(?:^|[\s،«])شد\s*[.!؛»]/.test(d7)), want = no7 ? "نشد" : ok7 ? "شد" : "";
-      if (want && want !== lastJ.out.res) { var was7 = lastJ.out.res, f7 = lastJ.fc ? S.get(lastJ.fc) : null; if (f7) PR.reverdict26(f7, want, t, s0); else { (lastJ.outHist = lastJ.outHist || []).push(lastJ.out); lastJ.out = { res: want, at: nowISO(), quote: clip(t, 200), sess: s0.id }; }
+      if (want && want !== lastJ.out.res) { var was7 = lastJ.out.res, f7 = fcOf27(lastJ); if (f7) PR.reverdict26(f7, want, t, s0); else { (lastJ.outHist = lastJ.outHist || []).push(lastJ.out); lastJ.out = { res: want, at: nowISO(), quote: clip(t, 200), sess: s0.id }; }
         sysLine25(s0, "↩ داوریِ 🎯 " + predLab26(lastJ) + " به گفتهٔ خودت عوض شد: «" + was7 + "» ⇒ «" + want + "» (داوریِ پیشین در تاریخچه می‌ماند)."); return lastJ; } }
-    var v = PR.predVerdictIn(t), ref = v ? null : PR.predRefIn(t); if (!v && !ref) return did;
+    var v = PR.predVerdictIn(t), ref = v ? null : PR.predRefIn(t);
+    /* دورِ ۲۷ (story R5، C53؛ A27-11 s05 p17، C27-20 pwC2 p28/p29): سرانجامِ روشن بی واژهٔ «پیش‌بینی» («مدیرم امروز درخواستم رو تأیید کرد!»، «… ۳۰٪. درست درومد») */
+    if (!v && !ref) { if (did) return did; return outcome27(s0, t, all.filter(function (y) { return !y.out; }), false) || did; }
     /* داوریِ ضعیف (بی واژهٔ «پیش‌بینی») فقط با واژهٔ مشترک با یک پیش‌بینیِ باز داوری است؛ وگرنه ارجاع است (صفحه می‌پرسد) */
     if (v && v.weak) { var ow = all.filter(function (y) { return !y.out; }); if (!ow.length) return did; if (!(ow.length === 1 && ovS(ow[0].text, t) >= 1)) { ref = { sent: v.sent }; v = null; } }
     var sent = (v || ref).sent, out = v ? (v.ok ? "شد" : "نشد") : "", pc = pctOf(sent);
@@ -2497,7 +2620,7 @@
     var x = pick(t, pc), open = all.filter(function (y) { return !y.out; });
     /* اطمینانِ گفته‌شده مالِ پیش‌بینیِ داوری‌شده است ⇒ بازنگریِ همان داوری، با تاریخچه */
     if (!x && v && pc != null) { var J = all.filter(function (y) { return y.out && predPct(y) === pc; });
-      if (J.length === 1) { var jf = J[0].fc ? S.get(J[0].fc) : null, was = J[0].out.res;
+      if (J.length === 1) { var jf = fcOf27(J[0]), was = J[0].out.res;
         if (was !== out) { if (jf) PR.reverdict26(jf, out, sent, s0); else { (J[0].outHist = J[0].outHist || []).push(J[0].out); J[0].out = { res: out, at: nowISO(), quote: clip(sent, 200), sess: s0.id }; }
           sysLine25(s0, "↩ داوریِ 🎯 " + predLab26(J[0]) + " به گفتهٔ خودت عوض شد: «" + was + "» ⇒ «" + out + "» (داوریِ پیشین در تاریخچه می‌ماند)."); }
         return J[0]; } }
@@ -2766,7 +2889,7 @@
   function bookItem26(s0, P0, it) {
     var U = userMsgs(s0), src = U.filter(function (y) { return String(y.at) === String(P0.msg); })[0] || U[U.length - 1];
     if (it.pred) { var px = ((s0.coach || {}).preds || []).filter(function (y) { return y && String(y.at) === String(it.pred) && (!it.pk || y.key === it.pk); })[0];
-      if (px && !px.fc && !px.out) { px.due = it.date; delete px.duePend; var f = { id: A.uid("fc"), type: "fcast", q: clip(px.text, 200), p: px.p != null ? px.p : null, due: it.date, dim: "s_decision", created: nowISO(), src: { chat: s0.id, quote: clip(px.text, 200) }, by: "chat" }; if (f.p == null) f.est = true; S.put(f); px.fc = f.id; return "🎯 «" + clip(px.text, 60) + "» — موعدِ داوری: " + fdate(it.date); }
+      if (px && !px.fc && !px.out) { px.due = it.date; delete px.duePend; var f = fc27(s0, px, it.date); px.fc = f.id; delete px.fc0; return "🎯 «" + clip(px.text, 60) + "» — موعدِ داوری: " + fdate(it.date); }   /* دورِ ۲۷ (C53): همان 🎯 ِ بی‌موعد موعد می‌گیرد */
       return ""; }
     if (it.plan) { var q = (s0.plans || []).filter(function (y) { return y && y.id === it.plan; })[0]; if (!q) return "";
       q.when = it.date; q.date0 = it.date; delete q.whenAsk; delete q.whenPend; q.dateBy = "her-yes";

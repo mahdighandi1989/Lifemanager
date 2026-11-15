@@ -2607,6 +2607,9 @@
        متنی که در پیامش نیست ⇒ رد. بی متن ⇒ همان سنجشِ پیشین. */
     var rTx19 = txtOf(a.result), resOk19 = !!rTx19 && quoteIn(rTx19, ut);
     if (rTx19 && !resOk19) said = said.filter(function (k) { return k !== "result"; });
+    /* دورِ ۲۷ (story R6، C57؛ D27-8 arD1 p13 «نسخهٔ دومِ همین حساب‌ها رو برادرم نوشته بود …»): نتیجه‌ای که از کسِ دیگری نقل کرد نتیجهٔ او نیست — نه مرحله، نه «اجرا +»؛
+       a45 همان را «کارِ دیگری» ثبت می‌کند (ST.otherWork27) */
+    try { if (said.indexOf("result") >= 0 && A.STORY && A.STORY.otherOwns27 && A.STORY.otherOwns27(ut, rTx19 && resOk19 ? rTx19 : "")) said = said.filter(function (k) { return k !== "result"; }); } catch (e) { }
     if (!resOk19 && resultNow(ut) && !resultNow(ut, false) && !SOLVED_RE.test(ut) && !weakOk(ut, { intro: !!(P && P.intro), stmt: stB })) said = said.filter(function (k) { return k !== "result"; });   // دورِ ۵ (F1، s03): «ثابت شد» از چند شکل ادعاست، نه نتیجه؛ دورِ ۶ (G1): «…درسته؟» حدس است
     /* نقش */
     if (a.role === "teacher") { var rec = M.filter(isUser).slice(-4).map(function (m) { return m.text; }).join(" "); if (LEARNER_RE.test(rec)) { C.teach = true; C.teachBy = "model"; } }
