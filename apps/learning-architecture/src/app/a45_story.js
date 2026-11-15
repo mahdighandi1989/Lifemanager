@@ -1290,6 +1290,10 @@
     var LK = [], reL = /(?:^|[\s،؛(])(?:مثلِ?|مثل|شبیهِ?|عینِ?|مانندِ?|همانندِ?|نظیرِ?)\s+(?:(?:همون|همان|اون|آن)\s+)?(مسئله(?:ٔ|ی|‌ی)?\s*)?([^\n،,.!؟?؛:]{2,50})/g;
     while ((m = reL.exec(T))) LK.push({ tail: tailOf(m[2]), prob: !!m[1], like: true, at: m.index, end: m.index + m[0].length });
     if (LK.length) out = out.filter(function (f) { var q = T.indexOf(String(f.tail || "").slice(0, 12)); return !(q >= 0 && LK.some(function (l) { return q >= l.at && q <= l.end; })); }).concat(LK);
+    /* دورِ ۲۷ (story R6، C30؛ C27-18 pwC2 «مهره‌ها رو حساب کردم: …»، B27·D15 oB1 «نتیجه‌ی آزمون شام: …»): نامِ کوتاهِ مسئله در سرِ پیام — بندِ پیش از «:» یا «X رو/را» ِ آغازِ پیام —
+       فقط با واژه‌ای که یکتا مالِ یک مسئلهٔ دیگرِ همین گفت‌وگوست (داوری در run26: subj). پیش‌تر بی قابِ «برگردیم/مسئلهٔ …» نوبت سرِ مسئلهٔ پیشین می‌ماند و نتیجه زیرِ آن می‌نشست. */
+    var hd27 = T.split(/[:：]/)[0]; if (hd27.length < T.length) { var cl27 = txt(hd27.split(/[.!؟?\n،,؛]/).pop()); if (cl27 && toks(cl27).length && toks(cl27).length <= 6) out.push({ tail: cl27, subj: true }); }
+    m = /^[\s«]*(?:سلام[،,!.\s]+)?((?:[^\s،,.:：!؟?]{2,}\s+){0,2}[^\s،,.:：!؟?]{3,})\s+(?:رو|را)(?![آ-ی])/.exec(T); if (m && !/(?:برگرد|مسئله)/.test(m[1])) out.push({ tail: txt(m[1]), subj: true });
     out.forEach(function (f) { var w0 = nz(f.tail).split(" ")[0] || ""; if (f.prob || f.strong) { ORD26.forEach(function (o) { if (new RegExp("^(?:" + o[0].source + ")$").test(w0)) f.ord = o[1]; }); if (/^(?:قبلی|قبل|پیشین)$/.test(w0)) f.ord = "prev"; if (/^(?:تازه|جدید|بعدی|آخر|آخری)$/.test(w0)) f.ord = "last"; } f.deic = DEIC26.test(w0); });
     return out.filter(function (f) { return !f.deic && (f.ord != null || toks(f.tail).length); });
   }
@@ -1312,6 +1316,11 @@
     return { ask: (cp ? [cp] : []).concat(tg.filter(function (x) { return x !== cp; })), frame: LK[0], like: true };
     function run26(FR) {
     for (var i = 0; i < FR.length; i++) { var f = FR[i], c = null;
+      /* C30 (دورِ ۲۷): نامِ کوتاه در سرِ پیام — واژه‌ای (≥ ۳ حرف) که فقط به یک مسئلهٔ این گفت‌وگو می‌خورد و آن مسئلهٔ کنونی نیست ⇒ همان؛ وگرنه این قاب چیزی نمی‌گوید */
+      if (f.subj) { var Ws = toks(f.tail).filter(function (w) { return w.length >= 3; }), TX = P.map(function (x) { return toks(x.title + " " + x.stmt); });
+        var hs = P.filter(function (x, k) { return Ws.some(function (w) { return hit26(w, TX[k]) && !TX.some(function (o, j) { return j !== k && hit26(w, o); }); }); });
+        if (hs.length === 1 && hs[0].id !== cur && !(cur && Ws.some(function (w) { var ci = P.map(function (x) { return x.id; }).indexOf(cur); return ci >= 0 && hit26(w, TX[ci]); }))) return { to: hs[0], frame: f };
+        continue; }
       /* بانکِ R26 #85 «برگردیم به اون مسئلهٔ قبلی» با چند مسئلهٔ پیشین: صفحه حدس نمی‌زند — یک مسئلهٔ دیگر ⇒ همان؛ بیشتر ⇒ می‌پرسد */
       if (f.ord === "prev") { var O0 = P.filter(function (x) { return x.id !== cur; }); if (O0.length === 1) c = O0[0]; else if (O0.length > 1) return { ask: O0, frame: f }; }
       else if (f.ord === "last") c = P[P.length - 1] || null;
@@ -1322,6 +1331,10 @@
       /* بانکِ R26 #99 «برگردیم به مسئلهٔ ماشین» (رکوردی به این نام نیست): نه بستن به رکوردی، نه نشستن زیرِ مسئلهٔ زنده — صفحه می‌پرسد کدام، یا مسئلهٔ تازه است */
       if (!mx) { if (f.strong && f.prob && !me && toks(f.tail).length) return { ask: [], unknown: clip(f.tail, 40), frame: f }; continue; }
       if (!f.strong && me >= mx) continue;
+      /* دورِ ۲۷ (story R6، C30؛ B27·D15 oB1 «برگردیم به مسئله‌ی بیداری ساعت ۶» وقتی کانون همان بیداری بود ⇒ صفحه به «شام» بست): نامی که به مسئلهٔ کنونی بیشتر می‌خورد
+         جابه‌جایی نیست؛ برابر ⇒ صفحه می‌پرسد (کنونی + بهترینِ دیگر)، هرگز حدس نمی‌زند */
+      if (f.strong && me > mx) return null;
+      if (f.strong && me && me === mx) { var cpe = P.filter(function (x) { return x.id === cur; })[0]; return { ask: (cpe ? [cpe] : []).concat(others.filter(function (z) { return z.n === mx; }).map(function (z) { return z.p; })), frame: f }; }
       if (f.bare || f.about) { var byT0 = others.filter(function (z) { var X = toks(z.p.title); return W.some(function (w) { return w.length >= 3 && hit26(w, X); }); }); if (!byT0.length) continue; }   // بی قابِ صریح، فقط واژهٔ عنوان   // بی «برگردیم»، واژه‌ای که به مسئلهٔ کنونی هم می‌خورد نام‌بردنِ دیگری نیست
       var best = others.filter(function (z) { return z.n === mx; }).map(function (z) { return z.p; });
       if (best.length === 1) return { to: best[0], frame: f };
