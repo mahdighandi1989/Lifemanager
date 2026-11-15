@@ -357,3 +357,47 @@ becomes «dates» and works where today worked.
 **Merge order:** arith first, then prior (the S1 families), then the rest in any order. After every merge the whole gate runs: the
 three round-26 clashes came from cross-fixer interaction, and gate 40 caught them only at the end. Round 28 starts only after
 `GATE_DONE fail=0`.
+
+### Clarifications after the independent bank (C59–C83; answers to the bank writer's 25 ambiguities, same order)
+Principle for all, as before: where the text itself does not decide, the page asks; no number or convention is invented.
+- **C59.** A sum that fits while the result's unit suggests a product («۸ و ۳ میشه ۱۱ متر مربع»): the arithmetic is ✓. The coach alone
+  gets one line naming the unit question; the page shows no flag.
+- **C60.** Operands written only in words («پنج و شش میشه سی») are numbers (as C37's «پنجاه‌پنجاه») and inside the reader.
+- **C61.** C44 applies to an integer result only. A short decimal with no approximation word («۰٫۳۷») follows C9's rounding (she wrote
+  decimal digits).
+- **C62.** The page never adds a scale word she did not use; with no scale word it writes plain digits.
+- **C63.** «N میلیون و M» with a bare M: if exactly one reading (M thousand or M units) makes her line right, that reading is used;
+  otherwise the page asks which she meant (C24's rule).
+- **C64.** C42 covers every arithmetic progression fixed exactly by its first two terms and its last: descending, decimal steps and
+  negative terms included. A symbolic last term stays «نسنجیده».
+- **C65.** When her own «؟» line and another person's line both wait, a bare «گرد کردم» binds to hers (C43 never binds to C57 lines).
+  Two of her own lines waiting ⇒ «کدام؟».
+- **C66.** Equal digits inside an expression with the same unit and another meaning are not stale and the page does not ask: only the
+  recorded dependency counts (C47).
+- **C67.** An irrational recomputation is shown exactly and approximately in her form («√۱۸۱ ≈ ۱۳٫۴۵»). That is the exact recomputation.
+- **C68.** Accepting a proposal is a correction. Its own dependants get C47 proposals in turn; nothing changes silently.
+- **C69.** An ask is still open on its own day and lapses when that day ends.
+- **C70. Idioms at their boundary:**
+  - «عید» said after 1 Farvardin of this year ⇒ the page asks whether next year's 1 Farvardin is meant.
+  - «آخرِ سال» said on the last day of Esfand ⇒ today, through «… درست است؟».
+  - «سرِ برج» or «اولِ ماه» said on day 1 ⇒ the page asks: today, or day 1 of the next month.
+  - «اولِ ماه» otherwise = «سرِ برج».
+  - «وسطِ ماه» and «آخرِ سالِ تحصیلی» are not calendar facts ⇒ the page asks which day and proposes no number.
+- **C71.** A negated day with no replacement («این جمعه نه»): nothing is booked; the page asks which day.
+- **C72.** A yes that carries its own day («بله، پس‌فردا» to a «فردا» ask): her day wins and is confirmed once with its date.
+- **C73.** A reminder on another day than the plan is one record with two dates (C52).
+- **C74.** A hypothetical that turns into a fact in the same message («اگه ۵ بود … آهان، اصلاً ۵ بوده»): the fact is a correction (C48);
+  the hypothetical part goes to the coach.
+- **C75.** Someone else's confidence («مربی گفت ۷۰ درصد») makes no 🎯 of hers. It is filed as «کارِ دیگری».
+- **C76.** A bare confidence number given as the reply to a question about a named outcome makes that outcome's 🎯. If the question named
+  no outcome, the page asks which.
+- **C77.** The same forecast with a new number updates the 🎯; the old number stays as history («اصلاح شد ⇐»).
+- **C78.** Moving a 📜 line moves the record it belongs to (ledger step, result, 🎯) with it. The original place keeps a history line.
+- **C79.** «کارِ دیگری» (C57) is only for a third person she names. A number of the coach or of the page that she repeats as her own is
+  hers.
+- **C80.** With two candidates, negating one («بلوتوثی نه») is not yet a choice: the page asks once «پس آن یکی؟».
+- **C81.** An ordinal reply («اولی», «دومی») to a tie is a choice, by the order in which the page listed the candidates.
+- **C82. Names (C22/C38):**
+  - Masked: third-party personal names, including with a title («حسن آقا»).
+  - Kept: public names inside a problem's or a theorem's name («حدسِ اردوش–اشتراوس»), her own name, and book titles.
+- **C83.** Page-authored text quoted back to her is re-converted to the current register; only her own words stay byte-exact (C55).
