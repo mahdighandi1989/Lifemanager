@@ -38724,11 +38724,11 @@ APP.goFromURL = function (q) {
     try { if (!root || typeof document === "undefined" || !document.createTreeWalker) return; var se = pageSess26(); if (!se || AS.convRegister(se, "", []) !== "shoma") return;
       var H = null, w = document.createTreeWalker(root, 4 /* TEXT */, null), nd, L = [];
       while ((nd = w.nextNode())) L.push(nd);
-      L.forEach(function (nd) { var t = nd.nodeValue; if (!t || !/[آ-ی]/.test(t) || !/[تیونشکرزدهآ]/.test(t)) return; var el = nd.parentNode; if (!el || !el.closest) return;
+      L.forEach(function (nd) { var t = nd.nodeValue; if (!t || nd.__r26 === t || !/[آ-ی]/.test(t) || !/[تیونشکرزدهآ]/.test(t)) return;   /* __r26: متنی که همین گذرگاه نوشت دوباره خوانده نمی‌شود (ناظرِ تغییر حلقه نمی‌زند) */ var el = nd.parentNode; if (!el || !el.closest) return;
         if (el.closest(".as-panel, textarea, input, script, style, [contenteditable], .math, math, svg")) return;
         var out = outMap25(se, t, toShoma); if (out === t) return;
         var key = t.replace(/\s+/g, " ").replace(/…\s*$/, "").trim(); if (key.length >= 6) { if (H == null) H = hersText26(); if (H.indexOf(key) >= 0) return; }
-        nd.nodeValue = out; });
+        nd.__r26 = out; nd.nodeValue = out; });
     } catch (e) { } }
   AS.regDom26 = regDom26;
   if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); } catch (e) { } return r; }; A.render._reg26 = true;
@@ -40414,6 +40414,8 @@ APP.goFromURL = function (q) {
      حرفِ خودش («مهمونی بودیم» ⇒ «بودید»). چنین جمله‌ای شاهدِ «شما» نیست؛ شاهدِ «تو» هم نمی‌سازد (برخلافِ «تو و …»). */
   var GROUP26 = /(?:^|[\s‌،(])(?:همه|همگی|هر[\s‌]*کدام|هر[\s‌]*یک|هر[\s‌]*دو|خانوادگی|دسته[‌\s]?جمعی)(?![آ-یٔ‌ِ])|(?:همه|هر[\s‌]*دو|هر[\s‌]*کدام)[‌]?(?:تان|تون)(?![آ-ی])/;
   function plural26(x, hers) { var u = unq18(x); if (!/(?:ید|ین)(?![آ-ی‌])/.test(u)) return false; if (GROUP26.test(u)) return true; if (!hers) return false;
+    /* «شما» ِ صریح بی واژهٔ گروه، خودش احترام است؛ هم‌ریشگی با فعلِ جمعِ او («دو شیر داریم» ⇒ «شما چه داده‌ای دارید؟») جمعش نمی‌کند (بانکِ R21 #152) */
+    if (/(?:^|[^آ-ی‌])شما(?![آ-ی‌])/.test(u)) return false;
     var W = u.match(/[آ-ی‌]{3,}(?:ید|ین)(?![آ-ی‌])/g) || []; return W.some(function (w) { var st = w.replace(/(?:ید|ین)$/, ""); return st.length >= 2 && new RegExp("(?:^|[^آ-ی‌])" + st + "یم(?![آ-ی‌])").test(hers); }); }
   function noPlural25(t, hers) { var to = false, out = String(t || "").split(/(?<=[.!؟?؛\n])/).map(function (x) { if (PLUR25.test(unq18(x))) { to = true; return " "; } if (plural26(x, hers)) return " "; return x; }).join(""); return { t: out, to: to }; }
   AS.noPlural25 = noPlural25;
@@ -40424,20 +40426,10 @@ APP.goFromURL = function (q) {
   function oneQ25(q) { var x = String(q || ""), d = 0, pd = 0, idx = [];
     for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); if (ch === "«") d++; else if (ch === "»" && d > 0) d--; else if (ch === "(") pd++; else if (ch === ")" && pd > 0) pd--; else if ((ch === "؟" || ch === "?") && !d && !pd) idx.push(i); }
     if (idx.length < 2) return x;
-    /* دورِ ۲۶ (Q9، U53، بانکِ R26 #231 «یک پرسش، نه دو پرسشِ چسبیده با ویرگول»): تکهٔ دومی که خودش یک پرسشِ کامل است (سه واژه یا بیشتر — «می‌توانی آن را در یک نگاه ببینی؟»)
-       پرسشِ دوم است، نه دنبالهٔ اولی ⇒ پرسشِ نوبت همان نخستین پرسشِ کامل است (کلی ⇐ خاص). دنباله‌های کوتاهِ حذفی («… کافی است؟ زائد؟ متناقض؟») مثلِ پیش با «،» یکی می‌شوند.
-       رفتارِ پیشین: AS.R26_QUARANTINE.oneQ25. */
-    for (var c = 0; c < idx.length - 1; c++) { var seg = x.slice(idx[c] + 1, idx[c + 1]).replace(/^[\s—–\-،:؛]+/, "").trim(); if (seg.split(/[\s‌]+/).filter(Boolean).length >= 3) { x = x.slice(0, idx[c] + 1); idx = idx.slice(0, c + 1); break; } }
-    if (idx.length < 2) return x;
     var out = "", last = idx[idx.length - 1];
     for (var j = 0; j < x.length; j++) { if (idx.indexOf(j) >= 0 && j !== last) { var nx = x.slice(j + 1).replace(/^\s+/, "").charAt(0); out += /[—–\-،:؛]/.test(nx) || !nx ? "" : "،"; continue; } out += x.charAt(j); }
     return out; }
   AS.oneQ25 = oneQ25;
-  AS.R26_QUARANTINE = Object.assign(AS.R26_QUARANTINE || {}, { oneQ25: function (q) { var x = String(q || ""), d = 0, pd = 0, idx = [];
-    for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); if (ch === "«") d++; else if (ch === "»" && d > 0) d--; else if (ch === "(") pd++; else if (ch === ")" && pd > 0) pd--; else if ((ch === "؟" || ch === "?") && !d && !pd) idx.push(i); }
-    if (idx.length < 2) return x; var out = "", last = idx[idx.length - 1];
-    for (var j = 0; j < x.length; j++) { if (idx.indexOf(j) >= 0 && j !== last) { var nx = x.slice(j + 1).replace(/^\s+/, "").charAt(0); out += /[—–\-،:؛]/.test(nx) || !nx ? "" : "،"; continue; } out += x.charAt(j); }
-    return out; } });
   function tqLine25(l) {
     if (/^- زمینه/.test(l)) return l;
     var bold = /\*\*پرسشِ این نوبت همین است:?\*\*/.test(l), one = /^- در این نوبت فقط \*\*یک\*\* پرسش/.test(l); if (!bold && !one) return l;
@@ -55514,11 +55506,11 @@ APP.goFromURL = function (q) {
   }
   function privSchool1(c) { return privSchool(c); }
   var ROLE26 = "(?:معلم|دبیر|مدیر|ناظم|مربی|استاد|مشاور)", POSS26 = "(?:[‌]?(?:مون|مان|م|ام|ش|شون|شان|ت|تون|تان))?";
-  var HON26 = "(?:خانمِ?|آقایِ?|استادِ?)";
+  var HON26 = "(?:خانمِ?|آقایِ?|استاد)";   // «استادِ دانشگاه» ترکیبِ اضافی است، نه نام — فقط «استاد + نام» ِ بی کسره
   var KIN26 = "(?:دوست|رفیق|پسر|دختر|نوه|برادر|داداش|خواهر|آبجی|همکار|همسایه|شاگرد|هم[‌\\s]?کلاسی|بچه|مامان|بابا|مادر|پدر|همسر|شوهر|خانم|زن|عمو|دایی|خاله|عمه|پسرخاله|دخترخاله|پسرعمو|دخترعمو|رئیس|صاحب[‌\\s]?خانه|صاحبخونه)";
   var PERSONN26 = "(?:" + KIN26 + "|" + ROLE26 + "|آقایی|خانمی|کسی|یکی|نفر|بچه‌ای|پسری|دختری|مردی|زنی|دوستی|همکاری|همسایه‌ای|معلمی|شاگردی)";
   function nameSub26(label) { return function (all, w, sp, name) { if (/\[نامِ?/.test(name) || /\[نامِ?/.test(w)) return all; var c = nameCut25(name); if (!c) return all; return w + sp + (c.pre ? c.pre + " " : "") + label + c.tail + (c.rest ? " " + c.rest : ""); }; }
-  var HONSTOP26 = new RegExp("^(?:" + ROLE26 + "|" + KIN26 + "|دکتر|مهندس|فروشنده|راننده|پلیس|منشی|پرستار|مسئول|کارمند|محترم|عزیز|جان|بزرگ|پیر|جوان|مسن|خانه[‌]?دار|خونه|خانه|راهنما|اجازه|ها|های|هایی|ی|ای|یی|و|که|رو|را|هم|گفت|گفته)(?:ِ|‌ی|ی|ه)?$");
+  var HONSTOP26 = new RegExp("^(?:" + ROLE26 + "|" + KIN26 + "|دکتر|مهندس|فروشنده|راننده|پلیس|منشی|پرستار|مسئول|کارمند|محترم|عزیز|جان|بزرگ|پیر|جوان|مسن|خانه[‌]?دار|خونه|خانه|راهنما|اجازه|دانشگاه|مدرسه|کلاس|ما|من|شما|ها|های|هایی|ی|ای|یی|و|که|رو|را|هم|گفت|گفته)(?:ِ|‌ی|ی|ه)?$");
   function privPeople(x) {
     /* معلم/مدیر: «معلممون خانم احمدی»، «معلمِ ریاضی‌مون آقای رضایی»، «خانم احمدی معلمِ ما»، «اسمِ معلممون …»، «معلممون اسمش …» */
     x = x.replace(new RegExp("(" + ROLE26 + "(?:ِ|‌ی|ی)?" + POSS26 + "(?:[\\s‌]+[آ-یٔ‌ِ]{2,14}" + POSS26 + "){0,2}[\\s‌،,]+" + HON26 + ")([\\s‌]+)" + NAME25, "g"), nameSub26("[نامِ معلم]"));

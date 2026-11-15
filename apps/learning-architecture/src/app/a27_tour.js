@@ -4689,6 +4689,8 @@
      حرفِ خودش («مهمونی بودیم» ⇒ «بودید»). چنین جمله‌ای شاهدِ «شما» نیست؛ شاهدِ «تو» هم نمی‌سازد (برخلافِ «تو و …»). */
   var GROUP26 = /(?:^|[\s‌،(])(?:همه|همگی|هر[\s‌]*کدام|هر[\s‌]*یک|هر[\s‌]*دو|خانوادگی|دسته[‌\s]?جمعی)(?![آ-یٔ‌ِ])|(?:همه|هر[\s‌]*دو|هر[\s‌]*کدام)[‌]?(?:تان|تون)(?![آ-ی])/;
   function plural26(x, hers) { var u = unq18(x); if (!/(?:ید|ین)(?![آ-ی‌])/.test(u)) return false; if (GROUP26.test(u)) return true; if (!hers) return false;
+    /* «شما» ِ صریح بی واژهٔ گروه، خودش احترام است؛ هم‌ریشگی با فعلِ جمعِ او («دو شیر داریم» ⇒ «شما چه داده‌ای دارید؟») جمعش نمی‌کند (بانکِ R21 #152) */
+    if (/(?:^|[^آ-ی‌])شما(?![آ-ی‌])/.test(u)) return false;
     var W = u.match(/[آ-ی‌]{3,}(?:ید|ین)(?![آ-ی‌])/g) || []; return W.some(function (w) { var st = w.replace(/(?:ید|ین)$/, ""); return st.length >= 2 && new RegExp("(?:^|[^آ-ی‌])" + st + "یم(?![آ-ی‌])").test(hers); }); }
   function noPlural25(t, hers) { var to = false, out = String(t || "").split(/(?<=[.!؟?؛\n])/).map(function (x) { if (PLUR25.test(unq18(x))) { to = true; return " "; } if (plural26(x, hers)) return " "; return x; }).join(""); return { t: out, to: to }; }
   AS.noPlural25 = noPlural25;

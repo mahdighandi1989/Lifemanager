@@ -53,6 +53,8 @@
 - Register signs decide only what they can read: a verb stem after «بـ/نـ», the clitic «ـت» only on a known possessive, joined «می»
   only with a verb stem. A sentence with a group word («همه», «هر کدام», «هر دو») or whose verb she used in first person plural is a
   real plural and is not «شما». If you add a rule that needs a new sign, add it to the stem lists, not as an open pattern.
+  An explicit «شما» with no group word stays a «شما» sign even when she used the same verb in first person plural («دو شیر داریم» ⇒
+  «شما چه داده‌ای دارید؟» is a mix; R21 bank #152).
 - Guillemets round a proposition or a label («این‌که «…»», «… را «…» می‌نامیم») are not a quotation of her.
 
 ## Contract: mind card
@@ -68,3 +70,13 @@
 ## Not done (reasons in HANDBOOK §12 row 74)
 - Bare first names with no marker; two-word names after an honorific; `a40` session-list titles; child wording beyond the
   understanding phase; text inside SVG; C26-33 not reproduced; two people in one browser (open sheet).
+
+## Resume after the pause (2026-11-15)
+- The WIP snapshot was reviewed hunk by hunk and kept: the `oneQ25` cut is reverted (round-25 contract kept, bank #231 second half
+  reported), `regDom26` no longer re-reads text it wrote itself (`__r26`), «استادِ دانشگاه» is not «استاد + name».
+- Re-checked C23–C39: C38 (her own words stay as typed) and C39 (no interval number; line and schedule follow one count) were already
+  built in; the bank copy equals `T/VARIANTS_R26.json`; bank result unchanged (34 green, #231 half / #257 with reasons).
+- Whole suite one at a time found one regression of mine: `plural26` turned an explicit «شما … دارید» into a group address when she
+  had written «داریم» (R21 bank #152) — fixed with its look-alike. `test_tour1_r25_prior` A25-10 now accepts «برهانتان را خودتان»
+  (one register, D26-40). `test_polya_fix5` M3 fails on 2026-11-15 only because its typed «۲۵ آبان» is tomorrow (calendar collision in
+  an old test that hard-codes a date; not this branch).

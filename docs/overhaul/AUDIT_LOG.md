@@ -5125,3 +5125,9 @@ dated stability, mind-card feed) under way.
   (bank Q9/Q10: 34 of 36 green, two with their reasons — #257 not built this round, #231 second half conflicts with the standing
   one-page-question contract; 8 green on BASE26). Previous rules quarantined (`AS.R26_QUARANTINE`,
   `PR.R26_QUARANTINE`). Lesson: `experiences/closed-word-list-vs-own-vocabulary-guard.md`.
+
+### 2026-11-15 — CHANGE — learning-architecture, Pólya round 26, fixer classify resumed after the pause
+- WIP snapshot reviewed and kept; C23–C39 re-checked (bank unchanged). Whole suite one at a time: one regression of this branch fixed
+  (`plural26` in `a27_tour.js`: an explicit «شما» with no group word is not a group address — R21 bank #152), one old assertion widened
+  to the one-register contract (`test_tour1_r25_prior` A25-10), and `test_polya_fix5` M3 red only because its hard-coded «۲۵ آبان» is
+  tomorrow on 2026-11-15 (calendar collision, not this branch).

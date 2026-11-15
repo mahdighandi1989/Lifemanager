@@ -251,7 +251,8 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
       [30, TO, 'بفرمایید ادامه بدهید و نتیجه را بنویسید.', /«تو» بنویس/, 'look-alike: a real «شما» imperative in a «تو» talk is still caught'],
       [40, SH, 'جوابت را بنویس و بعد عددت را نگاه کن.', /«شما» بنویس/, 'look-alike: «جوابت را … عددت را» (known possessives) are still «تو» signs'],
       [30, TO, 'خودت گفتی «همیشه ریاضی‌ام ضعیف بوده و هیچ‌وقت درست نمی‌شود».', /نه در پیام‌های اوست/, 'look-alike: an attributed long quote she never wrote is still caught'],
-      [30, TO, 'نتیجه را دیدید و نوشتید؛ حالا خودت بگو کدام گام مانده.', /دو ضمیر/, 'look-alike: «دیدید» (second person plural) in a «تو» talk is still a mix']];
+      [30, TO, 'نتیجه را دیدید و نوشتید؛ حالا خودت بگو کدام گام مانده.', /دو ضمیر/, 'look-alike: «دیدید» (second person plural) in a «تو» talk is still a mix'],
+      [30, TO.concat(['دو شیر داریم، تو بگو چی کار کنم']), 'شما چه داده‌ای دارید؟', /«تو» بنویس/, 'look-alike (R21 bank #152): her «داریم» does not make an explicit «شما … دارید» a group address']];
     for (const [age, msgs, r, re, name] of CATCH) { await person(age, msgs); const w = await rc(r); chk(re.test(String(w)), name + ' — ' + String(w).slice(0, 150)); }
   });
 
