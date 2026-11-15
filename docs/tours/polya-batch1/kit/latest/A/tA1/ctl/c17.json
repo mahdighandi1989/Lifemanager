@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('route','pb_l_mvaqmgi3aap');const t=document.getElementById('main').innerText;const i=t.indexOf('اکنون:');return t.slice(i,i+1200)})()"}
+{"eval": "(()=>{APP.go('route','pb_l_mvaqlzy8yvq');const t=document.getElementById('main').innerText;const i=t.indexOf('اکنون:');return t.slice(i,i+1200)})()"}

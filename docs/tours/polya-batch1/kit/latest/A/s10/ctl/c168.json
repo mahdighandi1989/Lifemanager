@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go('dossier','pb_l_mvc61ooxvqg');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"}
+{"eval": "JSON.stringify(APP.S.all(\"deadline\",x=>1).map(x=>({w:x.what,d:x.date,src:x.src,by:x.by,c:x.created})))"}

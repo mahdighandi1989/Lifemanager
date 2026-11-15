@@ -1,6 +1,6 @@
 #!/bin/bash
 # raw.sh sid N [maxsteps] (stdin = raw reply text, any JSON) -> write rN (+man), drive on
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26C
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27C
 cd $R; mkdir -p man/$1; cat > man/$1/r$2.txt
 python3 -c "
 import json

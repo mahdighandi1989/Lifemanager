@@ -1,6 +1,6 @@
 #!/bin/bash
 # nx.sh sid [answer.json] : answer the pending call (if a file is given), resume the driver, show the next pending prompt compactly
-B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26B; cd $B; s=$1
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27B; cd $B; s=$1
 if [ -n "$2" ]; then python3 tools/sv.py $s $2 || exit 1; fi
 [ -n "$HOLD" ] && export STOPAT=$(( $(ls $s/ctl | grep -c "^c[0-9]*.json$") + 1 ))
 WAIT=${WAIT:-100} bash tools/run.sh $s | cut -c1-260

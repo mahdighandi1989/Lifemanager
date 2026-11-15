@@ -1,1 +1,1 @@
-{"eval": "(()=>APP.liveAll().map(r=>r.p.title+' ['+APP.liveClosure(r.p.id).state+'/'+APP.livePhase(r.p.id)+']').join(' | '))()"}
+{"say": "سه تا حسابِ دیگه برای نوه‌م: ۲۶ ÷ ۴ = ۶٫۵، ۱۰۰ تقسیم بر ۷ = ۱۴، و ۱۳/۱۲ = ۱."}

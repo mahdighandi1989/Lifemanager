@@ -11,12 +11,13 @@
    "R22",
    "R23",
    "R24",
-   "R25"
+   "R25",
+   "R26"
   ],
-  "bytes": 209092,
+  "bytes": 246987,
   "path": "banks.jsonl.gz",
-  "records": 2046,
-  "sha256": "b4131318490985dea75dd1c01b1d77670e36b43f8e62ef716576717ba24ae36d"
+  "records": 2303,
+  "sha256": "c0875eabc587a8604fd88d671faa0f77c5bd6736d304e0df41ee74539e8c140c"
  },
  "blocks": [
   {
@@ -108,36 +109,18 @@
    "path": "blocks/round26.jsonl.gz",
    "records": 1522,
    "sha256": "00dd6176b269eca4e5b0d66316f02a1a3d8e49edb8f98238cc002144b112ba40"
+  },
+  {
+   "bytes": 744999,
+   "path": "blocks/round27.jsonl.gz",
+   "records": 1142,
+   "sha256": "185622801abfcd76713fc9be92e86414cbbef71a3bdc348d51aaf4cba8be9824"
   }
  ],
  "build_commits": {
-  "models20/haiku": {
-   "commit": "a94614ae",
-   "source": "models20/haiku/SUMMARY.md"
-  },
-  "models20/sonnet": {
-   "commit": "a94614ae",
-   "source": "models20/SUMMARY.md"
-  },
-  "models21/haiku": {
-   "commit": "ef3c1c67",
-   "source": "models21/haiku/SUMMARY.md"
-  },
-  "models21/prod": {
-   "commit": "ef3c1c67",
-   "source": "models21/prod/SUMMARY.md"
-  },
   "rerunA": {
    "commit": "7c21993",
    "source": "reports/rerunA.md"
-  },
-  "rerunB": {
-   "commit": null,
-   "source": null
-  },
-  "rerunC": {
-   "commit": null,
-   "source": null
   },
   "rerunD": {
    "commit": null,
@@ -360,8 +343,8 @@
    "source": "reports/round23B_handback.md"
   },
   "round23C": {
-   "commit": "574f4a30",
-   "source": "round23C/NOTES.txt"
+   "commit": null,
+   "source": null
   },
   "round23D": {
    "commit": "574f4a30",
@@ -401,19 +384,35 @@
   },
   "round26A": {
    "commit": "1f93c333",
-   "source": "round26A/defects.md"
+   "source": "reports/round26A_handback.md"
   },
   "round26B": {
    "commit": "1f93c333",
-   "source": "round26B/defects.md"
+   "source": "reports/round26B_handback.md"
   },
   "round26C": {
    "commit": "1f93c333",
-   "source": "round26C/defects.md"
+   "source": "reports/round26C_handback.md"
   },
   "round26D": {
    "commit": "1f93c333",
-   "source": "round26D/defects.md"
+   "source": "reports/round26D_handback.md"
+  },
+  "round27A": {
+   "commit": "253b357a",
+   "source": "reports/round27A_handback.md"
+  },
+  "round27B": {
+   "commit": null,
+   "source": null
+  },
+  "round27C": {
+   "commit": "253b357a",
+   "source": "reports/round27C_handback.md"
+  },
+  "round27D": {
+   "commit": "253b357a",
+   "source": "reports/round27D_handback.md"
   },
   "round3A": {
    "commit": null,
@@ -430,10 +429,6 @@
   "round3D": {
    "commit": null,
    "source": null
-  },
-  "round4A": {
-   "commit": "a5e54dc",
-   "source": "reports/round4A.md"
   },
   "round4B": {
    "commit": "a5e54dc",
@@ -535,19 +530,15 @@
    "commit": null,
    "source": null
   },
-  "runC": {
-   "commit": null,
-   "source": null
-  },
   "runD": {
    "commit": null,
    "source": null
   }
  },
  "counts": {
-  "bank_cases": 2046,
-  "blocks": 11020,
-  "exchanges_total": 5919,
+  "bank_cases": 2303,
+  "blocks": 12162,
+  "exchanges_total": 6511,
   "per_round": {
    "models20": {
     "by_author": {
@@ -724,6 +715,15 @@
     "with_page_outcome": 562,
     "with_turn_verdict": 519
    },
+   "round27": {
+    "by_author": {
+     "runner-simulated": 592
+    },
+    "exchanges": 592,
+    "with_full_request": 592,
+    "with_page_outcome": 592,
+    "with_turn_verdict": 354
+   },
    "round3": {
     "by_author": {
      "no-reply": 40,
@@ -792,21 +792,21 @@
    }
   },
   "scenarios": 50,
-  "system_prompts": 5
+  "system_prompts": 6
  },
  "generator": "scripts/tours/collect_dataset.py",
  "scenarios": {
-  "bytes": 1133596,
+  "bytes": 1169646,
   "path": "scenarios.jsonl.gz",
   "records": 50,
-  "sha256": "87912e5494730c8eb7a3f3ab32ea4a8f22d8c95903a87192325b82d0620f962d"
+  "sha256": "bd07ff8b3b24d567c2bfeaa1e888a4348f9db70bed678ea785592c70fee8fa5a"
  },
  "schema_version": 1,
  "shards": [
   {
    "bytes": 88755,
    "path": "exchanges/round3.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 50,
    "sha256": "1e55974238c8ae4e7fdf3e940cbd8fbcfed33c536956f22f20af94099e02c226",
    "sources": [
@@ -819,7 +819,7 @@
   {
    "bytes": 23175,
    "path": "exchanges/round4.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 58,
    "sha256": "d7dd26ffd3a23b94609f07942964407b35d9ba076c7f289791efd264f4608313",
    "sources": [
@@ -832,7 +832,7 @@
   {
    "bytes": 25418,
    "path": "exchanges/round5.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 57,
    "sha256": "6771b35d5a3047039634cc2ade637e59f33ba955ecf2361c27d908fc307bb59b",
    "sources": [
@@ -882,11 +882,11 @@
    ]
   },
   {
-   "bytes": 15195,
+   "bytes": 15143,
    "path": "exchanges/round9.jsonl.gz",
    "preserved": false,
    "records": 58,
-   "sha256": "a8e2a9dbbe29cdb2c57f59fe96f2173dbcce17b383ae76ab0669486b8c46e1c4",
+   "sha256": "73910f7dae70b0909dbf21823ffeeb78967cdd6ba6e885ce1fc4977b49cf0bd4",
    "sources": [
     "round9A",
     "round9B",
@@ -895,11 +895,11 @@
    ]
   },
   {
-   "bytes": 15192,
+   "bytes": 15145,
    "path": "exchanges/round10.jsonl.gz",
    "preserved": false,
    "records": 58,
-   "sha256": "a145b63463ed0ebf677eeeee6e9ec353c634ffd75b5a902bf1a69d3ae3921b79",
+   "sha256": "0a424208af6d1902caf9a37baaad329c0fa576a01a13cf1f689ea89e8080d97e",
    "sources": [
     "round10A",
     "round10B",
@@ -908,11 +908,11 @@
    ]
   },
   {
-   "bytes": 15665,
+   "bytes": 15619,
    "path": "exchanges/round11.jsonl.gz",
    "preserved": false,
    "records": 52,
-   "sha256": "4322407e17095c58c8b6532187d0ea1dfe897dd6915a145d5ed9aba55478cc6e",
+   "sha256": "e5a30a970bce271d5cd55c0f951474cf1df73e20c5580a961349721e1a9cab92",
    "sources": [
     "round11A",
     "round11B",
@@ -934,11 +934,11 @@
    ]
   },
   {
-   "bytes": 15232,
+   "bytes": 15191,
    "path": "exchanges/round13.jsonl.gz",
    "preserved": false,
    "records": 52,
-   "sha256": "5a814d82908aea9f9162b5216c7e7aff5634527277d07e955bffb4fb6773a4f5",
+   "sha256": "bf95b11c12947de8d3a36fa1f5e9135802b0b104470b45e7b2a7f5c4eb93fe14",
    "sources": [
     "round13A",
     "round13B",
@@ -949,7 +949,7 @@
   {
    "bytes": 134189,
    "path": "exchanges/round14.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 247,
    "sha256": "bc6a384b79bdafce3e9b3348863521d3ea753d60ecc9a942d25ba2f02a3b7ac3",
    "sources": [
@@ -962,7 +962,7 @@
   {
    "bytes": 132800,
    "path": "exchanges/round15.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 251,
    "sha256": "99a5cefa019aa061f107b7686dfcbbf8bb18306bb09d0f74c6c1945f09d23dca",
    "sources": [
@@ -975,7 +975,7 @@
   {
    "bytes": 141091,
    "path": "exchanges/round16.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 270,
    "sha256": "390acd2743f6ae71b07ef18f3b25f64be4376ab1caddeffbc8f0b40a37ada9b5",
    "sources": [
@@ -988,7 +988,7 @@
   {
    "bytes": 153889,
    "path": "exchanges/round17.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 257,
    "sha256": "f480657d0962c181c00218d4903fe750dd258a5d03cdcd27eeb88d0d2852657e",
    "sources": [
@@ -1001,7 +1001,7 @@
   {
    "bytes": 158606,
    "path": "exchanges/round18.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 267,
    "sha256": "ffc1c56084898cdbe6836bd7ec9e68e6f0657a89717db438606a1b87a1007275",
    "sources": [
@@ -1014,7 +1014,7 @@
   {
    "bytes": 181500,
    "path": "exchanges/round19.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 271,
    "sha256": "f50d50f2c8bf960e505bd3503f546d00b7e5efe9a7a1016213611a88e1188360",
    "sources": [
@@ -1027,7 +1027,7 @@
   {
    "bytes": 205603,
    "path": "exchanges/round20.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 324,
    "sha256": "b524182b2a0ac41596e80f61bb179de17b74f4146106c4ed241c656b6a01068a",
    "sources": [
@@ -1040,7 +1040,7 @@
   {
    "bytes": 89829,
    "path": "exchanges/models20.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 117,
    "sha256": "6a31f5ebf12e402bd88f5de5bf9e076eff464b80c4b3027e3517487bdc44a616",
    "sources": [
@@ -1051,7 +1051,7 @@
   {
    "bytes": 253294,
    "path": "exchanges/round21.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 380,
    "sha256": "6d9cc26a35f91eca3c0c162d23ec7c12a624a30d27530b71296bf2f26d08283a",
    "sources": [
@@ -1064,7 +1064,7 @@
   {
    "bytes": 96768,
    "path": "exchanges/models21.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 123,
    "sha256": "f624a8c84e37ef0c6bc1541e1af7de0ff981e345db74331d6a443fffe62be9c7",
    "sources": [
@@ -1075,7 +1075,7 @@
   {
    "bytes": 369239,
    "path": "exchanges/round22.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 565,
    "sha256": "95c7f28b0595751f2face2310c90cc0818ed2a9487e4a652a5757f17c9244d27",
    "sources": [
@@ -1088,7 +1088,7 @@
   {
    "bytes": 404834,
    "path": "exchanges/round23.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 575,
    "sha256": "388d6520dd77a7f7a3b1584f143f6af21f4a252a665329be0e727e10b8d3a00d",
    "sources": [
@@ -1101,7 +1101,7 @@
   {
    "bytes": 397473,
    "path": "exchanges/round24.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 565,
    "sha256": "793f2f9e2e8f5d4abe0cf8d41491429e0f037fc4b00da6fe7ae6c89799e9896a",
    "sources": [
@@ -1114,7 +1114,7 @@
   {
    "bytes": 414442,
    "path": "exchanges/round25.jsonl.gz",
-   "preserved": false,
+   "preserved": true,
    "records": 567,
    "sha256": "c324eecae0b054eb6b641743c74d2a4f067d00984579cc369153955b208263ff",
    "sources": [
@@ -1135,6 +1135,19 @@
     "round26B",
     "round26C",
     "round26D"
+   ]
+  },
+  {
+   "bytes": 482621,
+   "path": "exchanges/round27.jsonl.gz",
+   "preserved": false,
+   "records": 592,
+   "sha256": "b47dc00942ef7332b001d9fe0fc96c1a77db72c60cf08d611327bfbbcda27959",
+   "sources": [
+    "round27A",
+    "round27B",
+    "round27C",
+    "round27D"
    ]
   }
  ],
@@ -1494,8 +1507,8 @@
   },
   "eval_fraction": 0.2,
   "exchanges": {
-   "eval": 442,
-   "train": 1549
+   "eval": 557,
+   "train": 2026
   },
   "per_stratum": {
    "age_band": {
@@ -1565,44 +1578,45 @@
  },
  "system": [
   "system/7d160ab860be97fb7e1198c9.txt.gz",
+  "system/8bf4295f563ff860c5747699.txt.gz",
   "system/917f9c8f6d78f766b3ab756d.txt.gz",
   "system/b9778d55282eee0c87a1ff10.txt.gz",
   "system/d776d525fc331fee4faa359f.txt.gz",
   "system/eb1b24760d1655b2f07510c1.txt.gz"
  ],
- "total_bytes": 13692013,
+ "total_bytes": 15005880,
  "verdict_linking": {
   "by_kind": {
    "criterion": {
-    "items": 3779,
-    "linked": 553,
-    "with_turn_ref": 1731
+    "items": 3971,
+    "linked": 715,
+    "with_turn_ref": 1893
    },
    "defect": {
-    "items": 1770,
-    "linked": 224,
-    "with_turn_ref": 599
+    "items": 1826,
+    "linked": 259,
+    "with_turn_ref": 634
    },
    "need": {
-    "items": 1431,
-    "linked": 87,
-    "with_turn_ref": 204
+    "items": 1501,
+    "linked": 89,
+    "with_turn_ref": 206
    },
    "turn_note": {
-    "items": 1397,
-    "linked": 289,
-    "with_turn_ref": 421
+    "items": 1533,
+    "linked": 385,
+    "with_turn_ref": 517
    },
    "turn_row": {
-    "items": 1462,
-    "linked": 418,
-    "with_turn_ref": 1461
+    "items": 1597,
+    "linked": 553,
+    "with_turn_ref": 1596
    }
   },
-  "items": 9839,
-  "linked": 1571,
-  "ratio_linked": 0.1597,
-  "scenario_level": 8268,
-  "with_turn_ref": 4416
+  "items": 10428,
+  "linked": 2001,
+  "ratio_linked": 0.1919,
+  "scenario_level": 8427,
+  "with_turn_ref": 4846
  }
 }

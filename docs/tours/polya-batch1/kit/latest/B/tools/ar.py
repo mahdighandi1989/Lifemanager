@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ar.py sid : per prompt, the page arithmetic block lines and prior-ledger check lines (compact)"""
 import json,os,re,sys
-B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26B'
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27B'
 s=sys.argv[1]; D=f'{B}/{s}/ai'
 for n in sorted(int(f[1:-5]) for f in os.listdir(D) if re.match(r'p\d+\.json$',f)):
     u=json.load(open(f'{D}/p{n}.json'))['user']; j=u.rfind('# نوبتِ تازه'); out=[]

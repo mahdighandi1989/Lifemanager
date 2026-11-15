@@ -1,0 +1,1 @@
+{"shot": {"name": "mis103_dossier", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);return p})()"}}

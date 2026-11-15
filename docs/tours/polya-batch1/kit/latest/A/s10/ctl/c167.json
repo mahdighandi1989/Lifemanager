@@ -1,1 +1,1 @@
-{"shot":{"name":"dossier26_full_1","full":true}}
+{"eval": "JSON.stringify({t:APP.today(),dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,40),x.date]),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-1).map(m=>m.text.slice(0,250)),due:(APP.dueList()||[]).map(x=>x.txt).filter(x=>/📅|⏰/.test(x)),pl:(APP.ASSIST.cur().plans||[]).map(p=>[p.text&&p.text.slice(0,30),p.when,p.state])})"}

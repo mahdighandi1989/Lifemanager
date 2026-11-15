@@ -1,0 +1,1 @@
+{"eval": "(()=>{const x=APP.PRE.sysAll().find(x=>x.e.number==102);const c=x.e.checks||[];return c.slice(-3).map(c=>JSON.stringify(c).slice(0,700)).join(\" ¶ \")+\" ¶ STATE \"+JSON.stringify({st:x.e.state,how:x.e.how,ask:x.e.ask})})()"}

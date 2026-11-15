@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,300)),due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(x=>/🎯/.test(x)),fc:APP.S.all(\"fcast\",x=>x.created>\"2026-11-21\").map(x=>[(x.q||\"\").slice(0,20),x.verdict||x.res||x.out||x.outcome||x.v||null,x.updated])})"}

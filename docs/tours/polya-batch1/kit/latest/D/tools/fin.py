@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # fin.py sid — judging digest: page (sys) lines of the chat, dossier skeleton, route model summary, mind «از کجا», today
 import sys,json,glob,re,os
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26D/'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27D/'
 s=sys.argv[1]; D=R+s; num=lambda f:int(re.findall(r'\d+',os.path.basename(f))[0])
 L=int(os.environ.get('L','260'))
 seen=[]

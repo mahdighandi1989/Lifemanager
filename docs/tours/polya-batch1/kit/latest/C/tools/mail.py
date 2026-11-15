@@ -1,6 +1,6 @@
 # mail.py sid (stdin JSON: {"title","ok":bool,"result","story","moments":[[she,assistant,page]],"good":[],"bad":[[saw,why,should]],"next"}) -> <sid>/mail.html + mail.subject.txt
 import sys,json,html
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26C'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27C'
 sid=sys.argv[1]; p=json.loads(sys.stdin.read()); e=html.escape
 LINK='https://claude.ai/artifact/5YqS7HGgerCJwWmjomWJ4f'
 h=['<div dir="rtl" style="font-family:Tahoma,Vazirmatn,sans-serif;font-size:14px;line-height:1.9;text-align:right">']
@@ -16,5 +16,5 @@ else: h.append('<p><b>آنچه درست نبود:</b> در این سناریو �
 h.append('<p><b>بعدش:</b> %s</p>'%e(p.get('next','')))
 h.append('<p>تصویرنامهٔ گام‌به‌گام: <a href="%s">%s</a></p></div>'%(LINK,LINK))
 open(f'{R}/{sid}/mail.html','w').write('\n'.join(h))
-subj='🧭 پولیا · دورِ ۲۶ · %s · %s · %s'%(sid,p['title'],'✅' if p['ok'] else '⚠️')
+subj='🧭 پولیا · دورِ ۲۷ · %s · %s · %s'%(sid,p['title'],'✅' if p['ok'] else '⚠️')
 open(f'{R}/{sid}/mail.subject.txt','w').write(subj); print(subj); print(len('\n'.join(h)))

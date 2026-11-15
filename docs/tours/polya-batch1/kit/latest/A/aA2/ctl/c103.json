@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({t:APP.today(),pr:APP.PR.all().map(c=>({id:c.id,tid:c.tid,st:c.state||c.st,next:c.next||c.due,n:(c.sessions||c.log||[]).length,last:(c.sessions||c.log||[]).slice(-3).map(x=>[x.date||x.at,x.ok,x.pct])}))})"}

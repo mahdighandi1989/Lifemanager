@@ -1,1 +1,1 @@
-{"eval": "(()=>{document.querySelectorAll(\".lp-prior-no\")[3].click();return TT()+\" || \"+MT(\"کارِ پیشینِ تو —\",2200)})()"}
+{"eval": "(()=>{document.querySelectorAll(\".lp-prior-ok\")[1].click();return TT()})()"}

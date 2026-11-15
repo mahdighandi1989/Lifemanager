@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go('mind');return new Promise(r=>setTimeout(()=>{document.querySelectorAll('details').forEach(d=>d.open=true);r(document.querySelector('#main').innerText.replace(/\\n+/g,' | ').slice(0,200)+' ... '+(document.querySelector('#main').innerText.match(/چهار مرحل[^]{0,700}/)||[''])[0].replace(/\\n+/g,' | '))},900))})()"}

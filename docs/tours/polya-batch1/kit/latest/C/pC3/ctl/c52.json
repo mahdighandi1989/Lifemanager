@@ -1,1 +1,1 @@
-{"shot": {"name": "post_panel", "fold": false, "full": false, "js": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const b=document.querySelector('.as-body,.as-msgs');if(b)b.scrollTop=b.scrollHeight;return 'panel'})()"}}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()"}

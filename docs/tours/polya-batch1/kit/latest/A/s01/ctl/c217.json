@@ -1,1 +1,1 @@
-{"shot":{"name":"r26_arith_route","full":true}}
+{"eval": "(()=>{const b=[...document.querySelectorAll(\".as-panel button, .as-panel a\")].find(x=>/نقشهٔ مسیر/.test(x.textContent));if(!b)return \"NOBTN\";b.click();return \"ok\"})()"}

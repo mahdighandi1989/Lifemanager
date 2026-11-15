@@ -1,0 +1,1 @@
+{"eval": "(()=>{const p=APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id);APP.go(\"route\",p[p.length-1]);const t=document.getElementById(\"main\").innerText;return (t.match(/.{0,60}(چهارشنبه|پنجشنبه).{0,60}/g)||[]).join(\" ¦ \")})()"}

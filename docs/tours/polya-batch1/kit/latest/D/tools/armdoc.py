@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # armdoc.py — findings.md + mail.json for the short territory arms (evidence gathered with armf.py)
 import json,os
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26D/'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27D/'
 COMMON_RUN="بازپخشِ کنترل‌های round25D/{src} روی main 1f93c333، ساعتِ پایه ۲۶ مهر ۱۴۰۵. چهار نوبتِ آغازین (ایده ⇒ خواسته/داده/شرط ⇒ دو زیرمسئله ⇒ برگهٔ #۱۰۱ با gap.step) با همان پاسخ‌های مدلِ oD1u (نوشتهٔ همین دور) پاسخ داده شد. ساختِ قلمرو به راهِ واقعی: یادداشتِ «routine» زیرِ برگه در sheets/sh101.json{build} و بازکردنِ دوبارهٔ هارنس؛ هیچ درونِ صفحه دست‌کاری نشد."
 A=json.load(open(R+'arms.json'))
 for sid,a in A.items():

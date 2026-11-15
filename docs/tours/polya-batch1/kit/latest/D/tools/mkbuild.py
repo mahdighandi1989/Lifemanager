@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # mkbuild.py vN areaKey[,areaKey] — scratch copy of the page with extra territory areas in the registry (maps + ledger), built with the page's own build.py
 import sys,json,os,subprocess,shutil
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26D'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27D'
 LA=R+'/build/la/apps/learning-architecture'; ORIG='/home/user/Lifemanager/apps/learning-architecture'
 A={
  'change':{'id':'pr_change_detection','fa':'آشکارسازیِ تغییرِ ماندگار (پله) در دادهٔ نویزیِ حسگر','en':'Change-point (step) detection in noisy sensor data','desc_fa':'پنجرهٔ پایداری برای جدا کردنِ پلهٔ ماندگار از جهشِ گذرا، خط‌مبنای متحرک برای لغزش، و آستانه با سنجشِ هشدارِ نادرست','key_questions_fa':['این پله ماندگار است یا جهشِ گذرا؟']},

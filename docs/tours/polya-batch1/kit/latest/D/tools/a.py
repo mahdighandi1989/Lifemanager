@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # a.py sid < reply — answer the pending AI call (validates JSON), then continue the driver
 import sys,os,json,glob,re,subprocess
-B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26D'
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27D'
 s=sys.argv[1]; D=B+'/'+s; num=lambda f:int(re.findall(r'\d+',os.path.basename(f))[0])
 t=sys.stdin.read().strip()
 p=[num(f) for f in sorted(glob.glob(D+'/ai/p*.json'),key=num) if not os.path.exists(f'{D}/ai/r{num(f)}.txt')]

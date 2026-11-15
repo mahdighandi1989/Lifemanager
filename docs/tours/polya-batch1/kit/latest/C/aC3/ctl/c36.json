@@ -1,1 +1,1 @@
-{"shot": {"name": "route_c_end", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('route',p);return p})()"}}
+{"say": "حساب کردم: ۶ میلیون × ۱۰ = ۶۰ میلیون، داروی سه ماه ۲ میلیون × ۳ = ۶ میلیون، و ۲۰ درصدِ ۳۰۰ هزار = ۶۰ هزار. یه جا هم اشتباهی نوشتم ۲ میلیون × ۳ = ۶ هزار."}

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.S.all(\"eprob\",r=>r&&r.live&&r.p)[0].p.id;const pr=APP.STORY.priorFor(s,pid)||{};return JSON.stringify({sum:pr.sum,steps:(pr.steps||[]).map(x=>[x.n,x.verdict,(x.fixed?x.fixed.t:x.quote).slice(0,60),x.her||\"\",x.re?1:0])})})()"}
+{"say": "قبل از این‌که راهِ دیگه رو بگم، کلِ اثباتمو یه بار مرتب و از نو نوشتم که ببینی: گام ۱: لژاندر، توانِ ۲ در n! = [n/2] + [n/4] + … تا 2^K ≤ n. گام ۲: هر [n/2^k] ≤ n/2^k. گام ۳: جمعِ n/2 + … + n/2^K = n(1 − 1/2^K) < n. گام ۴: پس توان < n و 2^n عددِ n! را نمی‌شمارد."}

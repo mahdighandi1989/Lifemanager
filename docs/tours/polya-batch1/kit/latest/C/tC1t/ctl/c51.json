@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const s=await window.__sheetLoad('sh102');return s.status+' || '+s.notes.slice(-2).map(n=>n.by+': '+n.text).join(' ⟂ ')})()"}

@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=[...document.querySelectorAll(\".as-panel .as-msg, .as-panel [class*=msg]\")].slice(-4).map(e=>e.innerText.slice(0,400));return JSON.stringify(b)})()"}

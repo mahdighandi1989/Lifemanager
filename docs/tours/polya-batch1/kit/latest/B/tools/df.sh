@@ -1,6 +1,6 @@
 #!/bin/bash
 # df.sh sid [W] : compact new-vs-round25 prompt lines per turn (+ lines deduped across turns; - lines counted)
-B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26B; cd $B; s=$1
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27B; cd $B; s=$1
 for f in $(ls $s/ai/p*.json | sed 's/.*p\([0-9]*\).json/\1/' | sort -n); do
   W=2000 RL=0 python3 tools/show.py $s $f $(cat $s/src.txt) 2>/dev/null | grep -E "^=== |^\+ |^- |NO r2" 
 done | python3 -c "

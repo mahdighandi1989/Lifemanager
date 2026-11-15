@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const s=await window.__sheetLoad('sh102');return s?(s.status+' || '+s.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400)).join(' ⟂ ')):'NO SHEET'})()"}

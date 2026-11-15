@@ -1,1 +1,1 @@
-{"eval": "(()=>{document.querySelectorAll(\".lp-prior-ok\")[1].click();return TT()})()"}
+{"eval": "(()=>{document.querySelectorAll(\".lp-prior-ok\")[0].click();return TT()})()"}

@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({pr:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>[c.id,c.tid,(c.topic||\"\").slice(0,40)]),fc:(()=>{try{return APP.S.all(\"fcast\",x=>1).map(x=>[x.text||x.q,x.p||x.conf,x.due,x.verdict])}catch(e){return \"E\"+e}})(),due:(APP.dueList()||[]).map(x=>x.txt).slice(0,8)})"}

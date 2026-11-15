@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/venv/bin:$PATH
 cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/gatewt/apps/learning-architecture
 python /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/gatewt/apps/learning-architecture/build.py >/dev/null 2>&1 || echo BUILD_FAIL
 fail=0

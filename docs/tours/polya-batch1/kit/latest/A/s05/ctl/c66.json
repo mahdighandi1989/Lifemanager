@@ -1,1 +1,1 @@
-{"eval": "'skip c56 (round-21 inspection)'"}
+{"eval": "(()=>{APP.go('lprob','pb_l_mvaqm4myipr');const sel=document.querySelector('.prc-tsel');if(sel){sel.value='24';sel.dispatchEvent(new Event('change',{bubbles:true}));}const b=document.querySelector('.prc-start');if(b)b.click();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+' | '+FL().slice(0,900)})()"}

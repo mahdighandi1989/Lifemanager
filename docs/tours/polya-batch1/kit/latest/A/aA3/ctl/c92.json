@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({fc:APP.S.all(\"fcast\",x=>1).map(x=>[(x.q||\"\").slice(0,50),x.p,x.due,x.verdict||x.res||null]),preds:(APP.S.all(\"achat\",x=>x&&x.coach&&x.coach.preds).flatMap(s=>s.coach.preds.map(p=>[p.text.slice(0,40),p.p,p.due,p.out||null]))),dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,40),x.date])})"}

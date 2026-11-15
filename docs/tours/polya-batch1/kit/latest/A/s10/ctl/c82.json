@@ -1,1 +1,1 @@
-{"clock": "2026-10-29", "eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"}
+{"eval": "JSON.stringify({sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-3).map(m=>m.text.slice(0,220)),due:(APP.dueList()||[]).map(x=>x.txt).filter(x=>/📅|⏰/.test(x))})"}

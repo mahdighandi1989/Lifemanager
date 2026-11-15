@@ -1,6 +1,6 @@
 # dg.py sid N [full|page|blk:<header-substring>] -> minimal digest of prompt pN
 import sys,json,re,os
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26C'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27C'
 sid,n=sys.argv[1],sys.argv[2]; mode=sys.argv[3] if len(sys.argv)>3 else ''
 W=int(os.environ.get('W','300'))
 j=json.load(open(f'{R}/{sid}/ai/p{n}.json')); u=j['user']

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();let o={};try{const sc=APP.PRE.scope(s);o.stack=APP.PRE.all(sc);o.rec=APP.PRE.rec(sc)}catch(e){o.err=String(e)}try{o.causes=APP.MIND.phases().causes;o.pre=APP.MIND.phases().prereq}catch(e){o.merr=String(e)}return JSON.stringify(o).slice(0,4000)})()"}
+{"say": "همین بسه — مسئله‌ی جعبه‌قرص برای من حل شد: می‌دونم ترازو کافیه، پیام با تلگرام میره، و وزنِ هر خونه تازه‌ست. ببندش."}

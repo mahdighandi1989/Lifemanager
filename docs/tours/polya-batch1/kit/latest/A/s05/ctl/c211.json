@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({t:APP.today(),fc:APP.S.all(\"fcast\",x=>!x.verdict&&!x.out).map(x=>[x.id,(x.q||\"\").slice(0,70),x.p,x.due,x.verdict]),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,300)),due:(APP.dueList()||[]).map(x=>x.txt).filter(x=>/🎯|📅/.test(x))})"}

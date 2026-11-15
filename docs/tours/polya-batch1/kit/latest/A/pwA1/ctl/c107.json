@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify((()=>{const s=APP.ASSIST.cur();const pr=APP.STORY.priorFor(s,null);return {sum:pr&&pr.sum,steps:pr&&pr.steps.map(x=>[x.n||\"\",(x.v||x.verdict),(x.quote||x.q||\"\").slice(0,40),x.hist?x.hist.length:0])}})())"}

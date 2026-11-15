@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,2500)),1200))})()"}

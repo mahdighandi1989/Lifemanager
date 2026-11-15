@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"route\",\"pb_l_mvggdbppzua\");const t=document.getElementById(\"main\").innerText;return ((t.match(/.{0,50}(چهارشنبه|پنجشنبه).{0,50}/g))||[\"none\"]).join(\" ¦ \")})()"}

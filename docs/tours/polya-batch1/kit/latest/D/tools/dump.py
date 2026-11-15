@@ -1,18 +1,16 @@
-# dump.py sid [tagfilter] — per plan item: tag + eval summary + new msgs since previous item
-import json,sys,re,os
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26D/'
-s=sys.argv[1]; flt=sys.argv[2] if len(sys.argv)>2 else None
-P=json.load(open(R+s+'.plan.json')); prev=[]
-for i,x in enumerate(P,1):
-    f=f'{R}{s}/out/s{i}.json'
-    if not os.path.exists(f): break
-    r=json.load(open(f)); m=r.get('state',{}).get('msgs',[])
-    tag=x.get('tag') or ('src%d'%x['src'] if 'src' in x else 'EXIT')
-    new=[y for y in m if y not in prev][-6:]; prev=m
-    if flt and not re.search(flt,tag): continue
-    e=str(r.get('eval') or '')
-    if e.startswith('{"today"'):
-        o=json.loads(e); e='REC today=%s dl=%s prc=%s lists=%s mind=%s'%(o.get('today'),o.get('dl'),[ (c.get('tid'),c.get('state'),c.get('due'),c.get('sess'),c.get('stable')) if isinstance(c,dict) else c for c in (o.get('prc') or [])],o.get('lists'),o.get('mind'))
-    print(f'[{i}] {tag}: {e[:int(os.environ.get("EL","600"))]}')
-    for y in new:
-        if not y.startswith('user:') or os.environ.get('U'): print('    ',y[:int(os.environ.get("ML","400"))])
+#!/usr/bin/env python3
+# dump.py sid — print the end-of-run probe (route points + dossier per id + today), compacted
+import json,sys,re,glob,os
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27D'
+s=sys.argv[1]; W=int(os.environ.get('W','20000'))
+for f in sorted(glob.glob(f'{B}/{s}/out/s*.json'),key=lambda x:int(re.findall(r'\d+',x.split('/')[-1])[0])):
+    r=json.load(open(f)); e=r.get('eval','')
+    if isinstance(e,str) and e.startswith('{"ids"'):
+        o=json.loads(e); break
+else: print('no dump'); sys.exit()
+for i in o['ids']:
+    v=o['route'].get(i); print('### ROUTE',i, (v.get('dest','')[:100] if isinstance(v,dict) else v))
+    if isinstance(v,dict): print('   ', ' | '.join(p[1] for p in v['pts']))
+    d=o['dossier'].get(i,''); d=re.sub(r'از پیامِ گفت‌وگو: «[^»]*»','«…»',d); d=re.sub(r'\n+','\n',d)
+    k=d.find('📜 پروندهٔ کامل'); print('### DOSSIER',i); print(d[k:k+W])
+print('### TODAY'); t=o['today']; k=t.find('کارهای موعددار'); print(t[k:k+1500])

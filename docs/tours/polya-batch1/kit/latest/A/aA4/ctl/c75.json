@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval": "JSON.stringify({t:APP.today(),fc:APP.S.all(\"fcast\",x=>1).map(x=>[(x.q||\"\").slice(0,50),x.p,x.due,x.outcome||null]),due:(APP.dueList()||[]).map(x=>x.txt.slice(0,120))})"}

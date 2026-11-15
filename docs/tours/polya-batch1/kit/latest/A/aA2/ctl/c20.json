@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"practice\",\"prc_mvb7v2lj1fl6o\");const m=document.getElementById(\"main\");return m.innerText.slice(0,2500)+\"\\nINPUTS:\"+[...m.querySelectorAll(\"input,textarea,select,button\")].map(e=>(e.id||\"\")+\"/\"+(e.getAttribute(\"aria-label\")||e.placeholder||e.innerText||\"\").slice(0,40)).join(\" | \")})()"}
+{"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))"}

@@ -1,6 +1,6 @@
 import gzip, json, os, glob, collections
 R='/home/user/Lifemanager/docs/tours/dataset'
-B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26B/_src25'
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27B/_src25'
 blocks={}
 for f in glob.glob(R+'/blocks/*.jsonl.gz'):
     for l in gzip.open(f,'rt'):

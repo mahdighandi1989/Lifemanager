@@ -2,7 +2,7 @@
 # subst.py OLDP NEWP < reply > reply' — map record ids from old prompt to new prompt by first-appearance order;
 # round 23: also map field keys kN by their «label» in the prompt's field list ("- kN | type | «label» | …")
 import sys,re,json
-P=r'(?:pb_l_|achat_|case_|lp_)[a-z0-9]+'
+P=r'(?:pb_l_|achat_|case_|lp_|it[0-9]_)[a-z0-9]+'
 def txt(f):
     d=json.load(open(f)); return d.get('sys','')+'\n'+d.get('user','')
 def ids(t):
@@ -22,7 +22,7 @@ try:
     ta,tb=txt(sys.argv[1]),txt(sys.argv[2])
     a,b=ids(ta),ids(tb)
     mp={}
-    for kind in ('pb_l_','achat_','case_','lp_'):
+    for kind in ('pb_l_','achat_','case_','lp_','it1_','it2_','it3_'):
         A=[x for x in a if x.startswith(kind)]; Bb=[x for x in b if x.startswith(kind)]
         for x,y in zip(A,Bb):
             if x!=y: mp[x]=y

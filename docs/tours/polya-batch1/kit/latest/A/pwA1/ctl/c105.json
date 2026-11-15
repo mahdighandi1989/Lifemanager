@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;return (t.match(/[^\\n]*(گامِ کارِ پیشین|گامِ درست)[^\\n]*/g)||[]).join(\"\\n\")})()"}

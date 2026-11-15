@@ -1,0 +1,1 @@
+{"eval": "(async()=>{await new Promise(r=>setTimeout(r,125000));APP.go('home');await new Promise(r=>setTimeout(r,4000));APP.go('home');await new Promise(r=>setTimeout(r,3000));return 'swept'})()"}

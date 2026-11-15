@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const t=document.getElementById('main').innerText;const i=t.indexOf('بازنگری',t.indexOf('ثبتِ طرح'));return t.slice(i-200,i+2500)+' :: TOAST '+[...document.querySelectorAll('.toast,.snack,[role=alert]')].map(x=>x.textContent).join('|')})()"}

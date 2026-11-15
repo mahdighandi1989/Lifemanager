@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({t:APP.today(),due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(x=>/🎯|پیش/.test(x))})"}

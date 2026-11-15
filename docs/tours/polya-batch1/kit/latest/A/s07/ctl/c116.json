@@ -1,1 +1,1 @@
-{"shot": {"name": "part_today_lists_2026-12-01", "full": true}}
+{"clock": "2026-12-01", "eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).filter(t=>/🧪|فهرست|قفسه|پوشه|سیگنال|ادعا|مدل/.test(t)).join(' || ')})()"}

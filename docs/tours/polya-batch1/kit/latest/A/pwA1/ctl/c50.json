@@ -1,1 +1,1 @@
-{"eval": "(()=>{return FL().split(\"\\n\").slice(0,25).join(\"\\n\")+\"\\n---\\n\"+[...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|گام|بازنگری|✅|ثبت|طرح/.test(x)).join(\"\\n\")})()"}
+{"eval": "(()=>{F(\"lpWhy\",\"برای مرحلهٔ دومِ المپیاد تمرین می‌کنم و می‌خوام اثبات‌نویسی‌ام دقیق بشه\");const r=CT(\"ثبتِ فهم\");return r+\" | \"+TT()})()"}

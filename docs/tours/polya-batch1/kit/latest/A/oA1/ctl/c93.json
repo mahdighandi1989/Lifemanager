@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"today\");const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.textContent.trim().slice(0,30));return JSON.stringify([...new Set(b)].slice(0,60))})()"}

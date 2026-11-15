@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\").slice(0,120)),pr:APP.PR.all().map(c=>JSON.stringify(c).slice(0,600))})"}

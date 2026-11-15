@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();let o={};try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;o.pid=b&&b.pid;o.prior=APP.STORY.priorFor(s,o.pid||'')}catch(e){o.err=String(e)}try{o.tq=APP.STORY.priorTurnQ?APP.STORY.priorTurnQ(s,o.pid||''):null}catch(e){o.tqerr=String(e)}return JSON.stringify(o).slice(0,5000)})()"}
+{"say": "دو سه تا حسابِ دیگه هم کردم: لوله‌ی رانش ۴ تکه‌ی ۳ متری = ۱۲ متر. کابلِ برق ۲ تکه‌ی ۷ متری = ۱۵ متر. انرژی با ۱۸ متر: ۲۰۰۰ × ۹٫۸۱ × ۱۸ = ۳۵۳ هزار ژول، و ۳۵۳۱۶۰ ÷ ۴۸ = ۷۳۵۸ ثانیه، حدودِ ۱۲۳ دقیقه."}

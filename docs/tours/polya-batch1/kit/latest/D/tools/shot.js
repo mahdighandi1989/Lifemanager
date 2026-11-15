@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const path=require('path'),fs=require('fs');
 (async()=>{const [D,name,js]=process.argv.slice(2);
-const ctx=await chromium.launchPersistentContext((process.env.PROF||path.join(D,'profile_D26')),{viewport:{width:1360,height:900}});
+const ctx=await chromium.launchPersistentContext((process.env.PROF||path.join(D,'profile_D27')),{viewport:{width:1360,height:900}});
 const p=ctx.pages()[0]||await ctx.newPage(); await p.route('**/fonts.googleapis.com/**',r=>r.abort());
 await p.goto(process.env.LLA_HTML||'file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'); await p.waitForSelector('.nav');
 try{const inj=path.join(D,'inject.js'); if(fs.existsSync(inj)) await p.evaluate(fs.readFileSync(inj,'utf8'));}catch(e){}

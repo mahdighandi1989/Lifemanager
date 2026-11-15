@@ -1,6 +1,6 @@
 # add.py sid  (stdin: JSON list of items; item = {"say":..}|{"eval":..}|{"shot":name|{..}}|"exit"|"restore"|{"sheet":[id,text]}|{"clock":"YYYY-MM-DD"}|{"view":[v,arg]}) -> append ctls to src/<sid>/ctl
 import sys,json,glob,os
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26C'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27C'
 sid=sys.argv[1]; D=f'{R}/src/{sid}/ctl'
 HELP=json.load(open(f'{R}/src/s21/ctl/c23.json'))['eval0']
 PID="(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id))"

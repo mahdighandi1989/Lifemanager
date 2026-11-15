@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,1500)),900))})()"}
+{"say": "نوشتم «جمعهٔ بعد» و یه بار هم فقط گفتم «باشه» — هر دوش ثبت شد؟ کجا می‌بینمش؟"}

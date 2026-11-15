@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({t:APP.today(),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-1).map(m=>m.text.slice(0,350)),c:APP.PR.all().map(c=>({st:c.state,next:c.next,n:(c.sessions||[]).length})),due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\").slice(0,160)).filter(x=>/🧪|تمرین/.test(x))})"}

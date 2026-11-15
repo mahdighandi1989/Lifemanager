@@ -1,6 +1,6 @@
 # ins.py sid after_index (stdin items as add.py) -> insert ctls after src index, shifting later ones
 import sys,json,glob,os,subprocess,shutil
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26C'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27C'
 sid=sys.argv[1]; k=int(sys.argv[2]); D=f'{R}/src/{sid}/ctl'
 n=len(glob.glob(D+'/c*.json'))
 tmp=D+'_tail'; os.makedirs(tmp,exist_ok=True)

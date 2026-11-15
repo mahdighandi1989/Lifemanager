@@ -1,5 +1,5 @@
 import json,sys,os,re
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26A'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27A'
 s=sys.argv[1]; D=f'{R}/{s}/ai'; a=int(sys.argv[2]) if len(sys.argv)>2 else 1; b=int(sys.argv[3]) if len(sys.argv)>3 else 999
 HE=("# کارِ پیشین","# حسابِ صفحه","# دو مسئله","# اصلاحی که صفحه","# نتیجهٔ صفحه","# تاریخِ خودش","# بستنِ مسئله")
 ns=sorted(int(m.group(1)) for f in os.listdir(D) for m in [re.match(r'p(\d+)\.json',f)] if m)

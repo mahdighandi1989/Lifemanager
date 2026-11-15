@@ -1,6 +1,6 @@
 # v.py SID [N] [extra-head-substr ...] : compact view of prompt N (default: pending/last)
 import json,re,sys,os
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26A'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27A'
 s=sys.argv[1]; D=f'{R}/{s}/ai'
 ns=sorted(int(m.group(1)) for f in os.listdir(D) for m in [re.match(r'p(\d+)\.json',f)] if m)
 n=int(sys.argv[2]) if len(sys.argv)>2 and sys.argv[2].isdigit() else ns[-1]

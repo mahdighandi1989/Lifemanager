@@ -1,6 +1,6 @@
 #!/bin/bash
 # co.sh SID : continue replay from pos (no pending prompt); show next prompt or END
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26A
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27A
 L=$(wc -l < $R/$1/auto.log)
 python3 -u $R/tools/auto3.py $1 >> $R/$1/auto.log 2>&1; echo "EXIT $?" >> $R/$1/auto.log
 tail -n +$((L+1)) $R/$1/auto.log | grep "^c[0-9]*: \|cannot map\|^END\|STOPCTL" | cut -c1-${CW:-170} | tail -${CT:-6}

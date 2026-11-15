@@ -1,0 +1,1 @@
+{"eval": "(async()=>{APP.go('mind');await new Promise(r=>setTimeout(r,1200));document.querySelectorAll('details').forEach(d=>d.open=true);const t=document.getElementById('main').innerText;const i=t.indexOf('\u0686\u0647\u0627\u0631 \u0645\u0631\u062d\u0644\u0647\u0654 \u062d\u0644');return t.slice(i,i+1800)})()"}

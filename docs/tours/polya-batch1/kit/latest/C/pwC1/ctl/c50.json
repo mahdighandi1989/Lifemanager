@@ -1,1 +1,1 @@
-{"shot": {"name": "x_forms_prior", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);return 1})()"}}
+{"say": "یه گزارشِ سوم از کارِ خودم: گامِ ۷ — افتِ فشارِ لوله رو از جدولِ سازنده درآوردم، حدودِ ۱۲ متره؛ پس ارتفاعِ کلِ پمپاژ ۴۰ + ۱۲ = ۵۲ متر. گامِ ۸ — پر شدنِ مخزن: ۲۵۰ ÷ ۱۵٫۶ ≈ ۱۶ ساعت."}

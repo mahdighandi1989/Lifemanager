@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.S.all(\"eprob\",r=>r&&r.live&&r.p)[0].p.id;const pr=APP.STORY.priorFor(s,pid)||{};const x=pr.steps[1];return JSON.stringify({sum:pr.sum,s2:{v:x.verdict,her:x.her,hist:x.herHist,re:x.re}})})()"}
+{"say": "ببخشید، اشتباهی گفتم؛ منظورم گامِ ۲ نبود. همون حکمت درست بود."}

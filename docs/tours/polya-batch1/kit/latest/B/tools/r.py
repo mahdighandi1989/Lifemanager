@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """r.py sid  (stdin: lines R:/M:/T:/P:/S:/G:/A:) -> a/<sid>_cur.json ; then caller runs q.sh"""
 import sys,json,os
-B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26B'
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27B'
 s=sys.argv[1]; d={}; cur=None
 for l in sys.stdin.read().split('\n'):
     if l[:2] in ('R:','M:','T:','P:','S:','G:','A:','O:','C:','N:'): cur=l[0]; d[cur]=l[2:].strip()

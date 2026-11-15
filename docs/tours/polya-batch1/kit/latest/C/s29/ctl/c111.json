@@ -1,1 +1,1 @@
-{"shot": {"name": "fin_dossier", "full": true, "js": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);APP.go('dossier',p);return p})()"}}
+{"say": "یه سؤال: وقتی صفحه پرسید «این‌جا هم عوض شود؟»، عددهای داخلِ متنِ پیشنهادی رو هم از نو حساب کرد؟ و اون «۴۰ متر از درِ ورودی» که برای حوض گفتم که ربطی به لبه نداره، دست‌نخورده موند؟"}

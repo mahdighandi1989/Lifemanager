@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;return (t.match(/.{0,80}(تمرین بازیابی|T41|۴۱).{0,200}/g)||[]).slice(0,4).join(\" ¦ \")})()"}

@@ -1,6 +1,6 @@
 # run.py sid [maxsteps] -> feed src ctls until an AI request is pending (prints digest) or ctls end.
 import sys, os, json, time, glob, re, subprocess
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26C'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27C'
 sid=sys.argv[1]; D=f'{R}/{sid}'; W=int(os.environ.get('W','500')); OW=int(os.environ.get('OW','110')); QUIETOUT=os.environ.get('QO','1')=='1'
 lim=int(sys.argv[2]) if len(sys.argv)>2 else 9999
 stf=D+'/drv.json'
@@ -9,7 +9,7 @@ def save(): json.dump(S,open(stf,'w'))
 def alive():
     try:
         pid=int(open(D+'/harness.pid').read()); os.kill(pid,0)
-        return 'h26c' in open('/proc/%d/cmdline'%pid).read()
+        return 'h27c' in open('/proc/%d/cmdline'%pid).read()
     except Exception: return False
 def start():
     subprocess.run(['bash',R+'/tools/start.sh',sid],stdout=subprocess.DEVNULL); time.sleep(7)
@@ -25,8 +25,35 @@ while True:
     if p:
         mf=f'{R}/man/{sid}/r{p}.txt'; tf=f'{R}/man/{sid}/t{p}.txt'
         tn=json.load(open(D+'/ai/p%d.json'%p))['user'].split('# نوبتِ تازه')[-1].strip()
-        if os.path.exists(mf) and os.path.exists(tf) and open(tf).read()==tn:
-            open(D+'/ai/r%d.txt'%p,'w').write(open(mf).read()); print('  (auto r%d)'%p); time.sleep(0.5); continue
+        same=True
+        try:
+            o26=json.load(open(f'{R}/../round26C/{sid}/ai/p{p}.json'))['user']; n27=json.load(open(D+'/ai/p%d.json'%p))['user']
+            def keyb(u):
+                out=[]
+                for pt in re.split(r'(?m)^(?=# )',u):
+                    h=pt.split(chr(10),1)[0]
+                    if h.startswith('# حساب'): out.append(pt.strip())
+                    if h.startswith('# کارِ پیشینِ تو (حکم'): out+= [l for l in pt.split(chr(10)) if 'کارِ پیشینِ تو:' in l]
+                return out
+            if keyb(o26)!=keyb(n27) and not os.path.exists(f'{R}/man/{sid}/ok{p}'):
+                oldr=open(mf).read() if os.path.exists(mf) else ''
+                newb=' '.join(keyb(n27)); oldb=' '.join(keyb(o26))
+                risky=any(k in oldr for k in ('نمی‌خواند','نادرست','غلط','اشتباه')) or ('✗' in newb) or ('✗' in oldb) or ('؟ «' in newb)
+                if risky: same=False; print('  !! arith/prior block changed at p%d'%p)
+                else: print('  (block changed p%d, auto-accepted)'%p)
+        except Exception as e: pass
+        so=json.load(open(D+'/ai/p%d.json'%p)).get('sys','').startswith('تو مشاورِ ارشدِ ارجاع')
+        if same and os.path.exists(mf) and os.path.exists(tf) and (open(tf).read()==tn or (so and open(mf).read().startswith('{"agree"'))):
+            rep=open(mf).read()
+            try:
+                u27=json.load(open(D+'/ai/p%d.json'%p))['user']
+                cases=re.findall(r'(?m)^- (prc_[a-z0-9]+): تکنیکِ (\d+)',u27)
+                for old_id in set(re.findall(r'prc_[a-z0-9]+',rep)):
+                    if cases and old_id not in [c[0] for c in cases]:
+                        pick=[c[0] for c in cases if c[1]=='41'] or [cases[0][0]]
+                        rep=rep.replace(old_id,pick[0]); print('  (prc %s -> %s)'%(old_id,pick[0]))
+            except Exception as e: print('prcmap err',e)
+            open(D+'/ai/r%d.txt'%p,'w').write(rep); print('  (auto r%d)'%p); time.sleep(0.5); continue
         subprocess.run(['python3',R+'/tools/dg.py',sid,str(p)]); break
     w=S['wait']
     if w:

@@ -1,1 +1,1 @@
-{"say": "همین امروز."}
+{"eval": "APP.today()+\" \"+new Date().toString().slice(0,15)"}

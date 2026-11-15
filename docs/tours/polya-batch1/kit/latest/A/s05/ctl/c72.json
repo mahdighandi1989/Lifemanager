@@ -1,1 +1,1 @@
-{"shot": {"name": "part_t24_persian_date", "sel": ".prc-t24"}}
+{"eval": "JSON.stringify({nd:APP.PR.t24NoDate(APP.S.get('ex_mvqgpqzz2kkle')),warn:(document.querySelector('.prc-t24')||{}).innerText||'none'})"}

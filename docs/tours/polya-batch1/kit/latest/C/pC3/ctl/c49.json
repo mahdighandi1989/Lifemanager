@@ -1,1 +1,1 @@
-{"shot": {"name": "post_sessdossier", "full": true, "js": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return s.id})()"}}
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1200);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2500)})()"}

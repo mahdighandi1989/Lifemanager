@@ -1,1 +1,1 @@
-{"shot": {"name": "x_mind_end", "full": true}}
+{"eval": "(()=>document.querySelector('#main').innerText.slice(0,2500))()"}

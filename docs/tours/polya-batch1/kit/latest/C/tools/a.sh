@@ -1,6 +1,6 @@
 #!/bin/bash
 # a.sh sid N  (stdin = reply JSON) -> validate, write rN, continue driving
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26C
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27C
 cd $R; python3 -c "
 import sys,json
 t=sys.stdin.read().strip(); d=json.loads(t); assert 'reply' in d

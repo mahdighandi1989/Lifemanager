@@ -1,1 +1,1 @@
-{"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"}
+{"eval": "JSON.stringify({dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what,x.date]),sys:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.role==\"sys\"&&/📅/.test(m.text)).map(m=>m.text.slice(0,200)))})"}

@@ -1,6 +1,6 @@
 #!/bin/bash
 # arm.sh SID NUM AT TAG 'note text' : routine note + sweep, compact print
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26A
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27A
 python3 $R/tools/note.py $1 $2 $3 "$5"
 bash $R/tools/sweep.sh $1 $4 > $R/$1/arm_$4.txt 2>&1
 python3 - $R/$1/arm_$4.txt <<'P'

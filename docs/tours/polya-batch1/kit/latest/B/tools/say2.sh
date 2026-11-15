@@ -1,6 +1,6 @@
 #!/bin/bash
 # say2.sh sid textfile [advdays] : insert a say ctl at the current position, run it until the model is needed, show the prompt
-B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26B; cd $B; s=$1
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27B; cd $B; s=$1
 python3 -c "
 import json,sys
 d={'say':open(sys.argv[1]).read().strip()}

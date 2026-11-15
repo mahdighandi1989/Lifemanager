@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"mind\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"کارِ تکنیک\");return t.slice(i,i+700)})()"}

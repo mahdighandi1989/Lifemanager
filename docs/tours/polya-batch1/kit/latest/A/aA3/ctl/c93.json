@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({f:APP.S.all(\"fcast\",x=>1).map(x=>JSON.stringify(x).slice(0,500)),due:(APP.dueList()||[]).map(x=>x.txt).filter(x=>/🎯|📅/.test(x)),t:APP.today()})"}

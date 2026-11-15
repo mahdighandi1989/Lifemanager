@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const L=await window.__sheetList();return JSON.stringify(L.map(s=>s.id+' '+s.status+' '+s.title))})()"}

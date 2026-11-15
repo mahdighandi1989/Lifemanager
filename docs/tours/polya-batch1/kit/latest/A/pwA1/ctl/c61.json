@@ -1,1 +1,1 @@
-{"say": "از راهِ دیگه: حدس می‌زنم توانِ ۲ در n! دقیقاً برابرِ n منهای تعدادِ یک‌های n در مبنای ۲ باشه. برای n=6: ۶ = 110 دو تا یک، ۶ − ۲ = ۴، و 6! = 720 = 16 × 45، پس توان ۴ ✓. برای n=5: 101 دو تا یک، ۳؛ و 5! = 120 = 8 × 15 ✓. اگه درست باشه، چون n دست‌کم یه یک داره، توان ≤ n − 1 < n."}
+{"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.S.all(\"eprob\",r=>r&&r.live&&r.p)[0].p.id;const pr=APP.STORY.priorFor(s,pid)||{};const x=pr.steps[1];return JSON.stringify({sum:pr.sum,s2:{v:x.verdict,her:x.her,hist:x.herHist,re:x.re}})})()"}

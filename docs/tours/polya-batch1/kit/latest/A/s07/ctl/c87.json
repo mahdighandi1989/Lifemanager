@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,n:s.msgs.length,m:s.msgs.slice(0,3).map(m=>[APP.ASSIST.msgId(m),m.role,m.text.slice(0,60),!!m.pts])})))"}
+{"shot": {"name": "part_t24_page_judged", "full": true}}

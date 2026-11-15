@@ -1,5 +1,5 @@
 import sys,ast,os,json
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26A'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27A'
 l=sys.stdin.read().strip()[len('NEWHEADS: '):]
 h=ast.literal_eval(l)
 OK=['# حسابِ صفحه روی همین پیام','# نتیجهٔ صفحه از نوبتِ پیش','# پرونده‌های تمرینِ باز','# مرحلهٔ خطا از حرفِ خودش','# برنامه‌های بازِ خودش (شناسه‌ها)','# برنامه‌های بازِ خودش','# فهرست‌های جاری','# پیام‌های اخیرِ صفحه','# اصلاحِ پیامِ پیشین (شاید)','# فرمول (زمینه','# 🧭 نقشهٔ مسیرِ همین مسئله','# سنجشِ استاندارد','# ضمیرِ گفت‌وگو','# تاریخِ خودش']

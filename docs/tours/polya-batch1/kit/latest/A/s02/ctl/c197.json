@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what,x.date]),due:(APP.dueList()||[]).map(x=>x.txt).slice(0,6),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-3).map(m=>m.text.slice(0,200)),today:APP.today()})"}

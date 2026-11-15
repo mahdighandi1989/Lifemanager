@@ -1,0 +1,1 @@
+{"eval": "(async()=>{APP.ASSIST.toggle(false);APP.go('route',window.__pids[0]);await new Promise(r=>setTimeout(r,1500));return 'route'})()"}

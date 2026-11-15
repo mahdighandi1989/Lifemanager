@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify(REC ? JSON.parse(REC()).probs.map(p=>p.stmt&&p.stmt.slice(0,200)):0)"}

@@ -1,6 +1,6 @@
 #!/bin/bash
 # fa.sh SID : findings body from stdin + auto sections (routing, mind, route, scan); writes findings.md, RESULT.txt
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26A; S=$1; cd $R
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27A; S=$1; cd $R
 cat > $S/findings.md
 RT=$(python3 tools/route25.py $S | head -1); SC=$(python3 tools/scan7.py $S | tail -1)
 {

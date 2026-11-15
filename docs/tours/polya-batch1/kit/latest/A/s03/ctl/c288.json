@@ -1,1 +1,1 @@
-{"shot":{"name":"part_mind26_from","full":true}}
+{"eval": "(()=>{APP.go('dossier','achat_mvaqlthfj2ti9');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"}

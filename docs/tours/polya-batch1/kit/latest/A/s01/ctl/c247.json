@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({m:APP.ASSIST.cur().msgs.slice(-3).map(m=>m.role+\": \"+(m.text||\"\").slice(0,250)),pd:(()=>{const s=APP.ASSIST.cur();return JSON.stringify(s.preds||s.pred25||s.PD||Object.keys(s).filter(k=>/pred|fc/i.test(k)))})()})"}

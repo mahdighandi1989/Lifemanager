@@ -1,5 +1,5 @@
 import json,sys
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round26A'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round27A'
 u=json.load(open(f'{R}/{sys.argv[1]}/ai/p{sys.argv[2]}.json'))['user']
 i=u.find('{"changed"')
 if i<0: print('no result json'); sys.exit()

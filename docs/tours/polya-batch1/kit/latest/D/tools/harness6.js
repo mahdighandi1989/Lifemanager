@@ -7,7 +7,7 @@ const D = process.argv[2];
 ['ai', 'ctl', 'out', 'sheets', 'mail', 'profile', 'drive', 'drive/files'].forEach(d => fs.mkdirSync(path.join(D, d), { recursive: true }));
 const wait = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
-  const ctx = await chromium.launchPersistentContext((process.env.PROF||path.join(D,'profile_D26')), { viewport: { width: 1360, height: 900 } });
+  const ctx = await chromium.launchPersistentContext((process.env.PROF||path.join(D,'profile_D27')), { viewport: { width: 1360, height: 900 } });
   const p = ctx.pages()[0] || await ctx.newPage();
   const log = []; p.on('pageerror', e => log.push('pageerror: ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) log.push('console: ' + m.text()); });
   let n = fs.readdirSync(path.join(D, 'ai')).filter(f => /^p\d+\.json$/.test(f)).length;

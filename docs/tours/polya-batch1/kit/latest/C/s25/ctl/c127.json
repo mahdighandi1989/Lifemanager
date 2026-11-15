@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,1300)),900))})()"}
+{"say": "و اینا: ۱ + ۲ + … + ۲۰ = ۲۱۰، ۲۰ درصدِ ۳۰۰ = ۶۰، مساحتِ دایره با شعاعِ ۲ میشه π × ۲² ≈ ۱۲٫۵۷. اینا رو هم نوه‌م نوشته: ۱ + ۲ + … + ۱۰ = ۵۰ و ۲۰ درصدِ ۳۰۰ = ۶۶."}
