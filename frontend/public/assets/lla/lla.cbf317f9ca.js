@@ -50292,7 +50292,7 @@ APP.goFromURL = function (q) {
       ops.forEach(function (o) { o.u27 = r.res.u; }); });
       rc.O.forEach(function (o) { if (o.u || o.u27 || o.word || o.struct) return; var pv = rc.O.filter(function (q) { return q !== o && q.s < o.s && q.sent === o.sent && q.u && UFAC[q.u] && veq(q.v, o.v); }).pop(); if (pv) o.u27 = pv.u; }); });
     /* … و بزرگیِ عدد («۴ میلیون») بخشی از مقدار است: عددِ با «هزار/میلیون/میلیارد» همان داده‌ای نیست که بی آن آمده («۴ نفریم» ⇐ «۵»؛ بانکِ R27 #70) */
-    var MAGRE27 = /^[\s\u200c]*(?:هزار|میلیون|میلیارد|میلیار)(?![\u0621-\u06cc])/, dTxt27 = String(opt.clause || "") + " " + numParts0(D).map(function (p) { return p.o + " " + p.n; }).join(" ");
+    var MAGRE27 = /^[\s\u200c]*(?:هزار|میلیون|میلیارد|میلیار)(?:ه|ی|ـه)?(?![\u0621-\u06cc])/, dTxt27 = String(opt.clause || "") + " " + numParts0(D).map(function (p) { return p.o + " " + p.n; }).join(" ");
     /* بزرگیِ خودِ داده: پس از مقدارِ پیشینِ جفت در بندِ او / متنِ اصلاح (نه هر عددِ هم‌رقمِ آن بند — «۴ میلیون» کنارِ «۵ نفریم») */
     var magIn27 = function (q) { return numOccs(dTxt27).some(function (x) { return veq(x.v, q.a) && MAGRE27.test(dTxt27.slice(x.e, x.e + 14)); }); };
     occ.forEach(function (o) { o.root = rootOf(o);
@@ -50331,7 +50331,7 @@ APP.goFromURL = function (q) {
     var firstOld = occ.filter(function (o) { return o.root; }).reduce(function (m0, o) { return Math.min(m0, o.pos); }, Infinity); if (firstOld === Infinity) return [];
     var der = [], items = [], seen = {};
     /* دورِ ۲۷ (R2، A26-15 s04 «۲٫۷۵ میلیارد» ⇒ «۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون»): بزرگیِ عدد («هزار/میلیون/میلیارد») بخشی از مقدار است — بازگفتِ همان حاصل در مقیاسِ دیگر همان حاصل است (مشتقِ مشتق) */
-    var mag27 = function (o) { var m = /^[\s\u200c]*(هزار|میلیون|میلیارد|میلیار)(?![\u0621-\u06cc])/.exec(RC[o.ri].t.slice(o.e, o.e + 14)); return m ? (m[1] === "هزار" ? 1e3 : m[1] === "میلیون" ? 1e6 : 1e9) : 0; };
+    var mag27 = function (o) { var m = /^[\s\u200c]*(هزار|میلیون|میلیارد|میلیار)(?:ه|ی|ـه)?(?![\u0621-\u06cc])/.exec(RC[o.ri].t.slice(o.e, o.e + 14)); return m ? (m[1] === "هزار" ? 1e3 : m[1] === "میلیون" ? 1e6 : 1e9) : 0; };
     var derOf = function (o) { var d0 = der.filter(function (d) { return veq(d.v, o.v) && ucompat25(d.fu, famU25(o)) && !!d.pct === !!o.pct && (!d.loc27 || d.loc27.ri === o.ri && d.loc27.sent === o.sent); })[0] || null; if (d0) return d0;   // loc27: ضریبِ «۱ ± درصد» فقط در جملهٔ خودش
       var mo = mag27(o); if (!mo) return null; var d1 = der.filter(function (d) { return d.mag && d.mag !== mo && veq(d.v * d.mag, o.v * mo) && ucompat25(d.fu, famU25(o)) && !d.pct && !o.pct; })[0];
       return d1 ? Object.assign({}, d1, { v: o.v, re: d1.re == null ? null : +(d1.re * d1.mag / mo).toPrecision(10), mag: mo }) : null; };
@@ -50399,13 +50399,13 @@ APP.goFromURL = function (q) {
         if (tier !== 4 && !plain && !RC[c.ri].O.some(function (q) { return q !== c && q.pos < c.pos && (q.sent === c.sent || q.sent === c.sent - 1) && (q.der || q.root || derOf(q)) && veq(q.v, d.v); })) return; X.push({ v: d.v, re: d.re, f: d.f, pct: !!d.pct, kind: "" , d: d }); });
       var Y = occ.filter(function (y) { return y !== c && y.pos < c.pos && !y.struct && !y.fresh27 && !y.root && !veq(y.v, c.v) && !(y.der || (derOf(y) && !y.given)) && (tier === 4 || y.ri === c.ri && y.sent === c.sent || staleSent(y)) && (y.zone !== "ctx" || tier !== 4 && staleSent(y) || y.ri === home); })
         .map(function (y) { return { v: y.v, re: !plain && unc(y) ? null : y.v, f: fam25(y), pct: y.pct, kind: y.kind || "", ri: y.ri, mag27: !!mag27(y) }; });
-      var cMag27 = mag27(c); X.forEach(function (x) { if (x.mag27 == null) x.mag27 = x.d ? !!x.d.mag : (x.q ? numOccs(dTxt27).some(function (z) { return veq(z.v, x.q.a) && MAGRE27.test(dTxt27.slice(z.e, z.e + 14)); }) : false); });
+      var cMag27 = mag27(c), cSent27 = staleSent(c); X.forEach(function (x) { if (x.mag27 == null) x.mag27 = x.d ? !!x.d.mag : (x.q ? numOccs(dTxt27).some(function (z) { return veq(z.v, x.q.a) && MAGRE27.test(dTxt27.slice(z.e, z.e + 14)); }) : false); });
       X.forEach(function (x, i) { if (veq(x.v, c.v) && !!x.pct === !!c.pct) return;
 
         X.concat(Y).forEach(function (y, j) { if (j <= i) return;
           /* دورِ ۲۷ (R2، C66؛ بانکِ R27 #67/#99 «پس با ۲ میلیون بودجه کافیه» ⇒ ۲ = ۱۲ ÷ ۶): بزرگیِ حاصل («میلیون») از یکی از عملوندها می‌آید — در رده‌های (ج) و (د) رابطه‌ای که هیچ
              عملوندش بزرگی ندارد برای عددِ «… میلیون» هم‌رقمی است، نه وابستگی */
-          if (!plain && cMag27 && !(x.mag27 || y.mag27)) return;
+          if (!plain && cMag27 && !(x.mag27 || y.mag27) && (tier === 4 || !cSent27)) return;   // ردهٔ (ج): فقط وقتی جملهٔ خودش داده/حاصلِ کهنه ندارد
           OPS.forEach(function (op) { if (!dimOk(op[0], x.f, y.f, fam25(c), x.kind, y.kind)) return;
             if (tier === 4 && !plain && /[*\/]/.test(op[0]) && x.f && fam25(c) && x.f !== fam25(c) && x.f !== "pct" && fam25(c) !== "pct" && y.f && y.f !== "pct" && y.f !== x.f && y.f !== fam25(c)) return;   // سه جنسِ گوناگون با یک ضرب/تقسیم از هر جای مسئله: حدس است، نه رابطه
             if (tier === 4 && !plain && /[*\/]/.test(op[0]) && !fam25(c) && x.f && y.f && x.f !== y.f && x.f !== "pct" && y.f !== "pct" && (PHYS25[x.f] || PHYS25[y.f])) return;

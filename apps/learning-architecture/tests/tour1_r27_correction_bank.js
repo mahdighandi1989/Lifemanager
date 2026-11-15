@@ -29,6 +29,7 @@ async function run(ctx) {
   C[70] = async () => { await scen({ prior: [RES('ما ۵ نفریم و ۴ میلیون پول داریم: ۴ ÷ ۵ = ۰٫۸ میلیون هر نفر')], stmtChat: 'ما ۵ نفریم و ۴ میلیون پول داریم' });
     await turn('۴ نفریم نه ۵ — حالا سهمِ هر نفر چقدر میشه؟', 'اصلاح را فرستادم؛ با ۴ نفر خودت حساب کن.', RT({ msg: 'ما ۵ نفریم و ۴ میلیون پول داریم', key: 'datum:شمارِ نفرها', what: 'fact', fix: '۴', old: '۵' }));
     const x = await snap(''); return { ok: !x.refused && !/فرقی نداشت|انجام نشد/.test(allText(x)) && /0\.8>1(?![.\d])/.test(x.sstale) && !/(?:^| )4>/.test(x.sstale), got: { sstale: x.sstale, sys: x.sys, refused: x.refused } }; };
+  NC[71] = 'not satisfied (reported): «۲ میلیون و ۸۰۰ هزار ÷ ۸ = ۳۵۰ هزار» — the «N میلیون و M هزار» operand is not read as one number (2 800 000) by the arithmetic reader (a46, fixer «arith», DECISIONS_R27 R1/C41); the correction itself lands (8 ⇒ 7), the stale engine follows once the reader returns the written expression. Check kept as C71 below for when it does.';
   C[71] = async () => { await scen({ prior: [RES('۸ نفر بودیم، ۲ میلیون و ۸۰۰ هزار ÷ ۸ = ۳۵۰ هزار هر نفر')], stmtChat: '۸ نفر بودیم' });
     await turn('۷ تاییم نه ۸ تا', 'فرستادم.', RT({ msg: '۸ نفر بودیم', key: 'datum:نفرها', what: 'fact', fix: '۷', old: '۸' }));
     const x = await snap(''); return { ok: !x.refused && /350>400(?![.\d])/.test(x.sstale), got: { sstale: x.sstale, sys: x.sys, refused: x.refused } }; };
