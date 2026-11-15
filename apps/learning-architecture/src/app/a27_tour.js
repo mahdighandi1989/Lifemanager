@@ -3931,7 +3931,7 @@
     return hitS.every(function (x) { x = x.trim(); if (!/[؟?]\s*$/.test(x)) return false;
       var CL = x.split(/[؛;،,:]/).map(function (c) { return c.trim(); }).filter(Boolean), ci = -1; CL.forEach(function (c, i) { if (ci < 0 && (hasTok20(c, fix) || hasFrag(c, fix) || hasN26(c))) ci = i; });
       if (ci < 0 || CL.length < 2 || ci === CL.length - 1) return true;
-      return QW26.test(CL[ci]) || /^(?:اگه|اگر)(?=[\s‌])/.test(CL[ci]); });
+      return QW26.test(CL[ci]) || /^(?:اگه|اگر|فرض[\s‌]*(?:کن|کنیم|کنید|کنم)|فرضاً|فرضا|به[\s‌]*فرض)(?=[\s‌])/.test(CL[ci]); });   // بانکِ R22 #97: «فرض کن ظرف ۸ لیتر بود، اون وقت چی؟» فرض است، نه اصلاح
   }
   AS.fixQ22 = fixQ22;
   /* قرنطینه (دورِ ۲۲، P3 — REMOVAL_CANDIDATES): «؟» ِ پایانِ پیام = پرسش (D s36 رد شد)؛ تازه‌ترین هم‌خوانیِ واژه‌به‌واژه پیش از هم‌خوانیِ عینی (C22-6) */
