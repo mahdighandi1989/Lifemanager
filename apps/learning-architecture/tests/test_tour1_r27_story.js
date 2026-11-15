@@ -111,6 +111,19 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   K.C30_neg_shared = async () => { const [A] = await oB1(); await turn('امروز ساعت ۶ بیدار شدم و یه ساعت خوندم.'); const S = await st(); return [S.focus === A, J([A, S.focus])]; };
   K.C30_neg_noname = async () => { const [A] = await oB1(); await turn('حساب کردم: پنج روز از هفت روز موفق بودم.'); const S = await st(); return [S.focus === A, J([A, S.focus])]; };
 
+  /* ---------- R6 / C57: حسابِ کسِ دیگر (D27-8 arD1 p13) — «کارِ دیگری»، نه «نتیجه»، نه «اجرا +» ---------- */
+  const csx = (o) => Object.assign({ do: 'coach_state', ans: [], said: [], stuck: false, fail: false, role: 'self', nat: 'objective' }, o);
+  const turnA = (t, a) => p.evaluate(([t, a]) => __turn(t, a), [t, a]);
+  K.C57_arD1 = async () => { const A = await p.evaluate(() => { __wipe(); __fresh(); const pid = __mk('مصرفِ بخاری', 'بخاریِ برقیِ اتاقم ماهی چقدر برق می‌بره و با قبضم می‌خونه یا نه؟'); APP.liveBindSession(pid, __cur(), { force: true }); return pid; });
+    await turnA('نسخهٔ دومِ همین حساب‌ها رو برادرم نوشته بود، اینا رو هم ببین: ۱۳/۱۲ = ۱. ۱۳ ÷ ۱۲ = ۱. ۲۰ درصدِ ۳۰۰ میشه ۶۶. π × ۱۰² ≈ ۳۴۱. ۱ + ۲ + … + ۲۰ = ۲۲۰. ۲ میلیون × ۳ = ۶ هزار تومن.', [csx({ ph: 'b', said: ['result'], result: '۲۰ درصدِ ۳۰۰ میشه ۶۶' })]);
+    const R = await p.evaluate((A) => { const s = __cur(); return { story: ((s.coach.story || {})['L:' + A] || { items: [] }).items.map(x => x.k + ':' + x.t), ev: (s.coachEv || []).filter(e => !e.wd && e.ok).map(e => e.ph + ':' + e.how), dos: __dos(A).filter(x => /نتیجه|کارِ دیگری|کارنامه/.test(x)) }; }, A);
+    return [!R.story.some(x => /^res:/.test(x)) && R.story.some(x => /^other:/.test(x)) && !R.ev.some(e => /^c:/.test(e)) && R.dos.some(x => /کارِ دیگری/.test(x)) && !R.dos.some(x => /^نتیجه \(از گفت‌وگو\)/.test(x)), J(R)]; };
+  // بدلِ منفی: حسابِ خودش در همان شکل نتیجهٔ خودش می‌ماند
+  K.C57_neg_own = async () => { const A = await p.evaluate(() => { __wipe(); __fresh(); const pid = __mk('مصرفِ بخاری', 'بخاریِ برقیِ اتاقم ماهی چقدر برق می‌بره؟'); APP.liveBindSession(pid, __cur(), { force: true }); return pid; });
+    await turnA('خودم دوباره حساب کردم: ۲ × ۶ × ۳۰ = ۳۶۰ کیلووات‌ساعت.', [csx({ ph: 'b', said: ['result'], result: '۲ × ۶ × ۳۰ = ۳۶۰ کیلووات‌ساعت' })]);
+    const R = await p.evaluate((A) => ((__cur().coach.story || {})['L:' + A] || { items: [] }).items.map(x => x.k + ':' + x.t), A);
+    return [R.some(x => /^res:/.test(x)) && !R.some(x => /^other:/.test(x)), J(R)]; };
+
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 700)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   console.log(JSON.stringify(info));
