@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-18T09:30:00Z"
 created_at: "2026-10-18T09:30:00Z"
-updated_at: "2026-10-25T09:00:00Z"
+updated_at: "2026-11-15T12:00:00Z"
 merged_from: []
 ---
 
@@ -129,3 +129,19 @@ Round-24 tour (every scenario hit at least one S3 line about age or register) sh
 - [ ] Multi-step input cards keep the partial answer and ask only for what is missing.
 - [ ] Use age as an input to address form; never let commands to a machine count as evidence of informality.
 - [ ] Enumerate every entry point to an age-gated feature (list, button, direct route) and test each.
+
+## Update 2026-11-15
+**A register (formality) rewriter must find the person's own words inside each line, not trust the line's shape.**
+- Failure: the rewriter skipped a text node only when the WHOLE node was the person's text or sat inside a balanced quote. A page
+  line that glued a page label to her text («Lesson: <her lesson>») rewrote her words («in the anagram» ⇒ "you(formal) anagram"),
+  and a clipped title with its own opening quote mark left the quote depth open, so the rest of the page's line was never
+  converted. Labels inside SVG were skipped wholesale.
+- Fix: before rewriting, cut out every run of ≥ 3 consecutive tokens that occurs verbatim (ZWNJ included) in the person's corpus
+  (messages + records), replace each by a private-use placeholder, rewrite, restore the bytes. Quote marks inside her runs then no
+  longer count for quote depth. A quoted span that is NOT hers and that the page does not frame as hers ("your words: «…»") is page
+  text and takes the register too. Only page-owned SVG (a route map) is read; formula/chart SVG is not.
+- Same gateway, same lesson for the store: the rewrite runs where the line is stored, so every reader (dossier, e-mail, export)
+  gets the same bytes.
+- How to apply elsewhere: any automatic rewrite of mixed author/system text (translation, tone, redaction) should mask the
+  user-authored spans by verbatim match against the user's own corpus first; never infer authorship from punctuation or position.
+
