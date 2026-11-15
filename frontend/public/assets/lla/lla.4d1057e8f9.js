@@ -57661,6 +57661,8 @@ APP.goFromURL = function (q) {
     return can;
   }
   function arrive(o, e, it, how, w, extra) {
+    var also = e._also || []; delete e._also;   // دورِ ۲۷ (B27·D16): هر نامزدی که با همین رسیدن سنجیده شد در 📜 (سطرِ «سنجش») سرانجامِ دیدنی دارد — در گفت‌وگو پیشنهاد نمی‌شود
+    if (also.length) extra = (extra || "") + " — «" + also.map(function (x) { return clip(x, 50); }).join("» و «") + "» هم آمد و سنجیده شد؛ برای این گام کمتر می‌خواند";
     var conf = how === "ask", pa = e.ask && e.ask.id ? e.ask : null; e.state = "arrived"; e.arrivedAt = nowIso(); e.how = how; e.tool = { kind: it.kind, id: it.id, fa: clip(it.fa, 80), go: it.go, text: clip(it.text, 600), sn: conf ? ((e.ask || {}).sn || 0) : (w || []).length, key: conf ? curMsgKey() : "" }; delete e.ask; delete e.backBy; delete e.lastRej;
     (e.checks = e.checks || []).push({ at: nowIso(), ok: true, how: how, item: it.kind + ":" + it.id, reason: (conf ? "«" + clip(it.fa, 60) + "» — خودش تأیید کرد که همان ابزارِ گامِ «" + clip(e.step, 60) + "» است" : "«" + clip(it.fa, 60) + "» با نیازِ گامِ «" + clip(e.step, 60) + "» هم‌خوان است — واژه‌های مشترک: " + w.slice(0, 6).map(function (x) { return "«" + x + "»"; }).join("، ")) + (extra || "") });
     if (pa) evOut(o.sc, e, pa.evk || "ask", "جواب: همان است — «" + clip(it.fa, 50) + "»");
@@ -57668,9 +57670,7 @@ APP.goFromURL = function (q) {
     swEv(o.sc, e, "back", "🛎 ابزارِ لازم آمد: «" + clip(it.fa, 60) + "»", [(e.late ? "تکهٔ منتظر: «" : "گامِ منتظر: «") + clip(e.step, 120) + "»", "برگهٔ " + nn(e) + (how === "sheet" ? " — بسته شد با «پاسخ به برگهٔ دستیار " + nn(e) + "»" : how === "ask" ? " — پرسیدم و خودش گفت همان است" : " — ثبت‌گاهِ سامانه تازه شد"), "سنجش: " + e.checks[e.checks.length - 1].reason], "از سر گرفتنِ همان گام", e.backK);
     waitEv(o.sc, e);
     var sh = shE(e), closed = sheetClose(o, e, it, conf);
-    var also = e._also || []; delete e._also;   // دورِ ۲۷ (B27·D16): هر نامزدی که با همین رسیدن سنجیده شد سرانجامِ دیدنی دارد
-    sysMsg(e, "🛎 ابزارِ لازم آمد: «" + clip(it.fa, 60) + "» (برگهٔ " + nn(e) + ") — " + (conf ? (sh ? "گفتید همان است" : "گفتی همان است") : "سنجیدم که نیازِ گامِ «" + clip(e.step, 70) + "» را جواب می‌دهد") + "؛ همان گام را از سر می‌گیریم." + (closed ? " زیرِ برگه نوشتم و برگه را بستم." : "") +
-      (also.length ? " «" + also.map(function (x) { return clip(x, 50); }).join("» و «") + "» هم آمد و سنجیده شد — برای این گام کمتر از آن می‌خواند." : ""));
+    sysMsg(e, "🛎 ابزارِ لازم آمد: «" + clip(it.fa, 60) + "» (برگهٔ " + nn(e) + ") — " + (conf ? (sh ? "گفتید همان است" : "گفتی همان است") : "سنجیدم که نیازِ گامِ «" + clip(e.step, 70) + "» را جواب می‌دهد") + "؛ همان گام را از سر می‌گیریم." + (closed ? " زیرِ برگه نوشتم و برگه را بستم." : ""));
     stepsSync(e);
     o.put();
   }
@@ -57807,10 +57807,11 @@ APP.goFromURL = function (q) {
       /* دورِ ۲۵ (C2): هم‌واژگی‌ای که فقط از قابِ خودِ برگه می‌آید (نامِ نمای موجود در متنِ کمبود) هم پرسیدنی است، نه ناهم‌خوانیِ خاموش */
       if (r.best && r.best.n >= 1 && (r.best.a >= 1 || r.best.fr) && (e.asked || []).indexOf(r.best.it.id) < 0) { markRead(); (e.asked = e.asked || []).push(r.best.it.id); askFit(o, e, r, "sheet"); return; }
       /* دورِ ۲۷ (C20 بازگفته، C2؛ D27-27 oD1f، B27·D16 tB1): حوزه‌ای که جوابِ روتین **نام برد** و با برگه فقط در واژه‌های قاب هم‌پوشان است («سامانه»، «مسئله»،
-         «برگه»، «کمبود» یا نامِ نمایی که خودِ برگه برده) پیش‌تر «هیچ واژهٔ مشترکی ندارد» می‌گرفت و رد می‌شد — آن واژه‌ها وزنِ صفر دارند، پس n=0 بود. وزنِ صفر یعنی
+         «برگه»، «کمبود» یا نامِ نمایی که خودِ برگه برده) و از لحظهٔ ثبتِ برگه تازه ساخته یا کامل شده (regDiff — حوزهٔ قدیمی‌ای که جواب فقط نامش را برد چیزی «نیامده»؛ دورِ ۲۴ D24-1) پیش‌تر «هیچ واژهٔ مشترکی ندارد» می‌گرفت و رد می‌شد — آن واژه‌ها وزنِ صفر دارند، پس n=0 بود. وزنِ صفر یعنی
          «رسید» نمی‌سازد، نه این‌که چیزی نیامده: نامزدی هست و صفحه نمی‌تواند داوری کند ⇒ از خودش می‌پرسد. جوابی که هیچ نامزدی نام نبرد، یا نامزدی که هیچ واژه‌ای
          (حتی قاب) مشترک ندارد، همان ناهم‌خوانی می‌ماند. تغییرِ نام‌نبردهٔ ثبت‌گاه هرگز این پرسش را نمی‌سازد. */
-      var FWq = null; namedItems(tx).some(function (it) { if (RL.indexOf(it.id) >= 0 || (e.asked || []).indexOf(it.id) >= 0) return false; var f = frameWords(e, it); if (f.length) FWq = { it: it, f: f }; return !!FWq; });
+      var NEWq = {}; regDiff(e.fp).forEach(function (it) { NEWq[it.id] = 1; });
+      var FWq = null; namedItems(tx).some(function (it) { if (!NEWq[it.id] || RL.indexOf(it.id) >= 0 || (e.asked || []).indexOf(it.id) >= 0) return false; var f = frameWords(e, it); if (f.length) FWq = { it: it, f: f }; return !!FWq; });
       if (FWq) { markRead(); (e.asked = e.asked || []).push(FWq.it.id); var bq = score(e, FWq.it); bq.fw = FWq.f; askFit(o, e, { best: bq, tie: [], all: [bq] }, "sheet"); return; }
       /* «شاید نسخهٔ تازه هنوز منتشر نشده» فقط وقتی جواب چیزِ ساخته‌ای را **نام برده** که در این نسخهٔ صفحه نیست (شناسه یا نامِ درونِ `…`) و برگه خودش آن را
          کنار نگذاشته بود. دورِ ۲۵ (C25-19، B25·D15 ِ B_s): جوابِ واژه‌های عام («یک ابزارِ تازه برای تغییر در مسئله‌ها…») یا جوابی که قلمروِ کنارگذاشته را نام
