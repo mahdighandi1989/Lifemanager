@@ -157,9 +157,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-15",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI در Crossref و چکیده در PubMed وارسی شد) — Epton et al. 2017"
+    },
+    {
+     "at": "2026-11-15",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "۳ گزارهٔ موجود با منبعِ دوم پشتیبانی شد — Epton et al. 2017"
+    },
+    {
+     "at": "2026-11-15",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌دار (empirical/outside) با پایهٔ نوشته‌شده — Epton et al. 2017"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_decision"
   },
   "dc_group_decisions": {
@@ -793,9 +811,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-15",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI در Crossref و چکیده در PubMed وارسی شد) — Diekelmann & Born 2010"
+    },
+    {
+     "at": "2026-11-15",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "۳ گزارهٔ موجود با منبعِ دوم پشتیبانی شد — Diekelmann & Born 2010"
+    },
+    {
+     "at": "2026-11-15",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌دار (empirical/outside) با پایهٔ نوشته‌شده — Diekelmann & Born 2010"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_learn"
   },
   "ln_spacing": {

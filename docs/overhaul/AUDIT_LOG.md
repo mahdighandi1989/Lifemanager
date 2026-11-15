@@ -5116,3 +5116,9 @@ dated stability, mind-card feed) under way.
 - **CHANGE** `apps/learning-architecture/backtest/corpus/round-0038.json` (۸ موردِ تازه: زینوویف، گریسِ بیرمنگام، داو ۳۶٬۰۰۰، شیلر، رهوی، شامپولیون، دو انتزاعی)؛ قلمرو `a_evidentialism` گامِ ۲؛ `reviews/round-0038.json`.
 - **FINDING** ۷/۸ درست؛ یک هشدارِ سلامت (شامپولیون) که پس از بازبینی «اختلاف بر سرِ برچسب» ماند — تغییرِ برچسبِ پس از حکم برگردانده شد و پرونده تا بازرمزگذاریِ کورِ دوم excluded شد. آزمونِ تقارنِ بازرمزگذاری: حکم ۴/۴، ایستگاه‌ها ۲/۴.
 - **PROPOSAL** `p_field_ml2` (قابِ Many Labs 2 آماده، منتظرِ جمعیتِ تازه) و `p_retest_exclude_post_edit` — منتظرِ مالک. `epi-decisions` همچنان ۴۰۱.
+
+## 2026-11-15 — CHANGE + FINDING: ناظرِ عمومی (دورِ کامل)
+- **CHANGE** قلمروِ `sys-territory`: `ln_sleep` و `dc_goal_setting` از گامِ ۰ به ۳، هر کدام با منبعِ دومِ وارسی‌شده (Diekelmann & Born 2010 doi:10.1038/nrn2762؛ Epton et al. 2017 doi:10.1037/ccp0000260 — Crossref + PubMed). `apps/learning-architecture/territory/`، WORKLOG ‏(۲۰۲۶-۱۱-۱۵).
+- **CHANGE** `apps/learning-architecture/norms/norms.json`: `retrieved` ⇒ 2026-11-15 پس از جستجوی وب؛ هیچ عددی افزوده نشد (هیچ نامزدی شرط‌ها را نداشت)؛ جستجوها و نامزدهای آینده در `refresh_log`.
+- **FINDING** `page_map`: `/brain` در اجرای کامل «اندازه‌گیری نشد» (ناوبری به نشانیِ مطلق گزارش شد) ولی `--only /brain` بی‌خطا اندازه گرفت ⇒ ناپایداریِ ابزار، نه نقصِ محصول (همان الگوی 2026-11-01).
+- **FINDING + CHANGE** گیتِ قانونِ ۴ روی `main` ِ دست‌نخورده قرمز بود: `apps/learning-architecture/tests/test_polya_fix5.js` (M3) هر سال فقط در ۲۴ آبان شکست می‌خورد، چون «۲۵ آبان» ِ ثابتِ آزمون همان «فردا» بود و شرطِ «تاریخِ کاربر بیاید، فردا نیاید» با خودش تناقض داشت. آزمون حالا در این حالت «۲۷ آبان» را برمی‌دارد؛ کدِ محصول دست نخورد.
