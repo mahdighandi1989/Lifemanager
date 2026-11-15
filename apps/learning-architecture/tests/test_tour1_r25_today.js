@@ -288,9 +288,12 @@ const HELPERS = () => {
       const s = __cur(), m = s.msgs.filter(x => x.role === 'user')[0]; __q.push({ reply: 'درست شد.', status: 'related', memory: 'm', actions: [] });
       const r = APP.ASSIST.retractEdit(s, m, 'پنجشنبه باید فرمِ ثبت‌نام رو تحویل بدم. یادم بنداز.');
       for (let i = 0; i < 60 && APP.ASSIST.busy(); i++) await new Promise(z => setTimeout(z, 100)); await new Promise(z => setTimeout(z, 400));
-      o.dl = __dl(); o.hist = (APP.S.all('deadline')[0].fixHist || []).map(h => h.why); o.res = ((__cur().coach || {}).retNote || {}).res || null; o.ok = r && r.ok; return o; });
-    const whys = e.hist.concat((((e.res || {}).changed) || []).map(c => c.why));
-    BK(239, e.dl[0] && e.dl[0].date === e.thu && whys.length >= 1 && whys.every(w => w === 'با ✏️ ِ خودش روی همان پیام'), e);
+      /* دورِ ۲۷ (DECISIONS_R27 C58): ✏️ ِ روز ثبتِ پیشین را «جایگزین» می‌کند (بسته، با تاریخچه) و روزِ تازه را یک بار می‌پرسد؛ روزِ تازه فقط با «آره» ِ او می‌نشیند —
+         انتظارِ دورِ ۲۵ (جابه‌جاییِ مستقیمِ همان رکورد بی پرسش) با همان تصمیم عوض شد؛ «چرا» ِ اصلاح همان «با ✏️ ِ خودش روی همان پیام» می‌ماند */
+      o.ask = __sysLines().filter(x => /^📅/.test(x) && x.indexOf(APP.fdate(o.thu)) >= 0).length; await __say('آره', 'باشه.', [__cs({})]);
+      o.dl = __dl(); o.live = APP.S.all('deadline').filter(d => !d.done).map(d => d.date); o.hist = APP.S.all('deadline').reduce((a, d) => a.concat((d.fixHist || []).map(h => h.why)), []); o.res = ((__cur().coach || {}).retNote || {}).res || null; o.ok = r && r.ok; return o; });
+    const whys = (((e.res || {}).changed) || []).map(c => c.why);
+    BK(239, e.ask === 1 && e.live.length === 1 && e.live[0] === e.thu && whys.length >= 1 && whys.every(w => w === 'با ✏️ ِ خودش روی همان پیام') && e.hist.some(w => /جایگزین شد/.test(w)), e);
   });
 
   /* ===== A23-25 (s06)، A21-11 (s05)، A23-26 — کارنامه ===== */
