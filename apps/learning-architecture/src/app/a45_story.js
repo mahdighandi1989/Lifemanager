@@ -1108,6 +1108,11 @@
     /* بانکِ R26 #87 «مسئلهٔ قفسه‌ها تموم شد، …»: «مسئلهٔ X» ِ بی‌پیشوند — فقط با واژهٔ عنوانِ همان مسئله (پایین: title) */
     re = /(?:^|[\s،؛(.!؟?])مسئله(?:ٔ|ی|‌ی)\s+(?!(?:اول|قبلی|قبل|پیشین|دوم|سوم|چهارم|تازه|جدید|بعدی|دیگه|دیگر|من|خودم|ما)(?![آ-ی]))([^\n]{2,50})/g;
     while ((m = re.exec(T))) { var pre0 = T.slice(Math.max(0, m.index - 14), m.index + 1); if (/(?:یه|یک|این|همین|اون|آن|همون|همان|توی?|در|برای|سرِ?|به|درباره(?:ٔ|ی|‌ی)?)\s*$/.test(pre0.replace(/[\s،؛(.!؟?]$/, " "))) continue; out.push({ tail: tailOf(m[1]).split(/\s+/).slice(0, 3).join(" "), bare: true }); }
+    /* دورِ ۲۶ (C31 ِ DECISIONS_R26، ابهامِ ۹ ِ بانک — #89 «این هم مثلِ همون قفسه‌هاست …»): مسئله‌ای که فقط به تشبیه نام برده شد («مثلِ/شبیهِ/عینِ همون X») قابِ برگشت نیست؛
+       قابِ دیگری که همان واژه‌ها را در دلِ تشبیه گرفته («… مثلِ همون مسئلهٔ قفسه‌ها») هم کنار می‌رود. داوری‌اش در named26FromList (like). */
+    var LK = [], reL = /(?:^|[\s،؛(])(?:مثلِ?|مثل|شبیهِ?|عینِ?|مانندِ?|همانندِ?|نظیرِ?)\s+(?:(?:همون|همان|اون|آن)\s+)?(مسئله(?:ٔ|ی|‌ی)?\s*)?([^\n،,.!؟?؛:]{2,50})/g;
+    while ((m = reL.exec(T))) LK.push({ tail: tailOf(m[2]), prob: !!m[1], like: true, at: m.index, end: m.index + m[0].length });
+    if (LK.length) out = out.filter(function (f) { var q = T.indexOf(String(f.tail || "").slice(0, 12)); return !(q >= 0 && LK.some(function (l) { return q >= l.at && q <= l.end; })); }).concat(LK);
     out.forEach(function (f) { var w0 = nz(f.tail).split(" ")[0] || ""; if (f.prob || f.strong) { ORD26.forEach(function (o) { if (new RegExp("^(?:" + o[0].source + ")$").test(w0)) f.ord = o[1]; }); if (/^(?:قبلی|قبل|پیشین)$/.test(w0)) f.ord = "prev"; if (/^(?:تازه|جدید|بعدی|آخر|آخری)$/.test(w0)) f.ord = "last"; } f.deic = DEIC26.test(w0); });
     return out.filter(function (f) { return !f.deic && (f.ord != null || toks(f.tail).length); });
   }
@@ -1116,8 +1121,19 @@
   /* کدام مسئلهٔ این گفت‌وگو را نام برد؟ { to: مسئله } | { ask: [مسئله‌ها] } | null (نام نبرد، یا همان مسئلهٔ کنونی را گفت) */
   function named26(s, mt) { return named26FromList(probs26(s), focus26(s), mt, s); }
   function named26FromList(P, cur, mt, s) {
-    var FR = frames26(mt); if (!FR.length) return null;
+    var FR0 = frames26(mt); if (!FR0.length) return null;
     var C = (s && s.coach) || {}; if (P.length < 2 && !(P.length === 1 && P[0].id !== cur)) return null;
+    var LK = FR0.filter(function (f) { return f.like; }), r = run26(FR0.filter(function (f) { return !f.like; }));
+    if (r || !LK.length) return r;
+    /* C31: تشبیه نوبت را جابه‌جا نمی‌کند. فقط اگر همان پیام (بیرون از بندِ تشبیه) داده یا نتیجه‌ای دارد که متن نمی‌گوید مالِ کدام است ⇒ صفحه می‌پرسد (کنونی + نام‌برده) */
+    var L = run26(LK.map(function (f) { return Object.assign({}, f, { strong: false }); })); if (!L || !(L.to || (L.ask && L.ask.length))) return null;
+    var rest = String(mt || ""); LK.slice().reverse().forEach(function (l) { var e = rest.slice(l.end).search(/[\n،,.!؟?؛:]/); rest = rest.slice(0, l.at) + " " + (e < 0 ? "" : rest.slice(l.end + e)); });
+    if (!/[0-9۰-۹]/.test(rest) && !/(?:^|\s)(?:جواب|نتیجه)/.test(rest)) return null;
+    var tg = L.to ? [L.to] : L.ask, cp = P.filter(function (x) { return x.id === cur; })[0], RW = toks(rest).filter(function (w) { return w.length >= 3; });
+    var hitsOf = function (x) { var X = toks(x.title + " " + x.stmt); return RW.some(function (w) { return hit26(w, X) && !tg.some(function (y) { return y !== x && hit26(w, toks(y.title + " " + y.stmt)); }) && !(cp && x !== cp && hit26(w, toks(cp.title + " " + cp.stmt))); }); };
+    if (cp && hitsOf(cp)) return null;   // بندِ داده خودش واژهٔ مسئلهٔ کنونی را دارد ⇒ همان
+    return { ask: (cp ? [cp] : []).concat(tg.filter(function (x) { return x !== cp; })), frame: LK[0], like: true };
+    function run26(FR) {
     for (var i = 0; i < FR.length; i++) { var f = FR[i], c = null;
       /* بانکِ R26 #85 «برگردیم به اون مسئلهٔ قبلی» با چند مسئلهٔ پیشین: صفحه حدس نمی‌زند — یک مسئلهٔ دیگر ⇒ همان؛ بیشتر ⇒ می‌پرسد */
       if (f.ord === "prev") { var O0 = P.filter(function (x) { return x.id !== cur; }); if (O0.length === 1) c = O0[0]; else if (O0.length > 1) return { ask: O0, frame: f }; }
@@ -1137,6 +1153,7 @@
       return { ask: best, frame: f };
     }
     return null;
+    }
   }
   ST.named26 = named26;
   function focusTo26(s, c, why) {

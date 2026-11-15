@@ -37963,7 +37963,7 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۶ (story Q6، C26-16 — s25 p13/p14، s23 p5/p7/p8، s29 p3–p5: «# وضعِ کنونی … (بسته شد)» کنارِ «مرحلهٔ محتمل: فهمِ مسئله» و «u1) مجهول … چیست؟»): مسئلهٔ این گفت‌وگو
        بسته است و این پیام مسئلهٔ تازه‌ای نیاورد (صورتی پذیرفته نشد) ⇒ مسئلهٔ بازی در کار نیست و کارتِ مرحله/فهرستِ پرسش پیشنهاد نمی‌شود — همان C.prev.noPh ِ RM6f که
        پیش‌تر فقط برای پیامِ کوتاهِ بی‌پرسش بود (پرسشِ بازتابی، درخواستِ تمرین یا «کجا نگهش دارم؟» از آن جا می‌ماند). مسئلهٔ بسته چیزی پیشنهاد نمی‌کند. */
-    if (b && b.done && !C.stmt && ph !== "b") C.prev.noPh = true;
+    if (b && b.done && !C.stmt && ph !== "b" && afterClose23 && !guessNow(mt, teach)) C.prev.noPh = true;   // حدس/ادعای تازه پس از بستن همچنان مربی را از «فهم» می‌آورد (R1)
     return ph;
   }
   AS.coachPhase = coachPhase;
@@ -38328,18 +38328,19 @@ APP.goFromURL = function (q) {
     var sub25 = false; try { sub25 = said.indexOf("result") >= 0 && !!(A.STORY && A.STORY.subRes && (A.STORY.subRes(s, (P && P.live) || "", ut) || (A.STORY.splitOff && A.STORY.splitOff(s, ut) > 0))); } catch (e) { }
     /* دورِ ۲۶ (Q6، U11 = B25·D9 STILL — tB1 p6، aB1 p3، aB3 p5، pwB1 p8؛ C26-4): همان یک داوریِ دفترِ داستان با شاهدِ مثبت (a45 ST.wholeRes) — «نتیجه» فقط وقتی
        مسئله را به «بازنگری» می‌برد که جوابِ کل باشد؛ پیش‌تر هر نتیجه‌ای که «میانی» بودنش ثابت نمی‌شد جوابِ کل شمرده می‌شد */
-    try { if (!sub25 && said.indexOf("result") >= 0 && A.STORY && A.STORY.wholeRes && !A.STORY.wholeRes(s, (P && P.live) || "", ut, a)) sub25 = true; } catch (e) { }
-    if (said.indexOf("result") >= 0 && !sub25) ph = "b";
+    /* nw26 = نتیجهٔ سنجیده‌ای که جوابِ کل نیست: مرحله را به «بازنگری» نمی‌برد، ولی همان اعتبارِ «نتیجه» را در کارنامه می‌گیرد و اصلاحِ بعدی به آن می‌رسد (دفترِ رویدادِ how:"res") */
+    var nw26 = false; try { nw26 = !sub25 && said.indexOf("result") >= 0 && !!(A.STORY && A.STORY.wholeRes) && !A.STORY.wholeRes(s, (P && P.live) || "", ut, a); } catch (e) { }
+    if (said.indexOf("result") >= 0 && !sub25 && !nw26) ph = "b";
     else if (sub25) ph = ph0;
     else if (fail) ph = fwd ? "p" : cl && ORD[cl] < ORD[ph0] ? cl : (ph0 === "b" || ph0 === "c" ? "c" : ph0);
     else if (said.indexOf("plan") >= 0 && ORD[ph0] < ORD.c) ph = A.STORY && A.STORY.planIdea && A.STORY.planIdea(ut, txtOf(a.plan)) && !(a.plan && Array.isArray(a.plan.steps) && a.plan.steps.length >= 2) ? (ORD[ph0] < ORD.p ? "p" : ph0) : "c";   // دورِ ۲۵ (P5، بانکِ R25 #173/#183): ایده یا طرحِ پرسیده ⇒ «طرح»، نه «اجرا»
     else if (cl && ORD[cl] < ORD[ph0]) ph = stuck || said.length ? cl : ph0;          // عقب: فقط با گیر یا حرفِ تازه
     else if (fwd) ph = "p";
     /* دورِ ۵ (F1، s31): نشانهٔ قوی‌ترِ پیشین (نتیجهٔ بی‌ابهامِ خودش) با گزارشِ مدل به عقب برنمی‌گردد، مگر مدل شکست گزارش کند */
-    if (P && P.strong && !fail && !sub25 && ORD[ph] < ORD[P.strong]) ph = P.strong;
+    if (P && P.strong && !fail && !sub25 && !nw26 && ORD[ph] < ORD[P.strong]) ph = P.strong;
     if (!(P && P.live)) { C.ph = ph; C.st = st; }
     /* دورِ ۵ (F2): نشانه‌های همین پیام برای نوبتِ بعد (A.liveCoach(pid,{turn})): گیر/شکست یک نوبت؛ «نتیجه گفت» برای مسئلهٔ زنده تا صفحه ثبتش کند یا شکستی بیاید */
-    C.rep = { key: key, stuck: stuck, fail: fail, result: said.indexOf("result") >= 0 && !sub25, sub: sub25 || undefined, pk: pk };   // دورِ ۲۵: نتیجهٔ میانی پرسشِ «نتیجه‌ای گفتی ⇒ بازنگری» نمی‌گیرد
+    C.rep = { key: key, stuck: stuck, fail: fail, result: said.indexOf("result") >= 0 && !sub25 && !nw26, sub: sub25 || nw26 || undefined, pk: pk };   // دورِ ۲۵: نتیجهٔ میانی پرسشِ «نتیجه‌ای گفتی ⇒ بازنگری» نمی‌گیرد
     /* دورِ ۲۳ (Q3 «گفت‌وگو ⇄ صفحه یک داستان»، C23-11/A23-35/B·D5): همان said/ans ِ سنجیدهٔ همین پیام برای دفترِ داستان (a45_story.js) — یک منبع، نه سنجشِ دوم */
     C.saidOk = { key: key, at: String(um.at || ""), said: said.slice(), ans: qs.slice(), pk: pk, live: (P && P.live) || "", real: !!real, pasted: !!pasted };
     if (C.resBy) delete C.resBy;   // دورِ ۶ (G1): «نتیجه» دیگر تا ثبتِ صفحه نمی‌ماند — فقط C.rep برای پیامِ بعد
@@ -38361,7 +38362,7 @@ APP.goFromURL = function (q) {
         if (real) ids.forEach(function (id) { var q = qm[id]; if (q && qs.indexOf(q) >= 0 && ST4[String(id).charAt(0)]) okSt[ST4[String(id).charAt(0)]] = "ans"; });
         /* تورِ پولیا (RN3c): نتیجه و طرحِ سنجیده هر کدام شاهدِ مرحلهٔ خودند — در یک نوبت هر دو (طرح + نتیجه ⇒ طرح و اجرا)، و در سشنِ بسته به مسئلهٔ زنده هم؛
            بازگوییِ خودش (said u/c ِ سنجیده، نه صورتِ چسبانده، نه «آره») ⇒ موفقیتِ فهم. گذر از مرحله فقط وقتی هیچ‌کدام نبود (یک موفقیت برای مرحلهٔ تمام‌شده). */
-        var hasRes = said.indexOf("result") >= 0 && (P && P.live ? true : ph === "b"), hasPlan = said.indexOf("plan") >= 0;
+        var hasRes = said.indexOf("result") >= 0 && (P && P.live ? true : (ph === "b" || nw26)), hasPlan = said.indexOf("plan") >= 0;
         if (hasRes) okSt.c = "res";
         if (hasPlan) okSt.p = "plan";
         if (!hasRes && !hasPlan && !(P && P.live) && ORD[ph] > ORD[ph0]) okSt[ph0] = "pass";
@@ -47288,10 +47289,7 @@ APP.goFromURL = function (q) {
     if (K && R && (stuckT || !R.st)) R.q = q;
     var c0Put = false; if (c0Mark && o.turn && !sysT && q && q === pageQ) { if (c0Mark.A[q] !== c0Mark.k) { c0Mark.A[q] = c0Mark.k; if (c0Mark.T && c0Mark.t) c0Mark.T[q] = c0Mark.t; } c0Put = true; }
     if ((K && JSON.stringify([L.stk || null, L.ckHold || null]) !== R0) || c0Put || lad25Put) { try { S.put(pg); } catch (e) { } }
-    return { ph: ph, Q: Q, q: q, src: src, pageQ: pageQ, card: card, cardWhy: SC[0] ? SC[0].why : pageQ ? "page" : "", rung: rung,
-      /* دورِ ۲۶ (story Q6، C26-40 s28 p4، بانکِ R26 #173 — «نردبانِ پرسش‌های این مرحله تمام شد … فقط گامِ بعد را بگو» در نخستین نوبتِ یک مسئلهٔ زندهٔ تازه): نردبان وقتی «تمام»
-         است که پله‌هایش در نوبت‌های همین مسئله پرسیده شده باشند (L.lad25) — مسئله‌ای که تازه ثبت شد و پاسخ‌هایش از گفت‌وگو آمده هنوز نردبانی نپیموده است */
-      ladderEnd: !!Q.length && !q && Object.keys(L.lad25 || {}).length > 0, stuckN: stuckN };
+    return { ph: ph, Q: Q, q: q, src: src, pageQ: pageQ, card: card, cardWhy: SC[0] ? SC[0].why : pageQ ? "page" : "", rung: rung, ladderEnd: !!Q.length && !q, stuckN: stuckN };
   }
   /* دورِ ۱۰ (J1، s38 p1): «فقط جواب رو بگو» بی تلاشِ دیدنی (نه در همین پیام، نه طرح/گامی در صفحه) ⇒ کارِ همین نوبت با بالاترین اولویت (پولیا: پیش از
      نخستین سرنخ، تلاشِ خودش را بشنو) — opts.turn.onlyAns (بولی، از مربی) بر الگوی متنیِ همین‌جا مقدم است؛ امضای پیشین بی آن هم کار می‌کند */
@@ -58066,6 +58064,11 @@ APP.goFromURL = function (q) {
     /* بانکِ R26 #87 «مسئلهٔ قفسه‌ها تموم شد، …»: «مسئلهٔ X» ِ بی‌پیشوند — فقط با واژهٔ عنوانِ همان مسئله (پایین: title) */
     re = /(?:^|[\s،؛(.!؟?])مسئله(?:ٔ|ی|‌ی)\s+(?!(?:اول|قبلی|قبل|پیشین|دوم|سوم|چهارم|تازه|جدید|بعدی|دیگه|دیگر|من|خودم|ما)(?![آ-ی]))([^\n]{2,50})/g;
     while ((m = re.exec(T))) { var pre0 = T.slice(Math.max(0, m.index - 14), m.index + 1); if (/(?:یه|یک|این|همین|اون|آن|همون|همان|توی?|در|برای|سرِ?|به|درباره(?:ٔ|ی|‌ی)?)\s*$/.test(pre0.replace(/[\s،؛(.!؟?]$/, " "))) continue; out.push({ tail: tailOf(m[1]).split(/\s+/).slice(0, 3).join(" "), bare: true }); }
+    /* دورِ ۲۶ (C31 ِ DECISIONS_R26، ابهامِ ۹ ِ بانک — #89 «این هم مثلِ همون قفسه‌هاست …»): مسئله‌ای که فقط به تشبیه نام برده شد («مثلِ/شبیهِ/عینِ همون X») قابِ برگشت نیست؛
+       قابِ دیگری که همان واژه‌ها را در دلِ تشبیه گرفته («… مثلِ همون مسئلهٔ قفسه‌ها») هم کنار می‌رود. داوری‌اش در named26FromList (like). */
+    var LK = [], reL = /(?:^|[\s،؛(])(?:مثلِ?|مثل|شبیهِ?|عینِ?|مانندِ?|همانندِ?|نظیرِ?)\s+(?:(?:همون|همان|اون|آن)\s+)?(مسئله(?:ٔ|ی|‌ی)?\s*)?([^\n،,.!؟?؛:]{2,50})/g;
+    while ((m = reL.exec(T))) LK.push({ tail: tailOf(m[2]), prob: !!m[1], like: true, at: m.index, end: m.index + m[0].length });
+    if (LK.length) out = out.filter(function (f) { var q = T.indexOf(String(f.tail || "").slice(0, 12)); return !(q >= 0 && LK.some(function (l) { return q >= l.at && q <= l.end; })); }).concat(LK);
     out.forEach(function (f) { var w0 = nz(f.tail).split(" ")[0] || ""; if (f.prob || f.strong) { ORD26.forEach(function (o) { if (new RegExp("^(?:" + o[0].source + ")$").test(w0)) f.ord = o[1]; }); if (/^(?:قبلی|قبل|پیشین)$/.test(w0)) f.ord = "prev"; if (/^(?:تازه|جدید|بعدی|آخر|آخری)$/.test(w0)) f.ord = "last"; } f.deic = DEIC26.test(w0); });
     return out.filter(function (f) { return !f.deic && (f.ord != null || toks(f.tail).length); });
   }
@@ -58074,8 +58077,19 @@ APP.goFromURL = function (q) {
   /* کدام مسئلهٔ این گفت‌وگو را نام برد؟ { to: مسئله } | { ask: [مسئله‌ها] } | null (نام نبرد، یا همان مسئلهٔ کنونی را گفت) */
   function named26(s, mt) { return named26FromList(probs26(s), focus26(s), mt, s); }
   function named26FromList(P, cur, mt, s) {
-    var FR = frames26(mt); if (!FR.length) return null;
+    var FR0 = frames26(mt); if (!FR0.length) return null;
     var C = (s && s.coach) || {}; if (P.length < 2 && !(P.length === 1 && P[0].id !== cur)) return null;
+    var LK = FR0.filter(function (f) { return f.like; }), r = run26(FR0.filter(function (f) { return !f.like; }));
+    if (r || !LK.length) return r;
+    /* C31: تشبیه نوبت را جابه‌جا نمی‌کند. فقط اگر همان پیام (بیرون از بندِ تشبیه) داده یا نتیجه‌ای دارد که متن نمی‌گوید مالِ کدام است ⇒ صفحه می‌پرسد (کنونی + نام‌برده) */
+    var L = run26(LK.map(function (f) { return Object.assign({}, f, { strong: false }); })); if (!L || !(L.to || (L.ask && L.ask.length))) return null;
+    var rest = String(mt || ""); LK.slice().reverse().forEach(function (l) { var e = rest.slice(l.end).search(/[\n،,.!؟?؛:]/); rest = rest.slice(0, l.at) + " " + (e < 0 ? "" : rest.slice(l.end + e)); });
+    if (!/[0-9۰-۹]/.test(rest) && !/(?:^|\s)(?:جواب|نتیجه)/.test(rest)) return null;
+    var tg = L.to ? [L.to] : L.ask, cp = P.filter(function (x) { return x.id === cur; })[0], RW = toks(rest).filter(function (w) { return w.length >= 3; });
+    var hitsOf = function (x) { var X = toks(x.title + " " + x.stmt); return RW.some(function (w) { return hit26(w, X) && !tg.some(function (y) { return y !== x && hit26(w, toks(y.title + " " + y.stmt)); }) && !(cp && x !== cp && hit26(w, toks(cp.title + " " + cp.stmt))); }); };
+    if (cp && hitsOf(cp)) return null;   // بندِ داده خودش واژهٔ مسئلهٔ کنونی را دارد ⇒ همان
+    return { ask: (cp ? [cp] : []).concat(tg.filter(function (x) { return x !== cp; })), frame: LK[0], like: true };
+    function run26(FR) {
     for (var i = 0; i < FR.length; i++) { var f = FR[i], c = null;
       /* بانکِ R26 #85 «برگردیم به اون مسئلهٔ قبلی» با چند مسئلهٔ پیشین: صفحه حدس نمی‌زند — یک مسئلهٔ دیگر ⇒ همان؛ بیشتر ⇒ می‌پرسد */
       if (f.ord === "prev") { var O0 = P.filter(function (x) { return x.id !== cur; }); if (O0.length === 1) c = O0[0]; else if (O0.length > 1) return { ask: O0, frame: f }; }
@@ -58095,6 +58109,7 @@ APP.goFromURL = function (q) {
       return { ask: best, frame: f };
     }
     return null;
+    }
   }
   ST.named26 = named26;
   function focusTo26(s, c, why) {

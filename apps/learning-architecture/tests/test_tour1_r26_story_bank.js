@@ -231,6 +231,32 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     try { const r = await fn(); if (r && r.nc) { info.nc[x.n] = r.nc; continue; } if (r[0]) info.ok++; else errors.push('#' + x.n + ' [' + x.v.rc + ' ' + x.v.kind + '] «' + x.v.text.slice(0, 90) + '» ⇒ expected: ' + x.v.expect.slice(0, 160) + ' :: ' + String(r[1]).slice(0, 500)); }
     catch (e) { errors.push('#' + x.n + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); }
   }
+  // ---------------- C30 / C31 (DECISIONS_R26 «Clarifications after the independent bank» — ابهام‌های ۸ و ۹ ِ بانک؛ ورودیِ بانک ندارند) ----------------
+  const K = {};
+  // C30: پس از برگشت با نام، پیام‌های بی‌نامِ بعدی با همان مسئلهٔ نام‌برده می‌مانند (زنده‌ی باز، گفت‌وگویی، بسته)
+  K.C30_live = async () => { await base3(); await turn('برگردیم به مسئلهٔ قفسه‌ها', [cs({ ph: 'p' })]);
+    await turn('یه چیزی یادم اومد: ۳ تا تختهٔ ۲ متری لازم دارم.', [cs({ ph: 'p', said: ['d'] })]); const S1 = await st();
+    await turn('ارتفاعِ هر طبقه رو هم ۴۰ سانت گرفتم.', [cs({ ph: 'p', said: ['d'] })]); const S2 = await st();
+    return [S1.lprob === A && S2.lprob === A && inAny(S2, 'L:' + A, /تخته/) && inAny(S2, 'L:' + A, /۴۰ سانت/) && !inAny(S2, 'L:' + B, /تخته|سانت/), J([S1.lprob === A, S2.lprob === A, S2.story])]; };
+  K.C30_chat = async () => { await p.evaluate(() => { __wipe(); __fresh(); const pid = __mk('برنامهٔ امتحانِ فیزیک', 'دو هفته تا امتحانِ فیزیک مونده و ۶ فصل دارم. چطور بخونم؟'); APP.liveBindSession(pid, __cur(), { force: true }); window.__b = pid; });
+    await turn('یه مسئلهٔ دیگه: قبضِ آبمون دو برابر شده و نمی‌دونم چرا', [cs({ ph: 'u', said: ['u'] })]); const S1 = await st();
+    await turn('یه مسئلهٔ سوم هم هست، باید برای مادرم پرستار پیدا کنم و نمی‌دونم از کجا', [cs({ ph: 'u', said: ['u'] })]);
+    await turn('برگردیم به مسئلهٔ قبض', [cs({ ph: 'u' })]); const S2 = await st();
+    await turn('کنتور رو نگاه کردم، شب‌ها هم که همه خوابیم ساعتی ۲ لیتر می‌چرخه.', [cs({ ph: 'u', said: ['d'] })]); const S3 = await st(), bb = await p.evaluate(() => __b);
+    return [S2.pk === S1.pk && S3.pk === S1.pk && /قبض/.test(S3.stmt) && inAny(S3, S1.pk, /لیتر/) && !Object.keys(S3.story).some(k => k !== S1.pk && (S3.story[k] || []).some(x => /لیتر/.test(x))) && !S3.lprob, J([S1.pk, S2.pk, S3.pk, S3.stmt, S3.story, S3.lprob === bb])]; };
+  K.C30_closed = async () => { await base3(); await p.evaluate((A) => { const pg = APP.S.get('eprog_' + A), so = pg.solve = pg.solve || {}, L = so.live = so.live || {}; so.u = so.u || {}; so.u[1] = { done: true, from: 'chat', one: 'چند طبقه قفسه جا میشه', u: 'چند طبقه', dl: [{ id: 'd1', t: 'ارتفاعِ انباری ۲ متره' }], c: '' }; L.state = 'solved'; L.stateAt = new Date().toISOString(); L.chat = { sess: __cur().id, at: L.stateAt, solution: 'با طبقهٔ ۴۰ سانتی ۵ طبقه جا میشه', by: 'user' }; so.b = so.b || {}; so.b[1] = { done: true, verdict: 'verified', lesson: 'اول اندازه', at: L.stateAt }; APP.S.put(pg); }, A);
+    await turn('برگردیم به مسئلهٔ قفسه‌ها', [cs({ ph: 'b' })]); const S1 = await st();
+    const u = await turn('اگه طبقه‌ها رو ۳۵ سانتی بگیرم چند تا جا میشه؟', [cs({ ph: 'b' })]); const S2 = await st();
+    return [S1.lprob === A && S2.lprob === A && !inAny(S2, 'L:' + B, /./) && /قفسه/.test(multi(u) + liveLine(u) + nowLine(u)), J([S1.lprob === A, S2.lprob === A, S2.story['L:' + B], (multi(u) || liveLine(u)).slice(0, 200)])]; };
+  // C31: مسئله‌ای که فقط به تشبیه نام برده شد نوبت را جابه‌جا نمی‌کند؛ اگر همان پیام داده/نتیجه‌ای دارد که به هر دو می‌خورد، صفحه می‌پرسد
+  K.C31_plan = async () => { await base3(); await turn('این هم مثلِ همون مسئلهٔ قفسه‌هاست، اول باید اندازه بگیرم؛ پس اول ببینم امتحان چند فصل داره', [cs({ ph: 'p', said: ['plan'], plan: { text: 'اول ببینم امتحان چند فصل داره' } })]); const S = await st();
+    return [S.lprob === B && !S.ask && !inAny(S, 'L:' + A, /فصل/) && (S.story['L:' + A] || []).length === 1, J([S.lprob === B, S.ask, S.story])]; };
+  K.C31_only = async () => { await base3(); await turn('این هم یه جورایی شبیهِ مسئلهٔ قفسه‌هاست.', [cs({ ph: 'u' })]); const S = await st();
+    return [S.lprob === B && !S.ask, J([S.lprob === B, S.ask])]; };
+  K.C31_datum = async () => { await base3(); const u = await turn('این هم مثلِ همون مسئلهٔ قفسه‌هاست؛ آخرش ۳ تا شد.', [cs({ ph: 'b', said: ['result'], result: 'آخرش ۳ تا شد' })]); const S = await st();
+    return [!!S.ask && /منظورت کدام است/.test(multi(u)) && /قفسه/.test(multi(u)) && /امتحان/.test(multi(u)) && !inAny(S, 'L:' + A, /۳ تا/) && !inAny(S, 'L:' + B, /۳ تا/), J([S.ask, multi(u).slice(-300), S.story])]; };
+  for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').includes(k)) continue; info.n++;
+    try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 600)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   if (!BANK.length) info.nc.bank = 'VARIANTS_R26.json not found';
   console.log(JSON.stringify(info));
   console.log(errors.length ? 'ERRORS(' + errors.length + '):\n' + errors.join('\n') : 'NO ERRORS');
