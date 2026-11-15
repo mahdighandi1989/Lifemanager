@@ -50,3 +50,9 @@ Nothing else: `a38_live.js`, `a29_mind.js`, `a44_route.js`, `a26` are untouched.
 - C26-8 at pwC1 p3 («انرژیِ روزانه = ۲۴۷۰ × ۸ ≈ ۱۹٫۸ کیلووات‌ساعت»): the refusal there is the engine's ✗ on the scale (Q1/C15, arith); with my change the line now
   says so («با حسابِ صفحه نمی‌خواند») instead of «یا حکم». It lands once a46 reads it.
 - No real-model run of the two new turn lines (`undo`, `which`); the tests use the recorded and scripted replies.
+
+## Suite result (resumed run, 2026-11-15)
+Whole page suite run one test at a time on this branch head: 150 of 152 files exit 0. `fixtures_mind_seed.js` is a browser fixture (needs `window`),
+not a test. `test_polya_fix5.js` M3 fails identically on a clean BASE26 (`23e351f6`) snapshot: the test's fixed «۲۵ آبان» equals the page's
+next-day review date when today is 1405-08-24 (2026-11-15), so the line shows the same date twice. A hard-coded calendar date, not caused by this
+branch; belongs to «today» (dates, a41). `pytest tests/test_learning_architecture_handbook.py tests/test_supervisor_ownership.py`: 14 passed.
