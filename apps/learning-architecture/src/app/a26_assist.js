@@ -394,7 +394,13 @@
     var s = { id: A.uid("achat"), type: TYPE, title: "", pinned: "", status: "", memory: "", msgs: [], steps: [], files: [], reports: [] }; S.put(s); store("cur", s.id); return s;
   };
   AS.cur = function () { var id = store("cur"), s = id && S.get(id); return s && s.type === TYPE ? s : null; };
-  function provisional(s, text) { return s.title || clip(text, 50) || "گفت‌وگوی تازه"; }
+  /* دورِ ۲۶ (Q9، U29 bp3 s28 «سلام! امروز برگه‌ی سفید…»): عنوانِ پشتیبانِ سشن از پیامِ خام ساخته می‌شد — حالا بی سلام/معرفی و بی نامِ شخصِ سوم (A.AGE.titleOf، a43) */
+  function title26(text) { try { return A.AGE && A.AGE.titleOf ? A.AGE.titleOf(text) : text; } catch (e) { return text; } }
+  AS.title26 = title26;
+  /* بانکِ R26 #226: سشنِ روزِ دومِ یک مسئلهٔ زنده و بی عنوان از مدل ⇒ عنوانِ همان مسئله؛ وگرنه پیامِ پیراسته */
+  function liveTitle26(s) { try { var pid = s && (s.lprob || (A.liveSessionPid && A.liveSessionPid(s))), r = pid && A.liveRec && A.liveRec(pid); return r && r.p && r.p.title ? r.p.title : ""; } catch (e) { return ""; } }
+  AS.sessTitle26 = function (s, text, n) { return (s && s.title) || clip(liveTitle26(s) || title26(text != null ? text : (((s && s.msgs) || []).filter(function (m) { return m && m.role === "user"; })[0] || {}).text), n || 50); };
+  function provisional(s, text) { return AS.sessTitle26(s, text, 50) || "گفت‌وگوی تازه"; }
 
   /* ---------- پیام به هوش ---------- */
   var SYS = [
@@ -913,7 +919,11 @@
                متنِ پیشین: AS.R25_QUARANTINE.noFieldTxt24 */
             var btnN25 = document.querySelectorAll("#main button:not([disabled]), #main [role=tab], #main a.btn").length, um25 = ""; try { for (var i25 = s.msgs.length - 1; i25 >= 0; i25--) { if (s.msgs[i25] && s.msgs[i25].role === "user" && !/^\[سامانه/.test(String(s.msgs[i25].text || ""))) { um25 = String(s.msgs[i25].text || ""); break; } } } catch (e) { }
             var wantAct25 = !!btnN25 && AS.wantsAct25 && AS.wantsAct25(um25);
-            var fillTxt = !allN ? (wantAct25 ? ". این نما فیلدی برای پر کردن ندارد — چیزی پر نکن. خواستهٔ همین پیامِ کاربر («" + um25.replace(/[«»\n]/g, " ").slice(0, 80) + "») هنوز انجام نشده: اگر دکمه یا زبانه‌ای در همین نما به آن می‌رسد (ساختن/ثبت/باز کردن)، **همان یک دکمه** را بزن و هیچ دکمهٔ دیگری نه؛ اگر چنین دکمه‌ای نیست، در یک جمله بگو کجا انجام می‌شود؛ reply خیلی کوتاه.]"
+            /* دورِ ۲۶ (Q10، C26-32 pC1 p12–p14، pC2 p11، pC3 p15؛ بانکِ R26 #250): نمای «فهرست + فرمِ تازه» که از پیش همان چیز را برای همین مسئله دارد (نقشهٔ پیش‌نیازِ خودش) ⇒
+               «همان را باز کن»، نه «فیلدها را پر کن … دکمهٔ ساخت را بزن» (مدلِ لفظی یک نقشهٔ دومِ خالی با همان عنوان می‌ساخت). یابنده‌ها در AS.HOLDS26 (نما ⇒ رکوردِ موجود). */
+            var held26 = null; try { var hf26 = AS.HOLDS26 && AS.HOLDS26[A.state.view]; held26 = hf26 && !A.state.arg ? hf26(s) : null; } catch (e) { held26 = null; }
+            var fillTxt = held26 ? ". این نما از پیش «" + String(held26.title || "").replace(/[«»\n]/g, " ").slice(0, 70) + "» را برای همین مسئله دارد (" + held26.what + ") — همین‌جاست؛ همان را باز کن: {\"do\":\"go\",\"view\":\"" + held26.go[0] + "\",\"arg\":\"" + held26.go[1] + "\"} — فرمِ «تازه» را پر نکن و دکمهٔ ساخت را نزن (چیزِ دومی با همان نام ساخته نشود)، مگر کاربر صریح یک موردِ تازهٔ دیگر خواسته باشد؛ reply خیلی کوتاه.]"
+              : !allN ? (wantAct25 ? ". این نما فیلدی برای پر کردن ندارد — چیزی پر نکن. خواستهٔ همین پیامِ کاربر («" + um25.replace(/[«»\n]/g, " ").slice(0, 80) + "») هنوز انجام نشده: اگر دکمه یا زبانه‌ای در همین نما به آن می‌رسد (ساختن/ثبت/باز کردن)، **همان یک دکمه** را بزن و هیچ دکمهٔ دیگری نه؛ اگر چنین دکمه‌ای نیست، در یک جمله بگو کجا انجام می‌شود؛ reply خیلی کوتاه.]"
                 : AS.R25_QUARANTINE.noFieldTxt24)
               : ownN && ownN >= allN ? ". فیلدهای این صفحه همه «به قلمِ خودِ کاربر»اند (data-own): هیچ‌کدام را پر نکن — بگو خودش می‌نویسد و فقط جای نوشتن را نشان بده (هایلایت)؛ اگر دکمهٔ غیرِ تصمیمیِ لازمی هست بزن؛ reply خیلی کوتاه.]"
               : ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن" + (ownN ? " — فقط فیلدهایی که «به قلمِ خودِ کاربر — پر نکن» نیستند؛ آن‌ها را فقط هایلایت کن و بگو خودش می‌نویسد" : "") + " و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]";
@@ -1121,6 +1131,14 @@
   function subFa25(sub) { var t = ""; try { var el = document.querySelector('#main [role=tab][aria-selected="true"], #main .tab.on'); t = el ? String(el.textContent || "").replace(/\s+/g, " ").trim() : ""; } catch (e) { }
     return t ? " — زبانهٔ «" + t.replace(/[«»]/g, "") + "»" : " (قدم/برگهٔ " + sub + ")"; }
   AS.subFa25 = subFa25;
+  /* دورِ ۲۶ (Q10، C26-32): «این نما از پیش چه چیزی را برای کارِ همین سشن دارد؟» — نما ⇒ تابع(سشن) ⇒ { title, what, go:[view, arg] } یا null. فیکسرهای دیگر یابندهٔ نمای خودشان را می‌افزایند. */
+  AS.HOLDS26 = AS.HOLDS26 || {};
+  AS.HOLDS26.prereq = function (s) {
+    var pid = ""; try { pid = (A.liveSessionPid && A.liveSessionPid(s)) || (s && s.lprob) || ""; } catch (e) { pid = (s && s.lprob) || ""; }
+    var R = S.all("prereq", function (r) { return r && ((pid && r.pid === pid) || (s && r.sess === s.id)); }).sort(function (a, b) { return String(b.updated || b.created || "").localeCompare(String(a.updated || a.created || "")); });
+    if (!R.length) return null; var r0 = R.filter(function (r) { return (r.items || []).length; })[0] || R[0];
+    return { title: r0.title || "نقشهٔ پیش‌نیازها", what: fa((r0.items || []).length) + " مفهوم", go: ["prereq", r0.id] };
+  };
   var FACT25 = /(?:(?:^|[^A-Za-z])[A-Za-z]|\))!+$/;   // «n!»، «(n−k)!»، «2^n·n!» — فاکتوریل؛ «OK!»/«done!» (واژهٔ لاتینِ بلند) نه
   AS.FACT25 = FACT25;
   function bidiNodes(t) {
@@ -1172,7 +1190,7 @@
       all.length ? h("ul", { class: "plain" }, all.map(function (s) {
         var pg = AS.progress ? AS.progress(s) : null;   // همان شمارِ کشوی تور و «امروز» (یک منبع)
         return h("li", { class: "as-li" + (cur && cur.id === s.id ? " on" : "") }, h("button", { class: "linkish", type: "button", onclick: function () { store("cur", s.id); ui.view = "chat"; AS.clearMarks(); paint(); } },
-          h("b", {}, s.title || clip((s.msgs[0] || {}).text, 40) || "گفت‌وگوی تازه"),
+          h("b", {}, AS.sessTitle26(s, null, 40) || "گفت‌وگوی تازه"),
           h("span", { class: "small muted" }, " · " + A.fdate(s.updated) + (pg ? " · " + pg.label + " " + fa(pg.done) + "/" + fa(pg.all) : "") + (s.reports && s.reports.length ? " · 🛎" + fa(s.reports.length) : ""))));
       })) : h("p", { class: "small muted" }, "هنوز سشنی نیست."));
   }

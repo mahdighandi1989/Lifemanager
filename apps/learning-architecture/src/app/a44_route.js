@@ -600,11 +600,16 @@
   function entOf(rid, XS, e, eid) {
     var hitOf = function (X) { return ((X && X.st) || []).filter(function (x) { return x && x.id === eid; }); }, cand = [];
     if (e.sess) { var se = S.get(e.sess), P = (se && se.coach && se.coach.pre22) || {}, pk0 = A.STORY && A.STORY.pkAt ? A.STORY.pkAt(se, e.at) : "";
-      if (pk0 && P[pk0]) cand = hitOf(P[pk0]); if (!cand.length) Object.keys(P).forEach(function (k) { cand = cand.concat(hitOf(P[k])); }); }
+      /* دورِ ۲۶ (Q10، C26-34 pC3 🧭 — سهمِ classify): پشتهٔ گفت‌وگویی که با زنده شدنِ مسئله «منتقل» شد (movedTo) نسخهٔ کهنه است — وضعِ هر پیش‌نیاز (آموخته/باز) در پشتهٔ خودِ
+         مسئلهٔ زنده پیش می‌رود. خواندنِ نسخهٔ کهنه پیش‌نیازِ آموخته را برای همیشه «باز» نشان می‌داد («اکنون: پیش‌نیازِ … · ۱ پیش‌نیازِ باز تا برگشت به خط»). */
+      var liveY26 = function (Y) { return Y && !Y.movedTo ? Y : null; };
+      if (pk0 && liveY26(P[pk0])) cand = hitOf(P[pk0]); if (!cand.length) Object.keys(P).forEach(function (k) { if (liveY26(P[k])) cand = cand.concat(hitOf(P[k])); }); }
     if (!cand.length) XS.forEach(function (X) { cand = cand.concat(hitOf(X)); });
     if (cand.length > 1) { var t = String(e.title || ""), c2 = cand.filter(function (x) { return t.indexOf(clip(x.concept, 60)) >= 0; }); if (c2.length) cand = c2; }
     return cand[0] || null;
   }
+  /* دورِ ۲۶ (Q10، C26-34): رویدادِ پیش‌نیازِ دورانِ گفت‌وگو (e.sess) و رویدادِ بعدیِ همان پیش‌نیاز در مسئلهٔ زنده یک انحراف‌اند، نه دو — وقتی پشتهٔ همان سشن به همین مسئله منتقل شده، کلیدِ انحراف سشن ندارد */
+  function movedSess26(rid, e) { try { if (!rid.pid || !e.sess) return false; var se = S.get(e.sess), P = (se && se.coach && se.coach.pre22) || {}, pk0 = A.STORY && A.STORY.pkAt ? A.STORY.pkAt(se, e.at) : ""; var Y = pk0 && P[pk0]; if (Y) return Y.movedTo === rid.pid; return Object.keys(P).some(function (k) { return P[k] && P[k].movedTo === rid.pid; }); } catch (x) { return false; } }
   A.ROUTE.model = function (id) {
     var rid = routeId(id); if (!rid) return null;
     var D = rid.pid ? (A.dossier ? A.dossier(rid.pid) : null) : (A.dossierSess ? A.dossierSess(rid.sess) : null); if (!D) return null;
@@ -641,10 +646,10 @@
         return;
       }
       if (dk) {
-        var pe = dk === "pre" ? PRE.evId(e.id) : null, ent = pe ? (entOf(rid, XS, e, pe.eid) || E[pe.eid]) : null, key = dk === "pre" ? "pre:" + (e.sess ? e.sess + "|" : "") + (pe ? pe.eid : e.id) : dk + ":" + pts.length;
+        var pe = dk === "pre" ? PRE.evId(e.id) : null, ent = pe ? (entOf(rid, XS, e, pe.eid) || E[pe.eid]) : null, ks26 = e.sess && !movedSess26(rid, e) ? e.sess + "|" : "", key = dk === "pre" ? "pre:" + ks26 + (pe ? pe.eid : e.id) : dk + ":" + pts.length;
         var d = dk === "pre" ? preDet[key] : null;
         if (!d) {
-          var parD = ent && ent.parent ? preDet["pre:" + (e.sess ? e.sess + "|" : "") + ent.parent] : null;
+          var parD = ent && ent.parent ? preDet["pre:" + ks26 + ent.parent] : null;
           d = { key: key, kind: dk, fa: DET_FA[dk], from: parD && parD.pts.length ? parD.pts[parD.pts.length - 1] : lastMain, fromDet: parD ? dets.indexOf(parD) : -1, pts: [], rejoin: null, depth: ent ? ent.depth || 0 : 0, open: dk === "pre" ? !!(ent && OPEN[ent.state]) : false, concept: ent ? ent.concept : "", state: ent ? ent.state : "", step: ent ? ent.step : "", quote: ent ? ent.quote || "" : "", parent: parD ? dets.indexOf(parD) : -1, guess: dk === "guess" ? String((e.lines || [])[0] || "") : "" };
           dets.push(d); if (dk === "pre") preDet[key] = d;
         }

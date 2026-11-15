@@ -427,6 +427,14 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R25 P6 (C25-2, A23-14, D25-13, B24·D12, D23-30).
 - **Status:** reachable, not called: `APP.ASSIST.R25_QUARANTINE.noFieldTxt24` (still used for views with no button or no request), `.regSys24`,
   `APP.R25_QUARANTINE.liveReqSignals24`, `.resultQ24`, `.natGuess24`. Delete only with the owner's approval.
+## 2026-11-12 — open-ended register signs, ladder jump after one late success (learning-architecture, Pólya round 26, classify: Q9 + Q10)
+- **Files:** `apps/learning-architecture/src/app/a27_tour.js`, `a41_practice.js`.
+- **What they did:** `SIGN_SH` read any
+  «[بن] + letters + ید/ین» as second person plural («ندید», «نخستین», «بازدید»); `SIGN_TO18` read any word ending in «ت» before «را/می‌شود» as the clitic «ـت»
+  («ثبت را», «سانت می‌شود») and any joined «می…ی» as a verb («میلیونی»); `extGap` in `PR.eval` took the next rung of the page ladder after a late success even
+  while the technique's own sequence was incomplete («۲۱ روز · ۱ از ۳»).
+- **Why replaced:** DECISIONS_R26 Q9 (D26-33, D26-53, U55, C26-17, bank #232–#235) and Q10 (C26-42, C39).
+- **Status:** reachable, not called: `APP.ASSIST.R26_QUARANTINE.signSh25`, `.signTo18_25`, `APP.PR.R26_QUARANTINE.extGap25`. Delete only with the owner's approval.
 
 ## 2026-11-12 — round-25 readers of the prior-work reply (learning-architecture, Pólya round 26, prior: Q4)
 - **File:** `apps/learning-architecture/src/app/a45_story.js`.
