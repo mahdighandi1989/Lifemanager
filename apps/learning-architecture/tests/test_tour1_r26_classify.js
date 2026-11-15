@@ -170,7 +170,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     chk(d1.t && !/^سلام/.test(d1.t) && /برگه‌ی سفید/.test(d1.t), 'U29: the session dossier title (breadcrumb) has no greeting — ' + d1.t);
     await wipe(); await fresh();
     await ev(([a, b]) => { const s = __cur(), at = (i) => new Date(Date.UTC(2026, 9, 19, 8, i)).toISOString(); s.msgs.push({ role: 'user', text: a, at: at(0) }, { role: 'ai', text: 'خوب.', at: at(1) }, { role: 'user', text: b, at: at(2) }, { role: 'ai', text: 'خوب.', at: at(3) });
-      s.coach = { pk: 'c:2', gen: 2, stmt: 'x', pkLog: [{ pk: 'c:1', at: at(0) }, { pk: 'c:2', at: at(2) }] }; APP.S.put(s); }, [X[1], X[2]]);
+      s.coach = { pk: 'c:2', gen: 2, stmt: 'x', probs26: { 'c:1': { at: at(0), stmt: a }, 'c:2': { at: at(2), stmt: b } }, pkLog: [{ pk: 'c:1', at: at(0) }, { pk: 'c:2', at: at(2) }] }; APP.S.put(s); }, [X[1], X[2]]);
     const d2 = await ev(() => { const D = APP.dossierSess(__cur().id, 'c:2'), D1 = APP.dossierSess(__cur().id, 'c:1'); return { pks: (D.pks || []).map(x => x.title), t2: D.title, t1: D1.title }; });
     chk(d2.pks.length === 2 && !d2.pks.some(t => /^سلام|مریمم|متولد/.test(t)), 'C26-13 / C26-29: the «مسئله‌های این گفت‌وگو» list shows neither greeting, introduction nor birth sentence — ' + JSON.stringify(d2.pks));
     chk(!/متولد/.test(d2.t2) && !/مریمم/.test(d2.t1), 'C26-29: the dossier title of each chat problem (the «برگرد به» strip) likewise — ' + d2.t1 + ' | ' + d2.t2);

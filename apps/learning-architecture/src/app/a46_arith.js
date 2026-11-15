@@ -86,7 +86,7 @@
       .replace(/منفی(?:ِ)?\s*(?=\d)/g, "-")
       .replace(/ضرب\s*در|ضربدر/g, " * ").replace(/تقسیم\s*بر/g, " / ").replace(/منهای/g, " ~ ")
       .replace(/به[\u200c\s]?علاوه[ٔۀ]?(?:\u200c?ی)?|بعلاوه[ٔۀ]?(?:\u200c?ی)?|به[\u200c\s]?اضافه[ٔۀ]?(?:\u200c?ی)?/g, " + ")
-      .replace(/[×⋅·∙]/g, "*").replace(/÷/g, " / ")   /* C26: «÷» تقسیم است، هرگز «/» ِ کسرِ چسبیده یا ممیز */
+      .replace(/[×⋅·∙]/g, "*")   /* C26: «÷» تقسیم است، هرگز «/» ِ کسرِ چسبیده یا ممیز — در متن می‌ماند (هم‌طول، تا pos/pe ِ هر سنجش جای همان متنِ او باشد: convs25 ِ اصلاح) و توکن‌ساز آن را «/» ِ فاصله‌دار می‌خواند */
       .replace(/(\d%?)\s*[xX]\s*(?=\d)/g, "$1 * ").replace(/(\d%?)\s+در\s+(?=\d)/g, "$1 * ")
       .replace(/(^|[\s،,.؛:])(?:میشه|می[\u200c\s]?شه|می[\u200c\s]?شود|میشود|می[\u200c\s]?شد|شد)(?=$|[\s،,.؛:!؟?]|\d)/g, "$1 ＝ ")   /* «＝» = برشی که از واژه آمده («میشه»): دورِ ۲۶ (C18) — «میشه» میانِ دو عبارت «می‌شود/تبدیل می‌شود» است، نه لزوماً تساوی */
       .replace(/[≃≅]/g, "≈");
@@ -112,6 +112,7 @@
         if (mag) v = mul(v, F(p10(mag))); if (pct) v = div(v, F(B(100)));
         tk = { k: "n", raw: raw, v: v, pct: pct, mag: mag, int: raw.indexOf(".") < 0 && !pct && !mag, a: i, b: e, sp: sp };
       } else if (c === "π") { tk = { k: "n", raw: "π", v: PI.lo, ivl: PI, cst: true, pct: false, mag: 0, int: false, a: i, b: i + 1, sp: sp };   /* دورِ ۲۶ (C17، B26·D8): π ثابت است، نه مجهول — بازهٔ گویا */
+      } else if (c === "÷") { tk = { k: "o", t: "/", a: i, b: i + 1, sp: true, spA: true };
       } else if (c === "∕") { tk = { k: "o", t: "/", of: true, a: i, b: i + 1, sp: sp, spA: /\s/.test(s[i + 1] || " ") };
       } else if ("+-*/~^".indexOf(c) >= 0) tk = { k: "o", t: c, a: i, b: i + 1, sp: sp, spA: /\s/.test(s[i + 1] || " ") };
       else if (c === "²" || c === "³") tk = { k: "w2", t: c === "²" ? 2 : 3, a: i, b: i + 1, sp: sp };
@@ -209,7 +210,7 @@
   var MATH = /[√∛∑∫∏π^_|±∓<>≤≥≠≡∈∞∂∆∇]/;
   /* آنچه پس از عددِ گفته آن را عددِ دیگری می‌کند («۲ برابرِ …»، «۳ به ۲»، «۲ سوم»، «۳ تا ۵»، «۲ و ۵۷ صدم») ⇒ خوانده نمی‌شود */
   var AFTER_BAD = /^\s*(?:برابر(?=ِ?\s*[\d(])|به(?![آ-ی\u200c])|توان|ممیز|دوم(?![آ-ی])|سوم(?![آ-ی])|چهارم(?![آ-ی])|پنجم(?![آ-ی])|ششم(?![آ-ی])|هفتم(?![آ-ی])|هشتم(?![آ-ی])|نهم(?![آ-ی])|دهم(?![آ-ی])|صدم(?![آ-ی])|هزارم(?![آ-ی])|رادیکال|جذر|تا\s*\d+(?:\.\d+)?(?!\s*تا(?![آ-ی]))|و\s*\d+(?:\.\d+)?\s*(?:صدم|دهم|هزارم|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم)|:\s*\d)/;
-  var MIXED = /^\s*و\s*(\d+)\/(\d+)(?!\d|\.\d|\/)(?!\s*[+\-*\/~^(=≈])/;
+  var MIXED = /^\s*و\s*(\d+)\/(\d+)(?!\d|\.\d|\/)(?!\s*[+\-*\/÷~^(=≈])/;
   var FLOOR = new RegExp("^\\s*و\\s*(?:خرده\\u200c?\\s?ای|خورده\\u200c?\\s?ای|خرده(?![آ-ی])|خورده(?![آ-ی])|اندی|کمی|یه\\s*چیزی|یک\\s*چیزی|یه\\s*کم(?![آ-ی])|یه\\s*ذره)(?:\\s*[،,]?\\s*(?:یعنی|دقیق\\u200c?تر(?:ش)?)\\s*(" + APX + ")?\\s*(\\d+(?:\\.\\d+)?)(?!\\d|\\.\\d|\\/))?");
   var HALFW = /^\s*و\s*نیم(?![آ-ی])/;
   var REM = /^\s*(?:[،,]\s*|و\s*|با\s*)?(?:باقی[\u200c\s]?مانده(?:ٔ|ی|\u200cی|ش|\u200cاش)?|باقیش)\s*(\d+)(?![\d.\/])|^\s*(?:[،,]\s*|و\s*)(\d+)\s*(?:تا\s*)?(?:هم\s*)?(?:باقی\s*)?(?:می[\u200c\s]?مونه|می[\u200c\s]?ماند|اضافه\s*میاد)/;
@@ -234,7 +235,7 @@
     if (pv.k === "w" && FUNC_FA.test(pv.t) && !(/^توان/.test(pv.t) && !(T[s - 2] && T[s - 2].k === "w" && T[s - 2].t === "به"))) return false;
     return true;
   }
-  function textOf(seg, X) { return seg.slice(X.a, X.b).replace(/\s*∕\s*/g, " از ").replace(/\s+/g, " ").replace(/\*/g, "×").replace(/\s*~\s*/g, " − ").replace(/-/g, "−").replace(/%/g, "٪").trim(); }
+  function textOf(seg, X) { return seg.slice(X.a, X.b).replace(/\s*÷\s*/g, " / ").replace(/\s*∕\s*/g, " از ").replace(/\s+/g, " ").replace(/\*/g, "×").replace(/\s*~\s*/g, " − ").replace(/-/g, "−").replace(/%/g, "٪").trim(); }
 
   /* ---------- یک تکه: عبارتِ آغازی (گفته) و عبارتِ پایانی (حساب) ---------- */
   function leadOf(seg, T, o) {
@@ -444,7 +445,7 @@
   /* سمتِ چپِ برش به عدد (یا واحدِ همان عدد) ختم می‌شود — «… و تهران = ۱٫۲ + …» نام است، نه حساب */
   function endsNum(A) { var j = A.length - 1; while (j >= 0 && A[j].k === "w" && !NOSTRIP.test(A[j].t)) j--; return j >= 0 && (A[j].k === "n" || A[j].k === "w2" || (A[j].k === ")" && A[j].ok)); }
   function clock(A) { for (var j = 1; j + 1 < A.length; j++) if (A[j].k === "p" && A[j].t === ":" && A[j - 1].k === "n" && A[j + 1].k === "n" && !A[j + 1].sp) return true; return false; }
-  function pretty(x) { return String(x).replace(/\s*∕\s*/g, " از ").replace(/\s+/g, " ").replace(/＝/g, "میشه").replace(/\*/g, "×").replace(/\s*~\s*/g, " − ").replace(/-/g, "−").replace(/%/g, "٪").trim(); }
+  function pretty(x) { return String(x).replace(/\s*÷\s*/g, " / ").replace(/\s*∕\s*/g, " از ").replace(/\s+/g, " ").replace(/＝/g, "میشه").replace(/\*/g, "×").replace(/\s*~\s*/g, " − ").replace(/-/g, "−").replace(/%/g, "٪").trim(); }
   function chains(t, reg, out, note, CU, U) {
     var re = /(?<![<>!=:≠])=(?![=>])|≈|＝/g, m, cuts = [], cutW = [], cutAt = [], last = 0, segs = [];
     while ((m = re.exec(t))) { segs.push({ s: t.slice(last, m.index), at: last }); cuts.push(m[0] === "≈"); cutW.push(m[0] === "＝"); cutAt.push(m.index); last = m.index + m[0].length; }
@@ -708,7 +709,7 @@
   }
   /* C29 (دورِ ۲۶): اعتراضی که حق با او نیست — حکم می‌ماند، صفحه می‌گوید یک بار دوباره سنجید و تکه‌ای را که نمی‌خواند نشان می‌دهد؛ عددِ درست هرگز گفته نمی‌شود (نه به او، نه در دفتر و 📜) */
   function bothT(c) { return "نوشتهٔ خودش: «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» · بازسنجیِ صفحه: همین تکه — «" + fa(c.expr) + "» در برابرِ «" + fa(c.saidT || c.said) + "» — نمی‌خواند"; }
-  function keyOf(x) { return norm(String(x)).replace(/＝/g, "=").replace(/∕/g, "/").replace(/[\s×*]+/g, function (m) { return /[×*]/.test(m) ? "*" : ""; }); }
+  function keyOf(x) { return norm(String(x)).replace(/÷/g, "/").replace(/＝/g, "=").replace(/∕/g, "/").replace(/[\s×*]+/g, function (m) { return /[×*]/.test(m) ? "*" : ""; }); }
   /* ST.arithContest(s, msg) ⇒ null یا { cleared: [...], kept: [...], lines: [سطرهای مربی], note: سطرِ خودِ او } — یک بار برای هر پیام (s.seq) */
   ST.arithContest = function (s, msg) {
     var mt = String(msg || ""); if (!s || !mt.trim() || /^\s*\[/.test(mt)) return null;

@@ -6,6 +6,8 @@
 **به‌روزشده:** 2026-11-11 — ▶ مالک گفت ادامه بده؛ اصلاحِ دورِ ۲۵ در جریان (بخشِ «▶ ۲۰۲۶-۱۱-۱۱» را بخوان)
 
 ## ▶ ۲۰۲۶-۱۱-۱۵ — ازسرگیری روی Opus («ادامه بده» ِ مالک)
+
+- **گیتِ ۴۰ (a8c4bfe0): `GATE_DONE fail=1` — به main نرفت.** سه برخوردِ میانِ fixer ها (WORKLOG 137): «÷» ِ arith جای `pos` را جابه‌جا می‌کرد ⇒ U4/U5 ِ correction؛ «موقعیت» + fixture ِ C26-13 در classify؛ `tests/fixtures` در sandbox ِ pytest نبود. هر سه در merge26 درست شد. **گامِ بعدی:** آزمون‌های arith/correction/classify + pytest ِ مرورگر سبز ⇒ commit در merge26 ⇒ گیتِ ۴۱ ⇒ فقط با `GATE_DONE fail=0` ادغام در شاخهٔ کار و main.
 - ظرف همان ظرف بود (scratchpad، venv، worktree ها و شاخه‌ها سالم). هفت اصلاح‌گر روی Opus، هر کدام در worktree ِ قبلیِ خودش، با `FIX26.md` + `FIX26_RESUME.md` از آخرین کامیتش راه افتاد (بی worktree ِ تازه، بی push).
 - **وضع (۲۰۲۶-۱۱-۱۵):** پنج اصلاح‌گر تمام و گزارش‌شان در `reports/fix26/` (arith fcb2c4fa، prior 29df3024، loop 4add50a4، today 802fb17c، classify 82370720). هر پنج در شاخهٔ محلیِ `merge26` (worktree `scratchpad/merge26`، سر 65255bcc) ادغام شدند، بی تداخلِ کد؛ شماره‌ها: arith 130/127، prior 131/128، loop 132/129، today 133/130، classify 134/131؛ آزمون‌های مستندات ۱۴/۱۴. رونوشت: `fix26_pause/merge26_partial.bundle`. مانده: correction (135/132) و story (136/133)، سپس گیتِ کامل.
 - **گامِ بعدی:** با هر گزارش، hand-back در `reports/fix26/<name>.md` + هشِ شاخه این‌جا؛ هم‌زمان RUNNER27؛ بعد ادغام (arith اول)، گیت، خواندنِ `GATE_DONE fail=0`، push به `main`. مصرفِ Opus در این مرحله اندازه گرفته و به مالک گفته شود.

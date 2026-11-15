@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-11-11T12:00:00Z"
 created_at: "2026-11-11T12:00:00Z"
-updated_at: "2026-11-12T12:00:00Z"
+updated_at: "2026-11-15T12:00:00Z"
 merged_from: []
 ---
 
@@ -116,3 +116,8 @@ for (i = 1; i < segs.length; i++) {
 - **A question needs a place for its answer.** Store the open question with the message number; read only the next message's yes/no; record
   the answer (approximate ✓, or ✗ that can itself be contested). A reply that is neither leaves the question open and records nothing.
 - **A re-check that upholds a ✗ must still not leak the answer:** say it was re-checked once and point at the link that does not read.
+
+## Update 2026-11-15 — normalization must keep length when positions are shared
+- **What happened:** one fixer made the checker replace «÷» with « / » (three characters) during normalization, so a spaced division is never read as a glued fraction. The checker reports `pos/pe` for every check against the *normalized* text. Another fixer, working at the same time, used those positions to slice the *original* text (to bind a unit conversion such as «6131 s, about 102 min»). Each branch was green alone. After the merge, every check after a «÷» was shifted by two characters, the conversion bound to the wrong number, and a correction stopped reaching the steps built on it.
+- **Rule:** if a normalizer's offsets are consumed by anyone, every rewrite must keep the length (map a symbol to a single character and give the tokenizer the meaning — e.g. keep «÷» and tokenize it as a spaced «/»), or the normalizer must return an offset map. Add a test that asserts `text.slice(pos, pe)` on the *original* string for a sentence containing each rewritten symbol.
+- **Finding it:** when an integrated build fails a test that each branch passed, apply only the source diff of each other branch onto the failing branch one at a time (`git diff base X -- src | git apply -3`), skipping docs and bundles. The first one that turns the test red is the cause; then compare the shared function's output (here `pos/pe`) with and without it.
