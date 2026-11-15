@@ -5135,3 +5135,14 @@ dated stability, mind-card feed) under way.
   (C26); «و … میشه» is a sum and «N تا … M … میشه K» a product, ranges excluded (C28); a contest where she is wrong now says «re-checked
   once», points at the link that does not read and never gives the page's number (C29 — replaces «both computations» of 2026-11-12).
   Proof: new section `clar` of `tests/test_tour1_r26_arith.js` (13 errors on 77e74000 ⇒ 0), bank R26 Q1 42/42, page suite one test at a time.
+- **CHANGE (2026-11-12, learning-architecture, Pólya tour round 26, fixer «prior»: Q4; page WORKLOG 131 on the branch = 133 at merge)** Prior-work reply
+  reading (`apps/learning-architecture/src/app/a45_story.js`, one line in `a27_tour.js`). FINDING: the C8 check of her own fix had two judges — the page's
+  arithmetic engine and a second light reader that misread chains and «≈» — so a correct fix was refused; a re-reported step with a not-ok verdict had one
+  outcome («… نمی‌خواند»); replies were read per clause and without the verdict they answer (a quoted «قبول ندارم» was a new dispute, a trailing «و گامِ ۳ رو نه»
+  an acceptance, a dispute of a ✓ dropped); a model result with no link to the resume step became «her fix»; «خودم حساب کردم» mid-work opened a ledger while
+  «اینم کارِ خودمه، ببین: گامِ ۱۳ …» did not. CHANGE: one judge (the engine; the light reader only matches and is the fallback), her rework/remark recorded as
+  such, replies read relative to the step's verdict and per step, take-back restores the pre-dispute state with history, «which step?» when undecidable,
+  set-aside steps skipped by the resume point, the report request limited to work she calls her own or a real opening. Tests:
+  `tests/test_tour1_r26_prior.js` (15 runner scenarios replayed, 30 assertions red on BASE26; bank Q4 30/30), suite one file at a time. Quarantined: round-25
+  `CALLS25`, `calcs`, `ACC25`, `UNDO25` (`APP.STORY.R25_QUARANTINE`). Not done: D25-15 (a38 gate, story's file this round). Lesson:
+  `experiences/model-reports-state-page-validates.md` (Update 2026-11-12, prior).

@@ -428,3 +428,13 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Status:** reachable, not called: `APP.ASSIST.R25_QUARANTINE.noFieldTxt24` (still used for views with no button or no request), `.regSys24`,
   `APP.R25_QUARANTINE.liveReqSignals24`, `.resultQ24`, `.natGuess24`. Delete only with the owner's approval.
 
+## 2026-11-12 — round-25 readers of the prior-work reply (learning-architecture, Pólya round 26, prior: Q4)
+- **File:** `apps/learning-architecture/src/app/a45_story.js`.
+- **What:** `CALLS25` of round 25 (kept as `CALLS25_R25`: any «خودم … حساب کردم / نوشتم» counted as «my prior work», numbered steps only as «گام ۱: … گام ۲:»);
+  the light calculation reader `calcs` of round 25 (kept as `calcsR25`: «A = B = N» read as «A = first number of B», no «≈», a number glued to the expression
+  taken as its result); `ACC25` and `UNDO25` (acceptance / take-back words read per clause, regardless of the verdict they answer); and the rule in `priorReply`
+  «a ✓ verdict cannot be disputed» (one line, no separate function to keep).
+- **Why replaced:** DECISIONS_R26 Q4 (U3, U8, U9, U18, A26-7, A26-32, D26-9, D26-11, C26-8): `CALLS25` + `priorOpenAt`, `calcs` (chains, «≈»), `readReply`
+  with `EXA26`/`SAYR26`/`SAYW26`/`SAYWN26`/`UNDO26` (judgement relative to the step's verdict, per step).
+- **Status:** reachable, not called: `APP.STORY.R25_QUARANTINE.CALLS25`, `.calcs`, `.ACC25`, `.UNDO25` (and `.NO24` from round 25). `REJ25` is still used by
+  `pageFix`. Delete only with the owner's approval.
