@@ -79,6 +79,8 @@
   var RANK = { stmt: 0, u: 1, udraft: 1, uold: 1, restate: 1, guess: 2, gold: 2, plan: 3, planold: 3, cplan: 3, step: 4, out: 5, stepold: 5, ans: 6, verdict: 7, state: 8, back: 9 };
   /* نشانهٔ کارنامهٔ ذهن برای یک کنش (همان act.ok ِ A.MIND.phases) */
   function mindActs(pid) { var o = {}; try { var R = A.MIND && A.MIND.phases ? A.MIND.phases({ pid: pid }) : null; ((R && R.rows) || []).forEach(function (row) { (row.acts || []).forEach(function (a) { o[a.id] = { row: row.fa, sign: a.ok ? "+" : "−", at: a.at, fa: a.fa }; }); }); } catch (e) { } return o; }
+  /* دورِ ۲۶ (story Q6، C26-2): «وضع: حل شد» فقط از بستنِ خودِ صفحه (A.liveClosure) — «در بازنگری — هنوز بسته نشده» حل‌شده نیست */
+  function rev26(pid) { try { var c = A.liveClosure ? A.liveClosure(pid) : null; return !!(c && c.state === "review"); } catch (e) { return false; } }
   function chatPlans(se) { return ((se && se.plans) || []).filter(function (q) { return q && q.text; }); }
   function addSessEvents(add, se, opt) {
     opt = opt || {}; var pid = opt.pid || "";
@@ -86,7 +88,9 @@
     chatPlans(se).forEach(function (q) {
       var lk = q.step || q.will; if (pid && lk && lk.pid && lk.pid !== pid) return;   // پیوندِ برنامه ⇄ گامِ زنده (a41: q.step / q.will)
       /* دورِ ۲۱ (ADDENDUM R4+، A21-14 s03): برنامهٔ یک مسئله هرگز در پروندهٔ مسئلهٔ دیگر — مسئلهٔ برنامه = پیوندش، وگرنه مسئله‌ای که سشن در زمانِ برنامه به آن بسته بود */
-      if (pid && !(lk && lk.pid) && planPid(se, q) && planPid(se, q) !== pid) return;
+      /* دورِ ۲۶ (story Q3، U13/D26-6): یک مالک برای هر برنامه (a45 ST.planOwner — مرزِ پیامِ زایش، بسته بودنِ سشن، پنجرهٔ مسئلهٔ گفت‌وگویی که بعدتر ثبت شد)؛ برنامهٔ بی‌مالک
+         فقط در پروندهٔ تنها مسئلهٔ همان سشن می‌آید، نه در هر مسئله (پیش‌تر: planPid ِ خالی ⇒ همهٔ مسئله‌ها) */
+      if (pid && !(lk && lk.pid)) { var po26 = A.STORY && A.STORY.planOwner ? A.STORY.planOwner(se, q, q.src ? msgRef(se.id, typeof q.src === "object" ? q.src.mid || q.src.msg : q.src) : null) : planPid(se, q); if (po26 ? po26 !== pid : !!(A.STORY && A.STORY.planOwner) && !chatScope(se, pid)) return; }
       var sm = q.src ? msgRef(se.id, q.src) : null;
       add({ k: "cplan", at: (sm && sm.at) || q.at || "", title: "برنامهٔ خودت (از گفت‌وگو)", lines: [q.text].concat(q.when ? ["موعد: " + whenFa(q.when)] : []), from: "از گفت‌وگو", src: sm && sm.text ? sm : null,
         hist: (q.corr || []).map(function (c) { return { at: c.at, old: val(c.old) + (c.oldWhen && c.oldWhen !== q.when ? " (" + whenFa(c.oldWhen) + ")" : ""), new: val(c["new"]) + (c.oldWhen && c.oldWhen !== q.when ? " (" + whenFa(q.when) + ")" : ""), why: c.note || "" }; }) });
@@ -227,7 +231,7 @@
     var last = ev.reduce(function (m, e) { return e.at && e.at > m ? e.at : m; }, String(r.updated || ""));
     /* دورِ ۲۰ (RO6، B·D7): یک منبعِ وضع — مرحله‌ها از همان A.livePhase که خطِ «وضع» می‌خواند (مرحلهٔ جاری «در جریان» است، نه «هنوز نرسیده») */
     var ORD = ["u", "p", "c", "b"], pi = ph === "done" ? 4 : Math.max(0, ORD.indexOf(ph));
-    var state = L.state === "solved" ? "حل شد" : L.state === "abandoned" ? "آگاهانه کنار گذاشته" : L.incub && L.incub.at && !L.incub.back ? "مکث — کنار گذاشته تا فردا" : r.dormant && r.dormant > A.today() && !r.woke ? "خفته تا " + A.fdate(r.dormant) : ph === "done" ? "تمام شد" : "در جریان — " + (PH_FA[ph] || "");
+    var state = L.state === "solved" ? (rev26(pid) ? "در بازنگری — هنوز بسته نشده («✅ حل شد» زده شد؛ بازنگری ثبت نشده)" : "حل شد") : L.state === "abandoned" ? "آگاهانه کنار گذاشته" : L.incub && L.incub.at && !L.incub.back ? "مکث — کنار گذاشته تا فردا" : r.dormant && r.dormant > A.today() && !r.woke ? "خفته تا " + A.fdate(r.dormant) : ph === "done" ? "تمام شد" : "در جریان — " + (PH_FA[ph] || "");
     return { pid: pid, title: r.p.title, statement: r.p.statement, phase: ph, state: state, last: last, stages: ORD.map(function (k, j) { return { k: k, fa: PH_FA[k], reached: j <= pi || (L.state === "solved"), now: j === pi && ph !== "done" && L.state !== "solved" }; }),
       sessions: sessionsOf(pid, r).map(function (x) { return { id: x.id, title: x.title || clip(((x.msgs || [])[0] || {}).text, 50) || "گفت‌وگو", last: x.updated || "" }; }), events: ev };
   };
@@ -324,7 +328,7 @@
     ev.sort(function (a, b2) { var x = String(a.at || "9999"), y = String(b2.at || "9999"); return x < y ? -1 : x > y ? 1 : a.i - b2.i; });
     var last = ev.reduce(function (m, e) { return e.at && e.at > m ? e.at : m; }, String(r.updated || ""));
     var stDone = ph === "done", reach = { u: !!(u1 && u1.done), p: !!(L.plan && L.plan.at), c: L.steps.some(function (x) { return x.out || x.closed; }) || L.steps.length > 0, b: !!(b && b.done) };
-    var state = L.state === "solved" ? "حل شد" : L.state === "abandoned" ? "آگاهانه کنار گذاشته" : L.incub && L.incub.at && !L.incub.back ? "مکث — کنار گذاشته تا فردا" : r.dormant && r.dormant > A.today() && !r.woke ? "خفته تا " + A.fdate(r.dormant) : stDone ? "تمام شد" : "در جریان — " + (PH_FA[ph] || "");
+    var state = L.state === "solved" ? (rev26(pid) ? "در بازنگری — هنوز بسته نشده («✅ حل شد» زده شد؛ بازنگری ثبت نشده)" : "حل شد") : L.state === "abandoned" ? "آگاهانه کنار گذاشته" : L.incub && L.incub.at && !L.incub.back ? "مکث — کنار گذاشته تا فردا" : r.dormant && r.dormant > A.today() && !r.woke ? "خفته تا " + A.fdate(r.dormant) : stDone ? "تمام شد" : "در جریان — " + (PH_FA[ph] || "");
     return { pid: pid, title: r.p.title, statement: r.p.statement, phase: ph, state: state, last: last, stages: ["u", "p", "c", "b"].map(function (k) { return { k: k, fa: PH_FA[k], reached: reach[k] }; }),
       sessions: sessionsOf(pid, r).map(function (x) { return { id: x.id, title: x.title || clip(((x.msgs || [])[0] || {}).text, 50) || "گفت‌وگو", last: x.updated || "" }; }), events: ev };
   }
@@ -533,14 +537,17 @@
     var D = rawSess23.call(this, sid); if (!D) return D; var se = S.get(sid), ST = A.STORY;
     D.sid = sid;
     var L = (((se && se.coach) || {}).pkLog || []).map(function (e) { return e.pk; }).filter(function (x, i, X) { return x && X.indexOf(x) === i; });
+    /* دورِ ۲۶ (story Q3، C26-1 «مسئلهٔ ۲ از ۲» برای یک مسئله): شمارش و پنجره‌ها از مسئله‌ها (a45 ST.probGroups)، نه از هر تغییرِ pk */
+    var G26 = ST && ST.probGroups ? ST.probGroups(se) : null, at26 = function (a) { return G26 ? ST.probAt(se, a) : ST.pkAt(se, a); };
+    if (G26) { if (pk && pk !== "all") pk = ST.probOf(se, pk); L = G26.map(function (g) { return g.pk; }); }
     if (!ST || !ST.pkAt || L.length < 2) return D;
     var U = ((se && se.msgs) || []).filter(function (m) { return m && m.role === "user" && !/^\[/.test(String(m.text || "")); });
-    D.pks = L.map(function (k) { var w = ST.pkWindow(se, k), f = U.filter(function (m) { return String(m.at || "") >= String(w.from || "") && String(m.at || "") < String(w.to || "~"); })[0]; return { pk: k, from: w.from, title: f ? clip(f.text, 60) : k }; });
+    D.pks = L.map(function (k) { var w = ST.pkWindow(se, k), f = G26 ? U.filter(function (m) { return at26(m.at || "") === k; })[0] : U.filter(function (m) { return String(m.at || "") >= String(w.from || "") && String(m.at || "") < String(w.to || "~"); })[0]; return { pk: k, from: w.from, title: f ? clip(f.text, 60) : k }; });
     var cur = pk === "all" ? "all" : pk && L.indexOf(pk) >= 0 ? pk : L[L.length - 1]; D.pk = cur;
     if (cur === "all") { D.pid = sid + "|all"; return D; }
     var last = L[L.length - 1], me = D.pks.filter(function (x) { return x.pk === cur; })[0];
-    D.events = D.events.filter(function (e) { if (e.k === "stmt") return false; if (!e.at) return cur === last; return ST.pkAt(se, e.at) === cur; });
-    var f0 = U.filter(function (m) { return ST.pkAt(se, m.at || "") === cur; })[0];
+    D.events = D.events.filter(function (e) { if (e.k === "stmt") return false; if (!e.at) return cur === last; return at26(e.at) === cur; });
+    var f0 = U.filter(function (m) { return at26(m.at || "") === cur; })[0];
     if (f0) D.events.unshift({ k: "stmt", at: f0.at || "", title: "آغازِ این مسئلهٔ گفت‌وگو", lines: [clip(f0.text, 400)], i: -1 });
     D.events.forEach(function (e, j) { e.i = j; });
     D.pid = sid + "|" + cur; D.title = (me && me.title) || D.title;

@@ -347,3 +347,28 @@ matched nouns («برادرم»), so a retracted day, a brother's schedule and a
   by one hard-wired rule («today or a week later»). When new ambiguities arrived («next Friday» said on a Sunday; «the weekend» =
   Thursday or Friday) the hard-wired alternative was wrong for both; storing `opts: [a, b]` on the pending item let the question text,
   the answer reader and the buttons all follow the same two dates, with the old rule as the fallback when no options are stored.
+## Update 2026-11-12 — one judgement, positive evidence, and "which thing is this about"
+Round 26 of the same tour showed two more forms of the same failure.
+
+- **Two judges for one fact.** The ledger decided "this result is the whole answer" by positive evidence (the verb or counted noun of her own
+  unknown, a closing phrase, the last plan step). The stage decided the same fact by exclusion: every reported result that was not proved
+  intermediate moved the problem to look-back. Four scenarios went to look-back on a remainder, an estimate of a datum, a refuted test and one
+  branch of two. In all four the model itself had NOT reported the look-back stage. Rule: one function answers the question for every caller;
+  it accepts the page's own positive evidence, or the model's report when no page evidence contradicts it — never "not disproved".
+- **A counter word is not the quantity.** "چند تا اتوبوس؟" was answered by any "N تا". Match the counted noun, not the classifier.
+- **"The current object" is not "the object she is talking about".** With several problems in one conversation every writer filed under the
+  bound problem. The fix is a single focus decision before any block is built: an explicit naming frame plus a title/statement word binds the
+  turn; two candidates or an unknown name ⇒ ask and record nothing; a shared word without a frame does nothing. Stamp the binding at her
+  message time, because records of that message carry the message time, not the time the prompt was built.
+- **A record made before its owner existed has no owner.** A plan said while the problem was only a chat problem belonged to nobody and was
+  therefore shown under everybody. Ownership must be answerable for every time (bound object, window of the chat object that later became
+  the registered one, boundary inside the message that created a new object); "no owner" is shown only where there is exactly one candidate.
+- **"Closed" has one source.** Three surfaces read a raw state field and said "solved" while the page's own closure said "in review".
+
+## How to Apply Elsewhere (round 26 addendum)
+- Grep for every place that decides the same fact; keep one function and make the others call it.
+- When matching an answer to a question, drop classifiers and auxiliaries from both sides before comparing.
+- Before attributing an event of a turn, ask "which object did she name?"; make that a function with three outcomes: bind, ask, nothing.
+- For every list that filters by owner, test the case "owner unknown" explicitly — it must not mean "everyone".
+- A name inside a comparison («like that other one») is a reference, not a switch: strip comparison frames before deciding focus, and if
+  the rest of the message carries a datum whose owner the text does not decide, ask instead of filing it under either object.

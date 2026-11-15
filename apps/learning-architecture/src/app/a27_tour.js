@@ -2234,6 +2234,9 @@
     /* پس از بستن، آشکارسازِ مسئله بس نیست — گزارشِ نتیجه دربارهٔ همان مسئله («مثلث…»، عددها) هم آن را روشن می‌کند؛ مسئلهٔ تازه پرسشی از خودش دارد
        («…کجا برم؟»، «چطور…») یا گشایشِ هدف/گیر (OPEN22)، و گزارشِ نتیجه نیست */
     var afterClose23 = closedHere23 && !((/[؟?]/.test(ownText(mt)) || AS.open22(mt)) && statesProblem(mt) && !solvedSaid(mt));
+    /* دورِ ۲۶ (story Q3، C21 — oB1 p29/p31، B26x oB1 p25/p28): او با نام به مسئلهٔ بسته‌ای برگشته (a45 ST.namedClosed) ⇒ حرفِ این نوبت دربارهٔ همان مسئله است (اصلاح، نتیجهٔ
+       دیرآمده، سرانجامِ پیش‌بینی)، نه صورتِ یک مسئلهٔ تازهٔ گفت‌وگو — مسئلهٔ تازه فقط با معرفیِ خودش («یه مسئلهٔ دیگه دارم: …») */
+    try { if (closedHere23 && A.STORY && A.STORY.namedClosed && A.STORY.namedClosed(s)) afterClose23 = true; } catch (e) { }
     var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23;
     /* تورِ پولیا (RM6c، B·D1 s11): «پس X = n» ِ الگو (RESULT_WEAK) به‌تنهایی مرحله را به بازنگری نمی‌برد — فرمول/عدد درونِ ادعا یا هنگامِ گفتنِ
        صورت نتیجه نیست؛ مرحله فقط با گزارشِ مدل (said:result) یا نتیجهٔ ثبت‌شده؛ الگو فقط پیشنهاد می‌کند (C.prev.weakRes ⇒ سطرِ زمینه) */
@@ -2269,6 +2272,10 @@
     /* خواندنِ پشتیبانِ همین پیام؛ گزارشِ مدل (اگر آمد) جایش را می‌گیرد — از همین وضعِ پیش از پیام؛ ولی نتیجهٔ بی‌ابهامِ خودش (strong) را به عقب برنمی‌گرداند */
     C.pk = "c:" + (C.gen || 0);
     C.prev = { key: mkey(mt), ph0: ph0 || "u", st0: st0, pasted: pasted, intro: intro, work: pasted && workIn(mt), strong: said && !uns ? "b" : "", pk: C.pk, weakRes: weakRes || undefined };
+    /* دورِ ۲۶ (story Q6، C26-16 — s25 p13/p14، s23 p5/p7/p8، s29 p3–p5: «# وضعِ کنونی … (بسته شد)» کنارِ «مرحلهٔ محتمل: فهمِ مسئله» و «u1) مجهول … چیست؟»): مسئلهٔ این گفت‌وگو
+       بسته است و این پیام مسئلهٔ تازه‌ای نیاورد (صورتی پذیرفته نشد) ⇒ مسئلهٔ بازی در کار نیست و کارتِ مرحله/فهرستِ پرسش پیشنهاد نمی‌شود — همان C.prev.noPh ِ RM6f که
+       پیش‌تر فقط برای پیامِ کوتاهِ بی‌پرسش بود (پرسشِ بازتابی، درخواستِ تمرین یا «کجا نگهش دارم؟» از آن جا می‌ماند). مسئلهٔ بسته چیزی پیشنهاد نمی‌کند. */
+    if (b && b.done && !C.stmt && ph !== "b" && afterClose23 && !guessNow(mt, teach) && !/حدس|ادعا|فرضیه|فکر\s*(?:کنم|می[‌\s]?کنم)|به\s*نظرم/.test(mt)) C.prev.noPh = true;   // حدس/ادعای تازه پس از بستن همچنان مربی را از «فهم» می‌آورد (R1) — همان واژه‌های استثنای RM6f ِ بالا
     return ph;
   }
   AS.coachPhase = coachPhase;
@@ -2631,17 +2638,21 @@
     var fwd = cl === "p" && ORD[ph0] < ORD.p && (st.u || (!pasted && C.stmt) || (P && P.work && (stuck || fail)));
     /* دورِ ۲۵ (P5، B25·D9): همان داوریِ دفترِ داستان (a45 ST.subRes) — نتیجهٔ میانی مرحله را جابه‌جا نمی‌کند (پیش‌تر هر said:result ⇒ «بازنگری») */
     var sub25 = false; try { sub25 = said.indexOf("result") >= 0 && !!(A.STORY && A.STORY.subRes && (A.STORY.subRes(s, (P && P.live) || "", ut) || (A.STORY.splitOff && A.STORY.splitOff(s, ut) > 0))); } catch (e) { }
-    if (said.indexOf("result") >= 0 && !sub25) ph = "b";
+    /* دورِ ۲۶ (Q6، U11 = B25·D9 STILL — tB1 p6، aB1 p3، aB3 p5، pwB1 p8؛ C26-4): همان یک داوریِ دفترِ داستان با شاهدِ مثبت (a45 ST.wholeRes) — «نتیجه» فقط وقتی
+       مسئله را به «بازنگری» می‌برد که جوابِ کل باشد؛ پیش‌تر هر نتیجه‌ای که «میانی» بودنش ثابت نمی‌شد جوابِ کل شمرده می‌شد */
+    /* nw26 = نتیجهٔ سنجیده‌ای که جوابِ کل نیست: مرحله را به «بازنگری» نمی‌برد، ولی همان اعتبارِ «نتیجه» را در کارنامه می‌گیرد و اصلاحِ بعدی به آن می‌رسد (دفترِ رویدادِ how:"res") */
+    var nw26 = false; try { nw26 = !sub25 && said.indexOf("result") >= 0 && !!(A.STORY && A.STORY.wholeRes) && !A.STORY.wholeRes(s, (P && P.live) || "", ut, a); } catch (e) { }
+    if (said.indexOf("result") >= 0 && !sub25 && !nw26) ph = "b";
     else if (sub25) ph = ph0;
     else if (fail) ph = fwd ? "p" : cl && ORD[cl] < ORD[ph0] ? cl : (ph0 === "b" || ph0 === "c" ? "c" : ph0);
     else if (said.indexOf("plan") >= 0 && ORD[ph0] < ORD.c) ph = A.STORY && A.STORY.planIdea && A.STORY.planIdea(ut, txtOf(a.plan)) && !(a.plan && Array.isArray(a.plan.steps) && a.plan.steps.length >= 2) ? (ORD[ph0] < ORD.p ? "p" : ph0) : "c";   // دورِ ۲۵ (P5، بانکِ R25 #173/#183): ایده یا طرحِ پرسیده ⇒ «طرح»، نه «اجرا»
     else if (cl && ORD[cl] < ORD[ph0]) ph = stuck || said.length ? cl : ph0;          // عقب: فقط با گیر یا حرفِ تازه
     else if (fwd) ph = "p";
     /* دورِ ۵ (F1، s31): نشانهٔ قوی‌ترِ پیشین (نتیجهٔ بی‌ابهامِ خودش) با گزارشِ مدل به عقب برنمی‌گردد، مگر مدل شکست گزارش کند */
-    if (P && P.strong && !fail && !sub25 && ORD[ph] < ORD[P.strong]) ph = P.strong;
+    if (P && P.strong && !fail && !sub25 && !nw26 && ORD[ph] < ORD[P.strong]) ph = P.strong;
     if (!(P && P.live)) { C.ph = ph; C.st = st; }
     /* دورِ ۵ (F2): نشانه‌های همین پیام برای نوبتِ بعد (A.liveCoach(pid,{turn})): گیر/شکست یک نوبت؛ «نتیجه گفت» برای مسئلهٔ زنده تا صفحه ثبتش کند یا شکستی بیاید */
-    C.rep = { key: key, stuck: stuck, fail: fail, result: said.indexOf("result") >= 0 && !sub25, sub: sub25 || undefined, pk: pk };   // دورِ ۲۵: نتیجهٔ میانی پرسشِ «نتیجه‌ای گفتی ⇒ بازنگری» نمی‌گیرد
+    C.rep = { key: key, stuck: stuck, fail: fail, result: said.indexOf("result") >= 0 && !sub25 && !nw26, sub: sub25 || nw26 || undefined, pk: pk };   // دورِ ۲۵: نتیجهٔ میانی پرسشِ «نتیجه‌ای گفتی ⇒ بازنگری» نمی‌گیرد
     /* دورِ ۲۳ (Q3 «گفت‌وگو ⇄ صفحه یک داستان»، C23-11/A23-35/B·D5): همان said/ans ِ سنجیدهٔ همین پیام برای دفترِ داستان (a45_story.js) — یک منبع، نه سنجشِ دوم */
     C.saidOk = { key: key, at: String(um.at || ""), said: said.slice(), ans: qs.slice(), pk: pk, live: (P && P.live) || "", real: !!real, pasted: !!pasted };
     if (C.resBy) delete C.resBy;   // دورِ ۶ (G1): «نتیجه» دیگر تا ثبتِ صفحه نمی‌ماند — فقط C.rep برای پیامِ بعد
@@ -2663,7 +2674,7 @@
         if (real) ids.forEach(function (id) { var q = qm[id]; if (q && qs.indexOf(q) >= 0 && ST4[String(id).charAt(0)]) okSt[ST4[String(id).charAt(0)]] = "ans"; });
         /* تورِ پولیا (RN3c): نتیجه و طرحِ سنجیده هر کدام شاهدِ مرحلهٔ خودند — در یک نوبت هر دو (طرح + نتیجه ⇒ طرح و اجرا)، و در سشنِ بسته به مسئلهٔ زنده هم؛
            بازگوییِ خودش (said u/c ِ سنجیده، نه صورتِ چسبانده، نه «آره») ⇒ موفقیتِ فهم. گذر از مرحله فقط وقتی هیچ‌کدام نبود (یک موفقیت برای مرحلهٔ تمام‌شده). */
-        var hasRes = said.indexOf("result") >= 0 && (P && P.live ? true : ph === "b"), hasPlan = said.indexOf("plan") >= 0;
+        var hasRes = said.indexOf("result") >= 0 && (P && P.live ? true : (ph === "b" || nw26)), hasPlan = said.indexOf("plan") >= 0;
         if (hasRes) okSt.c = "res";
         if (hasPlan) okSt.p = "plan";
         if (!hasRes && !hasPlan && !(P && P.live) && ORD[ph] > ORD[ph0]) okSt[ph0] = "pass";

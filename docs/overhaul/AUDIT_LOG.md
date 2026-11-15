@@ -5206,3 +5206,32 @@ dated stability, mind-card feed) under way.
   (`plural26` in `a27_tour.js`: an explicit «شما» with no group word is not a group address — R21 bank #152), one old assertion widened
   to the one-register contract (`test_tour1_r25_prior` A25-10), and `test_polya_fix5` M3 red only because its hard-coded «۲۵ آبان» is
   tomorrow on 2026-11-15 (calendar collision, not this branch).
+
+## 2026-11-12 — Tour 1 round 26, fixer «story» (Q3 + Q6, C21)
+- **FINDING** Return by naming was heard only for the last split and only when the earlier problem was live and open; an earlier chat problem
+  was replaced by the next one. The same message was then filed under the problem that was merely live (U12, B26x·D33, A26-51, C26-12).
+- **FINDING** A chat plan made before its problem was registered had no owner and was shown in the dossier of every problem of the session
+  (U13); a problem created from a sentence in the middle of a message had no boundary inside that message (D26-6).
+- **FINDING** A forecast outcome was matched to an open forecast by a coincidental number, or by «the only open one», although the confidence
+  she had just stated belonged to another forecast (U15).
+- **FINDING** Two judgements of «whole answer» existed: the story ledger asked for positive evidence, the chat stage accepted every result
+  that was not proved intermediate (U11); «چند تا اتوبوس؟» was answered by any «N تا».
+- **FINDING** 🧭, 📜 and the prior-work ledger each read `L.state === "solved"`; the page's own closure (`A.liveClosure`) said «review» (C26-2).
+- **CHANGE** `apps/learning-architecture/src/app/a45_story.js` (problem list of a conversation, naming frames, bind-or-ask, in-message
+  boundary, plan owner, problem groups, one whole-answer judgement, destination, closure wording), `a27_tour.js` (stage from the one
+  judgement, closed named focus, no stage card for a closed problem), `a40_dossier.js` (plan owner, state,
+  session dossier groups), `a44_route.js` (review state), `a41_practice.js` (one line in `t24Judge`). Tests
+  `apps/learning-architecture/tests/test_tour1_r26_story.js` (red on BASE26: 51) and `test_tour1_r26_story_bank.js`
+  (bank Q3 + Q6: 45 of 47 green, 2 noted with reasons; red on BASE26: 20). WORKLOG (135 on the branch; 132 at merge).
+- **DECISION** A result she states as her answer and that the page cannot fault (aA4 p5 «۵ متر می‌خرم») still opens look-back — its first
+  question is the check that made her find the mistake. What changed: the closure card and the prompt now show her standing answer, a result
+  the page's reader flags or a failed test never counts, and nothing is called «حل شد» before the page's own closure.
+- **PROPOSAL** Not done, with reasons, in HANDBOOK §12 and the handoff note `docs/overhaul/handoff-notes/_pending_tour1_R26_story_2026-11-12.md`.
+
+### 2026-11-15 — CHANGE — Tour 1 round 26, fixer «story», resumed after the pause (C30/C31)
+- **CHANGE** `apps/learning-architecture/src/app/a45_story.js` `frames26` / `named26FromList`: a problem named only as an analogy
+  («مثلِ/شبیهِ همون X») does not move the turn (C31, bank ambiguity 9); a datum or result in the same message that the text does not assign
+  ⇒ the page asks which (current + named) and records nothing. C30 (later unnamed messages stay with the named problem) already held and is
+  now pinned by tests. The pause snapshot was reviewed hunk by hunk: kept, with one misplaced test block moved.
+  Tests: six C30/C31 checks added to `tests/test_tour1_r26_story_bank.js` (the three C31 checks red before the change).
+

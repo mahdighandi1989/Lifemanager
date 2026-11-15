@@ -455,3 +455,11 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R26 Q7 + C20 (a real tie is asked naming both; a clear single best fit arrives). Now: one candidate that alone meets
   the arrival condition arrives; several ⇒ ask naming all, unless the step or the sheet title carries the whole name of exactly one.
 - **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.rank25`. Delete only with the owner's approval.
+## 2026-11-12 — Tour 1 round 26, fixer «story»: `A.STORY.R26_QUARANTINE`
+- **What:** in `apps/learning-architecture/src/app/a45_story.js` — `NEWPROB25` of round 25 (a new problem only as «یه مسئلهٔ دیگه (هم) دارم» with
+  nothing in between), `switchTo` (return by naming only to the last split, only to an open live problem), `qSentence` of round 25 (the last
+  question sentence of the statement is the destination, whatever it asks), and the unwrapped `A.PR.fcMatch` / `fcNarrow` / `predFor`
+  (a forecast candidate by a shared number or as «the only open one», even when the confidence she stated belongs to another forecast).
+- **Why replaced:** DECISIONS_R26 Q3 + Q6, C21 (U12, U13, U15, C26-12, A26-51, U32, D25-25).
+- **Status:** reachable, not called: `APP.STORY.R26_QUARANTINE.NEWPROB25`, `.switchTo`, `.qSentence`, `.fcMatch`, `.fcNarrow`, `.predFor`.
+  Delete only with the owner's approval.
