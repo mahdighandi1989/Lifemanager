@@ -46,7 +46,7 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
     window.__cur = () => APP.ASSIST.cur();
     window.__wipe = () => { ['achat', 'eprog', 'eprob', 'kcase', 'pr', 'card', 'deadline', 'fcast', 'prereq', 'topic', 'wchain', 'case', 'practice', 'prc'].forEach(t => APP.S.all(t).forEach(r => APP.S.del(r.id))); localStorage.removeItem('lla.assist.cur'); };
     window.__ac = (t) => { const ck = APP.STORY.arithChk(t);
-      return { c: ck.map(c => ({ expr: c.expr, said: String(c.saidT || c.said), st: c.ask ? 'ask' : c.ok ? 'ok' : 'flag', kind: c.kind || '', valT: c.valT || '', other: c.other || '', unitQ: c.unitQ || '' })), u: (ck.unread || []).map(u => u.text),
+      return { c: ck.map(c => ({ expr: c.expr, said: String(c.saidT || c.said), st: c.ask ? 'ask' : c.ok ? 'ok' : 'flag', kind: c.kind || '', valT: c.valT || '', other: c.other || '', unitQ: c.unitQ || '', pos: c.pos, pe: c.pe })), u: (ck.unread || []).map(u => u.text),
         lines: APP.STORY.arithLines(ck), said: APP.STORY.arithSaid(ck) }; };
   }, T0);
   const head = (u) => String(u || '').split('# نوبتِ تازه')[0];
@@ -119,6 +119,9 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
     // ---- C45 / C62 ----
     await want('۴۵۰ × ۱۲۰۰ = ۵۰۰ هزار', 'FLAG', 'C45/C62: «۵۴۰ هزار» in her scale', r => r.c[0].valT === '۵۴۰ هزار');
     await want('سالی ۴٫۲ × ۱۲ = ۵۲٫۴ میلیون', 'FLAG', 'C45: the scaled reading she meant («۵۰٫۴ میلیون»)', r => r.c[0].valT === '۵۰٫۴ میلیون');
+    // ---- هم‌طولیِ یکدست‌سازی (experiences/exact-arithmetic-check… «Update 2026-11-15»): pos/pe روی متنِ خودِ او همان حساب را می‌بُرد ----
+    for (const [t, re] of [['کفش ۳ متر در ۴ متر = ۱۲ مترمربع', /^۳ متر در ۴ متر = ۱۲$/], ['نمک ۴ از ۲۶ = ۱۵٪', /^۴ از ۲۶ = ۱۵٪$/]]) {   // (rewrites older than round 27 — «درصد ⇒ %»، «میشه ⇒ ＝»، «ضرب در» — still change the length: HANDBOOK §12 row 84)
+      const r = await AC(t); chk(r.c[0] && re.test(t.slice(r.c[0].pos, r.c[0].pe)), 'length-preserving rewrite: «' + t + '» ⇒ slice «' + (r.c[0] ? t.slice(r.c[0].pos, r.c[0].pe) : '') + '»'); }
     // ---- A26-20 «ذرع» ----
     await want('پارچه‌فروش به ذرع می‌فروشه: ۵ ذرع = ۵٫۲ متر.', 'UNCHECKED', 'A26-20 pA3 p12: an unknown unit conversion is «نسنجیده», not silent');
     await want('۵ متر = ۵۰۰ سانت', 'OK', 'neg A26-20: a known conversion is still judged');
