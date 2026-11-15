@@ -94,6 +94,8 @@ const HELPERS = () => {
     await fresh();
     await E(async (d2) => { __freshChat();
       await __say('پیش‌بینیم: صفر یا یک هشدارِ اشتباه، ۸۰ درصد مطمئنم. تا پس‌فردا انجامش میدم.', 'روشن است.', [__cs({ said: ['plan'], plan: { text: 'تا پس‌فردا انجامش میدم', when: d2 } })]);
+      /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «آره» ِ او می‌نشیند */
+      await __say('آره', 'خب.');
       __fc('با پنجرهٔ ۴ ثانیه (تغییر کمتر از ۰٫۰۵ گرم)، در ۲۰ بار باز و بسته کردنِ بی‌قرص، صفر یا یک هشدارِ اشتباه می‌آید', 80, d2);
       __fc('فردا اتوبوسِ ساعتِ ۸ سرِ وقت می‌رسد', 60, d2);
     }, ymd(2));
@@ -121,7 +123,10 @@ const HELPERS = () => {
   await section('b15', async () => {
     await fresh();
     await E(async (d3) => { __freshChat();
-      await __say('میان‌ترمِ آمار ۲۰ آبانه، یادم بنداز.', 'گذاشتم.', [{ do: 'deadline', what: 'میان‌ترمِ آمار', date: d3 }]);
+      /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ کنشِ deadline): صفحه روز را از حرفِ خودش می‌خواند و با «آره» ِ او ثبت می‌کند. جملهٔ پیشینِ این آزمون («… ۲۰ آبانه») با تاریخِ
+         مدلِ ساختگی‌اش (سه روز بعد) نمی‌خواند — حالا که حرفِ خودش مقدم است، جمله با همان روز هم‌خوان شد («سه روز دیگه‌ست») و «آره» افزوده شد؛ بقیهٔ سناریو همان است */
+      await __say('میان‌ترمِ آمار سه روز دیگه‌ست، یادم بنداز.', 'گذاشتم.', [{ do: 'deadline', what: 'میان‌ترمِ آمار', date: d3 }]);
+      await __say('آره', 'خب.');
       APP.S.put({ id: 'dl_exam2', type: 'deadline', what: 'امتحانِ فیزیک', date: d3, done: false });
       APP.S.put({ id: 'dl_rep', type: 'deadline', what: 'گزارشِ فصلِ دوم', date: d3, done: false });
     }, ymd(3));
@@ -407,6 +412,8 @@ const HELPERS = () => {
     await bfresh();
     r = await E(async () => { __freshChat();
       await __say('پیش‌بینی می‌کنم تا جمعه تموم شه.', 'ببینیم.', [__cs({ ph: 'p', said: ['guess'], guess: { text: 'پیش‌بینی می‌کنم تا جمعه تموم شه' } })]);
+      /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 «بر هر دو مسیر»؛ بانکِ R26 #203): روزِ پیش‌بینی که صفحه از جملهٔ خودش خواند اول «… درست است؟» می‌گیرد — «آره» ِ او افزوده شد */
+      await __say('آره', 'خب.');
       await __say('خب، شروع کردم.', 'خوب.');
       const s = __cur(), C = s.coach || {}; return { preds: (C.preds || []).map(x => ({ t: x.text, due: x.due })), guesses: (C.guesses || []).map(x => x.text), fc: APP.S.all('fcast').map(f => ({ q: f.q, due: f.due })) }; });
     T(179, r.preds.length === 1 && r.preds[0].due === ymd(5) && !r.guesses.length && r.fc.some(f => f.due === ymd(5)), r);

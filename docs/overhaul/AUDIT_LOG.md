@@ -5167,3 +5167,22 @@ dated stability, mind-card feed) under way.
   `_pending_tour1_R26_loop_2026-11-12.md`.
 - **PROPOSAL** Not done, with reasons: the tour harness has no `HOST.status` (the close is invisible to runners until RUNNER27 emulates it);
   morphology beyond the two closed classes; a late piece is judged by the sheet's area, not by its relation to the closed problem.
+- **FINDING (2026-11-12, tour 1 round 26, fixer «today»)** The round-25 date gate («… درست است؟» + her yes) covered only dated sentences
+  that no other writer had recorded; a plan date reported by the model and the `deadline` action still reached «امروز» unasked, the date
+  reader matched weekdays across word boundaries («جلسه شنبه» ⇒ «سه‌شنبه») and could not read «تا شنبه» or «۲۰ آبانه», and an
+  unanswered question was dropped silently. In the forecast ledger a percent inside the claim was read as the confidence and a verdict
+  with a stated 60 % landed on the open 90 % forecast.
+- **CHANGE (2026-11-12, tour 1 round 26, fixer «today»; DECISIONS_R26 Q5 + Q8, C12 on both paths, C19)** `apps/learning-architecture/src/app/`
+  `a41_practice.js` (date reader, clause-level «her own future action», one gate for every date writer, pending questions that stay and
+  are answerable in «امروز», plan ⇄ follow-up link, forecast booking / verdict / take-back with history), `a27_tour.js` (`plan18` date
+  source, two guards, three correction-cue shapes), `a40_dossier.js` (verdict history). `AS.SYS` untouched. Tests:
+  `tests/test_tour1_r26_today.js` (47 runner checks, 42 red on BASE26; bank Q5 + Q8 52/52). Old assertions replaced by the decision are
+  commented in place; correction tests confirm dates through the Today row (`PR.dateYes`). WORKLOG (133), PROGRESS 130, HANDBOOK §10 / §12-78,
+  handoff `docs/overhaul/handoff-notes/_pending_tour1_R26_today_2026-11-12.md`, lesson in `experiences/model-reports-state-page-validates.md`.
+- **FINDING (2026-11-12, same)** A26-46 did not reproduce on BASE26 with the runner's own messages, day and actions; kept as a guard.
+- **CHANGE (2026-11-15, tour 1 round 26, fixer «today», resumed after the pause)** DECISIONS_R26 clarifications C32–C37 applied to the
+  date reader and the forecast ledger: an ambiguous day now carries two dated options (`opts`) so «جمعهٔ بعد» on another weekday and
+  «آخرِ هفته / آخرِ هفتهٔ بعد» (Thursday or Friday) are asked, never guessed; ordinal days without a month («تا بیستم») are read beside a
+  deadline word and pass through C19/C12; «پنجاه‌پنجاه» = 50 %, and a vague new forecast gets one «چند درصد مطمئنی؟». The WIP snapshot
+  (docs only) was reviewed and kept. Bank #134 and #203 are checked with «جمعه» instead of «آره» because C33 replaced their single-day
+  reading (entries not edited). Files: `a41_practice.js`, `a27_tour.js` (`plan18`: field `whenAskO`), `test_tour1_r26_today.js` (+16).

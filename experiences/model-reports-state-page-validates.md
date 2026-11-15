@@ -305,3 +305,45 @@ the page asks "which step?" instead of guessing.
 - Strip quoted spans before polarity detection; a quoted phrase is being talked about, not said.
 - For every "book X as the answer to the pending question" shortcut, require evidence that X is about that question; otherwise leave the question pending.
 - Pair every positive reading with its look-alike negative in the same test ("not yet" vs "not", "kept for later" vs "set aside", a memory vs a present doubt).
+## Update 2026-11-12 (round 26, today) — a confirmation gate sits on the record, not on one writer; a pending question is state
+
+**What happened.** Round 25 added "show the date the page read and book it on her yes" — but only for dated sentences that no other
+writer had recorded. The two other writers of the same record kept their old path: a plan date reported by the model and a `deadline`
+action went straight into the store, so the rule held exactly where it mattered least. The same round's question was dropped when the
+next message was not an answer, and «باشه» was not accepted, so real conversations (where the assistant asks its own question in the
+same turn) lost the date without a word. Separately, the date reader matched weekday names without word boundaries after it had removed
+the spaces («جلسه شنبه» ⇒ «سه‌شنبه»), and "is this her commitment?" was tested on the whole sentence with a verb pattern that also
+matched nouns («برادرم»), so a retracted day, a brother's schedule and a puzzle's name all got a date question.
+
+**Rules.**
+- A validation gate belongs to the record it protects. List every writer of that record (her words, the model's report, the model's
+  action, a correction, a page form) and route each through the same "pending ⇒ yes ⇒ book" step, or name it as an exception with its
+  reason. A gate on one writer is a bypass on the others.
+- When two reports of one thing arrive in one turn (a plan and its follow-up reminder, her sentence and the model's action), they join
+  one question. One commitment, one question, linked records that close together.
+- When the model's value and the page's reading of her own words disagree, her words win; when her words carry several candidates the
+  model's report only chooses among them; a value that is in nobody's words is neither booked nor asked.
+- A pending question is state with a life cycle: asked ⇒ answered | declined | corrected | still waiting. "Still waiting" is said once,
+  stays visible where the result would have appeared, and is answerable there. Never let it lapse silently.
+- Read a reply to a pending question by what it does: a plain yes (nothing else in its first sentence), a no, the same value repeated,
+  a different value (drop the old one, ask the new one for the same item), or an answer to somebody else's question (keep waiting).
+  A bare "yes" several turns later is not an answer; "yes, that date is right" is.
+- Tokenise before matching: join a prefix to a stem only when the prefix starts a word. Test on the pair that breaks it.
+- "Her own future action" is a property of the clause that holds the date, not of the sentence: past tense, reported speech, another
+  person's subject, a negated value, and a token that is part of the problem's own wording each disqualify that clause.
+- A stated attribute identifies the record (a stated confidence names the forecast). A verdict never lands on a record whose stated
+  attribute differs; if nothing identifies the record, ask which. Verdicts are reversible, with the previous verdict kept as history.
+- Reproduce before fixing: one reported defect of this family did not reproduce with the reporter's own inputs and was left alone.
+
+## How to Apply Elsewhere (round 26 addendum)
+- Grep for every assignment to the protected field; each hit is either routed through the gate or documented as an exception.
+- Old tests that assumed the ungated behaviour: answer the pending question through the product's own path (here the row's button in
+  the Today list) instead of adding a test-only bypass flag; change an assertion only where the decision replaced the behaviour.
+- A fixture whose sentence and reported value disagree («… ۲۰ آبانه» with a date twenty days ahead) was harmless while the report won;
+  once the user's words win, make the fixture consistent rather than weakening the rule.
+- Keep the question's identity (which message asked it) on the pending record, and stamp the booked record's source with the message
+  that made the commitment, not the message that said yes — later corrections look for the commitment.
+- (2026-11-15) An ambiguous reading should carry its candidates, not a default plus an "ambiguous" flag whose alternative is implied
+  by one hard-wired rule («today or a week later»). When new ambiguities arrived («next Friday» said on a Sunday; «the weekend» =
+  Thursday or Friday) the hard-wired alternative was wrong for both; storing `opts: [a, b]` on the pending item let the question text,
+  the answer reader and the buttons all follow the same two dates, with the old rule as the fallback when no options are stored.
