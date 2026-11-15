@@ -2998,14 +2998,19 @@
       if (j - i + 1 >= OWN27_MIN) { out.push([T[i][0], T[j][1]]); i = j + 1; } else i++; }
     return out; }
   AS.ownSpans27 = ownSpans27;
+  /* دورِ ۲۷ (C83): «…» ای که حرفِ او نیست (نه در نوشته‌ها و رکوردهایش، نه با تکهٔ ≥ ۳ واژه از آن‌ها) متنِ خودِ صفحه است که به او بازگفته می‌شود — پرسشِ صفحه، برچسب —
+     و مثلِ باقیِ سطر ضمیرِ کنونی را می‌گیرد. حرفِ او درونِ «…» بایت‌به‌بایت می‌ماند (C55). */
+  var HERFRAME27 = /(?:حرف|گفته|نوشته|پیام|نقل)ِ?[\s‌]*(?:خودِ?(?:ت|تان)|تو|شما|او)?[\s‌]*:?[\s‌]*$|(?:گفتی|نوشتی|گفتید|نوشتید|گفت|نوشت)[\s‌]*:?[\s‌]*$/;   /* «حرفِ خودت: «…»»، «گفتی «…»» ⇒ صفحه آن را حرفِ او می‌خواند ⇒ دست نمی‌خورد */
+  function pageQuote27(q, pre) { if (pre && HERFRAME27.test(pre)) return false; var key = String(q || "").replace(/\s+/g, " ").replace(/…\s*$/, "").trim(); if (key.length < 4 || key.split(" ").length < 2) return false;
+    var H = hersText26(); if (H && H.indexOf(key) >= 0) return false; try { if (ownSpans27(q).length) return false; } catch (e) { return false; } return true; }
   function outMap25(se, l, fn) { l = String(l || ""); var o0 = outMap25raw(se, l, fn); if (o0 === l && l.indexOf("«") < 0) return o0;   /* «…» ِ ناجورِ حرفِ او می‌توانست همهٔ سطر را «درونِ نقل» نشان دهد */
     var sp = []; try { sp = ownSpans27(l); } catch (e) { sp = []; } if (!sp.length) return o0;
     var keep = [], x = "", at = 0; sp.forEach(function (r, k) { x += l.slice(at, r[0]) + String.fromCharCode(0xE100 + k); keep.push(l.slice(r[0], r[1])); at = r[1]; }); x += l.slice(at);
     return outMap25raw(se, x, fn).replace(/[\uE100-\uE1FF]/g, function (c) { return keep[c.charCodeAt(0) - 0xE100] || ""; }); }
-  function outMap25raw(se, l, fn) { var out = "", d = 0, buf = "", qb = ""; l = String(l || "");
+  function outMap25raw(se, l, fn) { var out = "", d = 0, buf = "", qb = "", pre = ""; l = String(l || "");
     for (var i = 0; i < l.length; i++) { var ch = l.charAt(i);
-      if (ch === "«") { if (d === 0) { out += fn(buf); buf = ""; qb = ""; } else qb += ch; d++; continue; }
-      if (ch === "»" && d > 0) { d--; if (d === 0) { out += "«" + (qb.indexOf("«") < 0 && pageLabel25(se, qb) ? fn(qb) : qb) + "»"; qb = ""; } else qb += ch; continue; }
+      if (ch === "«") { if (d === 0) { pre = buf.slice(-40); out += fn(buf); buf = ""; qb = ""; } else qb += ch; d++; continue; }
+      if (ch === "»" && d > 0) { d--; if (d === 0) { out += "«" + (qb.indexOf("«") < 0 && (pageLabel25(se, qb) || pageQuote27(qb, pre)) ? fn(qb) : qb) + "»"; qb = ""; } else qb += ch; continue; }
       if (d === 0) buf += ch; else qb += ch; }
     return out + (d > 0 ? "«" + qb : "") + fn(buf); }
   AS.regSys = function (se, t) { var rg = ""; try { rg = AS.convRegister(se, "", []); } catch (e) { } var x = String(t == null ? "" : t); try { if (A.faDates) x = A.faDates(x); } catch (e) { } return rg === "shoma" ? outMap25(se, x, toShoma) : x; };
@@ -3013,10 +3018,18 @@
   /* دورِ ۲۵ (P6، A23-14 «STILL» ِ سه دور، U33، C25-3): ضمیرِ سطرِ صفحه فقط هنگامِ نقش بستن گذاشته می‌شد؛ متنِ ذخیره‌شدهٔ سشن (که پرونده، برون‌بری، ایمیل و هر خواننده‌ای جز
      حبابِ گفت‌وگو می‌خواند) «تو» می‌ماند. حالا همان یک گذرگاه (AS.regSys) هنگامِ ذخیرهٔ سشن هم روی سطرهای «سامانه» می‌نشیند: text = آنچه دیده می‌شود، text0 = متنِ خامِ صفحه
      (برای وقتی ضمیرِ گفت‌وگو عوض شود — نقش همیشه از text0 ساخته می‌شود). سطری که کدِ دیگری پس از آن دست زد (text ≠ textR) دوباره خام شمرده می‌شود. */
+  /* دورِ ۲۷ (R8، D27-25 s37 p13 «جلسه ثبت نشد: … — شناسهٔ پرونده (prc) را از فهرستِ … بده»؛ بانکِ R27 #298): نتیجهٔ کنشِ صفحه دو خواننده دارد — مدل (که شناسه و نامِ
+     فیلد را لازم دارد و همان متنِ خام را در «[سامانه: …]» می‌گیرد) و او (در حبابِ «سامانه»). سطری که به او نشان داده و ذخیره می‌شود از همین یک گذرگاه بی‌نشانهٔ درونی می‌شود:
+     بندِ پس از «—» که نشانهٔ لاتینِ پرانتزدار دارد (دستوری به مدل است، نه به او) و شناسهٔ خامِ رکورد. درونِ «…» (حرفِ او) دست نمی‌خورد. */
+  var IDRAW27 = /(^|[^A-Za-z0-9_])(?:prc|kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|eprog|pq|achat|rep|pb|dl|lp|card|deadline)_[A-Za-z0-9_]{5,}(?![A-Za-z0-9_])/g;
+  function forHer27(t) { var x = String(t == null ? "" : t); if (!/[a-z]/.test(x)) return x;
+    x = x.replace(/\s+—\s+[^—·«»]*\((?:[a-z_]{2,12})\)(?:[^—·«»]|«[^»]*»)*/g, "");
+    return outMap23(x, function (b) { return b.replace(IDRAW27, "$1").replace(/\s*\((?:[a-z_]{2,12})\)/g, "").replace(/ {2,}/g, " "); }); }
+  AS.forHer27 = forHer27;
   function regStore25(se) { if (!se || !Array.isArray(se.msgs)) return;
     for (var i = 0; i < se.msgs.length; i++) { var m = se.msgs[i]; if (!m || m.role !== "sys" || typeof m.text !== "string") continue;
-      var raw = m.text0 != null && m.text === m.textR ? m.text0 : m.text, out = AS.regSys(se, raw);
-      if (out !== raw) { m.text0 = raw; m.text = out; m.textR = out; } else if (m.text0 != null) { m.text = raw; delete m.text0; delete m.textR; } } }
+      var raw = m.text0 != null && m.text === m.textR ? m.text0 : m.text, raw0 = raw; raw = forHer27(raw); var out = AS.regSys(se, raw);
+      if (out !== raw) { m.text0 = raw; m.text = out; m.textR = out; } else if (m.text0 != null) { m.text = raw; delete m.text0; delete m.textR; } else if (raw !== raw0) m.text = raw; } }
   AS.regStore25 = regStore25;
   /* دورِ ۲۶ (Q9، U37 s12 «نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت»، «مانده: فقط بازنگریِ خودت» کنارِ «با فکرِ خودتان»؛ A23-14 🔭؛ بانکِ R26 #230): ضمیرِ او فقط روی سطرهای
      «سامانه» و فهرستِ «امروز» می‌نشست؛ متن‌های ثابتِ نماها (سرخط‌ها، نوارِ 🧭، برچسبِ فرم‌ها) هر کدام در پروندهٔ خودشان «تو» نوشته شده‌اند. یک گذرگاه برای همهٔ نماها: پس از هر
@@ -4821,6 +4834,17 @@
     if (/پرسشِ این نوبت همین است|در این نوبت فقط \*\*یک\*\* پرسش/.test(b)) b = b.split("\n").map(tqLine25).join("\n");
     if (/(?:پیشنهادِ|پرسشِ پیشنهادیِ) این نوبت:/.test(b)) b = b.replace(SUGQ25, function (m, pre, q) { return pre + "«" + oneQ25(q) + "»"; });
     return b; }); };
+  var GM27 = [["ژانویه", "ژانویهٔ"], ["فوریه", "فوریهٔ"], ["مارس"], ["آوریل", "آپریل"], ["مه", "مهٔ", "می"], ["ژوئن"], ["ژوئیه", "ژوئیهٔ", "جولای"], ["اوت", "آگوست"], ["سپتامبر"], ["اکتبر"], ["نوامبر"], ["دسامبر"]];
+  var GMRE27 = new RegExp("(\\d{1,2})\\s+(" + GM27.map(function (a) { return a.join("|"); }).join("|") + ")(?![آ-ی])\\s+(?:سالِ?\\s+)?(\\d{4})", "g");
+  function gregWrong27(rp) { var x = faDigits(String(rp || "")).replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 1632); }), m, G = A.AGE; if (!G || !G.parse) return null;
+    GMRE27.lastIndex = 0;
+    while ((m = GMRE27.exec(x))) { var mo = -1; GM27.forEach(function (a, i) { if (a.indexOf(m[2]) >= 0) mo = i + 1; }); if (mo < 0) continue;
+      var said = m[3] + "-" + (mo < 10 ? "0" : "") + mo + "-" + (+m[1] < 10 ? "0" : "") + (+m[1]);
+      var sent = x.slice(Math.max(0, x.lastIndexOf(".", m.index) + 1), m.index), r = null; try { r = G.parse(sent); } catch (e) { r = null; }
+      var ok = r && r.iso && /^\d{4}-\d{2}-\d{2}$/.test(r.iso) ? r.iso : (/تولد/.test(sent) && G.birth ? G.birth() : "");
+      if (ok && ok !== said) return { said: rp.slice(0, 0) + m[0], ok: (function () { var p = ok.split("-"); return (+p[2]) + " " + GM27[+p[1] - 1][0] + " " + p[0]; })() }; }
+    return null; }
+  AS.gregWrong27 = gregWrong27;
   AS.replyCheck = function (o, opts) {
     var s = AS._turnSession; if (!s || !o || typeof o.reply !== "string") return "";
     var um = lastUserMsg(s); if (!um || /^\[سامانه/.test(String(um.text || ""))) return "";
@@ -4835,6 +4859,9 @@
     if (coachOn && !edit && twoQ20(rp, pQs)) why.push("دو پرسش پرسیدی — در هر نوبت فقط یک پرسش (همان پرسشِ نوبت)");
     /* دورِ ۲۳ (Q5، C23-21): نقلِ «…» ِ بلند در متنِ پاسخ یا حرفِ خودِ اوست (در پیام‌هایش) یا متنِ صفحه (در پرامپت)؛ وگرنه حرفی به او نسبت داده شده که نگفته */
     try { var bad23 = quotesNotHers23(rp, s, String((opts && opts.prompt) || "")); if (bad23.length) why.push("نقلِ «" + clip(bad23[0], 60) + "» نه در پیام‌های اوست نه در صفحه — حرفی را که نگفته در گیومه به او نسبت نده (عینِ حرفش را بیاور یا بی گیومه بگو)"); } catch (e) { }
+    /* دورِ ۲۷ (R8، U52 = B25·D17 aB3y p2 «۱۲ اردیبهشت ۱۳۳۸ برابر است با ۲ مهٔ ۱۹۵۹» — درستش ۳ مه): تاریخِ میلادی‌ای که پاسخ کنارِ یک تاریخِ شمسی (یا کنارِ «تولد»)
+       می‌گوید با تبدیلِ خودِ صفحه سنجیده می‌شود (A.AGE.parse، همان که ثبت می‌کند)؛ نابرابر ⇒ یک بازنویسی با تاریخِ درست. */
+    try { var gd27 = gregWrong27(rp); if (gd27) why.push("تاریخِ میلادیِ «" + gd27.said + "» درست نیست — تبدیلِ صفحه «" + gd27.ok + "» است؛ یا همان را بنویس یا تاریخِ میلادی نگو"); } catch (e) { }
     var closing = acts.some(function (x) { return x && /^(?:chat_solved|chat_lookback)$/.test(x.do); });
     var bl = null; try { bl = AS.boundLive(s); } catch (e) { }
     if (coachOn && !closing && !(bl && bl.done) && SOLVED_CONF20.test(own) && !/(?:هنوز|نه)[\s‌]*(?:حل[\s‌]*نشد|حل[\s‌]*نشده)|حل[\s‌]*نشد/.test(own) && !/«حل شد» را/.test(rp)) why.push("«حل شد/درسته» را تو تأیید نکن — «حل شد» فقط پس از وارسیِ خودش و بستنِ صفحه می‌آید");
