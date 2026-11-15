@@ -13,7 +13,7 @@ const ACT = /__fx\.set|__fx\.btn|\.click\(|dispatchEvent|__adv|liveCopyAnswer|re
 
 async function replay(browser, name, opt) {
   opt = opt || {};
-  const fx = JSON.parse(fs.readFileSync(path.join(FXDIR, name + '.json'), 'utf8'));
+  const fx = JSON.parse(fs.readFileSync(path.join(opt.dir || FXDIR, name + '.json'), 'utf8'));   // opt.dir: دورِ ۲۷ (tests/fixtures/r27_correction)
   const ctx = await browser.newContext({ viewport: { width: 1360, height: 900 } });
   const p = await ctx.newPage(); const errors = [], calls = [], extra = []; let ri = 0;
   p.on('pageerror', e => errors.push('pageerror: ' + e.message)); const warns = [];

@@ -1,0 +1,143 @@
+{
+"from": "round27B/bp2",
+"t0": "2026-10-25T09:00:00",
+"base": 0,
+"inject": "(()=>{if(window.__RD)return;const RD=Date;window.__RD=RD;window.__off=0;function D(...a){if(!new.target)return new RD(RD.now()+window.__off).toString();return a.length?new RD(...a):new RD(RD.now()+window.__off)}D.prototype=RD.prototype;D.now=()=>RD.now()+window.__off;D.UTC=RD.UTC;D.parse=RD.parse;window.Date=D;window.__adv=(d)=>{window.__off+=d*864e5;try{APP.render()}catch(e){};return new D().toISOString()};})();\nwindow.__fx={set(sel,v){const e=typeof sel==='string'?document.querySelector(sel):sel;if(!e)return 'NOEL '+sel;const pr=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(pr,'value').set.call(e,v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'},\nbtn(re,root){const b=[...(root?document.querySelector(root):document).querySelectorAll('button')].filter(b=>b.getClientRects().length).find(b=>re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,60)},\nfields(){return [...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>e.getClientRects().length).map(e=>(e.id||e.name||'?')+'|'+e.type+'|'+(e.getAttribute('aria-label')||e.placeholder||'').slice(0,70)+'|'+String(e.value).slice(0,40))},\nbtns(){return [...document.querySelectorAll('#main button')].filter(b=>b.getClientRects().length).map(b=>b.textContent.trim().slice(0,50))},\nmain(n){return document.getElementById('main').innerText.slice(0,n||3000)}};'fx'\n",
+"steps": [
+{
+"say": "سلام. پشت‌بوم انبارم ۵۰ متر مربعه. می‌خوام آب بارون رو جمع کنم برای آبیاری درختای جوون پسته."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await w(700);const i=document.querySelector('.age-ask .age-in');if(!i)return 'NOCARD age='+APP.AGE.age();i.scrollIntoView({block:'center'});const st=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;st.call(i,\"1978-08-12\");i.dispatchEvent(new Event('input',{bubbles:true}));await w(300);[...document.querySelectorAll('.age-ask button')].find(b=>b.textContent.trim()==='ثبت').click();await w(700);const m=document.querySelector('.age-ask .bad');return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' err='+(m?m.textContent:'')+' card='+!!document.querySelector('.age-ask')})()"
+},
+{
+"say": "بارش سالانه‌ی اینجا حدود ۱۵۰ میلی‌متره. می‌خوام بدونم در سال چقدر آب از این پشت‌بوم جمع می‌شه، و دو تا بشکه‌ی ۲۲۰ لیتری که دارم بسه یا باید بیشتر بخرم."
+},
+{
+"say": "خب حجم میشه سطح ضرب در ارتفاع بارون دیگه: ۵۰ × ۱۵۰ = ۷۵۰۰. ولی ۷۵۰۰ چی؟ لیتر؟ متر مکعب؟ متر و میلی‌متر رو که نمیشه ضرب کرد... اینجاش رو نمی‌دونم."
+},
+{
+"say": "یعنی ۱۵۰ میلی‌متر رو متر کنم؟ یه متر صد میلی‌متره دیگه، پس میشه ۱.۵ متر. ۵۰ × ۱.۵ = ۷۵ متر مکعب! عجب، پس کلی آب جمع میشه. ولی متر مکعب رو نمی‌دونم چند لیتره."
+},
+{
+"say": "نه بابا، ۱.۵ متر یعنی تا سینه‌ی آدم! اینجا خشکه. پس اشتباه کردم. ولی راستش دقیق یادم نیست یه متر چند میلی‌متره، مدرسه خیلی وقت پیش بود. فکر می‌کردم صدتاست."
+},
+{
+"say": "آهان، صد ضرب در ده، میشه هزار میلی‌متر. پس ۱۵۰ میلی‌متر میشه ۰.۱۵ متر. ۵۰ × ۰.۱۵ = ۷.۵ متر مکعب. حالا این چند لیتره؟ اینو دیگه واقعاً نمی‌دونم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let o={};try{const sc=APP.PRE.scope(s);o.stack=APP.PRE.all(sc);o.rec=APP.PRE.rec(sc)}catch(e){o.err=String(e)}try{o.causes=APP.MIND.phases().causes;o.pre=APP.MIND.phases().prereq}catch(e){o.merr=String(e)}return JSON.stringify(o).slice(0,4000)})()"
+},
+{
+"say": "ده تا در طول، ده تا در عرض، ده تا در ارتفاع... هزارتا! پس هر متر مکعب هزار لیتره و ۷.۵ متر مکعب میشه ۷۵۰۰ لیتر. دو تا بشکه‌ی ۲۲۰ لیتری که فقط ۴۴۰ لیتره! خیلی کمه. آره، اینو تو «مسئله‌ی حل‌نشده‌ی خودم» ثبتش کن، می‌خوام ببینم چه مخزنی بخرم."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const S=(i,v)=>__fx.set('#'+i,v);APP.ASSIST.toggle(false);const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);const pid=L[L.length-1];APP.go('lprob',pid,'u');await w(1000);S('lpOne','می‌خواهم بدانم از بامِ انبار در سال چقدر آبِ باران جمع می‌شود و چه مخزنی لازم است');S('lpWhy','برای آبیاریِ نهال‌های پسته در تابستان');await w(200);const r0=__fx.btn(/ثبتِ کل/);await w(1200);const opt=(id,i)=>{const e=document.getElementById(id);if(!e)return 'NO '+id;__fx.set(e,e.options[i].value);return 'ok'};S('lpUnk','حجمِ آبی که در یک سال از بام جمع می‌شود و گنجایشِ مخزنی که لازم است');S('lpD_d1','سطحِ بامِ انبار پنجاه متر مربع');opt('lpDE_d1',1);S('lpD_d2','بارشِ سالانه حدودِ ۱۵ سانتی‌متر');opt('lpDE_d2',1);S('lpCond','آبِ یک سال جا شود');S('lpSat','yes');S('lpSuff','کافی است');S('lpSuffW','سطح و بارش حجم را می‌دهد');await w(400);const r=__fx.btn(/ثبتِ فهم/);await w(1400);const errs=[...document.querySelectorAll('#main .lp-err,#main .err,#main .warn,#main [role=alert],.toast')].map(e=>e.textContent.trim().slice(0,300)).join(' / ');return r0+' | '+r+' ERR='+errs+' ## '+__fx.fields().filter(f=>/lpD_|lpOne|lpUnk|lpCond/.test(f)).join(' ; ')})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const S=(i,v)=>__fx.set('#'+i,v);S('lpPrVague','«بس است» یعنی آبِ یک سالِ معمولی جا شود');S('lpPrLine','قیمتِ مخزن‌ها را فعلاً کنار می‌گذارم؛ تبخیر را بعداً با یک ضریب می‌گیرم');S('lpPrApprox','حدودِ ۷ تا ۸ هزار لیتر بس است');S('lpPrPrior','بیشترِ بارانِ کرمان زمستانی است');S('lpPrMeasure','حجم = ۵۰ مترمربع × ۰٫۱۵ متر = ۷٫۵ مترمکعب = ۷۵۰۰ لیتر');S('lpGuess','حدودِ ۷۵۰۰ لیتر');S('lpConf','70');S('lpTest','با حجمِ یک مخزنِ ۵۰۰۰ لیتریِ همسایه مقایسه می‌کنم');S('lpIfRef','حساب را دوباره می‌کنم');S('lpGWant','neutral');await w(400);const r=__fx.btn(/ثبتِ فهم/);await w(1500);const errs=[...document.querySelectorAll('#main .lp-err,#main .err,#main .warn,#main [role=alert],.toast')].map(e=>e.textContent.trim().slice(0,400)).join(' / ');const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const pid=APP.state.arg;const g=R['eprog_'+pid]||{};const u1=((g.solve||{}).u||{})[1];return r+' sub='+APP.state.sub+' ERR='+errs+' ## u1.done='+(u1&&u1.done)+' dl='+JSON.stringify(u1&&u1.dl)})()"
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem(\"mla.records.v1\")||\"{}\");const pid=APP.state.arg;const k=Object.keys(R).filter(k=>k.indexOf(pid)>=0);const r=R[\"eprob_\"+pid];return k.join(\",\")+\" ## \"+JSON.stringify(r).slice(0,1800)+\" ## SUB=\"+APP.state.sub+\" \"+__fx.main(800)})()"
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem(\"mla.records.v1\")||\"{}\");const pid=APP.state.arg;const g=R[\"eprog_\"+pid];return JSON.stringify(g.solve&&g.solve.u).slice(0,2500)+\" ## \"+__fx.main(60000).split(\"\\n\").filter(l=>/ثبت شد|هشدار|اول این|فهم/.test(l)).slice(0,10).join(\" ¦ \")})()"
+},
+{
+"eval": "(()=>{return __fx.fields().filter(f=>!/lpGK|lpBk|lpAsk|lpClaim/.test(f)).join(\"\\n\")})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const opt=(id,i)=>{const e=document.getElementById(id);if(!e)return 'NO '+id;__fx.set(e,e.options[i].value);return [...e.options].map(o=>o.value+'='+o.textContent.slice(0,30)).join(',')};const a=opt('lpIfRef',1);const b=opt('lpDep',1);await w(300);const r=__fx.btn(/ثبتِ فهم/);await w(1500);const errs=[...document.querySelectorAll('#main .lp-err,#main .err,#main .warn,#main [role=alert],.toast')].map(e=>e.textContent.trim().slice(0,400)).join(' / ');const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const g=R['eprog_'+APP.state.arg]||{};return a+' || '+b+' || '+r+' sub='+APP.state.sub+' ERR='+errs+' ## u='+JSON.stringify((g.solve||{}).u).slice(0,600)+' soft='+JSON.stringify(__fx.fields().filter(f=>/Soft/.test(f)))})()"
+},
+{
+"eval": "(()=>{const t=__fx.main(90000);const i=t.indexOf(\"ثبتِ فهم\");return t.slice(i-1500,i+1500)})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const r=__fx.btn(/^۲ کامل/);await w(1500);const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const g=R['eprog_'+APP.state.arg]||{};return r+' sub='+APP.state.sub+' ## u='+JSON.stringify((g.solve||{}).u).slice(0,900)})()"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"
+},
+{
+"say": "یه اصلاح: اولِ کار که گفتم پشت‌بوم ۵۰ متر مربعه اشتباه بود؛ امروز با متر اندازه گرفتم، ۶۰ متر مربعه. بارش همون ۱۵۰ میلی‌متره.",
+"eval0": "__adv(1);1"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);const P=document.querySelector('.as-panel');const box=[...P.querySelectorAll('*')].filter(e=>/این‌جا هم عوض شود/.test(e.textContent)&&e.children.length<12).pop();const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const pid=APP.liveSessionPid(APP.ASSIST.cur());const g=R['eprog_'+pid]||{};const u1=((g.solve||{}).u||{})[1]||{};const r=R['eprob_'+pid];return 'BOX: '+(box?box.innerText.slice(0,900):'NONE')+' ## stmt='+r.p.statement+' ## d='+JSON.stringify(u1.dl)+' measure='+((u1.prac||{}).measure)+' suff='+u1.suff+' ## fixHist='+JSON.stringify(r.p.fixHist||r.fixHist||null).slice(0,500)})()"
+},
+{
+"say": "با ۶۰: ۶۰ × ۰.۱۵ = ۹ متر مکعب، یعنی ۹۰۰۰ لیتر در سال."
+},
+{
+"click": ".as-editb >> nth=1"
+},
+{
+"eval": "(()=>{const t=document.querySelector(\".as-edtx\");return t?t.value:\"NO EDITOR\"})()"
+},
+{
+"fill": [
+".as-edtx",
+"بارش سالانه‌ی اینجا حدود ۱۴۰ میلی‌متره. می‌خوام بدونم در سال چقدر آب از این پشت‌بوم جمع می‌شه، و سه تا بشکه‌ی ۲۰۰ لیتری که دارم بسه یا باید بیشتر بخرم."
+]
+},
+{
+"click": ".as-edsave"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);const P=document.querySelector('.as-panel');const box=[...P.querySelectorAll('*')].filter(e=>/این‌جا هم عوض شود/.test(e.textContent)&&e.children.length<12).pop();const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const pid=APP.liveSessionPid(APP.ASSIST.cur());const g=R['eprog_'+pid]||{};const u1=((g.solve||{}).u||{})[1]||{};const r=R['eprob_'+pid];return 'BOX: '+(box?box.innerText.slice(0,900):'NONE')+' ## stmt='+r.p.statement+' ## d='+JSON.stringify(u1.dl)+' measure='+((u1.prac||{}).measure)+' suff='+u1.suff+' ## fixHist='+JSON.stringify(r.p.fixHist||r.fixHist||null).slice(0,500)})()"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()"
+},
+{
+"say": "با ۱۴۰ میلی‌متر: ۶۰ × ۰.۱۴ = ۸.۴ متر مکعب، یعنی ۸۴۰۰ لیتر. تصمیم گرفتم یه مخزن پلی‌اتیلن ۱۰ هزار لیتری بخرم که یه کم هم جای اضافه داشته باشه. هفته‌ی بعد، جمعه، از بازار کرمان می‌خرمش."
+},
+{
+"say": "هشتاد درصد مطمئنم. راستش اولش که میلی‌متر و متر رو قاطی کردم فکر کردم دیگه سنم رفته بالا و ریاضیم ضعیفه."
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"lprob\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);{const el=[...document.querySelectorAll('#main *')].filter(e=>e.children.length<6&&e.getClientRects().length&&\"\\u06f6\\u06f0|\\u0635\\u0648\\u0631\\u062a\\u0650 \\u0645\\u0633\\u0626\\u0644\\u0647\".split('|').some(t=>e.textContent.includes(t))).pop();if(el)el.scrollIntoView({block:'center'});}await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"mind\",null,null);await w(1000);document.querySelectorAll('#main details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});await w(400);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"prereq\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()"
+},
+{}
+],
+"replies": [
+"{\"reply\": \"پیش از عددها و جزئیات، کل را ببینیم: کلِ مسئله را در یک جمله و به زبانِ خودتان می‌گویید — دقیقاً چه چیزی را می‌خواهید بدانید؟ اگر بخواهید، این کار را می‌شود در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت کرد تا گام‌هایش بماند.\", \"title\": \"آبِ باران برای پسته\", \"pinned\": \"جمع کردنِ آبِ بارانِ پشت‌بامِ انبار (۵۰ مترمربع) برای آبیاریِ نهال‌های پسته\", \"memory\": \"باغدار؛ پشت‌بامِ انبار ۵۰ مترمربع؛ می‌خواهد آبِ باران را برای نهال‌های پسته جمع کند. پرسیدم کلِ مسئله در یک جمله.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"فهمِ مسئله: کل در یک جمله\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"حالا کل روشن است: مجهول، آبِ سالانهٔ این پشت‌بام است و این‌که دو بشکهٔ ۲۲۰ لیتری بس است یا نه؛ داده‌ها سطحِ ۵۰ مترمربع و بارشِ ۱۵۰ میلی‌متر. از این دو داده چطور به مقدارِ آب می‌رسید؟\", \"pinned\": \"آبِ سالانهٔ پشت‌بامِ ۵۰ مترمربعی با بارشِ ۱۵۰ میلی‌متر؛ دو بشکهٔ ۲۲۰ لیتری بس است؟\", \"memory\": \"مجهول: آبِ سالانهٔ پشت‌بام و کفایتِ دو بشکهٔ ۲۲۰ لیتری. داده: ۵۰ مترمربع، بارش ۱۵۰ میلی‌متر. پرسیدم از داده‌ها چطور به حجم می‌رسد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"طرح: از داده‌ها به حجم\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"d\"], \"ans\": [\"u0\", \"u1\", \"u2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"راهِ «سطح ضرب در ارتفاعِ بارش» را خودت درست دیدی؛ گیر فقط در واحد است. از زاویهٔ دیگر: دو دادهٔ تو با دو واحدِ مختلف‌اند — متر و میلی‌متر. اگر هر دو را به یک واحد بنویسی، ضربشان چه می‌شود؟\", \"pinned\": \"آبِ سالانهٔ پشت‌بامِ ۵۰ مترمربعی با بارشِ ۱۵۰ میلی‌متر؛ دو بشکهٔ ۲۲۰ لیتری بس است؟\", \"memory\": \"طرح: حجم = سطح × ارتفاعِ بارش؛ ۵۰×۱۵۰=۷۵۰۰ ولی واحد را نمی‌داند (متر × میلی‌متر). پرسیدم هر دو را به یک واحد بنویسد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"اجرا: یکی کردنِ واحدها\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"پیش از این‌که به لیتر برسیم، گامِ واحد را با واقعیت بسنج: ۱٫۵ متر بارانِ سالانه — یعنی اگر آبِ یک سال جایی جمع می‌شد، تا ارتفاعِ ۱٫۵ متر بالا می‌آمد — با بارانی که در کرمان دیده‌ای جور درمی‌آید؟\", \"pinned\": \"آبِ سالانهٔ پشت‌بامِ ۵۰ مترمربعی با بارشِ ۱۵۰ میلی‌متر؛ دو بشکهٔ ۲۲۰ لیتری بس است؟\", \"memory\": \"۱۵۰ میلی‌متر را ۱٫۵ متر گرفت (یک متر = صد میلی‌متر) و به ۷۵ مترمکعب رسید؛ تبدیلِ مترمکعب به لیتر را نمی‌داند. خواستم ۱٫۵ متر بارش را با واقعیت بسنجد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"اجرا: وارسیِ واحد با واقعیت\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"۵۰ × ۱.۵ = ۷۵ متر مکعب\", \"prior\": [{\"step\": \"تبدیلِ میلی‌متر به متر\", \"quote\": \"یه متر صد میلی‌متره دیگه، پس میشه ۱.۵ متر\", \"verdict\": \"wrong\", \"why\": \"یک متر هزار میلی‌متر است، نه صد\"}, {\"step\": \"حجم\", \"quote\": \"۵۰ × ۱.۵ = ۷۵ متر مکعب\", \"verdict\": \"wrong\", \"why\": \"بر تبدیلِ نادرستِ گامِ ۱ بنا شده\", \"dep\": [1]}]}]}",
+"{\"reply\": \"همین سنجیدن با واقعیت خطا را نشان داد — کارِ درستی بود. این‌جا یک دانستهٔ مشخص کم است، نه توانِ حساب: «تبدیلِ متر به میلی‌متر»، که همین گامِ شما (نوشتنِ ۱۵۰ میلی‌متر به متر) لازمش دارد. اول ببینیم چقدرش را دارید: یک متر چند سانتی‌متر است، و هر سانتی‌متر چند میلی‌متر (همان خط‌های ریزِ خط‌کش)؟\", \"memory\": \"واقعیت‌سنجی ۱٫۵ متر را رد کرد. پیش‌نیاز: تبدیلِ متر به میلی‌متر (۱ متر = ۱۰۰۰ میلی‌متر) برای گامِ ۱۵۰ mm ⇒ m؛ پرسشِ تشخیصی پرسیده شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": true, \"role\": \"self\", \"nat\": \"practical\", \"prereq\": {\"concept\": \"تبدیلِ متر به میلی‌متر (۱ متر = ۱۰۰۰ میلی‌متر)\", \"step\": \"نوشتنِ ۱۵۰ میلی‌متر بارش به متر\", \"quote\": \"دقیق یادم نیست یه متر چند میلی‌متره، مدرسه خیلی وقت پیش بود. فکر می‌کردم صدتاست\", \"q\": \"یک متر چند سانتی‌متر است، و هر سانتی‌متر چند میلی‌متر؟\", \"topic\": \"یکاها و تبدیلِ یکا\"}}]}",
+"{\"reply\": \"«یک متر = هزار میلی‌متر» را خودتان از خط‌کش ساختید و همان گام را هم برداشتید: ۰٫۱۵ متر، و ۷٫۵ مترمکعب — که با واقعیت هم می‌خواند. برای لیتر یک دانستهٔ دیگر لازم است: «تبدیلِ مترمکعب به لیتر». اول ببینیم چقدرش را دارید: یک لیتر حجمِ مکعبی به ضلعِ ۱۰ سانتی‌متر است (مثلِ پاکتِ شیرِ یک لیتری اگر مکعب بود)؛ مکعبی به ضلعِ ۱۰۰ سانتی‌متر چند تا از این مکعب‌ها را در خودش جا می‌دهد؟\", \"memory\": \"تشخیص: ۱ متر = ۱۰۰۰ میلی‌متر را نداشت، با خط‌کش خودش ساخت و به کار برد (۷٫۵ m³). پیش‌نیازِ دوم: مترمکعب به لیتر؛ پرسشِ تشخیصی با مکعب‌ها.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"missing\", \"mastery\": \"yes\", \"quote\": \"صد ضرب در ده، میشه هزار میلی‌متر. پس ۱۵۰ میلی‌متر میشه ۰.۱۵ متر\"}, \"prereq\": {\"concept\": \"تبدیلِ مترمکعب به لیتر (۱ مترمکعب = ۱۰۰۰ لیتر)\", \"step\": \"نوشتنِ ۷٫۵ مترمکعب آبِ سالانه به لیتر برای مقایسه با بشکه‌ها\", \"quote\": \"حالا این چند لیتره؟ اینو دیگه واقعاً نمی‌دونم\", \"q\": \"مکعبی به ضلعِ ۱۰۰ سانتی‌متر چند مکعبِ یک‌لیتری (ضلعِ ۱۰ سانتی‌متر) را جا می‌دهد؟\", \"topic\": \"یکاها و تبدیلِ یکا\"}, \"prior\": [{\"step\": \"تبدیلِ میلی‌متر به متر\", \"quote\": \"۱۵۰ میلی‌متر میشه ۰.۱۵ متر\", \"verdict\": \"ok\", \"why\": \"درست\"}, {\"step\": \"حجم\", \"quote\": \"۵۰ × ۰.۱۵ = ۷.۵ متر مکعب\", \"verdict\": \"ok\", \"why\": \"درست\", \"dep\": [1]}]}]}",
+"{\"reply\": \"«یک مترمکعب = هزار لیتر» را خودتان از مکعب‌ها ساختید و همان گام را هم برداشتید: سالی حدودِ ۷۵۰۰ لیتر، و ۴۴۰ لیترِ بشکه‌ها خیلی کم است. مسئله را با حرف‌های خودتان در «🔭 مسئلهٔ حل‌نشدهٔ خودم» می‌سازم تا انتخابِ مخزن گام‌به‌گام بماند.\", \"memory\": \"پیش‌نیازِ دوم (مترمکعب = ۱۰۰۰ لیتر) را خودش ساخت و به کار برد: ۷۵۰۰ لیتر در سال؛ بشکه‌ها کم. به خواستِ خودش 🔭 ساخته می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"انتخابِ مخزن\", \"s\": \"now\", \"view\": \"lprob\"}], \"actions\": [{\"do\": \"live_new\", \"title\": \"مخزنِ آبِ بارانِ پشت‌بامِ انبار\", \"statement\": \"پشت‌بوم انبارم ۵۰ متر مربعه. می‌خوام آب بارون رو جمع کنم برای آبیاری درختای جوون پسته. بارش سالانه‌ی اینجا حدود ۱۵۰ میلی‌متره. می‌خوام بدونم در سال چقدر آب از این پشت‌بوم جمع می‌شه، و دو تا بشکه‌ی ۲۲۰ لیتری که دارم بسه یا باید بیشتر بخرم.\", \"nat\": \"practical\"}, {\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"۷.۵ متر مکعب میشه ۷۵۰۰ لیتر\", \"prereq_res\": {\"id\": \"pq2\", \"diag\": \"missing\", \"mastery\": \"yes\", \"quote\": \"هزارتا! پس هر متر مکعب هزار لیتره و ۷.۵ متر مکعب میشه ۷۵۰۰ لیتر\"}}]}",
+"{\"reply\": \"اصلاحِ سطحِ پشت‌بام (۶۰ مترمربع به‌جای ۵۰؛ بارش همان ۱۵۰ میلی‌متر) را برای صفحه فرستادم؛ صفحه می‌گوید کجاها عوض شد. حسابِ ۷٫۵ مترمکعب با ۵۰ مترمربع بود — با ۶۰ مترمربع دوباره حسابش می‌کنید؟\", \"pinned\": \"آبِ سالانهٔ پشت‌بامِ انبار با بارشِ ۱۵۰ میلی‌متر؛ چه مخزنی؟\", \"memory\": \"اصلاح: سطحِ پشت‌بام ۶۰ مترمربع است نه ۵۰ (پیامِ اول)؛ بارش ۱۵۰ میلی‌متر بی‌تغییر. حسابِ ۷٫۵ مترمکعب باید دوباره شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"حسابِ دوباره با ۶۰ مترمربع\", \"s\": \"now\", \"view\": \"lprob\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"retract\": {\"msg\": \"پشت‌بوم انبارم ۵۰ متر مربعه\", \"key\": \"datum:سطحِ پشت‌بام\", \"what\": \"fact\", \"fix\": \"۶۰ متر مربعه\", \"old\": \"۵۰\"}}]}",
+"{\"reply\": \"صفحه صورتِ مسئله را با ۶۰ مترمربع به‌روز کرد و داوریِ «با همین داده‌ها معین می‌شود؟» را کنار گذاشت تا دوباره سنجیده شود؛ حسابِ تازه‌تان — ۹ مترمکعب، یعنی ۹۰۰۰ لیتر در سال — را هم خودتان کردید. پیش‌تر مسئله‌ای شبیه این — در کارِ خودتان یا همسایه‌ها، مثلاً استخرِ کشاورزی — دیده‌اید که چیزی از آن به کارِ انتخابِ مخزن بیاید؟\", \"pinned\": \"آبِ سالانهٔ پشت‌بامِ ۶۰ مترمربعی با بارشِ ۱۵۰ میلی‌متر؛ چه مخزنی؟\", \"memory\": \"پس از اصلاح: ۶۰ × ۰٫۱۵ = ۹ مترمکعب = ۹۰۰۰ لیتر در سال (خودش). پرسشِ مسئلهٔ مشابه برای انتخابِ مخزن.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"طرح: انتخابِ مخزن\", \"s\": \"now\", \"view\": \"lprob\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"۶۰ × ۰.۱۵ = ۹ متر مکعب، یعنی ۹۰۰۰ لیتر در سال\"}]}",
+"{\"reply\": \"صفحه طبقِ اصلاحت صورتِ مسئله و دادهٔ بارش را به‌روز کرد: «۱۴۰» به‌جای «۱۵۰».\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"حساب را خودتان با دادهٔ تازه دوباره کردید (۸٫۴ مترمکعب، یعنی ۸۴۰۰ لیتر) و تصمیم و روزِ خرید را هم گفتید. پیش از خرید، یک پیش‌بینی: چقدر مطمئنید که ۱۰ هزار لیتر در یک سالِ پربارش هم سرریز نکند؟\", \"pinned\": \"مخزنِ آبِ بارانِ پشت‌بامِ ۶۰ مترمربعی (بارش ۱۴۰ میلی‌متر)\", \"memory\": \"۶۰ × ۰٫۱۴ = ۸٫۴ مترمکعب = ۸۴۰۰ لیتر (خودش). تصمیم: مخزنِ پلی‌اتیلنِ ۱۰ هزار لیتری؛ برنامه: جمعهٔ هفتهٔ بعد از بازارِ کرمان. پرسیدم پیش‌بینی و اطمینان.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"اجرا: خریدِ مخزن (جمعه)\", \"s\": \"todo\", \"view\": \"lprob\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\", \"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"۶۰ × ۰.۱۴ = ۸.۴ متر مکعب، یعنی ۸۴۰۰ لیتر\", \"plan\": {\"text\": \"هفته‌ی بعد، جمعه، از بازار کرمان می‌خرمش\", \"when\": \"2026-10-30\"}}]}",
+"{\"reply\": \"پیش‌بینی‌تان (۸۰٪ که سرریز نکند) را نگه می‌دارم تا پس از یک فصل باران با واقعیت بسنجید. دربارهٔ «سنم رفته بالا و ریاضیم ضعیفه»: دقیق نگاه کنید — گیر در دو دانستهٔ مشخصِ مدرسه‌ای بود، «یک متر = هزار میلی‌متر» در گامِ تبدیلِ بارش، و «یک مترمکعب = هزار لیتر» در گامِ لیتر؛ هر دو را خودتان با خط‌کش و مکعب ساختید و بعد سه بار درست به کار بردید. این نبودِ یک دانسته بود، نه کم‌توانی.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"هشتاد درصد مطمئنم\"}}]}"
+],
+"keys": [
+"سلام. پشت‌بوم انبارم ۵۰ متر مربعه. می‌خوام آب بارون رو جمع کنم برای آبیاری درختای جوون پسته.",
+"بارش سالانه‌ی اینجا حدود ۱۵۰ میلی‌متره. می‌خوام بدونم در سال چقدر آب از این پشت‌بوم جمع می‌شه، و دو تا بشکه‌ی ۲۲۰ لیتری که دارم بسه یا باید بیشتر بخرم.",
+"خب حجم میشه سطح ضرب در ارتفاع بارون دیگه: ۵۰ × ۱۵۰ = ۷۵۰۰. ولی ۷۵۰۰ چی؟ لیتر؟ متر مکعب؟ متر و میلی‌متر رو که نمیشه ضرب کرد... اینجاش رو نمی‌دونم.",
+"یعنی ۱۵۰ میلی‌متر رو متر کنم؟ یه متر صد میلی‌متره دیگه، پس میشه ۱.۵ متر. ۵۰ × ۱.۵ = ۷۵ متر مکعب! عجب، پس کلی آب جمع میشه. ولی متر مکعب رو نمی‌دونم چند لیتره.",
+"نه بابا، ۱.۵ متر یعنی تا سینه‌ی آدم! اینجا خشکه. پس اشتباه کردم. ولی راستش دقیق یادم نیست یه متر چند میلی‌متره، مدرسه خیلی وقت پیش بود. فکر می‌کردم صدتاست.",
+"آهان، صد ضرب در ده، میشه هزار میلی‌متر. پس ۱۵۰ میلی‌متر میشه ۰.۱۵ متر. ۵۰ × ۰.۱۵ = ۷.۵ متر مکعب. حالا این چند لیتره؟ اینو دیگه واقعاً نمی‌دونم.",
+"ده تا در طول، ده تا در عرض، ده تا در ارتفاع... هزارتا! پس هر متر مکعب هزار لیتره و ۷.۵ متر مکعب میشه ۷۵۰۰ لیتر. دو تا بشکه‌ی ۲۲۰ لیتری که فقط ۴۴۰ لیتره! خیلی کمه. آره، اینو تو «مسئله‌ی حل‌نشده‌ی خودم» ثبتش کن، می‌خوام ببینم چه مخزنی بخرم.",
+"یه اصلاح: اولِ کار که گفتم پشت‌بوم ۵۰ متر مربعه اشتباه بود؛ امروز با متر اندازه گرفتم، ۶۰ متر مربعه. بارش همون ۱۵۰ میلی‌متره.",
+"با ۶۰: ۶۰ × ۰.۱۵ = ۹ متر مکعب، یعنی ۹۰۰۰ لیتر در سال.",
+"[اصلاحِ پیامِ قبلی] «۱۵۰» ⇐ «۱۴۰»، «دو» ⇐ «سه»، «۲۲۰» ⇐ «۲۰۰» — متنِ درستِ پیامم: «بارش سالانه‌ی اینجا حدود ۱۴۰ میلی‌متره. می‌خوام بدونم در سال چقدر آب از این پشت‌بوم جمع می‌شه، و سه تا بشکه‌ی ۲۰۰ لیتری که دارم بسه یا باید بیشتر بخرم.»",
+"با ۱۴۰ میلی‌متر: ۶۰ × ۰.۱۴ = ۸.۴ متر مکعب، یعنی ۸۴۰۰ لیتر. تصمیم گرفتم یه مخزن پلی‌اتیلن ۱۰ هزار لیتری بخرم که یه کم هم جای اضافه داشته باشه. هفته‌ی بعد، جمعه، از بازار کرمان می‌خرمش.",
+"هشتاد درصد مطمئنم. راستش اولش که میلی‌متر و متر رو قاطی کردم فکر کردم دیگه سنم رفته بالا و ریاضیم ضعیفه."
+]
+}
