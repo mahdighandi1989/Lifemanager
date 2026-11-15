@@ -5146,3 +5146,24 @@ dated stability, mind-card feed) under way.
   `tests/test_tour1_r26_prior.js` (15 runner scenarios replayed, 30 assertions red on BASE26; bank Q4 30/30), suite one file at a time. Quarantined: round-25
   `CALLS25`, `calcs`, `ACC25`, `UNDO25` (`APP.STORY.R25_QUARANTINE`). Not done: D25-15 (a38 gate, story's file this round). Lesson:
   `experiences/model-reports-state-page-validates.md` (Update 2026-11-12, prior).
+
+## 2026-11-12 — FINDING + CHANGE: تورِ پولیا دورِ ۲۶، fixer «loop» (Q7 + C20/C36)
+- **FINDING** All 14 Q7 defects reproduced red on BASE26 (`apps/learning-architecture/tests/test_tour1_r26_loop.js`: 13 runner flags false, bank 7/20).
+  Roots in `apps/learning-architecture/src/app/a44_route.js`: the fit compared written forms, not words (her colloquial step vs the area's formal
+  text ⇒ a clear tool was asked); the sheet's own words broke ties; naming the other candidate of a tie was a rejection plus a second ask; event
+  ids `sys23_<sw>_back|ask|resume` were not unique (a second arrival overwrote the first in 📜); a take-back left the sheet open; the prompt's
+  sheet list was a two-minute-old cache; the 🔭 row of a question had no control; a step-less sheet's reply reached nobody; a piece waiting after
+  closure and a tool arriving after closure had no «امروز» line; a page-self sheet with a wrong `gap.step` sat on a closed problem; `sys_done` on a
+  declined sheet and a bare close of a sheet were silent; the «جواب نداد» reason attributed a sheet word to her step.
+- **CHANGE** `a44_route.js` only: `foldW`/`tok1`/`areaIdx` (closed-class, lexicon-attested folding), `rank`/`score` (one eligible ⇒ arrive, several ⇒
+  ask naming all, whole-name exception), `tiePick`/`tieChoose`/`tieNone`/`tieDrop`/`tieAnswer` + `PRE.sysFit`/`sysLines` (answer by naming),
+  `idN`/`evOut` (one event per arrival/ask/resume, earlier event gets its later outcome), `sheetClose`/`sheetSeen`/`closedBare` (close with a note
+  on her confirmation; live sheet list), `sysCard`/`cardAnswer` (answer buttons), `looseSheets`/`sheetNews` (📬), `mootWatch`, `stepsSync`,
+  `lateScope`/`sysOpen` (territory areas only), `PRE.sysDone` (declined), `herShare`. The a26 system prompt is untouched.
+- **DECISION** A tie is not broken by counting the sheet's own words or by «three shared words against two»; the page asks. Closing a sheet is the
+  host's `approved` tick and is set only on her own confirmation. A problem closed before its tool arrived is never reopened by the page (C36).
+- **CHANGE (test)** One round-25 assertion (tB1d: «نه، اون یکی» ⇒ second ask) replaced per DECISIONS_R26 Q7/C20, with a comment in the test.
+- Quarantine: `APP.PRE.R24_QUARANTINE.rank25` (REMOVAL_CANDIDATES). WORKLOG (132), PROGRESS 129, HANDBOOK §10/§12 row 79, handoff note
+  `_pending_tour1_R26_loop_2026-11-12.md`.
+- **PROPOSAL** Not done, with reasons: the tour harness has no `HOST.status` (the close is invisible to runners until RUNNER27 emulates it);
+  morphology beyond the two closed classes; a late piece is judged by the sheet's area, not by its relation to the closed problem.
