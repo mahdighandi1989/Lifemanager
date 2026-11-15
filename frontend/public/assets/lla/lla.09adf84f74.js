@@ -39708,6 +39708,8 @@ APP.goFromURL = function (q) {
     if (d.runs.length > 1) return label + ": " + d.runs.slice(0, 4).map(function (r) { return "«" + r.n + "» (اصلاح شد ⇐ «" + r.o + "»)"; }).join("، ") + (extraN || "");
     /* دورِ ۲۳ (Q4، A23-30 «صورتِ مسئلهٔ گفت‌وگو: «۱۲» (اصلاح شد ⇐ «۱۰»)»): تکهٔ تنهای عددی یا بسیار کوتاه با واژهٔ پیرامونش نشان داده می‌شود */
     if (d.runs.length === 1 && /^[^\s]{1,8}$/.test(d.o) && /^[^\s]{1,8}$/.test(d.n) && /[0-9۰-۹]/.test(d.o + d.n) && String(o || "").split(/\s+/).length > 2) { var w23 = winDiff23(plainTx(String(o)).replace(/\s+/g, " ").trim(), plainTx(String(n)).replace(/\s+/g, " ").trim()); return label + ": «" + w23.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + w23.o + "»" + (extraO || "") + ")"; }
+    /* دورِ ۲۶ (Q2، pwC1 صورتِ ۴۰۰ نویسه‌ای «باغ ۲ ⇐ ۲٫۵ هکتاره»): تکه‌ای که از آغازِ متن تا برش رفت (diffRuns20 در متنِ بلندِ بریده) دو سوی یکسان نشان می‌داد — پنجرهٔ تفاوت */
+    if (d.runs.length === 1 && String(o || "").length > 70 && (d.o === d.n || d.o.length >= 60 || d.n.length >= 60)) { var w26 = winDiff23(plainTx(String(o)).replace(/\s+/g, " ").trim(), plainTx(String(n)).replace(/\s+/g, " ").trim()); return label + ": «" + clip(w26.n, 110) + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + clip(w26.o, 110) + "»" + (extraO || "") + ")"; }
     return label + ": «" + d.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + d.o + "»" + (extraO || "") + ")"; }
   AS.chLine20 = chLine20;
   /* R3a (دورِ ۲۱): یک ساختارِ نتیجه برای a27/a38/a40 — {changed:[{rec,old,new,why}], ask:[{field,label,old,new}], note:""}؛ شکلِ پیشینِ a38 (changes/text/pending)
@@ -39784,7 +39786,8 @@ APP.goFromURL = function (q) {
       if ((ed && String(ed[1]).trim()) || R.edit) return "با ✏️ ِ خودش روی همان پیام";
       var own = clip(plainTx(cu), 120); if (String(own).replace(/«»/g, "").trim()) return "به گفتهٔ خودش: «" + own + "»"; return why23; })();
     var put = function (rec, o, n, why, line) { var o1 = plainTx(o == null ? "" : String(o)), n1 = plainTx(n == null ? "" : String(n)), oc = clip(o1, 160), nc = clip(n1, 160);
-      if (oc === nc && o1 !== n1) { var w = winDiff23(o1, n1); oc = w.o; nc = w.n; }
+      /* دورِ ۲۶ (Q2، pwC1 «صورتِ مسئلهٔ گفت‌وگو: «باغ پستهٔ … جل…» (اصلاح شد ⇐ «باغ پستهٔ … جل…»)»): متنِ بلند در سطرِ خلاصه دوباره بریده می‌شود — پنجرهٔ تفاوت از همان آغاز */
+      if (o1 !== n1 && (oc === nc || o1.length > 70 || n1.length > 70)) { var w = winDiff23(o1, n1); oc = w.o; nc = w.n; }
       chS.push({ rec: rec, old: oc, "new": nc, why: why || why23 }); ch.push(line || chLine20(rec, o, n)); };
     /* R3+ (دورِ ۲۱، A21-5 — بازماندهٔ A16): جای‌گزینیِ رکوردهای مربی همان diff ِ کمینهٔ بخشِ مسئله است (A.liveCoreDiff/liveFixVal — که حدسِ مسئله را درست نشاند)،
        نه پنجرهٔ هم‌اندازهٔ واژه‌ها که «مثلثِ ضلع ۱ می‌شه» را می‌انداخت یا کلِ داده را با «۱۱ میلیارد» عوض می‌کرد؛ سنجه‌های پیشین فقط پشتیبان‌اند */
@@ -50035,9 +50038,11 @@ APP.goFromURL = function (q) {
   function fam25(o) { return famU25(o) || o.qf || o.cls || ""; }                                              // جنس برای سنجشِ بُعد: واحد، وگرنه واژهٔ پس از عدد
   function ucompat25(a, b) { return !a || !b || a === b; }
   /* جفت‌های پیشین ⇐ تازه؛ واحدِ مقدارِ بی‌واحد از رکوردها */
-  function pairs25(D, RC) {
+  function pairs25(D, RC, clause) {
     var pairs = [];
     numParts0(D).forEach(function (p) { var pr = numPair(p.o, p.n); if (pr) { var a = pr.a, b = pr.b, q = { a: a.v, b: b.v, u: a.u || b.u || "" };
+        /* دورِ ۲۶ (Q2، pwC1 «باغ ۲ هکتاره» ⇐ «۲٫۵»): جفتِ بی‌یکا یکای خودِ عدد را در بندِ پیامِ او دارد («۲ هکتاره») — همان یکا برای هر دو سو */
+        if (!a.u && !b.u && clause) { var cu26 = numOccs(String(clause)).filter(function (o) { return o.u && UFAC[o.u] && veq(o.v, a.v); }); if (cu26.length === 1) q.u = cu26[0].u; }
         if (a.u && b.u) { q.b = b.v * ufac(b.u) / ufac(a.u); q.u = a.u; }
         else if (!a.u && b.u && UFAC[b.u] && ufac(b.u) !== 1 || (!a.u && b.u && UFAC[b.u] && RC.some(function (rc) { return rc.O.some(function (o) { return o.u && o.u !== b.u && ufam(o.u) === ufam(b.u) && veq(o.v, a.v); }); }))) {
           var hit = null; RC.forEach(function (rc) { rc.O.forEach(function (o) { if (!hit && o.u && ufam(o.u) === ufam(b.u) && veq(o.v, a.v)) hit = o; }); });
@@ -50060,7 +50065,7 @@ APP.goFromURL = function (q) {
   function staleCore25(RC0, D, dbg, opt) {
     opt = opt || {};
     if (!D) return []; var RC = RC0.filter(function (rc) { return typeof rc.t === "string" && txt(rc.t); }).map(function (rc, i) { var O = ann25(rc.t); var R = runs25(rc.t, O); O.forEach(function (o) { o.ri = i; o.pos = i * 1e6 + o.s; o.zone = rc.zone || "work"; }); var x = { k: rc.k, lab: rc.lab, t: rc.t, zone: rc.zone || "work", O: O, R: R }; convs25(x); return x; });
-    var pairs = pairs25(D, RC); if (!pairs.length) return [];
+    var pairs = pairs25(D, RC, opt.clause || ""); if (!pairs.length) return [];
     var occ = []; RC.forEach(function (rc) { rc.O.forEach(function (o) { occ.push(o); }); });
     /* ---- دورِ ۲۶ (Q2، DECISIONS_R26 «Marking follows dependency, not equal digits»؛ U5 pwB1: کابلِ «۱۵ متر» کنارِ ارتفاعِ «۱۵ متره») ----
        عددِ هم‌مقدار با مقدارِ پیشین «بازگفتِ همان داده» است، مگر نوشتهٔ خودش چیزِ دیگری نشان دهد:
@@ -50114,8 +50119,10 @@ APP.goFromURL = function (q) {
     var before26 = function (q, c, hm) { if (q.ri === c.ri) return q.pos < c.pos; if (hm >= 0) { var off = offOf(c.ri, hm); if (q.ri === hm) return off >= 0 ? q.s < off + c.s : false; if (homeOf(q.ri) === hm) { var o2 = offOf(q.ri, hm); return off >= 0 && o2 >= 0 ? o2 + q.s < off + c.s : q.ri < c.ri; } return q.ri < hm; } return q.pos < c.pos; };
     var HOME = {}, homeOf = function (ri) { if (HOME[ri] !== undefined) return HOME[ri]; var t0 = nz(RC[ri].t), h = -1; if (RC[ri].zone !== "ctx" && t0.length >= 4) RC.forEach(function (rc, i) { if (h < 0 && rc.zone === "ctx" && nz(rc.t).indexOf(t0) >= 0) h = i; }); return (HOME[ri] = h); };   // دورِ ۲۶ (Q2): پیامی که این رکورد تکه‌ای از آن است
     var staleRec = function (o) { return RC[o.ri].O.some(function (q) { return q.root || q.der; }); };   // دورِ ۲۶ (Q2): عددِ یک پیامِ زمینه فقط وقتی «عملوندِ ممکن» است که همان پیام عددِ کهنه دارد
-    var curV = function (o) { return o.root ? (o.root.st === "old" ? o.root.q.a : o.root.q.a) : o.v; };          // مقدارِ «پیش از اصلاح» ِ هر عدد
-    var newV = function (o) { if (o.root) return o.root.q.nore ? null : o.root.q.b; var d = o.der || derOf(o); if (d && !o.given) return d.re; return o.v; };   // مقدارِ «پس از اصلاح»
+    /* دورِ ۲۶ (Q2، pwC1 «باغ ۲ هکتاره» ⇒ «۲۰۰۰۰ متر مربع»): ریشه‌ای که در یکای دیگری نوشته شد مقدارش را در یکای خودش دارد (همان ضریبِ rootOf) */
+    var rk26 = function (o) { var q = o.root.q; return q.u && o.u && UFAC[q.u] && UFAC[o.u] ? ufac(o.u) / ufac(q.u) : 1; };
+    var curV = function (o) { return o.root ? o.root.q.a / rk26(o) : o.v; };          // مقدارِ «پیش از اصلاح» ِ هر عدد
+    var newV = function (o) { if (o.root) return o.root.q.nore ? null : o.root.q.b / rk26(o); var d = o.der || derOf(o); if (d && !o.given) return d.re; return o.v; };   // مقدارِ «پس از اصلاح»
     var isStaleOp = function (o) { return !!o.root || !!(o.der || (derOf(o) && !o.given)); };
     var mm = function (o, v) { return o.pct ? v / 100 : v; };
     /* «۲+۲=۴»: در جمعِ خالص، دو عددِ هم‌مقدار شاید دو چیزِ جدا باشند (فقط یکی کهنه) ⇒ صفحه عدد پیشنهاد نمی‌کند (C11)؛ در ضرب/توان همان کمیت است («۱۰×۱۰») */
@@ -50161,7 +50168,7 @@ APP.goFromURL = function (q) {
         X.concat(Y).forEach(function (y, j) { if (j <= i) return;
           OPS.forEach(function (op) { if (!dimOk(op[0], x.f, y.f, fam25(c), x.kind, y.kind)) return;
             if (tier === 4 && !plain && /[*\/]/.test(op[0]) && x.f && fam25(c) && x.f !== fam25(c) && x.f !== "pct" && fam25(c) !== "pct" && y.f && y.f !== "pct" && y.f !== x.f && y.f !== fam25(c)) return;   // سه جنسِ گوناگون با یک ضرب/تقسیم از هر جای مسئله: حدس است، نه رابطه
-            if (tier === 4 && !plain && /[*\/]/.test(op[0]) && !fam25(c) && x.f && y.f && x.f !== y.f && x.f !== "pct" && y.f !== "pct" && (PHYS25[x.f] || PHYS25[y.f])) return;   // C25-4 pwC1 «۴ تا پنل» = «۸ ساعت» ÷ «۲ هکتار»: حاصلِ دو جنسِ گوناگون شمارِ تنها نیست
+            if (tier >= 3 && !plain && /[*\/]/.test(op[0]) && !fam25(c) && x.f && y.f && x.f !== y.f && x.f !== "pct" && y.f !== "pct" && (PHYS25[x.f] || PHYS25[y.f])) return;   // دورِ ۲۶ (Q2، pwC1 پس از یکای «هکتار»): در ردهٔ (ج) هم   // C25-4 pwC1 «۴ تا پنل» = «۸ ساعت» ÷ «۲ هکتار»: حاصلِ دو جنسِ گوناگون شمارِ تنها نیست
             var mul = /[*\/^]/.test(op[0]), xv = mul && x.pct ? x.v / 100 : x.v, yv = mul && y.pct ? y.v / 100 : y.v, v = op[1](xv, yv), tv = mul ? cv : c.v; if (!isFinite(v) || !veq(v, tv)) return;
             if (dbg && !plain) dbg.push({ imp: c.raw, k: RC[c.ri].k, x: x.v, op: op[0], y: y.v, tier: tier });
             if (x.re == null || y.re == null) { res.push(null); return; } var nv = op[1](mul && x.pct ? x.re / 100 : x.re, mul && y.pct ? y.re / 100 : y.re); res.push(isFinite(nv) ? outV25(mul ? nv : (c.pct ? nv / 100 : nv), c, false) : null); }); }); });
@@ -50447,7 +50454,10 @@ APP.goFromURL = function (q) {
      هیچ تغییر ⇒ changes خالی و text «چیزی …» (مربی آن را «تغییر» نمی‌خواند)؛ رد ⇒ text «ثبت نشد: …». دوباره‌خوانی با همان اصلاح بی‌اثر است. */
   function asResult(res) {
     shapeRes(res);
-    res.changes = (res.changed || []).map(function (c) { return c.label + (c.old || c.new ? ": «" + clip(typeof c.new === "string" ? c.new : "", 60) + "» (اصلاح شد ⇐ «" + clip(typeof c.old === "string" ? c.old : "", 60) + "»)" : ""); });   // دورِ ۲۴ (R3، B24·D16): یک سو
+    /* دورِ ۲۶ (Q2، pwC1 «صورتِ مسئله: «ایده: آبیاری…» (اصلاح شد ⇐ «ایده: آبیاری…»)» — دو سوی یکسان، تغییر دیده نمی‌شد): متنِ بلند با پنجرهٔ تفاوت (a27 chLine20)، نه برشِ آغازِ متن */
+    var CL26 = A.ASSIST && A.ASSIST.chLine20;
+    res.changes = (res.changed || []).map(function (c) { if (CL26 && typeof c.old === "string" && typeof c.new === "string" && c.old && c.new && (c.old.length > 60 || c.new.length > 60)) { try { return CL26(c.label, c.old, c.new); } catch (e26) { } }
+      return c.label + (c.old || c.new ? ": «" + clip(typeof c.new === "string" ? c.new : "", 60) + "» (اصلاح شد ⇐ «" + clip(typeof c.old === "string" ? c.old : "", 60) + "»)" : ""); });   // دورِ ۲۴ (R3، B24·D16): یک سو
     res.text = res.ok ? (res.changes.length ? "✓ " + res.changes.join("؛ ") : "چیزی از آن پیام در مسئلهٔ زنده ثبت نشده بود") + askLine(res.ask) : "ثبت نشد: " + (res.err || "");
     return res;
   }
@@ -50554,12 +50564,14 @@ APP.goFromURL = function (q) {
     ["تومان|تومن", "toman"], ["ریال", "rial"],
     /* دورِ ۲۴ (R3، B24·D5 s19 «۱۸ هفته … نه ۱۶؛ عروسی ۱۵ اسفنده»): نقشِ عدد — «هفته/روز» شمارِ روزهاست (هفته = ۷ روز) و عددِ پیش از نامِ ماه «روزِ ماه» است؛
        «۱۶ هفته» هرگز همان «۱۵ اسفند» نیست (پیش‌تر هر دو بی‌واحد بودند و «۱۶» ⇐ «۱۵» پرسیده می‌شد) */
-    ["هفته", "wk"], ["روز", "day"], ["فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند", "dom"]];
+    ["هفته", "wk"], ["روز", "day"],
+    /* دورِ ۲۶ (Q2، C25-4/C25-15 pwC1 «باغ ۲ هکتاره … پس ۲۰۰۰۰ متر مربع × ۰٫۰۰۵ متر = ۱۰۰»): هکتار یکای مساحت است (۱ هکتار = ۱۰٬۰۰۰ مترمربع، تعریفِ یکا) */
+    ["هکتار", "ha"], ["فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند", "dom"]];
   var UNIT_RAW = UNITS.slice();
   /* دورِ ۲۳ (Q4، بانکِ R23 #91 «۱۲ نفرن»): «ـن/ـند» ِ محاوره (= هستند) پس از واحد هم همان واحد است */
   UNITS = UNITS.map(function (u) { return [new RegExp("(^|[^a-zء-ی])(?:" + u[0] + ")(?=ی|ه|ن(?:د)?(?![a-zء-ی])|[^a-zء-ی]|$)", "g"), u[1]]; });
   var FUNC_W = ["با", "تا", "رو", "را", "از", "به", "در", "که", "هم", "یه", "یک", "این", "اون", "آن", "برای", "توی", "تو"];   // واژه‌های دستوری، نه نشانهٔ واقعیت
-  var UCAN = { km: 1, m2: 1, m3: 1, mm: 1, cm: 1, kg: 1, lit: 1, min: 1, lb: 1, deg: 1, hr: 1, ppl: 1, g: 1, cup: 1, m: 1, toman: 1, rial: 1, mg: 1, wk: 1, day: 1, dom: 1 };
+  var UCAN = { ha: 1, km: 1, m2: 1, m3: 1, mm: 1, cm: 1, kg: 1, lit: 1, min: 1, lb: 1, deg: 1, hr: 1, ppl: 1, g: 1, cup: 1, m: 1, toman: 1, rial: 1, mg: 1, wk: 1, day: 1, dom: 1 };
   /* دورِ ۲۱ (ADDENDUM R3+، A21-4): محاوره ⇄ نوشتار در سنجشِ «همان واقعیت» — خونه/خانه، همون/همان، می‌ارزه/می‌ارزد؛ «ٔ» ِ اضافه */
   function canTok(w) { var x = String(w).replace(/ٔ/g, ""); if (x.length > 3) x = x.replace(/ه$/, ""); x = x.replace(/ون$/, "ان"); if (x.length > 3) x = x.replace(/د$/, ""); return x; }
   function ftoks(t) { return ctoks(ucanon(t)).map(canTok); }
@@ -50568,7 +50580,7 @@ APP.goFromURL = function (q) {
   /* ---- دورِ ۲۲ (P3، DECISIONS_R22): «همان واقعیت» به معنا — مقدار + واحد، عددِ نوشته با واژه، هرگز عددِ تنها ----
      B·D2 bp2 «پنجاه متر مربع» = «۵۰ مترمربع»، «۱۵ سانتی‌متر» = «۱۵۰ میلی‌متر»؛ A22-17 s07 «۹ سانت» = «۹ سانتی‌متر»؛ C22-5 s29 «محیط ۴۰ متر» = «۴۰ متر لبه»؛
      C22-8 «۱ پیمانه» = «۱ پیمونه»؛ D s37 «بر ۴» ≠ «رقمِ اول ۴» (عددِ تنها بی واحد و بی همسایهٔ مشترک هرگز همان واقعیت نیست). */
-  var UFAC = { km: ["len", 1000], m: ["len", 1], cm: ["len", 0.01], mm: ["len", 0.001], m2: ["area", 1], m3: ["vol", 1], lit: ["vol", 0.001], kg: ["mass", 1], g: ["mass", 0.001], min: ["time", 1], hr: ["time", 60], cup: ["cup", 1], lb: ["lb", 1], deg: ["deg", 1], ppl: ["ppl", 1], toman: ["money", 10], rial: ["money", 1], mg: ["mass", 0.000001], wk: ["days", 7], day: ["days", 1], dom: ["dom", 1] };   // دورِ ۲۳ (Q4، بانکِ R23 #102): «میلی‌گرم» گرم نیست
+  var UFAC = { km: ["len", 1000], m: ["len", 1], cm: ["len", 0.01], mm: ["len", 0.001], m2: ["area", 1], ha: ["area", 10000], m3: ["vol", 1], lit: ["vol", 0.001], kg: ["mass", 1], g: ["mass", 0.001], min: ["time", 1], hr: ["time", 60], cup: ["cup", 1], lb: ["lb", 1], deg: ["deg", 1], ppl: ["ppl", 1], toman: ["money", 10], rial: ["money", 1], mg: ["mass", 0.000001], wk: ["days", 7], day: ["days", 1], dom: ["dom", 1] };   // دورِ ۲۳ (Q4، بانکِ R23 #102): «میلی‌گرم» گرم نیست
   var UNIT_AT = UNIT_RAW.map(function (u) { return [new RegExp("^[\\s]*(?:" + u[0] + ")(?=ی|ه|ن(?:د)?(?![a-zA-Zء-ی])|[\u064B-\u0652\u0654]|[^a-zA-Zء-ی]|$)", "i"), u[1]]; });   // دورِ ۲۶ (Q2): کسرهٔ اضافه («۴ مترِ روی بام») مرزِ واحد است
   function unitAt(t, i) { var x = String(t).slice(i, i + 28).replace(/[‌‏‎]/g, " ").replace(/ي/g, "ی").replace(/ك/g, "ک"); for (var k = 0; k < UNIT_AT.length; k++) { var m = UNIT_AT[k][0].exec(x); if (m) return { u: UNIT_AT[k][1], len: m[0].length }; } return null; }
   var NUMW_V = { "یک": 1, "یه": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "شیش": 6, "هفت": 7, "هشت": 8, "نه": 9, "ده": 10, "یازده": 11, "دوازده": 12, "سیزده": 13, "چهارده": 14, "پانزده": 15, "پونزده": 15,

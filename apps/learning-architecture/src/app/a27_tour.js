@@ -4001,6 +4001,8 @@
     if (d.runs.length > 1) return label + ": " + d.runs.slice(0, 4).map(function (r) { return "«" + r.n + "» (اصلاح شد ⇐ «" + r.o + "»)"; }).join("، ") + (extraN || "");
     /* دورِ ۲۳ (Q4، A23-30 «صورتِ مسئلهٔ گفت‌وگو: «۱۲» (اصلاح شد ⇐ «۱۰»)»): تکهٔ تنهای عددی یا بسیار کوتاه با واژهٔ پیرامونش نشان داده می‌شود */
     if (d.runs.length === 1 && /^[^\s]{1,8}$/.test(d.o) && /^[^\s]{1,8}$/.test(d.n) && /[0-9۰-۹]/.test(d.o + d.n) && String(o || "").split(/\s+/).length > 2) { var w23 = winDiff23(plainTx(String(o)).replace(/\s+/g, " ").trim(), plainTx(String(n)).replace(/\s+/g, " ").trim()); return label + ": «" + w23.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + w23.o + "»" + (extraO || "") + ")"; }
+    /* دورِ ۲۶ (Q2، pwC1 صورتِ ۴۰۰ نویسه‌ای «باغ ۲ ⇐ ۲٫۵ هکتاره»): تکه‌ای که از آغازِ متن تا برش رفت (diffRuns20 در متنِ بلندِ بریده) دو سوی یکسان نشان می‌داد — پنجرهٔ تفاوت */
+    if (d.runs.length === 1 && String(o || "").length > 70 && (d.o === d.n || d.o.length >= 60 || d.n.length >= 60)) { var w26 = winDiff23(plainTx(String(o)).replace(/\s+/g, " ").trim(), plainTx(String(n)).replace(/\s+/g, " ").trim()); return label + ": «" + clip(w26.n, 110) + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + clip(w26.o, 110) + "»" + (extraO || "") + ")"; }
     return label + ": «" + d.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + d.o + "»" + (extraO || "") + ")"; }
   AS.chLine20 = chLine20;
   /* R3a (دورِ ۲۱): یک ساختارِ نتیجه برای a27/a38/a40 — {changed:[{rec,old,new,why}], ask:[{field,label,old,new}], note:""}؛ شکلِ پیشینِ a38 (changes/text/pending)
@@ -4077,7 +4079,8 @@
       if ((ed && String(ed[1]).trim()) || R.edit) return "با ✏️ ِ خودش روی همان پیام";
       var own = clip(plainTx(cu), 120); if (String(own).replace(/«»/g, "").trim()) return "به گفتهٔ خودش: «" + own + "»"; return why23; })();
     var put = function (rec, o, n, why, line) { var o1 = plainTx(o == null ? "" : String(o)), n1 = plainTx(n == null ? "" : String(n)), oc = clip(o1, 160), nc = clip(n1, 160);
-      if (oc === nc && o1 !== n1) { var w = winDiff23(o1, n1); oc = w.o; nc = w.n; }
+      /* دورِ ۲۶ (Q2، pwC1 «صورتِ مسئلهٔ گفت‌وگو: «باغ پستهٔ … جل…» (اصلاح شد ⇐ «باغ پستهٔ … جل…»)»): متنِ بلند در سطرِ خلاصه دوباره بریده می‌شود — پنجرهٔ تفاوت از همان آغاز */
+      if (o1 !== n1 && (oc === nc || o1.length > 70 || n1.length > 70)) { var w = winDiff23(o1, n1); oc = w.o; nc = w.n; }
       chS.push({ rec: rec, old: oc, "new": nc, why: why || why23 }); ch.push(line || chLine20(rec, o, n)); };
     /* R3+ (دورِ ۲۱، A21-5 — بازماندهٔ A16): جای‌گزینیِ رکوردهای مربی همان diff ِ کمینهٔ بخشِ مسئله است (A.liveCoreDiff/liveFixVal — که حدسِ مسئله را درست نشاند)،
        نه پنجرهٔ هم‌اندازهٔ واژه‌ها که «مثلثِ ضلع ۱ می‌شه» را می‌انداخت یا کلِ داده را با «۱۱ میلیارد» عوض می‌کرد؛ سنجه‌های پیشین فقط پشتیبان‌اند */

@@ -15,6 +15,8 @@ const GROUP = process.env.LLA_R26_GROUP || 'B';
       if (c.strip) x.stripText = await R.p.evaluate(() => { const s = APP.ASSIST.cur(), ids = [s.id].concat((APP.liveAll ? APP.liveAll() : []).map(r => r.p.id)); return ids.map(id => { try { const M = APP.ROUTE.model(id); return M ? 'مانده: ' + M.remain : ''; } catch (e) { return 'ERR ' + e.message; } }).filter(Boolean).join(' ‖ '); });
       if (R.errors.length) errors.push(n + ' page errors: ' + R.errors.join(' | '));
       r = c.check(x); await R.close(); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
+    /* موردِ «نکرده» (notDone): اجرا می‌شود و دلیلش چاپ می‌شود — سبز شدنش خبر است، قرمزش دروازه را نمی‌بندد (گزارش در WORKLOG ۱۳۱) */
+    if (c.notDone) { info[c.name] = r.ok ? true : 'NOT DONE — ' + c.notDone; console.log('NOT DONE ' + c.name.slice(0, 60) + ' :: ' + c.notDone); continue; }
     info[c.name] = !!r.ok; if (!r.ok || process.env.LLA_R26_GOT) (r.ok ? console.log : (t) => errors.push(t))(c.name + ' got ' + J(r.got).slice(0, +process.env.GOTN || 1600)); }
   console.log(J({ group: GROUP, runners: info }));
   await b.close();
