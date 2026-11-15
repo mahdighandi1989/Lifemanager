@@ -169,6 +169,115 @@ const RUNS = Object.assign({}, JSON.parse(fs.readFileSync(vfile('R26_prior_runs.
     chk(!!P16 && P16.steps.length === 6 && P16.steps.slice(0, 5).every(x => x.verdict === 'ok' && x.fixed) && /گام ۶/.test(P16.steps[5].quote), 'A27-21: steps 1–5 keep their numbers and history; «گام ۶» is merged as step 6 :: ' + (P16 ? P16.steps.map(x => x.n + ':' + x.verdict + ':' + x.quote.slice(0, 20)).join(' / ') : 'none'));
     chk(!!P16 && !P16.steps.some(x => x.n > 6), 'A27-21: restated steps «گام ۱/۲/۳/۵» are not appended again');
   });
+  // ================= bank — ورودی‌های R4 در tests/variants/VARIANTS_R27.json =================
+  await section('bank', async () => {
+    const ids = Object.keys(E).filter(i => /^R4\b/.test(E[i].rc)).map(Number);
+    const BIKE = 'سلام، برای تمرینِ دوچرخه خودم حساب کردم: هر دور ۱۵۰ ثانیه طول می‌کشه، ۱۲ دور. ۱۵۰ × ۱۲ = ۱۸۰۰ ثانیه = ۱۸ دقیقه. پس با ۱۸ دقیقه گرم‌کردن کلاً ۳۶ دقیقه. درسته؟';
+    const BIKEP = [{ step: 'زمانِ دورها', quote: 'هر دور ۱۵۰ ثانیه طول می‌کشه، ۱۲ دور', verdict: 'ok', why: 'داده' },
+      { step: 'کلِ زمان', quote: '۱۵۰ × ۱۲ = ۱۸۰۰ ثانیه = ۱۸ دقیقه', verdict: 'ok', why: 'ضرب' },
+      { step: 'جمع', quote: 'پس با ۱۸ دقیقه گرم‌کردن کلاً ۳۶ دقیقه', verdict: 'incomplete', why: 'بر گامِ ۲ سوار است', dep: [2] }];
+    const bike = async () => { await wipe(); await fresh(); const r = await ppr(BIKE, BIKEP); return r; };
+    const P0 = async () => PR();
+    const s2 = (pr) => (pr && pr.steps[1]) || {};
+    const opening = async (i, text, prior, o) => { await wipe(); await fresh(); const r = await ppr(text, prior, o); return { r, pr: await PR() }; };
+    const reN = () => p.evaluate(() => (__cur().msgs || []).filter(m => m.role === 'sys' && /بازسنجی شد ⇒ درست/.test(m.text)).length);
+    const okRe = (u) => /بازسنجی شد ⇒ درست/.test(head(u));
+    for (const i of ids) {
+      const e = E[i], t = e.text.replace(/^.*‖\s*U:\s*/, '').replace(/^U:\s*/, '').trim();
+      try {
+        if ([151, 152, 155, 156, 157, 171].includes(i)) {
+          const first = await (async () => { await wipe(); await fresh(); return turn(t, 'باشه.', []); })();
+          const isAsk = ask(first.user), ar = /# حسابِ صفحه روی همین پیام/.test(head(first.user));
+          T(i, isAsk && (i !== 155 || ar), { ask: isAsk, arith: ar, q: tq(first.user).slice(0, 120) });
+        } else if (i === 153) {
+          const f = await (async () => { await wipe(); await fresh(); return turn(t, 'باشه.', []); })();
+          T(i, ask(f.user), { ask: ask(f.user), q: tq(f.user).slice(0, 120) });
+        } else if (i === 154) {
+          const o = await opening(i, t, [{ step: 'سرعتِ متوسط', quote: '(۶۰ + ۹۰) ÷ ۲ = ۷۵', verdict: 'wrong', why: 'برای مسافت‌های برابر میانگینِ هارمونیک است، نه حسابی' }]);
+          const x = (o.pr && o.pr.steps[0]) || {};
+          T(i, ask(o.r.user) && x.verdict === 'wrong' && !x.pageBad, { ask: ask(o.r.user), v: x.verdict, chk: x.chk });
+        } else if ([158, 159, 184].includes(i)) {
+          await bike(); const b0 = await P0(); const r = await turn(t, 'باشه.', []); const b1 = await P0();
+          T(i, s2(b0).verdict === 'wrong' && s2(b1).verdict === 'wrong' && !s2(b1).re && !s2(b1).fixed && !okRe(r.user) && !/بازسنجیِ حسابِ صفحه \(او به/.test(head(r.user)) && (await reN()) === 0, { v0: s2(b0).verdict, v1: s2(b1).verdict, re: s2(b1).re, fixed: !!s2(b1).fixed, rechk: head(r.user).split('\n').filter(l => /بازسنجی/.test(l)).join('|').slice(0, 200) });
+        } else if ([160, 179].includes(i)) {
+          await bike(); const r = await turn(t, 'باشه.', []); const b1 = await P0();
+          T(i, s2(b1).verdict === 'wrong' && !okRe(r.user) && /بازسنجی|دوباره بسنج|رد می‌کند/.test(head(r.user)), { v1: s2(b1).verdict, ctx: head(r.user).split('\n').filter(l => /بازسنجی|رد می‌کند/.test(l)).join('|').slice(0, 300) });
+        } else if (i === 161) {
+          await bike(); await turn('نه، من مطمئنم ۱۸۰۰ ثانیه همون ۱۸ دقیقه‌ست', 'باشه.', [csn({ ph: 'e', said: [], prior: [{ n: 2, quote: '۱۵۰ × ۱۲ = ۱۸۰۰ ثانیه = ۱۸ دقیقه', verdict: 'ok', why: 'دوباره سنجیدم' }] })]);
+          const r = await turn(t, 'باشه.', []); const b1 = await P0();
+          T(i, s2(b1).verdict === 'wrong' && !okRe(r.user) && (await reN()) === 0, { v1: s2(b1).verdict, line: (await p.evaluate((pr) => APP.STORY.priorLines(pr), b1)).join(' | ').slice(0, 300) });
+        } else if (i === 165) {
+          await bike(); await turn(t, 'باشه.', [csn({ ph: 'e', said: [] })]); const b1 = await P0();
+          T(i, s2(b1).verdict === 'ok' && !!s2(b1).fixed && ((b1.steps[2].depStale || []).length > 0 || !!b1.steps[2].stale || b1.steps[2].verdict !== 'ok'), { s2: [s2(b1).verdict, !!s2(b1).fixed], s3: b1 && b1.steps[2] });
+        } else if (i === 180) {
+          await bike(); await turn(t, 'باشه.', []); const b1 = await P0();
+          T(i, s2(b1).verdict === 'wrong' && !s2(b1).fixed, { s2: [s2(b1).verdict, !!s2(b1).fixed] });
+        } else if (i === 170) {
+          await bike(); await turn('نه، من مطمئنم ۱۸۰۰ ثانیه همون ۱۸ دقیقه‌ست', 'باشه.', []); const r = await turn(t, 'باشه.', []); const b1 = await P0();
+          T(i, s2(b1).verdict === 'wrong' && s2(b1).her !== 'no', { s2: [s2(b1).verdict, s2(b1).her], ctx: ctx(r.user).slice(0, 200) });
+        } else if (i === 162) {
+          const o = await opening(i, 'خودم شروع کردم: معیارها: قیمت، فاصله تا محلِ کار، مدرسهٔ بچه‌ها. حالا کدوم شهر؟', [{ step: 'معیارها', quote: 'معیارها: قیمت، فاصله تا محلِ کار، مدرسهٔ بچه‌ها', verdict: 'incomplete', why: 'نگه‌داریِ پدر و مادر در معیارها نیست' }]);
+          const r = await turn(t, 'باشه.', [csn({ ph: 'e', said: [] })]); const pr = await PR(); const x = (pr && pr.steps[0]) || {};
+          T(i, (x.her === 'no' || !!x.re) && /رد می‌کند/.test(ctx(r.user) + tq(r.user)), { her: x.her, q: tq(r.user).slice(0, 200), ctx: ctx(r.user).slice(0, 200) });
+        } else if (i === 163) {
+          const o = await run('pwA1', 13); const pid = o[13].pid; const ph0 = await p.evaluate((id) => APP.livePhase(id), pid);
+          await turn(t, 'باشه.', [csn({ ph: 'b', said: [], prior: [{ step: 'قفسه', quote: '۴۸ ÷ ۶ = ۸ قفسه', verdict: 'ok' }] })]);
+          const pr = await PR(pid), ph = await p.evaluate((id) => APP.livePhase(id), pid);
+          T(i, !!pr && pr.steps.length === 6 && pr.steps[5].verdict === 'ok' && /۴۸ ÷ ۶/.test(pr.steps[5].quote) && pr.steps.slice(0, 5).every(x => x.verdict === 'ok' && x.fixed) && ph === ph0, { ph0, ph, n: pr && pr.steps.length, st: pr && pr.steps.map(x => x.n + ':' + x.verdict + ':' + x.quote.slice(0, 20)) });
+        } else if (i === 164) {
+          NC(i, 'covered by the runner section A27-21 (pwA1 p17, the third report after closure: same ledger, steps 1–5 keep numbers/history, «گام ۶» merged as 6)'); info.bank[i] = !errors.some(x => /^A27-21/.test(x));
+        } else if (i === 172 || i === 174 || i === 176 || i === 177 || i === 178) {
+          await wipe(); await fresh(); const r = await turn(t, 'باشه.', []); T(i, !ask(r.user), { q: tq(r.user).slice(0, 120) });
+        } else if (i === 175 || i === 185) {
+          await wipe(); await fresh(); const r = await turn(t, 'باشه.', []); T(i, !ask(r.user), { q: tq(r.user).slice(0, 120) });
+        } else if (i === 173) {
+          await wipe(); await fresh(); await bind('کاشی', 'کاشیِ کفِ حمام'); await turn('کفِ حمام رو باید کاشی کنم، چند تا کاشی لازمه؟', 'باشه.', []); const r = await turn(t, 'باشه.', []);
+          T(i, !ask(r.user) && /# حسابِ صفحه روی همین پیام/.test(head(r.user)), { ask: ask(r.user) });
+        } else if (i === 182) {
+          await wipe(); await fresh(); await turn('یه تمرینِ ضرب: ۷ × ۸ = ?', 'باشه.', []); const r = await turn(t, 'باشه.', []); T(i, !ask(r.user), { q: tq(r.user).slice(0, 120) });
+        } else if (i === 183) {
+          await wipe(); await fresh(); await ppr('خودم حساب کردم: ۱۲ × ۲۰ = ۲۴۰ کتاب؛ ۲۴۰ ÷ ۴۰ = ۶ ردیف؛ پس ۶ ردیف در ۸ قفسه. درسته؟', [{ step: 'کتاب‌ها', quote: '۱۲ × ۲۰ = ۲۴۰ کتاب', verdict: 'ok' }, { step: 'ردیف', quote: '۲۴۰ ÷ ۴۰ = ۶ ردیف', verdict: 'ok' }, { step: 'نتیجه', quote: 'پس ۶ ردیف در ۸ قفسه', verdict: 'ok' }]);
+          await turn(t, 'باشه.', []); const pr = await PR(); T(i, !!pr && pr.steps.length === 3, { n: pr && pr.steps.length });
+        } else if (i === 181) {
+          await wipe(); await fresh(); await turn('مسئله اینه که چند تا مربع تو یه صفحهٔ ۲ در ۲ هست.', 'باشه.', []);
+          await turn(t, 'باشه.', [csn({ ph: 'e', said: ['res'], guess: '۸ تا', conf: '' })]);
+          const it = await items(); const g = it.filter(x => /guess|حدس/.test(x.k + ' ' + (x.t || '')));
+          T(i, !it.some(x => x.k === 'guess' && /۸ تا رو تو ذهنم شمردم/.test(x.t || '')) , { items: it.map(x => x.k + ':' + String(x.t || '').slice(0, 40)) });
+        } else if (i === 168) {
+          await wipe(); await fresh();
+          await ppr('خودم حساب کردم: گامِ ۱: دبی ۱۰ لیتر بر ثانیه. گامِ ۲: توانِ پمپ = ۱۰۰۰ × ۹٫۸ × ۰٫۰۱ × ۱۲ = ۱۲۰۰ وات. گامِ ۳: پس ۴ تا پنلِ ۳۵۰ واتی کافیه. درسته؟',
+            [{ step: 'دبی', quote: 'دبی ۱۰ لیتر بر ثانیه', verdict: 'ok' }, { step: 'توان', quote: 'توانِ پمپ = ۱۰۰۰ × ۹٫۸ × ۰٫۰۱ × ۱۲ = ۱۲۰۰ وات', verdict: 'wrong', why: 'حساب نمی‌خواند' },
+             { step: 'پنل', quote: 'پس ۴ تا پنلِ ۳۵۰ واتی کافیه', verdict: 'incomplete', why: 'بر ۱۲۰۰ واتِ ناقصِ گامِ ۲ بنا شده و ساعت‌های آفتاب را نشمرده', dep: [2] }]);
+          await turn('گامِ ۲ رو درست کردم: ۱۰۰۰ × ۹٫۸ × ۰٫۰۱ × ۱۲ = ۱۱۷۶ وات', 'آفرین.', [csn({ ph: 'e', said: [], prior: [{ n: 2, quote: '۱۰۰۰ × ۹٫۸ × ۰٫۰۱ × ۱۲ = ۱۱۷۶ وات', verdict: 'ok' }] })]);
+          const pr = await PR(), q = await PQ();
+          T(i, !!pr && pr.steps[1].verdict === 'ok' && pr.resume === 3 && !/۱۲۰۰ واتِ ناقص/.test(q) && /ساعت‌های آفتاب/.test(q) && /۱۲۰۰ واتِ ناقص/.test(pr.steps[2].why), { q, resume: pr && pr.resume, s2: pr && pr.steps[1].verdict });
+        } else if (i === 169) {
+          await wipe(); await fresh();
+          await ppr('خودم حساب کردم: گامِ ۱: ارتفاعِ پمپاژ ۴۰ متره. گامِ ۲: پس پمپِ ۲ کیلوواتی کافیه. درسته؟',
+            [{ step: 'ارتفاع', quote: 'ارتفاعِ پمپاژ ۴۰ متره', verdict: 'ok' }, { step: 'پمپ', quote: 'پس پمپِ ۲ کیلوواتی کافیه', verdict: 'incomplete', why: 'افتِ فشارِ لوله هنوز حساب نشده', dep: [1] }]);
+          await turn(t, 'خوب.', [csn({ ph: 'e', said: [], prior: [{ step: 'افتِ فشار', quote: 'افتِ فشار رو هم حساب کردم: ۰٫۸ بار', verdict: 'ok' }] })]);
+          const pr = await PR(), q = await PQ();
+          T(i, !!pr && pr.steps.length === 3 && pr.steps[2].verdict === 'ok' && !/افتِ فشار(?:ِ لوله)? هنوز حساب نشده/.test(q), { q, n: pr && pr.steps.length });
+        } else if (i === 166) {
+          NC(i, 'not mine — reproduced: after a ledger whose steps are all ✓, «عرض = ۶ سانت و طول = ۱۲ سانت» + «وارسی کردم … جور درمیاد» leave the stage at «اجرای طرح»; the whole-answer judgement is story\'s ST.finOf/ST.wholeRes (the unknown «ابعاد» is not matched by «عرض/طول»)');
+        } else if (i === 167) {
+          NC(i, 'not mine — reproduced: the opening\'s ledger rows are right in the story, but 📜 also shows «برنامهٔ خودت (از گفت‌وگو)» and «حدس (از گفت‌وگو)» built in a40 addSessEvents from the chat plan record (chatPlans) and se.coach.guesses of the SAME message; the ledger should own those quotes — dates/story (a40/a41)');
+        } else NC(i, 'not exercised');
+      } catch (ex) { T(i, false, 'exception ' + String(ex).slice(0, 200)); }
+    }
+    console.log('bank R4: ' + Object.values(info.bank).filter(Boolean).length + '/' + Object.keys(info.bank).length + ' pass; nc: ' + JSON.stringify(info.nc));
+  });
+  await section('C74', async () => {   // پرسشِ فرضی که در همان پیام واقعیت می‌شود: واقعیت اصلاح است (C48) و بخشِ فرضی برای مربی
+    const r = await p.evaluate(() => { const H = APP.STORY.hypoCut; const a = 'اگه هر دور ۱۰ ثانیه بود چی؟ آهان، اصلاً هر دور ۱۰ ثانیه بوده نه ۱۲.'; const o = H(a); return { len: [a.length, o.length], o }; });
+    chk(r.len[0] === r.len[1] && /اصلاً هر دور ۱۰ ثانیه بوده نه ۱۲/.test(r.o) && !/اگه/.test(r.o), 'C74: the hypothetical sentence is set aside, the fact «اصلاً … بوده نه ۱۲» stays for the correction engine; same length (offsets of other readers unchanged) :: ' + JSON.stringify(r));
+    const r2 = await p.evaluate(() => APP.STORY.hypoCut('اگه اشتباه نکنم، گامِ ۴ غلطه.'));
+    chk(/گامِ ۴ غلطه/.test(r2) && !/اشتباه نکنم/.test(r2), 'C46 look-alike: a hedging conditional keeps its main clause «گامِ ۴ غلطه» :: ' + r2);
+  });
+  await section('C27-21', async () => {   // pwC1 p2: پرسشِ ازسرگیری پس از اصلاحِ گامِ ۲ هنوز «بر ۱۳۶۰ واتِ ناقصِ گامِ ۲» می‌گفت
+    const c = await run('pwC1', 2); const q = await PQ(c[2].pid);
+    chk(!!q && c[2].pr && c[2].pr.steps[1].fixed && !/۱۳۶۰ واتِ ناقصِ گامِ ۲/.test(q), 'C27-21 (pwC1 p3): after step 2 was fixed ✓ the resume question no longer says step 3 rests «بر ۱۳۶۰ واتِ ناقصِ گامِ ۲» :: ' + q);
+    chk(/۱۳۶۰ واتِ ناقصِ گامِ ۲/.test(c[2].pr.steps[2].why || ''), 'C27-21: the old reason stays in the ledger history (why) :: ' + (c[2].pr.steps[2].why || ''));
+  });
   /*SECTIONS*/
 
   await b.close();
