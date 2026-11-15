@@ -121,3 +121,16 @@ for (i = 1; i < segs.length; i++) {
 - **What happened:** one fixer made the checker replace «÷» with « / » (three characters) during normalization, so a spaced division is never read as a glued fraction. The checker reports `pos/pe` for every check against the *normalized* text. Another fixer, working at the same time, used those positions to slice the *original* text (to bind a unit conversion such as «6131 s, about 102 min»). Each branch was green alone. After the merge, every check after a «÷» was shifted by two characters, the conversion bound to the wrong number, and a correction stopped reaching the steps built on it.
 - **Rule:** if a normalizer's offsets are consumed by anyone, every rewrite must keep the length (map a symbol to a single character and give the tokenizer the meaning — e.g. keep «÷» and tokenize it as a spaced «/»), or the normalizer must return an offset map. Add a test that asserts `text.slice(pos, pe)` on the *original* string for a sentence containing each rewritten symbol.
 - **Finding it:** when an integrated build fails a test that each branch passed, apply only the source diff of each other branch onto the failing branch one at a time (`git diff base X -- src | git apply -3`), skipping docs and bundles. The first one that turns the test red is the cause; then compare the shared function's output (here `pos/pe`) with and without it.
+
+## Update 2026-11-15 (round 27, prior) — a re-check is a recomputation, and a hypothetical is not a dispute
+**What happened.** A person asked «if the page one day misreads my correct sum, how would I know?» The dispute detector matched «the error is the page's»
+inside that conditional sentence, re-checked an old ✗ against a stored copy of her message that had been clipped to 600 characters, did not find the
+calculation there, and announced «1700 seconds = 17 minutes — re-checked, correct» (exact: 28.3 minutes). She had already fixed that step herself.
+
+**Rule.** (1) Strip hypothetical sentences («if … ?», «so is this right too?») before reading a message as a dispute or a correction — same length, so no
+other reader's offsets move; a fact stated later in the same message still counts. (2) A re-check must re-read the same expression from the full source and
+find it correct; «not found» is «not checked», never «correct». (3) A verdict the person already fixed herself is no longer on the table.
+
+### How to Apply Elsewhere
+Any verify-on-demand path (re-check, appeal, retry) must recompute from the complete original input and treat a missing reading as unknown, never as a pass;
+and intent detection must not fire on words inside a conditional or a question about the system itself.

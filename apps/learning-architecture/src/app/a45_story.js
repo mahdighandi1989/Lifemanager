@@ -404,9 +404,10 @@
   /* نوبتِ دفترِ کارِ پیشین پس از پاسخِ مدل: ادغامِ گزارش ⇒ اصلاحِ خوانای صفحه ⇒ retract ⇒ گام/نتیجهٔ سنجیدهٔ مدل؛ سپس یک رویداد در 📜/🧭 و اعتبار در کارنامه */
   function priorTurn25(s, a, um, key, pid, I, ch0, rs0) {
     var ut = String(um.text || ""), at = String(um.at || nowIso()), G = ledger(s, key, pid), old = G.pr, rep = priorOf(s, a, um), ch = (ch0 || []).slice(), isNew = false;
-    var open = false; try { open = (priorOpenAt(s, pid, um) || CALLS25.test(ut) || MINE26.test(ut)) && !(OTHER26.test(ut) && !MINE26.test(ut)); } catch (e) { }   // دورِ ۲۷ (C56): «یه چیزِ دیگه هم حساب کرده بودم: …» گامِ تازهٔ همان دفتر است
+    var open = false, open0 = false; try { open0 = (priorOpenAt(s, pid, um) || CALLS25.test(ut)) && !(OTHER26.test(ut) && !MINE26.test(ut)); open = open0 || (MINE26.test(ut) && !OTHER26.test(ut)); } catch (e) { }   // دورِ ۲۷ (C56): «یه چیزِ دیگه هم حساب کرده بودم: …» گامِ تازهٔ همان دفتر است
     var C = s.coach = s.coach || {}, asked = { n: rs0 || 0 };
-    if (!old) { if (!rep || !open) return; var real = rep.steps.filter(function (x) { return !x.test; }); if (!real.length) return;   // حالت‌های آزموده دفتر نیستند (A25-4)
+    /* دورِ ۲۷: دفترِ تازه فقط با آغازِ مسئله یا درخواستِ خودش (A26-7)؛ «حساب کرده بودم» فقط به دفترِ موجود گام می‌افزاید (open) */
+    if (!old) { if (!rep || !open0) return; var real = rep.steps.filter(function (x) { return !x.test; }); if (!real.length) return;   // حالت‌های آزموده دفتر نیستند (A25-4)
       old = rep; isNew = true; rep.steps.forEach(function (x) { delete x.mn; }); if (G.L) G.L.prior = old; else storyOf(s, key, true).prior = old; }
     else {
       if (rep) ch = ch.concat(priorMerge(old, rep, { open: open }));
@@ -1029,17 +1030,19 @@
   var NEWP27 = /(?:یه|یک)\s*(?:سؤال|سوال|مسئله|مساله|مشکل)(?:ِ|ٔ|‌ی|ی)?\s*(?:تازه|جدید|دیگه|دیگر)/;
   var SYMREL27 = /(?:[آ-ی]{2,}|[a-zA-Z])\s*[+×*÷\/−-]\s*(?:[آ-ی]{2,}|[a-zA-Z])\s*(?:=|میشه|می[‌\s]?شه)\s*[0-9۰-۹]/, ARROW27 = /[0-9۰-۹][^.!؟?\n]{0,80}(?:⇒|=>|→)\s*[0-9۰-۹]/;
   function worked27(x, own) {
-    if (ARROW27.test(x)) return true;
+    if (ARROW27.test(x) && !TEST25.test(x)) return true;   // «امتحان کردم: p=5 ⇒ ۲۴» حالتِ آزموده است، نه گام (A25-4)؛ حسابِ با عملگر («16−1=15») هنوز گام است
     if (own && SYMREL27.test(x)) return true;
     try { return ST.arithChk(x).some(function (c) { return /[+\-−*×÷\/^]/.test(String(c.expr)) && /^\d/.test(String(c.said)); }); } catch (e) { return false; }
   }
   ST.worked27 = worked27;
+  var TESTOK27 = /درسته|درست\s*(?:است|بود|درمیاد|درومد|در\s*میاد)|جور\s*(?:در)?(?:میاد|اومد|درآمد)/;
   var STUCK27 = /گیر\s*کردم|موندم|تا\s*این[‌\s]*جا\s*(?:رفتم|رسیدم|اومدم)|از\s*این[‌\s]*جا\s*(?:به\s*بعد|گیر)/;
   function priorAsk(s, pid, msg) {
     var t = String(msg || ""); if (!t.trim() || /^\s*\[/.test(t)) return false;
     /* C7: «بلند» طول نیست — گامِ کارشدهٔ خودش (حساب با نتیجه، استنتاج، تصمیمِ گرفته با دلیل) حتی یکی؛ «اول/بعد/پس» ِ تنها (خاطره، پرسش، بلندفکری) نه */
     var own27 = OWNSTEP27.test(t) || MINE26.test(t) || STUCK27.test(t);
-    if (!sentences(t).some(function (x) { return (STRONG25.test(x) && !TEST25.test(x)) || worked27(x, own27); })) return false;
+    /* حالتِ آزموده («دارم امتحان می‌کنم: ۷+۷=۱۴، ۱۱+۷=۱۸ … جور نمیشه») گام نیست؛ آزمونی که خودش «درسته» خواند («امتحان کردم: … 16−1=15 درسته») گامِ اوست (C25-7) */
+    if (!sentences(t).some(function (x) { return (STRONG25.test(x) && !TEST25.test(x)) || (worked27(x, own27) && (!TEST25.test(x) || TESTOK27.test(x))); })) return false;
     if (OTHER26.test(t) && !MINE26.test(t)) return false;   // دورِ ۲۶ (بانکِ R26 #127): کارِ کسِ دیگر — مگر کارِ خودش هم در همان پیام باشد
     /* «حلش کردم!»، «اثبات کردم …» بی این‌که خودش آن را کارِ پیشین بخواند یا گام‌هایش را بشمارد، ادعای حل است (بازنگری)، نه کارِ پیشین برای داوری */
     if (DONE25.test(t) && !CALLS25.test(t)) return false;
@@ -1651,7 +1654,7 @@
   var WORK24 = /[0-9۰-۹]\s*(?:[=×*÷\/+−\-]|ضربدر|ضرب\s*در|تقسیم\s*بر|منهای|میشه|می[‌\s]?شود)\s*[0-9۰-۹]|(?:^|\s)(?:پس|بنابراین)\s|گام(?:ِ)?\s*(?:[0-9۰-۹]|اول|دوم|سوم)|(?:^|\s)(?:اول|بعد|سپس)\s|فرض\s*(?:کردم|کنیم)|ثابت\s*(?:کردم|می[‌\s]?شه)|امتحان\s*کردم|حساب\s*کردم|ایده(?:م|‌ام)?\s*(?:اینه|این\s*است)/;
   /* دورِ ۲۷ (C56، C25-7 pC1 p1): پیامی که گامِ کارشدهٔ خودش را دارد («من امتحان کردم: x=4 و y=1 میشه 16−1=15») کارِ اوست حتی با یک جمله — حسابِ صفحه سطرهای «می‌خواند» را هم نشان می‌دهد */
   function workMsg(t) { var S0 = sentences(String(t || "")), own = OWNSTEP27.test(t) || MINE26.test(t) || TEST25.test(t);
-    return S0.filter(function (x) { return WORK24.test(x); }).length >= 2 || S0.some(function (x) { return worked27(x, own); }); }
+    return S0.filter(function (x) { return WORK24.test(x); }).length >= 2 || S0.some(function (x) { return worked27(x, own) && (own || !/[؟?]/.test(x)); }); }   // بی نشانهٔ کارِ خودش، جملهٔ پرسشیِ حساب («۷ × ۸ = ۵۶ بود دیگه؟») کارِ او نیست
   ST.workMsg = workMsg;
   AS.promptHooks.push(function (s, msg) {
     try { if (/^\s*\[/.test(String(msg || ""))) return "";
