@@ -45,3 +45,15 @@ Columns: question · the system's correct answer today (exists / partial / missi
 | 39 | Did the new tool get tested on my data? | missing | P1–P3 (DECISIONS_R25) | from R26 | — |
 | 40 | Did my correction reach my own prior steps? | partial (C25-15) | P1–P3 (DECISIONS_R25) | from R26 | — |
 | 41 | Where does a piece I brought after closing a problem wait? | missing (A25-22) | P1–P3 (DECISIONS_R25) | from R26 | — |
+| 42 | If the page recorded something wrongly, where do I undo it myself? | unknown | Q2/Q3 (DECISIONS_R26) | from R27 | — |
+| 43 | Which sentence of mine did each number in my mind card come from? | unknown | Q9 (DECISIONS_R26) | from R27 | — |
+| 44 | With two open predictions, how do I know which one an outcome landed on? | unknown | Q8 (DECISIONS_R26) | from R27 | — |
+| 45 | Was the tool that was built tested on my own data, or only with words? | unknown | Q7 (DECISIONS_R26) | from R27 | — |
+| 46 | When I name an earlier problem, which problem does my next sentence go to? | unknown | Q3 (DECISIONS_R26) | from R27 | — |
+| 47 | Does «solved» mean the same on the map, in the dossier and on the problem page? | unknown | Q6 (DECISIONS_R26) | from R27 | — |
+| 48 | If a weekday is part of my problem statement, does it become an appointment? | unknown | Q5 (DECISIONS_R26) | from R27 | — |
+| 49 | I wrote «جمعهٔ بعد» or said «باشه» — was it recorded? | unknown | Q5 (DECISIONS_R26) | from R27 | — |
+| 50 | When the page asks «change it here too?», does it recompute the numbers inside the proposed text? | unknown | Q2 (DECISIONS_R26) | from R27 | — |
+| 51 | After one lapse, why is my next reminder three weeks away? | unknown | Q7 (DECISIONS_R26) | from R27 | — |
+| 52 | When my grandchild comes, how do I tell the page it is me or them? | unknown | Q10 (DECISIONS_R26) | from R27 | — |
+| 53 | A sheet that left no step waiting — will you tell me when it is answered? | unknown | Q4 (DECISIONS_R26) | from R27 | — |
