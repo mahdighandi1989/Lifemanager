@@ -85,3 +85,26 @@ if (fresh.length >= 3 && fresh.every(ok)) finding.status = "verified";
 - **راه‌حل:** سقف را اول تعریف کن: «زبرینِ احتمالی که خودِ این راه توجیه می‌کند». سپس هر شرط را بپرس که *شرطِ صدقِ تصدیق* است یا *شرطِ نیروی راه*. اولی ⇒ ضعیف‌ترین حلقه؛ دومی ⇒ احتمالِ کل: q·r + (1−q)·½. یک ویژگیِ رمزگذاری («تصدیق دربارهٔ خودِ راه است؟») دو حالت را جدا می‌کند.
 - **نکته‌های حیاتی:** (۱) «بی‌داده ⇒ ½» فقط برای رده‌ای درست است که تعریفش دلیلی به هیچ سو نیست؛ «منبعِ معتبر» بی‌داده فقط «کمتر از یقین» است. (۲) کمینهٔ سقف‌ها وقتی دو شرطِ راه با r < ½ هم‌زمان‌اند زیرِ زبرین می‌افتد — پاسبان لازم است. (۳) صفحهٔ ورودیِ رمزگذارِ کور را خودت پاک کن: فهرستِ «جمله‌های حذف‌شده» همان نشتِ سرانجام است. (۴) معیارِ اعمال را پیش از دیدنِ اثر ثابت کن (دو خوانشِ کورِ هم‌رأی)، و اگر خوانش‌های دودستگی حکمِ درستی را خراب می‌کنند، اعمال‌نکردن را با دلیل ثبت کن، نه تنظیمِ عدد. (۵) Brier ِ سقفِ «زبرین» می‌تواند بدتر شود؛ این نشانهٔ خطا نیست، اگر سقف پیش‌بینی نیست — گزارشش کن.
 - **How to apply elsewhere:** in any rule engine that caps confidence, write the cap's definition (sup vs point forecast) next to the theorem list; classify every condition as truth-condition vs route-condition; give unmeasured base rates ½ only for definitionally neutral classes; keep a re-encode ledger with a fixed acceptance rule (two independent blind readings + reviewer) and a clean-input check for blind encoders.
+
+## Update 2026-11-11
+
+- **A derived "theorem" is a claim like any other — send the proof to an independent reviewer before filing the rule proposal.** A
+  multiple-testing cap (`1/(2 − (1−α)^m)`) looked like a clean consequence of the axioms, but the result depended on *where* the symmetry
+  axiom was applied (one global null vs. each effect separately — the latter gives `1/(1+α)` for any m). A number that changes with the
+  chosen partition is not a theorem of the system. The reviewer caught it; the proposal was not filed and the negative result was logged.
+- **Before calling something a "gap in the rules", check whether an existing rule would fire under a complete encoding.** The two
+  "analysis-freedom" cases were first attributed to a missing rule; an existing rule ("unproven premise") covers them once the encoder
+  writes the premise status. Diagnose encoding first, rules second.
+- **A detection that rests on the blind encoder's own judgement (e.g. "form: invalid") tests the encoder, not rule coverage** — say so in
+  the ledger instead of counting it as coverage of the fallacy.
+- **An unselected frame read only through a summarising fetch is not verified.** If the raw table cannot be read, add nothing (all or
+  nothing) and record the source and the blocker for the next round.
+
+## Update 2026-11-12
+- **Finding-state is computed by the tool at run time — never annotate a finding after the run and ship.** Adding a `fix` note to a finding *after* `run` left it in a "verified on fresh cases" state that the tool had reached by the no-fix path, counting three unrelated new cases as confirmation. An independent reviewer caught it by re-running on a copy. Rule: any manual edit to findings/corpus ⇒ `run --rerun` before commit, and "verified" only counts if the fresh cases actually exercise the rule the fix touched.
+- **Second chances must be symmetric.** Blind re-encoding only the cases that failed (after a diagnosis already said which key decides them) is an asymmetric second chance; pair it with blind re-encoding of a random set of passing cases and report verdict stability.
+
+## Update 2026-11-14
+- **Do not relabel a case after the verdict to match the judge — even when the judge looks right.** When a sound-labelled case trips a borderline cap (here 85 vs 80, both numbers from the blind encoder), the honest state is "disputed label", kept as an open health alarm, resolved by a second blind encoding of the deciding keys — not by flipping ground truth. Post-verdict relabels must also never count as fresh confirmation for other findings.
+- **Report symmetry at two levels.** A blind re-encoding of random passing cases can keep the verdict (4/4) while the set of flagged stations changes (2/4); report both, since the second is the real encoding-stability signal.
+- **A complete, unselected frame can still be the wrong population.** If the frame's population has no matching bucket, adding it would leak its rate into unrelated base values; prepare it fully, then hand the new bucket to the owner as a proposal.

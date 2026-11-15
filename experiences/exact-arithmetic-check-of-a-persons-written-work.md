@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-11-11T12:00:00Z"
 created_at: "2026-11-11T12:00:00Z"
-updated_at: "2026-11-11T12:00:00Z"
+updated_at: "2026-11-15T12:00:00Z"
 merged_from: []
 ---
 
@@ -75,3 +75,49 @@ for (i = 1; i < segs.length; i++) {
 ## 🔗 References
 - منبع اولیه: گزارش‌های یک دورِ آزمونِ سناریویی (پنج اجراکننده) و بانکِ مستقلِ ۵۸ موردی.
 - مرتبط: [model-reports-state-page-validates], [two-sided-needs-judging-for-scenario-tours]
+
+## Update 2026-11-12
+یک دور آزمونِ بعد، همان سنجش دو خطای تازه داشت، هر دو از «خواندنِ بیش از نوشته»:
+
+- **واژهٔ کنارِ عدد را در عدد ضرب کرد.** «۱۸ × ۱٫۲۲ = ۲۱٫۹۶ میلیون» یعنی ۲۱٫۹۶ در برابرِ ۲۱٬۹۶۰٬۰۰۰ ⇒ «نادرست» به کارِ درست. واژهٔ مقیاس و واحد **واحدِ** نتیجه است، نه عاملِ آن.
+- **رواداریِ گرد کردن را به تساویِ دقیق داد.** «۱/۲ + ۱/۳ + ۱/۴ = ۱» چون ۱۳/۱۲ به «۱» گرد می‌شود «درست» خوانده شد.
+
+### 💡 آنچه افزوده شد
+1. **چند خوانشِ سازگار، نه یک خوانشِ عینی.** برای واژهٔ مقیاس دو خوانش بسنج: عینی، و «همه در یک مقیاس» (جمله‌ای که واژه ندارد در مقیاسِ نتیجه است). هر کدام بخواند ⇒ درست.
+   هیچ‌کدام نخواند و فقط توانِ هزار فرق دارد ⇒ بپرس. عددها در هیچ خوانشی نخوانند ⇒ نادرست — واژه لغزشِ واقعی را نمی‌پوشاند.
+2. **رواداری فقط جایی که خودش نشانه‌اش را نوشته.** رقمِ اعشار یا «≈/حدود» یعنی «گرد کرده‌ام». عددِ صحیحِ بی‌نشانه برای مقدارِ ناصحیح: اگر عبارت جمعِ کسرهاست نادرست است؛
+   وگرنه نه درست است نه نادرست.
+3. **حالتِ سوم بساز.** «درست / نادرست» کم است. «نه این نه آن — مقدارِ دقیق این است، بپرس» و «نسنجیده» دو خروجیِ صادقانه‌اند؛ سکوت روی سطری که عملگر و نتیجه دارد
+   خروجیِ صادقانه نیست، چون خواننده آن را «مشکلی نبود» می‌فهمد.
+4. **فعلِ «می‌شود» تساوی نیست.** «با n = 4 می‌شود 1+3+5+7 = 16»: عددِ پیش از فعل شرط است. «۱×۲ می‌شود ۲×۳»: تبدیل است. فقط «حساب می‌شود عدد» ادعاست.
+5. **مقدارِ ماشین به شکلِ نوشتهٔ آدم.** درصد را درصد، اعشار را اعشار (یک رقم بیشتر، همان رقمی که نشان می‌دهد چرا نمی‌خواند)، با همان واژهٔ مقیاس. کسرِ خام برای کسی که
+   اعشار نوشته ناخواناست.
+6. **برچسبِ علت را از شاهد بگیر.** «خطای واحد» فقط وقتی عددِ بی‌تبدیل همان نوشتهٔ اوست. وگرنه لغزشِ حساب است.
+7. **حکمِ ماشین اعتراض‌پذیر باشد.** وقتی آدم می‌گوید «درست حساب کردم»، همان نوشته را یک بار دوباره بسنج و هر دو حساب را کنارِ هم نشان بده. خواند ⇒ حکم را در **همهٔ** جاهایی
+   که نشسته بردار، با تاریخچه. نخواند ⇒ حکم بماند، با شاهد، و بحث حلقه نشود. بی حکمِ روی میز، «درست حساب کردم» فقط یک جمله است.
+
+8. **پیکرهٔ واقعی را با نسخهٔ پیشین و تازه بخوان و فقط تفاوت‌ها را نگاه کن.** آزمون‌های دست‌ساز و حتی بانکِ مستقل چهار بدخوانی را ندیدند که پویشِ ۹۷۲ پیامِ واقعی در چند
+   ثانیه نشان داد (واژه‌ای که هم نامِ تابع است هم نامِ کمیت؛ عددِ مرکبِ «۱۶ میلیون و ۶۴۰»؛ عددی که هم نتیجهٔ تساویِ پیش است هم آغازِ حسابِ بعد؛ حرفِ تنهایی که مجهول است نه واحد).
+   برای هر تغییرِ خوانندهٔ متنِ آدم‌ها، خروجی سه فهرست است: حکم‌های نادرستی که رفتند، حکم‌های تازه (هر کدام را با چشم ببین)، و سطرهای «داوری نکردم».
+
+### 🔄 How to Apply Elsewhere (افزوده)
+- هر جا واژه‌ای کنارِ عدد است (مقیاس، واحد، «برابر»، «تا»)، اول بپرس «این واحد است یا عامل؟» و هر دو خوانش را بسنج.
+- رواداری را به **نشانهٔ نوشته‌شده** ببند، نه به نوعِ عدد.
+- برای هر سنجشِ خودکار سه خروجی طراحی کن: تأیید، رد، و «داوری نکردم». خروجیِ سوم باید دیده شود.
+- حکمی که ماشین می‌دهد یک راهِ بازسنجی و یک جای واحد برای برداشتن می‌خواهد؛ وگرنه گفت‌وگو و دفتر دو روایت می‌شوند.
+- پیش از ادغام، نسخهٔ پیشین و تازه را روی همهٔ متن‌های واقعیِ موجود اجرا کن و تفاوت‌ها را یکی‌یکی بخوان.
+
+## Update 2026-11-15
+- **A reading the reader had to invent is a question, not a ✓.** Reading every unscaled number "in the same scale" made «۳۰۰ + ۲۰ میلیون ÷ ۴۰ = ۸۰۰ هزار»
+  agree, but only by a reading the text does not state. Rule that held: the standard reading (each word on its own number) decides ✓/✗; a reading
+  that only works by moving a word is shown and asked — unless the person wrote that very number with that word elsewhere in the same message.
+- **"Neither ✓ nor ✗" must be narrow, or it hides slips.** The question state is only for an integer that is the rounding or the truncation of
+  the exact value; any other integer is ✗. A fraction written as a fraction («۱۳/۱۲ = ۱») is an identity, so ✗; the same numbers with «÷» are a quotient.
+- **A question needs a place for its answer.** Store the open question with the message number; read only the next message's yes/no; record
+  the answer (approximate ✓, or ✗ that can itself be contested). A reply that is neither leaves the question open and records nothing.
+- **A re-check that upholds a ✗ must still not leak the answer:** say it was re-checked once and point at the link that does not read.
+
+## Update 2026-11-15 — normalization must keep length when positions are shared
+- **What happened:** one fixer made the checker replace «÷» with « / » (three characters) during normalization, so a spaced division is never read as a glued fraction. The checker reports `pos/pe` for every check against the *normalized* text. Another fixer, working at the same time, used those positions to slice the *original* text (to bind a unit conversion such as «6131 s, about 102 min»). Each branch was green alone. After the merge, every check after a «÷» was shifted by two characters, the conversion bound to the wrong number, and a correction stopped reaching the steps built on it.
+- **Rule:** if a normalizer's offsets are consumed by anyone, every rewrite must keep the length (map a symbol to a single character and give the tokenizer the meaning — e.g. keep «÷» and tokenize it as a spaced «/»), or the normalizer must return an offset map. Add a test that asserts `text.slice(pos, pe)` on the *original* string for a sentence containing each rewritten symbol.
+- **Finding it:** when an integrated build fails a test that each branch passed, apply only the source diff of each other branch onto the failing branch one at a time (`git diff base X -- src | git apply -3`), skipping docs and bundles. The first one that turns the test red is the cause; then compare the shared function's output (here `pos/pe`) with and without it.

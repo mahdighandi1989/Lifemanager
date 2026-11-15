@@ -106,17 +106,29 @@ function modalityConflicts(text) {
       const u1 = await turn(e.text, 'خوب است.', [{ do: 'coach_state', plan: { text: strip(e.text), when } }]);
       strict('plan+ ' + e.text.slice(0, 20), u1.user);
       const st = await p.evaluate(() => (__cur().plans || []).map(x => ({ text: x.text, when: x.when, done: !!x.done })));
-      const u2 = await turn('باشه.');
-      const ln = lines(u2.user).filter(l => /deadline/.test(l) && /پیگیری/.test(l));
-      const ok = st.length === 1 && st[0].when === when && ln.length === 1 && ln[0].indexOf(when) >= 0 && /^- زمینه \(نه پرسشِ دوم\)/.test(ln[0]);
+      /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 «بر هر دو مسیر»): روزِ برنامهٔ گزارش‌شده را صفحه از حرفِ خودش می‌خواند و با «… درست است؟» می‌پرسد؛ تا «آره/باشه» ِ او برنامه «جلسهٔ بعد» است
+         (جز خودِ امروز — «امشب»)، و چون همان پرسش «در «امروز» بیاید؟» است، پیشنهادِ پیگیریِ دوم با کنشِ deadline در نوبتِ بعد دیگر نمی‌آید. انتظارِ دورِ ۱۷
+         (ثبتِ بی‌پرسش با تاریخِ مدل + پیشنهادِ deadline) با همان تصمیم عوض شد. «ابتدای ماهِ آینده» را صفحه یکمِ ماهِ شمسیِ بعد می‌خواند (نه 2026-11-01 ِ میلادیِ بانک). */
+      const x26 = await p.evaluate((when) => { const td = APP.today(); let ms = td; for (let i = 1; i < 40; i++) { const d = APP.addDays(td, i); if (/^۱ /.test(APP.fdate(d))) { ms = d; break; } }
+        let fr = td; for (let i = 1; i < 8; i++) { const d = APP.addDays(td, i), p = d.split('-'); if (new Date(+p[0], +p[1] - 1, +p[2]).getDay() === 5) { fr = d; break; } }
+        return { td, ms, fr, asked: (__cur().msgs || []).filter(m => m.role === 'sys' && /📅/.test(m.text) && /درست است؟|کدام روز/.test(m.text)).length }; }, when);
+      const exp26 = /ابتدای ماه آینده/.test(e.text) ? x26.ms : /^آخر هفته/.test(e.text) ? x26.fr /* «آخرِ هفته» = جمعه (RM5 ِ دورِ ۱۸)؛ بانکِ دورِ ۱۷ «22/23» می‌گوید */ : when, today26 = exp26 === x26.td;
+      /* دورِ ۲۶ C33 (DECISIONS_R26، روشن‌سازی پس از بانک): «آخرِ هفته» یک روز نیست — صفحه «کدام روز: پنجشنبه … یا جمعه …؟» می‌پرسد (بانکِ دورِ ۱۷ هم «22/23» گفته بود)؛
+         «باشه» هیچ‌کدام را برنمی‌گزیند، پس پاسخِ او این‌جا «جمعه» است و انتظار همان جمعه می‌ماند */
+      const u2 = await turn(/^آخر هفته/.test(e.text) ? 'جمعه.' : 'باشه.');
+      const st2 = await p.evaluate(() => (__cur().plans || []).map(x => ({ text: x.text, when: x.when })));
+      const ln = lines(u2.user).filter(l => /deadline/.test(l) && /پیگیری/.test(l) && /"do":"deadline"|\\"do\\":\\"deadline\\"/.test(l));
+      const ok = st.length === 1 && st[0].when === (today26 ? exp26 : 'next-session') && (today26 ? x26.asked <= 1 /* «…، فردا بهت خبر می‌دم» خودش یک تعهدِ تاریخ‌دار است */ : x26.asked === 1) && st2.length === 1 && st2[0].when === exp26 && (today26 || ln.length === 0);
       r.pos.push([e.text.slice(0, 30), ok]);
-      chk(ok, 'rc1plan+ (model-reported plan validated, kept with its date, offered next turn with the deadline action): «' + e.text + '» ' + JSON.stringify(st) + ' ' + JSON.stringify(ln).slice(0, 300));
+      chk(ok, 'rc1plan+ (model-reported plan validated; its day asked by the page and kept on her yes; no second follow-up offer): «' + e.text + '» ' + JSON.stringify(st) + ' ' + JSON.stringify(st2) + ' ' + JSON.stringify(x26) + ' ' + JSON.stringify(ln).slice(0, 300));
     }
     // تاریخِ ناواقعی / نقلی که در پیام نیست ⇒ رد
     await fresh();
     await turn('از دوشنبه ناهار رو از خونه می‌برم.', 'باشه.', [{ do: 'coach_state', plan: { text: 'از دوشنبه ناهار رو از خونه می‌برم', when: '2026-02-30' } }, { do: 'coach_state', plan: { text: 'هر روز ورزش می‌کنم', when: '2026-10-20' } }]);
     const bad = await p.evaluate(() => (__cur().plans || []).map(x => x.text + '@' + x.when));
-    chk(bad.length === 1 && /ناهار/.test(bad[0]) && /2026-10-19/.test(bad[0]), 'rc1plan validation: an impossible date is replaced by the page-computed one; a quote not in her message is rejected ' + JSON.stringify(bad));
+    /* دورِ ۲۶ (DECISIONS_R26 Q5): تاریخِ ناممکنِ مدل کنار می‌رود و روزِ حرفِ خودش («دوشنبه») پرسیده می‌شود — تا «آره» ِ او «جلسهٔ بعد» */
+    const bad26 = await p.evaluate(() => ((__cur().datePend || {}).items || []).map(x => x.date));
+    chk(bad.length === 1 && /ناهار/.test(bad[0]) && /next-session/.test(bad[0]) && bad26.length === 1 && bad26[0] === '2026-10-19', 'rc1plan validation: an impossible date is replaced by the page-read one (asked, not booked); a quote not in her message is rejected ' + JSON.stringify(bad) + JSON.stringify(bad26));
     const negs = bank('RC1.plan', 'neg').map(e => e.text).concat(['هر روز یه ستون اضافه می‌کنم و هیچ تصمیمی نمی‌گیرم.', 'یه متن قانع‌کننده می‌خوام، تا پنجشنبه باید بفرستم.']);
     for (const t of negs) {
       await fresh(); const n0 = await p.evaluate(() => APP.S.all('deadline').length);
@@ -125,7 +137,8 @@ function modalityConflicts(text) {
       const fb = lines(u1.user).filter(l => /پیگیری/.test(l) && /deadline/.test(l));
       const asserted = fb.filter(l => /برنامه یا آزمایشِ خودش را گفت/.test(l) || !/فقط اگر/.test(l));
       const st = await p.evaluate(() => (__cur().plans || []).length);
-      const u2 = await turn('باشه.'); const later = lines(u2.user).filter(l => /پیگیری/.test(l) && /deadline/.test(l) && !/فقط اگر/.test(l));
+      /* دورِ ۲۶ (DECISIONS_R26 Q5): «باشه» حالا «آره» به پرسشِ بازِ تاریخِ صفحه است («تا پنجشنبه باید … تحویل بدم» ⇒ «… درست است؟»)؛ نوبتِ پرکن «خب.» شد تا همان چیزِ این منفی سنجیده شود: بی گزارشِ مدل نه برنامه‌ای ثبت می‌شود، نه موعدی */
+      const u2 = await turn('خب.'); const later = lines(u2.user).filter(l => /پیگیری/.test(l) && /deadline/.test(l) && !/فقط اگر/.test(l));
       const n1 = await p.evaluate(() => APP.S.all('deadline').length);
       const ok = !asserted.length && st === 0 && !later.length && n1 === n0;
       r.neg.push([t.slice(0, 30), ok]);

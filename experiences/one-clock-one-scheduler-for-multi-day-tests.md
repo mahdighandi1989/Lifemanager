@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T12:00:00Z"
 created_at: "2026-10-17T12:00:00Z"
-updated_at: "2026-10-19T12:00:00Z"
+updated_at: "2026-11-15T12:00:00Z"
 merged_from: []
 ---
 
@@ -97,3 +97,11 @@ same act; keep the owner line (the one with the person's answer buttons) and fol
   semantics (a plan done is not its prediction's outcome).
 - Give each line a machine id at the source (`dl`, `pids`, `prom`) so the final layer never parses display text.
 - Relative words in a quoted commitment ("tomorrow morning I'll call") need the day they were said next to them when the line is shown later.
+
+## Update 2026-11-15
+- **A fixed calendar date in a test is a once-a-year time bomb.** A browser test typed the user's own day «25 Aban» and asserted
+  "the step shows the user's date and NOT tomorrow's". On 24 Aban the two are the same day, so the assertion contradicted itself and the
+  merge gate went red on unchanged code. Fix in the test (not the product): if the fixed date resolves to tomorrow, pick another day
+  («27 Aban»).
+- **How to apply elsewhere:** when a test asserts that two dates differ, derive at least one from the test's clock (today + k), or
+  guard the collision explicitly. Before you trust a "red on unchanged main", ask whether today's date is special for the test.

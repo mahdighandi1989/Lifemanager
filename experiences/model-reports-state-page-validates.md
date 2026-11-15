@@ -281,3 +281,112 @@ quote had dropped took the date of an unrelated open plan. (3) A weekday named o
 - For every "create" in an event handler, list the other writers of the same entity and make the handler look in their output first.
 - Replace any `else default_date` branch with "ask once" plus a stored pending question that the next user message answers.
 - Compare pending answers by message identity, not by timestamp order (two events can share a millisecond in tests and in fast replies).
+
+## Update 2026-11-12 (round 26, prior) — one judge per fact; read a reply against the state it answers; when undecidable, ask
+**Challenge.** A validated ledger of the person's own steps accepted her correction only if "the page's check agrees". Three things went wrong at once.
+(1) The agreement was computed by two readers — the authoritative arithmetic engine and a second, lighter pattern kept for a side job (matching "the same
+calculation with a new number"). The light one misread chains (`a = b = c` as `a = first number of b`) and did not know `≈`; its false "wrong" vetoed the
+engine's "right", so correct work was refused while the same page showed the same numbers as checked. (2) Replies to verdicts were read by words alone:
+"step 4 looks wrong to me" was an acceptance whatever the verdict was, a quoted "I don't accept" inside a take-back was a new rejection, and a clause
+"I accept step 4 and step 3 not" gave both steps the first polarity. (3) A model-validated result was booked as her fix of whatever step had been asked,
+with no link to that step.
+
+**Resolution.** One judge per fact: the engine decides; the light reader only matches and is the fallback where the engine read nothing (and it was made
+correct for chains anyway). A reply is read **relative to the verdict of the step it names** ("it is wrong" on a ✓ is a dispute, on a ✗ an acceptance), per
+named step even inside one clause, with quoted spans treated as mentions; a take-back is only of her own open rejection and restores the pre-dispute state
+with history; taking back an acceptance is a new dispute. A result becomes "her fix" only when it is about that step (same calculation or the page's own
+value; for non-numeric steps shared content) and the turn carries no open guess. Where the reading cannot decide (a "why do you say …?" that fits two steps)
+the page asks "which step?" instead of guessing.
+
+**How to Apply Elsewhere.**
+- When two validators can both veto, list them; make exactly one authoritative per fact and demote the other to a matcher or a fallback. A side-reader
+  written for convenience will sooner or later contradict the real one — and the user sees "right" and "refused" on the same screen.
+- Never classify a reply by its words alone when it answers a stated position: compute polarity from (stated judgement × current state).
+- Strip quoted spans before polarity detection; a quoted phrase is being talked about, not said.
+- For every "book X as the answer to the pending question" shortcut, require evidence that X is about that question; otherwise leave the question pending.
+- Pair every positive reading with its look-alike negative in the same test ("not yet" vs "not", "kept for later" vs "set aside", a memory vs a present doubt).
+## Update 2026-11-12 (round 26, today) — a confirmation gate sits on the record, not on one writer; a pending question is state
+
+**What happened.** Round 25 added "show the date the page read and book it on her yes" — but only for dated sentences that no other
+writer had recorded. The two other writers of the same record kept their old path: a plan date reported by the model and a `deadline`
+action went straight into the store, so the rule held exactly where it mattered least. The same round's question was dropped when the
+next message was not an answer, and «باشه» was not accepted, so real conversations (where the assistant asks its own question in the
+same turn) lost the date without a word. Separately, the date reader matched weekday names without word boundaries after it had removed
+the spaces («جلسه شنبه» ⇒ «سه‌شنبه»), and "is this her commitment?" was tested on the whole sentence with a verb pattern that also
+matched nouns («برادرم»), so a retracted day, a brother's schedule and a puzzle's name all got a date question.
+
+**Rules.**
+- A validation gate belongs to the record it protects. List every writer of that record (her words, the model's report, the model's
+  action, a correction, a page form) and route each through the same "pending ⇒ yes ⇒ book" step, or name it as an exception with its
+  reason. A gate on one writer is a bypass on the others.
+- When two reports of one thing arrive in one turn (a plan and its follow-up reminder, her sentence and the model's action), they join
+  one question. One commitment, one question, linked records that close together.
+- When the model's value and the page's reading of her own words disagree, her words win; when her words carry several candidates the
+  model's report only chooses among them; a value that is in nobody's words is neither booked nor asked.
+- A pending question is state with a life cycle: asked ⇒ answered | declined | corrected | still waiting. "Still waiting" is said once,
+  stays visible where the result would have appeared, and is answerable there. Never let it lapse silently.
+- Read a reply to a pending question by what it does: a plain yes (nothing else in its first sentence), a no, the same value repeated,
+  a different value (drop the old one, ask the new one for the same item), or an answer to somebody else's question (keep waiting).
+  A bare "yes" several turns later is not an answer; "yes, that date is right" is.
+- Tokenise before matching: join a prefix to a stem only when the prefix starts a word. Test on the pair that breaks it.
+- "Her own future action" is a property of the clause that holds the date, not of the sentence: past tense, reported speech, another
+  person's subject, a negated value, and a token that is part of the problem's own wording each disqualify that clause.
+- A stated attribute identifies the record (a stated confidence names the forecast). A verdict never lands on a record whose stated
+  attribute differs; if nothing identifies the record, ask which. Verdicts are reversible, with the previous verdict kept as history.
+- Reproduce before fixing: one reported defect of this family did not reproduce with the reporter's own inputs and was left alone.
+
+## How to Apply Elsewhere (round 26 addendum)
+- Grep for every assignment to the protected field; each hit is either routed through the gate or documented as an exception.
+- Old tests that assumed the ungated behaviour: answer the pending question through the product's own path (here the row's button in
+  the Today list) instead of adding a test-only bypass flag; change an assertion only where the decision replaced the behaviour.
+- A fixture whose sentence and reported value disagree («… ۲۰ آبانه» with a date twenty days ahead) was harmless while the report won;
+  once the user's words win, make the fixture consistent rather than weakening the rule.
+- Keep the question's identity (which message asked it) on the pending record, and stamp the booked record's source with the message
+  that made the commitment, not the message that said yes — later corrections look for the commitment.
+- (2026-11-15) An ambiguous reading should carry its candidates, not a default plus an "ambiguous" flag whose alternative is implied
+  by one hard-wired rule («today or a week later»). When new ambiguities arrived («next Friday» said on a Sunday; «the weekend» =
+  Thursday or Friday) the hard-wired alternative was wrong for both; storing `opts: [a, b]` on the pending item let the question text,
+  the answer reader and the buttons all follow the same two dates, with the old rule as the fallback when no options are stored.
+## Update 2026-11-12 — one judgement, positive evidence, and "which thing is this about"
+Round 26 of the same tour showed two more forms of the same failure.
+
+- **Two judges for one fact.** The ledger decided "this result is the whole answer" by positive evidence (the verb or counted noun of her own
+  unknown, a closing phrase, the last plan step). The stage decided the same fact by exclusion: every reported result that was not proved
+  intermediate moved the problem to look-back. Four scenarios went to look-back on a remainder, an estimate of a datum, a refuted test and one
+  branch of two. In all four the model itself had NOT reported the look-back stage. Rule: one function answers the question for every caller;
+  it accepts the page's own positive evidence, or the model's report when no page evidence contradicts it — never "not disproved".
+- **A counter word is not the quantity.** "چند تا اتوبوس؟" was answered by any "N تا". Match the counted noun, not the classifier.
+- **"The current object" is not "the object she is talking about".** With several problems in one conversation every writer filed under the
+  bound problem. The fix is a single focus decision before any block is built: an explicit naming frame plus a title/statement word binds the
+  turn; two candidates or an unknown name ⇒ ask and record nothing; a shared word without a frame does nothing. Stamp the binding at her
+  message time, because records of that message carry the message time, not the time the prompt was built.
+- **A record made before its owner existed has no owner.** A plan said while the problem was only a chat problem belonged to nobody and was
+  therefore shown under everybody. Ownership must be answerable for every time (bound object, window of the chat object that later became
+  the registered one, boundary inside the message that created a new object); "no owner" is shown only where there is exactly one candidate.
+- **"Closed" has one source.** Three surfaces read a raw state field and said "solved" while the page's own closure said "in review".
+
+## How to Apply Elsewhere (round 26 addendum)
+- Grep for every place that decides the same fact; keep one function and make the others call it.
+- When matching an answer to a question, drop classifiers and auxiliaries from both sides before comparing.
+- Before attributing an event of a turn, ask "which object did she name?"; make that a function with three outcomes: bind, ask, nothing.
+- For every list that filters by owner, test the case "owner unknown" explicitly — it must not mean "everyone".
+- A name inside a comparison («like that other one») is a reference, not a switch: strip comparison frames before deciding focus, and if
+  the rest of the message carries a datum whose owner the text does not decide, ask instead of filing it under either object.
+## Update 2026-11-15 — a correction must follow dependency, not equal digits; and reproduce with the runner's own turns
+
+- **Identity of a quantity is value + unit + role.** When a person corrects a number, an equal number elsewhere is not "the same datum" unless the
+  page can show it: same unit family (with conversion — a value written in another unit is compared in its own unit), same time rate («per day» is
+  not «per minute»), not an independently computed result, not a measured value. Each check removed a real false alarm.
+- **Follow only written dependency.** A number is stale when the person's own writing derives it from the corrected value: an expression, a unit
+  conversion, a rounding of a result, a named difference list, or a chain of results she wrote in the same message. Anything else is asked.
+- **Never mark half of a chain.** If one operand of a written relation depends on the corrected value through a path the page cannot see, the
+  recomputed value would be stated as exact and be wrong. Ask instead (the page's own exact recomputation, or nothing).
+- **One voice.** The person and the model must be told the same list of what went stale — build both from one engine result.
+- **Reproduce agent-tour defects by replay.** Store each runner's control steps and the recorded model replies, freeze the page clock on the run's
+  day, and pair each recorded reply with the call by the content of its "fresh turn" (not by call index), so a fix that adds or removes a model
+  call still gets the right reply. Map generated ids by creation order. A fixture that lacks the defect's turn is reported, not faked.
+
+### How to Apply Elsewhere
+When a user edits a value that other records were computed from, keep a dependency graph from what the user actually wrote (expressions,
+conversions, roundings) and use it for marking, proposals and the assistant's summary alike; treat unit, rate and provenance as part of a value's
+identity; and when the graph has a hole, ask rather than recompute.

@@ -60,7 +60,9 @@ async function run(ctx) {
     await ev(async (M) => __edit(__U(1), M.replace('شکر ۱ پیمانه', 'شکر ۱٫۵ پیمانه').replace('کره ۱۰۰ گرم', 'کره ۱۲۰ گرم')), M);
     const x = await snap(pid), d1 = ask(x, 'dl:d1'), d2 = ask(x, 'dl:d2'); const line = await ev(() => { const s = __cur(), r = (s.retracts || []).filter(z => !z.copy).slice(-1)[0] || {}; return (r.changed || []).map(c => APP.ASSIST.chLine20(c.label, c.old, c.new)).join(' | '); });
     return { ok: /شکر ۱٫۵ پیمانه/.test(x.st) && /کره ۱۲۰ گرم/.test(x.st) && !!d1 && /۱٫۵ پیمانه شکر/.test(d1.new) && !!d2 && d2.new === '۱۲۰ گرم کره' && /۱٫۵/.test(line) && /۱۲۰/.test(line), got: { x, line } }; };
-  C[99] = async () => { await scen({ prior: ['طرح رو باید به شورایاری بدم.', { t: 'مهلتش ۲۰ آبانه.', a: [{ do: 'deadline', what: 'تحویلِ طرح به شورایاری', date: later(20) }] }] });
+  /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12): روزِ موعد از حرفِ خودش خوانده می‌شود و بر تاریخِ مدل مقدم است. جملهٔ پیشین («مهلتش ۲۰ آبانه») با تاریخِ مدلِ ساختگی (۲۰ روز بعد) نمی‌خواند؛
+     حالا جمله همان روز را می‌گوید (تاریخِ شمسیِ later(20)) — آنچه این ورودی می‌سنجد (بخشِ «چه» ِ موعد با تاریخِ دست‌نخورده) همان است */
+  C[99] = async () => { const fa20 = await ev((d) => APP.fdate(d).split(' ').slice(0, 2).join(' '), later(20)); await scen({ prior: ['طرح رو باید به شورایاری بدم.', { t: 'مهلتش ' + fa20 + 'ه.', a: [{ do: 'deadline', what: 'تحویلِ طرح به شورایاری', date: later(20) }] }] });
     await turn('مهلت رو باید به شهرداری منطقه بدم نه شورایاری', 'فرستادم.', RT({ msg: 'طرح رو باید به شورایاری بدم', key: 'deadline:d1', what: 'fact', fix: 'شهرداری منطقه', old: 'شورایاری' }));
     const x = await snap(''); return { ok: x.dls.length === 1 && x.dls[0].what === 'تحویلِ طرح به شهرداری منطقه' && x.dls[0].date === later(20) && x.dls[0].h > 0, got: x.dls }; };
   C[100] = async () => { const pid = await scen({ prior: ['عروسی برادرم ۱۵ اسفنده، ۵ ماه مونده.'], live: {} });

@@ -161,11 +161,13 @@ const HELPERS = () => {
       out.noWhen = (__cur().plans || []).map(x => x.when);
       __freshChat();
       await __say('فردا صبح به داروخانه زنگ می‌زنم و می‌پرسم.', 'خوب.', [__cs({ plan: { text: 'فردا صبح به داروخانه زنگ می‌زنم', when: APP.addDays(APP.today(), 1) } })]);
+      /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه — هرچند با حرفِ خودش بخواند — با «… درست است؟» و «آره» ِ او می‌نشیند؛ تا آن وقت «جلسهٔ بعد» است */
+      out.tom0 = (__cur().plans || []).map(x => x.when); await __say('آره', 'خب.', [__cs({})]);
       out.tom = (__cur().plans || []).map(x => x.when); out.tomExp = APP.addDays(APP.today(), 1);
       return out; });
     X('B24·D21 s15: «… از اول تا آخر بخونم. خوبه؟» پرسشِ نظر است ⇒ برنامه ثبت نمی‌شود (نه با موعدِ ساختگیِ مدل)', r.q.length === 0, r);
     X('B24·D21: تاریخِ مدل بی زمانی در حرفِ خودش ⇒ «جلسهٔ بعد»، نه تاریخِ ساختگی', r.noWhen.length === 1 && r.noWhen[0] === 'next-session', r);
-    X('B24·D21 (نگهبان): «فردا صبح … زنگ می‌زنم» با تاریخِ مدل همان فردا می‌ماند', r.tom.length === 1 && r.tom[0] === r.tomExp, r);
+    X('B24·D21 (نگهبان): «فردا صبح … زنگ می‌زنم» با تاریخِ مدل همان فردا می‌ماند', r.tom0.length === 1 && r.tom0[0] === 'next-session' && r.tom.length === 1 && r.tom[0] === r.tomExp, r);
     BK(152, r.b152.length === 0, r);
   });
 
@@ -174,6 +176,7 @@ const HELPERS = () => {
     await fresh();
     const r = await E(async () => { __freshChat();
       await __say('پیش‌بینیم: صفر یا یک هشدارِ اشتباه، ۸۰ درصد مطمئنم. تا پس‌فردا انجامش میدم.', 'ثبت شد.', [{ do: 'go', view: 'fcast' }, __cs({ plan: { text: 'تا پس‌فردا انجامش میدم', when: APP.addDays(APP.today(), 2) }, guess: { text: 'صفر یا یک هشدارِ اشتباه' } })]);
+      /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12): موعدِ 🎯 روزِ برنامهٔ همان پیام است و آن روز با «آره» ِ او می‌نشیند */ await __say('آره', 'خب.', [__cs({})]);
       const n1 = APP.S.all('fcast').length;
       APP.ASSIST.toggle && APP.ASSIST.toggle(false); APP.go('fcast'); await new Promise(r => setTimeout(r, 300));
       const q = document.getElementById('fcQ'), pc = document.getElementById('fcP');
@@ -283,6 +286,7 @@ const HELPERS = () => {
     const r = await E(async () => { __freshChat();
       const t = APP.today(), p = t.split('-'), d0 = new Date(+p[0], +p[1] - 1, +p[2]).getDay(), k = (6 - d0 + 7) % 7, exp = APP.addDays(t, k === 0 ? 7 : k);
       await __say('تا شنبه‌ی بعد باید تحویلش بدم', 'ثبت شد.', [{ do: 'deadline', what: 'تحویلِ گزارش', date: APP.addDays(t, 13) }, __cs({})]);
+      /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ کنشِ deadline): تاریخِ خواندهٔ صفحه (نه تاریخِ مدل) با «آره» ِ او ثبت می‌شود */ await __say('آره', 'خب.', [__cs({})]);
       const d = APP.S.all('deadline')[0] || {}; const lines = __sysLines().concat(__today()).join(' ‖ ');
       return { exp, date: d.date, iso: /\d{4}-\d{2}-\d{2}/.test(lines), fa: APP.fdate(exp), lines: lines.slice(0, 500) };
     });

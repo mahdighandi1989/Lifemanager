@@ -226,7 +226,9 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     const first = e.ask, other = first === 'pr_prior_a' ? 'pr_prior_b' : 'pr_prior_a';
     await turn('نه، اون یکی', 'باشه.', [cs({})]);
     e = await one(101); sy = await sysMsgs();
-    chk(e.st === 'wait' && e.ask === other && !sy.some(t => ARR.test(t)), 'tB1d: after her «نه» the equal rival is ASKED, not declared (it scored no better than what she rejected) :: ' + JSON.stringify(e));
+    // دورِ ۲۶ (DECISIONS_R26 · Q7 / C20؛ U62 = B26x·D27): «نه، اون یکی» در گره **همان جواب است** — نامزدِ دیگر با تأییدِ خودش می‌رسد و پرسشِ دومی ساخته نمی‌شود.
+    // پیش‌تر (دورِ ۲۵) این‌جا انتظار می‌رفت رقیب دوباره «پرسیده» شود (e.st === 'wait' && e.ask === other)؛ همان رفتار را دورِ ۲۶ ایراد شمرد («آره، گفتم که»).
+    chk((e.st === 'arrived' || e.st === 'resumed') && e.tool === other && e.how === 'ask' && sy.filter(t => ASKED.test(t)).length === 1 && !(e.rej || []).length, 'tB1d (R26): her «نه، اون یکی» at a tie IS the answer — the other one arrives by her own word, no second ask, nothing booked as rejected :: ' + JSON.stringify(e));
     await turn('خب؟', 'یک پرسش.', [cs({})]);
     await turn('آره همینه', 'برگردیم.', [cs({})]);
     e = await one(101); chk((e.st === 'arrived' || e.st === 'resumed') && e.tool === other && e.how === 'ask', 'tB1d: her «آره» ⇒ arrival by her own word :: ' + JSON.stringify(e));

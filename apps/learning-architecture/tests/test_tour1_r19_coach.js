@@ -182,7 +182,7 @@ const normC = (t) => String(t || '').replace(/[«»]/g, '').replace(/[\s‌]+/g,
     await day('2026-10-17'); u = await turn('سلام.'); pl = await p.evaluate(() => __plans());
     T(3, pl[0] && pl[0].state === 'notdone' && !asked(u), { pl, a: asked(u) });
     // 5 — Today tap «انجام دادم»
-    await wipe(); await day('2026-10-15'); await fresh(); await say('تا شنبه فصل ۳ رو می‌خونم.', { text: 'تا شنبه فصل ۳ رو می‌خونم', when: '2026-10-17' });
+    await wipe(); await day('2026-10-15'); await fresh(); await say('تا شنبه فصل ۳ رو می‌خونم.', { text: 'تا شنبه فصل ۳ رو می‌خونم', when: '2026-10-17' }); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «… درست است؟» ِ صفحه و «آره» ِ او می‌نشیند — «آره» افزوده شد؛ بقیهٔ ورودی همان است */ await turn('آره');
     await day('2026-10-17'); await p.evaluate(() => APP.go('home')); await p.waitForTimeout(100);
     x = await p.evaluate(() => { const b = document.querySelector('#main .plan-done'); if (!b) return { btn: false }; b.click(); return { btn: true, own: !!b.closest('[data-own]') }; });
     await p.waitForTimeout(100); u = await turn('سلام.'); pl = await p.evaluate(() => __plans()); td = await p.evaluate(() => __today());
@@ -199,14 +199,14 @@ const normC = (t) => String(t || '').replace(/[«»]/g, '').replace(/[\s‌]+/g,
     pl = await p.evaluate(() => __plans()); await day('2026-10-18'); td = await p.evaluate(() => __today());
     T(6, pl.length === 1 && td.length <= 1, { pl, td });
     // 8 — «هنوز نه» ⇒ open, not duplicated; asked again at most once later
-    await wipe(); await day('2026-10-15'); await fresh(); await say('تا شنبه کمد رو مرتب می‌کنم.', { text: 'تا شنبه کمد رو مرتب می‌کنم', when: '2026-10-17' });
+    await wipe(); await day('2026-10-15'); await fresh(); await say('تا شنبه کمد رو مرتب می‌کنم.', { text: 'تا شنبه کمد رو مرتب می‌کنم', when: '2026-10-17' }); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «… درست است؟» ِ صفحه و «آره» ِ او می‌نشیند — «آره» افزوده شد؛ بقیهٔ ورودی همان است */ await turn('آره'); 
     await day('2026-10-17'); await p.evaluate(() => APP.go('home')); await p.waitForTimeout(100);
     x = await p.evaluate(() => { const b = document.querySelector('#main .plan-notyet'); if (!b) return { btn: false }; b.click(); return { btn: true }; });
     pl = await p.evaluate(() => __plans()); td = await p.evaluate(() => __today()); const uA = await turn('سلام.');
     await day('2026-10-18'); const td2 = await p.evaluate(() => __today()); const uB = await turn('سلام دوباره.'); const uC = await turn('خب.');
     T(7, x.btn && pl.length === 1 && pl[0].state === 'open' && !td.length && !asked(uA) && td2.length === 1 && td2[0].acts.indexOf('هنوز نه') < 0 && asked(uB) && !asked(uC), { x, pl, td, td2, a: [asked(uA), asked(uB), asked(uC)] });
     // 9 (neg) — unrelated live step done ⇒ plan unchanged, still asked
-    pid = await setup(['خرید']); await say('از فردا ورزش صبح می‌کنم.', { text: 'ورزش صبح', when: '2026-10-16' }); await setOut(pid, 's1', 'yes');
+    pid = await setup(['خرید']); await say('از فردا ورزش صبح می‌کنم.', { text: 'ورزش صبح', when: '2026-10-16' }); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «… درست است؟» ِ صفحه و «آره» ِ او می‌نشیند — «آره» افزوده شد؛ بقیهٔ ورودی همان است */ await turn('آره'); await setOut(pid, 's1', 'yes');
     await day('2026-10-17'); u = await turn('سلام.'); pl = await p.evaluate(() => __plans());
     T(8, pl[0].state === 'open' && !pl[0].step && asked(u, 'pl1'), { pl, a: asked(u) });
     // 10 (neg) — on_guess g1 untested ⇒ not closed; «اول حدس را بیازما», not «انجام شد؟»
@@ -222,7 +222,7 @@ const normC = (t) => String(t || '').replace(/[«»]/g, '').replace(/[\s‌]+/g,
     pl = await p.evaluate(() => __plans());
     T(10, pl[0] && pl[0].state === 'open', { pl });
     // 12 (neg) — no link, due passed ⇒ asked once; Today line present
-    await wipe(); await day('2026-10-15'); await fresh(); await say('فردا به مامانم زنگ می‌زنم.', { text: 'فردا به مامانم زنگ می‌زنم', when: '2026-10-16' });
+    await wipe(); await day('2026-10-15'); await fresh(); await say('فردا به مامانم زنگ می‌زنم.', { text: 'فردا به مامانم زنگ می‌زنم', when: '2026-10-16' }); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «… درست است؟» ِ صفحه و «آره» ِ او می‌نشیند — «آره» افزوده شد؛ بقیهٔ ورودی همان است */ await turn('آره'); 
     await day('2026-10-17'); td = await p.evaluate(() => __today()); const u1 = await turn('سلام.'), u2 = await turn('خب.');
     T(11, asked(u1, 'pl1') && !asked(u2) && td.length === 1, { td, a: [asked(u1), asked(u2)] });
     // 13 (neg) — «هر ماه» vs step «هر هفته», no report ⇒ not linked
@@ -235,11 +235,11 @@ const normC = (t) => String(t || '').replace(/[«»]/g, '').replace(/[\s‌]+/g,
     await day('2026-10-17'); u = await turn('سلام.'); td = await p.evaluate(() => __today());
     T(13, !asked(u) && !td.length, { a: asked(u), td });
     // 15 (neg) — expired ⇒ not asked, no Today line
-    await wipe(); await day('2026-10-15'); await fresh(); await say('فردا کتاب رو پس می‌دم.', { text: 'فردا کتاب رو پس می‌دم', when: '2026-10-16' });
+    await wipe(); await day('2026-10-15'); await fresh(); await say('فردا کتاب رو پس می‌دم.', { text: 'فردا کتاب رو پس می‌دم', when: '2026-10-16' }); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «… درست است؟» ِ صفحه و «آره» ِ او می‌نشیند — «آره» افزوده شد؛ بقیهٔ ورودی همان است */ await turn('آره'); 
     await day('2026-10-17'); await turn('سلام.'); await turn('خب.'); u = await turn('بعد؟'); pl = await p.evaluate(() => __plans()); td = await p.evaluate(() => __today());
     T(14, pl[0].state === 'expired' && !asked(u) && !td.length, { pl, td });
     // 16 (neg) — tap «انجام ندادم» ⇒ notdone, never asked again
-    await wipe(); await day('2026-10-15'); await fresh(); await say('تا شنبه گزارش رو تموم می‌کنم.', { text: 'تا شنبه گزارش رو تموم می‌کنم', when: '2026-10-17' });
+    await wipe(); await day('2026-10-15'); await fresh(); await say('تا شنبه گزارش رو تموم می‌کنم.', { text: 'تا شنبه گزارش رو تموم می‌کنم', when: '2026-10-17' }); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «… درست است؟» ِ صفحه و «آره» ِ او می‌نشیند — «آره» افزوده شد؛ بقیهٔ ورودی همان است */ await turn('آره');
     await day('2026-10-17'); await p.evaluate(() => APP.go('home')); await p.waitForTimeout(100);
     x = await p.evaluate(() => { const b = document.querySelector('#main .plan-notdone'); if (!b) return { btn: false }; b.click(); return { btn: true }; });
     await day('2026-10-18'); u = await turn('سلام.'); pl = await p.evaluate(() => __plans()); td = await p.evaluate(() => __today());

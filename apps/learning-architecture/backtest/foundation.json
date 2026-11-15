@@ -1,6 +1,6 @@
 {
- "round": 35,
- "at": "2026-11-11",
+ "round": 38,
+ "at": "2026-11-15",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 284,
+    "ok": 302,
     "health_alarm": 0,
     "missed": 29,
-    "mislocated": 12
+    "mislocated": 10
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 267,
+    "ok": 280,
     "health_alarm": 0,
-    "missed": 41,
-    "mislocated": 17
+    "missed": 42,
+    "mislocated": 19
    },
    "changed": [
     {
@@ -1252,24 +1252,54 @@
      "t": "کرک بلادزورث و شاهدانِ عینی (بالتیمور، ۱۹۸۵)",
      "from": "ok",
      "to": "missed"
+    },
+    {
+     "id": "r35_bible_codes_genesis_1994",
+     "t": "آزمونِ «رمزهای سفرِ پیدایش» در مجلهٔ Statistical Science (۱۹۹۴)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r35_abs_food_diary_pvalue",
+     "t": "دفترچهٔ خوراک و سردرد",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r37_fisher_plateau_1929",
+     "t": "«فلاتِ بلندِ ماندگار» ِ اروینگ فیشر (اکتبرِ ۱۹۲۹)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r37_abs_rent_plateau_loan",
+     "t": "سناریوی انتزاعی: چهار سالِ بالا رفتنِ اجاره و وامِ خانهٔ دوم",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r38_zinoviev_letter_1924",
+     "t": "«نامهٔ زینوویف» و یادداشتِ اعتراضِ وزارتِ خارجهٔ بریتانیا (اکتبرِ ۱۹۲۴)",
+     "from": "ok",
+     "to": "mislocated"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 284,
+    "ok": 302,
     "health_alarm": 0,
     "missed": 29,
-    "mislocated": 12
+    "mislocated": 10
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 267,
+    "ok": 280,
     "health_alarm": 0,
-    "missed": 41,
-    "mislocated": 17
+    "missed": 42,
+    "mislocated": 19
    },
    "changed": [
     {
@@ -1373,6 +1403,36 @@
      "t": "کرک بلادزورث و شاهدانِ عینی (بالتیمور، ۱۹۸۵)",
      "from": "ok",
      "to": "missed"
+    },
+    {
+     "id": "r35_bible_codes_genesis_1994",
+     "t": "آزمونِ «رمزهای سفرِ پیدایش» در مجلهٔ Statistical Science (۱۹۹۴)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r35_abs_food_diary_pvalue",
+     "t": "دفترچهٔ خوراک و سردرد",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r37_fisher_plateau_1929",
+     "t": "«فلاتِ بلندِ ماندگار» ِ اروینگ فیشر (اکتبرِ ۱۹۲۹)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r37_abs_rent_plateau_loan",
+     "t": "سناریوی انتزاعی: چهار سالِ بالا رفتنِ اجاره و وامِ خانهٔ دوم",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r38_zinoviev_letter_1924",
+     "t": "«نامهٔ زینوویف» و یادداشتِ اعتراضِ وزارتِ خارجهٔ بریتانیا (اکتبرِ ۱۹۲۴)",
+     "from": "ok",
+     "to": "mislocated"
     }
    ]
   }
@@ -1535,8 +1595,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 163,
-   "fullAfter": 163
+   "fullBefore": 178,
+   "fullAfter": 178
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1545,8 +1605,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 163,
-   "fullAfter": 163
+   "fullBefore": 178,
+   "fullAfter": 178
   },
   "p_found_scope": null
  },

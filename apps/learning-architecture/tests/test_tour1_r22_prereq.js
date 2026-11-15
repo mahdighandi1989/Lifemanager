@@ -307,7 +307,9 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     const pv = await p.evaluate(() => { const r = APP.S.all('prereq')[0]; APP.go('prereq', r.id); return { live: !!document.querySelector('.pr-golive'), route: !!document.querySelector('.pr-goroute'), state: (document.querySelector('.pr-state') || {}).textContent || '' }; });
     chk(pv.live && pv.route && /آموخته شد/.test(pv.state), '🧩 view links to its problem and route; item shows its state :: ' + JSON.stringify(pv));
     // solved ⇒ destination «حل شد», now on it; strip gone
-    await p.evaluate((pid) => { __liveSet(pid, (so, L) => { L.state = 'solved'; L.stateAt = new Date(Date.now() + 9000).toISOString(); }); }, pidR);
+    // دورِ ۲۶ (DECISIONS_R26 Q6، C26-2 — جایگزینِ ادعای پیشین): «حل شد» روی 🧭 فقط از بستنِ خودِ صفحه (A.liveClosure) — «✅ حل شد» ِ بی بازنگریِ ثبت‌شده «در بازنگری» است؛
+    // پس این‌جا بستن کامل می‌شود (بازنگریِ ثبت‌شده)، همان‌طور که صفحه می‌کند.
+    await p.evaluate((pid) => { __liveSet(pid, (so, L) => { L.state = 'solved'; L.stateAt = new Date(Date.now() + 9000).toISOString(); so.b = so.b || {}; so.b[1] = { done: true, verdict: 'verified', at: L.stateAt }; }); }, pidR);
     x = await p.evaluate((pid) => { const M = APP.ROUTE.model(pid); return { dest: M.dest, now: M.now, reached: M.reached }; }, pidR);
     chk(x.dest === 'حل شد ✓' && x.now === -2 && x.reached, 'P2: solved ⇒ destination «حل شد» and the now-marker on it :: ' + JSON.stringify(x));
     g = await p.evaluate(() => { APP.go('home'); return !!document.querySelector('#main .rt-geo'); });

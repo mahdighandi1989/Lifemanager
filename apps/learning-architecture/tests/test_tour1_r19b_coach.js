@@ -63,7 +63,7 @@ function strictScan(user) {
       window.R = (o) => Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, o);
       window.__turn = async (text, reply, actions) => {
         const n0 = __calls.length; __q.push(R({ reply: reply || 'باشه.', actions: actions || [] }));
-        await APP.ASSIST.send(text); __q.length = 0;
+        await APP.ASSIST.send(text); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 «بر هر دو مسیر»): هر تاریخ فقط با «آره» ِ او به رکورد و «امروز» می‌رسد. این آزمون پیش از دورِ ۲۶ نوشته شده و تاریخِ نشسته را فرض می‌کند؛ پس پس از هر نوبت، برای هر برنامه یا موعدی که مدل گزارش کرده، همان «آره، همین» ِ ردیفِ 📅 ِ «امروز» زده می‌شود (راهِ خودِ صفحه: PR.dateYes ⇒ PR.dateResolve) — خودِ انتظارها دست نخورده‌اند مگر جایی که جداگانه نوشته شده */ try { if (APP.PR && APP.PR.dateYes) APP.PR.dateYes(null, true); } catch (e26) { }  __q.length = 0;
         const c = __calls.slice(n0).filter(x => !/^\[سامانه/.test(String((x.user.split('# نوبتِ تازه\n')[1] || '')).trim()))[0] || {};
         return { sys: c.sys || '', user: c.user || '' };
       };
@@ -189,7 +189,8 @@ function strictScan(user) {
     T(8, okBase(s) && s.fills[0].pending === '۱۲۰ میلیون تومان' && s.fills[1].val === '۸ میلیون' && !s.fills[1].pending && !s.fills[1].corr, s);
     // 9 — plan 5 back: «روزی یک ساعت», date unchanged
     await go(9, { 1: [cs({ plan: { text: 'روزی دو ساعت درس بخونم', when: '2026-10-18' } })] }, RT('روزی دو ساعت درس بخونم', 'plan', 'یک ساعت'));
-    T(9, okBase(s) && s.plans[0].text === 'روزی یک ساعت درس بخونم' && s.plans[0].when === '2026-10-18' && hasNote(s.plans[0].corr), s);
+    /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12؛ بانکِ R26 #161): در نوبتِ برنامه («روزی دو ساعت درس بخونم») او هنوز روزی نگفته — تاریخِ مدل (2026-10-18) در حرفِ خودش نیست و ثبت نمی‌شود؛ برنامه «جلسهٔ بعد» می‌ماند و اصلاحِ متن همان را نگه می‌دارد */
+    T(9, okBase(s) && s.plans[0].text === 'روزی یک ساعت درس بخونم' && s.plans[0].when === 'next-session' && hasNote(s.plans[0].corr), s);
     // 10 — guess 3 back (life): only «سرایدار» replaced; on_guess plan stays linked to g1
     await go(10, { 1: [cs({ guess: { text: 'سرایدار کلید رو برداشته' } })] }, RT('سرایدار کلید رو برداشته', 'guess', 'همسایه‌ی طبقه‌ی دوم'));
     T(10, okBase(s) && s.guesses.length === 1 && s.guesses[0].id === 'g1' && s.guesses[0].text === 'همسایه‌ی طبقه‌ی دوم کلید رو برداشته' && hasNote(s.guesses[0].corr), s);

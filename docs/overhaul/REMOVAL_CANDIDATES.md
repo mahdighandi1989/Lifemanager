@@ -427,4 +427,39 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R25 P6 (C25-2, A23-14, D25-13, B24·D12, D23-30).
 - **Status:** reachable, not called: `APP.ASSIST.R25_QUARANTINE.noFieldTxt24` (still used for views with no button or no request), `.regSys24`,
   `APP.R25_QUARANTINE.liveReqSignals24`, `.resultQ24`, `.natGuess24`. Delete only with the owner's approval.
+## 2026-11-12 — open-ended register signs, ladder jump after one late success (learning-architecture, Pólya round 26, classify: Q9 + Q10)
+- **Files:** `apps/learning-architecture/src/app/a27_tour.js`, `a41_practice.js`.
+- **What they did:** `SIGN_SH` read any
+  «[بن] + letters + ید/ین» as second person plural («ندید», «نخستین», «بازدید»); `SIGN_TO18` read any word ending in «ت» before «را/می‌شود» as the clitic «ـت»
+  («ثبت را», «سانت می‌شود») and any joined «می…ی» as a verb («میلیونی»); `extGap` in `PR.eval` took the next rung of the page ladder after a late success even
+  while the technique's own sequence was incomplete («۲۱ روز · ۱ از ۳»).
+- **Why replaced:** DECISIONS_R26 Q9 (D26-33, D26-53, U55, C26-17, bank #232–#235) and Q10 (C26-42, C39).
+- **Status:** reachable, not called: `APP.ASSIST.R26_QUARANTINE.signSh25`, `.signTo18_25`, `APP.PR.R26_QUARANTINE.extGap25`. Delete only with the owner's approval.
 
+## 2026-11-12 — round-25 readers of the prior-work reply (learning-architecture, Pólya round 26, prior: Q4)
+- **File:** `apps/learning-architecture/src/app/a45_story.js`.
+- **What:** `CALLS25` of round 25 (kept as `CALLS25_R25`: any «خودم … حساب کردم / نوشتم» counted as «my prior work», numbered steps only as «گام ۱: … گام ۲:»);
+  the light calculation reader `calcs` of round 25 (kept as `calcsR25`: «A = B = N» read as «A = first number of B», no «≈», a number glued to the expression
+  taken as its result); `ACC25` and `UNDO25` (acceptance / take-back words read per clause, regardless of the verdict they answer); and the rule in `priorReply`
+  «a ✓ verdict cannot be disputed» (one line, no separate function to keep).
+- **Why replaced:** DECISIONS_R26 Q4 (U3, U8, U9, U18, A26-7, A26-32, D26-9, D26-11, C26-8): `CALLS25` + `priorOpenAt`, `calcs` (chains, «≈»), `readReply`
+  with `EXA26`/`SAYR26`/`SAYW26`/`SAYWN26`/`UNDO26` (judgement relative to the step's verdict, per step).
+- **Status:** reachable, not called: `APP.STORY.R25_QUARANTINE.CALLS25`, `.calcs`, `.ACC25`, `.UNDO25` (and `.NO24` from round 25). `REJ25` is still used by
+  `pageFix`. Delete only with the owner's approval.
+
+## 2026-11-12 — «most shared words wins» ranking of the territory loop (learning-architecture, Pólya round 26, loop: Q7)
+- **File:** `apps/learning-architecture/src/app/a44_route.js`.
+- **What it did:** `rank` (R25) declared the candidate with the most full-weight shared words «clear» unless another had exactly the same counts. Two
+  areas with the same description were split by a word of the sheet's own title («آشکارسازی») and one was declared «🛎 ابزارِ لازم آمد» without asking
+  or naming the other (D26-20).
+- **Why replaced:** DECISIONS_R26 Q7 + C20 (a real tie is asked naming both; a clear single best fit arrives). Now: one candidate that alone meets
+  the arrival condition arrives; several ⇒ ask naming all, unless the step or the sheet title carries the whole name of exactly one.
+- **Status:** reachable, not called: `APP.PRE.R24_QUARANTINE.rank25`. Delete only with the owner's approval.
+## 2026-11-12 — Tour 1 round 26, fixer «story»: `A.STORY.R26_QUARANTINE`
+- **What:** in `apps/learning-architecture/src/app/a45_story.js` — `NEWPROB25` of round 25 (a new problem only as «یه مسئلهٔ دیگه (هم) دارم» with
+  nothing in between), `switchTo` (return by naming only to the last split, only to an open live problem), `qSentence` of round 25 (the last
+  question sentence of the statement is the destination, whatever it asks), and the unwrapped `A.PR.fcMatch` / `fcNarrow` / `predFor`
+  (a forecast candidate by a shared number or as «the only open one», even when the confidence she stated belongs to another forecast).
+- **Why replaced:** DECISIONS_R26 Q3 + Q6, C21 (U12, U13, U15, C26-12, A26-51, U32, D25-25).
+- **Status:** reachable, not called: `APP.STORY.R26_QUARANTINE.NEWPROB25`, `.switchTo`, `.qSentence`, `.fcMatch`, `.fcNarrow`, `.predFor`.
+  Delete only with the owner's approval.

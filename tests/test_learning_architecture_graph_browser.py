@@ -67,9 +67,11 @@ def sandbox(tmp_path_factory):
     os.makedirs(root / "tests")
     for p in glob.glob(os.path.join(LLA, "tests", "*.js")):
         shutil.copy(p, root / "tests" / os.path.basename(p))
-    # independent variant banks (tests/variants/*.json, read by require('./variants/…')) — read-only data, by symlink
-    if os.path.isdir(os.path.join(LLA, "tests", "variants")):
-        os.symlink(os.path.join(LLA, "tests", "variants"), root / "tests" / "variants")
+    # read-only data folders beside the tests, by symlink: independent variant banks (tests/variants/*.json, read by
+    # require('./variants/…')) and the round-26 replay fixtures (tests/fixtures/r26_correction/*.json, read by tour1_r26_replay.js)
+    for sub in ("variants", "fixtures"):
+        if os.path.isdir(os.path.join(LLA, "tests", sub)):
+            os.symlink(os.path.join(LLA, "tests", sub), root / "tests" / sub)
     return root
 
 

@@ -5111,3 +5111,162 @@ dated stability, mind-card feed) under way.
   is green. PROPOSAL: the collector should carry forward provenance it cannot recompute, the way it already keeps shrunken shards.
 - **FINDING (2026-11-12)** `docs/tours/polya-batch1/kit/checkpoint.sh` holds the owner's e-mail address as an escaped sed pattern
   (already in history). Not changed in this task; PROPOSAL: read the address from an environment variable.
+- **CHANGE (2026-11-12, tour batch 1, round 26, fixer «arith» — Q1)** `apps/learning-architecture/src/app/a46_arith.js` only. Roots, each
+  reproduced red-first on BASE26 (23e351f6) from the runners' own sentences: a scale word («هزار/میلیون/میلیارد») was multiplied into the
+  written result (correct work shown ✗ — S1); the half-unit rounding allowance applied to integers turned 13/12 into «1» (false exact
+  identity shown ✓ — S1); «میشه» was cut like «=», so a condition number became the claimed value; a sentence period after a number hid
+  «یعنی 2.75»; π, «A از B میشه N٪», «N برابر», running sums with a unit and ellipsis sums were silent; every unit-bearing mismatch was
+  labelled a unit error; the page value was a raw fraction; the prompt block needed a prior ledger; nothing let her contest the page's ✗.
+  Now: scale and unit words are units (C15); exact rationals are exact, an integer for a non-integer value is asked (C16); an operator
+  line the reader cannot parse is «نسنجیده» (C17); the claimed value follows the last «=»/«میشه» (C18); three states ✓ / ✗ / «؟»;
+  `A.STORY.arithContest` re-runs a contested ✗ once, shows both computations and clears it everywhere when she is right (owner bank 36).
+  Proof: `tests/test_tour1_r26_arith.js` (114 errors on BASE26 ⇒ 0), independent bank R26 Q1 42/42, bank R25 P2 58/58. One round-25
+  guard changed with a comment (unit words between numbers are now read). Nothing deleted or quarantined.
+- **FINDING (2026-11-12, fixer «arith»)** A scan of all 972 user messages of round 26 with the base and the new reader (the runs' own
+  prompts) was the strongest check: all 16 false ✗ of the base are gone, the 8 new ✗ are real slips the base passed silently, and the scan
+  exposed four more misreadings the runners had not reported (the word «توان» read as a function name — this is C26-11, which did not
+  reproduce outside its sentence; the compound number «۱۶ میلیون و ۶۴۰»; «… = ۳٫۲۵ از ۲۵ میشه ۱۳٪»; a Persian-letter unknown read as a
+  unit). PROPOSAL: keep such a corpus scan (base vs new, differences only) as a standing step for any change to a reader of people's text.
+- **CHANGE (2026-11-15, fixer «arith», resumed after the pause)** DECISIONS_R26 clarifications C23–C29 applied to `a46_arith.js`
+  (`agree`, `chains`, `trailOf`, `parser`/`norm`, `askT`, `bothT`, the prompt hooks; new `ST.arithAnswer`, `truncF`, `rdNums`): an operand's
+  scale word is arithmetic (C23); with two different scale words the one-scale reading is shown and asked instead of ✓, unless she wrote
+  those numbers with that scale elsewhere in the same message (C24); «؟» only for the rounding or truncation of the exact value (C25/C27);
+  tight «۱۳/۱۲ = ۱» is a fraction identity ⇒ ✗, «÷»/«تقسیم بر» ⇒ «؟», and her next-message «آره، گرد کردم»/«نه» is stored as ✓-approximate / ✗
+  (C26); «و … میشه» is a sum and «N تا … M … میشه K» a product, ranges excluded (C28); a contest where she is wrong now says «re-checked
+  once», points at the link that does not read and never gives the page's number (C29 — replaces «both computations» of 2026-11-12).
+  Proof: new section `clar` of `tests/test_tour1_r26_arith.js` (13 errors on 77e74000 ⇒ 0), bank R26 Q1 42/42, page suite one test at a time.
+- **CHANGE (2026-11-12, learning-architecture, Pólya tour round 26, fixer «prior»: Q4; page WORKLOG 131 on the branch = 133 at merge)** Prior-work reply
+  reading (`apps/learning-architecture/src/app/a45_story.js`, one line in `a27_tour.js`). FINDING: the C8 check of her own fix had two judges — the page's
+  arithmetic engine and a second light reader that misread chains and «≈» — so a correct fix was refused; a re-reported step with a not-ok verdict had one
+  outcome («… نمی‌خواند»); replies were read per clause and without the verdict they answer (a quoted «قبول ندارم» was a new dispute, a trailing «و گامِ ۳ رو نه»
+  an acceptance, a dispute of a ✓ dropped); a model result with no link to the resume step became «her fix»; «خودم حساب کردم» mid-work opened a ledger while
+  «اینم کارِ خودمه، ببین: گامِ ۱۳ …» did not. CHANGE: one judge (the engine; the light reader only matches and is the fallback), her rework/remark recorded as
+  such, replies read relative to the step's verdict and per step, take-back restores the pre-dispute state with history, «which step?» when undecidable,
+  set-aside steps skipped by the resume point, the report request limited to work she calls her own or a real opening. Tests:
+  `tests/test_tour1_r26_prior.js` (15 runner scenarios replayed, 30 assertions red on BASE26; bank Q4 30/30), suite one file at a time. Quarantined: round-25
+  `CALLS25`, `calcs`, `ACC25`, `UNDO25` (`APP.STORY.R25_QUARANTINE`). Not done: D25-15 (a38 gate, story's file this round). Lesson:
+  `experiences/model-reports-state-page-validates.md` (Update 2026-11-12, prior).
+
+## 2026-11-12 — FINDING + CHANGE: تورِ پولیا دورِ ۲۶، fixer «loop» (Q7 + C20/C36)
+- **FINDING** All 14 Q7 defects reproduced red on BASE26 (`apps/learning-architecture/tests/test_tour1_r26_loop.js`: 13 runner flags false, bank 7/20).
+  Roots in `apps/learning-architecture/src/app/a44_route.js`: the fit compared written forms, not words (her colloquial step vs the area's formal
+  text ⇒ a clear tool was asked); the sheet's own words broke ties; naming the other candidate of a tie was a rejection plus a second ask; event
+  ids `sys23_<sw>_back|ask|resume` were not unique (a second arrival overwrote the first in 📜); a take-back left the sheet open; the prompt's
+  sheet list was a two-minute-old cache; the 🔭 row of a question had no control; a step-less sheet's reply reached nobody; a piece waiting after
+  closure and a tool arriving after closure had no «امروز» line; a page-self sheet with a wrong `gap.step` sat on a closed problem; `sys_done` on a
+  declined sheet and a bare close of a sheet were silent; the «جواب نداد» reason attributed a sheet word to her step.
+- **CHANGE** `a44_route.js` only: `foldW`/`tok1`/`areaIdx` (closed-class, lexicon-attested folding), `rank`/`score` (one eligible ⇒ arrive, several ⇒
+  ask naming all, whole-name exception), `tiePick`/`tieChoose`/`tieNone`/`tieDrop`/`tieAnswer` + `PRE.sysFit`/`sysLines` (answer by naming),
+  `idN`/`evOut` (one event per arrival/ask/resume, earlier event gets its later outcome), `sheetClose`/`sheetSeen`/`closedBare` (close with a note
+  on her confirmation; live sheet list), `sysCard`/`cardAnswer` (answer buttons), `looseSheets`/`sheetNews` (📬), `mootWatch`, `stepsSync`,
+  `lateScope`/`sysOpen` (territory areas only), `PRE.sysDone` (declined), `herShare`. The a26 system prompt is untouched.
+- **DECISION** A tie is not broken by counting the sheet's own words or by «three shared words against two»; the page asks. Closing a sheet is the
+  host's `approved` tick and is set only on her own confirmation. A problem closed before its tool arrived is never reopened by the page (C36).
+- **CHANGE (test)** One round-25 assertion (tB1d: «نه، اون یکی» ⇒ second ask) replaced per DECISIONS_R26 Q7/C20, with a comment in the test.
+- Quarantine: `APP.PRE.R24_QUARANTINE.rank25` (REMOVAL_CANDIDATES). WORKLOG (132), PROGRESS 129, HANDBOOK §10/§12 row 79, handoff note
+  `_pending_tour1_R26_loop_2026-11-12.md`.
+- **PROPOSAL** Not done, with reasons: the tour harness has no `HOST.status` (the close is invisible to runners until RUNNER27 emulates it);
+  morphology beyond the two closed classes; a late piece is judged by the sheet's area, not by its relation to the closed problem.
+- **FINDING (2026-11-12, tour 1 round 26, fixer «today»)** The round-25 date gate («… درست است؟» + her yes) covered only dated sentences
+  that no other writer had recorded; a plan date reported by the model and the `deadline` action still reached «امروز» unasked, the date
+  reader matched weekdays across word boundaries («جلسه شنبه» ⇒ «سه‌شنبه») and could not read «تا شنبه» or «۲۰ آبانه», and an
+  unanswered question was dropped silently. In the forecast ledger a percent inside the claim was read as the confidence and a verdict
+  with a stated 60 % landed on the open 90 % forecast.
+- **CHANGE (2026-11-12, tour 1 round 26, fixer «today»; DECISIONS_R26 Q5 + Q8, C12 on both paths, C19)** `apps/learning-architecture/src/app/`
+  `a41_practice.js` (date reader, clause-level «her own future action», one gate for every date writer, pending questions that stay and
+  are answerable in «امروز», plan ⇄ follow-up link, forecast booking / verdict / take-back with history), `a27_tour.js` (`plan18` date
+  source, two guards, three correction-cue shapes), `a40_dossier.js` (verdict history). `AS.SYS` untouched. Tests:
+  `tests/test_tour1_r26_today.js` (47 runner checks, 42 red on BASE26; bank Q5 + Q8 52/52). Old assertions replaced by the decision are
+  commented in place; correction tests confirm dates through the Today row (`PR.dateYes`). WORKLOG (133), PROGRESS 130, HANDBOOK §10 / §12-78,
+  handoff `docs/overhaul/handoff-notes/_pending_tour1_R26_today_2026-11-12.md`, lesson in `experiences/model-reports-state-page-validates.md`.
+- **FINDING (2026-11-12, same)** A26-46 did not reproduce on BASE26 with the runner's own messages, day and actions; kept as a guard.
+- **CHANGE (2026-11-15, tour 1 round 26, fixer «today», resumed after the pause)** DECISIONS_R26 clarifications C32–C37 applied to the
+  date reader and the forecast ledger: an ambiguous day now carries two dated options (`opts`) so «جمعهٔ بعد» on another weekday and
+  «آخرِ هفته / آخرِ هفتهٔ بعد» (Thursday or Friday) are asked, never guessed; ordinal days without a month («تا بیستم») are read beside a
+  deadline word and pass through C19/C12; «پنجاه‌پنجاه» = 50 %, and a vague new forecast gets one «چند درصد مطمئنی؟». The WIP snapshot
+  (docs only) was reviewed and kept. Bank #134 and #203 are checked with «جمعه» instead of «آره» because C33 replaced their single-day
+  reading (entries not edited). Files: `a41_practice.js`, `a27_tour.js` (`plan18`: field `whenAskO`), `test_tour1_r26_today.js` (+16).
+- **CHANGE (2026-11-12, learning-architecture, Pólya round 26, fixer «classify»: Q9 + Q10)** Root causes: (1) privacy masking ran only on
+  dossier events and only for minors, while titles and labels were built from the raw message — a child's school name became a chat-problem
+  title shown in 📜, «امروز» and the 🧭 strip (C26-22); (2) the second-person possessive «ـت» was converted only for hand-listed words and the
+  static text of the views never passed the register gateway; (3) the reply post-check read any «…ت + را/می‌شود», any «[بن]…ید/ین» and any
+  joined «می…ی» as register signs; (4) the mind card had no label for the prior-work source and booked an incomplete step, a refuted
+  assumption and a result the page itself marked ✗ with the wrong sign; (5) the follow-up after navigation always said «fill and build»,
+  the route read a prerequisite stack that had already moved to the live problem, and a late retrieval success jumped to the 21-day rung
+  while the line said «۱ از ۳». Fix: `A.AGE.privLabel/titleOf` applied when the title is WRITTEN (`privStore26` in the `S.put` hook) and in
+  the session dossier; page questions recognised from the view registry; `POSS26/NOTPOSS26` with a test that scans the page's own strings;
+  `regDom26` after every render; verb-stem based signs; `AS.HOLDS26`; `movedSess26`; the retrieval gap capped at the technique's own cycle
+  until its sequence is complete. C26-33 was not reproduced. Test `apps/learning-architecture/tests/test_tour1_r26_classify.js`
+  (bank Q9/Q10: 34 of 36 green, two with their reasons — #257 not built this round, #231 second half conflicts with the standing
+  one-page-question contract; 8 green on BASE26). Previous rules quarantined (`AS.R26_QUARANTINE`,
+  `PR.R26_QUARANTINE`). Lesson: `experiences/closed-word-list-vs-own-vocabulary-guard.md`.
+
+### 2026-11-15 — CHANGE — learning-architecture, Pólya round 26, fixer classify resumed after the pause
+- WIP snapshot reviewed and kept; C23–C39 re-checked (bank unchanged). Whole suite one at a time: one regression of this branch fixed
+  (`plural26` in `a27_tour.js`: an explicit «شما» with no group word is not a group address — R21 bank #152), one old assertion widened
+  to the one-register contract (`test_tour1_r25_prior` A25-10), and `test_polya_fix5` M3 red only because its hard-coded «۲۵ آبان» is
+  tomorrow on 2026-11-15 (calendar collision, not this branch).
+
+## 2026-11-12 — Tour 1 round 26, fixer «story» (Q3 + Q6, C21)
+- **FINDING** Return by naming was heard only for the last split and only when the earlier problem was live and open; an earlier chat problem
+  was replaced by the next one. The same message was then filed under the problem that was merely live (U12, B26x·D33, A26-51, C26-12).
+- **FINDING** A chat plan made before its problem was registered had no owner and was shown in the dossier of every problem of the session
+  (U13); a problem created from a sentence in the middle of a message had no boundary inside that message (D26-6).
+- **FINDING** A forecast outcome was matched to an open forecast by a coincidental number, or by «the only open one», although the confidence
+  she had just stated belonged to another forecast (U15).
+- **FINDING** Two judgements of «whole answer» existed: the story ledger asked for positive evidence, the chat stage accepted every result
+  that was not proved intermediate (U11); «چند تا اتوبوس؟» was answered by any «N تا».
+- **FINDING** 🧭, 📜 and the prior-work ledger each read `L.state === "solved"`; the page's own closure (`A.liveClosure`) said «review» (C26-2).
+- **CHANGE** `apps/learning-architecture/src/app/a45_story.js` (problem list of a conversation, naming frames, bind-or-ask, in-message
+  boundary, plan owner, problem groups, one whole-answer judgement, destination, closure wording), `a27_tour.js` (stage from the one
+  judgement, closed named focus, no stage card for a closed problem), `a40_dossier.js` (plan owner, state,
+  session dossier groups), `a44_route.js` (review state), `a41_practice.js` (one line in `t24Judge`). Tests
+  `apps/learning-architecture/tests/test_tour1_r26_story.js` (red on BASE26: 51) and `test_tour1_r26_story_bank.js`
+  (bank Q3 + Q6: 45 of 47 green, 2 noted with reasons; red on BASE26: 20). WORKLOG (135 on the branch; 132 at merge).
+- **DECISION** A result she states as her answer and that the page cannot fault (aA4 p5 «۵ متر می‌خرم») still opens look-back — its first
+  question is the check that made her find the mistake. What changed: the closure card and the prompt now show her standing answer, a result
+  the page's reader flags or a failed test never counts, and nothing is called «حل شد» before the page's own closure.
+- **PROPOSAL** Not done, with reasons, in HANDBOOK §12 and the handoff note `docs/overhaul/handoff-notes/_pending_tour1_R26_story_2026-11-12.md`.
+
+### 2026-11-15 — CHANGE — Tour 1 round 26, fixer «story», resumed after the pause (C30/C31)
+- **CHANGE** `apps/learning-architecture/src/app/a45_story.js` `frames26` / `named26FromList`: a problem named only as an analogy
+  («مثلِ/شبیهِ همون X») does not move the turn (C31, bank ambiguity 9); a datum or result in the same message that the text does not assign
+  ⇒ the page asks which (current + named) and records nothing. C30 (later unnamed messages stay with the named problem) already held and is
+  now pinned by tests. The pause snapshot was reviewed hunk by hunk: kept, with one misplaced test block moved.
+  Tests: six C30/C31 checks added to `tests/test_tour1_r26_story_bank.js` (the three C31 checks red before the change).
+
+- **CHANGE (2026-11-15, Pólya round-26 fixer «correction», Q2 + C11)** One stale engine (`a38` `staleCore25`) now serves the prior-work ledger
+  (`A.livePriorStale`), chat-only problems (`A.liveSessStale`), the strip (`A.liveCorrStale`, read by `a44`), copies (`fullCopy26`: a proposal is the
+  page's exact recomputation of the whole text or nothing) and the result block the model reads (one voice, D26-8). Marking follows written dependency,
+  not equal digits: an independent equal quantity, a measured number, or a number in a clause with another time rate («روزی» vs «دقیقه‌ای») is never
+  the corrected datum; written-result chains in her own message, unit conversions (new unit «هکتار» = 10,000 m²; roots are read in their own unit),
+  rounding and named difference lists are followed. `a27`: a correction plus a question is recorded; a ZWNJ word stays one word in the fix check; a
+  rebooked ✏️ result is judged on its final text; long change lines show the changed window. `a39`: page notices carry no data chart.
+  Tests replay the runners' own turns (`tests/tour1_r26_replay.js`, `tests/fixtures/r26_correction/`): 17 green, 2 reported not done (s07 fixture lacks
+  the edit; pwC2 needs a multi-hop population model — partial marking would print a wrong exact value). Bank VARIANTS_R26 Q2: 29/30, #48 reported
+  (today's area). WORKLOG 136 / PROGRESS 133 on this branch (assigned 131/128; renumbered at merge).
+
+## 2026-11-11 — CHANGE + FINDING: بک‌تستِ پیوسته، دورِ ۳۶ (روتینِ backtest)
+- **CHANGE** `apps/learning-architecture/backtest/corpus/round-0036.json` (۴ موردِ تازه: «دنیای جیمی» ۱۹۸۰، استدلالِ یک‌در‌۲۵۰۰ ِ درشوویتز، AP و فلوریدا ۲۰۰۰، یک انتزاعی)، قلمرو `a_modal_anti_luck` گامِ ۴ (مرز)، `reviews/round-0036.json`، WORKLOG ِ صفحه. موتور هر چهار را درست داوری کرد؛ ممیزی و کنترل‌ها تمیز.
+- **FINDING** قضیهٔ پیشنهادیِ «بهترین از m آزمون» در بازبینیِ مستقل رد شد (از A0–A4 برنمی‌آید: نتیجه به سطحی که اصلِ تقارن بر آن گذاشته شود بسته است) ⇒ پیشنهادِ قاعده ثبت نشد؛ دو یافتهٔ r35 به «خطای رمزگذاری» بازتشخیص شد.
+- **PROPOSAL** `p_territory_verify_label` (شرطِ تثبیتِ حوزهٔ قلمرو فقط با وقایعی که برچسبشان همان ایستگاه را دارد) — منتظرِ مالک.
+- **FINDING** مسیرِ ۱: قابِ Ioannidis 2005 آغاز شد و افزوده نشد (جدولِ خام در دسترس نبود). `epi-decisions` همچنان ۴۰۱ از Render.
+
+## 2026-11-12 — CHANGE + FINDING: بک‌تستِ پیوسته، دورِ ۳۷ (روتینِ backtest)
+- **CHANGE** `apps/learning-architecture/backtest/corpus/round-0037.json` (۵ موردِ تازه: فیشر ۱۹۲۹، کانت/اصلِ توازی، لئوی نهم و فرمانِ کنستانتین، والا ۱۴۴۰، یک انتزاعی)؛ بازرمزگذاریِ کورِ دو موردِ r35؛ قلمرو `a_evidentialism` گامِ ۱. پیکره پیش از `run` جدا کامیت شد.
+- **FINDING** هر پنج درست داوری شد؛ دو یافتهٔ r35 «fixed» (منتظرِ تأیید با وقایعِ تازهٔ مرتبط). بازبینیِ مستقل: ۵ مشکل، ۴ اصلاح؛ باز: آزمونِ تقارنِ بازرمزگذاری.
+- **FINDING** درس: افزودنِ `fix` پس از `run` وضع را «verified» ِ کاذب می‌گذاشت ⇒ همیشه پس از هر ویرایشِ یافته `run --rerun` (experiences/continuous-backtest-for-a-rule-based-judge.md).
+- **FINDING** مسیرِ ۱ (Ioannidis 2005) افزوده نشد؛ `epi-decisions` همچنان ۴۰۱.
+- **FINDING** گیت: `x_about_route` ِ رمزگذارِ کور روی دو موردِ r37 (فقط از پروتکلِ دوخوانشی مجاز است، test_found_mixture.js) برداشته شد؛ حکم‌ها بی تغییر.
+
+## 2026-11-14 — CHANGE + FINDING + PROPOSAL: بک‌تستِ پیوسته، دورِ ۳۸ (روتینِ backtest)
+- **CHANGE** `apps/learning-architecture/backtest/corpus/round-0038.json` (۸ موردِ تازه: زینوویف، گریسِ بیرمنگام، داو ۳۶٬۰۰۰، شیلر، رهوی، شامپولیون، دو انتزاعی)؛ قلمرو `a_evidentialism` گامِ ۲؛ `reviews/round-0038.json`.
+- **FINDING** ۷/۸ درست؛ یک هشدارِ سلامت (شامپولیون) که پس از بازبینی «اختلاف بر سرِ برچسب» ماند — تغییرِ برچسبِ پس از حکم برگردانده شد و پرونده تا بازرمزگذاریِ کورِ دوم excluded شد. آزمونِ تقارنِ بازرمزگذاری: حکم ۴/۴، ایستگاه‌ها ۲/۴.
+- **PROPOSAL** `p_field_ml2` (قابِ Many Labs 2 آماده، منتظرِ جمعیتِ تازه) و `p_retest_exclude_post_edit` — منتظرِ مالک. `epi-decisions` همچنان ۴۰۱.
+
+## 2026-11-15 — CHANGE + FINDING: ناظرِ عمومی (دورِ کامل)
+- **CHANGE** قلمروِ `sys-territory`: `ln_sleep` و `dc_goal_setting` از گامِ ۰ به ۳، هر کدام با منبعِ دومِ وارسی‌شده (Diekelmann & Born 2010 doi:10.1038/nrn2762؛ Epton et al. 2017 doi:10.1037/ccp0000260 — Crossref + PubMed). `apps/learning-architecture/territory/`، WORKLOG ‏(۲۰۲۶-۱۱-۱۵).
+- **CHANGE** `apps/learning-architecture/norms/norms.json`: `retrieved` ⇒ 2026-11-15 پس از جستجوی وب؛ هیچ عددی افزوده نشد (هیچ نامزدی شرط‌ها را نداشت)؛ جستجوها و نامزدهای آینده در `refresh_log`.
+- **FINDING** `page_map`: `/brain` در اجرای کامل «اندازه‌گیری نشد» (ناوبری به نشانیِ مطلق گزارش شد) ولی `--only /brain` بی‌خطا اندازه گرفت ⇒ ناپایداریِ ابزار، نه نقصِ محصول (همان الگوی 2026-11-01).
+- **FINDING + CHANGE** گیتِ قانونِ ۴ روی `main` ِ دست‌نخورده قرمز بود: `apps/learning-architecture/tests/test_polya_fix5.js` (M3) هر سال فقط در ۲۴ آبان شکست می‌خورد، چون «۲۵ آبان» ِ ثابتِ آزمون همان «فردا» بود و شرطِ «تاریخِ کاربر بیاید، فردا نیاید» با خودش تناقض داشت. آزمون حالا در این حالت «۲۷ آبان» را برمی‌دارد؛ کدِ محصول دست نخورد.
+- **FINDING + CHANGE** (2026-11-15, نشستِ تور، ادغامِ دورِ ۲۶) گیتِ ۴۰ روی ادغامِ هفت fixer سه شکستِ ناشی از برخوردِ سهم‌ها داشت: (۱) arith «÷» را در `norm` به « / » بدل می‌کرد و `pos/pe` ِ سنجش‌ها دو نویسه جابه‌جا می‌شد ⇒ `convs25` ِ correction تبدیلِ «۱۰۲ دقیقه» را گم کرد؛ «÷» حالا هم‌طول می‌ماند و توکن‌ساز آن را «/» ِ فاصله‌دار می‌خواند. (۲) «موقعیت» به `NOTPOSS26` رفت؛ fixture ِ C26-13 به شکلِ `coach.probs26`. (۳) sandbox ِ `test_learning_architecture_graph_browser.py` پوشهٔ `tests/fixtures/` را symlink می‌کند. علت با جفت‌آزماییِ diff ِ src ِ هر fixer روی correction پیدا شد. WORKLOG (137)، PROGRESS 134؛ درس در `experiences/exact-arithmetic-check-of-a-persons-written-work.md`.
