@@ -212,7 +212,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     // look-alike negatives: an unrelated next message (no naming) leaves the shown ❓ pending; a bare «نه» to something else is not her answer
     await scaleUp(); await addArea('s_problem', A_chg); await addArea('s_problem', A_stp);
     await reply(101, ['پاسخ به برگهٔ دستیار #۱۰۱ — ساخته شد: دو حوزهٔ تازه.']); await check();
-    await turn('نه، فردا نمی‌تونم سراغش برم؛ یه سؤال: نویزِ ۰٫۰۵ گرم با ۱۰ نمونه چقدر میشه؟', 'یک پرسش.', [cs({})]);
+    await turn('نه، فردا نمی‌تونم سراغش برم، باید برم سرِ کار.', 'باشه.', [cs({})]);
     e = await one(101); td = await todayAll(); sy = await sysMsgs();
     chk(!!e && e.st === 'wait' && !!e.ask && e.alt.length === 1 && !e.rej.length && td.some(t => /^❓/.test(t)) && !sy.some(t => MIS.test(t)), 'C54 neg: a message that names neither candidate (and a «نه» about something else) leaves the shown ❓ pending — nothing picked, nothing rejected :: ' + JSON.stringify({ e, td }));
     await scaleUp(); await addArea('s_problem', A_chg); await addArea('s_problem', A_stp);
@@ -292,10 +292,115 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     chk(!e || !e.late, 'C27-7 neg: a NEW problem after closure (no «همون … که بستیم», no «تکه») is not booked as a piece of the closed problem :: ' + JSON.stringify(e));
   });
 
-  await section('bank', async () => { if (!QI.length) { info.noBank = true; return; } });
+  await section('bank', async () => {
+    if (!QI.length) { info.noBank = true; return; }
+    // «گامِ قفل»: step «۲ — کدام روش برای باز کردنِ درِ حیاط با گوشی امن‌تر است؟» ⏸ waiting for system sheet #۱۰۵; a tie brings «احرازِ دومرحله‌ایِ بلوتوث» and «کلیدِ موقتِ زمان‌دار»
+    const STEP = '۲ — کدام روش برای باز کردنِ درِ حیاط با گوشی امن‌تر است؟';
+    const G_lock = { title: 'سنجشِ امنیتِ روش‌های باز کردنِ در با گوشی', area: 'sys-territory', kind: 'build', step: STEP, abstract: 'کسی که می‌خواهد درِ حیاط را با گوشی باز کند باید روش‌های باز کردن را از نظرِ امنیت با هم بسنجد.',
+      missing: 'حوزه‌ای برای سنجشِ امنیتِ روش‌های بازکردنِ قفلِ در با گوشی نیست.', where: 'قلمروِ سامانه‌ها — حلِ مسئله (s_problem)', how: 'حوزهٔ تازه با پرسش‌های کلیدی', why_not: 'pr_hypothesis_testing آزمونِ فرضیه است، نه سنجشِ قفل.', evidence: 'در نقشهٔ قلمرو حوزه‌ای برای قفلِ گوشی‌دار نیست.', confidence: 0.85 };
+    const D_lock = 'سنجشِ امنیتِ باز کردنِ درِ حیاط با گوشی: قفل، رمز و دسترسی';
+    const A_bt = MK('pr_lock_bt', 'احرازِ دومرحله‌ایِ بلوتوث', 'Two-step Bluetooth auth', D_lock, ['کدام قفل امن‌تر است؟']), A_tm = MK('pr_lock_tm', 'کلیدِ موقتِ زمان‌دار', 'Timed temporary key', D_lock, ['کدام قفل امن‌تر است؟']);
+    const A_smart = MK('pr_lock_smart', 'قفلِ هوشمند با کلیدِ موقت و زمان‌بندی', 'Smart lock', 'باز کردنِ درِ حیاط با گوشی به‌شکلِ امن: قفلِ هوشمند، کلیدِ موقت و زمان‌بندی', ['کدام قفلِ هوشمند امن است؟']);
+    const A_list = MK('pr_tool_list', 'نما: فهرستِ ابزارها', 'Tool list', 'کدام روش و کدام ابزار در کدام نمای سامانه است', ['کدام نما؟']);
+    const lockUp = async () => { await wipe(); await fresh(); const pid = await bind('درِ حیاط با گوشی', 'می‌خوام درِ حیاط رو با گوشی باز کنم، ولی امن باشه.');
+      await gapTurn('گامِ ۲: کدوم روش برای باز کردنِ درِ حیاط با گوشی امن‌تره؟ اینجا روشی براش هست؟', G_lock, 'نیست؛ برای ثبت بررسی می‌کنم.', [cs({ ph: 'p' })], 105); return pid; };
+    const tieL = async () => { const pid = await lockUp(); await addArea('s_problem', A_bt); await addArea('s_problem', A_tm);
+      await reply(105, ['پاسخ به برگهٔ دستیار #105 — دو حوزه ساخته شد: «احرازِ دومرحله‌ایِ بلوتوث» و «کلیدِ موقتِ زمان‌دار».']); await check(); return pid; };
+    const pick = async (msg) => { const pid = await tieL(); const e0 = await one(105); await turn(msg, 'باشه.', [cs({})]); return { pid, e0, e: await one(105) }; };
+    const got = (x, id) => !!x.e && x.e.st !== 'wait' && x.e.tool === id && !!x.e0 && !!x.e0.ask && x.e0.alt.length === 1;
+    const smartUp = async () => { const pid = await lockUp(); await addArea('s_problem', A_smart); await reply(105, ['پاسخ به برگهٔ دستیار #105 — حوزهٔ `pr_lock_smart`.']); await check(); return pid; };
+    let x, pid;
+    x = await pick('همون بلوتوثیه'); td = await todayAll(); T(1, got(x, 'pr_lock_bt') && !td.some(t => /^❓/.test(t)), { x, td });
+    x = await pick('زمان‌دار'); T(2, got(x, 'pr_lock_tm'), x);
+    x = await pick('همون «کلیدِ موقتِ زمان‌دار» ـه، نه اون یکی'); sy = await sysMsgs(); T(3, got(x, 'pr_lock_tm') && sy.filter(t => ASKED.test(t)).length === 1, { x, sy: sy.slice(-1) });
+    x = await pick('دومرحله‌ای بهتره به نظرم'); T(4, got(x, 'pr_lock_bt'), x);
+    x = await pick('دو مرحله ای'); T(5, got(x, 'pr_lock_bt'), x);
+    // 6 — one clear single best fit; an unrelated area is not offered
+    await lockUp(); await addArea('s_problem', A_smart); await addArea('s_problem', MK('pr_diary', 'یادداشتِ روزانه', 'Daily journal', 'نوشتنِ رویدادهای هر روز در دفتر', ['امروز چه شد؟']));
+    await reply(105, ['پاسخ به برگهٔ دستیار #105 — دو حوزه: `pr_lock_smart` و `pr_diary`.']); await check(); e = await one(105); sy = await sysMsgs();
+    T(6, !!e && e.st === 'arrived' && e.tool === 'pr_lock_smart' && !sy.some(t => ASKED.test(t)) && !sy.some(t => /یادداشتِ روزانه/.test(t)), { e, sy: sy.slice(-1) });
+    // 7 — frame/view-word-only overlap with a named candidate ⇒ ask (chat + Today); not answered-and-silent, not rejected
+    await lockUp(); await addArea('s_problem', A_list);
+    await reply(105, ['پاسخ به برگهٔ دستیار #105 — حوزهٔ `pr_tool_list` («نما: فهرستِ ابزارها») ساخته شد.']); await check(); e = await one(105); sy = await sysMsgs(); td = await todayAll(); nt = await notes(105);
+    T(7, !!e && e.st === 'wait' && e.ask === 'pr_tool_list' && sy.some(t => ASKED.test(t)) && !sy.some(t => MIS.test(t)) && td.some(t => /^❓/.test(t)) && !nt.length, { e, sy: sy.slice(-1), td, nt });
+    // 20 / 30 — her yes / no right after that shown ask
+    await turn('آره همونه', 'باشه.', [cs({})]); e = await one(105); T(20, !!e && e.st !== 'wait' && e.tool === 'pr_tool_list' && e.how === 'ask', e);
+    await lockUp(); await addArea('s_problem', A_list);
+    await reply(105, ['پاسخ به برگهٔ دستیار #105 — حوزهٔ `pr_tool_list` («نما: فهرستِ ابزارها») ساخته شد.']); await check();
+    await turn('نه، اون یه چیزِ دیگه‌ست', 'باشه.', [cs({})]); e = await one(105); sh = await sheet(105);
+    T(30, !!e && e.st === 'wait' && !e.tool && !e.ask && e.rej.indexOf('pr_tool_list') >= 0 && sh.status === 'open', { e, sh });
+    // 8 — take-back closes the sheet
+    await smartUp();
+    await turn('نه، این همون نیست', 'باشه.', [cs({})]); await turn('نه ببخشید، اشتباهی زدم، همون بود', 'باشه.', [cs({})]); await p.waitForTimeout(60);
+    e = await one(105); sh = await sheet(105); u = await turn('بریم', 'برگردیم.', [cs({})]);
+    T(8, !!e && e.st !== 'wait' && e.tool === 'pr_lock_smart' && sh.status === 'approved' && !/#105 «.*?» \[open/.test(sheetsLine(u)), { e, sh, l: sheetsLine(u).slice(0, 200) });
+    // 26 — a firm «نه» after arrival, no take-back
+    await smartUp();
+    await turn('نه، اصلاً به درد نمی‌خوره', 'باشه.', [cs({})]); e = await one(105); sh = await sheet(105);
+    T(26, !!e && e.st === 'wait' && e.rej.indexOf('pr_lock_smart') >= 0 && sh.status === 'open' && !(await p.evaluate(() => __status.some(z => z.st === 'approved'))), { e, sh });
+    // 9 — the sheet list in the prompt is in creation order with each current state
+    await wipe(); await fresh(); await bind('درِ حیاط با گوشی', 'می‌خوام درِ حیاط رو با گوشی باز کنم، ولی امن باشه.');
+    await p.evaluate(() => { __mk(103); __mk(104); __sheets.sh104.status = 'answered'; });
+    await gapTurn('گامِ ۲: کدوم روش برای باز کردنِ درِ حیاط با گوشی امن‌تره؟ اینجا روشی براش هست؟', G_lock, 'نیست؛ برای ثبت بررسی می‌کنم.', [cs({ ph: 'p' })], 105);
+    u = await turn('برگه‌هام چی شدن؟', 'این‌ها.', [cs({})]);
+    const sl = sheetsLine(u), ix = ['103', '104', '105'].map(n => sl.indexOf('#' + n));
+    T(9, ix.every(i => i >= 0) && ix[0] < ix[1] && ix[1] < ix[2] && /#104 «[^»]*» \[answered/.test(sl), { sl: sl.slice(0, 400) });
+    // 10 / 28 — a meta question / a reflective remark while step 2 waits: no «گذر از مرحله» credit (the model reports a phase move, as in tB1z p16)
+    for (const [k, msg] of [[10, 'سامانه برای این کار ابزاری داره؟'], [29, 'درسته، الان می‌فهمم چرا گیر کرده بودم']]) {
+      await lockUp(); await turn(msg, 'جواب.', [cs({ ph: 'c' })]);
+      const ce = await p.evaluate(() => (__cur().coachEv || []).filter(x => x && x.src === 'chatok' && x.how === 'pass').length); e = await one(105);
+      T(k, ce === 0 && !!e && e.st === 'wait', { ce, e });
+    }
+    // 11 — the context line names the turn's question, not «پیش‌نیاز»
+    await smartUp(); u = await turn('قفلِ حیاط رو امروز دیدم', 'برگردیم.', [cs({})]);
+    T(11, !/همان «پیش‌نیاز» است/.test(head(u.user)) && !/پس از پیش‌نیاز/.test(head(u.user)), head(u.user).split('\n').filter(l => /همان «/.test(l)).map(l => l.slice(0, 120)));
+    // 31 (neg) — a prerequisite really open keeps «پیش‌نیاز»
+    await lockUp(); await turn('رمزِ یک‌بارمصرف رو اصلاً نمی‌دونم چیه.', 'تشخیصی.', [cs({ ph: 'p', prereq: { concept: 'مفهومِ رمزِ یک‌بارمصرف', step: STEP, quote: 'رمزِ یک‌بارمصرف رو اصلاً نمی‌دونم چیه', q: 'رمزی که فقط یک بار کار می‌کند را دیده‌ای؟' } })]);
+    u = await turn('نه', 'باشه.', [cs({})]); const lb = head(u.user).split('\n').filter(l => /^- زمینه \(نه پرسشِ دوم؛ پرسشِ این نوبت همان «/.test(l));
+    T(32, lb.every(l => /همان «پیش‌نیاز» است/.test(l)), lb.map(l => l.slice(0, 120)));
+    // 12 / 27 — a piece after closure: Today line; closed stays closed; no meta destination; 13 — her «بازش کن» reopens
+    pid = await lockUp(); await p.evaluate((pid) => __liveSet(pid, (so, L) => { L.state = 'solved'; }), pid);
+    const G_pc = Object.assign({}, G_lock, { title: 'سنجشِ بردِ بلوتوث', step: 'سنجشِ برد بلوتوث در حیاط' });
+    await gapTurn('یه تکهٔ دیگه از همون قفل که بستیم: بردِ بلوتوث تو حیاط چقدره؟ سامانه روشی برای این داره؟', G_pc, 'نیست؛ ثبت می‌کنم.', [cs({})], 106);
+    e = await one(106); td = await todayAll(); const rt = await p.evaluate((pid) => { const M = APP.ROUTE.model(pid); return { dest: M.dest, destQ: M.destQ }; }, pid);
+    const closed = (await p.evaluate((pid) => (APP.S.get('eprog_' + pid).solve.live || {}).state, pid)) === 'solved';
+    T(12, !!e && e.late && td.some(t => /^⏸ تکهٔ «سنجشِ برد بلوتوث در حیاط»/.test(t)) && closed && !/روشی برای این داره|[؟?]$/.test(String(rt.dest || '')), { e, td, rt });
+    T(27, !/روشی برای این داره|[؟?]$/.test(String(rt.dest || '')), rt); T(28, closed && !!e && e.late, { e, closed });
+    await turn('بازش کن، می‌خوام امتحانش کنم', 'باشه.', [cs({})]);
+    const st13 = await p.evaluate((pid) => (APP.S.get('eprog_' + pid).solve.live || {}).state, pid);
+    T(13, st13 !== 'solved', { st13 });
+    // 14 — one Latin-origin bare word
+    x = await pick('بلوتوث'); T(14, got(x, 'pr_lock_bt'), x);
+    // 15 / 24 — a real tie asks naming both, chat and Today
+    await tieL(); e = await one(105); sy = await sysMsgs(); td = await todayAll();
+    const both = (t) => /احرازِ دومرحله‌ایِ بلوتوث/.test(t) && /کلیدِ موقتِ زمان‌دار/.test(t);
+    const ok15 = !!e && !!e.ask && e.alt.length === 1 && sy.filter(t => ASKED.test(t)).length === 1 && both(sy.filter(t => ASKED.test(t))[0]) && td.some(t => /^❓/.test(t) && both(t)) && !sy.some(t => ARR.test(t));
+    T(15, ok15, { e, sy: sy.slice(-1), td }); T(24, ok15, 'same fixture: two candidates sharing the same step words equally');
+    // 16 — ordinal
+    x = await pick('اولی'); T(16, got(x, x.e0 && x.e0.ask), x);
+    // 17 / 18 — after the choice: no ❓ in Today; 🧭 not «منتظرِ برگه»
+    x = await pick('همون بلوتوثیه'); td = await todayAll(); const m18 = await p.evaluate((pid) => { const M = APP.ROUTE.model(pid); return JSON.stringify({ remain: M.remain, now: M.nowFa }); }, x.pid);
+    T(17, got(x, 'pr_lock_bt') && !td.some(t => /^❓/.test(t)), { td }); T(18, got(x, 'pr_lock_bt') && !/منتظرِ برگه/.test(m18), m18);
+    // 19 — a reply naming no area at all ⇒ rejected, reopened, a line saying it named no tool
+    await lockUp(); await reply(105, ['پاسخ به برگهٔ دستیار #105 — فعلاً چیزی نساختیم.']); await check(); e = await one(105); sy = await sysMsgs(); sh = await sheet(105);
+    T(19, !!e && e.st === 'wait' && !e.ask && sh.status === 'open' && sy.some(t => MIS.test(t) && /نام نبرد/.test(t)) && !sy.some(t => ARR.test(t)), { e, sy: sy.slice(-1), sh });
+    // 21 / 22 / 23 — not a choice
+    x = await pick('همون قفلیه'); T(21, !!x.e && x.e.st === 'wait' && !!x.e.ask && x.e.alt.length === 1, x);
+    x = await pick('بلوتوثیه یعنی چی؟'); T(22, !!x.e && x.e.st === 'wait' && !!x.e.ask && x.e.alt.length === 1, x);
+    x = await pick('نمی‌دونم، هر دو خوبن'); T(23, !!x.e && x.e.st === 'wait' && !!x.e.ask && x.e.alt.length === 1 && !x.e.rej.length, x);
+    // 25 — ONE shared word only ⇒ asked, not arrived
+    await lockUp(); await addArea('s_problem', MK('pr_safe_box', 'گاوصندوقِ امن', 'Safe box', 'نگه‌داشتنِ مدارکِ امن در گاوصندوق', ['کدام گاوصندوق؟']));
+    await reply(105, ['پاسخ به برگهٔ دستیار #105 — حوزهٔ `pr_safe_box` («گاوصندوقِ امن»).']); await check(); e = await one(105);
+    T(25, !!e && e.st === 'wait' && e.ask === 'pr_safe_box' && !e.tool, e);
+    // 32 — a candidate word with no pending tie creates no arrival
+    await lockUp(); await turn('بلوتوث', 'یعنی چه؟', [cs({})]); e = await one(105); T(31, !!e && e.st === 'wait' && !e.tool && !e.ask, e);
+    // 33 — negated one and named the other in one reply
+    x = await pick('زمان‌دار نه، بلوتوثی'); T(33, got(x, 'pr_lock_bt'), x);
+  });
+
 
   await b.close();
   console.log('runners: ' + JSON.stringify(info.R7 || {})); if (process.env.DBG) console.log(JSON.stringify(info.c7post));
-  console.log('bank R7: ' + (info.noBank ? 'not present' : Object.values(info.bank).filter(Boolean).length + '/' + QI.length));
+  console.log('bank R7: ' + (info.noBank ? 'not present' : Object.values(info.bank).filter(Boolean).length + '/' + Object.keys(info.bank).length + ' tested of ' + QI.length));
   if (errors.length) { console.log('ERRORS (' + errors.length + '):\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
 })();
