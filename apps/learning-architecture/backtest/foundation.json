@@ -1,5 +1,5 @@
 {
- "round": 38,
+ "round": 39,
  "at": "2026-11-15",
  "classes": {
   "B": 25,
@@ -1136,7 +1136,7 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 302,
+    "ok": 310,
     "health_alarm": 0,
     "missed": 29,
     "mislocated": 10
@@ -1145,9 +1145,9 @@
   },
   "deg": {
    "kinds": {
-    "ok": 280,
+    "ok": 287,
     "health_alarm": 0,
-    "missed": 42,
+    "missed": 43,
     "mislocated": 19
    },
    "changed": [
@@ -1282,12 +1282,18 @@
      "t": "«نامهٔ زینوویف» و یادداشتِ اعتراضِ وزارتِ خارجهٔ بریتانیا (اکتبرِ ۱۹۲۴)",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r39_salamander_letter_1985",
+     "t": "«نامهٔ سمندر» و «نشانی از جعل نیست» (۱۹۸۴–۱۹۸۵)",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 302,
+    "ok": 310,
     "health_alarm": 0,
     "missed": 29,
     "mislocated": 10
@@ -1296,9 +1302,9 @@
   },
   "both": {
    "kinds": {
-    "ok": 280,
+    "ok": 287,
     "health_alarm": 0,
-    "missed": 42,
+    "missed": 43,
     "mislocated": 19
    },
    "changed": [
@@ -1433,6 +1439,12 @@
      "t": "«نامهٔ زینوویف» و یادداشتِ اعتراضِ وزارتِ خارجهٔ بریتانیا (اکتبرِ ۱۹۲۴)",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r39_salamander_letter_1985",
+     "t": "«نامهٔ سمندر» و «نشانی از جعل نیست» (۱۹۸۴–۱۹۸۵)",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   }
@@ -1595,8 +1607,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 178,
-   "fullAfter": 178
+   "fullBefore": 182,
+   "fullAfter": 182
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1605,8 +1617,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 178,
-   "fullAfter": 178
+   "fullBefore": 182,
+   "fullAfter": 182
   },
   "p_found_scope": null
  },
