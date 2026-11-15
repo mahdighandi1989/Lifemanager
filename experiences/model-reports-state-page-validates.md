@@ -13,6 +13,7 @@ updated_at: "2026-10-18T21:00:00Z"
 updated_at: "2026-11-11T12:00:00Z"
 updated_at: "2026-10-18T20:00:00Z"
 updated_at: "2026-10-25T09:00:00Z"
+updated_at: "2026-11-15T20:00:00Z"
 merged_from: []
 ---
 
@@ -390,3 +391,60 @@ Round 26 of the same tour showed two more forms of the same failure.
 When a user edits a value that other records were computed from, keep a dependency graph from what the user actually wrote (expressions,
 conversions, roundings) and use it for marking, proposals and the assistant's summary alike; treat unit, rate and provenance as part of a value's
 identity; and when the graph has a hole, ask rather than recompute.
+
+## Update 2026-11-15 (round 27) — dependency has a time axis; a proposal is a recomputation, never an inference
+
+- **Writing order is the cheapest dependency test.** A number written *before* the person ever stated a datum cannot be built on it, and a
+  number written *in or after* the correcting message was written with the new value. Give every record the time of the message it came
+  from (or its own form time) and most equal-digit false positives disappear without any word heuristics.
+- **An edit is her own verdict.** When she edits a bubble and leaves another occurrence of the same digit untouched, that occurrence is not the
+  datum she changed. Use the changed spans of the edit, not the digits.
+- **Units are implied by what she wrote next to the number:** an operand of a sum carries the sum's unit; «۲۵ سانته، ۲۵ ÷ ۴» restates the
+  same quantity; a magnitude word («میلیون») is part of the value. A product changes dimension, so never infer an operand's unit from a product.
+- **Propose only what you can recompute from her written expression.** Parse what she wrote first (a square, a root, «A×B (C)») so the exact
+  relation answers before any inferred one; an irrational result is shown exactly and approximately («√۲۰۸ ≈ ۱۴٫۴۲»); a rounding to
+  her digits is labelled «≈»; an operand already stale from an earlier correction enters the recomputation with its own new value.
+- **Over-tightening is a regression too:** making every inferred relation "ask only", and later dropping the cross-sentence tier, broke
+  earlier banks whose relations («۱۲ نفر … هر نفر ۳ تا، یعنی ۳۶»; «… میشه ۱۶٫۸ … پس ۲٫۱ لیتر») are her own writing. Narrow by evidence of
+  the datum (writing order, units, the edit's spans), not by deleting a tier; keep the old banks in the loop.
+- **A trailing `//` comment can swallow code.** Inserting a line before a statement that continued on the same physical line, then commenting
+  the inserted line, commented out the rest of that statement (a unit-preserving rule) — the gate caught it as «۶۰ متره مربعه». After a
+  scripted insertion, diff the touched line against the base.
+## Update 2026-11-15 — a "yes" belongs to one question; a stored sentence is never re-read against a new today
+- A confirmation word answers the newest question the page asked under its last reply, wherever it stands in the message («…، بله، لطفاً فردا …»);
+  older unanswered questions need an explicit reference ("the date is right", a button, or restating the same act). Otherwise a yes meant for the
+  assistant's other question silently books a stale date.
+- Relative dates are facts about the moment they were said. Store the anchor day with the question and never recompute "tomorrow" from a later
+  today; a question closes when its day ends or when the user reports the act done — it is never re-asked with a shifted (or next-year) date.
+- An edit turn that quotes the old text is not an answer: re-derive from the corrected text, close the old question as "replaced" (keep history),
+  and ask once for the new day. A negated day is excluded everywhere (booking, offers, answers to other questions).
+
+### How to Apply Elsewhere
+Bind every confirmation to exactly one pending question (the newest under the last reply); keep the anchor time of every relative expression and
+never re-evaluate stored text against a new clock; close stale questions instead of re-deriving them; treat edit/correction turns as data changes
+that replace questions, never as answers.
+## Update 2026-11-15 (tour 1 round 27, «story»)
+- **A short name is a title word, never any statement word.** Binding a message to a problem by a bare word at its head («مهره‌ها رو …») must match only the problem's *title*, only a word unique to one problem, and never a time/general word («هفته»، «داده»، «نتیجه»). Matching the statement bound «مهم‌ترین داده:» to a problem that said «دست داده», and «یه هفته گذشت:» to «… هفته‌ای دو بار».
+- **Drop the clipped tail of a display title before tokenising it.** A title shortened for display («… تو یه مه…») yields a fragment token («مه») that equals the stem of unrelated words («مهم» ⇒ «مه»).
+- **One record, two states:** when a record must exist at once but gains a field later (a 🎯 before its date), keep a separate pointer for the incomplete state (`fc0`) so every old check of «complete» (`fc`) keeps its meaning, and route every creation through one function that reuses the incomplete record.
+## Update 2026-11-15 (round 27, loop) — a question the page SHOWED is a question; pick the best by inclusion, not by counting
+
+- **Shown, not only asked.** The page posted «❓ … A or B?» in the chat and in Today, but read her answer only once the coach had made it
+  "this turn's question" (a key set at prompt time). Her very next message — «it's the "workshop" one» — fell through, three groups saw it.
+  Rule: a question the page displayed to the person is pending from the moment it was displayed. Her next message answers it when it names
+  or ordinal-points to a candidate; a bare yes/no answers it only if that question was the newest thing she saw before replying.
+- **Best by inclusion.** "Two shared words each ⇒ tie" asked about an obvious winner. Without inventing a threshold: candidate X is the clear
+  best when it covers every word of HER step that each rival covers, and its own description (its name removed) strictly contains each
+  rival's overlap with the need. Identical descriptions never dominate each other ⇒ a real tie stays a question; a word that only sits in
+  one candidate's NAME (often copied from the sheet title) does not break a tie.
+- **Zero weight ≠ nothing came.** Frame words ("system", "sheet", "problem") carry zero weight for "arrived", but a candidate the reply
+  NAMED and that shares only those words is still a candidate: ask, do not reject as "no shared word".
+- **Every input gets one visible outcome.** When two replies are read in one sweep, the losers are named in the arrival's record (not offered in the chat); a later «no»
+  that names a loser rejects that one, never the tool that arrived.
+- **Reproduce with the runner's own state, not a tidy fixture.** The after-closure case only failed once the session also carried the
+  chat-problem statement of the closed problem (as the real run did); a clean bound session passed and would have hidden it.
+
+### How to Apply Elsewhere
+When a UI shows a question, record "shown at" and treat the next user turn as a candidate answer, gated by explicit reference (name,
+ordinal) unless it is the newest question; prefer set inclusion over count thresholds for "clearly best"; give every incoming item one
+visible outcome; build reproductions from the logged state, including state that looks irrelevant.

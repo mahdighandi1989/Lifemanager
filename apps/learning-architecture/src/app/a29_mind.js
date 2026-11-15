@@ -361,6 +361,16 @@
   function wdFlag(v) { return v === true || (typeof v === "string" && !!v.trim()) || (!!v && typeof v === "object" && !Array.isArray(v)); }
   function wdOut(o) { return !!(o && (wdFlag(o.wd) || wdFlag(o.retracted) || wdFlag(o.withdrawn))); }
   M.wdOut = wdOut;
+  /* دورِ ۲۷ (R8، U24 s11 «− گامِ کارِ پیشین که درست نبود» برای گامِ «⚠️ ناقص» — STILL؛ بانکِ R27 #303/#318): دفترِ کارِ پیشین وقتی مسئله به مسئلهٔ زنده بسته شد
+     زیرِ کلیدِ دیگری است («L:pid» یا L.prior ِ همان مسئله) و رویداد pid ندارد ⇒ گام پیدا نمی‌شد و «ناقص» شکست شمرده می‌شد. همهٔ دفترهای همین سشن (هر کلیدِ داستان و هر
+     مسئلهٔ زندهٔ بسته به آن) دیده می‌شوند؛ گامی که نقلش همان نقلِ رویداد است حکمش را می‌دهد. */
+  function priorStep27(s, e) { var L = [], C = (s && s.coach) || {}, q = String(e.key || "").split("|").filter(Boolean).pop() || "";
+    Object.keys(C.story || {}).forEach(function (k) { var P = C.story[k] && C.story[k].prior; if (P) L.push(P); });
+    var pids = [s && s.lprob].concat(((s && s.lprobLog) || []).map(function (x) { return x && x.p; })).filter(Boolean);
+    pids.forEach(function (pid) { try { var P = A.STORY.priorFor(s, pid); if (P && L.indexOf(P) < 0) L.push(P); } catch (e0) { } });
+    var hit = null; L.some(function (P) { var c = (P.steps || []).filter(function (x) { return x && x.n === e.prior; }); if (c.length > 1 && q) c = c.filter(function (x) { return String(x.quote || "").indexOf(q.slice(0, 30)) >= 0 || q.indexOf(String(x.quote || "").slice(0, 30)) >= 0; });
+      if (c.length) { hit = c[0]; return true; } return false; });
+    return hit; }
   M.phases = function (opt) {
     var fpid = opt && opt.pid ? String(opt.pid) : "";
     var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {}, acts: [] }; });
@@ -391,6 +401,7 @@
         /* دورِ ۲۶ (Q9، U24 s11 «− گامِ کارِ پیشین که درست نبود» برای گامِ «⚠️ ناقص»؛ بانکِ R26 #237): «درست نبود» فقط گامی است که دفترِ کارِ پیشین همین حالا «نادرست» می‌داند.
            گامِ ناقص یا فقط «وابسته» شکست نیست و در کارنامه «−» نمی‌گیرد (نه + و نه −). حکم از خودِ دفتر (A.STORY.priorFor) خوانده می‌شود، نه از رویداد. */
         if (e.src === "prior" && !e.ok && e.how !== "priorfix") { try { var pl26 = A.STORY && A.STORY.priorFor ? A.STORY.priorFor(s, e.pid || "") : null, st26 = pl26 && (pl26.steps || []).filter(function (x) { return x && x.n === e.prior; })[0];
+          if (!st26) st26 = priorStep27(s, e);
           if (st26 && st26.verdict !== "wrong") return; } catch (e26) { } }
         /* دورِ ۲۶ (Q9، U46 pwB1/pwB2 «+ نتیجه‌ای که گفت» برای پیامی که صفحه خودش ✗ زده بود؛ بانکِ R26 #239): نتیجه‌ای که حسابِ صفحه در همان پیام نمی‌خواند اعتبار نمی‌گیرد
            (خوانندهٔ حسابِ a46: A.STORY.arithChk + arithNote — نه نسخهٔ محلی) */

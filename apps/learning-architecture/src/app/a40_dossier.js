@@ -82,6 +82,16 @@
   /* دورِ ۲۶ (story Q6، C26-2): «وضع: حل شد» فقط از بستنِ خودِ صفحه (A.liveClosure) — «در بازنگری — هنوز بسته نشده» حل‌شده نیست */
   function rev26(pid) { try { var c = A.liveClosure ? A.liveClosure(pid) : null; return !!(c && c.state === "review"); } catch (e) { return false; } }
   function chatPlans(se) { return ((se && se.plans) || []).filter(function (q) { return q && q.text; }); }
+  /* دورِ ۲۷ (story R5، C53؛ A27-12 s05، D27-14 pwD2): رویدادِ 📜 ِ یک پیش‌بینیِ گفت‌وگو — در پروندهٔ گفت‌وگو و (تازه) در پروندهٔ مسئله‌ای که پیش‌بینی زیرِ آن ثبت شد (x.prob)؛
+     🎯 ِ بی‌موعدِ دورِ ۲۷ (x.fc0) همان 🎯 است. own27 = مسئلهٔ همان پیش‌بینی، تا پروندهٔ هر مسئلهٔ گفت‌وگو آن را زیرِ مسئلهٔ خودش بیاورد نه زیرِ پنجرهٔ زمانی. */
+  function predFc27(x) { return x ? ((x.fc && S.get(x.fc)) || (x.fc0 && S.get(x.fc0)) || null) : null; }
+  function predEv27(se, x) { var sid = se.id, f = predFc27(x);
+        var o = x.out && x.out.res ? x.out.res : f && f.outcome ? f.outcome : "", due = (f && f.due) || x.due || "", p = f && f.p != null ? f.p : x.p, sm = x.at ? (se.msgs || []).filter(function (m) { return m && m.role === "user" && String(m.at || "") === String(x.at); })[0] : null;
+        return { k: "fcast", at: x.at || "", title: "🎯 پیش‌بینی (از گفت‌وگو)", lines: [x.text].concat(p != null ? ["اطمینان: " + fa(p) + "٪"] : []).concat(due && !o ? ["موعدِ داوری: " + val(due)] : []),
+          /* دورِ ۲۶ (Q8، B26·D32): داوری‌ای که برگشت یا عوض شد تاریخچه‌اش را در 📜 دارد (a41 PR.reverdict26: f.verdictHist) */
+          hist: f && (f.verdictHist || []).length ? f.verdictHist.map(function (h0) { return { was: h0.was || "هنوز باز", at: h0.at || "", why: h0.why || "" }; }) : undefined,
+          out: o ? o + (x.out && x.out.quote ? " — به گفتهٔ خودت: «" + clip(x.out.quote, 120) + "»" : "") + (f && (f.verdictHist || []).length ? " (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : "") : f && (f.verdictHist || []).length ? "داوری برگشت — دوباره باز (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : due ? "هنوز داوری نشده" : "هنوز داوری نشده — موعدی نگفتی", src: sm && sm.text ? msgRef(sid, A.liveMsgId ? A.liveMsgId(sm) : "") : null, own27: x.prob || null };
+  }
   function addSessEvents(add, se, opt) {
     opt = opt || {}; var pid = opt.pid || "";
     var own23 = function (at, ev) { try { return A.STORY && A.STORY.owns ? A.STORY.owns(se, pid, at, ev) : chatScope(se, pid); } catch (e) { return chatScope(se, pid); } };
@@ -120,6 +130,8 @@
       add({ k: "guess", at: g.at || "", title: "حدس (از گفت‌وگو)", lines: [g.text], out: res, hist: (g.corr || []).map(function (c) { var isRes = c.field === "res" || RAWFA[String(c.old || "").trim()] || RAWFA[String(c["new"] || "").trim()];
           return isRes ? { at: c.at, old: hv(String(c.old == null ? "" : c.old)) || "—", new: String(c["new"] || "").trim() ? hv(String(c["new"])) : "سرانجام کنار رفت — دوباره آزموده شود", why: c.note || "" } : { at: c.at, old: val(c.old), new: val(c["new"]), why: c.note || "" }; }),
         mind: g.res ? [{ row: "حدس/کالیبراسیون", sign: g.res === "confirmed" ? "+" : "−" }] : [] }); });
+    /* دورِ ۲۷ (story R5، C53؛ A27-12 s05 «دو 🎯 ِ تازه در پروندهٔ مسئله نیست»): پیش‌بینی‌های گفت‌وگو در پروندهٔ مسئلهٔ خودشان — مسئلهٔ ثبت‌شده با پیش‌بینی (x.prob)، وگرنه مالکِ لحظهٔ پیام */
+    if (pid) (((se.coach || {}).preds) || []).forEach(function (x) { if (!x || !x.text) return; var f = predFc27(x); if (f && f.prc) return; if (!(x.prob ? x.prob.pid === pid : own23(x.at || ""))) return; add(predEv27(se, x)); });
     (se.copyAsk || []).forEach(function (q) { if (pid && q.pid !== pid) return; if (q.state === "open") add({ k: "copyask", at: q.at, title: "پرسشِ صفحه: «این‌جا هم عوض شود؟»", lines: [q.label + ": " + askFa24(q.old, q.new)], out: "هنوز جواب نداده‌ای — همان «" + q.old + "» مانده" }); });
     (se.evlog || []).forEach(function (e) { if (pid && e.pid && e.pid !== pid) return; if (pid && !e.pid && A.STORY && A.STORY.owns && !own23(e.at || "", e)) return;   /* دورِ ۲۵ (P5، A25-16): خودِ رویداد هم — تکهٔ پیامِ مرزی که مالِ مسئلهٔ پیشین است (e.not25) */ add(Object.assign({}, e, { k: e.k || "act" })); });
   }
@@ -266,12 +278,7 @@
         S.all("fcast", function (f) { return f && f.prc && cs[f.prc]; }).forEach(function (f) { add({ k: "fcast", at: f.outcomeAt || f.created || "", title: "🎯 پیش‌بینی", lines: [f.q].concat(f.p != null ? ["اطمینان: " + fa(f.p) + "٪"] : []).concat(f.due ? ["موعدِ داوری: " + val(f.due)] : []),
           out: f.outcome === "yes" || f.outcome === "درست" ? "شد" : f.outcome === "no" || f.outcome === "نادرست" ? "نشد" : f.outcome ? val(f.outcome) : "هنوز داوری نشده" }); }); } } catch (e) { console.warn(e); }
     /* دورِ ۲۵ (P7، A25-14): پیش‌بینی‌های خودش در همین گفت‌وگو (a41 coach.preds) و سرانجامشان — همان یک رکورد؛ آن‌که 🎯 اش به پروندهٔ تمرینِ همین سشن بسته شد بالا آمده است */
-    try { var csP = (typeof cs === "object" && cs) || {}; (((se.coach || {}).preds) || []).forEach(function (x) { if (!x || !x.text) return; var f = x.fc ? S.get(x.fc) : null; if (f && f.prc && csP[f.prc]) return;
-        var o = x.out && x.out.res ? x.out.res : f && f.outcome ? f.outcome : "", due = (f && f.due) || x.due || "", p = f && f.p != null ? f.p : x.p, sm = x.at ? (se.msgs || []).filter(function (m) { return m && m.role === "user" && String(m.at || "") === String(x.at); })[0] : null;
-        add({ k: "fcast", at: x.at || "", title: "🎯 پیش‌بینی (از گفت‌وگو)", lines: [x.text].concat(p != null ? ["اطمینان: " + fa(p) + "٪"] : []).concat(due && !o ? ["موعدِ داوری: " + val(due)] : []),
-          /* دورِ ۲۶ (Q8، B26·D32): داوری‌ای که برگشت یا عوض شد تاریخچه‌اش را در 📜 دارد (a41 PR.reverdict26: f.verdictHist) */
-          hist: f && (f.verdictHist || []).length ? f.verdictHist.map(function (h0) { return { was: h0.was || "هنوز باز", at: h0.at || "", why: h0.why || "" }; }) : undefined,
-          out: o ? o + (x.out && x.out.quote ? " — به گفتهٔ خودت: «" + clip(x.out.quote, 120) + "»" : "") + (f && (f.verdictHist || []).length ? " (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : "") : f && (f.verdictHist || []).length ? "داوری برگشت — دوباره باز (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : due ? "هنوز داوری نشده" : "هنوز داوری نشده — موعدی نگفتی", src: sm && sm.text ? msgRef(sid, A.liveMsgId ? A.liveMsgId(sm) : "") : null }); }); } catch (e) { console.warn(e); }
+    try { var csP = (typeof cs === "object" && cs) || {}; (((se.coach || {}).preds) || []).forEach(function (x) { if (!x || !x.text) return; var f = predFc27(x); if (f && f.prc && csP[f.prc]) return; add(predEv27(se, x)); }); } catch (e) { console.warn(e); }
     ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
     var title = se.title || (first ? clip(first.text, 60) : "گفت‌وگو");
     /* دورِ ۲۱ (R4، C21-13، bank #94): سشنی که مسئلهٔ زنده دارد ⇒ عنوانِ درست و پیوند به پروندهٔ همان مسئله */
@@ -546,7 +553,9 @@
     var cur = pk === "all" ? "all" : pk && L.indexOf(pk) >= 0 ? pk : L[L.length - 1]; D.pk = cur;
     if (cur === "all") { D.pid = sid + "|all"; return D; }
     var last = L[L.length - 1], me = D.pks.filter(function (x) { return x.pk === cur; })[0];
-    D.events = D.events.filter(function (e) { if (e.k === "stmt") return false; if (!e.at) return cur === last; return at26(e.at) === cur; });
+    /* دورِ ۲۷ (story R5، C53؛ D27-14 pwD2): پیش‌بینی‌ای که مسئلهٔ خودش را دارد (own27) زیرِ همان مسئله — نه زیرِ پنجرهٔ زمانیِ پیامش */
+    var own27 = function (o) { if (!G26) return o.pk || ""; var id = o.pid ? "L:" + o.pid : ""; var g = G26.filter(function (x) { return (id && x.id === id) || (o.pk && x.pks.indexOf(o.pk) >= 0); })[0]; return g ? g.pk : ""; };
+    D.events = D.events.filter(function (e) { if (e.k === "stmt") return false; if (e.own27) { var g27 = own27(e.own27); if (g27) return g27 === cur; } if (!e.at) return cur === last; return at26(e.at) === cur; });
     var f0 = U.filter(function (m) { return at26(m.at || "") === cur; })[0];
     if (f0) D.events.unshift({ k: "stmt", at: f0.at || "", title: "آغازِ این مسئلهٔ گفت‌وگو", lines: [clip(f0.text, 400)], i: -1 });
     D.events.forEach(function (e, j) { e.i = j; });

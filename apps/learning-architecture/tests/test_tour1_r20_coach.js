@@ -86,6 +86,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     const r = APP.ASSIST.retractEdit(s, m, t);
     for (let i = 0; i < 80 && (__calls.length === n0 || APP.ASSIST.busy()); i++) await new Promise(res => setTimeout(res, 100));
     await new Promise(res => setTimeout(res, 300)); __q.length = 0;
+    /* دورِ ۲۷ (DECISIONS_R27 C58): ✏️ ِ روز ثبتِ پیشین را «جایگزین» می‌کند و روزِ تازه را یک بار می‌پرسد — همان قراردادِ __turn: «آره، همین» ِ ردیفِ 📅 زده می‌شود */
+    try { if (APP.PR && APP.PR.dateYes) APP.PR.dateYes(null, true); } catch (e27) { }
     const all = __calls.slice(n0); return { r: r && { ok: r.ok, err: r.err || '', same: !!r.same }, user: (all[0] || {}).user || '', n: all.length };
   }, [n, newText, reply || '', actions || []]);
   const E = {}; BANK.forEach((e, i) => { E[i] = e; });
