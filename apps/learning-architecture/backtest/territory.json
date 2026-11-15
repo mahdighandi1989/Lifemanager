@@ -634,7 +634,7 @@
    "history": []
   },
   "a_evidentialism": {
-   "stage": 1,
+   "stage": 2,
    "history": [
     {
      "round": 37,
@@ -642,11 +642,36 @@
      "stage": 1,
      "what": "منابعِ خوانده‌شده برای «قرینه‌گرایی»: صورت‌بندیِ محوری (EVI: S در باورِ p در زمانِ t موجه است اگر و فقط اگر قرینه‌های S در t باورِ p را پشتیبانی کند — Feldman و Conee ۱۹۸۵)، اصلِ کلیفورد (۱۸۷۷)، و اشکال‌ها: قرینهٔ فراموش‌شده، پشتیبانیِ احتمالیِ نادیده، گردآوریِ قرینه، دلایلِ عملی (جیمز ۱۸۹۶) و شکاکیت.",
      "by": "ناظرِ بک‌تست"
+    },
+    {
+     "round": 38,
+     "at": "2026-11-14",
+     "stage": 2,
+     "what": "گزاره‌های محوریِ «قرینه‌گرایی» از دو منبعِ گامِ ۱ (IEP ِ Mittag، SEP ِ Chignell) استخراج شد: صورت‌بندیِ EVI، هم‌اندازگیِ درجهٔ باور با قوتِ قرینه (لاک/کلیفورد)، ذهنی‌بودنِ قرینه، معیارِ «محتمل‌تر از نقیض» برای پشتیبانی، و جداییِ توجیهِ معرفتی از دلیلِ عملی (پاسخ به جیمز).",
+     "by": "ناظرِ بک‌تست"
     }
    ],
    "sources": [
     "Internet Encyclopedia of Philosophy, «Evidentialism» (Daniel M. Mittag) — https://iep.utm.edu/evidentialism/",
     "Stanford Encyclopedia of Philosophy, «The Ethics of Belief» (Andrew Chignell; rev. 2018) — https://plato.stanford.edu/entries/ethics-belief/"
+   ],
+   "claims": [
+    {
+     "txt": "S در باورِ p در زمانِ t موجه است اگر و فقط اگر قرینه‌های S در t باورِ p را پشتیبانی کند (و همین برای تعلیقِ حکم و انکار).",
+     "src": "IEP «Evidentialism» (Mittag)، مقدمه و §2 (EVI؛ Feldman & Conee 1985)"
+    },
+    {
+     "txt": "پشتیبانیِ قرینه در صورت‌بندیِ رایج یعنی قرینه گزاره را «محتمل‌تر از نادرستی» کند؛ قرینه فقط آن چیزی است که شخص دارد (باورها و حالت‌های ادراکی)، نه واقعیت‌های بیرون از دسترسِ او.",
+     "src": "IEP «Evidentialism» §2b–2d"
+    },
+    {
+     "txt": "درجهٔ باور باید با قوتِ قرینه هم‌اندازه باشد؛ باور بر قرینهٔ ناکافی نادرست است (اصلِ کلیفورد: «همیشه، همه‌جا و برای هر کس نادرست است که چیزی را بر قرینهٔ ناکافی باور کند»).",
+     "src": "SEP «The Ethics of Belief» §1.1، §1.2، §4.1، §5.3 (لاک، کلیفورد)"
+    },
+    {
+     "txt": "دلیلِ عملی یا اخلاقی (گزینهٔ «زنده، ناگزیر و خطیر» ِ جیمز) شاید باور را عملاً روا کند، ولی توجیهِ معرفتیِ آن را نمی‌سازد؛ این دو توجیه جدا هستند.",
+     "src": "IEP «Evidentialism» (Mittag) §3d؛ SEP «The Ethics of Belief» §2.1 (جداییِ هنجارهای عملی، اخلاقی و معرفتی)"
+    }
    ]
   },
   "a_reliabilism": {
@@ -1796,8 +1821,8 @@
    ],
    "verify": {
     "since": 13,
-    "fresh": 9,
-    "ok": 6,
+    "fresh": 10,
+    "ok": 7,
     "ids": [
      "r14_kahneman_flight_instructors",
      "r17_dewey_1948",
@@ -1807,7 +1832,8 @@
      "r35_bible_codes_genesis_1994",
      "r35_abs_food_diary_pvalue",
      "r37_fisher_plateau_1929",
-     "r37_abs_rent_plateau_loan"
+     "r37_abs_rent_plateau_loan",
+     "r38_scared_straight_1978"
     ]
    }
   },
@@ -3196,6 +3222,6 @@
    "bookOnly": true
   }
  },
- "round": 37,
- "updated": "2026-11-13"
+ "round": 38,
+ "updated": "2026-11-15"
 }

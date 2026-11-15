@@ -5111,3 +5111,8 @@ dated stability, mind-card feed) under way.
 - **FINDING** درس: افزودنِ `fix` پس از `run` وضع را «verified» ِ کاذب می‌گذاشت ⇒ همیشه پس از هر ویرایشِ یافته `run --rerun` (experiences/continuous-backtest-for-a-rule-based-judge.md).
 - **FINDING** مسیرِ ۱ (Ioannidis 2005) افزوده نشد؛ `epi-decisions` همچنان ۴۰۱.
 - **FINDING** گیت: `x_about_route` ِ رمزگذارِ کور روی دو موردِ r37 (فقط از پروتکلِ دوخوانشی مجاز است، test_found_mixture.js) برداشته شد؛ حکم‌ها بی تغییر.
+
+## 2026-11-14 — CHANGE + FINDING + PROPOSAL: بک‌تستِ پیوسته، دورِ ۳۸ (روتینِ backtest)
+- **CHANGE** `apps/learning-architecture/backtest/corpus/round-0038.json` (۸ موردِ تازه: زینوویف، گریسِ بیرمنگام، داو ۳۶٬۰۰۰، شیلر، رهوی، شامپولیون، دو انتزاعی)؛ قلمرو `a_evidentialism` گامِ ۲؛ `reviews/round-0038.json`.
+- **FINDING** ۷/۸ درست؛ یک هشدارِ سلامت (شامپولیون) که پس از بازبینی «اختلاف بر سرِ برچسب» ماند — تغییرِ برچسبِ پس از حکم برگردانده شد و پرونده تا بازرمزگذاریِ کورِ دوم excluded شد. آزمونِ تقارنِ بازرمزگذاری: حکم ۴/۴، ایستگاه‌ها ۲/۴.
+- **PROPOSAL** `p_field_ml2` (قابِ Many Labs 2 آماده، منتظرِ جمعیتِ تازه) و `p_retest_exclude_post_edit` — منتظرِ مالک. `epi-decisions` همچنان ۴۰۱.

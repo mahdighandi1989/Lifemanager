@@ -5940,6 +5940,179 @@
      "بازبینیِ دورِ 36 مشکلِ اصلاح‌نشده دارد"
     ]
    }
+  },
+  {
+   "round": 38,
+   "at": "2026-11-15",
+   "note": "دورِ ۳۸: ۸ موردِ تازه (زینوویف ۱۹۲۴، گریسِ بیرمنگام، داو ۳۶٬۰۰۰، شیلر ۲۰۰۰، رهوی، شامپولیون ۱۸۲۲، دو انتزاعی) — شامپولیون «اختلاف بر سرِ برچسب» و تا بازرمزگذاریِ کورِ دوم excluded؛ آزمونِ تقارن: حکم ۴/۴، مجموعهٔ ایستگاه‌ها ۲/۴؛ قرینه‌گرایی گامِ ۲؛ قابِ Many Labs 2 به پیشنهادِ p_field_ml2؛ بازبینیِ مستقل ۹ مشکل، ۹ اصلاح",
+   "corpus": {
+    "n": 341,
+    "tiers": {
+     "real": 224,
+     "booklet": 51,
+     "problem": 26,
+     "abstract": 40
+    },
+    "new": 7,
+    "files": 28
+   },
+   "books": {
+    "mesbah": {
+     "n": 341,
+     "sound": 105,
+     "healthAlarms": 0,
+     "failures": 236,
+     "detected": 207,
+     "located": 197,
+     "fullyLocated": 178,
+     "controls": {
+      "agree": 0.852,
+      "negAgree": 0.254,
+      "negOk": true,
+      "posDetect": 1,
+      "posOk": true
+     }
+    }
+   },
+   "findings": {
+    "open": 41,
+    "fixed": 15,
+    "resolved": 16,
+    "verified": 8
+   },
+   "coverage": {
+    "rulesTested": 58,
+    "rules": 80,
+    "sectionsTested": 55,
+    "sections": 72,
+    "domains": 12,
+    "untested": [
+     "r_truth_narrow",
+     "r_badihi_wijdani_other",
+     "r_shohud_misrouted",
+     "r_naql_unreliable_corrob",
+     "r_naql_mubham_q",
+     "r_istiqra_small_n",
+     "r_yad_orig_t1",
+     "r_yad_orig_t2",
+     "r_yad_orig_t3",
+     "r_yad_orig_t4",
+     "r_yad_orig_t5",
+     "r_yad_undoc_t4",
+     "r_yad_undoc_t3",
+     "r_yad_undoc_t2",
+     "r_yad_undoc_t1",
+     "r_grade_false_zero",
+     "r_r_sanad_ahad",
+     "r_expert_pop_econ",
+     "r_expert_pop_psych",
+     "r_expert_pop_socsci",
+     "r_expert_pop_unknown",
+     "r_aql_conseq"
+    ],
+    "byDomain": {
+     "پزشکی": 38,
+     "علم": 31,
+     "ریاضی": 30,
+     "فناوری و مهندسی": 27,
+     "زندگی روزمره": 28,
+     "دین": 27,
+     "فلسفه": 25,
+     "تاریخ و سیاست": 27,
+     "مالی و بانکی": 26,
+     "بازار و معامله": 27,
+     "حقوق و قضا": 28,
+     "رسانه و خبر": 27
+    }
+   },
+   "brier": {
+    "claims": 233,
+    "ceil": 0.29731
+   },
+   "foundation": {
+    "classes": {
+     "B": 25,
+     "S": 20,
+     "O": 8,
+     "X": 0,
+     "?": 0
+    },
+    "modes": {
+     "num": {
+      "ok": 302,
+      "health_alarm": 0,
+      "missed": 29,
+      "mislocated": 10,
+      "changed": 0
+     },
+     "deg": {
+      "ok": 280,
+      "health_alarm": 0,
+      "missed": 42,
+      "mislocated": 19,
+      "changed": 22
+     },
+     "derived": {
+      "ok": 302,
+      "health_alarm": 0,
+      "missed": 29,
+      "mislocated": 10,
+      "changed": 0
+     },
+     "both": {
+      "ok": 280,
+      "health_alarm": 0,
+      "missed": 42,
+      "mislocated": 19,
+      "changed": 22
+     }
+    },
+    "baseMeasured": 3,
+    "baseTotal": 11,
+    "baseval": {
+     "p_thiqa": 99.9,
+     "p_zahir": 99.9,
+     "p_mubham_q": 99.9,
+     "p_sense_unctrl": 74.95,
+     "p_hidden_inf": 74.95,
+     "p_expert_bias": 50,
+     "p_hidden_factor": 74.95,
+     "p_expert_econ_lab": 60,
+     "p_expert_psych08": 36.4,
+     "p_expert_socsci_ns": 60.9,
+     "p_mem": 50
+    },
+    "samples": 3,
+    "conventional": 0,
+    "audit": 0,
+    "baseChanges": []
+   },
+   "territory": {
+    "areas": 108,
+    "groups": 14,
+    "byStage": [
+     63,
+     6,
+     1,
+     2,
+     35,
+     1
+    ],
+    "bookOnly": 33,
+    "score": 159,
+    "scoreBookOnly": 132,
+    "scoreEvidenced": 27,
+    "max": 540,
+    "moved": [
+     "a_evidentialism"
+    ]
+   },
+   "routine": {
+    "newEvents": 7,
+    "newSamples": 0,
+    "staleFindings": [],
+    "alarms": []
+   }
   }
  ]
 }
