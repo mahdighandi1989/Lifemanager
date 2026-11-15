@@ -3460,6 +3460,9 @@
   function plan18(s, o, pt, key, at) {
     var td = A.today(), w = String((o && typeof o === "object" && o.when) || ""), um24 = lastUserMsg(s), ut24 = um24 ? String(um24.text || "") : "";
     if (askOnly24(ut24, pt)) return;
+    /* دورِ ۲۷ (DECISIONS_R26 C35 دوباره؛ A27-20 aA3 p4، C27-27 tC1 p3): آیندهٔ شرطی («اگر اولی را زودتر شروع کنم…»، «اگه با یه سنسور نشه…») تا خودش تعهد نکند
+       نه برنامه می‌شود نه «📌 قولِ بی‌تاریخ» */
+    if (/(?:^|[\s،,!؟?.:])(?:اگه|اگر)(?![آ-ی‌])/.test(String(pt || ""))) return;
     /* حرفِ زمان‌دارِ او در همین پیام یا دو پیامِ پیشِ خودش («از کی؟» ⇐ «از فردا»)؛ تاریخِ گذشته همچنان رد می‌شود (پایین) */
     var her24 = (s.msgs || []).filter(isUser).slice(-3).map(function (m) { return String(m.text || ""); }).join(" \n ");
     if (realDate(w) && w >= td && !HER_WHEN24.test(String(pt || "")) && !HER_WHEN24.test(her24)) w = "next-session";
