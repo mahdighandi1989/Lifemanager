@@ -13,6 +13,7 @@ updated_at: "2026-10-18T21:00:00Z"
 updated_at: "2026-11-11T12:00:00Z"
 updated_at: "2026-10-18T20:00:00Z"
 updated_at: "2026-10-25T09:00:00Z"
+updated_at: "2026-11-15T20:00:00Z"
 merged_from: []
 ---
 
@@ -426,3 +427,24 @@ that replace questions, never as answers.
 - **A short name is a title word, never any statement word.** Binding a message to a problem by a bare word at its head («مهره‌ها رو …») must match only the problem's *title*, only a word unique to one problem, and never a time/general word («هفته»، «داده»، «نتیجه»). Matching the statement bound «مهم‌ترین داده:» to a problem that said «دست داده», and «یه هفته گذشت:» to «… هفته‌ای دو بار».
 - **Drop the clipped tail of a display title before tokenising it.** A title shortened for display («… تو یه مه…») yields a fragment token («مه») that equals the stem of unrelated words («مهم» ⇒ «مه»).
 - **One record, two states:** when a record must exist at once but gains a field later (a 🎯 before its date), keep a separate pointer for the incomplete state (`fc0`) so every old check of «complete» (`fc`) keeps its meaning, and route every creation through one function that reuses the incomplete record.
+## Update 2026-11-15 (round 27, loop) — a question the page SHOWED is a question; pick the best by inclusion, not by counting
+
+- **Shown, not only asked.** The page posted «❓ … A or B?» in the chat and in Today, but read her answer only once the coach had made it
+  "this turn's question" (a key set at prompt time). Her very next message — «it's the "workshop" one» — fell through, three groups saw it.
+  Rule: a question the page displayed to the person is pending from the moment it was displayed. Her next message answers it when it names
+  or ordinal-points to a candidate; a bare yes/no answers it only if that question was the newest thing she saw before replying.
+- **Best by inclusion.** "Two shared words each ⇒ tie" asked about an obvious winner. Without inventing a threshold: candidate X is the clear
+  best when it covers every word of HER step that each rival covers, and its own description (its name removed) strictly contains each
+  rival's overlap with the need. Identical descriptions never dominate each other ⇒ a real tie stays a question; a word that only sits in
+  one candidate's NAME (often copied from the sheet title) does not break a tie.
+- **Zero weight ≠ nothing came.** Frame words ("system", "sheet", "problem") carry zero weight for "arrived", but a candidate the reply
+  NAMED and that shares only those words is still a candidate: ask, do not reject as "no shared word".
+- **Every input gets one visible outcome.** When two replies are read in one sweep, the losers are named in the arrival's record (not offered in the chat); a later «no»
+  that names a loser rejects that one, never the tool that arrived.
+- **Reproduce with the runner's own state, not a tidy fixture.** The after-closure case only failed once the session also carried the
+  chat-problem statement of the closed problem (as the real run did); a clean bound session passed and would have hidden it.
+
+### How to Apply Elsewhere
+When a UI shows a question, record "shown at" and treat the next user turn as a candidate answer, gated by explicit reference (name,
+ordinal) unless it is the newest question; prefer set inclusion over count thresholds for "clearly best"; give every incoming item one
+visible outcome; build reproductions from the logged state, including state that looks irrelevant.
