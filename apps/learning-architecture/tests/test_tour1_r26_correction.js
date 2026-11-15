@@ -11,7 +11,8 @@ const GROUP = process.env.LLA_R26_GROUP || 'B';
   for (const n of names) { const c = CASES[n]; let r;
     try { const R = await replay(b, n, { upto: c.upto || 0 }); const x = await R.p.evaluate(SNAP);
       x.unk = await R.p.evaluate(() => (APP.ASSIST.cur().coach || {}).unkBy || {});
-      if (c.strip) x.stripText = await R.p.evaluate(async () => { const s = APP.ASSIST.cur(); try { APP.go('route', s.id); } catch (e) { } await new Promise(z => setTimeout(z, 400)); let t = (document.getElementById('main') || {}).innerText || ''; const i = t.indexOf('مانده'); if (i < 0) { try { APP.ASSIST.toggle(true); } catch (e) { } await new Promise(z => setTimeout(z, 300)); t = document.body.innerText || ''; } const j = t.indexOf('مانده'); return j >= 0 ? t.slice(Math.max(0, j - 200), j + 300) : t.slice(0, 300); });
+      /* نوار همان مدلِ 🧭 است (APP.ROUTE.model — همان «مانده» که ROUTE.strip می‌نویسد): برای سشن و برای هر مسئلهٔ زندهٔ آن */
+      if (c.strip) x.stripText = await R.p.evaluate(() => { const s = APP.ASSIST.cur(), ids = [s.id].concat((APP.liveAll ? APP.liveAll() : []).map(r => r.p.id)); return ids.map(id => { try { const M = APP.ROUTE.model(id); return M ? 'مانده: ' + M.remain : ''; } catch (e) { return 'ERR ' + e.message; } }).filter(Boolean).join(' ‖ '); });
       if (R.errors.length) errors.push(n + ' page errors: ' + R.errors.join(' | '));
       r = c.check(x); await R.close(); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
     info[c.name] = !!r.ok; if (!r.ok || process.env.LLA_R26_GOT) (r.ok ? console.log : (t) => errors.push(t))(c.name + ' got ' + J(r.got).slice(0, +process.env.GOTN || 1600)); }

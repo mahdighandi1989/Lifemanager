@@ -39575,9 +39575,10 @@ APP.goFromURL = function (q) {
     if (!edit && fixQ22(own, fix) && !CORR19b.test(own)) return { err: "پرسش است، نه اصلاح" };
     if (!edit && OTHER_ERR19b.test(own) && !/(?:اشتباه|غلط)[\s‌]*(?:گفتم|نوشتم)/.test(own)) return { err: "اصلاحِ اشتباهِ دستیار یا دیگری است، نه حرفِ خودش" };
     /* دورِ ۲۶ (Q2، A26-34 tA1 fix «دقیقه‌ای ۱٫۶ لیتر» برای «… ۱٫۶ لیتر شد، نه ۲»، بانکِ R26 #50 «۱٫۶ سانت» برای «قطرش ۱٫۶ شد نه ۲»): مدل مقدارِ درست را با یکا/نامِ تکهٔ پیشین بازنویسی می‌کند —
-       صفحه می‌سنجد: هر عددِ fix در همین پیامِ اوست و هر واژهٔ دیگرش یا در همین پیام است یا در تکهٔ پیشینِ خودش (یکا/نامی که با همان داده آمده بود). */
+       صفحه می‌سنجد: هر عددِ fix در همین پیامِ اوست و هر واژهٔ دیگرش یا در همین پیام است یا در تکهٔ پیشینِ خودش (یکا/نامی که با همان داده آمده بود).
+       واژه با نیم‌فاصله‌اش یک واژه است («دقیقه‌ای»، نه «دقیقه» + «ای» — پسوندِ تنها در هیچ متنی واژه نیست). */
     var fixOk26 = !!fix && (quoteIn(fix, ut) || hasFrag(ut, fix) || hasTok20(ut, fix));
-    if (!fixOk26 && fix) { var fn26 = nums19b(fix), fw26 = String(fix).replace(/[0-9۰-۹٠-٩.٫]+/g, " ").split(/[\s‌،,؛;:«»()]+/).filter(function (w) { return w.length >= 2; }), src26 = frag + " " + txtOf(x.old);
+    if (!fixOk26 && fix) { var fn26 = nums19b(fix), fw26 = String(fix).replace(/[0-9۰-۹٠-٩.٫]+/g, " ").split(/[\s،,؛;:«»()]+/).filter(function (w) { return w.length >= 2; }), src26 = frag + " " + txtOf(x.old);
       fixOk26 = fn26.length > 0 && fn26.every(function (n) { var r = numRe19b(n); return !!r && r.test(faDigits(ut).replace(/٫/g, ".")); }) && fw26.every(function (w) { return hasTok20(ut, w) || hasTok20(src26, w); }); }
     if (!fixOk26) return { err: "مقدارِ درست در همین پیامِ او نیست" };
     var M = s.msgs || [], ui = M.indexOf(um), src = null, n = 0, i, one = tok20(frag).length <= 1;
@@ -39922,12 +39923,15 @@ APP.goFromURL = function (q) {
         ne.src20 = { sess: s.id, msg: R.curId, span: clip(sp26 != null && String(sp26).trim() ? sp26 : R.fix, 300), key: k }; delete ne.wd;
         /* دورِ ۲۶ (Q2، بانکِ R26 #45 «کلاس ۲۸ نفره، گروه‌های ۴ نفره، پس ۷ گروه» ⇒ «کلاس ۳۲ نفره … پس ۷ گروه»): نتیجه‌ای که در همان جملهٔ داده بود و عددش از همان داده حساب شده، با دادهٔ تازه
            «نتیجهٔ درست» نیست — دوباره ثبت می‌شود ولی با نشانِ کهنه (حسابِ خودِ اوست؛ صفحه بازنویسی‌اش نمی‌کند) */
-        try { if (ne.how === "res" && eS[i].span != null && typeof A.liveRestsOn === "function" && A.liveRestsOn(String(eS[i].span), D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { src: "", ctx: "", clause: R.frag, derOnly: true }) === "yes") {
+        /* دورِ ۲۶ (Q2، U6 s17 ✏️ «۲۴ × ۰.۸ = ۱۹.۲ ⇐ ۲۴ × ۰.۷ = ۱۶.۸»): سنجه روی متنِ **تازهٔ** نتیجه است — نتیجه‌ای که خودش با مقدارِ درست از نو حساب کرد بر مقدارِ پیشین بنا نیست */
+        try { if (ne.how === "res" && eS[i].span != null && typeof A.liveRestsOn === "function" && A.liveRestsOn(String(ne.src20.span), D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { src: "", ctx: "", clause: R.frag, derOnly: true }) === "yes") {
           var oS26 = D21 && D21.o ? D21.o : R.old || R.frag, nS26 = D21 && D21.n ? D21.n : R.fix; ne.stale = { at: nowIso(), by: R.curId, from: R.srcId, old: clip(oS26, 60), "new": clip(nS26, 60), why: "بر «" + clip(oS26, 40) + "» بنا بود — با «" + clip(nS26, 40) + "» دوباره حساب شود" };
           put("نتیجهٔ «" + clip(plainTx(String(eS[i].span)), 60) + "»", String(eS[i].span), "کنار رفت — " + ne.stale.why, ne.stale.why, "نتیجهٔ «" + clip(plainTx(String(eS[i].span)), 60) + "» دیگر برقرار نیست — " + ne.stale.why); } } catch (e26) { console.warn(e26); }
         add.push(ne); nR++; } });
     /* همان ✏️ با چند جفت («۰.۸ ⇐ ۰.۷»، «۱۹.۲ ⇐ ۱۶.۸»): جفتِ بعدی روی رویدادی که جفتِ پیشینِ همین نوبت دوباره ثبت کرد هم می‌نشیند */
-    EV.forEach(function (e) { if (!e || e.wd || !e.rebook || e.msg !== R.curId || e.rebook.from !== R.srcId || !e.src20 || e.src20.span == null || mine.indexOf(e) >= 0) return; var v26 = sub(String(e.src20.span), false); if (v26 != null && String(v26).trim() && v26 !== e.src20.span) e.src20.span = clip(v26, 300); });
+    EV.forEach(function (e) { if (!e || e.wd || !e.rebook || e.msg !== R.curId || e.rebook.from !== R.srcId || !e.src20 || e.src20.span == null || mine.indexOf(e) >= 0) return; var v26 = sub(String(e.src20.span), false); if (v26 != null && String(v26).trim() && v26 !== e.src20.span) { e.src20.span = clip(v26, 300);
+      /* دورِ ۲۶ (Q2، U6 s17 ✏️ «۰.۸ ⇐ ۰.۷» و «۱۹.۲ ⇐ ۱۶.۸» در یک ویرایش): نشانِ «بر مقدارِ پیشین بنا بود» که جفتِ پیشینِ همین نوبت روی متنِ نیمه‌اصلاح زد، با متنِ کامل دوباره سنجیده می‌شود */
+      try { if (e.stale && e.stale.by === R.curId && !e.stale.ask && typeof A.liveRestsOn === "function" && A.liveRestsOn(String(e.src20.span), { o: e.stale.old, n: e.stale["new"] }, { src: "", ctx: "", clause: e.stale.old, derOnly: true }) !== "yes") delete e.stale; } catch (e26) { } } });
     if (add.length) s.coachEv = EV.concat(add);
     /* دورِ ۲۳ (Q4، A23-30 oA1 «برای ۱۰ نفر: ۱۰ × ۹ ÷ ۲ = ۴۵» پس از «۱۲ نفره بود»): نتیجهٔ ثبت‌شده‌ای از پیامِ دیگرِ همان مسئله که مقدارِ پیشین را به کار برد بازنویسی نمی‌شود
        (۱۲ × ۹ ÷ ۲ نادرست است) — با دلیل کنار می‌رود («بر «۱۰» بنا بود — با «۱۲» دوباره حساب شود»)؛ رویداد پاک نمی‌شود، فقط کهنه نشان می‌خورد */
@@ -50079,6 +50083,9 @@ APP.goFromURL = function (q) {
     var rootOf = function (o) { for (var i = 0; i < pairs.length; i++) { var q = pairs[i]; if (!ucompat25(ufam(q.u), ufam(o.u)) || o.struct || !!q.pct !== !!o.pct && q.pct != null) continue; var k = q.u && o.u && UFAC[q.u] && UFAC[o.u] ? ufac(o.u) / ufac(q.u) : 1; if (veq(q.a, o.v * k)) return { q: q, st: "old" }; if (!q.nore && veq(q.b, o.v * k)) return { q: q, st: "new" }; } return null; };
     occ.forEach(function (o) { o.root = rootOf(o); });
     occ.forEach(function (o) { if (o.root && o.root.st === "old" && indep(o)) { o.twin = true; o.root = null; } });
+    /* دورِ ۲۶ (Q2، A26-34 tA1 «دبیش دقیقه‌ای ۲ لیتره» ⇐ «۱٫۶»؛ «هر روز: ۱۲ × ۲ = ۲۴ لیتر» ِ همان پیام): هم‌مقدار در بندی با نرخِ زمانیِ دیگر کمیتِ دیگری است (a38 rate26، همان سنجهٔ نسخه‌ها) */
+    var R026 = RATE26.filter(function (r) { return r[1].test(String(opt.clause || "") + " " + numParts0(D).map(function (p) { return p.o; }).join(" ")); }).map(function (r) { return r[0]; });
+    if (R026.length) occ.forEach(function (o) { if (!o.root || o.root.st !== "old" || o.zone === "given") return; var r1 = rate26(RC[o.ri].t, o); if (r1.length && !r1.some(function (x) { return R026.indexOf(x) >= 0; })) { o.twin = true; o.root = null; } });
     /* دورِ ۲۶ (Q2، D26-46 s37 / بانکِ R26 #71 «x + 4 + 8 + 7 + y = ۳۰» کنارِ «۴ نفر مهمون»): عددِ بی‌واحد در یک عبارتِ **نمادین** فقط وقتی همان داده است که شاهد داشته باشد — عددِ دیگری از همان
        بند دادهٔ همین مسئله باشد (صورت/فرمِ فهم؛ «۱۰٪» ≡ «۰٫۱») یا واژه‌ای از بندِ دادهٔ اصلاح‌شده کنارش باشد؛ وگرنه فقط هم‌رقم است */
     var GV26 = []; occ.forEach(function (o) { if (o.zone === "given" && !o.struct) GV26.push(o.pct ? o.v / 100 : o.v); });
@@ -50203,12 +50210,28 @@ APP.goFromURL = function (q) {
         var d0 = derOf(c); if (d0 && !c.given && !(c.zone === "given" && !c.mark && c.pos < d0.pos) && !c.kind && !givenOf(c) && !indep(c)) { push(c, d0.re, d0.re == null, d0.rel || "", false); grew = true; return; }
         if (givenOf(c)) return;
         if (c.zone === "work" && !c.coef && !c.kind && !c.word && chain26(c)) { c.chain = true; push(c, null, true, "", true); grew = true; return; }   // دورِ ۲۶ (Q2): زنجیرهٔ معادلهٔ نمادین ⇒ پرسش
+        /* دورِ ۲۶ (Q2، B26·D4 aB3 «… حقوق ۱۸ ضربدر ۱.۲ = ۲۱.۶. کسری ۵.۷ میلیون.»): زنجیرهٔ حاصل‌های نوشتهٔ خودش — عددِ نخستِ جمله‌ای که درست پس از جمله‌ای با دو حاصلِ نوشته
+           (پس از «=») می‌آید و دقیقاً یک عمل از آن دو حاصل است، که دست‌کم یکی‌شان کهنه است (۲۷٫۳ − ۲۱٫۶ = ۵٫۷ ⇒ ۲۷٫۳ − ۲۲٫۸ = ۴٫۵). هر دو عملوند حاصلِ نوشتهٔ همان پیام‌اند،
+           نه هم‌رقمی از جای دیگر؛ حاصلی که هیچ عملوندش کهنه نیست هرگز. */
+        if (!c.opnd && !c.mark && !c.rel && c.sent > 0 && !RC[c.ri].O.some(function (q) { return q !== c && q.sent === c.sent && q.pos < c.pos && !q.struct; })) {
+          var PR26 = RC[c.ri].O.filter(function (q) { return q.sent === c.sent - 1 && q.rel && q.rel.res === q; }), hit26 = null;
+          PR26.forEach(function (a) { PR26.forEach(function (b2) { if (hit26 || a === b2 || !(isStaleOp(a) || isStaleOp(b2))) return;
+            [["-", function (x, y) { return x - y; }], ["+", function (x, y) { return x + y; }], ["*", function (x, y) { return x * y; }], ["/", function (x, y) { return x / y; }]].forEach(function (op) {
+              if (hit26 || (op[0] === "+" || op[0] === "*") && a.pos > b2.pos) return; if (!veq(op[1](a.v, b2.v), c.v)) return; var na = newV(a), nb = newV(b2); hit26 = { re: na == null || nb == null ? null : outV25(op[1](na, nb), c, false), t: "«" + a.raw + "» " + op[0] + " «" + b2.raw + "»" }; }); }); });
+          if (hit26) { if (hit26.re != null && veq(hit26.re, c.v)) return; push(c, hit26.re, hit26.re == null, hit26.t, true); grew = true; return; } }
         if (c.opnd || c.zone === "t1" || !(c.mark || ROLE(c))) return;
         if (c.kind) return;
         /* دورِ ۲۶ (Q2): عددِ پیامِ زمینه فقط با رابطهٔ نوشته‌شدهٔ خودش (عبارت، تبدیلِ واحد، بازگفت) کهنه می‌شود — رابطهٔ حدسیِ یک‌عملی (رده‌های ج و د) در متنِ آزادِ گفت‌وگو تصادف می‌سازد */
         if (c.zone === "ctx") { /* دورِ ۲۶ (Q2، بانکِ R26 #52 «هر دور ۲۵ دقیقه‌ست، ۴ دور یعنی ۱۰۰ دقیقه»): در پیامِ خودش فقط جمله‌ای که خودِ مقدارِ اصلاح‌شده در آن است — یک عمل با همان مقدار و عددی از همان جمله */
           var rs26 = RC[c.ri].O.filter(function (q) { return q !== c && q.sent === c.sent && q.pos < c.pos && q.root && q.root.st === "old"; }); if (!rs26.length) return;
-          var cc = implicit(c, 3).filter(function () { return true; }).map(function (z) { return { re: z }; }); if (!cc.length || cc.some(function (z) { return z.re != null && veq(z.re, c.v); })) return;
+          var cc = implicit(c, 3).filter(function () { return true; }).map(function (z) { return { re: z }; });
+          /* دورِ ۲۶ (Q2، A26-34 tA1 «… یعنی ۲۶٫۵ لیتر. … دبیش دقیقه‌ای ۲ لیتره، پس روزی حدودِ ۱۳ دقیقه»): یک عمل میانِ همان مقدارِ کهنهٔ این جمله و حاصلی که خودش پیش‌تر در همین پیام
+             گفت (پس از «=»/«یعنی»)؛ با واژهٔ تقریب پیش از عدد («حدودِ»، «تقریباً»، «≈») گردکردنِ ضرب/تقسیمِ خودش پذیرفته است (C16) و مقدارِ تازه هم گرد می‌شود (۲۶٫۵ ÷ ۱٫۶ ≈ ۱۷) */
+          if (!cc.length) { var ap26 = /(?:حدود[ِ]?|تقریباً|تقریبا|≈|~)[\s‌]*$/.test(RC[c.ri].t.slice(Math.max(0, c.s - 14), c.s)), WR26 = RC[c.ri].O.filter(function (q) { return q !== c && q.pos < c.pos && q.sent <= c.sent && (q.rel && q.rel.res === q || q.mark && !q.opnd && !q.word) && !q.root && !isStaleOp(q); });
+            rs26.forEach(function (a) { WR26.forEach(function (b2) { [[function (x, y) { return y / x; }, "÷"], [function (x, y) { return x * y; }, "×"], [function (x, y) { return y - x; }, "−"], [function (x, y) { return x + y; }, "+"]].forEach(function (op) {
+              var v0 = op[0](a.v, b2.v); if (!isFinite(v0) || !(veq(v0, c.v) || ap26 && /[÷×]/.test(op[1]) && Number.isInteger(c.v) && !veq(v0, c.v) && veq(Math.round(v0), c.v))) return; var na = newV(a), nb = newV(b2), v1 = na == null || nb == null ? null : op[0](na, nb);
+              cc.push({ re: v1 == null || !isFinite(v1) ? null : ap26 && !veq(v0, c.v) ? Math.round(v1) : outV25(v1, c, false) }); }); }); }); }
+          if (!cc.length || cc.some(function (z) { return z.re != null && veq(z.re, c.v); })) return;
           var o26 = cc.every(function (z) { return z.re != null && veq(z.re, cc[0].re); }) ? cc[0].re : null; push(c, o26, o26 == null, "", true); grew = true; return; }        /* (الف۲) عبارتِ نوشته در رکوردِ دیگر با همین مقدار */
         var cand = []; RC.forEach(function (rc) { rc.R.forEach(function (r2) { if (r2.res && !veq(r2.res.v, c.v)) return; if (!r2.ops.some(isStaleOp)) return; var v0 = r2.ev(curV); if (!veq(v0, c.pct ? c.v / 100 : c.v)) return; var v1 = r2.ev(newV); cand.push({ re: isFinite(v1) ? outV25(v1, c, false) : null, name: r2.txt }); }); });
         var tierName = cand.length ? cand[0].name : "";
@@ -50688,6 +50711,13 @@ APP.goFromURL = function (q) {
       out.push({ s: m.index, e: m.index + m[0].length, t: B0.map(function (v, i) { return fmtNum(v, { fa: fa0 }) + (i < seps.length ? seps[i] : ""); }).join("") }); }
     return out;
   }
+  /* دورِ ۲۶ (Q2، A26-34 tA1 «دبیش دقیقه‌ای ۲ لیتره» ⇐ «۱٫۶»؛ «هر درختچه روزی … فکر کنم ۲ لیتر» دست نخورد): هم‌مقدار در همان یکا با نرخِ زمانیِ دیگر کمیتِ دیگری است —
+     «لیتر در دقیقه» نسخهٔ «لیتر در روز» نیست. نرخ = واژهٔ زمانیِ بندِ همان عدد («دقیقه‌ای»، «روزی»، «در ماه»، «هر هفته» …؛ بند تا «،» یا پایانِ جمله). هر دو سو نرخ دارند و
+     هیچ نرخِ مشترکی ندارند ⇒ همان واقعیت نیست؛ یک سو بی نرخ ⇒ همان سنجهٔ پیشین (صفحه حدس نمی‌زند). */
+  var RATE26 = [["min", /دقیقه[‌]?ای|(?:در|هر)[\s‌]+دقیقه/], ["hour", /ساعتی|(?:در|هر)[\s‌]+ساعت/], ["day", /(?:^|[^آ-ی])روزی(?![آ-ی])|روزانه|(?:در|هر)[\s‌]+روز(?![آ-ی])/], ["week", /هفته[‌]?ای|هفتگی|(?:در|هر)[\s‌]+هفته/], ["month", /(?:^|[^آ-ی])ماهی(?![آ-ی])|ماهانه|(?:در|هر)[\s‌]+ماه(?![آ-ی])/], ["year", /(?:^|[^آ-ی])سالی(?![آ-ی])|سالانه|(?:در|هر)[\s‌]+سال(?![آ-ی])/]];
+  function rate26(T, o) { T = String(T || ""); var a = o.s, z = o.e; while (a > 0 && !/[.!؟?؛;\n،,]/.test(T.charAt(a - 1))) a--; while (z < T.length && !/[.!؟?؛;\n،,]/.test(T.charAt(z))) z++;
+    var cl = T.slice(a, z); return RATE26.filter(function (r) { return r[1].test(cl); }).map(function (r) { return r[0]; }); }
+  function rateClash26(V, c, SO, oc) { var r1 = rate26(V, c), r0 = rate26(SO, oc); return r1.length > 0 && r0.length > 0 && !r1.some(function (x) { return r0.indexOf(x) >= 0; }); }
   function numCopy23(v, D, oldClause, oldSent) {
     var V = String(v == null ? "" : v); if (!txt(V) || !D) return null; var reps = [], SO = String(oldSent || oldClause || ""), OX = occX(SO), VX = occX(V);
     var herW = ftoks(String(oldClause || "")).filter(function (w0) { return w0.length >= 2 && !/^\d/.test(w0) && !UCAN[w0] && FUNC_W.indexOf(w0) < 0 && !numOccs(w0).length; });
@@ -50701,6 +50731,7 @@ APP.goFromURL = function (q) {
       if (uo && un && ufam(un) !== ufam(uo)) return;
       VX.forEach(function (c) { var ok = false, nv0 = pr.b.v;
         if (oc && (!!oc.range !== !!c.range || !!oc.mask !== !!c.mask || !!oc.div !== !!c.div)) return;   // دورِ ۲۴ (R3، D23-5): نقشِ مقسوم‌علیه
+        if (oc && rateClash26(V, c, SO, oc)) return;   // دورِ ۲۶ (Q2): نرخِ دیگر ⇒ کمیتِ دیگر
         if (c.u && uo) { ok = ufam(c.u) === ufam(uo) && veq(c.v * ufac(c.u), pr.a.v * ufac(uo)); nv0 = pr.b.v * ufac(un) / ufac(c.u); }
         else if (c.u && !uo && un && ufam(c.u) === ufam(un) && veq(c.v, pr.a.v)) { ok = nbrOK(c, oc, herW); nv0 = pr.b.v * ufac(un) / ufac(c.u); }
         else if (veq(c.v, pr.a.v) && !(c.u && un && ufam(c.u) !== ufam(un))) { ok = nbrOK(c, oc, herW); nv0 = uo && !c.u ? pr.b.v * ufac(un) / ufac(uo) : pr.b.v; }
@@ -50790,6 +50821,14 @@ APP.goFromURL = function (q) {
   }
   A.liveRestNum = restNum;
   function fieldKey(key) { var m = /^field:\s*(.+)$/.exec(String(key || "")); return m ? m[1].trim() : ""; }
+  /* دورِ ۲۶ (Q2، A26-34 tA1 حدسِ «فکر کنم ۲ لیتر» ِ «هر درختچه روزی چقدر آب می‌خواد —» در برابرِ «دبیش دقیقه‌ای ۲ لیتره»): متنِ حدسِ گفت‌وگو نرخش را در جملهٔ پیامِ خودش دارد —
+     نرخِ دیگر (روزی ≠ دقیقه‌ای) ⇒ کمیتِ دیگری است و پرسیده نمی‌شود؛ پیام پیدا نشد یا نرخی نیست ⇒ همان سنجهٔ پیشین */
+  function guessRateOff26(g0, D, oldClause) { try {
+    var R0 = RATE26.filter(function (r) { return r[1].test(String(oldClause || "") + " " + numParts0(D).map(function (p) { return p.o; }).join(" ")); }).map(function (r) { return r[0]; }); if (!R0.length || !g0.sess) return false;
+    var se = S.get(g0.sess), g = nz(g0.guess), M = se ? umsgs(se).filter(function (m) { return nz(m.text).indexOf(g) >= 0; }) : []; if (!M.length) return false;
+    var T = nz(M[0].text), i = T.indexOf(g), a = i; while (a > 0 && !/[.!؟?؛;\n]/.test(T.charAt(a - 1))) a--;
+    var r1 = RATE26.filter(function (r) { return r[1].test(T.slice(a, i + g.length)); }).map(function (r) { return r[0]; });
+    return r1.length > 0 && !r1.some(function (x) { return R0.indexOf(x) >= 0; }); } catch (e) { return false; } }
   function copyCands(pid, D, oldClause, key, cx) {
     var r = rec(pid); if (!r || !D) return []; var s = solOf(pgOf(pid)), L = live(s), u1 = s.u && s.u[1], out = [], fk = fieldKey(key); cx = cx || {}; var oldSent = cx.sent || "";
     var cand = function (path, label, obj, key0, page, sig) { var v = obj && obj[key0]; if (!page || typeof v !== "string" || !txt(v) || PH_RE.test(v)) return;
@@ -50815,7 +50854,7 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۳ (Q4، D23-9 oD1 «حدودِ ۰٫۳»): حدسی که بر همان داده بنا شد (از پیامِ دیگری) پیرو است — به معنا، یا وقتی مدل گفت حدس بر این داده است (rests: guess) و
        متنِ حدس همان مقدارِ پیشین را دارد؛ همیشه با «این‌جا هم عوض شود؟» (حرفِ خودش است). حدسِ آزموده‌وردشده هرگز (D23-7: نتیجهٔ ردشده بازنویسی نمی‌شود) */
     var g0 = s.g && s.g[1];
-    if (g0 && txt(g0.guess) && !g0.withdrawn && !gRefuted(g0, L) && !(cx.mid && (srcIs(g0.src, cx.sid, cx.mid) || g0.mid === cx.mid))) {
+    if (g0 && txt(g0.guess) && !g0.withdrawn && !gRefuted(g0, L) && !(cx.mid && (srcIs(g0.src, cx.sid, cx.mid) || g0.mid === cx.mid)) && !guessRateOff26(g0, D, oldClause)) {
       var n0g = out.length; cand("g.guess", "حدس", g0, "guess", true, "lpGuess");
       if (out.length === n0g && restsHas(cx.rests, "guess")) { var ng = restNum(g0.guess, D); ng = fullCopy26(g0.guess, ng, D, oldClause, function (V) { return restNum(V, D); }); if (ng != null) out.push({ pid: pid, path: "g.guess", field: "g.guess", sig: "lpGuess", label: "حدس", old: g0.guess, new: ng, named: true, d: { o: D.o, n: D.n, parts: D.parts || null } }); } }
     L.steps.forEach(function (st, i) { cand("step:" + st.id, "گامِ " + fa(i + 1), st, "text", pageSrc(st.src), "lpStep");
@@ -52218,7 +52257,8 @@ APP.goFromURL = function (q) {
       /* دورِ ۲۲ (P8، A22-16، بانکِ R22 #180): پس از بارگذاریِ دوباره پیام پیش از سشن (یا پیش از همهٔ پیام‌ها) کشیده می‌شود ⇒ رکوردش هنوز پیدا نیست؛
          نشانِ «دیده شد» برداشته و یک بار دیگر (کمی بعد) وارسی می‌شود، نه این‌که تا تغییرِ بعدیِ DOM بی نمودار بماند */
       if (!rec0 && msg.classList.contains("user") && !msg.querySelector(".mx-plot") && !(+msg.getAttribute("data-mxr") >= 5)) { msg.setAttribute("data-mxr", String((+msg.getAttribute("data-mxr") || 0) + 1)); setTimeout(function () { if (!msg.querySelector(".mx-plot") && msg.isConnected) { msg.removeAttribute("data-mxv"); scan(); } }, 300); }
-      var d = P0 ? { xl: null, yl: P0.map(function (p) { return String(p.y); }), xn: "", yn: "", rec: true } : !f && series(t); if (!d || (!d.rec && seenBefore(msg, d))) return;
+      /* دورِ ۲۶ (Q2، B s17): پیامِ خودِ صفحه (sys — مثلاً فهرستِ «عددهای حساب‌شده … کهنه») داده نیست؛ نمودارِ «داده‌های همین پیام» فقط برای پیامِ او یا مربی */
+      var d = P0 ? { xl: null, yl: P0.map(function (p) { return String(p.y); }), xn: "", yn: "", rec: true } : !f && !msg.classList.contains("sys") && series(t); if (!d || (!d.rec && seenBefore(msg, d))) return;
       var rec = rec0, extra = (rec && rec.m.plotAdd) || [], pl;
       var draw = function () {
         var nw = plot(d, extra, function (x, y) {

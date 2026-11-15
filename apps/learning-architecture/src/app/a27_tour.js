@@ -3868,9 +3868,10 @@
     if (!edit && fixQ22(own, fix) && !CORR19b.test(own)) return { err: "پرسش است، نه اصلاح" };
     if (!edit && OTHER_ERR19b.test(own) && !/(?:اشتباه|غلط)[\s‌]*(?:گفتم|نوشتم)/.test(own)) return { err: "اصلاحِ اشتباهِ دستیار یا دیگری است، نه حرفِ خودش" };
     /* دورِ ۲۶ (Q2، A26-34 tA1 fix «دقیقه‌ای ۱٫۶ لیتر» برای «… ۱٫۶ لیتر شد، نه ۲»، بانکِ R26 #50 «۱٫۶ سانت» برای «قطرش ۱٫۶ شد نه ۲»): مدل مقدارِ درست را با یکا/نامِ تکهٔ پیشین بازنویسی می‌کند —
-       صفحه می‌سنجد: هر عددِ fix در همین پیامِ اوست و هر واژهٔ دیگرش یا در همین پیام است یا در تکهٔ پیشینِ خودش (یکا/نامی که با همان داده آمده بود). */
+       صفحه می‌سنجد: هر عددِ fix در همین پیامِ اوست و هر واژهٔ دیگرش یا در همین پیام است یا در تکهٔ پیشینِ خودش (یکا/نامی که با همان داده آمده بود).
+       واژه با نیم‌فاصله‌اش یک واژه است («دقیقه‌ای»، نه «دقیقه» + «ای» — پسوندِ تنها در هیچ متنی واژه نیست). */
     var fixOk26 = !!fix && (quoteIn(fix, ut) || hasFrag(ut, fix) || hasTok20(ut, fix));
-    if (!fixOk26 && fix) { var fn26 = nums19b(fix), fw26 = String(fix).replace(/[0-9۰-۹٠-٩.٫]+/g, " ").split(/[\s‌،,؛;:«»()]+/).filter(function (w) { return w.length >= 2; }), src26 = frag + " " + txtOf(x.old);
+    if (!fixOk26 && fix) { var fn26 = nums19b(fix), fw26 = String(fix).replace(/[0-9۰-۹٠-٩.٫]+/g, " ").split(/[\s،,؛;:«»()]+/).filter(function (w) { return w.length >= 2; }), src26 = frag + " " + txtOf(x.old);
       fixOk26 = fn26.length > 0 && fn26.every(function (n) { var r = numRe19b(n); return !!r && r.test(faDigits(ut).replace(/٫/g, ".")); }) && fw26.every(function (w) { return hasTok20(ut, w) || hasTok20(src26, w); }); }
     if (!fixOk26) return { err: "مقدارِ درست در همین پیامِ او نیست" };
     var M = s.msgs || [], ui = M.indexOf(um), src = null, n = 0, i, one = tok20(frag).length <= 1;
@@ -4215,12 +4216,15 @@
         ne.src20 = { sess: s.id, msg: R.curId, span: clip(sp26 != null && String(sp26).trim() ? sp26 : R.fix, 300), key: k }; delete ne.wd;
         /* دورِ ۲۶ (Q2، بانکِ R26 #45 «کلاس ۲۸ نفره، گروه‌های ۴ نفره، پس ۷ گروه» ⇒ «کلاس ۳۲ نفره … پس ۷ گروه»): نتیجه‌ای که در همان جملهٔ داده بود و عددش از همان داده حساب شده، با دادهٔ تازه
            «نتیجهٔ درست» نیست — دوباره ثبت می‌شود ولی با نشانِ کهنه (حسابِ خودِ اوست؛ صفحه بازنویسی‌اش نمی‌کند) */
-        try { if (ne.how === "res" && eS[i].span != null && typeof A.liveRestsOn === "function" && A.liveRestsOn(String(eS[i].span), D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { src: "", ctx: "", clause: R.frag, derOnly: true }) === "yes") {
+        /* دورِ ۲۶ (Q2، U6 s17 ✏️ «۲۴ × ۰.۸ = ۱۹.۲ ⇐ ۲۴ × ۰.۷ = ۱۶.۸»): سنجه روی متنِ **تازهٔ** نتیجه است — نتیجه‌ای که خودش با مقدارِ درست از نو حساب کرد بر مقدارِ پیشین بنا نیست */
+        try { if (ne.how === "res" && eS[i].span != null && typeof A.liveRestsOn === "function" && A.liveRestsOn(String(ne.src20.span), D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { src: "", ctx: "", clause: R.frag, derOnly: true }) === "yes") {
           var oS26 = D21 && D21.o ? D21.o : R.old || R.frag, nS26 = D21 && D21.n ? D21.n : R.fix; ne.stale = { at: nowIso(), by: R.curId, from: R.srcId, old: clip(oS26, 60), "new": clip(nS26, 60), why: "بر «" + clip(oS26, 40) + "» بنا بود — با «" + clip(nS26, 40) + "» دوباره حساب شود" };
           put("نتیجهٔ «" + clip(plainTx(String(eS[i].span)), 60) + "»", String(eS[i].span), "کنار رفت — " + ne.stale.why, ne.stale.why, "نتیجهٔ «" + clip(plainTx(String(eS[i].span)), 60) + "» دیگر برقرار نیست — " + ne.stale.why); } } catch (e26) { console.warn(e26); }
         add.push(ne); nR++; } });
     /* همان ✏️ با چند جفت («۰.۸ ⇐ ۰.۷»، «۱۹.۲ ⇐ ۱۶.۸»): جفتِ بعدی روی رویدادی که جفتِ پیشینِ همین نوبت دوباره ثبت کرد هم می‌نشیند */
-    EV.forEach(function (e) { if (!e || e.wd || !e.rebook || e.msg !== R.curId || e.rebook.from !== R.srcId || !e.src20 || e.src20.span == null || mine.indexOf(e) >= 0) return; var v26 = sub(String(e.src20.span), false); if (v26 != null && String(v26).trim() && v26 !== e.src20.span) e.src20.span = clip(v26, 300); });
+    EV.forEach(function (e) { if (!e || e.wd || !e.rebook || e.msg !== R.curId || e.rebook.from !== R.srcId || !e.src20 || e.src20.span == null || mine.indexOf(e) >= 0) return; var v26 = sub(String(e.src20.span), false); if (v26 != null && String(v26).trim() && v26 !== e.src20.span) { e.src20.span = clip(v26, 300);
+      /* دورِ ۲۶ (Q2، U6 s17 ✏️ «۰.۸ ⇐ ۰.۷» و «۱۹.۲ ⇐ ۱۶.۸» در یک ویرایش): نشانِ «بر مقدارِ پیشین بنا بود» که جفتِ پیشینِ همین نوبت روی متنِ نیمه‌اصلاح زد، با متنِ کامل دوباره سنجیده می‌شود */
+      try { if (e.stale && e.stale.by === R.curId && !e.stale.ask && typeof A.liveRestsOn === "function" && A.liveRestsOn(String(e.src20.span), { o: e.stale.old, n: e.stale["new"] }, { src: "", ctx: "", clause: e.stale.old, derOnly: true }) !== "yes") delete e.stale; } catch (e26) { } } });
     if (add.length) s.coachEv = EV.concat(add);
     /* دورِ ۲۳ (Q4، A23-30 oA1 «برای ۱۰ نفر: ۱۰ × ۹ ÷ ۲ = ۴۵» پس از «۱۲ نفره بود»): نتیجهٔ ثبت‌شده‌ای از پیامِ دیگرِ همان مسئله که مقدارِ پیشین را به کار برد بازنویسی نمی‌شود
        (۱۲ × ۹ ÷ ۲ نادرست است) — با دلیل کنار می‌رود («بر «۱۰» بنا بود — با «۱۲» دوباره حساب شود»)؛ رویداد پاک نمی‌شود، فقط کهنه نشان می‌خورد */
