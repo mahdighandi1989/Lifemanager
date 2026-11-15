@@ -84,7 +84,7 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
     info.bank.n = bank.length; info.bank.q2 = Q2.length;
     const BH = require('./tour1_r27_correction_bank.js');
     const out = await BH.run({ p, ev, turn, bank, Q2, H });
-    Object.assign(info.bank, out.summary); Object.assign(info.nc, out.nc);
+    Object.assign(info.bank, out.summary, out.extra ? { extra: out.extra } : {}); Object.assign(info.nc, out.nc);
     out.fail.forEach(f => errors.push('bank ' + f));
   }
   console.log(J({ bank: info.bank, nc: info.nc }, null, 1));

@@ -4061,9 +4061,7 @@
       return hit && nz(cur) !== nz(s0) ? cur : null;
     }
     var tryRep = function (old, nw) { var re = fzRe(old); if (!re) return null; var m = re.exec(s0); if (!m) return null; var n2 = nw;
-      /* دورِ ۲۷ (R2؛ A27-8 s04 ✏️ «پنجشنبه ⇐ شنبه» روی «… شنبه می‌ذارم، نه پنجشنبه …» ⇒ «نه شنبه»): متنی که مقدارِ پیشین را نفی کرده («نه X»، «به‌جای X») خودش اصلاح را
-         گفته است — واژهٔ نفی‌شده هرگز بازنویسی نمی‌شود و آن متن نسخهٔ واقعیتِ پیشین نیست */
-      if (negated27(s0, old)) return null;   // (نیز پیش از شاخهٔ «همان واژه به شکلِ دیگر» در پایین) if (m[m.length - 1] === "" && /ه$/.test(nz(old)) && /ه$/.test(nw)) n2 = nw.replace(/ه$/, "");
+      if (m[m.length - 1] === "" && /ه$/.test(nz(old)) && /ه$/.test(nw)) n2 = nw.replace(/ه$/, "");
       /* دورِ ۲۲ (P3، بانکِ R22 #66 «اتاقم ۵۰ متر مربعه» ⇐ «۶۰ متره»): وقتی مقدارِ درست «عدد + همان واحد (یا آغازِ واحدِ متن)» است، فقط عدد عوض می‌شود و واحدِ نوشتهٔ خودش می‌ماند */
       var nO = numOccs(old), nN = numOccs(n2); if (nO.length === 1 && nN.length === 1 && txt(nz(old)) === txt(nz(String(old).slice(nO[0].s, nO[0].e)))) { var rest = ctoks(String(n2).slice(nN[0].e)), aft = ctoks(s0.slice(m.index + m[0].length, m.index + m[0].length + 60));
         if (txt(String(n2).slice(0, nN[0].s)) === "" && rest.length && rest.every(function (w, k) { return aft[k] && (aft[k] === w || aft[k].indexOf(w) === 0); })) return s0.slice(0, m.index) + String(n2).slice(nN[0].s, nN[0].e) + s0.slice(m.index + m[0].length);
@@ -4075,7 +4073,6 @@
           var iu24 = impliedUnit(s0, m.index, nN[0].u), ua24 = unitAt(String(n2), nN[0].e), raw24 = String(n2).slice(nN[0].s, nN[0].e + (ua24 ? ua24.len : 0)).trim();
           return s0.slice(0, m.index) + (iu24 && ufac(iu24) !== ufac(nN[0].u) ? raw24 : String(n2).slice(nN[0].s, nN[0].e)) + s0.slice(m.index + m[0].length); } }
       var e0 = spanGrow(s0, m.index, m.index + m[0].length, old, n2); return s0.slice(0, e0.s) + n2 + s0.slice(e0.e); };
-    if (negated27(s0, D.o)) return null;   // دورِ ۲۷ (R2، A27-8): متنی که مقدارِ پیشین را نفی کرده بازنویسی نمی‌شود — هیچ شاخه‌ای («نه پنجشنبه» ⇒ «نه شنبهه» از شاخهٔ ریشهٔ واژه)
     if (D.win && D.winN && nz(D.win) !== nz(D.o)) { var w = tryRep(D.win, D.winN); if (w != null) return w; }
     var r0 = tryRep(D.o, D.n); if (r0 == null && D.alt && nz(D.alt.o) !== nz(D.o)) r0 = tryRep(D.alt.o, D.alt.n);   // دورِ ۲۰ (RO4): تکهٔ عینی با نشانه‌گذاری ⇐ همان تکه بی نشانه‌گذاری
     /* دورِ ۲۲ (P3، بانکِ R22 #80 «طرحش ⇐ بودجه‌ش» در «تحویلِ طرحِ کارگاه»): یک واژه به شکلِ دیگرش (ضمیر/کسرهٔ اضافه) — همان واژه، با پسوندِ نوشتهٔ خودِ رکورد */
@@ -4617,9 +4614,10 @@
       rc.O.forEach(function (o) { if (o.u || o.u27 || o.word || o.struct) return; var pv = rc.O.filter(function (q) { return q !== o && q.s < o.s && q.sent === o.sent && q.u && UFAC[q.u] && veq(q.v, o.v); }).pop(); if (pv) o.u27 = pv.u; }); });
     /* … و بزرگیِ عدد («۴ میلیون») بخشی از مقدار است: عددِ با «هزار/میلیون/میلیارد» همان داده‌ای نیست که بی آن آمده («۴ نفریم» ⇐ «۵»؛ بانکِ R27 #70) */
     var MAGRE27 = /^[\s\u200c]*(?:هزار|میلیون|میلیارد|میلیار)(?![\u0621-\u06cc])/, dTxt27 = String(opt.clause || "") + " " + numParts0(D).map(function (p) { return p.o + " " + p.n; }).join(" ");
-    var magIn27 = function (v) { return numOccs(dTxt27).some(function (x) { return veq(x.v, v) && MAGRE27.test(dTxt27.slice(x.e, x.e + 14)); }); };
+    /* بزرگیِ خودِ داده: پس از مقدارِ پیشینِ جفت در بندِ او / متنِ اصلاح (نه هر عددِ هم‌رقمِ آن بند — «۴ میلیون» کنارِ «۵ نفریم») */
+    var magIn27 = function (q) { return numOccs(dTxt27).some(function (x) { return veq(x.v, q.a) && MAGRE27.test(dTxt27.slice(x.e, x.e + 14)); }); };
     occ.forEach(function (o) { o.root = rootOf(o);
-      if (o.root && !o.u && MAGRE27.test(RC[o.ri].t.slice(o.e, o.e + 14)) && !magIn27(o.v)) { o.eq27 = true; o.root = null; }
+      if (o.root && !o.u && MAGRE27.test(RC[o.ri].t.slice(o.e, o.e + 14)) && !magIn27(o.root.q)) { o.eq27 = true; o.root = null; }
       if (o.root && !o.u && o.u27) { var q = o.root.q, qu = q.u && UFAC[q.u] ? q.u : ""; if (!qu) { var qw27 = (new RegExp("(?:^|[^0-9۰-۹٠-٩.٫])" + "[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?" + "[\\s\\u200c]*(ثانیه|دقیقه|ساعت|روز|هفته|ماه|سال)").exec(String(opt.clause || "") + " " + numParts0(D).map(function (p) { return p.o; }).join(" ")) || [])[1], UW27 = { min: "دقیقه", hr: "ساعت", day: "روز", wk: "هفته" };
           if ((q.u && q.u !== o.u27) || (qw27 && UW27[o.u27] && UW27[o.u27] !== qw27)) { o.eq27 = true; o.root = null; } return; } var qa = o.root.st === "old" ? q.a : q.b;   // یکای بیرونِ جدولِ تبدیل («ثانیه»): نامِ دیگر ⇒ کمیتِ دیگر
         if (ufam(o.u27) !== ufam(qu) || !veq(o.v * ufac(o.u27), qa * ufac(qu))) { o.eq27 = true; o.root = null; } } });
@@ -4720,10 +4718,15 @@
         /* دورِ ۲۶ (Q2، D26-8 pwD1 «۵۷ = ۵۵ + ۲» که ۵۵ پس از آن نوشته شده؛ C25-4 pwC1 «۴ تا پنل» = «۸ ساعت» ÷ «۲ هکتار»): در ردهٔ (د) عملوند باید پیش از این عدد نوشته شده باشد */
         if (tier === 4 && !plain && !occ.some(function (q) { return q !== c && before26(q, c, home) && (q.der || q.root || derOf(q)) && veq(q.v, d.v); })) return;
         if (tier !== 4 && !plain && !RC[c.ri].O.some(function (q) { return q !== c && q.pos < c.pos && (q.sent === c.sent || q.sent === c.sent - 1) && (q.der || q.root || derOf(q)) && veq(q.v, d.v); })) return; X.push({ v: d.v, re: d.re, f: d.f, pct: !!d.pct, kind: "" , d: d }); });
-      var Y = occ.filter(function (y) { return y !== c && y.pos < c.pos && !y.struct && !y.root && !veq(y.v, c.v) && !(y.der || (derOf(y) && !y.given)) && (tier === 4 || y.ri === c.ri && y.sent === c.sent || staleSent(y)) && (y.zone !== "ctx" || tier !== 4 && staleSent(y) || y.ri === home); })
-        .map(function (y) { return { v: y.v, re: !plain && unc(y) ? null : y.v, f: fam25(y), pct: y.pct, kind: y.kind || "", ri: y.ri }; });
+      var Y = occ.filter(function (y) { return y !== c && y.pos < c.pos && !y.struct && !y.fresh27 && !y.root && !veq(y.v, c.v) && !(y.der || (derOf(y) && !y.given)) && (tier === 4 || y.ri === c.ri && y.sent === c.sent || staleSent(y)) && (y.zone !== "ctx" || tier !== 4 && staleSent(y) || y.ri === home); })
+        .map(function (y) { return { v: y.v, re: !plain && unc(y) ? null : y.v, f: fam25(y), pct: y.pct, kind: y.kind || "", ri: y.ri, mag27: !!mag27(y) }; });
+      var cMag27 = mag27(c); X.forEach(function (x) { if (x.mag27 == null) x.mag27 = x.d ? !!x.d.mag : (x.q ? numOccs(dTxt27).some(function (z) { return veq(z.v, x.q.a) && MAGRE27.test(dTxt27.slice(z.e, z.e + 14)); }) : false); });
       X.forEach(function (x, i) { if (veq(x.v, c.v) && !!x.pct === !!c.pct) return;
+
         X.concat(Y).forEach(function (y, j) { if (j <= i) return;
+          /* دورِ ۲۷ (R2، C66؛ بانکِ R27 #67/#99 «پس با ۲ میلیون بودجه کافیه» ⇒ ۲ = ۱۲ ÷ ۶): بزرگیِ حاصل («میلیون») از یکی از عملوندها می‌آید — در رده‌های (ج) و (د) رابطه‌ای که هیچ
+             عملوندش بزرگی ندارد برای عددِ «… میلیون» هم‌رقمی است، نه وابستگی */
+          if (!plain && cMag27 && !(x.mag27 || y.mag27)) return;
           OPS.forEach(function (op) { if (!dimOk(op[0], x.f, y.f, fam25(c), x.kind, y.kind)) return;
             if (tier === 4 && !plain && /[*\/]/.test(op[0]) && x.f && fam25(c) && x.f !== fam25(c) && x.f !== "pct" && fam25(c) !== "pct" && y.f && y.f !== "pct" && y.f !== x.f && y.f !== fam25(c)) return;   // سه جنسِ گوناگون با یک ضرب/تقسیم از هر جای مسئله: حدس است، نه رابطه
             if (tier === 4 && !plain && /[*\/]/.test(op[0]) && !fam25(c) && x.f && y.f && x.f !== y.f && x.f !== "pct" && y.f !== "pct" && (PHYS25[x.f] || PHYS25[y.f])) return;
@@ -4758,10 +4761,12 @@
     occ.forEach(function (o) { if (o.root || o.struct || o.pct || o.der || o.word || o.u) return; var pr = RC[o.ri].O.filter(function (q) { return q.sent === o.sent && q.pct && q.root && q.root.st === "old" && !q.root.q.nore; })[0]; if (!pr) return; var q = pr.root.q;
       [[1, "+"], [-1, "−"]].forEach(function (sg) { if (o.der || !veq(o.v, 1 + sg[0] * q.a / 100)) return; push(o, +(1 + sg[0] * q.b / 100).toPrecision(10), false, "۱ " + sg[1] + " «" + pr.raw + "»", true); if (o.der) o.der.loc27 = { ri: o.ri, sent: o.sent }; }); });
     for (var pass = 0, grew = true, t4 = false; pass < 12 && (grew || !t4); pass++) { if (!grew) t4 = true; grew = false;
-      DIFFS26.forEach(function (c) { if (c.der || c.root || c.fresh27) return; var a = c.diffOf[0], b = c.diffOf[1]; if (!isStaleOp(a) && !isStaleOp(b)) return; var na = newV(a), nb = newV(b), re = na == null || nb == null ? null : outV25(Math.abs(nb - na), c, false);
+      DIFFS26.forEach(function (c) { if (c.der || c.root || c.fresh27 || (ord27 && ord27.preAt && RC[c.ri].at && RC[c.ri].at < ord27.preAt && RC[c.ri].zone !== "given")) return; var a = c.diffOf[0], b = c.diffOf[1]; if (!isStaleOp(a) && !isStaleOp(b)) return; var na = newV(a), nb = newV(b), re = na == null || nb == null ? null : outV25(Math.abs(nb - na), c, false);
         if (re != null && veq(re, c.v)) { c.given = true; return; } c.root = null; push(c, re, re == null, "تفاضلِ «" + a.raw + "» و «" + b.raw + "»", true); grew = true; });
       occ.forEach(function (c) {
         if (c.pos <= firstOld || c.root || c.struct || c.der || c.fresh27) return;   // دورِ ۲۷ (C47): نوشته با مقدارِ درست
+        /* دورِ ۲۷ (R2، C47؛ D27-24 s37 گام‌های فرمِ «بر ۴ … ۷۲ یا ۷۶» که پیش از «رقمِ اول ۴» نوشته شدند): عددِ رکوردی که پیش از نخستین پیامِ داده نوشته شد از آن ساخته نشده است */
+        if (ord27 && ord27.preAt && RC[c.ri].at && RC[c.ri].at < ord27.preAt && RC[c.ri].zone !== "given") return;
         /* (الف) حاصلِ نوشتهٔ همین رکورد */
         if (c.rel && c.rel.res === c) { var r = c.rel, vOld = r.ev(curV);
           if (eqR25(vOld, c, r.approx) && r.ops.some(isStaleOp)) { var vNew = r.ev(newV), rounded = !veq(vOld, c.pct ? c.v / 100 : c.v), re = isFinite(vNew) && !dupSum(r) ? outV25(vNew, c, rounded) : null;
@@ -4810,10 +4815,10 @@
         var cand = []; RC.forEach(function (rc) { rc.R.forEach(function (r2) { if (r2.res && !veq(r2.res.v, c.v)) return; if (!r2.ops.some(isStaleOp)) return; var v0 = r2.ev(curV); if (!veq(v0, c.pct ? c.v / 100 : c.v)) return; var v1 = r2.ev(newV); cand.push({ re: isFinite(v1) ? outV25(v1, c, false) : null, name: r2.txt }); }); });
         var tierName = cand.length ? cand[0].name : "";
         if (!cand.length) { cand = wordRel(c); tierName = cand.length ? cand[0].name : ""; }
-        /* دورِ ۲۷ (R2، C47/C66): ردهٔ (ج) رابطهٔ همان جمله است («۱۲ نفر … هر نفر ۳ تا، یعنی ۳۶») — فقط وقتی جملهٔ همین عدد خودش مقدارِ اصلاح‌شده (یا حاصلِ کهنه‌ای) را دارد؛
-           جفتِ اصلاح به‌تنهایی در جمله‌ای که آن را ندارد هم‌رقمی است (D27-24 «۷۲ = ۴ × ۱۸»). ردهٔ (د) — یک عمل با عددی از هر جای مسئله — وابستگیِ ثبت‌شده نیست و نشان نمی‌زند
-           (C27-23 «۹٫۴ ⇒ ۱۰ پنل ⇒ ۱۲٫۵»، D27-30 «۱۷ = ۱۵ + ۲ ⇒ ۱۴»). قاعدهٔ پیشین (ردهٔ د برای نامزدِ کهنگی): docs/overhaul/REMOVAL_CANDIDATES.md — implicit(c, 4) دست نخورده و هنوز برای «عملوندِ نامعلوم» (unc) به کار می‌رود */
-        var imp27 = false; if (!cand.length && staleSent(c)) { cand = implicit(c, 3).map(function (z) { return { re: z }; }); }
+        /* دورِ ۲۷ (R2، C47/C66): رده‌های (ج) و (د) می‌مانند (زنجیرهٔ نوشتهٔ او میانِ جمله‌ها و پیام‌ها؛ برداشتنشان نُه ورودیِ بانک‌های R24–R26 را می‌شکست) — ولی رکوردی که پیش از
+           نخستین پیامِ داده نوشته شد هرگز نامزد نیست (پایینِ همین حلقه، pre27c)؛ D27-30 اکنون از عبارتِ نوشتهٔ «√(۱۵² + ۸²)» (ردهٔ الف) پیش از آن جواب می‌گیرد. */
+        var imp27 = false; if (!cand.length) { cand = implicit(c, 3).map(function (z) { return { re: z }; }); }
+        if (!cand.length && t4) { cand = implicit(c, 4).map(function (z) { return { re: z }; }); }
         if (dbg) dbg.push({ v: c.v, k: RC[c.ri].k, cand: cand });
         /* دورِ ۲۶ (Q2، D25-19 s36 «۰٫۱×۲۰ + ۰٫۲۵×ح = ۰٫۱۵(۲۰+ح) ⇒ ۰٫۱ح = ۱ ⇒ ح = ۱۰»): نتیجهٔ یک زنجیرهٔ «⇒» که معادلهٔ نمادینِ آغازش مقدارِ کهنه را دارد به آن وابسته است؛ صفحه جبر را حساب نمی‌کند ⇒ می‌پرسد */
         /* دورِ ۲۶ (Q2، s17 «۲۴ × ۰.۷ = ۱۶.۸ مترمکعب، پس یه مخزن بتنی ۱۷ مترمکعبی»): عددِ صحیحی که گردِ بالا/پایینِ یک حاصلِ کهنهٔ هم‌جنس در همان پیام است از آن برداشته شده — انتخابِ خودِ اوست، صفحه عدد پیشنهاد نمی‌کند، می‌پرسد */
@@ -5455,7 +5460,9 @@
     return r1.length > 0 && !r1.some(function (x) { return R0.indexOf(x) >= 0; }); } catch (e) { return false; } }
   function copyCands(pid, D, oldClause, key, cx) {
     var r = rec(pid); if (!r || !D) return []; var s = solOf(pgOf(pid)), L = live(s), u1 = s.u && s.u[1], out = [], fk = fieldKey(key); cx = cx || {}; var oldSent = cx.sent || "";
-    var cand = function (path, label, obj, key0, page, sig) { var v = obj && obj[key0]; if (!page || typeof v !== "string" || !txt(v) || PH_RE.test(v)) return;
+    /* دورِ ۲۷ (R2؛ A27-8 s04 ✏️ «پنجشنبه ⇐ شنبه» روی «… شنبه می‌ذارم، نه پنجشنبه …» ⇒ «نه شنبه»): پرسشِ «این‌جا هم عوض شود؟» هرگز برای متنی نیست که مقدارِ پیشین را
+       نفی کرده («نه X»، «به‌جای X») — آن متن خودش اصلاح را گفته است و واژهٔ نفی‌شده بازنویسی نمی‌شود (negated27) */
+    var cand = function (path, label, obj, key0, page, sig) { var v = obj && obj[key0]; if (!page || typeof v !== "string" || !txt(v) || PH_RE.test(v) || negated27(v, D.o)) return;
       var named = !!fk && (fk === path || fk === sig || fk === path.replace(/^[a-z]+[.:]/, "") || ("lpD_" + path.replace(/^dl:/, "")) === fk);
       /* دورِ ۲۲ (P3): اصلاحِ عددی ⇒ فقط «همان واقعیت به معنا» (numCopy: مقدار + واحد، یا همسایهٔ مشترک) — نه جایگزینیِ نوشتاریِ عددِ تنها («بر ۴»)؛
          اصلاحِ واژه‌ای ⇒ جایگزینیِ کمینه + سنجشِ دو سو، و اگر تکه با یکی دو واژهٔ میانی آمده، همان بازه (subseqFix) */
@@ -5578,7 +5585,7 @@
         "new": "کهنه پس از اصلاح — با «" + clip(nT, 30) + "» دوباره حساب شود" + (reF.length ? " (" + reF.join("، ") + ")" : "") + (askF.length ? " — «" + askF.join("، ") + "»: از «" + clip(oT, 30) + "» حساب شده بود؟ (صفحه رابطه‌اش را نشناخت و عددی پیشنهاد نمی‌کند)" : ""), why: "این عددها در نوشتهٔ خودش حاصلِ حساب از «" + clip(oT, 30) + "» بودند" }; } catch (e) { console.warn(e); return null; } };
   function sessCands(se, D, srcT, R) {
     var sid = se.id, oc0 = fragClause(srcT, D), st0 = fragSent(srcT, D), numD = isNumD(D), out = [];
-    var mk = function (path, label, v, alsoRests) { if (!txt(v)) return; var nv = numD ? numCopy(v, D, oc0, st0) : null; if (nv == null && !numD) { nv = fixVal(v, D); if (nv != null && !sameFact(v, D, oc0)) nv = null; }
+    var mk = function (path, label, v, alsoRests) { if (!txt(v) || negated27(v, D.o)) return; var nv = numD ? numCopy(v, D, oc0, st0) : null; if (nv == null && !numD) { nv = fixVal(v, D); if (nv != null && !sameFact(v, D, oc0)) nv = null; }
       if (nv == null && alsoRests && numD && restsHas(R.rests, "guess")) nv = restNum(v, D);
       if (numD) nv = fullCopy26(v, nv, D, oc0, function (V) { var x = numCopy(V, D, oc0, st0); if (x == null && alsoRests && restsHas(R.rests, "guess")) x = restNum(V, D); return x; });   // دورِ ۲۶ (Q2، C11؛ C26-35)
       if (nv == null || nz(nv) === nz(v)) return;

@@ -390,3 +390,22 @@ Round 26 of the same tour showed two more forms of the same failure.
 When a user edits a value that other records were computed from, keep a dependency graph from what the user actually wrote (expressions,
 conversions, roundings) and use it for marking, proposals and the assistant's summary alike; treat unit, rate and provenance as part of a value's
 identity; and when the graph has a hole, ask rather than recompute.
+
+## Update 2026-11-15 (round 27) — dependency has a time axis; a proposal is a recomputation, never an inference
+
+- **Writing order is the cheapest dependency test.** A number written *before* the person ever stated a datum cannot be built on it, and a
+  number written *in or after* the correcting message was written with the new value. Give every record the time of the message it came
+  from (or its own form time) and most equal-digit false positives disappear without any word heuristics.
+- **An edit is her own verdict.** When she edits a bubble and leaves another occurrence of the same digit untouched, that occurrence is not the
+  datum she changed. Use the changed spans of the edit, not the digits.
+- **Units are implied by what she wrote next to the number:** an operand of a sum carries the sum's unit; «۲۵ سانته، ۲۵ ÷ ۴» restates the
+  same quantity; a magnitude word («میلیون») is part of the value. A product changes dimension, so never infer an operand's unit from a product.
+- **Propose only what you can recompute from her written expression.** Parse what she wrote first (a square, a root, «A×B (C)») so the exact
+  relation answers before any inferred one; an irrational result is shown exactly and approximately («√۲۰۸ ≈ ۱۴٫۴۲»); a rounding to
+  her digits is labelled «≈»; an operand already stale from an earlier correction enters the recomputation with its own new value.
+- **Over-tightening is a regression too:** making every inferred relation "ask only", and later dropping the cross-sentence tier, broke
+  earlier banks whose relations («۱۲ نفر … هر نفر ۳ تا، یعنی ۳۶»; «… میشه ۱۶٫۸ … پس ۲٫۱ لیتر») are her own writing. Narrow by evidence of
+  the datum (writing order, units, the edit's spans), not by deleting a tier; keep the old banks in the loop.
+- **A trailing `//` comment can swallow code.** Inserting a line before a statement that continued on the same physical line, then commenting
+  the inserted line, commented out the rest of that statement (a unit-preserving rule) — the gate caught it as «۶۰ متره مربعه». After a
+  scripted insertion, diff the touched line against the base.

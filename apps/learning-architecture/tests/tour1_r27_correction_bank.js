@@ -25,7 +25,7 @@ async function run(ctx) {
   /* ---- C48: «X نه Y» و نقلِ پیشینی که هر دو عدد را دارد ---- */
   C[69] = async () => { await scen({ prior: [RES('۱۲ تا بسته دارم، هر بسته ۰٫۴ کیلو، پس ۱۲ × ۰٫۴ = ۴٫۸ کیلو')], stmtChat: '۱۲ تا بسته دارم، هر بسته ۰٫۴ کیلو' });
     await turn('اولش نوشتم هر بسته ۰٫۴ کیلوئه؛ اشتباه بود، ۰٫۳۵ ـه', 'فرستادم.', RT({ msg: 'هر بسته ۰٫۴ کیلوئه', key: 'datum:وزنِ بسته', what: 'fact', fix: '۰٫۳۵', old: '۰٫۴' }));
-    const x = await snap(''); return { ok: !x.refused && !/انجام نشد/.test(allText(x)) && x.ev.some(e => /۴٫۸/.test(e.span) && !!e.stale) && /۴٫۲/.test(x.sstale + allText(x)) && /4\.8>4\.2/.test(x.sstale), got: { ev: x.ev, sstale: x.sstale, sys: x.sys, refused: x.refused } }; };
+    const x = await snap(''); return { ok: !x.refused && !/انجام نشد/.test(allText(x)) && /4\.8>4\.2/.test(x.sstale) && /۴٫۸ ⇒ ۴٫۲/.test(allText(x)), got: { ev: x.ev, sstale: x.sstale, sys: x.sys, refused: x.refused } }; };
   C[70] = async () => { await scen({ prior: [RES('ما ۵ نفریم و ۴ میلیون پول داریم: ۴ ÷ ۵ = ۰٫۸ میلیون هر نفر')], stmtChat: 'ما ۵ نفریم و ۴ میلیون پول داریم' });
     await turn('۴ نفریم نه ۵ — حالا سهمِ هر نفر چقدر میشه؟', 'اصلاح را فرستادم؛ با ۴ نفر خودت حساب کن.', RT({ msg: 'ما ۵ نفریم و ۴ میلیون پول داریم', key: 'datum:شمارِ نفرها', what: 'fact', fix: '۴', old: '۵' }));
     const x = await snap(''); return { ok: !x.refused && !/فرقی نداشت|انجام نشد/.test(allText(x)) && /0\.8>1(?![.\d])/.test(x.sstale) && !/(?:^| )4>/.test(x.sstale), got: { sstale: x.sstale, sys: x.sys, refused: x.refused } }; };
@@ -58,7 +58,7 @@ async function run(ctx) {
   C[92] = async () => { const pid = await scen({ prior: ['۱۲ تا صندلی کرایه می‌کنم', 'نه ۱۲ تا، بیشتر لازمه'], live: { title: 'تولد', stmt: 'جشنِ تولد' } });
     await edit(1, ['۱۲ تا صندلی کرایه', '۱۵ تا صندلی کرایه']); const x = await snap(pid); return { ok: !x.asks.some(q => /نه ۱۵ تا/.test(q.new)), got: { asks: x.asks } }; };
   C[78] = async () => { const pid = await scen({ prior: ['وزنم ۷۸ کیلو بود و قدم ۱۷۵'], live: { title: 'وزن', stmt: 'وزنم ۷۸ کیلو بود و قدم ۱۷۵' } });
-    const r = await edit(1, ['۷۸ کیلو', '۷۶ کیلو']); const x = await snap(pid), t = J([r.r.changed, x.ch, x.sys]);
+    const r = await edit(1, ['۷۸ کیلو', '۷۶ کیلو']); const x = await snap(pid), t = J([x.ch, x.sys]);   // آنچه او می‌بیند (سطرِ «اصلاح شد»)، نه قالبِ خامِ changed ِ این مهار
     return { ok: /[۷7][۶6][^«»]*» \(اصلاح شد ⇐ «[^»]*[۷7][۸8]/.test(t) && !/۱۷۵ ⇒|«[^»]*[۷7][۸8][^»]*» \(اصلاح شد ⇐ «[^»]*[۷7][۶6]/.test(t), got: { r: r.r, ch: x.ch } }; };
   C[79] = async () => { await scen({ prior: [RES('۵۰ تا لیوان بین ۶ تا میز: ۵۰ ÷ ۶ ≈ ۸٫۳ لیوان هر میز')], stmtChat: '۵۰ تا لیوان بین ۶ تا میز' });
     await turn('۵۰ تا لیوان بین ۸ تا میز نه ۶ تا', 'فرستادم.', RT({ msg: '۵۰ تا لیوان بین ۶ تا میز', key: 'datum:میز', what: 'fact', fix: '۸ تا میز', old: '۶ تا میز' }));
@@ -105,6 +105,13 @@ async function run(ctx) {
     if (!C[n]) { out.summary.nc++; out.nc[n] = 'no check written'; out.fail.push(tag + ' — no check'); out.summary.fail++; continue; }
     let r; try { r = await C[n](); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
     if (r.ok) out.summary.pass++; else { out.summary.fail++; out.fail.push(tag + ' got ' + J(r.got).slice(0, +process.env.GOTN || 1500)); } }
+  /* C74 (روشن‌سازیِ پس از بانک؛ ورودیِ بانک نیست): فرضی که در همان پیام واقعیت شد اصلاح است؛ بدلِ منفی: فرضِ تنها (C46) هیچ چیز را عوض نمی‌کند */
+  if (!process.env.ONLY || process.env.ONLY.split(',').includes('C74')) {
+    const H74 = (text) => ev(async () => 0).then(() => scen({ prior: [RES('ما ۴ نفریم و ۸ میلیون داریم: ۸ ÷ ۴ = ۲ میلیون هر نفر')], stmtChat: 'ما ۴ نفریم و ۸ میلیون داریم' }))
+      .then(() => turn(text, 'فرستادم.', RT({ msg: 'ما ۴ نفریم و ۸ میلیون داریم', key: 'datum:نفرها', what: 'fact', fix: '۵ نفر', old: '۴' }))).then(() => snap(''));
+    const a = await H74('اگه ۵ نفر بودیم سهم چقدر میشد؟ آهان، اصلاً ۵ نفر بودیم، مادرم هم وارثه.'), b = await H74('اگه ۵ نفر بودیم سهم چقدر میشد؟');
+    const ok = !a.refused && /2>1\.6(?![\d])/.test(a.sstale) && !!b.refused && !b.sstale;
+    out.extra = { C74: ok }; if (!ok) out.fail.push('C74 got ' + J({ a: { sstale: a.sstale, refused: a.refused, sys: a.sys }, b: { sstale: b.sstale, refused: b.refused } }).slice(0, 1500)); }
   return out;
 }
 module.exports = { run };
