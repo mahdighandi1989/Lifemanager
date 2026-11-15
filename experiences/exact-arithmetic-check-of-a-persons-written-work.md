@@ -128,3 +128,15 @@ for (i = 1; i < segs.length; i++) {
 - **Rule 2 (answer binding):** a pending question stays open until answered. An answer binds by what it names (a number she repeats); a bare "yes" binds only to the question of the immediately preceding message; lines by another person and exact identities never wait for her answer; several candidates ⇒ ask "which one?" and store nothing.
 - **Rule 3 (attribution):** quoted work of another person is checked and shown, marked as theirs — not hidden (hiding it is what let the false binding happen) and not booked as hers. Only a strong verb (wrote / computed) opens the span; a weak verb (said) counts only with a number after it in the same sentence; a first-person verb ("I wrote for my brother") is hers.
 - **Rule 4 (closed forms are arithmetic, not convention):** an ellipsis sum is exact when the written terms fix an arithmetic progression (first two and last); anything else stays "not checked".
+## Update 2026-11-15 (round 27, prior) — a re-check is a recomputation, and a hypothetical is not a dispute
+**What happened.** A person asked «if the page one day misreads my correct sum, how would I know?» The dispute detector matched «the error is the page's»
+inside that conditional sentence, re-checked an old ✗ against a stored copy of her message that had been clipped to 600 characters, did not find the
+calculation there, and announced «1700 seconds = 17 minutes — re-checked, correct» (exact: 28.3 minutes). She had already fixed that step herself.
+
+**Rule.** (1) Strip hypothetical sentences («if … ?», «so is this right too?») before reading a message as a dispute or a correction — same length, so no
+other reader's offsets move; a fact stated later in the same message still counts. (2) A re-check must re-read the same expression from the full source and
+find it correct; «not found» is «not checked», never «correct». (3) A verdict the person already fixed herself is no longer on the table.
+
+### How to Apply Elsewhere
+Any verify-on-demand path (re-check, appeal, retry) must recompute from the complete original input and treat a missing reading as unknown, never as a pass;
+and intent detection must not fire on words inside a conditional or a question about the system itself.

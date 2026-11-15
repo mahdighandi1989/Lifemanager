@@ -839,16 +839,22 @@
     var steps = G.pr ? G.pr.steps.filter(function (x) { return x.pageBad && x.verdict === "wrong" && !x.fixed && !(x.re && x.re.by === "page" && x.reAt); }) : [];
     /* «✗» ِ پیامِ پیشین که همان گامِ دفتر است و یک بار بازسنجی شده، دوباره روی میز نیست */
     var doneK = G.pr ? G.pr.steps.filter(function (x) { return x.re && x.re.by === "page"; }).map(function (x) { return keyOf(x.fixed ? x.fixed.t : x.quote); }) : [];
+    /* دورِ ۲۷ (D27-2): «✗» ای که خودش همان گام را درست کرد (اصلاحِ خودش در دفتر) دیگر روی میز نیست — متنِ پیشینِ گام */
+    if (G.pr) G.pr.steps.forEach(function (x) { if (x.fixed && x.quote) doneK.push(keyOf(x.quote)); });
     var mem = (C.arithBad || []).filter(function (b) { return !b.re && b.seq !== (s.seq || 0) && !doneK.some(function (k) { return k.indexOf(keyOf(b.expr)) >= 0; }); });
     if (!steps.length && !mem.length) return null;
     /* اعتراض: واژهٔ خودش، یا بازنویسیِ همان حساب با همان نتیجه */
-    var mk = keyOf(mt), restates = function (e, v) { return mk.indexOf(keyOf(String(e) + "=" + String(v))) >= 0; }, said = CONTEST.test(mt);
+    /* دورِ ۲۷ (C46، D27-2 S1): بندِ فرضی («اگه یه روز صفحه حسابِ درستم رو غلط بخونه، از کجا بفهمم خطا از صفحه‌ست؟») اعتراض نیست — ST.hypoCut (a45، سهمِ «prior») آن را هم‌طول کنار می‌گذارد */
+    var mh = ST.hypoCut ? ST.hypoCut(mt) : mt;
+    var mk = keyOf(mh), restates = function (e, v) { return mk.indexOf(keyOf(String(e) + "=" + String(v))) >= 0; }, said = CONTEST.test(mh);
     /* همان حساب با نتیجهٔ دیگر در همین پیام = اصلاحِ خودش (کارِ دفتر، C8)، نه اعتراض */
     var mine = arithChk(mt), fixes = function (e, v) { var k = keyOf(e); return mine.some(function (c) { return keyOf(c.expr) === k && String(c.said) !== String(v); }); };
     steps.forEach(function (x) {
       var txt0 = x.fixed ? x.fixed.t : x.quote, ck = arithChk(txt0), bad = ck.filter(function (c) { return !c.ok; });
       if (!said && !bad.some(function (c) { return restates(c.expr, c.said); }) && !ck.some(function (c) { return (x.bad || []).indexOf(String(c.said)) >= 0 && restates(c.expr, c.said); })) return;
       if (bad.some(function (c) { return fixes(c.expr, c.said); })) return;
+      /* دورِ ۲۷ (C46): بی هیچ حسابِ خوانده‌شده بازسنجی «درست» نمی‌گوید — نسنجیده می‌ماند */
+      if (!bad.length && !ck.some(function (c) { return c.ok === true && !c.ask; })) { out.open = (out.open || []).concat([{ n: x.n, t: clip(txt0, 120) }]); return; }
       if (!bad.length) {   // صفحه حالا می‌خواند: «✗» ِ پیشین خطای خوانشِ خودِ صفحه بود
         var was = x.verdict, rep = null, ch = [];
         try { rep = ST.priorOf(s, { prior: [{ n: x.n, step: x.step, quote: x.quote, verdict: x.why ? "unchecked" : "ok", why: x.why || "" }] }, um); } catch (e) { rep = null; }
@@ -868,18 +874,25 @@
     /* «✗» ِ پیامِ پیشین (بی دفتر) */
     if (!out.cleared.length && !out.kept.length) mem.forEach(function (b) {
       if ((!said && !restates(b.expr, b.said)) || fixes(b.expr, b.said)) return;
-      var ck = arithChk(b.text), mine = ck.filter(function (c) { return (!c.ok || (b.ask && c.ask)) && String(c.expr) === String(b.expr); });   // ✗ ای که از «نه، گرد نکردم» آمد (C26) با بازسنجی پاک نمی‌شود
+      /* دورِ ۲۷ (D27-2 S1، C46 «بازسنجی همیشه بازحساب است»): متنِ نگه‌داشته بریده است (۶۰۰ نویسه) — بازسنجی روی پیامِ کاملِ خودش؛ «درست» فقط وقتی همان حساب دوباره خوانده شد و ✓ است.
+         نیافتنِ همان حساب «درست» نیست: ✗ سرِ جایش می‌ماند و صفحه می‌گوید دوباره نتوانست بخواند (نسنجیده) — هرگز اعتماد به جای بازحساب. */
+      var full = b.text; if (/…$/.test(String(b.text || ""))) (s.msgs || []).some(function (m) { if (m && m.role === "user" && clip(m.text, 600) === b.text) { full = String(m.text); return true; } return false; });
+      var ck = arithChk(full), same = ck.filter(function (c) { return String(c.expr) === String(b.expr); }), mine = same.filter(function (c) { return !c.ok || (b.ask && c.ask); });   // ✗ ای که از «نه، گرد نکردم» آمد (C26) با بازسنجی پاک نمی‌شود
+      var reads = same.filter(function (c) { return c.ok === true && !c.ask; });
+      if (!mine.length && !reads.length) { b.re = { at: at, to: "unread" }; out.open = (out.open || []).concat([{ n: 0, t: fa(b.expr) + " = " + fa(b.saidT) }]); return; }
       b.re = { at: at, to: mine.length ? "wrong" : "ok" };
-      if (mine.length) out.kept.push({ n: 0, t: fa(b.expr) + " = " + fa(b.saidT), bad: mine }); else out.cleared.push({ n: 0, t: fa(b.expr) + " = " + fa(b.saidT), was: "wrong", to: "ok", ck: ck.filter(function (c) { return String(c.expr) === String(b.expr); }) });
+      if (mine.length) out.kept.push({ n: 0, t: fa(b.expr) + " = " + fa(b.saidT), bad: mine }); else out.cleared.push({ n: 0, t: fa(b.expr) + " = " + fa(b.saidT), was: "wrong", to: "ok", ck: reads });
     });
-    if (!out.cleared.length && !out.kept.length) return null;
+    if (!out.cleared.length && !out.kept.length && !(out.open || []).length) return null;
     var who = function (o) { return o.n ? "گامِ " + fa(o.n) + " («" + o.t + "»)" : "«" + o.t + "»"; };
     out.cleared.forEach(function (o) { var okL = ST.arithLines((o.ck || []).filter(function (c) { return c.ok && !c.ask; })); out.lines.push("✓ بازسنجی شد ⇒ درست: " + who(o) + " — حسابِ صفحه هم همان را می‌دهد" + (okL.length ? " (" + okL.join("؛ ") + ")" : "") + ". «✗» ِ پیشین از خوانشِ خودِ صفحه بود و همه‌جا برداشته شد (دفتر، 🧭، 📜، کارنامه)."); });
+    (out.open || []).forEach(function (o) { out.lines.push("؟ بازسنجی: صفحه حسابِ " + who(o) + " را دوباره نتوانست بخواند — نسنجیده؛ «✗» ِ پیشین نه برداشته شد نه تأیید؛ «درست» نخوانش و با خودش همان تکه را حساب کن."); });
     out.kept.forEach(function (o) { out.lines.push("✗ بازسنجی شد (یک بار) ⇒ حکم ماند: " + who(o) + " — " + o.bad.map(bothT).join("؛ ") + " (عددِ درست را لو نده)."); });
-    out.note = "🧮 بازسنجیِ حسابِ صفحه (به درخواستِ خودت): " + out.cleared.map(function (o) { return who(o) + " می‌خواند — بازسنجی شد ⇒ درست؛ «✗» ِ پیشین خطای خوانشِ صفحه بود و برداشته شد"; }).concat(out.kept.map(function (o) { return who(o) + " — " + o.bad.map(bothT).join("؛ ").replace(/نوشتهٔ خودش/g, "نوشتهٔ تو") + " — یک بار دوباره سنجیده شد و حکم ماند؛ همین تکه را خودت دوباره حساب کن"; })).join(" · ");
+    out.note = "🧮 بازسنجیِ حسابِ صفحه (به درخواستِ خودت): " + out.cleared.map(function (o) { return who(o) + " می‌خواند — بازسنجی شد ⇒ درست؛ «✗» ِ پیشین خطای خوانشِ صفحه بود و برداشته شد"; }).concat(out.kept.map(function (o) { return who(o) + " — " + o.bad.map(bothT).join("؛ ").replace(/نوشتهٔ خودش/g, "نوشتهٔ تو") + " — یک بار دوباره سنجیده شد و حکم ماند؛ همین تکه را خودت دوباره حساب کن"; }))
+      .concat((out.open || []).map(function (o) { return who(o) + " — صفحه دوباره نتوانست بخواندش (نسنجیده)؛ حکمِ پیشین نه برداشته شد نه تأیید — همین تکه را خودت دوباره حساب کن"; })).join(" · ");
     /* 📜: یک رویداد برای همین بازسنجی */
     try { if (A.EVLOG && A.EVLOG.add) A.EVLOG.add(Object.assign(G.pid ? { pid: G.pid } : { sess: s.id }, { id: "ar26_" + key.replace(/[^\w]/g, "_"), k: (ST.EV_K && ST.EV_K.prior) || "cprior", at: at, title: "بازسنجیِ حسابِ صفحه (اعتراضِ خودت)",
-      lines: out.cleared.map(function (o) { return who(o) + ": بازسنجی شد ⇒ درست («✗» ِ پیشین از خوانشِ صفحه بود)"; }).concat(out.kept.map(function (o) { return who(o) + ": بازسنجی شد ⇒ حکم ماند — " + o.bad.map(bothT).join("؛ ").replace(/نوشتهٔ خودش/g, "نوشتهٔ تو"); })),
+      lines: out.cleared.map(function (o) { return who(o) + ": بازسنجی شد ⇒ درست («✗» ِ پیشین از خوانشِ صفحه بود)"; }).concat(out.kept.map(function (o) { return who(o) + ": بازسنجی شد ⇒ حکم ماند — " + o.bad.map(bothT).join("؛ ").replace(/نوشتهٔ خودش/g, "نوشتهٔ تو"); })).concat((out.open || []).map(function (o) { return who(o) + ": دوباره خوانده نشد ⇒ نسنجیده"; })),
       out: "", src: um ? { sess: s.id, mid: AS.msgId ? AS.msgId(um) : "", text: um.text, at: um.at || "", title: s.title || "" } : null, by: "page" })); } catch (e4) { }
     C.arithRe = { key: key, out: out, said: false };
     return out;
@@ -938,7 +951,7 @@
       var an = ""; try { var ra = ST.arithAnswer(s, msg); if (ra && ra.lines.length) an = ["# جوابِ او به «؟» ِ صفحه (پرسشِ گرد کردن / خوانشِ مقیاس در پیامِ پیشین)"].concat(ra.lines.map(function (l) { return "- زمینه (نه پرسشِ دوم): " + l; })).join("\n"); } catch (e0) { an = ""; }
       try { var r = ST.arithContest(s, msg); if (!r) return an;
         return (an ? an + "\n" : "") + ["# بازسنجیِ حسابِ صفحه (او به «✗» ِ صفحه اعتراض کرد؛ صفحه همان نوشته را یک بار دوباره سنجید)"].concat(r.lines.map(function (l) { return "- زمینه (نه پرسشِ دوم): " + l; }))
-          .concat(["- زمینه (نه پرسشِ دوم): " + (r.cleared.length ? "برای آنچه «درست» شد: روشن بگو حق با او بود و خطا از خوانشِ صفحه؛ دوباره از او نخواه لغزش بجوید. " : "") + (r.kept.length ? "برای آنچه «ماند»: بگو صفحه یک بار دوباره سنجید و حکم ماند، و همان تکه‌ای را که نمی‌خواند نشانش بده؛ عددِ درست را نگو — بگذار خودش همان تکه را دوباره حساب کند؛ نه کوتاه بیا و نه بحث را از نو کن؛ همین بازسنجی یک بار است. " : "") + "صفحه همین را به خودش هم نوشته است."]).join("\n");
+          .concat(["- زمینه (نه پرسشِ دوم): " + (r.cleared.length ? "برای آنچه «درست» شد: روشن بگو حق با او بود و خطا از خوانشِ صفحه؛ دوباره از او نخواه لغزش بجوید. " : "") + ((r.open || []).length ? "برای آنچه «نسنجیده» ماند: نه «درست» بگو نه «غلط»؛ بگو صفحه دوباره نتوانست بخواندش و با خودش همان تکه را حساب کن. " : "") + (r.kept.length ? "برای آنچه «ماند»: بگو صفحه یک بار دوباره سنجید و حکم ماند، و همان تکه‌ای را که نمی‌خواند نشانش بده؛ عددِ درست را نگو — بگذار خودش همان تکه را دوباره حساب کند؛ نه کوتاه بیا و نه بحث را از نو کن؛ همین بازسنجی یک بار است. " : "") + "صفحه همین را به خودش هم نوشته است."]).join("\n");
       } catch (e) { return an; }
     });
     AS.promptHooks.push(function (s, msg) {

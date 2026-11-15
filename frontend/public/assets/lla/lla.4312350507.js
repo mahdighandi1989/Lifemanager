@@ -58560,7 +58560,8 @@ APP.goFromURL = function (q) {
         if (rx25 && A.liveRec && A.liveRec(X25.from)) { var kO = "L:" + X25.from, EO = storyOf(s, kO, true), itO = { k: "res", t: clip(rx25, 300), fin: ST.finOf(s, X25.from, pre25, rx25), at: String(um.at || nowIso()), mid: mid(um), n: EO.items.length + 1 };
           EO.items.push(itO); logEv(s, X25.from, itO, um, kO); feed(X25.from, s, [itO], um); } } } catch (e) { }
     var rs25 = 0; try { var g25 = ledger(s, key, pid).pr; rs25 = g25 ? g25.resume : 0; } catch (e) { }   // گامی که پرسشِ نوبتِ پیش درباره‌اش بود (نقطهٔ ازسرگیری پیش از این پیام)
-    var prCh25 = priorReply(s, key, pid, ut, um);   // دورِ ۲۴ (R8): پاسخِ او به «درست است؟» ِ حکم‌ها — دورِ ۲۵: با معنا، هر گام جدا
+    var ppid27 = pid || priorPid27(s, ut), pkey27 = ppid27 === pid ? key : keyFor(s, ppid27);   // دورِ ۲۷ (C56): دفترِ مسئلهٔ بسته
+    var prCh25 = priorReply(s, pkey27, ppid27, ut, um);   // دورِ ۲۴ (R8): پاسخِ او به «درست است؟» ِ حکم‌ها — دورِ ۲۵: با معنا، هر گام جدا
     /* said ِ سنجیدهٔ a27 (صورتِ چسبانده فقط با برچسبِ صریح)؛ «کل» با نشانهٔ صریحِ خودش («کلش اینه: …»، «در یک جمله: …») حتی در پیامِ نخست — مدل گزارشِ وضعِ همین پیام را داد */
     var said = so ? so.said.slice() : [], real = !!(so && so.real), I = [];
     /* دورِ ۲۴ (R2، بانکِ R24 #27، A24-7): پیامِ نخستِ خودش با نشانهٔ صریحِ مجهولِ خودش («می‌خوام بدونم چند تا … بخرم»، «ساعت‌ها را چطور بچینم؟») صورتِ چسبانده نیست —
@@ -58602,7 +58603,7 @@ APP.goFromURL = function (q) {
       if (uw.length && uw.every(function (w0) { return hit(w0, base); })) { var E0 = storyOf(s, key, true); E0.unk = { t: clip(uk, 100), at: String(um.at || nowIso()) }; } }
     /* دورِ ۲۴ (R8 «کارِ پیشینِ من»، نقشهٔ راهِ منبع‌ها §۲۱): حکمِ گام‌به‌گامِ کارِ پیشینش (coach_state.prior) — صفحه نقل و عدد/واحد را می‌سنجد */
     /* دورِ ۲۵ (P1): یک دفتر — گزارشِ تازه ادغام می‌شود، اصلاحِ خودش در همان گام می‌نشیند، اصلاحِ داده گام را کهنه می‌کند (priorTurn25) */
-    try { priorTurn25(s, a, um, key, pid, I, prCh25 || [], rs25); } catch (e) { console.warn(e); }
+    try { priorTurn25(s, a, um, pkey27, ppid27, I, prCh25 || [], rs25); } catch (e) { console.warn(e); }
     if (!I.length) { try { S.put(s); } catch (e) { } return; }
     var E = storyOf(s, key, true), m0 = mid(um), at = String(um.at || nowIso()), added = [];
     /* دورِ ۲۶ (Q3، D26-6 pwD2 p6 «… پس خودِ حدس برای 73 درسته … حالا یه حدس به ذهنم رسید: … می‌خوام این رو مثلِ یه مسئلهٔ واقعی … اول برای 97 و 193 امتحانش می‌کنم»):
@@ -58630,9 +58631,10 @@ APP.goFromURL = function (q) {
   /* نوبتِ دفترِ کارِ پیشین پس از پاسخِ مدل: ادغامِ گزارش ⇒ اصلاحِ خوانای صفحه ⇒ retract ⇒ گام/نتیجهٔ سنجیدهٔ مدل؛ سپس یک رویداد در 📜/🧭 و اعتبار در کارنامه */
   function priorTurn25(s, a, um, key, pid, I, ch0, rs0) {
     var ut = String(um.text || ""), at = String(um.at || nowIso()), G = ledger(s, key, pid), old = G.pr, rep = priorOf(s, a, um), ch = (ch0 || []).slice(), isNew = false;
-    var open = false; try { open = (priorOpenAt(s, pid, um) || CALLS25.test(ut)) && !(OTHER26.test(ut) && !MINE26.test(ut)); } catch (e) { }
+    var open = false, open0 = false; try { open0 = (priorOpenAt(s, pid, um) || CALLS25.test(ut)) && !(OTHER26.test(ut) && !MINE26.test(ut)); open = open0 || (MINE26.test(ut) && !OTHER26.test(ut)); } catch (e) { }   // دورِ ۲۷ (C56): «یه چیزِ دیگه هم حساب کرده بودم: …» گامِ تازهٔ همان دفتر است
     var C = s.coach = s.coach || {}, asked = { n: rs0 || 0 };
-    if (!old) { if (!rep || !open) return; var real = rep.steps.filter(function (x) { return !x.test; }); if (!real.length) return;   // حالت‌های آزموده دفتر نیستند (A25-4)
+    /* دورِ ۲۷: دفترِ تازه فقط با آغازِ مسئله یا درخواستِ خودش (A26-7)؛ «حساب کرده بودم» فقط به دفترِ موجود گام می‌افزاید (open) */
+    if (!old) { if (!rep || !open0) return; var real = rep.steps.filter(function (x) { return !x.test; }); if (!real.length) return;   // حالت‌های آزموده دفتر نیستند (A25-4)
       old = rep; isNew = true; rep.steps.forEach(function (x) { delete x.mn; }); if (G.L) G.L.prior = old; else storyOf(s, key, true).prior = old; }
     else {
       if (rep) ch = ch.concat(priorMerge(old, rep, { open: open }));
@@ -58863,7 +58865,7 @@ APP.goFromURL = function (q) {
       /* ادغامِ دورِ ۲۵ (P1 + P2): «bad» = حساب‌هایی که موتورِ a46 نادرست خواند (فقط وقتی یادداشتِ همان موتور گام را نادرست دانست) */
       var bad = nt.bad ? ck.filter(function (c) { return !c.ok; }) : [];
       steps.push({ n: steps.length + 1, step: st || clip(span, 80), quote: clip(span, 300), verdict: v, why: why, fix: fix, chk: chk, chkM: chkM, dep: dep, said: ST.arithSaid ? ST.arithSaid(ck) : ck.filter(function (c) { return !c.conv; }).map(function (c) { return c.said; }),
-        bad: bad.map(function (c) { return String(c.said); }), badC: bad.map(function (c) { return { key: kNorm(c.expr), val: c.val, said: String(c.said) }; }), pageBad: bad.length > 0, test: isTestStep(span, hm, x), mn: x.n != null ? (+digs(x.n) || 0) : 0, cause: cause, her: "" });
+        bad: bad.map(function (c) { return String(c.said); }), badC: bad.map(function (c) { return { key: kNorm(c.expr), val: c.val, said: String(c.said) }; }), pageBad: bad.length > 0, test: isTestStep(span, hm, x), mn: x.n != null ? (+digs(x.n) || 0) : 0, lab: LAB27(span), cause: cause, her: "" });
     });
     if (!steps.length) return null;
     /* وابستگی: dep ِ مدل، یا عددِ **نادرستِ** همان گام (نتیجهٔ حسابی که صفحه ناهم‌خوان یافت) در نقلِ گامِ بعد — عددِ درستِ مشترک وابستگی نیست (B25·D7) */
@@ -58910,11 +58912,18 @@ APP.goFromURL = function (q) {
   /* ادغامِ گزارشِ تازه در دفتر — هرگز جایگزینی. o.open: پیام آغازِ مسئله است یا خودش آن را کارِ پیشین خواند (فقط آن‌وقت گامِ تازه افزوده می‌شود) */
   /* وابستگیِ تازهٔ یک گام: گامی که پیش‌تر پایه‌اش بود و دیگر نیست «rerouted» می‌خورد (A26-31) */
   function reDep(pr, x, dep, at) { var nd = (dep || []).filter(function (n) { return n !== x.n; }); (x.dep || []).forEach(function (n) { var z = pr.steps[n - 1]; if (z && nd.indexOf(n) < 0) z.rerouted = at; }); x.dep = nd; }
+  /* دورِ ۲۷ (C56، A27-21): «گام ۳: …» در گزارشِ بعدی شمارهٔ خودِ اوست — همان گامِ دفتر، اگر دست‌کم یک واژه یا تکهٔ ریاضیِ مشترک دارد (نه گامِ تازه) */
+  function LAB27(q) { var m = /^\s*گام(?:ِ|‌ِ)?\s*([0-9۰-۹]+)\s*[:：—\-–]/.exec(String(q || "")); return m ? (+digs(m[1]) || 0) : 0; }
+  function near27(z, q) { var b = String(q || "").replace(/^\s*گام(?:ِ|‌ِ)?\s*[0-9۰-۹]+\s*[:：—\-–]\s*/, ""), T = [z.quote, z.fixed ? z.fixed.t : "", z.step].join(" "),
+      W = toks(T.replace(/[0-9۰-۹.٫]/g, " ")).filter(function (w) { return w.length >= 3; }), M = function (x) { return (digs(x).match(/[A-Za-z0-9][A-Za-z0-9\/\^\[\]()]{2,}/g) || []); }, MT = M(T);
+    return toks(b.replace(/[0-9۰-۹.٫]/g, " ")).some(function (w) { return w.length >= 3 && hit(w, W); }) || M(b).some(function (f) { return MT.indexOf(f) >= 0; }); }
   function priorMerge(old, rep, o) {
-    var at = rep.at, ch = [], hold = function (a, b) { var x = nz(a), y = nz(b); return !!x && !!y && (x === y || (x.length >= 8 && y.indexOf(x) >= 0) || (y.length >= 8 && x.indexOf(y) >= 0)); };
+    var at = rep.at, ch = [], hold = function (a, b) { var x = nz(a), y = nz(b); return !!x && !!y && (x === y || (x.length >= 8 && y.indexOf(x) >= 0) || (y.length >= 8 && x.indexOf(y) >= 0)); }, used27 = {};
     rep.steps.forEach(function (y) {
       var x = y.mn && old.steps[y.mn - 1] ? old.steps[y.mn - 1] : null;
       if (!x) x = old.steps.filter(function (z) { return nz(z.quote) === nz(y.quote) || (z.fixed && nz(z.fixed.t) === nz(y.quote)); })[0] || old.steps.filter(function (z) { return hold(z.quote, y.quote) || (z.fixed && hold(z.fixed.t, y.quote)); })[0] || null;
+      if (!x && y.lab && old.steps[y.lab - 1] && !used27[y.lab] && near27(old.steps[y.lab - 1], y.quote)) x = old.steps[y.lab - 1];
+      if (x) used27[x.n] = 1;
       if (!x) { if (!o.open || y.test) return; y.n = old.steps.length + 1; delete y.mn; old.steps.push(y); ch.push({ n: y.n, k: "new" }); return; }
       var was = x.verdict, same = hold(curText(x), y.quote) || hold(x.quote, y.quote);
       if (same) {
@@ -58960,6 +58969,22 @@ APP.goFromURL = function (q) {
   ST.R25_QUARANTINE.ACC25 = ACC25; ST.R25_QUARANTINE.UNDO25 = UNDO25;   // قرنطینهٔ دورِ ۲۶: جانشین EXA26/SAYW26 (داوری نسبت به حکمِ همان گام) و UNDO26 (پس گرفتن با معنا)
   var WHYSAY25 = /چرا\s*(?:می[‌\s]?گی|می[‌\s]?گید|می[‌\s]?گویی|گفتی|نوشتی|زدی)/;
   function stepNs(c) { var o = [], re = /گام(?:ِ|‌ِ)?\s*(?:شمارهٔ?\s*)?([0-9]+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم)/g, m, d = digs(c); while ((m = re.exec(d))) { var n = +m[1] || ORDN25[m[1]] || 0; if (n && o.indexOf(n) < 0) o.push(n); var tail = /^(?:\s*(?:و|،)\s*(?:گام(?:ِ)?\s*)?([0-9]+))+/.exec(d.slice(m.index + m[0].length)); if (tail) (tail[0].match(/[0-9]+/g) || []).forEach(function (k) { if (o.indexOf(+k) < 0) o.push(+k); }); } return o; }
+  /* ---------- دورِ ۲۷ (C46، D27-2 S1): پرسشِ فرضی دربارهٔ کارِ خودش نه اعتراض است نه اصلاح ----------
+     «اگه یه روز صفحه حسابِ درستِ منو غلط بخونه، از کجا بفهمم خطا از صفحه‌ست؟»، «اگه ۸ ثانیه بود چی؟»، «یعنی اینم درسته؟» — دفتر عوض نمی‌شود، مربی جواب می‌دهد.
+     جمله‌ای که با شرط («اگه/اگر/فرض کن …») آغاز می‌شود و پرسش است همه‌اش کنار می‌رود؛ شرطِ بی پرسش فقط تا نخستین «،» (مقدم؛ «اگه اشتباه نکنم، گامِ ۴ غلطه» ردِ واقعی می‌ماند)؛
+     جملهٔ پرسشیِ «یعنی … ؟» هم کنار می‌رود. هم‌طول: هر حرفِ کنارگذاشته فاصله می‌شود (جای متن برای خواننده‌های دیگر عوض نمی‌شود). */
+  var HYPO27 = /^(?:\s|و|ولی|اما|حالا|راستی|خب|خوب|یه\s*سؤال|سؤالم\s*اینه(?:\s*که)?|[:،,])*(?:اگه|اگر|فرض\s*کن(?:یم|ید)?|فرضاً|فرضا|مثلاً\s*اگه|چی\s*می[\u200c\s]?شه\s*اگه|چه\s*می[\u200c\s]?شود\s*اگر|در\s*صورتی\s*که)(?![آ-ی])/;
+  var HYPOQ27 = /^(?:\s|و|ولی|اما|حالا|[:،,])*یعنی(?![آ-ی])[^؟?]*[؟?]\s*$/;
+  function hypoCut(t) {
+    t = String(t || ""); var out = "", re = /[^.!؟?؛\n]*(?:[.!؟?؛\n]+|$)/g, m;
+    while ((m = re.exec(t)) && m[0]) { var sn = m[0], q = /[؟?]/.test(sn);
+      if (HYPO27.test(sn) && q) sn = sn.replace(/[^\n]/g, " ");
+      else if (HYPOQ27.test(sn)) sn = sn.replace(/[^\n]/g, " ");
+      else if (HYPO27.test(sn)) { var k = sn.search(/[،,]/); sn = k > 0 ? sn.slice(0, k + 1).replace(/[^\n]/g, " ") + sn.slice(k + 1) : sn.replace(/[^\n]/g, " "); }
+      out += sn; }
+    return out;
+  }
+  ST.hypoCut = hypoCut;
   function splitCl(t) { return String(t || "").split(/(?<=[.!؟?…])\s+|\n+|؛\s*|\s+(?=(?:ولی|اما|ولیکن)\s)/).map(txt).filter(Boolean); }
   /* خواندنِ پاسخِ او به حکم‌ها با معنا، هر گام جدا. خروجی: { yes, acts: [{ n, act: ok|no|undo, why, pair }] } — فقط خوانش؛ چیزی نمی‌نویسد */
   /* ---------- دورِ ۲۶ (Q4 «خواندنِ پاسخ به حکم‌ها»، DECISIONS_R26) ----------
@@ -58979,7 +59004,8 @@ APP.goFromURL = function (q) {
   /* «گامِ ۴ رو کلاً گذاشتم کنار» — خودش گام را بی‌نیاز کرد (نگه داشتن برای بعد کنار گذاشتن نیست) */
   var DROP26 = /(?:گذاشتم(?:ش)?\s*کنار|کنار(?:ش)?\s*گذاشتم|کنار\s*می[‌\s]?(?:ذارم|گذارم)(?:ش)?|حذف(?:ش)?\s*(?:کردم|می[‌\s]?کنم)|بی[‌\s]?خیال(?:ش|ِ)?[^.!؟?\n]{0,12}شدم|دیگه?\s*لازم(?:ش)?\s*(?:نیست|ندارم))/;
   /* کارِ کسِ دیگر («همکارم این‌طوری حساب کرده بود: …») کارِ پیشینِ خودش نیست */
-  var OTHER26 = /(?:همکار|دوست|رفیق|معلم|استاد|برادر|خواهر|پدر|بابا|مادر|مامان|هم[‌\s]?کلاسی|هم[‌\s]?اتاقی|شوهر|خانم|همسر|پسر|دختر|بچه|مشاور|فروشنده)(?:م|ِ?\s*من|مون|مان|ش|ه)?\s[^.!؟?\n]{0,30}(?:حساب(?:ش)?\s*(?:رو|را)?\s*کرد(?:ه(?:\s*بود)?)?|حل(?:ش)?\s*کرد(?:ه(?:\s*بود)?)?|نوشت(?:ه(?:\s*بود)?)?|رفت(?:ه(?:\s*بود)?)?)(?![‌\s]*ام)(?![آ-ی])/;
+  /* دورِ ۲۷ (C57 سمتِ دفتر): «داداشم حساب کرد …»، «معلممون گفت ۲ × ۳۶ = ۷۲» — حسابِ کسِ دیگر کارِ پیشینِ او نیست (داداش/آبجی/… و «گفت» افزوده شد) */
+  var OTHER26 = /(?:همکار|دوست|رفیق|معلم|استاد|برادر|داداش|آبجی|خواهر|عمو|دایی|خاله|عمه|شریک|رئیس|پدر|بابا|مادر|مامان|هم[‌\s]?کلاسی|هم[‌\s]?اتاقی|شوهر|خانم|همسر|پسر|دختر|بچه|مشاور|فروشنده)(?:م|ِ?\s*من|مون|مان|ش|ه)?\s[^.!؟?\n]{0,30}(?:حساب(?:ش)?\s*(?:رو|را)?\s*کرد(?:ه(?:\s*بود)?)?|حل(?:ش)?\s*کرد(?:ه(?:\s*بود)?)?|نوشت(?:ه(?:\s*بود)?)?|رفت(?:ه(?:\s*بود)?)?|گفت(?:ه(?:\s*بود)?)?)(?![‌\s]*ام)(?![آ-ی])/;
   var UNDO26 = /اشتباهی\s*(?:زدم|کلیک|خورد|دکمه|گفتم|بود|نوشتم|رد\s*کردم)|دستم\s*خورد|(?:رد|«نه»|حرفم|حرفمو|«قبول\s*ندارم»)\s*(?:رو|را)?\s*پس\s*می[‌\s]?گیرم/;
   var STEPW26 = /گام(?:ِ|‌ِ)?\s*(?:شمارهٔ?\s*)?(?:[0-9۰-۹]+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم)/g;
   function stepSegs(c) { var ix = [], m; STEPW26.lastIndex = 0; while ((m = STEPW26.exec(c))) ix.push(m.index); if (ix.length < 2) return [c]; return ix.map(function (k, i) { return c.slice(i ? k : 0, i + 1 < ix.length ? ix[i + 1] : c.length); }); }
@@ -58988,7 +59014,7 @@ APP.goFromURL = function (q) {
   function openNo(x) { if (!x) return null; if (x.her === "no") return { noAt: String(x.herAt || "") }; var H = x.herHist || [], e = null; H.forEach(function (h) { if (h.noAt) e = h; else if (h.undoAt) e = null; }); return e && !e.undone ? e : null; }
   /* خواندنِ پاسخِ او به حکم‌ها با معنا، هر گام جدا. خروجی: { yes, acts: [{ n, act: ok|no|undo|undo-ok, why, pair }], which?: [n…], again? } — فقط خوانش؛ چیزی نمی‌نویسد */
   function readReply(pr, ut, o) {
-    var t = String(ut || ""), R = { yes: false, acts: [] }; if (!pr || !t.trim() || /^\s*\[/.test(t)) return R;
+    var t = hypoCut(ut), R = { yes: false, acts: [] }; if (!pr || !t.trim() || /^\s*\[/.test(t)) return R;
     if (YES24.test(t)) { R.yes = true; return R; }
     var S0 = pr.steps, pend = S0.filter(function (x) { return x.her === "no" && !x.reAt; })[0], rs = pr.resume ? S0[pr.resume - 1] : null, CL = splitCl(t), lastNs = [];
     var isOk = function (n) { var x = S0[n - 1]; return !!x && x.verdict === "ok" && !x.stale; };
@@ -59010,6 +59036,11 @@ APP.goFromURL = function (q) {
           else if (ns.length) pol = "no";
           else if (tied.length > 1) { if (rs && tied.indexOf(rs.n) >= 0) { ns = [rs.n]; pol = "no"; } else { R.which = tied.slice(); return; } }
         }
+        /* دورِ ۲۷ (D26-11، بانکِ R27 #162): ردِ به معنا — «ولی پدر و مادرم رو تو همون «فاصله» حساب کرده بودم» می‌گوید آنچه دلیلِ حکم کم‌دار می‌خواند در گامش هست:
+           بندِ «ولی/اما» با فعلِ «حساب/لحاظ/در نظر … کرده بودم» که واژه‌ای از دلیلِ حکمِ دقیقاً یک گامِ «نه درست» را نام می‌برد ⇒ ردِ همان گام (بی واژهٔ «اشتباه») */
+        if (!pol && !q && /^\s*(?:ولی|اما|ولیکن)\s/.test(c) && /(?:حساب|لحاظ|در\s*نظر|آورده|گذاشته)\s*(?:کرده|گرفته)?\s*(?:بودم|ام|‌ام)|حساب(?:شون|ش)?\s*کردم/.test(c)) {
+          var cw27 = toks(noQuote(c).replace(/[«»]/g, " ")).concat(toks((c.match(/«([^»]*)»/g) || []).join(" ").replace(/[«»]/g, " "))).filter(function (w) { return w.length >= 3; }), hit27 = S0.filter(function (x) { return x.verdict !== "ok" && x.why && cw27.some(function (w) { return hit(w, toks(x.why).filter(function (z) { return z.length >= 3; })); }); });
+          if (hit27.length === 1) { ns = [hit27[0].n]; pol = "no"; } }
         if (!pol && /(?:من\s*)?درست\s*می[‌\s]?گم|حق\s*با\s*منه/.test(u)) { var rx = S0.filter(function (x) { return x.re && x.verdict !== "ok"; }).pop(); if (rx) R.again = rx.n; return; }
         if (!pol && !und) return;
         if (!ns.length) {
@@ -59092,13 +59123,17 @@ APP.goFromURL = function (q) {
   /* اصلاحِ خودِ او که صفحه خودش می‌تواند بخواند و بسنجد (بی گزارشِ مدل): (۱) بندی که گام را نام می‌برد و حسابِ درستی دارد؛ (۲) «X، نه Y» که Y عددِ نادرستِ یک گام است؛
      (۳) همان حسابِ گام با نتیجهٔ درست؛ (۴) گامِ وابسته که با عددِ تازه دوباره نوشته شده. هر کدام فقط با همان سنجشِ C8. */
   function pageFix(pr, ut, at) {
-    var ch = [], t = String(ut || ""), done = {}, fx = function (x, nt, k) { if (!nt || done[x.n] || okNow(x)) return; var w = x.verdict; var ok = tryFix(x, nt, at, "her"); done[x.n] = 1; ch.push({ n: x.n, k: ok ? "fix" : "retry", was: w }); if (ok) relink(pr); };
+    var ch = [], t = hypoCut(ut), done = {}, fx = function (x, nt, k) { if (!nt || done[x.n] || okNow(x)) return; var w = x.verdict; var ok = tryFix(x, nt, at, "her"); done[x.n] = 1; ch.push({ n: x.n, k: ok ? "fix" : "retry", was: w }); if (ok) relink(pr); };
     var newOf = function (x, c) { var b = (x.badC || []).filter(function (b0) { return b0.key === c.key; })[0]; return b ? subNum(curText(x), b.said, c.said) : ""; };
     splitCl(t).forEach(function (c) { var ns = stepNs(c); if (!ns.length || REJ25.test(c)) return; var C = calcs(c).filter(function (k) { return k.ok; });
       /* دورِ ۲۶ (بانکِ R26 #112): «گامِ ۲ رو درست کردم شد ۲۸» — بندی که گام را نام می‌برد و همان مقدارِ حسابِ صفحه را می‌گوید (بی نوشتنِ خودِ حساب) */
       if (!C.length) { if (ns.length === 1 && /درست(?:ش)?\s*کردم|اصلاح(?:ش)?\s*کردم|عوض(?:ش)?\s*کردم/.test(c)) { var xv = pr.steps[ns[0] - 1], B1 = xv && !okNow(xv) ? (xv.badC || []) : [];
           if (B1.length === 1) { var nv = numsOf(c.replace(STEPW26, " ")).filter(function (n) { return Math.abs(parseFloat(n) - B1[0].val) <= tolOf(n, false) + 1e-9; })[0]; if (nv) fx(xv, subNum(curText(xv), B1[0].said, nv)); } } return; }
       ns.forEach(function (n) { var x = pr.steps[n - 1]; if (!x || okNow(x)) return; var nt = ""; C.some(function (k) { nt = newOf(x, k); return !!nt; }); fx(x, nt || c.replace(/^[^:：]{0,40}(?:درست|اصلاح)\s*(?:ش\s*)?کردم\s*[:：]\s*/, "")); }); });
+    /* دورِ ۲۷ (بانکِ R27 #165): «درستش ۳۰ دقیقه‌ست» بی نامِ گام — فقط اگر دقیقاً یک گامِ نادرست مقدارِ دقیقِ صفحه‌اش همین عدد است (C8)؛ عددِ دیگر («۲۵») هیچ */
+    splitCl(t).forEach(function (c) { if (stepNs(c).length || !/(?:^|\s)درست(?:ش|ه|ِش)?\s*(?:اینه\s*[:：]?\s*)?[0-9۰-۹]/.test(c)) return; var N = numsOf(c);
+      var cand = pr.steps.filter(function (x) { return !okNow(x) && (x.badC || []).length === 1 && N.some(function (n) { return Math.abs(parseFloat(n) - x.badC[0].val) <= tolOf(n, false) + 1e-9; }); });
+      if (cand.length === 1) { var xb = cand[0], nv = N.filter(function (n) { return Math.abs(parseFloat(n) - xb.badC[0].val) <= tolOf(n, false) + 1e-9; })[0]; fx(xb, subNum(curText(xb), xb.badC[0].said, nv)); } });
     var pm, pre = /(\d+(?:\.\d+)?)[^0-9]{0,24}[،,]?\s*نه\s+(\d+(?:\.\d+)?)/g, d = digs(t);
     while ((pm = pre.exec(d))) { if (pm[1] === pm[2]) continue; var cand = pr.steps.filter(function (x) { return !okNow(x) && (x.bad || []).indexOf(pm[2]) >= 0; }); if (cand.length === 1) fx(cand[0], subNum(curText(cand[0]), pm[2], pm[1])); }
     calcs(t).filter(function (k) { return k.ok; }).forEach(function (k) { pr.steps.forEach(function (x) { if (!okNow(x) && (x.badC || []).some(function (b) { return b.key === k.key; })) fx(x, newOf(x, k)); }); });
@@ -59144,6 +59179,21 @@ APP.goFromURL = function (q) {
   }
   ST.priorLines = priorLines;
   /* پرسشِ نوبت از نقطهٔ ازسرگیری — گامِ درست هرگز؛ حکمِ ردشده ⇒ دلیلش */
+  /* دورِ ۲۷ (C27-21، C27-24؛ بانکِ R27 #168، #169): دلیلِ حکمِ یک گام از لحظهٔ داوری است — بندی از آن که (۱) بر گامی دیگر تکیه دارد که از آن پس درست شد
+     («بر ۱۳۶۰ واتِ ناقصِ گامِ ۲ بنا شده» پس از اصلاحِ گامِ ۲)، یا (۲) «هنوز …» ِ تکه‌ای را می‌گوید که گامِ ✓ ِ بعدی آورده («افتِ فشار هنوز حساب نشده» پس از گامِ «افتِ فشار … ۱۲ متر») —
+     در پرسشِ نوبت نمی‌آید (در تاریخچه و 📜 می‌ماند). */
+  function whyNow27(pr, x) {
+    var w = String((x && x.why) || ""); if (!w) return "";
+    var parts = w.split(/\s*[؛،,]\s*|\s+و\s+/).filter(Boolean), S0 = pr.steps;
+    var keep = parts.filter(function (c) {
+      var named = (c.match(/گام(?:ِ|‌ِ)?\s*([0-9۰-۹]+)/g) || []).map(function (g) { return +digs(g).replace(/\D/g, "") || 0; });
+      if (named.some(function (n) { var z = S0[n - 1]; return z && z.n !== x.n && z.fixed && okNow(z); })) return false;
+      if (/هنوز/.test(c)) { var W = toks(c.replace(/[0-9۰-۹.٫]/g, " ")).filter(function (t) { return t.length >= 3 && !/^(?:هنوز|نشده|نکرده|حساب|معلوم|نیست|خودش|گفته)$/.test(t); });
+        if (W.length && S0.some(function (z) { return z.n > x.n && okNow(z) && W.filter(function (t) { return hit(t, toks(curText(z))); }).length >= Math.min(2, W.length); })) return false; }
+      return true; });
+    return keep.join("، ");
+  }
+  ST.whyNow27 = whyNow27;
   function priorQ(pr) {
     if (!pr) return ""; var no = pr.steps.filter(function (x) { return x.her === "no" && !x.reAt; })[0];
     if (no) return no.herWhy ? "دلیلِ تازه‌ات برای گامِ " + fa(no.n) + " («" + clip(no.herWhy, 70) + "»): همین دلیل گام را کامل ثابت می‌کند — هر حالتی را می‌پوشاند؟"
@@ -59156,13 +59206,24 @@ APP.goFromURL = function (q) {
     if (x.her === "ok" && !x.fixed) return "حکمِ گامِ " + fa(x.n) + " («" + clip(curText(x), 60) + "») را پذیرفتی — حالا درستِ همین گام را خودت چطور می‌نویسی؟";
     /* دورِ ۲۶ (D25-5، D26-3): پرسش از وضعِ همین لحظهٔ گام — حرفِ تازه‌اش یا بازنویسی‌اش، نه متنِ کهنه */
     if (x.say) return "گامِ " + fa(x.n) + ": حرفِ تازه‌ات («" + clip(x.say.t, 60) + "») هم هنوز گام را درست نمی‌کند" + (x.say.why ? " — " + clip(x.say.why, 90) : "") + ": حالا درستِ همین گام را خودت چطور می‌نویسی؟";
-    if (x.verdict === "wrong") return "گامِ " + fa(x.n) + " («" + clip(curText(x), 60) + "») جای درنگ است" + (x.chk ? " (" + x.chk + ")" : x.why ? " — " + clip(x.why, 90) : "") + ": خودت این گام را دوباره وارسی می‌کنی — کجایش می‌لنگد؟";
-    if (x.verdict === "incomplete") return "گامِ " + fa(x.n) + " («" + clip(curText(x), 60) + "») ناقص مانده" + (x.why ? " — " + clip(x.why, 90) : "") + ": چه چیزی کم دارد تا کامل شود؟";
+    if (x.verdict === "wrong") return "گامِ " + fa(x.n) + " («" + clip(curText(x), 60) + "») جای درنگ است" + (x.chk ? " (" + x.chk + ")" : whyNow27(pr, x) ? " — " + clip(whyNow27(pr, x), 90) : "") + ": خودت این گام را دوباره وارسی می‌کنی — کجایش می‌لنگد؟";
+    if (x.verdict === "incomplete") return "گامِ " + fa(x.n) + " («" + clip(curText(x), 60) + "») ناقص مانده" + (whyNow27(pr, x) ? " — " + clip(whyNow27(pr, x), 90) : "") + ": چه چیزی کم دارد تا کامل شود؟";
     return "گامِ " + fa(x.n) + " («" + clip(curText(x), 60) + "») را چطور وارسی می‌کنی — روشن می‌بینی که درست است؟";
   }
   ST.priorQ = priorQ;
   /* دورِ ۲۶ (Q6، C26-2): «بسته شد» فقط از بستنِ خودِ صفحه (A.liveClosure) — «در بازنگری — هنوز بسته نشده» بسته نیست */
   function priorReview26(pid) { try { var c = A.liveClosure ? A.liveClosure(pid) : null; return !!(c && c.state === "review"); } catch (e) { return false; } }
+  /* دورِ ۲۷ (C56، A27-21): هر گزارشِ بعدی — پیش یا پس از بستن — در همان دفتر ادغام می‌شود، هرگز جایش را نمی‌گیرد.
+     ریشه: پس از «✅ حل شد» گفت‌وگو دیگر به مسئلهٔ زنده بسته نیست (boundLive.done)، pid = "" و دفترِ مسئلهٔ بسته دیده نمی‌شد؛ گزارشِ سوم دفترِ تازه‌ای در داستانِ نشست می‌ساخت
+     (شماره‌ها از نو، تاریخچه صفر). حالا تا وقتی نشست دفترِ خودش را ندارد و پیام مسئلهٔ تازه‌ای نمی‌آورد، دفترِ کارِ پیشین همان دفترِ مسئلهٔ بسته است. */
+  function priorPid27(s, t) {
+    try { var bl = AS.boundLive ? AS.boundLive(s) : null; if (!bl || !bl.pid || !bl.done) return "";
+      if (NEWP27.test(String(t || ""))) return "";
+      var pg = S.get("eprog_" + bl.pid), L = (pg && pg.solve && pg.solve.live) || {}; if (!L.prior) return "";
+      var C = (s && s.coach) || {}; if (storyOf(s, String(C.pk || "c:0")).prior) return "";
+      return bl.pid; } catch (e) { return ""; }
+  }
+  ST.priorPid = function (s, t) { var bl = null; try { bl = AS.boundLive ? AS.boundLive(s) : null; } catch (e) { } return (bl && !bl.done && bl.pid) || priorPid27(s, t); };
   function priorClosed(pid) { if (!pid) return false; try { var pg = S.get("eprog_" + pid), L = (pg && pg.solve && pg.solve.live) || {}; return L.state === "solved" || L.state === "dropped" || (A.livePhase && A.livePhase(pid) === "done"); } catch (e) { return false; } }
   /* کارِ پیشینِ مسئلهٔ زنده یا گفت‌وگو: L.prior (از import) یا story ِ کلیدِ همین لحظه */
   /* پرسشِ ازسرگیری پرسشِ نوبت است تا وقتی کارِ تازه‌ای (طرح/گام/نتیجه) پس از آخرین به‌روزشدنِ دفتر در داستان نیامده.
@@ -59186,15 +59247,40 @@ APP.goFromURL = function (q) {
   /* این پیام درخواستِ «گزارشِ کارِ پیشین» می‌گیرد؟ — فقط آغازِ مسئله (یا همان پیامی که دفتر از آن آمد)، یا پیامی که خودش کارِ پیشینش می‌خواند */
   function ownWorkN(t) { return sentences(String(t || "")).filter(function (x) { return WORK24.test(x) && !TEST25.test(x); }).length; }
   var STRONG25 = /[0-9۰-۹]\s*(?:[=×*÷\/+−\-]|ضربدر|ضرب\s*در|تقسیم\s*بر|منهای|به[‌\s]?علاوه)\s*[0-9۰-۹][^.!؟?\n]{0,60}(?:=|میشه|می[‌\s]?شود|می[‌\s]?شه|شد)\s*(?:حدود(?:ِ)?\s*)?[0-9۰-۹]|حساب(?:ش)?\s*(?:رو|را)?\s*کرد(?:م|ه[‌\s]*ام|ه\s*بودم)[^.!؟?\n]*[0-9۰-۹]|[0-9۰-۹][^.!؟?\n]*حساب(?:ش)?\s*(?:رو|را)?\s*کرد(?:م|ه[‌\s]*ام|ه\s*بودم)|گام(?:ِ)?\s*(?:[0-9۰-۹]+|اول)\s*[:：—\-–]|(?:^|\s)(?:[0-9۰-۹]+|x|y|n|[a-zA-Z])\s*(?:رو|را)\s*[^.!؟?\n]{0,12}گرفتم|(?:وزن|نمره)\s*دادم|=[^.!؟?\n]{0,40}(?:پس|یعنی|بنابراین)|(?:پس|یعنی|بنابراین)[^.!؟?\n]{0,40}=|تصمیم\s*گرفت(?:م|ه[‌\s]*ام)[^.!؟?\n]*(?:چون|زیرا)|پس\s+[^.!؟?\n]{0,24}[0-9۰-۹][^.!؟?\n]{0,12}می[‌\s]?مونه|[0-9۰-۹]\s*[^.!؟?\n0-9۰-۹]{0,14}(?:میشه|می[‌\s]?شود|شد)\s*(?:حدود(?:ِ)?\s*)?[0-9۰-۹]/;
+  /* ---------- دورِ ۲۷ (C56؛ A27-13، B27·D3، C25-7) — گامِ کارشده در آغاز، حتی تنها یک رابطه با مقدارِ حساب‌شده ----------
+     ریشه: STRONG25 فقط «عدد عملگر عدد» ِ چسبیده را می‌شناخت — «۲۰۰ پیام در ثانیه × ۳۶۰۰ = ۷۲۰۰۰۰»، «۴۰ میلیون × ۱٫۲ = ۴۸ میلیون» (واحد میانِ عدد و عملگر) را نه؛
+     جملهٔ «امتحان کردم: … میشه 16−1=15» را TEST25 کنار می‌گذاشت هرچند حسابِ نوشته‌شده دارد؛ «طول + عرض = ۱۸» (رابطهٔ نمادین با مقدار) و «… ۱۳ تا ⇒ ۱۳/۲۷» (استنتاج با پیکان) هم نه.
+     حالا: (۱) حسابی که موتورِ خودِ صفحه (a46 ST.arithChk) در جمله می‌خواند و عملگر دارد — درست یا نادرست — گامِ کارشده است، با «امتحان کردم» هم؛
+     (۲) رابطهٔ نمادینِ دو واژه با مقدار، فقط با نشانهٔ «خودم/رفتم/گام» در همان پیام (صورتِ مسئله «x² − y² = 15» گام نیست)؛ (۳) عدد … «⇒» عدد.
+     «خودم یه گام رفتم» / «گامِ اول رو خودم رفتم» نشانهٔ صریحِ کارِ خودش است؛ پیامی که مسئلهٔ تازه‌ای را با گامِ خودش می‌آورد («یه سؤالِ تازه: … خودم یه گام رفتم») آغازِ همان مسئله است. */
+  var OWNSTEP27 = /خودم[^.!؟?\n]{0,30}(?:(?:یه|یک|اولین|نخستین)\s*)?گام(?:ش|ی)?\s*(?:رو\s*|را\s*)?(?:رفتم|برداشتم|جلو\s*رفتم)|گام(?:ِ|‌ِ)?\s*(?:اول|نخست|۱|1)(?:ش)?\s*(?:رو|را)\s*خودم\s*(?:رفتم|برداشتم|حساب\s*کردم)/;
+  var NEWP27 = /(?:یه|یک)\s*(?:سؤال|سوال|مسئله|مساله|مشکل)(?:ِ|ٔ|‌ی|ی)?\s*(?:تازه|جدید|دیگه|دیگر)/;
+  var SYMREL27 = /(?:[آ-ی]{2,}|[a-zA-Z])\s*[+×*÷\/−-]\s*(?:[آ-ی]{2,}|[a-zA-Z])\s*(?:=|میشه|می[‌\s]?شه)\s*[0-9۰-۹]/, ARROW27 = /[0-9۰-۹][^.!؟?\n]{0,80}(?:⇒|=>|→)\s*[0-9۰-۹]/;
+  function worked27(x, own) {
+    if (ARROW27.test(x) && !TEST25.test(x)) return true;   // «امتحان کردم: p=5 ⇒ ۲۴» حالتِ آزموده است، نه گام (A25-4)؛ حسابِ با عملگر («16−1=15») هنوز گام است
+    if (own && SYMREL27.test(x)) return true;
+    try { return ST.arithChk(x).some(function (c) { return /[+\-−*×÷\/^]/.test(String(c.expr)) && /^\d/.test(String(c.said)); }); } catch (e) { return false; }
+  }
+  ST.worked27 = worked27;
+  /* ادغامِ دورِ ۲۷ (arith × prior): بی نشانهٔ کارِ خودش، حسابِ درست در گپِ روزمره («امروز ۲ × ۳ = ۶ تا تخم‌مرغ خریدیم، خوش گذشت») گامِ کارشده نیست —
+     فقط وقتی پیام نشانهٔ مسئله دارد (پرسش، «مسئله/سؤال»، «نمی‌دونم»، «می‌خوام بدونم»، «چقدر/چطور/چند/چرا»، گیر). */
+  var PROB27 = /[؟?]|مسئله|مساله|سؤال|سوال|مشکل|نمی[‌\s]?دونم|نمی[‌\s]?دانم|می[‌\s]?خوام\s*بدونم|چطور|چقدر|چند|چرا|کمک/;
+  function probSig27(t) { return PROB27.test(String(t || "")) || STUCK27.test(String(t || "")); }
+  var TESTOK27 = /درسته|درست\s*(?:است|بود|درمیاد|درومد|در\s*میاد)|جور\s*(?:در)?(?:میاد|اومد|درآمد)/;
+  var STUCK27 = /گیر\s*کردم|موندم|تا\s*این[‌\s]*جا\s*(?:رفتم|رسیدم|اومدم)|از\s*این[‌\s]*جا\s*(?:به\s*بعد|گیر)/;
   function priorAsk(s, pid, msg) {
     var t = String(msg || ""); if (!t.trim() || /^\s*\[/.test(t)) return false;
     /* C7: «بلند» طول نیست — گامِ کارشدهٔ خودش (حساب با نتیجه، استنتاج، تصمیمِ گرفته با دلیل) حتی یکی؛ «اول/بعد/پس» ِ تنها (خاطره، پرسش، بلندفکری) نه */
-    if (!sentences(t).some(function (x) { return STRONG25.test(x) && !TEST25.test(x); })) return false;
+    var own27 = OWNSTEP27.test(t) || MINE26.test(t) || STUCK27.test(t);
+    /* حالتِ آزموده («دارم امتحان می‌کنم: ۷+۷=۱۴، ۱۱+۷=۱۸ … جور نمیشه») گام نیست؛ آزمونی که خودش «درسته» خواند («امتحان کردم: … 16−1=15 درسته») گامِ اوست (C25-7) */
+    if (!sentences(t).some(function (x) { return (STRONG25.test(x) && !TEST25.test(x)) || (worked27(x, own27) && (own27 || probSig27(t)) && (!TEST25.test(x) || TESTOK27.test(x))); })) return false;
     if (OTHER26.test(t) && !MINE26.test(t)) return false;   // دورِ ۲۶ (بانکِ R26 #127): کارِ کسِ دیگر — مگر کارِ خودش هم در همان پیام باشد
     /* «حلش کردم!»، «اثبات کردم …» بی این‌که خودش آن را کارِ پیشین بخواند یا گام‌هایش را بشمارد، ادعای حل است (بازنگری)، نه کارِ پیشین برای داوری */
     if (DONE25.test(t) && !CALLS25.test(t)) return false;
     var pr = ST.priorFor(s, pid); if (pr) return (!!pr.src && pr.src === clip(nz(t), 200)) || CALLS25.test(t);
     if (CALLS25.test(t)) return true;
+    /* دورِ ۲۷ (C56): «خودم یه گام رفتم» در پیامی که مسئلهٔ تازه‌ای می‌آورد ⇒ آغازِ همان مسئله (پس از مسئلهٔ دیگری در همین نشست هم) */
+    if (OWNSTEP27.test(t) && NEWP27.test(t)) return true;
     return priorOpenAt(s, pid, { text: t, at: "~" });
   }
   ST.priorAsk = priorAsk;
@@ -59206,11 +59292,14 @@ APP.goFromURL = function (q) {
        resume  — نقطهٔ ازسرگیریِ دفتر؛ اگر همین پیام همان گام را دوباره نوشته، هر دو شاخه گفته می‌شود (A25-2). */
   ST.priorTurn = function (s, pid, mt) {
     var t = String(mt || ""); if (!t.trim() || /^\s*\[/.test(t)) return null;
+    if (!pid && s) pid = priorPid27(s, t);   // دورِ ۲۷ (C56): پس از بستن، دفترِ همان مسئله
     var pr = ST.priorFor(s, pid);
     if (!pr) { if (!priorAsk(s, pid, t)) return null;
       return { id: "open", q: OPEN_Q25, line: "پیامش کارِ پیشینِ خودش را دارد (مسئله، ایده و گام‌هایی که خودش برداشته) — پرسشِ این نوبت **نقطهٔ ازسرگیری** است: حکمِ هر گام را بده (قراردادِ «# کارِ پیشینِ تو»)، سپس نخستین گامی را که «✓ درست» نیست با شماره و نقلِ خودش نام ببر و فقط همان را بپرس؛ اگر همه درست بود، گامِ بعدیِ خودش را بپرس. کلِ مسئله در یک جمله، مجهول و راهِ آزمودنِ حدس را نپرس — پرسشِ «درست است» ِ او جوابش همان حکمِ گام‌هاست. پرسشِ این نوبت: «" + OPEN_Q25 + "»" }; }
-    if (priorClosed(pid)) return null;
+    /* دورِ ۲۷ (D26-11 پس از بستن، C56): مسئلهٔ بسته پرسشِ ازسرگیری ندارد (A25-20) — ولی ردِ حکم، پس گرفتنش، «کدام گام؟» و «دوباره» پس از بستن هم شنیده می‌شوند */
+    var closed27 = priorClosed(pid);
     var R = readReply(pr, t, { first: (pr.turns || 0) < 1 }), no = R.acts.filter(function (a) { var x9 = pr.steps[a.n - 1]; return a.act === "no" && !!x9; })[0];
+    if (closed27 && !no && !(R.which && R.which.length > 1) && !R.again && !R.acts.some(function (a) { return /^undo/.test(a.act); })) return null;
     /* دورِ ۲۶ (U8): «چرا میگی …؟» که به دو گام می‌خورد و هیچ‌کدام گامِ ازسرگیری نیست ⇒ صفحه می‌پرسد کدام گام — حدس نمی‌زند، «خودت فکر می‌کنی چرا؟» هم نه */
     if (!no && R.which && R.which.length > 1) { var qw = "حکمِ کدام گام را می‌گویی — " + R.which.map(function (n) { return "گامِ " + fa(n); }).join(" یا ") + "؟";
       return { id: "which", ns: R.which, q: qw, fixed: true, line: "پیامش حکمِ یکی از گام‌ها را زیرِ پرسش می‌برد ولی روشن نیست کدام (" + R.which.map(function (n) { return "گامِ " + fa(n) + " «" + clip(curText(pr.steps[n - 1]), 40) + "»"; }).join("؛ ") + "). حدس نزن و «چرا» را به خودش برنگردان؛ فقط همین یک پرسش: «" + qw + "»" }; }
@@ -59218,7 +59307,7 @@ APP.goFromURL = function (q) {
     var un26 = R.acts.filter(function (a) { return /^undo/.test(a.act) && (openNo(pr.steps[a.n - 1]) || a.act === "undo-ok"); })[0];
     if (!no && un26) { var xu = pr.steps[un26.n - 1], simU = JSON.parse(JSON.stringify(pr)), qu = ""; try { var yu = simU.steps[un26.n - 1], eu = null; (yu.herHist || []).forEach(function (h) { if (h.noAt && !h.undone) eu = h; });
         if (eu && yu.re && yu.re.by === "coach" && eu.v && eu.v !== yu.verdict && !yu.fixed) { yu.verdict = eu.v; yu.why = eu.why || ""; } delete yu.re; delete yu.reAt; yu.her = un26.act === "undo-ok" ? "ok" : (eu && eu.her) || ""; yu.ackT = 1; relink(simU); simU.turns = 0; qu = priorQ(simU); } catch (e) { qu = ""; }
-      return { id: "undo", n: xu.n, q: qu, fixed: true, line: "همین پیام ردِ خودش بر حکمِ گامِ " + fa(xu.n) + " را **پس می‌گیرد** — این ردِ تازه نیست و دوباره‌سنجی نمی‌خواهد. صفحه حالتِ پیش از رد را با تاریخچه برمی‌گرداند؛ در یک جمله همین را تأیید کن (بی سرزنش) و دوباره داوری نکن" + (qu ? "؛ سپس فقط همین یک پرسش: «" + qu + "»" : "") + "." }; }
+      return { id: "undo", n: xu.n, q: closed27 ? "" : qu, fixed: !closed27, line: "همین پیام ردِ خودش بر حکمِ گامِ " + fa(xu.n) + " را **پس می‌گیرد** — این ردِ تازه نیست و دوباره‌سنجی نمی‌خواهد. صفحه حالتِ پیش از رد را با تاریخچه برمی‌گرداند؛ در یک جمله همین را تأیید کن (بی سرزنش) و دوباره داوری نکن" + (qu && !closed27 ? "؛ سپس فقط همین یک پرسش: «" + qu + "»" : "") + "." }; }
     if (no) { var x = pr.steps[no.n - 1], okV = x.verdict === "ok" && !x.stale, ckD = okV ? ST.arithChk(curText(x)) : [], pgOk = okV && ckD.length > 0 && ckD.every(function (c) { return c.ok === true; }),
         q = no.why ? "دلیلت برای گامِ " + fa(x.n) + " («" + clip(no.why, 70) + "»): همین دلیل " + (okV ? "نشان می‌دهد گام نادرست است — کدام بخشش را می‌شکند؟" : "گام را کامل ثابت می‌کند — هر حالتی را می‌پوشاند؟") : "حکمِ گامِ " + fa(x.n) + " («" + clip(curText(x), 60) + "») را رد کردی — به چه دلیل " + (okV ? "نادرست" : "درست") + " است؟";
       return { id: "dispute", n: x.n, q: q, line: "همین پیام حکمِ گامِ " + fa(x.n) + " («" + clip(curText(x), 60) + "» — " + VERD[x.verdict] + ") را رد می‌کند" + (no.why ? "؛ دلیلِ خودش: «" + clip(no.why, 120) + "»" : "") + ". نخست همان گام را **با شاهد دوباره بسنج** (" + (x.pageBad ? "حسابِ صفحه: " + (x.chkM || x.chk) : pgOk ? "حسابِ صفحه همان را می‌خواند: " + ckD.map(function (c) { return String(c.expr) + " = " + String(c.said); }).join("؛ ") : "دلیلِ حکم: " + (x.why || "—")) + ") — نه کوتاه آمدنِ بی‌دلیل، نه پافشاریِ بی‌دلیل؛ نتیجه را در coach_state بده: \"prior\":[{\"n\":" + x.n + ",\"quote\":\"همان نقل\",\"verdict\":\"…\",\"why\":\"شاهدِ دوباره‌سنجی\"}] تا روی صفحه بنشیند. این ردِ حکم است، نه حدسِ تازه و نه «چرا» ِ توضیح‌خواه: «چرا» را به خودش برنگردان و آزمونِ حدس نخواه. سپس فقط همین یک پرسش: «" + q + "»" }; }
@@ -59794,11 +59883,13 @@ APP.goFromURL = function (q) {
   /* ---------- دورِ ۲۴ (R8): «کارِ پیشینِ تو» در پرامپت، و قراردادِ گزارشش وقتی پیامش کارِ خودش را دارد ---------- */
   /* «کارِ خودش در پیام»: دست‌کم دو جمله با نشانهٔ گامِ خودش (حسابِ نوشته، «=»، «پس …»، «گامِ …»، «اول … بعد …»، «فرض/ثابت/امتحان/حساب کردم») — «چند گام» یعنی بیش از یکی */
   var WORK24 = /[0-9۰-۹]\s*(?:[=×*÷\/+−\-]|ضربدر|ضرب\s*در|تقسیم\s*بر|منهای|میشه|می[‌\s]?شود)\s*[0-9۰-۹]|(?:^|\s)(?:پس|بنابراین)\s|گام(?:ِ)?\s*(?:[0-9۰-۹]|اول|دوم|سوم)|(?:^|\s)(?:اول|بعد|سپس)\s|فرض\s*(?:کردم|کنیم)|ثابت\s*(?:کردم|می[‌\s]?شه)|امتحان\s*کردم|حساب\s*کردم|ایده(?:م|‌ام)?\s*(?:اینه|این\s*است)/;
-  function workMsg(t) { return sentences(String(t || "")).filter(function (x) { return WORK24.test(x); }).length >= 2; }
+  /* دورِ ۲۷ (C56، C25-7 pC1 p1): پیامی که گامِ کارشدهٔ خودش را دارد («من امتحان کردم: x=4 و y=1 میشه 16−1=15») کارِ اوست حتی با یک جمله — حسابِ صفحه سطرهای «می‌خواند» را هم نشان می‌دهد */
+  function workMsg(t) { var S0 = sentences(String(t || "")), own = OWNSTEP27.test(t) || MINE26.test(t) || TEST25.test(t);
+    return S0.filter(function (x) { return WORK24.test(x); }).length >= 2 || S0.some(function (x) { return worked27(x, own) && (own || (!/[؟?]/.test(x) && probSig27(t))); }); }   // بی نشانهٔ کارِ خودش، جملهٔ پرسشیِ حساب («۷ × ۸ = ۵۶ بود دیگه؟») کارِ او نیست
   ST.workMsg = workMsg;
   AS.promptHooks.push(function (s, msg) {
     try { if (/^\s*\[/.test(String(msg || ""))) return "";
-      var bl = AS.boundLive ? AS.boundLive(s) : null, pid = bl && !bl.done ? bl.pid : "", pr = markWait(s, pid, ST.priorFor(s, pid)), out = [], PT = null;
+      var bl = AS.boundLive ? AS.boundLive(s) : null, pid = (bl && !bl.done ? bl.pid : "") || priorPid27(s, msg), pr = markWait(s, pid, ST.priorFor(s, pid)), out = [], PT = null;
       try { PT = ST.priorTurn(s, pid, String(msg || "")); } catch (e) { PT = null; }
       if (pr) {
         out.push("# کارِ پیشینِ تو (حکمِ هر گام؛ نقل و عدد/واحد را صفحه سنجید)");
@@ -60745,16 +60836,22 @@ APP.goFromURL = function (q) {
     var steps = G.pr ? G.pr.steps.filter(function (x) { return x.pageBad && x.verdict === "wrong" && !x.fixed && !(x.re && x.re.by === "page" && x.reAt); }) : [];
     /* «✗» ِ پیامِ پیشین که همان گامِ دفتر است و یک بار بازسنجی شده، دوباره روی میز نیست */
     var doneK = G.pr ? G.pr.steps.filter(function (x) { return x.re && x.re.by === "page"; }).map(function (x) { return keyOf(x.fixed ? x.fixed.t : x.quote); }) : [];
+    /* دورِ ۲۷ (D27-2): «✗» ای که خودش همان گام را درست کرد (اصلاحِ خودش در دفتر) دیگر روی میز نیست — متنِ پیشینِ گام */
+    if (G.pr) G.pr.steps.forEach(function (x) { if (x.fixed && x.quote) doneK.push(keyOf(x.quote)); });
     var mem = (C.arithBad || []).filter(function (b) { return !b.re && b.seq !== (s.seq || 0) && !doneK.some(function (k) { return k.indexOf(keyOf(b.expr)) >= 0; }); });
     if (!steps.length && !mem.length) return null;
     /* اعتراض: واژهٔ خودش، یا بازنویسیِ همان حساب با همان نتیجه */
-    var mk = keyOf(mt), restates = function (e, v) { return mk.indexOf(keyOf(String(e) + "=" + String(v))) >= 0; }, said = CONTEST.test(mt);
+    /* دورِ ۲۷ (C46، D27-2 S1): بندِ فرضی («اگه یه روز صفحه حسابِ درستم رو غلط بخونه، از کجا بفهمم خطا از صفحه‌ست؟») اعتراض نیست — ST.hypoCut (a45، سهمِ «prior») آن را هم‌طول کنار می‌گذارد */
+    var mh = ST.hypoCut ? ST.hypoCut(mt) : mt;
+    var mk = keyOf(mh), restates = function (e, v) { return mk.indexOf(keyOf(String(e) + "=" + String(v))) >= 0; }, said = CONTEST.test(mh);
     /* همان حساب با نتیجهٔ دیگر در همین پیام = اصلاحِ خودش (کارِ دفتر، C8)، نه اعتراض */
     var mine = arithChk(mt), fixes = function (e, v) { var k = keyOf(e); return mine.some(function (c) { return keyOf(c.expr) === k && String(c.said) !== String(v); }); };
     steps.forEach(function (x) {
       var txt0 = x.fixed ? x.fixed.t : x.quote, ck = arithChk(txt0), bad = ck.filter(function (c) { return !c.ok; });
       if (!said && !bad.some(function (c) { return restates(c.expr, c.said); }) && !ck.some(function (c) { return (x.bad || []).indexOf(String(c.said)) >= 0 && restates(c.expr, c.said); })) return;
       if (bad.some(function (c) { return fixes(c.expr, c.said); })) return;
+      /* دورِ ۲۷ (C46): بی هیچ حسابِ خوانده‌شده بازسنجی «درست» نمی‌گوید — نسنجیده می‌ماند */
+      if (!bad.length && !ck.some(function (c) { return c.ok === true && !c.ask; })) { out.open = (out.open || []).concat([{ n: x.n, t: clip(txt0, 120) }]); return; }
       if (!bad.length) {   // صفحه حالا می‌خواند: «✗» ِ پیشین خطای خوانشِ خودِ صفحه بود
         var was = x.verdict, rep = null, ch = [];
         try { rep = ST.priorOf(s, { prior: [{ n: x.n, step: x.step, quote: x.quote, verdict: x.why ? "unchecked" : "ok", why: x.why || "" }] }, um); } catch (e) { rep = null; }
@@ -60774,18 +60871,25 @@ APP.goFromURL = function (q) {
     /* «✗» ِ پیامِ پیشین (بی دفتر) */
     if (!out.cleared.length && !out.kept.length) mem.forEach(function (b) {
       if ((!said && !restates(b.expr, b.said)) || fixes(b.expr, b.said)) return;
-      var ck = arithChk(b.text), mine = ck.filter(function (c) { return (!c.ok || (b.ask && c.ask)) && String(c.expr) === String(b.expr); });   // ✗ ای که از «نه، گرد نکردم» آمد (C26) با بازسنجی پاک نمی‌شود
+      /* دورِ ۲۷ (D27-2 S1، C46 «بازسنجی همیشه بازحساب است»): متنِ نگه‌داشته بریده است (۶۰۰ نویسه) — بازسنجی روی پیامِ کاملِ خودش؛ «درست» فقط وقتی همان حساب دوباره خوانده شد و ✓ است.
+         نیافتنِ همان حساب «درست» نیست: ✗ سرِ جایش می‌ماند و صفحه می‌گوید دوباره نتوانست بخواند (نسنجیده) — هرگز اعتماد به جای بازحساب. */
+      var full = b.text; if (/…$/.test(String(b.text || ""))) (s.msgs || []).some(function (m) { if (m && m.role === "user" && clip(m.text, 600) === b.text) { full = String(m.text); return true; } return false; });
+      var ck = arithChk(full), same = ck.filter(function (c) { return String(c.expr) === String(b.expr); }), mine = same.filter(function (c) { return !c.ok || (b.ask && c.ask); });   // ✗ ای که از «نه، گرد نکردم» آمد (C26) با بازسنجی پاک نمی‌شود
+      var reads = same.filter(function (c) { return c.ok === true && !c.ask; });
+      if (!mine.length && !reads.length) { b.re = { at: at, to: "unread" }; out.open = (out.open || []).concat([{ n: 0, t: fa(b.expr) + " = " + fa(b.saidT) }]); return; }
       b.re = { at: at, to: mine.length ? "wrong" : "ok" };
-      if (mine.length) out.kept.push({ n: 0, t: fa(b.expr) + " = " + fa(b.saidT), bad: mine }); else out.cleared.push({ n: 0, t: fa(b.expr) + " = " + fa(b.saidT), was: "wrong", to: "ok", ck: ck.filter(function (c) { return String(c.expr) === String(b.expr); }) });
+      if (mine.length) out.kept.push({ n: 0, t: fa(b.expr) + " = " + fa(b.saidT), bad: mine }); else out.cleared.push({ n: 0, t: fa(b.expr) + " = " + fa(b.saidT), was: "wrong", to: "ok", ck: reads });
     });
-    if (!out.cleared.length && !out.kept.length) return null;
+    if (!out.cleared.length && !out.kept.length && !(out.open || []).length) return null;
     var who = function (o) { return o.n ? "گامِ " + fa(o.n) + " («" + o.t + "»)" : "«" + o.t + "»"; };
     out.cleared.forEach(function (o) { var okL = ST.arithLines((o.ck || []).filter(function (c) { return c.ok && !c.ask; })); out.lines.push("✓ بازسنجی شد ⇒ درست: " + who(o) + " — حسابِ صفحه هم همان را می‌دهد" + (okL.length ? " (" + okL.join("؛ ") + ")" : "") + ". «✗» ِ پیشین از خوانشِ خودِ صفحه بود و همه‌جا برداشته شد (دفتر، 🧭، 📜، کارنامه)."); });
+    (out.open || []).forEach(function (o) { out.lines.push("؟ بازسنجی: صفحه حسابِ " + who(o) + " را دوباره نتوانست بخواند — نسنجیده؛ «✗» ِ پیشین نه برداشته شد نه تأیید؛ «درست» نخوانش و با خودش همان تکه را حساب کن."); });
     out.kept.forEach(function (o) { out.lines.push("✗ بازسنجی شد (یک بار) ⇒ حکم ماند: " + who(o) + " — " + o.bad.map(bothT).join("؛ ") + " (عددِ درست را لو نده)."); });
-    out.note = "🧮 بازسنجیِ حسابِ صفحه (به درخواستِ خودت): " + out.cleared.map(function (o) { return who(o) + " می‌خواند — بازسنجی شد ⇒ درست؛ «✗» ِ پیشین خطای خوانشِ صفحه بود و برداشته شد"; }).concat(out.kept.map(function (o) { return who(o) + " — " + o.bad.map(bothT).join("؛ ").replace(/نوشتهٔ خودش/g, "نوشتهٔ تو") + " — یک بار دوباره سنجیده شد و حکم ماند؛ همین تکه را خودت دوباره حساب کن"; })).join(" · ");
+    out.note = "🧮 بازسنجیِ حسابِ صفحه (به درخواستِ خودت): " + out.cleared.map(function (o) { return who(o) + " می‌خواند — بازسنجی شد ⇒ درست؛ «✗» ِ پیشین خطای خوانشِ صفحه بود و برداشته شد"; }).concat(out.kept.map(function (o) { return who(o) + " — " + o.bad.map(bothT).join("؛ ").replace(/نوشتهٔ خودش/g, "نوشتهٔ تو") + " — یک بار دوباره سنجیده شد و حکم ماند؛ همین تکه را خودت دوباره حساب کن"; }))
+      .concat((out.open || []).map(function (o) { return who(o) + " — صفحه دوباره نتوانست بخواندش (نسنجیده)؛ حکمِ پیشین نه برداشته شد نه تأیید — همین تکه را خودت دوباره حساب کن"; })).join(" · ");
     /* 📜: یک رویداد برای همین بازسنجی */
     try { if (A.EVLOG && A.EVLOG.add) A.EVLOG.add(Object.assign(G.pid ? { pid: G.pid } : { sess: s.id }, { id: "ar26_" + key.replace(/[^\w]/g, "_"), k: (ST.EV_K && ST.EV_K.prior) || "cprior", at: at, title: "بازسنجیِ حسابِ صفحه (اعتراضِ خودت)",
-      lines: out.cleared.map(function (o) { return who(o) + ": بازسنجی شد ⇒ درست («✗» ِ پیشین از خوانشِ صفحه بود)"; }).concat(out.kept.map(function (o) { return who(o) + ": بازسنجی شد ⇒ حکم ماند — " + o.bad.map(bothT).join("؛ ").replace(/نوشتهٔ خودش/g, "نوشتهٔ تو"); })),
+      lines: out.cleared.map(function (o) { return who(o) + ": بازسنجی شد ⇒ درست («✗» ِ پیشین از خوانشِ صفحه بود)"; }).concat(out.kept.map(function (o) { return who(o) + ": بازسنجی شد ⇒ حکم ماند — " + o.bad.map(bothT).join("؛ ").replace(/نوشتهٔ خودش/g, "نوشتهٔ تو"); })).concat((out.open || []).map(function (o) { return who(o) + ": دوباره خوانده نشد ⇒ نسنجیده"; })),
       out: "", src: um ? { sess: s.id, mid: AS.msgId ? AS.msgId(um) : "", text: um.text, at: um.at || "", title: s.title || "" } : null, by: "page" })); } catch (e4) { }
     C.arithRe = { key: key, out: out, said: false };
     return out;
@@ -60844,7 +60948,7 @@ APP.goFromURL = function (q) {
       var an = ""; try { var ra = ST.arithAnswer(s, msg); if (ra && ra.lines.length) an = ["# جوابِ او به «؟» ِ صفحه (پرسشِ گرد کردن / خوانشِ مقیاس در پیامِ پیشین)"].concat(ra.lines.map(function (l) { return "- زمینه (نه پرسشِ دوم): " + l; })).join("\n"); } catch (e0) { an = ""; }
       try { var r = ST.arithContest(s, msg); if (!r) return an;
         return (an ? an + "\n" : "") + ["# بازسنجیِ حسابِ صفحه (او به «✗» ِ صفحه اعتراض کرد؛ صفحه همان نوشته را یک بار دوباره سنجید)"].concat(r.lines.map(function (l) { return "- زمینه (نه پرسشِ دوم): " + l; }))
-          .concat(["- زمینه (نه پرسشِ دوم): " + (r.cleared.length ? "برای آنچه «درست» شد: روشن بگو حق با او بود و خطا از خوانشِ صفحه؛ دوباره از او نخواه لغزش بجوید. " : "") + (r.kept.length ? "برای آنچه «ماند»: بگو صفحه یک بار دوباره سنجید و حکم ماند، و همان تکه‌ای را که نمی‌خواند نشانش بده؛ عددِ درست را نگو — بگذار خودش همان تکه را دوباره حساب کند؛ نه کوتاه بیا و نه بحث را از نو کن؛ همین بازسنجی یک بار است. " : "") + "صفحه همین را به خودش هم نوشته است."]).join("\n");
+          .concat(["- زمینه (نه پرسشِ دوم): " + (r.cleared.length ? "برای آنچه «درست» شد: روشن بگو حق با او بود و خطا از خوانشِ صفحه؛ دوباره از او نخواه لغزش بجوید. " : "") + ((r.open || []).length ? "برای آنچه «نسنجیده» ماند: نه «درست» بگو نه «غلط»؛ بگو صفحه دوباره نتوانست بخواندش و با خودش همان تکه را حساب کن. " : "") + (r.kept.length ? "برای آنچه «ماند»: بگو صفحه یک بار دوباره سنجید و حکم ماند، و همان تکه‌ای را که نمی‌خواند نشانش بده؛ عددِ درست را نگو — بگذار خودش همان تکه را دوباره حساب کند؛ نه کوتاه بیا و نه بحث را از نو کن؛ همین بازسنجی یک بار است. " : "") + "صفحه همین را به خودش هم نوشته است."]).join("\n");
       } catch (e) { return an; }
     });
     AS.promptHooks.push(function (s, msg) {
