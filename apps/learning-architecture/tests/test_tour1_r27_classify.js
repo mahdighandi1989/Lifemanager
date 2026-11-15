@@ -122,6 +122,37 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
   });
 
 
+  // ================= C22/C38 — نامِ کوچکِ بی‌نشان در عنوان، 🧭 و «امروز» (C27-4 aC1 p12، D27-33 arD2 p12) =================
+  await section('names', async () => {
+    const C = [
+      ['حرفِ داداشم علی: اگه من ۶ تا تیله‌م رو بهش بدم، تیله‌هامون برابر میشه', 'حرفِ داداشم [نامِ شخص]: اگه من ۶ تا تیله‌م رو بهش بدم، تیله‌هامون برابر میشه', 'C27-4 aC1 p12 model title'],
+      ['یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه.', 'یه معمای دیگه: داداشم [نامِ شخص] میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه.', 'C27-4 aC1 p12 her sentence as a title'],
+      ['داداشم علی گفت کابل رو از مغازهٔ حسن آقا بگیرم، اونجا ارزون‌تره.', 'داداشم [نامِ شخص] گفت کابل رو از مغازهٔ [نامِ شخص] آقا بگیرم، اونجا ارزون‌تره.', 'D27-33 arD2 p12'],
+      ['خواهرم آیسودا گفت جوابش ۱۲ میشه', 'خواهرم [نامِ شخص] گفت جوابش ۱۲ میشه', 'a name not in the common list, bound by the speech verb'],
+      ['دوستِ پسرم کیان این رو پرسید', 'دوستِ پسرم [نامِ شخص] این رو پرسید', 'kin chain'],
+      ['مریم خانم همسایه‌مون یه کیک پخت', '[نامِ شخص] خانم همسایه‌مون یه کیک پخت', 'postposed honorific'],
+      // look-alikes: nothing changes
+      ['علی ۳ سیب دارد و ۲ تا به رضا می‌دهد', null, 'look-alike C22: a problem character with no kin word stays'],
+      ['داداشم امروز گفت جوابش ۱۲ میشه', null, 'look-alike: an adverb after «داداشم» is not a name'],
+      ['داداشم ۶ تا تیله داره', null, 'look-alike: a number after «داداشم»'],
+      ['داداشم هم همین رو گفت', null, 'look-alike: «هم»'],
+      ['داداشم کتاب خرید', null, 'look-alike: an object noun followed by a verb is not a name unless it is a known name'],
+      ['ممنون آقا، حاج آقا هم گفت', null, 'look-alike: «ممنون آقا» / «حاج آقا» are not names'],
+      ['خانم معلم گفت', null, 'look-alike: «خانم معلم»'],
+    ];
+    const got = await ev((C) => C.map(c => APP.AGE.privLabel(c[0])), C);
+    C.forEach((c, i) => chk(got[i] === (c[1] == null ? c[0] : c[1]), c[2] + ': «' + c[0] + '» ⇒ «' + got[i] + '»'));
+    // the page: the live problem's title (as the model gave it) on the problem list, 🧭 strip and Today; her own chat message stays byte-exact
+    await wipe(); await setB(await birthFor(9)); await fresh();
+    const P12 = 'یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش کن ببینم درسته یا نه.';
+    await turn(P12, 'خوب.', [{ do: 'live_new', title: 'حرفِ داداشم علی: ۶ تیله و برابری', statement: 'داداشم علی میگه اگه من ۶ تا تیله‌م رو بهش بدم، تیله‌هامون برابر میشه.', kind: 'prove' }]);
+    const v = await ev(async () => { const L = APP.liveAll().map(r => r.p.title); const o = { L, views: [] }; for (const a of [['home'], ['e_prob']]) { APP.go.apply(APP, a); await new Promise(r => setTimeout(r, 150)); o.views.push(document.querySelector('#main').innerText); }
+      o.msg = (__cur().msgs || []).filter(m => m.role === 'user').map(m => m.text)[0]; o.title = __cur().title || ''; return o; });
+    chk(!/علی/.test(JSON.stringify(v.L)) && !/علی/.test(v.title) && !/داداشم علی/.test(v.views[0]) && !/حرفِ داداشم علی/.test(v.views[1]), 'C27-4: «علی» is in no title (problem list, 🧭, Today); her statement on the problem card stays as she wrote it — ' + JSON.stringify([v.L, v.title, v.views.map(t => t.split('\n').filter(l => /داداشم علی/.test(l)))]).slice(0, 500));
+    chk(v.msg === P12, 'C55: her own chat message keeps the name as typed — ' + v.msg);
+  });
+
+
   console.log(JSON.stringify(info.summary || {}), JSON.stringify(info.nc), JSON.stringify(info.note || {}));
   await b.close();
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
