@@ -3764,6 +3764,9 @@
   /* دورِ ۲۶ (Q2، بانکِ R26 #44 «مسیر ۴۲۰ نیست، از جادهٔ جدید ۴۵۰ کیلومتره»، #49 «اول گفتم هفته‌ای دو بار؛ دفترم رو نگاه کردم، سه بار بوده»): «<عدد> نیست، … <عدد>» در همان بند، و روایتِ
      «اول/قبلاً گفتم X؛ … Y بوده» هم نشانهٔ اصلاحِ حرفِ خودش‌اند (گزارشِ مدل + تکهٔ پیشینِ خودش + مقدارِ درست در همین پیام همچنان لازم است) */
   CORR19b = new RegExp(CORR19b.source + "|[0-9۰-۹][^\\s،,.!؟?]*[\\s‌]+(?:[^\\s،,.!؟?]+[\\s‌]+)?نیست(?:ن|ند|ه)?[\\s‌]*[،,][^.!؟?\\n]{0,40}?[0-9۰-۹]|(?:اول(?:ش)?|قبلاً|قبلا|پیش‌?تر)[\\s‌]+(?:که[\\s‌]+)?(?:گفتم|نوشتم)(?![آ-ی])[^.!؟?\\n]{1,60}[؛;،,][^.!؟?\\n]{1,60}(?:بوده|بود|است)(?=[\\s.!،,]|$)", "i");
+  /* دورِ ۲۷ (R2، C48؛ A27-9 s04 «۴ نفریم نه ۵ … چقدر میشه؟»، C27-26 pwC1 «قیمتِ هر پنل ۵ میلیون بود نه ۴٫۵ — حالا سهمِ هر برادر چقدر میشه؟»): «X ⟨یکا/نام⟩ (بود|ـه|یم)؟ نه Y»
+     با هر یکا یا نامِ شمرده‌شده میانِ عدد و «نه» (بی ویرگول هم) خودش اصلاح است — پرسشِ همان پیام به مربی می‌رود و اصلاح رد نمی‌شود */
+  CORR19b = new RegExp(CORR19b.source + "|[0-9۰-۹]+(?:[.٫][0-9۰-۹]+)?[\\s‌]*(?:[آ-ی‌]{1,12}[\\s‌]+){0,2}(?:(?:بود|است|ـه)[\\s‌]+)?[،,]?[\\s‌]*نه[\\s‌]+[0-9۰-۹]", "i");
   AS.CORR_RE = CORR19b;
   /* بانکِ R19b (INF15 #15، #16): «اشتباه کردم» ِ تنها (کلید را جا گذاشتم، سرِ امتحان علامت را انداختم) اغلب کارِ بیرونی است، نه شکستِ مرحلهٔ همین حل —
      الگو آن را فقط «در انتظار» (pend) نگه می‌دارد تا گزارشِ مدل داوری کند (نامتقارن: شکستِ دروغ گران‌تر است)؛ «حل نشد/غلط بود» ِ دیگر مثلِ پیش */
@@ -3812,7 +3815,8 @@
     while (i < n) {
       while (i < n && isSep(i)) i++; if (i >= n) break; var s0 = i; while (i < n && !isSep(i)) i++;
       var w = T.slice(s0, i), cuts = [0];
-      for (var k = 1; k < w.length; k++) { var a = w.charAt(k - 1), b = w.charAt(k), da = DIG20.test(a), db = DIG20.test(b), pa = /[آ-ی]/.test(a), pb = /[آ-ی]/.test(b);
+      /* دورِ ۲۷ (R2، C27-26 pwC1 «۴٫۵» ⇐ «۵»): ممیزِ فارسی «٫» میانِ دو رقم بخشی از همان عدد است (در بازهٔ حروفِ فارسی است و «۴٫۵» را «۴» و «۵» می‌بُرید — «۵» در «۴٫۵» پیدا می‌شد) */
+      for (var k = 1; k < w.length; k++) { var a = w.charAt(k - 1), b = w.charAt(k), dm = function (q) { return w.charAt(q) === "٫" && DIG20.test(w.charAt(q - 1)) && DIG20.test(w.charAt(q + 1)); }, da = DIG20.test(a) || dm(k - 1), db = DIG20.test(b) || dm(k), pa = /[آ-ی]/.test(a) && !dm(k - 1), pb = /[آ-ی]/.test(b) && !dm(k);
         if (b === "=" || a === "=" || (da && pb) || (pa && db)) cuts.push(k); }
       cuts.push(w.length);
       for (var c = 0; c < cuts.length - 1; c++) { var ss = s0 + cuts[c], ee = s0 + cuts[c + 1], nn = nTok20(T.slice(ss, ee)); if (nn) out.push({ t: T.slice(ss, ee), n: nn, s: ss, e: ee }); }
@@ -3946,6 +3950,8 @@
   var EDIT20 = /^\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]/;
   AS.EDIT_RE = EDIT20;
   var CORR20 = new RegExp(CORR19b.source + "|(?:^|[\\s،,.])نه[\\s‌]*[،,!]|(?:^|[\\s،,.])نه[\\s‌]+[^\\s]|بود(?![آ-ی])|نبود(?:م|یم|ی)?(?![آ-ی])|غلط|اشتباه(?![\\s‌]*کردم)|تصحیح|منظورم|راستش|در[\\s‌]*واقع|درواقع|درست[\\s‌]*کن(?![آ-ی])|(?:رو|را)[\\s‌]+[^\\s]+[\\s‌]+(?:کن|کنید)(?![آ-ی])|درست(?:ش|ه)(?![آ-ی])");
+  /* دورِ ۲۷ (R2، C74): فرضی که در همان پیام به واقعیت بدل شد («اگه ۵ نفر بودیم …؟ آهان، اصلاً ۵ نفر بودیم») — بخشِ واقعیت نشانهٔ اصلاح است، بخشِ فرضی به مربی می‌رود */
+  CORR20 = new RegExp(CORR20.source + "|(?:^|[\\s،,.؟?])(?:آهان|آها)?[\\s،,]*(?:اصلاً|اصلا|در[\\s‌]*واقع|درواقع)[\\s‌]+[^.!؟?\\n]{0,40}?بود(?:ه|یم|ند|ن|م)(?![آ-ی])");
   AS.CORR_RE20 = CORR20;
   /* دلیلِ رد به زبانِ ساده (سطرِ سامانه برای خودش) */
   function plainErr20(e) { e = String(e || "");
@@ -3977,12 +3983,23 @@
     for (i = ui - 1; i >= 0 && !src; i--) if (isUser(M[i]) && !EDIT20.test(String(M[i].text || "")) && exactIn22(M[i].text, frag)) src = M[i];
     for (i = ui - 1; i >= 0 && !src; i--) if (isUser(M[i]) && hasTok20(M[i].text, frag)) src = M[i];
     if (!src && !one) for (i = ui - 1; i >= 0 && !src; i--) if (isUser(M[i]) && (hasFrag(M[i].text, frag) || (frag.length >= 4 && quoteIn(frag, M[i].text)))) src = M[i];
-    if (!src && !edit && (hasTok20(ut, frag) || quoteIn(frag, ut))) return { err: "نقل از پیامِ فعلی است، نه پیامِ پیشینش" };
+    /* دورِ ۲۷ (R2، D27-16 oD1 «اولش گفتم هر قرص ۰٫۳ گرمه؛ … ۰٫۲۵» در سشنِ تازهٔ همان مسئله): بازنقلِ حرفِ پیشینِ خودش در پیامِ کنونی («اولش گفتم X») منبع را از
+       میان نمی‌برد — نخست سشن‌های پیشینِ همان مسئله جست‌وجو می‌شوند و «نقل از پیامِ فعلی» فقط وقتی است که در هیچ‌کدام نیست (پیش‌تر این رد پیش از آن جست‌وجو می‌آمد) */
+    var quoteCur27 = !src && !edit && (hasTok20(ut, frag) || quoteIn(frag, ut));
     /* دورِ ۲۲ (P3، بانکِ R22 #72): حرفی که در سشنِ پیشینِ یک مسئلهٔ زنده (حتی حل‌شده) گفته بود — منبع همان پیام در همان سشن است، نه «نیست» */
     var xsS = null; if (!src) { try { var xs0 = (A.liveAll ? A.liveAll() : []).reduce(function (acc, r) { S.all("achat", function (y) { return y && y.id !== s.id && (y.lprob === r.p.id || r.sess === y.id || (y.lprobLog || []).some(function (e) { return e && e.p === r.p.id; })); }).forEach(function (y) { if (acc.indexOf(y) < 0) acc.push(y); }); return acc; }, []);
       xs0.sort(function (a0, b0) { return String(b0.updated || "").localeCompare(String(a0.updated || "")); }).some(function (y) { var U0 = (y.msgs || []).filter(isUser); for (var k = U0.length - 1; k >= 0; k--) if (!EDIT20.test(String(U0[k].text || "")) && (exactIn22(U0[k].text, frag) || (!one && hasTok20(U0[k].text, frag)))) { src = U0[k]; xsS = y; return true; } return false; }); } catch (e) { } }
+    /* … و بازنقل با واژه‌های خودِ این پیام («هر قرص ۰٫۳ گرمه») وقتی پیامِ پیشین همان مقدار را با واژهٔ دیگری گفته بود («قرص‌ها حدودِ ۰٫۳ گرم‌اند»): پیامِ پیشینی که مقدارِ پیشینِ نام‌برده
+       (old ِ مدل) را با دست‌کم یک واژهٔ معنادارِ همان تکه دارد منبع است */
+    if (!src && quoteCur27 && txtOf(x.old).trim()) { var ow27 = tok20(frag).map(function (t0) { return t0.n; }).filter(function (w) { return w.length >= 2 && !/^[0-9.٫]+$/.test(w) && !hasTok20(txtOf(x.old), w); });
+      for (i = ui - 1; i >= 0 && !src; i--) if (isUser(M[i]) && !EDIT20.test(String(M[i].text || "")) && hasTok20(M[i].text, txtOf(x.old).trim()) && ow27.some(function (w) { return hasTok20(M[i].text, w); })) src = M[i]; }
+    if (!src && quoteCur27) return { err: "نقل از پیامِ فعلی است، نه پیامِ پیشینش" };
     if (!src) return { err: "تکه در هیچ پیامِ پیشینِ خودِ او در این سشن نیست" };
-    if (hasTok20(frag, fix) || (typeof A.liveSameVal === "function" && A.liveSameVal(x.old ? txtOf(x.old) : frag, fix))) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };   // دورِ ۲۲: «۷۴ کیلو» = «۷۴ کیلوئه» به معنا
+    /* دورِ ۲۷ (R2، C48؛ A27-9 s04): «X نه Y» در نقلِ پیشین — مقدارِ آن پیام X است؛ Y ِ نفی‌شده «مقدارِ پیشین» نیست («ما ۵ نفر وارثیم نه ۴ نفر» ⇐ «۴ نفر» اصلاح است) */
+    var frag48 = typeof A.liveNegStrip48 === "function" ? A.liveNegStrip48(frag) || frag : frag;
+    /* … و وقتی مقدارِ پیشین را مدل نام برده و در تکه هست («۵» در «ما ۵ نفریم و ۴ میلیون پول داریم»)، سنجه همان مقدار است، نه هر عددِ دیگرِ تکه («۴ میلیون») */
+    var old48 = txtOf(x.old).trim(), byOld = !!old48 && hasTok20(frag, old48) && !hasTok20(old48, fix);
+    if ((!byOld && hasTok20(frag48, fix)) || (typeof A.liveSameVal === "function" && A.liveSameVal(x.old ? txtOf(x.old) : frag48, fix))) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };   // دورِ ۲۲: «۷۴ کیلو» = «۷۴ کیلوئه» به معنا
     /* دورِ ۲۳ (Q4، D23-7 aD3 «اولش که گفتم ۶۷ ماه اشتباه بود؛ درستش ۶۱ و نیمه»): «اشتباه گفتم» (لغزشِ گفتن) با «نتیجه‌ام رد شد» فرق دارد — حدس/نتیجه‌ای که خودش
        آزمود و رد شد بازنویسی نمی‌شود؛ «رد شد» شاهدِ کارِ اوست و مقدارِ تازه نتیجهٔ تازهٔ اوست (✏️ ِ خودِ پیام جداست) */
     if (!edit) { var refG = refutedTarget23(s, frag, what, key); if (refG) return { err: "آن حدس/نتیجه را خودش آزمود و رد شد («" + clip(refG, 40) + "») — «رد شد» همان می‌ماند و مقدارِ تازه نتیجهٔ تازهٔ اوست، نه اصلاحِ اشتباهِ گفتاری", refuted: true }; }

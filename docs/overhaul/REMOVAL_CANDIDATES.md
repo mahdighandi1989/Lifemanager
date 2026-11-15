@@ -463,3 +463,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R26 Q3 + Q6, C21 (U12, U13, U15, C26-12, A26-51, U32, D25-25).
 - **Status:** reachable, not called: `APP.STORY.R26_QUARANTINE.NEWPROB25`, `.switchTo`, `.qSentence`, `.fcMatch`, `.fcNarrow`, `.predFor`.
   Delete only with the owner's approval.
+## 2026-11-15 — Tour 1 round 27, fixer «correction»: `fixVal` body kept as `fixVal0`
+- **What:** in `apps/learning-architecture/src/app/a38_live.js` the old `fixVal` body is kept unchanged as `fixVal0`; the new `fixVal` wrapper refuses a
+  replacement that would put a new operand into a written, true equation of the same text (the text keeps its stale mark and the exact recomputation is
+  proposed instead).
+- **Why replaced:** DECISIONS_R27 C47 «Proposals are never made by text replacement» (B27·D8 «۲۴ × ۰٫۷۵ = ۱۶.۸»).
+- **Status:** called by `fixVal` and by the `D.parts` recursion.
+  Delete only with the owner's approval.
