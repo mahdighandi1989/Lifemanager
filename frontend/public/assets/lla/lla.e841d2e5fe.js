@@ -38709,7 +38709,25 @@ APP.goFromURL = function (q) {
      عنوان‌هایش (هر چه در پیام‌هایش هست) و نقلِ بلند دست نمی‌خورد */
   function pageLabel25(se, q) { q = String(q || ""); if (!q || tk22(q).length > 3 || !/(?:‌ات|ت)(?![آ-ی])/.test(q)) return false;
     var M = (se && se.msgs) || []; for (var i = 0; i < M.length; i++) if (isUser(M[i]) && String(M[i].text || "").indexOf(q) >= 0) return false; return true; }
-  function outMap25(se, l, fn) { var out = "", d = 0, buf = "", qb = ""; l = String(l || "");
+  /* دورِ ۲۷ (R8، C55 — B27·D4 s12 «… رو مرتب کنید»، «شما آناگرام»؛ aB4 «» جواب رو نگویید»؛ U37 «مانده: فقط بازنگریِ خودت»): گذرگاهِ ضمیر فقط وقتی حرفِ او را
+     دست نمی‌زد که همهٔ سطر حرفِ او بود یا درونِ «…» ِ سالم بود. سطرِ صفحه که برچسب + حرفِ او را در یک رشته دارد («کل: …»، «درس: …»، 📅 «…»)، و حرفِ اویی که خودش «
+     دارد یا بریده شده («… «پایتخت کشوری …») ژرفای «…» را به هم می‌زد: یا حرفِ او «شما» می‌شد یا بقیهٔ سطرِ صفحه دیگر تبدیل نمی‌شد. حالا پیش از تبدیل هر تکهٔ سطر که
+     عینِ نوشتهٔ اوست (≥ ۳ واژهٔ پیاپی، بی‌تغییرِ یک نویسه — نیم‌فاصله هم) با نشانه‌ای جدا می‌شود و پس از تبدیل همان بایت‌ها برمی‌گردد؛ «…» ِ درونِ حرفِ او هم دیگر
+     ژرفا نمی‌شمارد. متنِ خودِ صفحه (حتی برچسبِ ایستا) همان تبدیل را می‌گیرد. */
+  var OWN27_MIN = 3;
+  function ownSpans27(l) { var H = null, T = [], re = /[^\s«»]+/g, m, out = [];
+    while ((m = re.exec(l))) T.push([m.index, m.index + m[0].length]);
+    var norm = function (x) { return x.replace(/\s+/g, " "); };
+    for (var i = 0; i + OWN27_MIN - 1 < T.length; ) { if (H == null) H = hersText26(); if (!H) return out;
+      var j = i - 1; while (j + 1 < T.length && H.indexOf(norm(l.slice(T[i][0], T[j + 1][1]))) >= 0) j++;
+      if (j - i + 1 >= OWN27_MIN) { out.push([T[i][0], T[j][1]]); i = j + 1; } else i++; }
+    return out; }
+  AS.ownSpans27 = ownSpans27;
+  function outMap25(se, l, fn) { l = String(l || ""); var o0 = outMap25raw(se, l, fn); if (o0 === l && l.indexOf("«") < 0) return o0;   /* «…» ِ ناجورِ حرفِ او می‌توانست همهٔ سطر را «درونِ نقل» نشان دهد */
+    var sp = []; try { sp = ownSpans27(l); } catch (e) { sp = []; } if (!sp.length) return o0;
+    var keep = [], x = "", at = 0; sp.forEach(function (r, k) { x += l.slice(at, r[0]) + String.fromCharCode(0xE100 + k); keep.push(l.slice(r[0], r[1])); at = r[1]; }); x += l.slice(at);
+    return outMap25raw(se, x, fn).replace(/[\uE100-\uE1FF]/g, function (c) { return keep[c.charCodeAt(0) - 0xE100] || ""; }); }
+  function outMap25raw(se, l, fn) { var out = "", d = 0, buf = "", qb = ""; l = String(l || "");
     for (var i = 0; i < l.length; i++) { var ch = l.charAt(i);
       if (ch === "«") { if (d === 0) { out += fn(buf); buf = ""; qb = ""; } else qb += ch; d++; continue; }
       if (ch === "»" && d > 0) { d--; if (d === 0) { out += "«" + (qb.indexOf("«") < 0 && pageLabel25(se, qb) ? fn(qb) : qb) + "»"; qb = ""; } else qb += ch; continue; }
@@ -38738,7 +38756,8 @@ APP.goFromURL = function (q) {
       var H = null, w = document.createTreeWalker(root, 4 /* TEXT */, null), nd, L = [];
       while ((nd = w.nextNode())) L.push(nd);
       L.forEach(function (nd) { var t = nd.nodeValue; if (!t || nd.__r26 === t || !/[آ-ی]/.test(t) || !/[تیونشکرزدهآ]/.test(t)) return;   /* __r26: متنی که همین گذرگاه نوشت دوباره خوانده نمی‌شود (ناظرِ تغییر حلقه نمی‌زند) */ var el = nd.parentNode; if (!el || !el.closest) return;
-        if (el.closest(".as-panel, textarea, input, script, style, [contenteditable], .math, math, svg")) return;
+        if (el.closest(".as-panel, textarea, input, script, style, [contenteditable], .math, math")) return;
+        if (el.closest("svg") && !el.closest("svg.rt-svg")) return;   /* دورِ ۲۷ (R8، D26-40 aD3 «کارِ پیشینِ تو (از گفت‌وگو)» روی 🧭): برچسب‌های نقشهٔ مسیر متنِ خودِ صفحه‌اند؛ باقیِ svg (فرمول، نمودار) نه */
         var out = outMap25(se, t, toShoma); if (out === t) return;
         var key = t.replace(/\s+/g, " ").replace(/…\s*$/, "").trim(); if (key.length >= 6) { if (H == null) H = hersText26(); if (H.indexOf(key) >= 0) return; }
         nd.__r26 = out; nd.nodeValue = out; });
