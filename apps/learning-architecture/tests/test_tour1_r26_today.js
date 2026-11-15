@@ -6,7 +6,8 @@
 //   Q8 — A26-28 (aA3 p7–8، aA4 p8–9) · U49/U50 (aB3 p9–p14) · D26-14 (pwD1 p5–6) · B26·D32 (oB1 p31–32) · B25·D22 STILL (oB1 p14) · D26-23 (oD1 p17) · A26-46 (oA1 p16–17)
 //  و بانکِ مستقلِ VARIANTS_R26 (tests/variants/VARIANTS_R26.json): Q5 = #130–#162، Q8 = #203–#221.
 //  هیچ تاریخی در انتظارها نوشته نشده: همه از ساعتِ یخ‌زدهٔ T0 حساب می‌شوند.
-// LLA_FILE = ساختِ دیگر (قرمزِ اول)؛ ONLY=reader,ask,model,pred,corr,bank5,bank8
+// LLA_FILE = ساختِ دیگر (قرمزِ اول)؛ ONLY=reader,ask,model,pred,corr,bank5,bank8,clar
+//  بخشِ clar: DECISIONS_R26 «Clarifications after the independent bank» C32–C35 و C37 (پس از وقفهٔ ۲۰۲۶-۱۱-۱۲ افزوده شد)
 const { chromium } = require('playwright');
 const path = require('path');
 const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'dist', 'learning-architecture.html'));
@@ -328,8 +329,10 @@ const HELPERS = () => {
     BK(132, r.ask.length === 1 && /درست است؟/.test(r.ask[0]) && !/همین امروز یا/.test(r.ask[0]) && r.pend.length === 1 && r.pend[0].date === d && !r.pend[0].amb, { r, d });
     r = await ask1(1, 'هفته‌ی بعد، جمعه میرم می‌خرمش', [{ do: 'coach_state', ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'practical', plan: { text: 'هفته‌ی بعد، جمعه میرم می‌خرمش', when: '+4' } }]); d = await plus(r, 11);
     BK(133, r.ask.length === 1 && /درست است؟/.test(r.ask[0]) && r.pend.length === 1 && r.pend[0].date === d && r.pl[0].when === 'next-session' && r.dl.length === 0, { r, d });
-    r = await ask1(0, 'آخرِ هفتهٔ بعد میرم شهرستان سراغش'); { const d11 = await plus(r, 11), d12 = await plus(r, 12); y = await yes('آره');
-      BK(134, r.ask.length === 1 && r.pend.length === 1 && (r.pend[0].date === d11 || r.pend[0].date === d12) && r.dl.length === 0 && y.dl.length === 1, { r, y }); }
+    /* #134 — DECISIONS_R26 C33 (پس از نوشتنِ بانک): «آخرِ هفتهٔ بعد» یک روز نیست ⇒ صفحه پنجشنبه یا جمعه (D0+11 / D0+12) را می‌پرسد؛
+       «آره» ِ ساده هیچ‌کدام را برنمی‌گزیند (ثبت نمی‌شود، یک سطر می‌گوید)، و «جمعه» همان را ثبت می‌کند. بخشِ «فقط با پاسخِ او ثبت می‌شود» ِ ورودی همان است. */
+    r = await ask1(0, 'آخرِ هفتهٔ بعد میرم شهرستان سراغش'); { const d11 = await plus(r, 11), d12 = await plus(r, 12); y = await yes('آره'); const y2 = await yes('جمعه');
+      BK(134, r.ask.length === 1 && r.pend.length === 1 && r.pend[0].amb && (r.pend[0].date === d11 || r.pend[0].date === d12) && r.dl.length === 0 && y.dl.length === 0 && y2.dl.length === 1 && y2.dl[0].date === d12, { r, y, y2, d11, d12 }); }
     r = await ask1(0, 'سه روز دیگه با بنگاه قرار دارم'); d = await plus(r, 3); y = await yes('باشه');
     BK(135, r.pend.length === 1 && r.pend[0].date === d && y.dl.length === 1 && y.dl[0].date === d && y.lines.filter(x => /ثبت شد/.test(x)).length === 1, { r, y });
     r = await ask1(0, 'سه روز دیگه با استاد راهنما جلسه دارم'); d = await plus(r, 3); y = await yes('آره همون فصلِ ۲ رو میگم'); { const y2 = await yes('آره، تاریخش هم درسته');
@@ -385,8 +388,9 @@ const HELPERS = () => {
     const say1 = async (dayN, text, acts) => { await fresh(dayN); return E(async ([text, acts]) => { const pr = await __say(text, 'خب.', __rel(acts || [__cs({})])); return { preds: __preds(), fc: __fc(), ask: __ask(), pend: ((__cur().datePend || {}).items || []).map(x => x.date), td: APP.today(), guessNote: /همین پیام حدس است/.test(pr) }; }, [text, acts]); };
     const then = (t, acts) => E(async ([t, acts]) => { const n0 = __sysLines().length; const pr = await __say(t, 'خب.', __rel(acts || [__cs({})])); return { preds: __preds(), fc: __fc(), lines: __sysLines().slice(n0), dl: __dl(), today: __today(), pr }; }, [t, acts]);
     let r, y;
-    r = await say1(0, 'هفتاد درصد مطمئنم تا آخرِ همین هفته فصلِ ۳ رو تموم می‌کنم'); { const fri = await E(() => __nextDow(5)); y = await then('آره');
-      BK(203, r.preds.length === 1 && r.preds[0].p === 70 && r.pend.length === 1 && r.pend[0] === fri && y.fc.length === 1 && y.fc[0].p === 70 && y.fc[0].due === fri, { r, y, fri }); }
+    /* #203 — DECISIONS_R26 C33 (پس از نوشتنِ بانک): «آخرِ همین هفته» ⇒ صفحه پنجشنبه یا جمعه را می‌پرسد؛ پاسخِ «جمعه» همان تأییدِ تاریخِ صفحه است که ورودی می‌خواهد */
+    r = await say1(0, 'هفتاد درصد مطمئنم تا آخرِ همین هفته فصلِ ۳ رو تموم می‌کنم'); { const fri = await E(() => __nextDow(5)); y = await then('جمعه');
+      BK(203, r.preds.length === 1 && r.preds[0].p === 70 && r.pend.length === 1 && r.pend[0] === fri && r.ask.length === 1 && /پنجشنبه/.test(r.ask[0]) && y.fc.length === 1 && y.fc[0].p === 70 && y.fc[0].due === fri, { r, y, fri }); }
     await fresh(0); await E(() => __birth('1959-03-01'));
     r = await E(async () => { await __say('به احتمالِ نود درصد فردا جوابِ آزمایش میاد', 'خب.', [__cs({})]); return { preds: __preds(), tom: APP.addDays(APP.today(), 1), pend: ((__cur().datePend || {}).items || []).map(x => x.date) }; }); y = await then('بله');
     BK(204, r.preds.length === 1 && r.preds[0].p === 90 && y.fc.length === 1 && y.fc[0].p === 90 && y.fc[0].due === r.tom, { r, y });
@@ -423,6 +427,39 @@ const HELPERS = () => {
     await fresh(0); r = await E(async () => { await __say('ماشین صبح‌ها دیر روشن میشه', 'خب.', [__cs({ said: ['guess'], guess: { text: 'باتری ضعیف شده' } })]); const pr = await __say('خب؟', 'خب.', [__cs({})]); return { refused: /عیناً در پیامِ او نبود/.test(pr), g: ((__cur().coach || {}).guesses || []).length }; });
     BK(219, r.refused && r.g === 0, r);
     r = await say1(0, 'هفتاد درصدِ کتاب رو تا دیروز خونده بودم'); BK(221, r.preds.length === 0 && r.fc.length === 0 && r.ask.length === 0, r);
+  });
+
+  /* ===== DECISIONS_R26 «Clarifications after the independent bank» C32–C35، C37 (افزوده هنگامِ کار؛ هر مثبت با همانندِ منفی) ===== */
+  await section('clar', async () => {
+    const one = async (dayN, msgs) => { await fresh(dayN); return E(async (msgs) => { const o = { td: APP.today() }; for (let i = 0; i < msgs.length; i++) { const n0 = __sysLines().length; await __say(msgs[i], 'خب.', [__cs({})]); o['l' + i] = __sysLines().slice(n0); o['dl' + i] = __dl(); o['pend' + i] = ((__cur().datePend || {}).items || []).map(x => ({ date: x.date, amb: !!x.amb, opts: x.opts || null })); }
+      o.preds = __preds(); o.fc = __fc(); o.dq = __dq().map(d => ({ txt: d.txt, acts: (d.acts || []).map(a => a.t) })); return o; }, msgs); };
+    const D = (r, n) => E(([d, n]) => APP.addDays(d, n), [r.td, n]);
+    /* C32 — یکشنبه: «جمعهٔ بعد» دوپهلوست ⇒ با هر دو تاریخ می‌پرسد؛ «همین جمعه» ⇒ D0+5، «جمعهٔ بعد/هفتهٔ بعد» ⇒ D0+12 */
+    let r = await one(0, ['جمعهٔ بعد مقاله رو می‌فرستم', 'همین جمعه']); let d5 = await D(r, 5), d12 = await D(r, 12);
+    X('C32 «جمعهٔ بعد» در یکشنبه ⇒ یک پرسش با هر دو جمعه؛ تا پاسخ چیزی ثبت نمی‌شود؛ «همین جمعه» ⇒ جمعهٔ پیشِ رو', r.l0.length === 1 && /کدام روز/.test(r.l0[0]) && r.pend0.length === 1 && r.pend0[0].amb && JSON.stringify(r.pend0[0].opts) === JSON.stringify([d5, d12]) && r.dl0.length === 0 && r.dl1.length === 1 && r.dl1[0].date === d5, r);
+    r = await one(0, ['جمعهٔ بعد مقاله رو می‌فرستم', 'هفتهٔ بعد']); X('C32 «هفتهٔ بعد» ⇒ جمعهٔ پس از آن', r.dl1.length === 1 && r.dl1[0].date === d12, r);
+    r = await one(0, ['جمعهٔ بعد مقاله رو می‌فرستم']); X('C32 ردیفِ «امروز» دو دکمهٔ دو تاریخ + «هیچ‌کدام» دارد', r.dq.length === 1 && r.dq[0].acts.length === 3 && /جمعه/.test(r.dq[0].acts[0]) && /جمعه/.test(r.dq[0].acts[1]), r);
+    r = await one(5, ['جمعه‌ی بعد شام رو زودتر می‌خورم']); { const d7 = await D(r, 7); X('C32 همانندِ منفی: در خودِ جمعه «جمعه‌ی بعد» دوپهلو نیست ⇒ هفت روز بعد با «… درست است؟»', r.l0.length === 1 && /درست است؟/.test(r.l0[0]) && r.pend0.length === 1 && !r.pend0[0].amb && r.pend0[0].date === d7, r); }
+    /* C33 — «آخرِ هفته / آخرِ همین هفته / آخرِ هفتهٔ بعد» ⇒ پنجشنبه یا جمعه */
+    r = await one(0, ['آخرِ همین هفته کمد رو می‌سازم', 'پنجشنبه']); { const d4 = await D(r, 4);
+      X('C33 «آخرِ همین هفته» ⇒ پرسشِ پنجشنبه یا جمعه؛ «پنجشنبه» ⇒ ثبتِ پنجشنبه', r.l0.length === 1 && /پنجشنبه/.test(r.l0[0]) && /جمعه/.test(r.l0[0]) && r.pend0[0].amb && JSON.stringify(r.pend0[0].opts) === JSON.stringify([d4, d5]) && r.dl1.length === 1 && r.dl1[0].date === d4, r); }
+    r = await one(0, ['آخرِ هفته کمد رو می‌سازم', 'باشه']); X('C33 «باشه» هیچ‌کدام از دو روز را برنمی‌گزیند ⇒ چیزی ثبت نمی‌شود و یک سطر می‌گوید کدام را بنویسد', r.dl1.length === 0 && r.l1.length === 1 && /پنجشنبه/.test(r.l1[0]) && /جمعه/.test(r.l1[0]), r);
+    r = await one(0, ['آخرِ هفته‌ها معمولاً مهمون داریم']); X('C33 همانندِ منفی: «آخرِ هفته‌ها» عادت است ⇒ پرسشی نیست', r.l0.length === 0 && r.pend0.length === 0, r);
+    /* C34 — موعدی که خودش برای کارِ خودش می‌گوید ⇒ مسیرِ C12؛ واقعیتی دربارهٔ دیگری ⇒ بی پرسش */
+    r = await one(0, ['تا بیستم باید تحویل بدهم', 'آره']); { const d20 = await E(() => { const t = APP.today(); for (let k = 0; k < 40; k++) { const d = APP.addDays(t, k); if (/^۲۰ /.test(APP.fdate(d))) return d; } return ''; });
+      X('C34 «تا بیستم باید تحویل بدهم» ⇒ نخستین بیستمِ پیشِ رو با «… درست است؟» و ثبت با «آره»', r.l0.length === 1 && /درست است؟/.test(r.l0[0]) && r.pend0.length === 1 && r.pend0[0].date === d20 && r.dl0.length === 0 && r.dl1.length === 1 && r.dl1[0].date === d20, { r, d20 }); }
+    r = await one(0, ['مهلتِ برادرم بیستمه']); X('C34 همانندِ منفی: موعدِ دیگری ⇒ بی پرسش', r.l0.length === 0 && r.pend0.length === 0, r);
+    r = await one(0, ['تا حالا جلسه دوم رو نرفتم']); X('C34 همانندِ منفی: «جلسه دوم» روزِ ماه نیست', r.l0.length === 0 && r.pend0.length === 0, r);
+    /* C35 — شرطِ آینده ⇒ نه ثبت، نه پرسش */
+    r = await one(0, ['اگه شنبه برم بازار، مخزن رو می‌خرم']); X('C35 «اگه شنبه برم …» ⇒ نه پرسش، نه ثبت', r.l0.length === 0 && r.pend0.length === 0 && r.dl0.length === 0, r);
+    r = await one(0, ['شنبه میرم بازار و مخزن رو می‌خرم']); X('C35 همانندِ مثبت: تعهدِ بی‌شرط ⇒ پرسش', r.l0.length === 1 && /درست است؟/.test(r.l0[0]), r);
+    /* C37 — «پنجاه‌پنجاه» = ۵۰٪؛ «احتمالاً» عدد نمی‌سازد ⇒ یک بار پرسیدنِ عدد؛ «آخرِ ماه» = آخرین روزِ ماهِ شمسی */
+    r = await one(0, ['پیش‌بینیم: پنجاه‌پنجاه فردا بارون میاد']); X('C37 «پنجاه‌پنجاه» ⇒ اطمینانِ ۵۰٪', r.preds.length === 1 && r.preds[0].p === 50, r);
+    r = await one(0, ['پیش‌بینیم: احتمالاً فردا بارون میاد', '۷۰ درصد']);
+    X('C37 «احتمالاً» ⇒ بی عدد؛ صفحه یک بار عددش را می‌پرسد و «۷۰ درصد» ِ بعدی کنارِ همان می‌نشیند (پیش‌بینیِ دوم نمی‌شود)', r.l0.filter(x => /چند درصد/.test(x)).length === 1 && r.preds.length === 1 && r.preds[0].p === 70 && !r.l1.some(x => /چند درصد/.test(x)), r);
+    r = await one(0, ['پیش‌بینیم: ۸۰ درصد فردا بارون میاد']); X('C37 همانندِ منفی: عددِ گفته‌شده ⇒ پرسشِ عدد نیست', r.preds.length === 1 && r.preds[0].p === 80 && !r.l0.some(x => /چند درصد/.test(x)), r);
+    r = await one(0, ['تا آخرِ ماه پایان‌نامه رو تحویل می‌دم']); { const me = await E(() => { const t = APP.today(); let last = t; for (let k = 0; k < 40; k++) { const d = APP.addDays(t, k); if (k && /^۱ /.test(APP.fdate(d))) return last; last = d; } return ''; });
+      X('C37 «آخرِ ماه» ⇒ آخرین روزِ ماهِ شمسی، از راهِ «… درست است؟»', r.pend0.length === 1 && r.pend0[0].date === me && /درست است؟/.test(r.l0[0]) && r.dl0.length === 0, { r, me }); }
   });
 
   await b.close();
