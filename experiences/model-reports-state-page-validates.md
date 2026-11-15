@@ -372,3 +372,21 @@ Round 26 of the same tour showed two more forms of the same failure.
 - For every list that filters by owner, test the case "owner unknown" explicitly — it must not mean "everyone".
 - A name inside a comparison («like that other one») is a reference, not a switch: strip comparison frames before deciding focus, and if
   the rest of the message carries a datum whose owner the text does not decide, ask instead of filing it under either object.
+## Update 2026-11-15 — a correction must follow dependency, not equal digits; and reproduce with the runner's own turns
+
+- **Identity of a quantity is value + unit + role.** When a person corrects a number, an equal number elsewhere is not "the same datum" unless the
+  page can show it: same unit family (with conversion — a value written in another unit is compared in its own unit), same time rate («per day» is
+  not «per minute»), not an independently computed result, not a measured value. Each check removed a real false alarm.
+- **Follow only written dependency.** A number is stale when the person's own writing derives it from the corrected value: an expression, a unit
+  conversion, a rounding of a result, a named difference list, or a chain of results she wrote in the same message. Anything else is asked.
+- **Never mark half of a chain.** If one operand of a written relation depends on the corrected value through a path the page cannot see, the
+  recomputed value would be stated as exact and be wrong. Ask instead (the page's own exact recomputation, or nothing).
+- **One voice.** The person and the model must be told the same list of what went stale — build both from one engine result.
+- **Reproduce agent-tour defects by replay.** Store each runner's control steps and the recorded model replies, freeze the page clock on the run's
+  day, and pair each recorded reply with the call by the content of its "fresh turn" (not by call index), so a fix that adds or removes a model
+  call still gets the right reply. Map generated ids by creation order. A fixture that lacks the defect's turn is reported, not faked.
+
+### How to Apply Elsewhere
+When a user edits a value that other records were computed from, keep a dependency graph from what the user actually wrote (expressions,
+conversions, roundings) and use it for marking, proposals and the assistant's summary alike; treat unit, rate and provenance as part of a value's
+identity; and when the graph has a hole, ask rather than recompute.
