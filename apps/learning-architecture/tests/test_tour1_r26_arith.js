@@ -135,16 +135,21 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     await want('V = 180 × 0.12 = 21.6 مترمکعب، با ۲ مترمکعبِ آبِ چاه میشه ۲۳٫۶', 'OK', 'neg: the right running sum with a unit');
     await want('۰٫۲۵ تقسیم بر ۰٫۰۵ میشه ۵ برابر', 'OK', 'D26-24 oD1 p9');
     await want('۰٫۲۵ تقسیم بر ۰٫۰۵ میشه ۶ برابر', 'FLAG', 'neg: «برابر» does not shield a wrong quotient');
-    await want('۴ از ۲۶ میشه ۱۵٪', 'OK', 'D26-24 s36 p3');
+    // DECISIONS_R27 C44 جای این انتظار را گرفت (D27-23): درصدِ صحیح بی واژهٔ تقریب که گردشدهٔ مقدارِ دقیق است «؟» ِ C25 را دارد (پیش‌تر OK)
+    await want('۴ از ۲۶ میشه ۱۵٪', 'ASK', 'D26-24 s36 p3 (C44)');
     await want('۴ از ۲۶ میشه ۲۵٪', 'FLAG', 'neg: «A از B میشه N٪» wrong', r => /٪/.test(r.c[0].valT));
     await want('۱۶ و ۱۲ میشه ۲۸', 'OK', 'D26-24 aD1 p5');
     // DECISIONS_R26 C28 جای این انتظار را گرفت: «و … میشه N» عملگرِ جمع است (پیش‌تر UNCHECKED)
     await want('۱۶ و ۱۲ میشه ۱۴', 'FLAG', 'C28: «و … میشه» is a sum ⇒ a wrong sum is ✗');
-    await want('۱ + ۲ + … + ۲۰ = ۲۱۰', 'UNCHECKED', 'C17: ellipsis sum');
+    // DECISIONS_R27 C42 جای این انتظار را گرفت: جمعِ سه‌نقطه‌ایِ دنبالهٔ حسابی دقیق حساب می‌شود (پیش‌تر UNCHECKED)؛ سه‌نقطهٔ دیگر همچنان «نسنجیده»
+    await want('۱ + ۲ + … + ۲۰ = ۲۱۰', 'OK', 'C42: arithmetic-progression ellipsis sum');
+    await want('۲ + ۴ + … + ۱۹ = ۹۰', 'UNCHECKED', 'C17/C42: an ellipsis that is not an arithmetic progression stays unread');
     await want('۱۰۰ − ۲۰٪ = ۸۰', 'UNCHECKED', 'C17: «درصدِ چه؟» is told as unread, not left silent');
     await want('۱/۲ + ۱/۳ = ۲/۵', 'UNCHECKED', 'C17: two readings ⇒ unread, not silent');
     // بیرون از خواننده، مثلِ پیش (C17: فقط سطرِ عملگردار؛ جبر داوریِ مربی است)
-    for (const t of ['سه تا ۸۰ میشه درست ۲۴۰', 'از ۵۲۰ رفت ۶۵۰، یعنی ۲۵٪', 'x² + 3 = 12', 'پس ۲۰ = ۴x و x = ۵', 'قیمتِ ماشین = ۴۵۰ میلیون', 'n = 12', 'از ۸:۴۵ با ۴۰ دقیقه راه میشه ۹:۲۵', 'نمره‌م از ۲۰ شد ۱۷'])
+    // DECISIONS_R27 C41 (D26-24 aD4، «سه تا A»): «سه تا ۸۰ میشه درست ۲۴۰» دیگر بیرون از خواننده نیست — ضرب است و ✓ (پایین‌تر در test_tour1_r27_arith)
+    await want('سه تا ۸۰ میشه درست ۲۴۰', 'OK', 'C41: «سه تا A» is a product');
+    for (const t of ['از ۵۲۰ رفت ۶۵۰، یعنی ۲۵٪', 'x² + 3 = 12', 'پس ۲۰ = ۴x و x = ۵', 'قیمتِ ماشین = ۴۵۰ میلیون', 'n = 12', 'از ۸:۴۵ با ۴۰ دقیقه راه میشه ۹:۲۵', 'نمره‌م از ۲۰ شد ۱۷'])
       await want(t, 'SILENT', 'outside the reader as before');
     info.nc['D26-24 aD4'] = '«سه تا ۸۰ با دو تا برش میشه ۲۴۰ و ۶ دهم»، «می‌مونه حدود ۷۹ و ۷ دهم» (aD4 p2–p5) عملگر ندارند و مفروق در پیام نیست — به حکمِ C17 بیرون از خواننده می‌مانند (asserted: silent)';
     // ---- B_x D15 (U28): لغزشِ تقسیم برچسبِ «واحد» نمی‌گیرد؛ خطای واقعیِ تبدیل می‌گیرد ----
@@ -174,7 +179,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     r = await want('۱۷۰۰ ثانیه یعنی ۱۷ دقیقه', 'FLAG', 'pwD1 p1: conversion value in her form', r => !/\//.test(r.c[0].valT) && /۲۸٫۳ دقیقه/.test(r.c[0].valT));
     // ---- قراردادِ دیگران: سه حالت، ck.unread، و یادداشتِ کنارِ گام ----
     r = await AC('۱۰۰ ÷ ۷ = ۱۴'); chk(r.note.bad === false && r.note.ask === true && /گرد شده؟/.test(r.note.chk) && !/درست/.test(r.note.chk), 'arithNote: an asked check is neither «درست» nor bad :: ' + JSON.stringify(r.note));
-    r = await AC('۱ + ۲ + … + ۲۰ = ۲۱۰'); chk(r.note.bad === false && r.note.unread === true && /نسنجیده/.test(r.note.chk) && !/درست/.test(r.note.chk), 'arithNote: an unread operator line says «نسنجیده» :: ' + JSON.stringify(r.note));
+    // DECISIONS_R27 C42: «۱ + … + ۲۰» حالا خوانده می‌شود؛ قراردادِ «نسنجیده» با سه‌نقطه‌ای که دنبالهٔ حسابی نیست آزموده می‌شود
+    r = await AC('۲ + ۴ + … + ۱۹ = ۹۰'); chk(r.note.bad === false && r.note.unread === true && /نسنجیده/.test(r.note.chk) && !/درست/.test(r.note.chk), 'arithNote: an unread operator line says «نسنجیده» :: ' + JSON.stringify(r.note));
     const sd = await p.evaluate(() => [APP.STORY.arithSaid(APP.STORY.arithChk('۱۸ × ۱٫۲۲ = ۲۱٫۹۶ میلیون')), APP.STORY.arithSaid(APP.STORY.arithChk('۱۷ × ۱۲ = ۲۱۴ میلیون'))]);
     chk(JSON.stringify(sd) === JSON.stringify([['21.96'], ['214']]), 'arithSaid keeps its contract (the written number, digits only) :: ' + JSON.stringify(sd));
   });
@@ -193,8 +199,9 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     chk(/✓ «۳۰×۳ \+ ۱۲×۵ = ۹۰ \+ ۶۰» می‌خواند/.test(B) && /✓ «۹۰ \+ ۶۰ = ۱۵۰» می‌خواند/.test(B), 'B26·D35 aB4 p3 (bank #20): every link of the chain :: ' + B.slice(0, 400));
     info.bank[19] = info.bank[19] && /✓ «۹۰ \+ ۶۰ = ۱۵۰» می‌خواند/.test(B);
     // C17/C16 در پرامپت: «نسنجیده» و «؟» سطر دارند؛ مربی آن‌ها را درست/غلط اعلام نکند
-    u = await turn('پس ۱ + ۲ + … + ۲۰ = ۲۱۰ و هر جعبه ۱۰۰ ÷ ۷ = ۱۴ تا', 'باشه.', [csn({ ph: 'c', said: [] })]); B = blockOf(u.user);
-    chk(/— حسابِ «پس ۱ \+ ۲ \+ … \+ ۲۰ = ۲۱۰» را صفحه نسنجیده/.test(B) && /؟ «۱۰۰ \/ ۷» ≈ ۱۴٫۲۹ می‌شود/.test(B) && /نه درست‌اند نه نادرست/.test(B) && !/✓ «۱۰۰/.test(B), 'C17 + C16 reach the coach as their own lines :: ' + B.slice(0, 600));
+    // DECISIONS_R27 C42: سطرِ «نسنجیده» با سه‌نقطه‌ای که دنبالهٔ حسابی نیست (۱ + … + ۲۰ حالا ✓ است)
+    u = await turn('پس ۲ + ۴ + … + ۱۹ = ۹۰ و هر جعبه ۱۰۰ ÷ ۷ = ۱۴ تا', 'باشه.', [csn({ ph: 'c', said: [] })]); B = blockOf(u.user);
+    chk(/— حسابِ «پس ۲ \+ ۴ \+ … \+ ۱۹ = ۹۰» را صفحه نسنجیده/.test(B) && /؟ «۱۰۰ \/ ۷» ≈ ۱۴٫۲۹ می‌شود/.test(B) && /نه درست‌اند نه نادرست/.test(B) && !/✓ «۱۰۰/.test(B), 'C17 + C16 reach the coach as their own lines :: ' + B.slice(0, 600));
     // B26·D35 aB4 p3: مسئلهٔ گفت‌وگویی (ثبت‌نشده) که صورتش پیش از این پیام آمده — زنجیرهٔ درستِ او هم بلوک می‌گیرد
     await wipe(); await fresh();
     await turn('نوه‌م یه معما ازم پرسید که بلد نبودم: تو یه مزرعه مرغ و خرگوش هست، روی هم ۳۵ تا سر و ۹۴ تا پا. چند تا مرغ و چند تا خرگوش داریم؟', 'چه چیزی مجهول است؟', [csn({ ph: 'u', said: ['u', 'd'], nat: 'objective' })]);
@@ -380,8 +387,9 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || [path.join(_
     chk(c0(11).some(c => c.st === 'flag' && c.said === '2.9') && !c0(11).some(c => c.st === 'flag' && c.said === '2'), 'bank#12: the flag is on «۲٫۹», the true first half does not rescue the line :: ' + JSON.stringify(c0(11)));
     chk(verdict(R[12][0]) === 'FLAG' && verdict(R[13][0]) === 'OK' && verdict(R[14][0]) === 'FLAG' && verdict(R[15][0]) === 'OK' && verdict(R[15][1]) === 'FLAG' && verdict(R[16][0]) === 'OK' && verdict(R[16][1]) === 'FLAG' && verdict(R[17][0]) === 'OK',
       'bank#13–18: read with a real verdict (running sum with a unit, π, «A از B میشه N٪», powers, «برابر») — not merely «نسنجیده»');
-    chk(R[18].every(r => verdict(r) === 'UNCHECKED'), 'bank#19: ellipsis sums are «نسنجیده» (both spellings), never silent, never ✓');
-    info.nc[18] = 'ellipsis sums are not expanded: both get «نسنجیده» (NOT-FLAG / NOT-OK allow it); the reader does not guess between an arithmetic and a geometric progression';
+    // DECISIONS_R27 C42 جای این انتظار را گرفت: هر دو جمعِ دنبالهٔ حسابی‌اند و دقیق حساب می‌شوند — اولی ✓ (NOT-FLAG)، دومی ✗ (NOT-OK)؛ همان انتظارِ خودِ بانک
+    chk(verdict(R[18][0]) === 'OK' && verdict(R[18][1]) === 'FLAG', 'bank#19 (C42): AP ellipsis sums computed exactly — first ✓, second ✗ :: ' + R[18].map(J).join(' | '));
+    info.nc[18] = 'C42 (round 27): an ellipsis fixed by its first two terms and the last is an arithmetic progression and is computed exactly; any other ellipsis stays «نسنجیده»';
     chk(c0(20)[0] && !c0(20)[0].unit && c0(20)[0].kind !== 'dim' && !/واحد|تبدیل/.test(R[20][0].lines[0]) && /۸۴۰۰/.test(c0(20)[0].valT), 'bank#21: a division slip is not labelled a unit error :: ' + JSON.stringify(R[20][0].lines));
     chk(c0(22)[0] && /۰٫۸۷۵/.test(c0(22)[0].valT) && c0(38)[0] && /٪/.test(c0(38)[0].valT) && !/\//.test(c0(38)[0].valT), 'bank#23/#39: the page value is a decimal / a percent, never a raw fraction :: ' + JSON.stringify([c0(22), c0(38)]));
     chk(R[23].every(r => /≈ ۱۴٫۲۹|≈ ۳۳٫۳۳/.test(r.c[0].valT) && r.note.bad === false && !/درست/.test(r.note.chk)), 'bank#24: the exact value in decimal form, neither booked as a failure nor confirmed :: ' + JSON.stringify(R[23].map(r => [r.c[0].valT, r.note.chk])));
