@@ -63,3 +63,9 @@ D26-20, D26-21, D26-22, D26-54) + clarifications C20 and C36. Base: `BASE26` (23
   only `open|approved`, and an owner note reopens an answered/approved sheet) or the close after a take-back stays invisible to runners.
 - Docs numbers used: WORKLOG (135), PROGRESS 132, HANDBOOK §12 row 79. Lower numbers are left for the other fixers, so
   `tests/test_learning_architecture_handbook.py` reports a numbering gap on this branch alone until the merge.
+
+## Suite note (resume, 2026-11-15)
+Whole page suite on 9f5dfdc8: 141/142 green. The one red, `test_polya_fix5` «M3: current step shows one date», is a calendar
+coincidence in that old test, not a44: it hard-codes «۲۵ آبان» (= 2026-11-16) and asserts that date differs from `T.d1` (tomorrow);
+run on 2026-11-15 the two are the same day. It was green on 2026-11-12 and goes green again from 2026-11-16. Owner of that test should
+compute the date from today instead of hard-coding it (FIX26 rule); not changed here (outside Q7).
