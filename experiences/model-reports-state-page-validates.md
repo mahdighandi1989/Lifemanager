@@ -305,3 +305,5 @@ Round 26 of the same tour showed two more forms of the same failure.
 - When matching an answer to a question, drop classifiers and auxiliaries from both sides before comparing.
 - Before attributing an event of a turn, ask "which object did she name?"; make that a function with three outcomes: bind, ask, nothing.
 - For every list that filters by owner, test the case "owner unknown" explicitly — it must not mean "everyone".
+- A name inside a comparison («like that other one») is a reference, not a switch: strip comparison frames before deciding focus, and if
+  the rest of the message carries a datum whose owner the text does not decide, ask instead of filing it under either object.

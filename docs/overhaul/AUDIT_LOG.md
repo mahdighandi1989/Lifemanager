@@ -5132,3 +5132,11 @@ dated stability, mind-card feed) under way.
   question is the check that made her find the mistake. What changed: the closure card and the prompt now show her standing answer, a result
   the page's reader flags or a failed test never counts, and nothing is called «حل شد» before the page's own closure.
 - **PROPOSAL** Not done, with reasons, in HANDBOOK §12 and the handoff note `docs/overhaul/handoff-notes/_pending_tour1_R26_story_2026-11-12.md`.
+
+### 2026-11-15 — CHANGE — Tour 1 round 26, fixer «story», resumed after the pause (C30/C31)
+- **CHANGE** `apps/learning-architecture/src/app/a45_story.js` `frames26` / `named26FromList`: a problem named only as an analogy
+  («مثلِ/شبیهِ همون X») does not move the turn (C31, bank ambiguity 9); a datum or result in the same message that the text does not assign
+  ⇒ the page asks which (current + named) and records nothing. C30 (later unnamed messages stay with the named problem) already held and is
+  now pinned by tests. The pause snapshot was reviewed hunk by hunk: kept, with one misplaced test block moved.
+  Tests: six C30/C31 checks added to `tests/test_tour1_r26_story_bank.js` (the three C31 checks red before the change).
+
