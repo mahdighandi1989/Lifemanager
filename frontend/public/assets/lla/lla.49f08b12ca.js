@@ -55559,6 +55559,7 @@ APP.goFromURL = function (q) {
     var fc = fcOf27(x);
     if (fc && fc.outcome) { if (!x.out) x.out = { res: fc.outcome, at: fc.outcomeAt || nowISO(), quote: clip(quote, 200), sess: s0.id }; return x; }
     if (!fc && predPct(x) != null) { fc = { id: A.uid("fc"), type: "fcast", q: clip(x.text, 200), p: predPct(x), due: today(), dim: "s_decision", created: x.at || nowISO(), src: { chat: s0.id, quote: clip(x.text, 200) }, by: "chat" }; x.fc = fc.id; }
+    if (fc && !fc.due) fc.due = today();   /* دورِ ۲۷ (C53): 🎯 ِ بی‌موعد روزِ داوری را موعد می‌گیرد — همان که پیش‌تر 🎯 ِ ساخته‌شده هنگامِ داوری داشت */
     if (fc) { fc.outcome = out; fc.outcomeAt = nowISO(); fc.judgedBy = { kind: "her-words", sess: s0.id, quote: clip(quote, 200), d: today() }; S.put(fc); PR.predMark(s0, fc, out, quote); }
     if (!x.out) x.out = { res: out, at: nowISO(), quote: clip(quote, 200), sess: s0.id };
     return x;
