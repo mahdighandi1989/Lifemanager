@@ -49826,7 +49826,7 @@ APP.goFromURL = function (q) {
     var s = hits[0], e2 = s + X.length - 1, o = String(frag).slice(F[s].s, F[e2].e - (X.length === 1 && /[²³]$/.test(F[s].t) ? 1 : 0)), n = String(nm.n).trim(), FX = tokz(fix);
     var a0 = s, b0 = e2, nPre = "", nPost = "";
     if (isNum(F[e2].t) && F[e2 + 1] && !isNum(F[e2 + 1].t)) { var fx1 = FX.filter(function (t) { return eqT(t, F[e2 + 1].t) || (!isNum(t) && stem28(t) === stem28(F[e2 + 1].t)); })[0];
-      if (fx1 && !tokz(n).some(function (t) { return eqT(t, fx1); })) { b0 = e2 + 1; nPost = " " + fx1; } }
+      if (fx1 && !tokz(n).some(function (t) { return eqT(t, fx1) || (!isNum(t) && stem28(t) === stem28(fx1)); })) { b0 = e2 + 1; nPost = " " + F[e2 + 1].t; } }   // املای خودِ رکورد («میلی‌گرم»، نه «میلی‌گرمه» ِ جملهٔ اصلاح)
     /* عددِ تنهای نام‌برده با همسایهٔ معنادارش که در مقدارِ درست هم هست («دقیقه‌ای ۲ لیتره» ⇐ «دقیقه‌ای ۱٫۶ لیتر») — جای همان کمیت، نه هر «۲ لیتر» */
     if (X.length === 1 && s > 0 && !isNum(F[s - 1].t) && !MAG28.test(nz(F[s - 1].t)) && FX.some(function (t) { return eqT(t, F[s - 1].t); }) && !tokz(n).some(function (t) { return eqT(t, F[s - 1].t); })) { a0 = s - 1; nPre = F[s - 1].t + " "; }
     if (a0 !== s || b0 !== e2) { o = String(frag).slice(F[a0].s, F[b0].e); n = nPre + n + nPost; }
