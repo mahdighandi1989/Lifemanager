@@ -5312,3 +5312,5 @@ dated stability, mind-card feed) under way.
 - **CHANGE** `apps/learning-architecture/src/app/a41_practice.js` (`rebook27`؛ `editBooked27` به آن سپرده)، `a27_tour.js` (`retractApply`، `coach_state`، `coachPhase0`/`narr27`)، `a38_live.js` (`runs25`، `retractSess`، `accept27`، `redoClear27`، `staleCore25`)، `a45_story.js` (`priorMerge` فقط)، `a46_arith.js` (`normM`/`rpM`/`backPos`، √، `m2`). آزمونِ تازه `tests/test_tour1_r27b_leftovers.js`؛ #71/#84 از NC ِ بانکِ correction بیرون؛ #317 در بانکِ classify. قرنطینه‌ها: REMOVAL_CANDIDATES (2026-11-16). WORKLOG (147)، PROGRESS (143)، HANDBOOK §۱۰ و §۱۲ ردیفِ ۹۱.
 
 - 2026-11-16 · CHANGE · تورِ پولیا FIX27B: history (WORKLOG 146) و leftovers (بازشماره به 147/144) در merge27b ادغام شدند، بی برخوردِ کد؛ آزمون‌های r27b و r27 (story bank، correction، arith، prior) روی ساختهٔ ادغامی سبز.
+
+- 2026-11-16 · CHANGE · FIX27B (history + leftovers) گیتِ ۴۴ سبز ⇒ main 33f7de9f؛ RUNNER28/LAUNCH28 با <MAIN28>=33f7de9f؛ چهار اجراکنندهٔ دورِ ۲۸ راه افتادند.

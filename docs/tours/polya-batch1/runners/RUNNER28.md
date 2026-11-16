@@ -1,6 +1,6 @@
 # Tour batch 1 (Pólya) — ROUND 28 (read RUNNER.md … RUNNER27.md incl. all ADDENDA, then this; this overrides)
 
-Page: main <MAIN28> (round-27 merge + FIX27B; `build.py --check` in sync, dist newer — else STOP). What changed: DECISIONS_R27.md R1–R8
+Page: main 33f7de9f (round-27 merge + FIX27B; `build.py --check` in sync, dist newer — else STOP). What changed: DECISIONS_R27.md R1–R8
 with its binding Clarifications C40–C83, the fixers' hand-backs reports/fix27/*.md and reports/fix27b/*.md (read their «Not done» lists —
 each is a claim to test), the handoff notes docs/overhaul/handoff-notes/_pending_tour1_R27_*_2026-11-15.md and _pending_tour1_R27B_*_2026-11-16.md,
 and WORKLOG 138–147 (145: two clashes between fixers found only after the merge — arithmetic in small talk is not prior work; the

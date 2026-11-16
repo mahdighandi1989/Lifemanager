@@ -1,5 +1,5 @@
 # Round 28 runner brief (common to A, B, C, D)
-Page: /home/user/Lifemanager, main = <MAIN28> (round-27 fixes + FIX27B), dist rebuilt after the merge. Do NOT edit the repo.
+Page: /home/user/Lifemanager, main = 33f7de9f (round-27 fixes + FIX27B), dist rebuilt after the merge. Do NOT edit the repo.
 Environment: T = <scratchpad>/tour1_polya. Python: `export PATH=<scratchpad>/venv/bin:$PATH`.
 Playwright for node is global (`require('playwright')` works anywhere; Chromium preinstalled — never run "playwright install").
 Read in order: T/RUNNER.md, RUNNER2.md … RUNNER27.md (all ADDENDA), then RUNNER28.md (overrides). Also T/scenarios.md/json,
