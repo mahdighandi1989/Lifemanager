@@ -5314,3 +5314,5 @@ dated stability, mind-card feed) under way.
 - 2026-11-16 · CHANGE · تورِ پولیا FIX27B: history (WORKLOG 146) و leftovers (بازشماره به 147/144) در merge27b ادغام شدند، بی برخوردِ کد؛ آزمون‌های r27b و r27 (story bank، correction، arith، prior) روی ساختهٔ ادغامی سبز.
 
 - 2026-11-16 · CHANGE · FIX27B (history + leftovers) گیتِ ۴۴ سبز ⇒ main 33f7de9f؛ RUNNER28/LAUNCH28 با <MAIN28>=33f7de9f؛ چهار اجراکنندهٔ دورِ ۲۸ راه افتادند.
+
+- 2026-11-16 · DECISION · نقشهٔ راهِ منبع‌ها §۲۲: شاخص‌های پیشرفت کنارِ درصدِ سبز (S1/S2 در هر سناریو، خانوادهٔ تازه/تکراری، نقصِ ادغام، «ساخته نشد» ِ مانده)؛ معیارِ سبز پایین نمی‌آید.
