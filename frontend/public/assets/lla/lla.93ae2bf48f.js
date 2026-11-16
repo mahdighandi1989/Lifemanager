@@ -39346,6 +39346,9 @@ APP.goFromURL = function (q) {
   function planDone18(s, pd) {
     var id = typeof pd === "string" ? pd : pd && (pd.id || pd.plan), ok = !(pd && typeof pd === "object" && (pd.done === false || pd.done === "false"));
     var x = plansAll(s).filter(function (y) { return y.p.id === String(id || "") && !(y.p.state === "done" || y.p.state === "notdone"); })[0]; if (!x) return;
+    /* دورِ ۲۸ (dates، C94؛ D28-7 aD2 p6 — مدل در همان نوبت هم plan ِ «ادامه میدم و تا امتحان ۲۰ دی همینو چک می‌کنم» را گزارش کرد و هم plan_done با شناسهٔ همان برنامه):
+       برنامه‌ای که در همین نوبت به دنیا آمد در همان نوبت «انجام شد/نشد» نمی‌گیرد — گزارشِ مدل با وضعِ صفحه نمی‌خواند */
+    try { var lu28 = lastUserMsg(s); if (lu28 && x.s === s && String(x.p.at || "") === String(lu28.at || "")) return; } catch (e) { }
     x.p.done = true; x.p.state = ok ? "done" : "notdone"; x.p.doneAt = nowIso(); if (x.s !== s) try { S.put(x.s); } catch (e) { }
     /* RN2d/RN3c: همان کار ⇒ گامِ پیوسته هم همین وضع (از راهِ a38، با پیامِ خودش)؛ انجام‌شده ⇒ یک موفقیتِ اجرا با شناسهٔ همان کار */
     var um = lastUserMsg(s), act = x.p.step ? "lstep:" + x.p.step.pid + ":" + x.p.step.id : "pl:" + x.p.id;
@@ -56299,7 +56302,7 @@ APP.goFromURL = function (q) {
   /* C19 — روی متنِ هنجارشده (nrm26: نیم‌فاصله ⇒ فاصله) */
   var PAST26 = /(?:^| )(?:ن?می ?|ن)?(?:کرد|داد|آورد|اورد|برد|خورد|زد|اومد|آمد|دید|خرید|رسید|پرسید|کشید|شنید|فهمید|نوشت|گفت|رفت|گرفت|گذاشت|ذاشت|ساخت|فروخت|خوند|خواند|موند|ماند|تونست|خواست|فرستاد|افتاد|نشست|بست|شکست|دونست|سپرد|شمرد|پرداخت|انداخت|برگشت)(?:م|یم|ه بودم|ه بودیم|ه ام)(?![آ-ی])|(?:^| )بود(?:م|یم)?(?![آ-ی])/;
   var OTHER26 = /(?:^| )(?:گفت|گفته|گفتن|گفتند|میگه|می گه|میگن|می گن|می گوید|می گویند|نوشته|اعلام کرد(?:ه|ن|ند)?|خبر داد(?:ه|ن|ند)?|قول داد(?:ه|ن|ند)?)(?![آ-ی])/;
-  var THIRD26 = /(?:^| )(?:برادر|داداش|خواهر|آبجی|مادر|مامان|پدر|بابا|مدیر|رئیس|استاد|معلم|همکار|دوست|رفیق|خانم|همسر|شوهر|زن|دختر|پسر|بچه|نوه|مربی|دکتر|صاحب ?خونه|صاحب ?خانه|مشتری|همسایه)(?: ?ها)?(?:م|مون|مان| ام|ی ?م)(?![آ-ی])/;
+  var THIRD26 = /(?:^| )(?:برادر|داداش|خواهر|آبجی|مادر|مامان|پدر|بابا|مدیر|رئیس|استاد|معلم|همکار|دوست|رفیق|خانم|همسر|شوهر|زن|دختر|پسر|بچه|نوه|مربی|دکتر|صاحب ?خونه|صاحب ?خانه|مشتری|همسایه)(?: ?ها)?(?:م|مون|مان| ام| م| مون|ی ?م)(?![آ-ی])/;   /* دورِ ۲۸: «نوه‌م» (نیم‌فاصله ⇒ فاصله) */
   var FIRST26 = /(?:^| )(?:(?:بر|در|ور|وا|باز|فرا)?ن?می ?(?!ز(?:م|مون)(?![آ-ی])|ل(?:م|مون)(?![آ-ی])|وه)[آ-ی]{1,12}م(?:ش|شون|ت|تون)?|ب(?!رادرم|ابام|چه|اغم|دنم|یستم|ازم|عدم|عدیم|هم|اهم|ارم|انکم|رگم|رنامه|لیتم|لیطم|یمارم|خشم|حثم|دهیم)[آ-ی]{2,12}م(?:ش|شون|ت|تون)?|باید|قراره|قرار است|دارم|داریم|هستم)(?![آ-ی])/;
   /* دورِ ۲۷ (D27-29): فعلِ سومِ شخصِ ماضیِ نقلی («گذاشته»، «نوشته»، «تعیین کرده») — کارِ صفحه یا دیگری، نه «ـه‌ام/ـه‌ایم» ِ خودش */
   /* دورِ ۲۷ (بانکِ R27 #104): «امضا رو جمعهٔ بعد بذار» — فرمانِ او به صفحه دربارهٔ کارِ خودش، مثلِ فعلِ اول‌شخص */
@@ -56343,6 +56346,8 @@ APP.goFromURL = function (q) {
       if (/[؟?]\s*$/.test(st) || /(?:^|[\s،])(?:اگه|اگر|شاید|کاش)(?![آ-ی])/.test(st) || HABIT25.test(st) || PRED_EXPL.test(st) || PR.predVerdictIn(st) || /پیش[‌\s]?بینی|(?:٪|%|درصد)\s*(?:مطمئن|احتمال|اطمینان)/.test(st) || BIRTH26.test(st)) return;
       /* دورِ ۲۸ (بانکِ R28 #30، B28·D14 nB1 p16): «احتمالش ۴۰ درصده که جمعه بارون بیاد» — جملهٔ درصد‌دار با احتمال/اطمینان/شانس، به هر ترتیب، پیش‌بینی است (🎯 ِ R4)، نه کارِ تاریخ‌دارِ او */
       if (/(?:٪|%|درصد)/.test(st) && /(?:مطمئن|احتمال|اطمینان|شانس)/.test(st)) return;
+      /* دورِ ۲۸ (C19/C35؛ A28-34 oA1 p33 «تو «امروز» هنوز از من می‌پرسه «پنج‌شنبه رسماً جواب می‌دم»»): نقلِ سطرِ صفحه یا حرفِ پیشین در گلایه تعهدِ تازه نیست — روزِ درونِ «…» خوانده نمی‌شود */
+      if (/«/.test(st) && /(?:^|[\s،])(?:می[‌\s]?پرسه|می[‌\s]?پرسی|پرسیدی|پرسید|نوشتی|نوشته|نوشتین|گفتی|میگه|می[‌\s]?گه|نشون[‌\s]?میده|نشون[‌\s]?می[‌\s]?ده|آوردی|زدی|اومده|آمده)(?![آ-ی])/.test(st)) st = st.replace(/«[^»]*(?:»|$)/g, " ");
       /* «هفتهٔ بعد، جمعه، …» یک تاریخ است — ویرگولش بند نمی‌شکند */
       var st2 = st.replace(/(هفته[‌\s]*(?:ی|ٔ)?\s*(?:بعد|دیگه|دیگر|آینده))\s*[،,]\s*(?=(?:روزِ?\s*)?(?:(?:یک|دو|سه|چهار|پنج)[‌\s]?)?(?:شنبه|جمعه))/g, "$1 ");
       var parts = st2.split(/\s*[،؛]\s*|:\s+|\s+—\s+|\s+و\s+(?=(?:[^\s]+\s+){0,2}?(?:[0-9۰-۹]{1,2}\s*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)|(?:یک|دو|سه[‌\s]?|چهار|پنج[‌\s]?)?شنبه|جمعه|فردا|پس[‌\s]?فردا|سر[ِ‌\s]*برج|آخر[ِ‌\s]*(?:سال|امسال)|(?:بعد|پس)[ِ‌\s]*(?:از[‌\s]*)?(?:عید|نوروز)|عید|نوروز))/);
@@ -56436,14 +56441,14 @@ APP.goFromURL = function (q) {
   PR.ovD27 = ovD27;
   /* روزهای پیامِ او: pos = روزهایی که پیش می‌گذارد، neg = روزهایی که نفی می‌کند، yes = جملهٔ پذیرش (هر جا که باشد) و روزهای همان جمله */
   function herDays27(t) {
-    var R = { pos: [], neg: [], posC: {}, amb: [], ok: [], corr: CORRW27.test(nrm26(t)), yes: false, yesRest: "", yesDates: [], generic: false }, td = today();
+    var R = { pos: [], neg: [], posC: {}, negC: {}, amb: [], ok: [], corr: CORRW27.test(nrm26(t)), yes: false, yesRest: "", yesDates: [], generic: false }, td = today();
     String(t || "").split(/\s*[،؛.!:؟?\n]\s*|\s+—\s+|\s+(?:ولی|اما)\s+/).forEach(function (c) {
       var I = null; try { I = PR.whenInfo(c); } catch (e) { } if (!I || !I.date || I.free) return;
       var xc = nrm26(c), sp = dateSpan26(xc) || { i: 0, j: 0 }, after = xc.slice(sp.j);
       var neg = /(?:^|[ ،])نه[،,]? ?$/.test(xc.slice(0, sp.i)) || /^ ?(?:ی ?)?(?:هم ?)?(?:نه|نیست|نبود|نمیشه|نمی شه)(?![آ-ی])/.test(after) || NEGV27.test(after) ||
         (R.corr && /(?:^| )(?:گفتم|نوشتم|گفته بودم|نوشته بودم)(?![آ-ی])/.test(xc) && !/منظورم/.test(xc));
       if (I.amb) { if (!neg) R.amb.push(I); else if (!I.opts) R.neg.push(I.date); return; }
-      if (neg) { R.neg.push(I.date); return; }
+      if (neg) { R.neg.push(I.date); if (!R.negC[I.date]) R.negC[I.date] = (String(t || "").split(/[.!؟?\n]+/).filter(function (z) { return z.indexOf(c.trim()) >= 0; })[0] || c).trim(); return; }
       /* دورِ ۲۸ (C92، B28·D7 dB1 p11 «عید درسته»): بازگفتنِ روزِ پرسیده با واژهٔ پذیرش، در هر جای پیام، پاسخِ همان پرسش است (هر پرسشِ مانده با همان روز) */
       if (I.date >= td && /(?:^| )(?:درسته|درست است|درسته دیگه|همینه|اوکیه|خوبه)$/.test(xc.replace(/[\s.!]+$/, ""))) R.ok.push(I.date);
       if (I.date < td || (PAST26.test(xc) && !/منظورم/.test(xc)) || ((THIRD26.test(xc) || OTHER26.test(xc)) && !FIRST26.test(xc))) return;
@@ -56453,6 +56458,8 @@ APP.goFromURL = function (q) {
     R.amb.forEach(function (I) { var o = I.opts || [I.date, add(I.date, 7)], left = o.filter(function (d) { return R.neg.indexOf(d) < 0 && d >= td; }); if (left.length === 1 && o.some(function (d) { return R.neg.indexOf(d) >= 0; })) { R.pos.push(left[0]); R.posC[left[0]] = R.posC[left[0]] || ""; } });
     R.pos = R.pos.filter(function (d, i, X) { return R.neg.indexOf(d) < 0 && X.indexOf(d) === i; });
     var ys = sentsOf25(t).filter(function (z) { return YES27.test(z); })[0];
+    /* دورِ ۲۸ (C113؛ D28-16 tD1 p16 «یه مسئلهٔ دیگه هم دارم: ماشینم … ثبتش کن»): «ثبتش کن» با مفعولِ نام‌برده (مسئله/سؤالِ تازه، یا «ثبتش کن: …») همان را می‌خواهد، نه پرسشِ تاریخ */
+    if (ys && /^\s*ثبت/.test(ys) && (/ثبت ?(?:ش)? ?کن\s*[:：]\s*\S/.test(nrm26(t)) || /(?:مسئله|مساله|سؤال|سوال|مشکل|موضوع)\S* ?(?:ی ?)?(?:دیگه|دیگر|جدید|تازه)|(?:یه|یک) (?:مسئله|مساله|سؤال|سوال|مشکل)\S* (?:دیگه|دیگر|جدید|تازه)/.test(nrm26(t)))) ys = null;
     if (ys) { R.yes = true; R.yesRest = ys.replace(YESW27, ""); var rx = nrm26(R.yesRest);
       R.yesRest.split(/\s*[،؛:]\s*/).forEach(function (c) { var I = null; try { I = PR.whenInfo(c); } catch (e) { } if (I && I.date && !I.amb && I.date >= td && R.neg.indexOf(I.date) < 0) R.yesDates.push(I.date); });
       R.generic = toks(R.yesRest).length <= 2 || /درست|همینه|همین (?:روز|تاریخ)|تاریخ|ثبت|بذار|بگذار|یاد|پیگیری|لطف/.test(rx); }
@@ -56473,7 +56480,7 @@ APP.goFromURL = function (q) {
     /* روزهای نفی‌شده از نامِ روزهای این پیام بیرون می‌روند (C51: «پنجشنبه نه، شنبه» پاسخِ «پنجشنبه» به پرسشِ دیگری نیست) */
     var xA = x0; wdToks26(x0).forEach(function (w) { var I = null; try { I = PR.whenInfo(w.name); } catch (e) { } if (I && R.neg.indexOf(I.date) >= 0) xA = xA.slice(0, w.start) + new Array(w.end - w.start + 1).join(" ") + xA.slice(w.end); });
     var mine = []; try { mine = PR.herDates(t, s0).filter(function (o) { return !o.amb && R.neg.indexOf(o.date) < 0; }); } catch (e) { }
-    var mineFor = function (it) { return mine.some(function (o) { return o.date === it.date && ovD27(o.what, it.what) >= 1; }); };
+    var mineFor = function (it) { return mine.some(function (o) { return o.date === it.date && ovD27(o.what, it.what) >= 1 && sameAct28(o.what, it.what); }); };   /* دورِ ۲۸: کارِ دیگری با همان روز و یک واژهٔ مشترک («خونه») بازگفتنِ این کار نیست */
     var open = L.filter(function (P) { return P.state === "open"; }).slice(-1)[0] || null;
     var newest = open || L.slice().sort(function (a, b) { return String(a.at || "").localeCompare(String(b.at || "")); }).slice(-1)[0];
     var exYes = /(?:^|[ ،])تاریخ\S* ?(?:هم ?)?(?:درسته|درست است|همینه|اوکیه|خوبه)/.test(x0), exNo = /(?:^|[ ،])تاریخ\S* ?(?:نه|غلطه|اشتباهه|درست نیست)|ثبت(?:ش)? ?نکن/.test(x0);
@@ -56492,7 +56499,9 @@ APP.goFromURL = function (q) {
         /* C49/C69: پرسشی که روزش گذشته با هیچ پاسخی ثبت نمی‌شود و تاریخِ تازه‌ای هم از آن ساخته نمی‌شود */
         if (ds.length && ds.every(function (d) { return d < td; })) { lap.push(it); return; }
         /* C51: روزِ پرسیده را نفی کرد ⇒ کنار؛ روزی که به جایش گفت (اگر یکی است) برای همان کار یک بار پرسیده می‌شود؛ وگرنه «کدام روز؟» (C71) */
-        if (!it.amb && R.neg.indexOf(it.date) >= 0) { said = true; quiet = true; (s0.dateNo = s0.dateNo || []).push(it.date); var a1 = altFor(it, true);
+        /* دورِ ۲۸ (C92، A28-1 s01 p23 «برای ودیعه هم باید برم بانک؛ پنجشنبه نه، شنبه می‌رم» پرسشِ «فردا به بنگاه زنگ می‌زنم» را جابه‌جا کرد): «X نه، Y» فقط کارِ جملهٔ خودش را
+           جابه‌جا می‌کند — جمله‌ای که جز روز و واژه‌های قاب («مهلت»، «نیست») چیزی ندارد، یا همان کار را می‌گوید */
+        if (!it.amb && R.neg.indexOf(it.date) >= 0 && negBound28(R, it.date, it.what, bare27)) { said = true; quiet = true; (s0.dateNo = s0.dateNo || []).push(it.date); var a1 = altFor(it, true);
           if (a1) re27.push(Object.assign({}, it, { date: a1, what: whatFor(it, a1), amb: false, opts: undefined, wd: "", was: it.date }));
           else { noAlt.push(it); re27.push(Object.assign({}, it, { date: add(td, 1), amb: true, free: true, opts: undefined, wd: "", was: it.date, why: "neg" })); }
           return; }
@@ -56519,9 +56528,10 @@ APP.goFromURL = function (q) {
         /* C72: «بله، پس‌فردا» به پرسشِ «فردا» ⇒ روزِ خودش؛ یک بار با تاریخش تأیید می‌شود */
         else if (first && R.yes && other.length === 1) { said = true; quiet = true; re27.push(Object.assign({}, it, { date: other[0], what: whatFor(it, other[0]), was: it.date })); }
         else if (isNew && exYes) { var l3 = bookItem26(s0, P0, it); if (l3) done.push(l3); said = true; }
-        else if ((first && short && R.pos.indexOf(it.date) >= 0) || mineFor(it)) { var l4 = bookItem26(s0, P0, it); if (l4) done.push(l4); said = true; }
+        /* دورِ ۲۸ (C92، A28-3 s01 p29 «قبضِ آب رو هم اولِ ماه می‌دم» پرسشِ «اجاره … سرِ برج» را ثبت کرد): همان روز برای کارِ دیگری پاسخِ این پرسش نیست */
+        else if ((first && short && R.pos.indexOf(it.date) >= 0 && (bare27 || (ovD27(R.posC[it.date] || "", it.what) >= 1 && sameAct28(R.posC[it.date] || "", it.what)))) || mineFor(it)) { var l4 = bookItem26(s0, P0, it); if (l4) done.push(l4); said = true; }
         /* روزِ دیگری برای همین کار گذاشت («منظورم پس‌فردا صبح بود»؛ «نه، شنبه») ⇒ روزِ پیشین کنار، روزِ تازه یک بار پرسیده می‌شود */
-        else if (first && altFor(it) && (R.corr || NO25.test(t) || (AS.CORR_RE && AS.CORR_RE.test(t)) || (short && (bare27 || ovD27(R.posC[altFor(it)] || "", it.what) >= 1)))) { var a2 = altFor(it); said = true; quiet = true; (s0.dateNo = s0.dateNo || []).push(it.date); re27.push(Object.assign({}, it, { date: a2, what: whatFor(it, a2), was: it.date })); }
+        else if (first && altFor(it) && (R.corr || NO25.test(t) || (AS.CORR_RE && AS.CORR_RE.test(t)) || (short && (bare27 || (ovD27(R.posC[altFor(it)] || "", it.what) >= 1 && sameAct28(R.posC[altFor(it)] || "", it.what)))))) { var a2 = altFor(it); said = true; quiet = true; (s0.dateNo = s0.dateNo || []).push(it.date); re27.push(Object.assign({}, it, { date: a2, what: whatFor(it, a2), was: it.date })); }
         else if (isNew && (first ? NO25.test(t) : exNo)) { said = true; (s0.dateNo = s0.dateNo || []).push(it.date); unpend(it); }
         else left.push(it);
       });
@@ -56649,10 +56659,17 @@ APP.goFromURL = function (q) {
   /* ستاکِ فعل‌های مضارعِ یک جمله («میریم» ⇐ ر، «قطع می‌کنم» ⇐ کن) — برای این‌که روزِ جملهٔ کارِ دیگری پاسخِ ردیفِ «کدام روز؟» ِ این کار نشود */
   function pres28(t) { var x = nrm26(t), re = /(?:^| )ن?می ?([آ-ی]{1,8}?)(?:یم|ید|ند|ن|م|ه|ی|د)(?![آ-ی])/g, m, out = []; while ((m = re.exec(x))) out.push(m[1].replace(/^ی(?=[اآ])/, "")); return out; }
   function sameAct28(c, what) {
-    var a = pres28(c).filter(function (v) { return !LIGHT28.test(v); }), b = pres28(what); if (!a.length) return true;
-    return a.some(function (v) { return b.indexOf(v) >= 0; });
+    var a = pres28(c), b = pres28(what); if (!a.length) return true;
+    if (!b.length) return a.every(function (v) { return LIGHT28.test(v); });   /* «رنگ‌کاری رو ۵ فروردین می‌کنم» برای «رنگ‌کاری … بعد از عید» */
+    return a.some(function (v) { return b.indexOf(v) >= 0; });                  /* «قبضِ آب … می‌دم» با «اجاره … واریز می‌کنم» کارِ دیگری است */
   }
   PR.sameAct28 = sameAct28;
+  /* «X نه، Y» دربارهٔ این کار است؟ — جملهٔ نفی (R.negC) جز روز و واژه‌های قاب چیزی ندارد، یا همان کار را می‌گوید (C92؛ A28-1) */
+  function negBound28(R, d, what, bare) {
+    var c = (R.negC || {})[d] || ""; if (bare || !c) return true; if (ovD27(c, what) >= 1 && sameAct28(c, what)) return true;
+    return !toks(nrm26(c).replace(DATEW27, " ").replace(/(?:^| )(?:نه|نیست|نیس|مهلت|موعد|روزش|تاریخش|قرار|قرارش|ولی|اما|بلکه|پس|که|ست|است|هست|ه|منظورم|اشتباه|گفتم|نوشتم|بود|بذار|بگذار|باشه|آره|بله)(?![آ-ی])/g, " ")).length;
+  }
+  PR.negBound28 = negBound28;
   /* ۰ = گزارشِ انجامِ این کار نیست؛ ۱ = فقط فعلِ همان کار، بی هیچ واژهٔ دیگر («زنگ زدم»)؛ ۲ = فعلِ همان کار با همان چیز («به مادربزرگ زنگ زدم») —
      فعلِ همان کار با چیزِ دیگری («به تعمیرکار زنگ زدم») ۰ است (C94 ِ منفی؛ بانکِ R28 #36) */
   function did28(t, what) {
@@ -56662,7 +56679,7 @@ APP.goFromURL = function (q) {
     sentsOf25(t).forEach(function (c) { if (best === 2) return; var xc = nrm26(c); if (THIRD26.test(xc) && !FIRST26.test(xc)) return;
       V.forEach(function (v) { v.past.forEach(function (ps) { if (best === 2) return;
         var pe = v.pre ? v.pre.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : "", r = new RegExp("(?:^| )" + (pe ? "(?:" + pe + "(?:ش)?) (?:[آ-ی]+ ){0,2}" : "") + ps + "(?:م|یم|مش|یمش)(?![آ-ی])"), m = r.exec(xc); if (!m) return;
-        var rest = (xc.slice(0, m.index) + " " + xc.slice(m.index + m[0].length)).replace(DATEW27, " ").replace(/(?:^| )(?:امروز|دیروز|پریروز|بالاخره|الان|همین|هم|رو|را|به|با|که|و|بهش|باهاش|اونو|اینو|اون|این|دیگه|آره|بله)(?![آ-ی])/g, " ");
+        var rest = (xc.slice(0, m.index) + " " + xc.slice(m.index + m[0].length)).replace(DATEW27, " ").replace(/(?:^| )(?:امروز|دیروز|پریروز|بالاخره|الان|همین|هم|رو|را|به|با|که|و|بهش|باهاش|اونو|اینو|اون|این|دیگه|آره|بله|سلام|خب|خوب|راستی|صبح|عصر|ظهر|شب|امشب|امروزصبح)(?![آ-ی])/g, " ");
         var rt = toks(rest).filter(function (w) { return w !== pe; });
         if (!rt.length) { best = Math.max(best, 1); return; }
         var w0 = nrm26(what); if (pe) w0 = w0.replace(new RegExp("(?:^| )" + pe + "(?![آ-ی])", "g"), " ");
@@ -56701,7 +56718,7 @@ APP.goFromURL = function (q) {
     var n = 0, td = today(), L = pends26(s0), newest = s0.datePend && L.indexOf(s0.datePend) >= 0 ? s0.datePend : L[L.length - 1];
     L.forEach(function (P) { var keep = []; (P.items || []).forEach(function (it) {
       var why = lapsed27(s0, it, P.d0); if (doneOnly && why === "date") why = "";
-      if (!why && !it.amb && !it.free && !it.pred && it.date <= add(td, 7) && didIt28(t, it, P === newest)) why = "done";   /* دورِ ۲۸ (C94) */
+      if (!why && !it.amb && !it.free && !it.pred && it.date <= add(td, 7) && !/^\s*\[اصلاحِ/.test(String(t || "")) && didIt28(t, it, P === newest)) why = "done";   /* ✏️ گزارشِ تازه نیست (C28-10: روزش را datePend می‌پرسد) */   /* دورِ ۲۸ (C94) */
       if (why) { (P.lapsed = P.lapsed || []).push({ what: it.what, date: it.date, why: why, at: nowISO() }); n++;
         if (it.plan) { var q = (s0.plans || []).filter(function (y) { return y && y.id === it.plan; })[0]; if (q) { delete q.whenPend; delete q.whenAsk; } } }
       else keep.push(it); });
@@ -56723,7 +56740,7 @@ APP.goFromURL = function (q) {
   function negBooked27(s0, t, at) {
     var R = herDays27(t), out = [], td = today(); if (!R.neg.length) return out;
     (s0.plans || []).forEach(function (q) { if (!q || !/^\d{4}-\d\d-\d\d$/.test(String(q.when || "")) || R.neg.indexOf(q.when) < 0 || q.done || (q.state && q.state !== "open")) return;
-      var rel = (s0.plans || []).filter(function (y) { return y && y.when === q.when && y.state === "open"; }).length === 1 || sentsOf25(t).some(function (c) { return ovD27(c, q.text) >= 1; }); if (!rel) return;
+      var rel = ((s0.plans || []).filter(function (y) { return y && y.when === q.when && y.state === "open"; }).length === 1 || sentsOf25(t).some(function (c) { return ovD27(c, q.text) >= 1; })) && negBound28(R, q.when, q.text, false); if (!rel) return;   /* دورِ ۲۸ (C92، A28-1) */
       var c = R.pos.filter(function (d) { return d !== q.when && d >= td; }), alt = c.length === 1 ? c[0] : (c.filter(function (d) { return ovD27(R.posC[d] || "", q.text) >= 1; }).length === 1 ? c.filter(function (d) { return ovD27(R.posC[d] || "", q.text) >= 1; })[0] : "");
       (q.whenHist = q.whenHist || []).push({ was: q.when, at: nowISO(), why: "روزش را نفی کرد", msg: at }); (s0.dateNo = s0.dateNo || []).push(q.when);
       try { S.all("deadline", function (r) { return r && !r.done && r.plan && r.plan.id === q.id && r.date === q.when; }).forEach(function (r) { r.done = true; r.doneAt = nowISO(); r.doneBy = { kind: "replaced", plan: q.id }; S.put(r); }); } catch (e) { }
@@ -56737,7 +56754,7 @@ APP.goFromURL = function (q) {
   function negBookedDl27(s0, t, at) {
     var R = herDays27(t), out = [], td = today(); if (!R.neg.length) return out;
     var mineDl = S.all("deadline", function (r) { return r && !r.done && R.neg.indexOf(r.date) >= 0 && (r.sess === s0.id || (r.src && r.src.sess === s0.id)) && /^her/.test(String(r.by || "")); });
-    mineDl.forEach(function (r) { var rel = mineDl.length === 1 || sentsOf25(t).some(function (c) { return ovD27(c, r.quote || r.what) >= 1; }); if (!rel) return;
+    mineDl.forEach(function (r) { var rel = (mineDl.length === 1 || sentsOf25(t).some(function (c) { return ovD27(c, r.quote || r.what) >= 1; })) && negBound28(R, r.date, r.quote || r.what, false); if (!rel) return;   /* دورِ ۲۸ (C92، A28-1) */
       var c = R.pos.filter(function (d) { return d !== r.date && d >= td; }), alt = c.length === 1 ? c[0] : "";
       (r.fixHist = r.fixHist || []).push({ at: nowISO(), field: "deadline", old: r.date, new: alt || "", why: "روزش را نفی کرد", msg: at }); (s0.dateNo = s0.dateNo || []).push(r.date);
       r.done = true; r.doneAt = nowISO(); r.doneBy = { kind: "replaced", why: "neg" }; S.put(r);
@@ -56909,7 +56926,7 @@ APP.goFromURL = function (q) {
       if ((s0.plans || []).some(function (q) { return q && String(q.at || "") === at && q.when === it.date; })) return; if (!it.amb && covered25(s0, it, m)) return; if (noD.indexOf(it.date) >= 0 && !it.first) return; items.push(it); });
     /* دورِ ۲۸ (C92، D28-22 tD2 p7 «اولِ ماه هم گاز رو قطع می‌کنم» کنارِ پرسشِ «قسطِ … سرِ برج» با همان ۱ آذر): پرسش‌ها برای هر کار جدا — کارِ دیگری در همان روز
        پرسیده می‌شود؛ فقط همان کار با همان روز دوباره پرسیده نمی‌شود (پیش‌تر همان «روز» هر کارِ تازه‌ای را بی‌صدا می‌انداخت) */
-    items = items.filter(function (it) { return it.amb || it.plan || it.dl || it.pred || !askedZ.some(function (z) { return z.date === it.date && (norm(z.what) === norm(it.what) || ovD27(z.what, it.what) >= 1); }); });
+    items = items.filter(function (it) { return it.amb || it.plan || it.dl || it.pred || !askedZ.some(function (z) { return z.date === it.date && (norm(z.what) === norm(it.what) || (ovD27(z.what, it.what) >= 1 && sameAct28(it.what, z.what) && sameAct28(z.what, it.what))); }); });
     /* یک پرسش برای یک کار در همین نوبت (دو راهِ ✏️ همان پرسشِ «روزِ گذشته» را دو بار می‌ساختند) */
     items = items.filter(function (it, i, X) { return !it.past || X.findIndex(function (z) { return z.past === it.past && norm(z.what) === norm(it.what); }) === i; });
     /* یک کار، یک پرسش: تعهدِ دوپهلویی که همان پیش‌بینی/برنامه است جدا پرسیده نمی‌شود */

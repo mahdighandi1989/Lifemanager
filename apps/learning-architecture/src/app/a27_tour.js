@@ -3617,6 +3617,9 @@
   function planDone18(s, pd) {
     var id = typeof pd === "string" ? pd : pd && (pd.id || pd.plan), ok = !(pd && typeof pd === "object" && (pd.done === false || pd.done === "false"));
     var x = plansAll(s).filter(function (y) { return y.p.id === String(id || "") && !(y.p.state === "done" || y.p.state === "notdone"); })[0]; if (!x) return;
+    /* دورِ ۲۸ (dates، C94؛ D28-7 aD2 p6 — مدل در همان نوبت هم plan ِ «ادامه میدم و تا امتحان ۲۰ دی همینو چک می‌کنم» را گزارش کرد و هم plan_done با شناسهٔ همان برنامه):
+       برنامه‌ای که در همین نوبت به دنیا آمد در همان نوبت «انجام شد/نشد» نمی‌گیرد — گزارشِ مدل با وضعِ صفحه نمی‌خواند */
+    try { var lu28 = lastUserMsg(s); if (lu28 && x.s === s && String(x.p.at || "") === String(lu28.at || "")) return; } catch (e) { }
     x.p.done = true; x.p.state = ok ? "done" : "notdone"; x.p.doneAt = nowIso(); if (x.s !== s) try { S.put(x.s); } catch (e) { }
     /* RN2d/RN3c: همان کار ⇒ گامِ پیوسته هم همین وضع (از راهِ a38، با پیامِ خودش)؛ انجام‌شده ⇒ یک موفقیتِ اجرا با شناسهٔ همان کار */
     var um = lastUserMsg(s), act = x.p.step ? "lstep:" + x.p.step.pid + ":" + x.p.step.id : "pl:" + x.p.id;

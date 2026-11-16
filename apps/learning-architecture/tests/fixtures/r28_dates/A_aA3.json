@@ -1,0 +1,292 @@
+{
+"from": "round28A/aA3",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام. من پروین هستم، معلمِ بازنشسته. نوه‌ام این برنامه را برایم نصب کرده. دکتر دو تا دارو برایم نوشته: یکی را باید هر ۸ ساعت یک بار بخورم، آن یکی را هر ۱۲ ساعت یک بار، و دومی را حتماً با غذا. من صبحانه ساعت ۸، ناهار ساعت یک و نیم و شام ساعت ۸ شب می‌خورم. ساعت ۱۱ شب می‌خوابم و ۶ و نیم صبح بیدار می‌شوم. نمی‌خواهم نصفه‌شب برای دارو بیدار شوم. ساعت‌ها را چطور بچینم؟"
+},
+{
+"eval": "(()=>{const c=document.querySelector(\".age-ask\");return c?\"CARD\":\"NOCARD\"})()"
+},
+{
+"eval": "(()=>{const c=document.querySelector('.age-ask');if(!c)return 'NOCARD';const i=c.querySelector('.age-in');i.focus();i.value='۳۱ مهر ۱۳۳۸';i.dispatchEvent(new Event('input',{bubbles:true}));c.querySelector('.btn.sm:not(.ghost)').click();const c2=document.querySelector('.age-ask');return 'INVALID AGE='+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' | card='+(c2?c2.innerText.slice(-160):'GONE')})()"
+},
+{
+"eval": "(()=>{const c=document.querySelector('.age-ask');if(!c)return 'NOCARD';const i=c.querySelector('.age-in');i.focus();i.value='۲۰ اردیبهشت ۱۳۳۸';i.dispatchEvent(new Event('input',{bubbles:true}));c.querySelector('.btn.sm:not(.ghost)').click();const c2=document.querySelector('.age-ask');return 'JALALI AGE='+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' | card='+(c2?c2.innerText.slice(-160):'GONE')})()"
+},
+{
+"eval": "'card='+document.querySelectorAll('.age-ask').length+' AGE='+APP.AGE.birth()"
+},
+{
+"say": "تاریخ تولدم را در آن کادر زدم؛ برای اطمینان این‌جا هم می‌نویسم: متولدِ 1338/2/20 هستم. کلِ مسئله: می‌خواهم ساعتِ خوردنِ دو دارو را طوری بچینم که فاصله‌هایشان درست باشد، دومی با غذا باشد و شب بیدار نشوم."
+},
+{
+"eval": "\"AGE \"+APP.AGE.birth()+\" age=\"+APP.AGE.age()"
+},
+{
+"say": "هر ۸ ساعت یعنی سه بار، هر ۱۲ ساعت دو بار. اولی را امتحان کردم: ساعت ۸ صبح، ۴ بعدازظهر و ۱۲ شب… ولی ۱۲ شب که من خوابم! پس این نشد."
+},
+{
+"say": "کلِ برنامه را جابه‌جا می‌کردیم! پس اگر اولی را زودتر شروع کنم، همان ۶ و نیم که بیدار می‌شوم: ۶ و نیم صبح، ۲ و نیم بعدازظهر، ۱۰ و نیم شب — هر سه بیدارم. دومی را هم با صبحانهٔ ۸ و شامِ ۸ شب می‌خورم که درست ۱۲ ساعت است. درست است؟"
+},
+{
+"say": "شرط به شرط نگاه کردم: ۶ و نیم تا ۲ و نیم هشت ساعت، ۲ و نیم تا ۱۰ و نیم هشت ساعت، ۱۰ و نیم شب تا ۶ و نیم صبح هم هشت ساعت. ۱۰ و نیم پیش از خوابِ ساعت ۱۱ است. دومی: ۸ صبح تا ۸ شب دوازده ساعت و هر دو با غذا. همه درست درآمد. ببخشید که دوباره می‌پرسم: «هر ۸ ساعت» یعنی باید دقیقِ دقیق باشد؟ اگر یک روز نیم ساعت دیر بخورم چه؟"
+},
+{
+"say": "می‌پرسم که نیم ساعت دیر و زود اشکال دارد یا نه، و این‌که داروی اول را هم با غذا بخورم یا فرقی نمی‌کند. فردا صبح به داروخانهٔ سرِ کوچه زنگ می‌زنم."
+},
+{
+"say": "فکر می‌کنم بگوید نیم ساعت اشکالی ندارد؛ هفتاد درصد مطمئنم. بله، لطفاً فردا یادم بیندازید."
+},
+{
+"clock": "2026-10-17"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"say": "سلام. زنگ زدم. داروساز گفت تا یک ساعت دیر و زود اشکالی ندارد، و داروی اول با غذا یا بی‌غذا فرقی نمی‌کند. پیش‌بینی‌ام درست بود! پس برنامه همان است که چیدم."
+},
+{
+"eval": "JSON.stringify({fc:APP.S.all(\"fcast\",x=>1).map(x=>[(x.q||\"\").slice(0,50),x.p,x.due,x.verdict||x.res||null]),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,250))})"
+},
+{
+"eval": "JSON.stringify({fc:APP.S.all(\"fcast\",x=>1).map(x=>[(x.q||\"\").slice(0,50),x.p,x.due,x.verdict||x.res||null]),dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,40),x.date]),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,250))})"
+},
+{
+"say": "این‌که وقتی یک چیز در جای بدی می‌افتد، کلِ برنامه را جابه‌جا کنم، نه یک تکه‌اش را؛ و هر شرط را جدا وارسی کنم. آن پرسشی که گفتید شرط به شرط امتحان کنید بیشتر از همه کمک کرد. این جور حساب‌های روزمره را دوست دارم، مثل برنامهٔ کلاس‌هایم."
+},
+{
+"eval": "(()=>{APP.go(\"psy_item\");const m=document.getElementById(\"main\");const r=[...m.querySelectorAll(\"input[type=radio]\")];if(!r.length)return \"NO ITEM\";r[0].click();const t=[...m.querySelectorAll(\"input\")].find(e=>e.type===\"text\"||e.type===\"number\");if(t){t.value=\"50\";t.dispatchEvent(new Event(\"input\",{bubbles:true}))};[...m.querySelectorAll(\"button\")].find(b=>/ثبتِ پاسخ/.test(b.innerText)).click();APP.go(\"mind\");const x=document.getElementById(\"main\").innerText;const i=x.indexOf(\"استدلالِ سیال\\tمسئله\");const j=x.indexOf(\"سن:\");return x.slice(j,j+60)+\"\\n\"+x.slice(i,i+450)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvasr0huu0530');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const L=APP.S.all(\"eprob\",r=>r&&r.live&&r.p);const id=L[L.length-1].p.id;APP.go(\"lprob\",id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"🔭\");return id+\" N=\"+(t.split(\"از گفت‌وگو\").length-1)+\" | \"+t.slice(i,i+1800)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvasqzguxysmn');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvasr04iqlw72');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"reload": true
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur()||APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length)[0];const sys=s.msgs.filter(m=>m.role==\"sys\").map(m=>m.text.slice(0,260));const pid=APP.S.all(\"eprob\",r=>r&&r.live&&r.p)[0].p.id;APP.go(\"lprob\",pid);const t=document.getElementById(\"main\").innerText;const tu=(t.match(/[^\\n]{0,40}(ـت|‌ات|خودت|برایت|می‌کنی |داری |بنویس |بگو |کن\\b)[^\\n]{0,30}/g)||[]).slice(0,12);APP.go(\"today\");const t2=document.getElementById(\"main\").innerText;const tu2=(t2.match(/[^\\n]{0,40}(‌ات |خودت|می‌کنی |داری )[^\\n]{0,30}/g)||[]).slice(0,6);return JSON.stringify({sys,tu,tu2,due:DUE()})})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltfhy2c0w');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "JSON.stringify({fc:APP.S.all(\"fcast\",x=>1).map(x=>[(x.q||\"\").slice(0,50),x.p,x.due,x.verdict||x.res||null]),preds:(APP.S.all(\"achat\",x=>x&&x.coach&&x.coach.preds).flatMap(s=>s.coach.preds.map(p=>[p.text.slice(0,40),p.p,p.due,p.out||null]))),dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,40),x.date])})"
+},
+{
+"eval": "JSON.stringify({f:APP.S.all(\"fcast\",x=>1).map(x=>JSON.stringify(x).slice(0,500)),due:(APP.dueList()||[]).map(x=>x.txt).filter(x=>/🎯|📅/.test(x)),t:APP.today()})"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsy6akp0r');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return APP.today()+\"\\n\"+s.msgs.filter(m=>m.role!=\"ai\").slice(-10).map(m=>m.role[0]+\": \"+m.text.slice(0,230)).join(\"\\n\")+\"\\n--DUE\\n\"+DUE()})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsyo7bogn');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61uf1ds5');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"سلام خانم پروین، خوش آمدید. چیدنِ ساعت‌ها را با هم و با فکرِ خودتان پیش می‌بریم؛ دربارهٔ خودِ داروها هر جا لازم شد از پزشک یا داروساز می‌پرسید. پیش از جزئیات: کلِ مسئله را در یک جمله و به زبانِ خودتان می‌گویید؟\", \"title\": \"ساعتِ دو دارو\", \"memory\": \"پروین، معلمِ بازنشسته؛ دو دارو (هر ۸ ساعت؛ هر ۱۲ ساعت با غذا)؛ وعده‌ها ۸، ۱۳:۳۰، ۲۰؛ خواب ۲۳ تا ۶:۳۰؛ نمی‌خواهد نصفه‌شب بیدار شود؛ پرسیدم کل را در یک جمله بگوید؛ با «شما».\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\", \"c\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"کلِ مسئله را روشن گفتید: فاصله‌های درست، داروی دوم با غذا، و بیدار نشدن در شب. حالا شرط‌ها را جدا کنید: کدام قیدها واقعی‌اند و نمی‌شود دستشان زد، و کدام را می‌شود کمی جابه‌جا کرد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"1338/2/20\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u0\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"خودتان امتحان کردید و دیدید که نوبتِ ۱۲ شب با خوابتان جور نیست — این هم یک یافته است، نه شکست. پیش‌تر مسئله‌ای شبیه این داشته‌اید — مثلاً وقتی در برنامهٔ کلاس‌ها یک زنگ در جای بدی می‌افتاد، چه می‌کردید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": true, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"تجربهٔ برنامهٔ مدرسه را خودتان به این‌جا آوردید: کلِ برنامه را جابه‌جا کردید، نه یک تکه‌اش را. «درست است» را من نمی‌گویم؛ این حدسِ شماست. چطور می‌آزماییدش — مثلاً شرط به شرط: فاصله‌ها، غذا و خواب؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"guess\": {\"text\": \"۶ و نیم صبح، ۲ و نیم بعدازظهر، ۱۰ و نیم شب — هر سه بیدارم. دومی را هم با صبحانهٔ ۸ و شامِ ۸ شب می‌خورم که درست ۱۲ ساعت است\", \"q\": \"چطور می‌آزماییدش — مثلاً شرط به شرط: فاصله‌ها، غذا و خواب؟\"}, \"plan\": {\"text\": \"اگر اولی را زودتر شروع کنم، همان ۶ و نیم که بیدار می‌شوم: ۶ و نیم صبح، ۲ و نیم بعدازظهر، ۱۰ و نیم شب\"}}]}",
+"{\"reply\": \"وارسیِ شرط به شرطِ شما کامل بود: سه فاصلهٔ هشت‌ساعته، ۱۰ و نیم پیش از خواب، و داروی دوم دوازده ساعت و هر دو با غذا. پرسشِ «نیم ساعت دیر شود چه؟» دربارهٔ خودِ داروست و من نباید جای داروساز یا پزشک جوابش را بدهم. از چه کسی و دقیقاً چه چیزی می‌پرسید تا این معلوم شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"check\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"check\": {\"msgs\": [\"۶ و نیم تا ۲ و نیم هشت ساعت، ۲ و نیم تا ۱۰ و نیم هشت ساعت، ۱۰ و نیم شب تا ۶ و نیم صبح هم هشت ساعت\"]}, \"guess_res\": {\"id\": \"g1\", \"res\": \"confirmed\"}}]}",
+"{\"reply\": \"دو پرسشِ روشن برای داروساز دارید و روزش را هم گفتید. پیش از این تماس: چه پیش‌بینی می‌کنید و چقدر مطمئنید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"plan\": {\"text\": \"فردا صبح به داروخانهٔ سرِ کوچه زنگ می‌زنم\", \"when\": \"2026-10-17\"}}]}",
+"{\"reply\": \"پیش‌بینی‌تان را با درصدش گفتید: «نیم ساعت اشکالی ندارد»، هفتاد درصد. فردا که جواب را شنیدید، آن را با همین پیش‌بینی کنار هم می‌گذاریم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [\"e1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"تماس را گرفتید و جواب با پیش‌بینیِ هفتاد درصدی‌تان خواند؛ برنامهٔ ۶ و نیم، ۲ و نیم و ۱۰ و نیم سرِ جایش ماند. حالا که کار به نتیجه رسید: از این ماجرا چه درسی برای دفعهٔ بعد برمی‌دارید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"deadline_done\", \"what\": \"پیگیری: تماس با داروخانه دربارهٔ دو دارو\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"داروساز گفت تا یک ساعت دیر و زود اشکالی ندارد، و داروی اول با غذا یا بی‌غذا فرقی نمی‌کند\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"plan_done\": {\"id\": \"pl2\", \"done\": true}}]}",
+"{\"reply\": \"درسِ خودتان روشن است: کلِ برنامه را جابه‌جا کنید، نه یک تکه را، و هر شرط را جدا وارسی کنید. مسئله، وارسی، این درس، پرسشی که بیشتر کمکتان کرد و سلیقه‌تان را ثبت می‌کنم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"ساعتِ دو دارو\", \"statement\": \"دکتر دو تا دارو برایم نوشته: یکی را باید هر ۸ ساعت یک بار بخورم، آن یکی را هر ۱۲ ساعت یک بار، و دومی را حتماً با غذا. من صبحانه ساعت ۸، ناهار ساعت یک و نیم و شام ساعت ۸ شب می‌خورم. ساعت ۱۱ شب می‌خوابم و ۶ و نیم صبح بیدار می‌شوم. نمی‌خواهم نصفه‌شب برای دارو بیدار شوم. ساعت‌ها را چطور بچینم؟\", \"kind\": \"find\", \"lesson\": \"وقتی یک چیز در جای بدی می‌افتد، کلِ برنامه را جابه‌جا کنم، نه یک تکه‌اش را؛ و هر شرط را جدا وارسی کنم\", \"check\": \"۶ و نیم تا ۲ و نیم هشت ساعت، ۲ و نیم تا ۱۰ و نیم هشت ساعت، ۱۰ و نیم شب تا ۶ و نیم صبح هم هشت ساعت\", \"bestQ\": \"آن پرسشی که گفتید شرط به شرط امتحان کنید\", \"taste\": \"این جور حساب‌های روزمره را دوست دارم، مثل برنامهٔ کلاس‌هایم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"taste\": {\"text\": \"این جور حساب‌های روزمره را دوست دارم، مثل برنامهٔ کلاس‌هایم\"}}]}"
+],
+"keys": [
+"سلام. من پروین هستم، معلمِ بازنشسته. نوه‌ام این برنامه را برایم نصب کرده. دکتر دو تا دارو برایم نوشته: یکی را باید هر ۸ ساعت یک بار بخورم، آن یکی را هر ۱۲ ساعت یک بار، و دومی را حتماً با غذا. من صبحانه ساعت ۸، ناهار ساعت یک و نیم و شام ساعت",
+"تاریخ تولدم را در آن کادر زدم؛ برای اطمینان این‌جا هم می‌نویسم: متولدِ 1338/2/20 هستم. کلِ مسئله: می‌خواهم ساعتِ خوردنِ دو دارو را طوری بچینم که فاصله‌هایشان درست باشد، دومی با غذا باشد و شب بیدار نشوم.",
+"هر ۸ ساعت یعنی سه بار، هر ۱۲ ساعت دو بار. اولی را امتحان کردم: ساعت ۸ صبح، ۴ بعدازظهر و ۱۲ شب… ولی ۱۲ شب که من خوابم! پس این نشد.",
+"کلِ برنامه را جابه‌جا می‌کردیم! پس اگر اولی را زودتر شروع کنم، همان ۶ و نیم که بیدار می‌شوم: ۶ و نیم صبح، ۲ و نیم بعدازظهر، ۱۰ و نیم شب — هر سه بیدارم. دومی را هم با صبحانهٔ ۸ و شامِ ۸ شب می‌خورم که درست ۱۲ ساعت است. درست است؟",
+"شرط به شرط نگاه کردم: ۶ و نیم تا ۲ و نیم هشت ساعت، ۲ و نیم تا ۱۰ و نیم هشت ساعت، ۱۰ و نیم شب تا ۶ و نیم صبح هم هشت ساعت. ۱۰ و نیم پیش از خوابِ ساعت ۱۱ است. دومی: ۸ صبح تا ۸ شب دوازده ساعت و هر دو با غذا. همه درست درآمد. ببخشید که دوباره می‌",
+"می‌پرسم که نیم ساعت دیر و زود اشکال دارد یا نه، و این‌که داروی اول را هم با غذا بخورم یا فرقی نمی‌کند. فردا صبح به داروخانهٔ سرِ کوچه زنگ می‌زنم.",
+"فکر می‌کنم بگوید نیم ساعت اشکالی ندارد؛ هفتاد درصد مطمئنم. بله، لطفاً فردا یادم بیندازید.",
+"سلام. زنگ زدم. داروساز گفت تا یک ساعت دیر و زود اشکالی ندارد، و داروی اول با غذا یا بی‌غذا فرقی نمی‌کند. پیش‌بینی‌ام درست بود! پس برنامه همان است که چیدم.",
+"این‌که وقتی یک چیز در جای بدی می‌افتد، کلِ برنامه را جابه‌جا کنم، نه یک تکه‌اش را؛ و هر شرط را جدا وارسی کنم. آن پرسشی که گفتید شرط به شرط امتحان کنید بیشتر از همه کمک کرد. این جور حساب‌های روزمره را دوست دارم، مثل برنامهٔ کلاس‌هایم."
+]
+}
