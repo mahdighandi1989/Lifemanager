@@ -178,3 +178,11 @@ prior ⇒ dates ⇒ forecast ⇒ story ⇒ surface; the families' tests re-run a
   the page says they look like duplicates and asks whether to merge.
 - **C130 (29).** The «شما» wording follows the page's existing register (C55); the fixer keeps it consistent with nearby labels.
 - **C131 (30).** For entries that move the clock, the replay of the group that saw the defect, with its clock shim, is the real replay.
+
+### Rulings asked by the round-28 fixers
+- **C132 (bank R28 #30 vs DECISIONS_R26 C12 / R26 #203).** A weekday inside a forecast sentence («احتمالش ۴۰ درصده که جمعه بارون بیاد») is
+  the 🎯's due date, never a plan's date. So it makes no 📌 row and no date-ask row (what R28 #30 forbids). The single «موعدِ این
+  پیش‌بینی … است؟» confirm that C12 requires stays, because it confirms the forecast's due date. Both banks are satisfied by this
+  reading: #30 is counted as passing when there is no 📌 or date-ask row; the remaining confirm belongs to forecast (`duePend`).
+- **C133 («وسطِ ماه یعنی حدودِ ۱۵ دی»).** She gave the day herself, so the page books it with no extra question and labels it with her
+  own words («از حرفِ خودت: حدودِ ۱۵ دی»). «حدود» changes nothing here: unlike C120 (judging an outcome), no value is being judged.
