@@ -865,8 +865,22 @@
     try { var OS = otherSpans(t); if (OS.length) out.concat(out.unread).forEach(function (c) { var o = OS.filter(function (x) { return c.pos >= x.a && c.pos < x.b; })[0]; if (o) c.other = o.who; }); } catch (e3) { }
     return out;
   }
+  /* دورِ ۲۸ (C13 در همان گفت‌وگو؛ s02 p4 ⇒ p7): عددِ اعشاری که خودش در پیامِ پیشینِ همین گفت‌وگو گرد کرد («sqrt(3.2^2 + 1.8^2) ≈ 3.67») در حسابِ بعدی
+     همان بازه است — وگرنه «sqrt(3.67^2 + 1.6^2) ≈ 4.005» (که با قطرِ گردنشده درست است) ✗ ِ دروغ می‌گرفت. فقط عددِ اعشاری (عددِ صحیح بازهٔ پهن دارد)؛ حداکثر ۱۲ پیامِ پیشینِ خودش */
+  var RCACHE = {}, RCN = 0;
+  function prevReg(q, ctx) {
+    var o = {}; try { var s = AS && AS.cur ? AS.cur() : null, M = ((s && s.msgs) || []).filter(function (m) { return m && m.role === "user" && !/^\s*\[/.test(String(m.text || "")); }), me = String(ctx || q || "").trim(), k = -1;
+      for (var j = M.length - 1; j >= 0; j--) { var tj = String(M[j].text || "").trim(); if (me && (tj === me || tj.indexOf(me) >= 0)) { k = j; break; } }
+      var P = (k >= 0 ? M.slice(0, k) : M.filter(function (m) { return String(m.text || "").trim() !== me; })).slice(-12);
+      P.forEach(function (m) { var key0 = String(m.text || ""); if (RCACHE.hasOwnProperty(key0)) { var c0 = RCACHE[key0]; Object.keys(c0).forEach(function (x) { o[x] = o[x] ? hull(o[x], c0[x]) : c0[x]; }); return; }
+        var r0 = {}, nt = function (raw, v) { if (raw.indexOf(".") < 0) return; r0[raw] = r0[raw] ? hull(r0[raw], v) : v; }, t1 = normM(String(m.text || "")).t, ra = new RegExp("(?:≈|" + APX + ")\\s*(\\d+\\.\\d+)(?!\\d|\\.\\d|[\\/%])", "g"), mm;
+        while ((mm = ra.exec(t1))) nt(mm[1], wide(iv(dec(mm[1])), tolSaid({ raw: mm[1], mag: 0, pct: false }, false)));
+        run(t1, {}, nt, null); RCACHE[key0] = r0; if (++RCN > 400) { RCACHE = {}; RCN = 0; } Object.keys(r0).forEach(function (x) { o[x] = o[x] ? hull(o[x], r0[x]) : r0[x]; }); });
+    } catch (e) { o = {}; }
+    return o;
+  }
   function arithChk(q, ctx) {
-    var reg = {}, note = function (raw, v) { reg[raw] = reg[raw] ? hull(reg[raw], v) : v; };
+    var reg = prevReg(q, ctx), note = function (raw, v) { reg[raw] = reg[raw] ? hull(reg[raw], v) : v; };
     /* عددهایی که خودش «حدود/تقریباً» نوشته یا گرد کرده (در همهٔ پیام، نه فقط همین نقل) */
     var N0 = normM(ctx || q), t0 = N0.t, ra = new RegExp("(?:≈|" + APX + ")\\s*(\\d+(?:\\.\\d+)?)(?!\\d|\\.\\d|[\\/%])", "g"), m;
     while ((m = ra.exec(t0))) { var tk = { raw: m[1], mag: 0, pct: false }; note(m[1], wide(iv(dec(m[1])), tolSaid(tk, false))); }

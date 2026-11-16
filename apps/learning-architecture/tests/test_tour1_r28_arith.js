@@ -146,6 +146,21 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
     u = await turn('راستی فردا جلسه‌ی مدرسه دارم', 'باشه.', [csn({})]); A0 = await askOf(); chk(!A0[0].re, 'neg C106: an unrelated next message is no answer :: ' + JSON.stringify(A0));
   });
 
+  // ================= C13 در همان گفت‌وگو (A s02 p4 ⇒ p7): گردِ خودش در پیامِ پیشین بازه است =================
+  await section('prev', async () => {
+    await wipe(); await fresh();
+    await turn('خب مجهول بلندترین پاره‌خط داخل بارِ. کف رو حساب کردم: sqrt(3.2^2 + 1.8^2) ≈ 3.67. باز هم از ۴ کمتره! گیر کردم.', 'باشه.', [csn({})]);
+    let u = await turn('قطر کف با ارتفاع یه مثلث قائم دیگه می‌سازه: sqrt(3.67^2 + 1.6^2) ≈ 4.005. جا میشه!', 'باشه.', [csn({})]), B = blockOf(u.user);
+    chk(!/✗/.test(B), 'A s02 p7 (C13 across her messages): «3.67» is her own rounding from p4, so «≈ 4.005» (right for the unrounded diagonal) is never ✗ :: ' + B);
+    await wipe(); await fresh();
+    u = await turn('قطر کف با ارتفاع یه مثلث قائم دیگه می‌سازه: sqrt(3.67^2 + 1.6^2) ≈ 4.005. جا میشه!', 'باشه.', [csn({})]); B = blockOf(u.user);
+    chk(/✗ «sqrt/.test(B), 'neg C13: with no earlier rounding of her own, «3.67» is exact and «≈ 4.005» (4.0036) is ✗ by C9 :: ' + B);
+    await wipe(); await fresh();
+    await turn('حدود ۱۵ نفر میان', 'باشه.', [csn({})]);
+    u = await turn('خودم حساب کردم: ۱۵ × ۲ = ۳۱', 'باشه.', [csn({})]); B = blockOf(u.user);
+    chk(/✗ «۱۵ × ۲»/.test(B), 'neg C13: an earlier integer «حدود ۱۵» does not widen a later exact «۱۵ × ۲ = ۳۱» :: ' + B);
+  });
+
   // ================= block — آنچه مربی در همان نوبت می‌بیند (S1 ها) =================
   await section('block', async () => {
     await wipe(); await fresh();
