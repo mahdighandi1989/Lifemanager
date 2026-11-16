@@ -464,14 +464,18 @@
         var cand = old.steps.filter(inStep); if (!fw.length && cand.length !== 1) cand = [];
         /* دورِ ۲۶ (Q2، U4/U5 pwB1 «ارتفاع ۱۵ ⇐ ۱۸ متر»: گامِ کابلِ «۱۵ متری» کهنه شد و گام‌های ۲ تا ۵ و ۱۰ تا ۱۲ نه؛ C25-15): گامِ درستی که کهنه می‌شود را موتورِ اصلاحِ صفحه می‌گوید
            (a38 A.livePriorStale — وابستگیِ نوشتهٔ خودش، زنجیره‌ای)، نه «عددِ تکه در متنِ گام هست». null ⇒ اصلاحِ غیرِ عددی: همان سنجهٔ پیشین. */
-        var EN26 = null; if (r.ok && typeof A.livePriorStale === "function") { try { EN26 = A.livePriorStale({ pid: pid, sid: s.id, steps: old.steps.map(function (x) { return { n: x.n, t: curText(x), q: x.fixed ? x.quote : "", dep: x.dep || [] }; }), frag: r.frag2 || r.frag, fix: r.fix, old: r.old || "", cur: ut, stmt: C.stmt || "", msgs: (s.msgs || []).filter(function (m) { return m && m.role === "user" && !/^\[(?:سامانه|اصلاحِ پیامِ قبلی)/.test(String(m.text || "")); }).map(function (m) { return String(m.text || ""); }) }); } catch (e) { EN26 = null; } }
-        if (EN26) { old.steps.forEach(function (x) { if (!EN26[x.n] || !okNow(x) || ch.some(function (c) { return c.n === x.n && (c.k === "fix" || c.k === "stale"); })) return; x.stale = { frag: clip(r.old || r.frag, 60), fix: clip(r.fix, 60), at: at, nums: EN26[x.n] }; x.her = ""; ch.push({ n: x.n, k: "stale" });
+        var EN26 = null; if (r.ok && typeof A.livePriorStale === "function") { try { EN26 = A.livePriorStale({ pid: pid, sid: s.id, steps: old.steps.map(function (x) { return { n: x.n, t: curText(x), q: x.fixed ? x.quote : "", dep: x.dep || [], stale: x.stale && Array.isArray(x.stale.nums) ? x.stale.nums : null }; }), frag: r.frag2 || r.frag, fix: r.fix, old: r.old || "", cur: ut, stmt: C.stmt || "", msgs: (s.msgs || []).filter(function (m) { return m && m.role === "user" && !/^\[(?:سامانه|اصلاحِ پیامِ قبلی)/.test(String(m.text || "")); }).map(function (m) { return String(m.text || ""); }) }); } catch (e) { EN26 = null; } }
+        /* دورِ ۲۸ (R2 correction، C89؛ بانکِ R28 #51): گامی که از اصلاحِ پیشین هنوز کهنه است هم با اصلاحِ تازه دوباره نشان می‌گیرد — پیشنهادش با مقدارِ جاریِ هر دو داده (a38 از
+           نشان‌های بازِ همان گام‌ها: steps[i].stale)؛ پیشنهادِ پیشین به تاریخچهٔ نشان می‌رود، کنارِ تازه «جاری» نمی‌ماند */
+        if (EN26) { old.steps.forEach(function (x) { if (!EN26[x.n] || !(okNow(x) || (x.verdict === "ok" && x.stale && !((x.depStale || []).length))) || ch.some(function (c) { return c.n === x.n && (c.k === "fix" || c.k === "stale"); })) return; if (x.stale) (x.staleHist = x.staleHist || []).push(Object.assign({ done: at, how: "superseded by a later correction" }, x.stale)); x.stale = { frag: clip(r.old || r.frag, 60), fix: clip(r.fix, 60), at: at, nums: EN26[x.n] }; x.her = ""; ch.push({ n: x.n, k: "stale" });
             /* همان پیوندِ «وابسته» ِ راهِ پیشین (C25-15): گامِ بعدی که عددِ نتیجهٔ این گام را به کار برده وابستهٔ آن است — حتی اگر موتور خودش را هم کهنه خوانده باشد */
             old.steps.forEach(function (y) { y.dep = y.dep || []; if (y.n > x.n && y.dep.indexOf(x.n) < 0 && (x.said || []).concat(resNums(curText(x))).some(function (n) { return n && numRe(n).test(digs(curText(y))); })) y.dep.push(x.n); }); });
           cand = cand.filter(function (x) { return !okNow(x); }); }
         cand.forEach(function (x) { if (ch.some(function (c) { return c.n === x.n && (c.k === "fix" || c.k === "stale"); }) || (x.depWrong || []).length || (x.depStale || []).length) return;   // گامِ وابسته با تکهٔ گامِ دیگر بازنویسی نمی‌شود — باید با عددِ تازه دوباره حساب شود
-          var nt = subFrag(curText(x), r.frag, r.fix) || (fn.length === 1 && numsOf(r.fix).length === 1 ? subNum(curText(x), fn[0], numsOf(r.fix)[0]) : "");
+          var nt = subFrag(curText(x), r.frag, r.fix, ut) || (fn.length === 1 && numsOf(r.fix).length === 1 ? subNum(curText(x), fn[0], numsOf(r.fix)[0]) : "");
           if (!okNow(x)) { if (nt) { var w = x.verdict; ch.push({ n: x.n, k: tryFix(x, nt, at, "her") ? "fix" : "retry", was: w }); } }
+          /* دورِ ۲۸ (R2 correction، C88؛ بانکِ R28 #61 «۲۰ تا فاکتور رو شمردم، ۱۲ تاش مهر داشت» ⇐ «۱۴»): گامِ داده‌ای که حسابی ندارد «کهنه» نمی‌شود — خودِ داده است: همان تکه با تاریخچه عوض می‌شود */
+          else if (r.ok && nt && nz(nt) !== nz(curText(x)) && !(ST.arithChk(curText(x)) || []).length && !(ST.arithChk(nt) || []).length) { var w28 = x.verdict; applyFix(x, nt, at, "her", x.verdict, "corr"); ch.push({ n: x.n, k: "fix", was: w28 }); }
           else if (r.ok) { x.stale = { frag: clip(r.frag, 60), fix: clip(r.fix, 60), at: at }; x.her = ""; ch.push({ n: x.n, k: "stale" });
             /* هر گامِ بعدی که عددِ نتیجهٔ این گام را به کار برده وابستهٔ آن است */
             old.steps.forEach(function (y) { if (y.n > x.n && y.dep.indexOf(x.n) < 0 && (x.said || []).concat(resNums(curText(x))).some(function (n) { return n && numRe(n).test(digs(curText(y))); })) y.dep.push(x.n); }); } }); });
@@ -720,7 +724,10 @@
     if (!hitM) return ""; var nn = /[۰-۹]/.test(hitM[0]) ? fa(String(newN)).replace(".", "٫") : String(newN);
     return T.slice(0, hitM.index) + nn + T.slice(hitM.index + hitM[0].length);
   }
-  function subFrag(text, frag, fix) {
+  /* دورِ ۲۸ (R2 correction، C88؛ C28-2 s25 «۱۰ تاشو چک کردم — ۸ تا بود» ⇒ نقلِ دفتر «۸. درسته دیگه؟ ثابت شد»): جایگزینی کوچک‌ترین تکه است (جفتِ اصلاحِ موتورِ a38 از حرفِ خودش) —
+     نقلِ او بیرون از آن تکه بایت‌به‌بایت می‌ماند؛ کلِ تکهٔ گزارشِ مدل با مقدارِ درست فقط وقتی که جفتِ کمینه پیدا نشد (subFrag0، همان رفتارِ پیشین) */
+  function subFrag(text, frag, fix, cur) { try { if (typeof A.liveCoreDiff === "function" && typeof A.liveFixVal === "function") { var D = A.liveCoreDiff(frag, fix, cur || ""); if (D && D.o && D.n && !D.absent28 && nz(D.o).length < nz(frag).length) { var v = A.liveFixVal(text, D); if (v != null && nz(v) !== nz(text)) return v; } } } catch (e) { } return subFrag0(text, frag, fix); }
+  function subFrag0(text, frag, fix) {
     var T = String(text || ""), f = txt(frag), i = T.indexOf(f); if (!f) return "";
     if (i < 0) { var dT = digs(T), dF = digs(f); if (dT.length === T.length) i = dT.indexOf(dF); }
     if (i >= 0 && (!/^\d/.test(digs(f)) || !/[0-9۰-۹.٫]/.test(T.charAt(i - 1) || " ")) && (!/\d$/.test(digs(f)) || !/[0-9۰-۹]/.test(T.charAt(i + f.length) || " "))) return T.slice(0, i) + txt(fix) + T.slice(i + f.length);
