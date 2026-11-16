@@ -1837,4 +1837,33 @@
          پیش‌بینی نمی‌خواند ⇒ دربارهٔ آن نیست (پیش‌تر «تنها پیش‌بینیِ باز» — شامِ ۹۰٪ — بی هیچ نشانه‌ای «نشد» می‌خورد) */
       if (PR26.predFor) { var rawPF26 = PR26.predFor; PR26.predFor = function (s0, said, pc, noFc) { var x = rawPF26.apply(this, arguments);
           if (x && pc != null) { var xp = x.p != null ? x.p : (PR26.pctOf25 ? PR26.pctOf25(x.text) : null); if (xp != null && xp !== pc) return null; } return x; }; ST.R26_QUARANTINE.predFor = rawPF26; } } } catch (e) { }
+
+  /* ---------- دورِ ۲۷b (history، C37 ⇐ C53؛ بانکِ R27 #200): پیش‌بینیِ مبهم دربارهٔ خواستهٔ خودِ مسئله ----------
+     «فکر کنم قبول شم» زیرِ مسئلهٔ «می‌خوام کنکور قبول شم» پیش‌بینیِ پیامدِ همان خواسته است (واژهٔ «قبول» از جملهٔ خواستهٔ خودش در صورت، فعلِ آینده/التزامی، بی عدد و بی پرسش).
+     صفحه آن را پیش‌بینی می‌شناسد (PR.bookPred) و — چون عدد ندارد — یک بار عددش را می‌پرسد (C37، همان سطرِ a41)؛ هیچ عددی ساخته نمی‌شود. هر «فکر کنم …» پیش‌بینی نیست:
+     فقط وقتی جملهٔ پس از واژهٔ مبهم واژهٔ خواستهٔ صورت را دارد. پاسخِ کوتاهِ عددی («شصت»، «۶۰») به همان پرسش اطمینانِ همان پیش‌بینی است (C60: عدد به واژه هم عدد است). */
+  var HEDGE27 = /(?:^|[\s،.])(?:فکر\s*(?:کنم|می[‌\s]?کنم)|احتمالاً|احتمالا|به\s*نظرم|حدس\s*می[‌\s]?زنم)\s+([^.!؟?\n،]{2,60})/;
+  var FUTV27 = /(?:^|[\s‌])(?:ب|ن|می[‌\s]?|نمی[‌\s]?)?[آ-ی]{1,8}(?:م|ی|ه|یم|ید|ن|شم|شی|شه|بشم|کنم|کنه|میشم|نمیشم)$|(?:^|\s)(?:شم|بشم|می[‌\s]?شم|میشه|می[‌\s]?شه|بشه|نشم|نمی[‌\s]?شم|میاد|میام|می[‌\s]?گیرم|بگیرم)$/;
+  var TENS27 = { "ده": 10, "بیست": 20, "سی": 30, "چهل": 40, "پنجاه": 50, "شصت": 60, "هفتاد": 70, "هشتاد": 80, "نود": 90, "صد": 100 }, ONES27 = { "یک": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "هفت": 7, "هشت": 8, "نه": 9 };
+  function bareNum27(t) { var x = txt(String(t || "").replace(/[.!،]+$/, "")).replace(/\s*(?:٪|%|درصد)\s*$/, ""), d = nz(x);
+    if (/^\d{1,3}$/.test(d)) return +d <= 100 ? +d : null; var m = /^(ده|بیست|سی|چهل|پنجاه|شصت|هفتاد|هشتاد|نود|صد)(?:\s*و\s*(یک|دو|سه|چهار|پنج|شش|هفت|هشت|نه))?$/.exec(x); if (!m) return null; var v = TENS27[m[1]] + (m[2] ? ONES27[m[2]] : 0); return v <= 100 ? v : null; }
+  ST.bareNum27 = bareNum27;
+  function goalW27(stmt) { var T = String(stmt || ""), m = /(?:می[‌\s]?خوا(?:م|هم)|بتونم|بتوانم|قراره|باید)\s+([^.!؟?\n]{2,80})/.exec(T); if (!m) return [];
+    return toks(m[1]).map(stem).filter(function (w) { return w.length >= 3 && !/^(?:بشم|شم|کنم|بکنم|برم|بدم|بیام|ببینم|بفهمم|بدونم|بشه|کنه)$/.test(w); }); }
+  ST.vagueGoal27 = function (s0) {
+    var PR27 = A.PR; if (!PR27 || !PR27.bookPred || !s0) return null; var U = (s0.msgs || []).filter(isUser), m = U[U.length - 1]; if (!m) return null;
+    var t = String(m.text || ""), at = String(m.at || ""), C0 = s0.coach || {};
+    /* (۲) پاسخِ کوتاهِ عددی به پرسشِ عددِ همان پیش‌بینی */
+    var pu = U[U.length - 2], lp = pu ? (C0.preds || []).filter(function (y) { return y && y.pAsk && y.p == null && !y.out && String(y.at) === String(pu.at || ""); }).pop() : null, pv = lp ? bareNum27(t) : null;
+    if (lp && pv != null) { lp.p = pv; var lf = PR27.predFc ? PR27.predFc(lp) : null; if (!lf && PR27.fc27) { lf = PR27.fc27(s0, lp, ""); if (lf && !lp.fc) lp.fc0 = lf.id; } if (lf && !lf.outcome) { lf.p = pv; delete lf.est; S.put(lf); }
+      (s0.msgs = s0.msgs || []).push({ role: "sys", at: nowIso(), text: "🎯 «" + clip(lp.text, 50) + "» — اطمینان: " + fa(pv) + "٪ (به گفتهٔ خودت)." }); return lp; }
+    /* (۱) پیش‌بینیِ مبهم دربارهٔ خواستهٔ همین مسئله */
+    if (/[0-9۰-۹٪%]/.test(t) || (C0.preds || []).some(function (y) { return y && String(y.at) === at; })) return null;
+    var h = HEDGE27.exec(t); if (!h || /[؟?]/.test(h[1])) return null; var cl = txt(h[1]); if (toks(cl).length > 8 || !FUTV27.test(nz(cl))) return null;
+    var bl = null; try { bl = AS.boundLive ? AS.boundLive(s0) : null; } catch (e) { } var pid = bl && !bl.done ? bl.pid : ""; if (!pid) return null;
+    var G = goalW27(stmtOf(s0, pid)), W = toks(cl).map(stem); if (!G.length || !W.some(function (w) { return G.indexOf(w) >= 0; })) return null;
+    return PR27.bookPred(s0, txt(h[0]).replace(/^[\s،.]+/, ""), at, "", "page");
+  };
+  AS.afterTurnHooks = AS.afterTurnHooks || [];
+  AS.afterTurnHooks.push(function (s) { try { if (ST.vagueGoal27(s)) S.put(s); } catch (e) { console.warn(e); } });
 })(APP);

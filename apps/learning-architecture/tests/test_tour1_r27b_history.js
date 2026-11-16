@@ -160,6 +160,15 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
       return o; });
     return [r.ph0 === 'b' && r.ph1 === 'c' && r.ph2 === 'c' && r.ph3 === 'b', J(r)]; };   // منفی در همان بخش: جوابِ کلِ تازه پس از بازشدن دوباره «بازنگری» است
 
+  /* ---------- #200 (C37 ⇐ C53): پیش‌بینیِ مبهم دربارهٔ خواستهٔ مسئله ⇒ یک بار پرسشِ عدد؛ «شصت» ⇒ 🎯 ۶۰٪ ---------- */
+  const fcs = () => ev(() => ({ fc: APP.S.all('fcast').filter(x => !x.sample).map(x => ({ q: x.q, p: x.p })), preds: ((__cur().coach || {}).preds || []).map(x => ({ t: x.text, p: x.p })), sys: __cur().msgs.filter(m => m.role === 'sys').map(m => m.text) }));
+  E[200] = async () => { await ev(() => __one('کنکور', 'می‌خوام کنکور قبول شم.')); await ev(() => __turn('فکر کنم قبول شم', [])); const S1 = await fcs(); await ev(() => __turn('شصت', [])); const S2 = await fcs();
+    return [S1.fc.filter(f => f.p != null).length === 0 && S1.sys.filter(x => /چند درصد مطمئنی/.test(x)).length === 1 && S2.fc.some(f => f.p === 60) && S2.sys.filter(x => /چند درصد مطمئنی/.test(x)).length === 1, J([S1, S2])]; };
+  K.C37_neg = async () => {   // منفی: «فکر کنم» دربارهٔ چیزی جز خواستهٔ صورت، یا حدسِ عددیِ جواب، پیش‌بینی نیست و پرسیده نمی‌شود
+    const out = [];
+    for (const t of ['فکر کنم فردا بارون بیاد', 'فکر کنم جوابش ۱۲ باشه', 'به نظرم این سؤال سخته؟']) { await ev(() => __one('کنکور', 'می‌خوام کنکور قبول شم.')); await ev((t) => __turn(t, []), t); out.push(await fcs()); }
+    return [out.every(S => !S.preds.length && !S.sys.some(x => /چند درصد مطمئنی/.test(x))), J(out)]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------
