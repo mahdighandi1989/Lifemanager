@@ -378,13 +378,15 @@
   var OTHER28 = new RegExp("(?:^|[\\s،,.:«(])(" + WHO27 + ")((?:\\s+[^\\s.!؟?،:]{1,14}){0,4}?)\\s+(?:(" + CALCV28 + ")|(" + SAYV28 + "))(?![آ-ی])", "g");
   var SENT28 = /[.!؟?\n؛](?![0-9۰-۹])/g;
   var CALCX28 = /[0-9۰-۹][0-9۰-۹.٫,٬\/]*\s*(?:[×x*÷\/+\-−–]|ضرب|تقسیم|منها|منهای|به[‌\s]?علاوه|بعلاوه|درصدِ?)\s*[0-9۰-۹(]/;
-  var CLAIM28 = /(?:=|میشه|می[‌\s]?شه|می[‌\s]?شود|درمیاد|درمی[‌\s]?آد|شد(?![آ-ی]))\s*[^.!؟?]{0,12}[0-9۰-۹]|جواب\S*\s+[^.!؟?]{0,20}[0-9۰-۹]|[0-9۰-۹]+\s*(?:درصد|٪|%)?\s*(?:مطمئن|احتمال|شانس)|(?:مطمئن|احتمال|شانس)\S*\s+[^.!؟?]{0,12}[0-9۰-۹]/;
+  var CLAIM28 = /(?:=|میشه|می[‌\s]?شه|می[‌\s]?شود|درمیاد|درمی[‌\s]?آد|شد(?![آ-ی]))\s*[^.!؟?]{0,12}[0-9۰-۹]|جواب\S*\s+[^.!؟?]{0,20}[0-9۰-۹]|[0-9۰-۹]+\s*(?:درصد|٪|%)?\s*(?:مطمئن|احتمال|شانس)|(?:مطمئن|احتمال|شانس)\S*\s+[^.!؟?]{0,12}[0-9۰-۹]|[0-9۰-۹]+\s*(?:درصد|٪|%)\s+ن?می[‌\s]?[آ-ی]/;
   var LIST28 = /:\s*\S|(?:^|[\s«])(?:اینا|این[‌\s]?ها|این\s+حساب|همین\s+حساب|حساب[‌]?ها|نسخه)/;
   var MINEV28 = /(?:^|[\s،,.])(?:(?:ولی|اما)\s+)?(?:من|خودم)(?![آ-ی])|(?:گذاشتم|کردم|گرفتم|نوشتم|رسیدم|درآوردم|شمردم|دیدم|زدم|خریدم|ساختم)(?![آ-ی])/;
   function sentAt28(T, i) { var a = 0, b = T.length, m; SENT28.lastIndex = 0; while ((m = SENT28.exec(T))) { if (m.index < i) a = m.index + 1; else { b = m.index + 1; break; } } return { a: a, b: b }; }
   function attr28(ut) { var T = String(ut || ""), m, out = []; OTHER28.lastIndex = 0;
     while ((m = OTHER28.exec(T))) { var mid0 = m[2] || "", end = m.index + m[0].length, se = sentAt28(T, end - 1), after = T.slice(end, se.b);
       if (/کمک/.test(mid0)) continue;                                        // «مامانم کمکم کرد تاریخ رو نوشت» — جملهٔ خودش
+      if (m[3] && /^کرد$/.test(m[3]) && !/حساب|ضرب|جمع|تقسیم/.test(mid0)) continue;   // «داداشم فقط نگاه کرد: …» نسبتِ حساب نیست (بانکِ R28 #207)
+      if (/(?:^|[\s،,.])(?:خودم|من)\s+[^.!؟?]{0,20}(?:حساب\s*کردم|نوشتم|درآوردم|شمردم)(?![آ-ی])/.test(T.slice(se.a, m.index))) continue;   // «خودم حساب کردم، داداشم …» — کارِ خودش
       var calc = !!m[3], claim = CALCX28.test(after) || CLAIM28.test(after);
       out.push({ who: m[1], at: m.index, end: end, sent: se, calc: calc, claim: claim, other: (calc && /[0-9۰-۹]/.test(T.slice(end, T.length))) || (!calc && claim), say: !calc, after: after }); }
     return out; }
@@ -1953,12 +1955,16 @@
       Object.keys(T).forEach(function (key) { if (o) return; (T[key].items || []).forEach(function (x) { if (!o && x && ("st23_" + key.replace(/[^\w]/g, "_") + "_" + x.k + "_" + x.n) === evId) o = { s: s, key: key, it: x }; }); }); }); return o; }
   function rePh27(pid, s) { var pg = S.get("eprog_" + pid); if (!pg || !pg.solve || !pg.solve.live) return; var L = pg.solve.live, ph = phaseOfItems(storyOf(s, "L:" + pid).items.concat(L.chatImpItems || []));
     if ((ph || "") !== (L.chatPh || "")) { L.chatPh = ph || ""; L.chatPhAt = nowIso(); S.put(pg); } }
+  function dlMv28(pid, it, mv) { var pg = S.get("eprog_" + pid), L = pg && pg.solve && pg.solve.live, d = L && L.uDraft; if (!d) return; var hit = false;
+    (d.dl || []).forEach(function (x) { if (x && (nz(x.t) === nz(it.t) || (x.chat && x.chat.mid === it.mid && nz(x.chat.t) === nz(it.t)))) { if (mv) x.mv28 = mv; else delete x.mv28; hit = true; } }); if (hit) S.put(pg); }
   ST.moveItem27 = function (evId, toPid, back) {
     var o = evItem27(evId); if (!o || !toPid) return null; var s = o.s, from = /^L:(.+)$/.exec(o.key), at = nowIso(), kB = "L:" + toPid, EB = storyOf(s, kB, true);
     if (back) { var orig = (storyOf(s, o.it.mvFrom || "").items || []).filter(function (x) { return x && x.mv27 && x.mv27.copy === evId; })[0];
       o.it.mv27 = { to: o.it.mvFrom, at: at, back: true }; if (orig) { (orig.mvHist = orig.mvHist || []).push({ to: orig.mv27.to, at: orig.mv27.at }, { back: true, at: at }); delete orig.mv27; }
-      var home = /^L:(.+)$/.exec(o.it.mvFrom || ""); S.put(s); rePh27(toPid, s); if (home) rePh27(home[1], s); return { item: orig }; }
+      var home = /^L:(.+)$/.exec(o.it.mvFrom || ""); S.put(s); rePh27(toPid, s); if (home) { rePh27(home[1], s); if (o.it.k === "d") dlMv28(home[1], o.it, null); } return { item: orig }; }
     var cp = Object.assign({}, o.it, { n: EB.items.length + 1, mvFrom: o.key, at: o.it.at }); delete cp.mv27; EB.items.push(cp);
+    /* دورِ ۲۸ (C95، بانکِ R28 #214): دادهٔ جابه‌جاشده در پیش‌نویسِ فرمِ فهمِ مبدأ هم دیگر شمرده نمی‌شود (سطرِ پیش‌نویس با نشانِ mv28 می‌ماند، پاک نمی‌شود) */
+    if (from && o.it.k === "d") dlMv28(from[1], o.it, { to: toPid, at: at });
     var cpId = "st23_" + kB.replace(/[^\w]/g, "_") + "_" + cp.k + "_" + cp.n; o.it.mv27 = { to: kB, at: at, copy: cpId };
     S.put(s); if (from) rePh27(from[1], s); try { var um = (s.msgs || []).filter(function (m) { return isUser(m) && mid(m) === cp.mid; })[0]; feed(toPid, s, [cp], um || null); } catch (e) { } rePh27(toPid, s);
     return { item: cp, id: cpId };
@@ -2002,10 +2008,16 @@
       if (!(ck.length || (ck.unread || []).length)) return; var N = numsOf(x); if (!N.length) return;
       if (have.some(function (y) { var Y = numsOf(y.t); return N.every(function (n) { return Y.indexOf(n) >= 0; }); })) return;
       var it = { k: "calc", t: clip(x, 300) }; I.push(it); have.push(it); });
+    /* دادهٔ بی‌گزارش (بانکِ R28 #201، D28-17 tD1 p17 «هزینهٔ جمع کردنِ موکتِ قدیمی هم ۵۰۰ هزار تومنه»): جملهٔ خبریِ او با یک مقدار و واحدش، بی حساب و بی پرسش و بی فعلِ آینده،
+       که هیچ قلمِ همان پیام پوشش نمی‌دهد ⇒ «داده (از گفت‌وگو)» */
+    sentences(ut).forEach(function (x) { var i = ut.indexOf(x); if (OW && i >= OW.from && i < OW.to) return; if (/[؟?]\s*$/.test(x) || FUTURE.test(x) || !QTY28.test(x)) return; var st28 = nz(stmtOf(s, pid) || C.stmt || ""); if (st28 && st28.indexOf(nz(x).slice(0, 30)) >= 0) return; var ck = []; try { ck = ST.arithChk(x, ut) || []; } catch (e) { } if (ck.length) return;
+      var N = numsOf(x); if (!N.length || have.some(function (y) { var Y = numsOf(y.t); return N.every(function (n) { return Y.indexOf(n) >= 0; }); })) return;
+      var it = { k: "d", t: clip(x, 300) }; I.push(it); have.push(it); });
     if (!I.length) return false; var at = String(um.at || nowIso());
     I.forEach(function (it) { it.at = at; it.mid = m0; it.n = E.items.length + 1; E.items.push(it); logEv(s, pid, it, um, key); });
     return true;
   };
+  var QTY28 = /[0-9۰-۹][0-9۰-۹.٫,٬]*\s*(?:هزار|میلیون|میلیارد)?\s*(?:تومن|تومان|ریال|متر|سانت|کیلو|لیتر|گرم|درصد|٪)/;
   function isSysT28(t) { return /^\s*\[(?:سامانه|اصلاحِ پیامِ قبلی)/.test(String(t || "")); }
   AS.afterTurnHooks = AS.afterTurnHooks || [];
   AS.afterTurnHooks.push(function (s) { try { if (ST.ownCalc28(s)) S.put(s); } catch (e) { console.warn(e); } });
