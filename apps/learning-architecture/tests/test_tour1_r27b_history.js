@@ -217,6 +217,20 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
       const c = APP.S.get(cid); return { sess: (c.sessions || []).length, n1: APP.STORY.probs26(__cur()).length, n0, e0, e1: APP.S.all('eprob').length, dA: __dos(A).filter(x => /خوابیدم/.test(x)) }; }, [A, cid]);
     return [o.sess === 1 && o.n1 === o.n0 && o.e1 === o.e0 && !o.dA.length, J(o)]; };
 
+  /* ---------- #223 (aB2): 📜 ِ مسئلهٔ تازه‌ثبت‌شده از نخستین صورتِ خودش آغاز می‌شود؛ سطرهای گفت‌وگوی A فقط مالِ A ---------- */
+  const chatA = async () => ev(async () => { __wipe(); __fresh();
+    await __turn('انباری ۲ متر ارتفاع داره. چند طبقه قفسه توش جا میشه؟', [cs({ ph: 'u', said: ['u', 'd'] })]);
+    await __turn('هر طبقه ۴۰ سانت فاصله می‌خواد', [cs({ ph: 'u', said: ['d'] })]);
+    await __turn('پس ۲۰۰ ÷ ۴۰ = ۵ طبقه، جواب شد ۵ طبقه', [cs({ ph: 'b', said: ['result'], result: 'جواب شد ۵ طبقه' })]);
+    await __turn('برنامه‌م اینه که فردا چوب بخرم', [cs({ ph: 'p', said: ['plan'], plan: 'فردا چوب بخرم' })]); });
+  E[223] = async () => { await chatA(); const o = await ev(async () => { const B = __mk('مهره‌های رنگی', 'سه رنگ مهره داریم؛ به چند حالت می‌شه دو مهره برداشت؟'); APP.liveBindSession(B, __cur(), { force: true });
+      await __turn('سه رنگ مهره داریم؛ به چند حالت می‌شه دو مهره برداشت؟', [cs({ ph: 'u', said: ['u'] })]); const L = APP.S.get('eprog_' + B).solve.live;
+      return { dB: __dos(B), ph: APP.liveStoryPhase(B), draft: JSON.stringify(L.uDraft || null), sd: (APP.dossier(__cur().id).events || []).map(e => (e.lines || [])[0]).filter(x => /۴۰ سانت|۵ طبقه|چوب بخرم/.test(x || '')) }; });
+    return [!o.dB.some(x => /۴۰ سانت|۵ طبقه|چوب بخرم/.test(x)) && !/۴۰ سانت/.test(o.draft) && o.ph !== 'b' && o.sd.length >= 3, J(o)]; };
+  K.B_D5_neg = async () => {   // منفی (B·D5): مسئلهٔ زنده‌ای که از همین گفت‌وگو ساخته شد کارِ گفت‌وگو را می‌گیرد
+    await chatA(); const o = await ev(async () => { const A = __mk('قفسه‌های انباری', 'انباری ۲ متر ارتفاع داره. چند طبقه قفسه توش جا میشه؟'); APP.liveBindSession(A, __cur(), { force: true }); return __dos(A); });
+    return [o.some(x => /۴۰ سانت/.test(x)) && o.some(x => /۵ طبقه/.test(x)), J(o)]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------

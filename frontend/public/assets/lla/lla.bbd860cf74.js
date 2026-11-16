@@ -52804,6 +52804,9 @@ APP.goFromURL = function (q) {
       var lk = q.step || q.will; if (pid && lk && lk.pid && lk.pid !== pid) return;   // پیوندِ برنامه ⇄ گامِ زنده (a41: q.step / q.will)
       /* دورِ ۲۷b (history، D27-17 s30، بانکِ R27 #224): برنامه‌ای که به پروندهٔ تمرین پیوست (a41 PR.planLink ⇒ q.prc) مالِ همان پرونده است — در 📜 ِ هیچ مسئله‌ای نمی‌آید (پروندهٔ تمرین c.plans نشانش می‌دهد) */
       if (pid && q.prc) return;
+      /* دورِ ۲۷b (#223): برنامه‌ای که پیش از ثبتِ این مسئله دربارهٔ مسئلهٔ دیگرِ گفت‌وگو گفته شد (a45 importChat ⇒ chatImp.other27) مالِ این مسئله نیست */
+      if (pid && !(lk && lk.pid)) { var im27 = ((prog(pid).live || {}).chatImp) || null, qa27 = (q.src ? (msgRef(se.id, typeof q.src === "object" ? q.src.mid || q.src.msg : q.src) || {}).at : "") || q.at || "";
+        if (im27 && im27.other27 && im27.sess === se.id && qa27 && String(qa27) < String(im27.from || "")) return; }
       /* دورِ ۲۱ (ADDENDUM R4+، A21-14 s03): برنامهٔ یک مسئله هرگز در پروندهٔ مسئلهٔ دیگر — مسئلهٔ برنامه = پیوندش، وگرنه مسئله‌ای که سشن در زمانِ برنامه به آن بسته بود */
       /* دورِ ۲۶ (story Q3، U13/D26-6): یک مالک برای هر برنامه (a45 ST.planOwner — مرزِ پیامِ زایش، بسته بودنِ سشن، پنجرهٔ مسئلهٔ گفت‌وگویی که بعدتر ثبت شد)؛ برنامهٔ بی‌مالک
          فقط در پروندهٔ تنها مسئلهٔ همان سشن می‌آید، نه در هر مسئله (پیش‌تر: planPid ِ خالی ⇒ همهٔ مسئله‌ها) */
@@ -60358,11 +60361,16 @@ APP.goFromURL = function (q) {
     var E = storyOf(s, pk), win = ST.pkWindow(s, pk);
     /* دورِ ۲۴ (R7، A23-32): هر رویدادِ گفت‌وگو مالِ مسئلهٔ خودش — اگر pk ِ کنونی هنوز مسئلهٔ پیشینِ گفت‌وگوست (مسئلهٔ تازه وسطِ همان گفت‌وگو آمد و pk عوض نشد)،
        پنجرهٔ مسئلهٔ زنده از پیامی آغاز می‌شود که صورتِ خودِ این مسئله را گفت، نه از آغازِ مسئلهٔ پیشین (حدسِ «۱۰۰» و گام‌های «۳ نفر» ِ دست‌دادن مالِ «پیشنهادِ کار» نیست) */
-    var from24 = win.from, cut24 = false;
+    var from24 = win.from, cut24 = false, other27 = false;
     try { var lr = A.liveRec ? A.liveRec(pid) : null, stm = lr && lr.p ? txt(lr.p.statement || lr.p.title) : "", base = toks(stm).filter(function (w, i, X) { return X.indexOf(w) === i; });
       if (base.length >= 3) { var UM = (s.msgs || []).filter(function (m) { return isUser(m) && String(m.at || "") >= String(win.from || ""); }), sc = UM.map(function (m) { return toks(m.text).filter(function (w, i, X) { return X.indexOf(w) === i && hit(w, base); }).length; }), mx = Math.max.apply(null, sc.concat([0]));
-        var si = sc.indexOf(mx); if (si > 0 && mx >= Math.max(2, Math.ceil(base.length * 0.4)) && sc[0] * 2 < mx) { from24 = String(UM[si].at || from24); cut24 = true; } } } catch (e) { }
-    var items24 = cut24 ? E.items.filter(function (x) { return !x.at || String(x.at) >= from24; }) : E.items;
+        var si = sc.indexOf(mx); if (si > 0 && mx >= Math.max(2, Math.ceil(base.length * 0.4)) && sc[0] * 2 < mx) { from24 = String(UM[si].at || from24); cut24 = true; }
+        /* دورِ ۲۷b (history، aB2 «📜 ِ B نُه سطرِ A را داشت»، بانکِ R27 #223): مسئلهٔ زنده‌ای که هیچ پیامِ پنجرهٔ گفت‌وگو صورتش را نمی‌گوید (هیچ پیامی دو واژهٔ صورت
+           را ندارد و همهٔ پیام‌ها روی هم کمتر از دو واژه) مسئلهٔ گفت‌وگوی جاری نیست — مسئلهٔ دیگری است که تازه ثبت شد؛ کارِ گفت‌وگوی پیشین (مالِ مسئلهٔ دیگر) واردش نمی‌شود
+           و پنجره‌اش از همین لحظه آغاز می‌شود (پیش‌تر همهٔ داده/نتیجه/برنامهٔ A به 📜 و فرمِ فهمِ B می‌رفت). */
+        var any27 = {}; UM.forEach(function (m) { toks(m.text).forEach(function (w) { if (hit(w, base)) any27[w] = 1; }); });
+        if (UM.length && mx < 2 && Object.keys(any27).length < 2) other27 = true; } } catch (e) { }
+    var items24 = other27 ? [] : cut24 ? E.items.filter(function (x) { return !x.at || String(x.at) >= from24; }) : E.items; if (other27) from24 = nowIso();
     /* دورِ ۲۵ (P5، A25-16 oA1 p6–p18، A23-32): پیامِ مرزی هر دو مسئله را دارد («برای n نفر: n(n−1)/2. ولی … یه پیشنهادِ کار دارم …») — کارِ سنجیدهٔ آن پیام که پیش از
        نخستین جملهٔ مسئلهٔ تازه آمده مالِ مسئلهٔ پیشین است، نه دادهٔ این یکی (پیش‌تر نتیجهٔ دست‌دادن‌ها نقطهٔ نقشهٔ «پیشنهادِ کار» شد و مرحله‌اش را جلو برد) */
     if (cut24) { try { var bm = UM[si], bt = String(bm.text || ""), bmid = mid(bm), S25 = sentences(bt), off25 = -1, pos25 = 0;
@@ -60375,12 +60383,12 @@ APP.goFromURL = function (q) {
     L.chatImp = { sess: s.id, pk: pk, from: from24, to: nowIso(), n: items24.length };
     /* دورِ ۲۶ (Q3، D26-6): پیامی که این مسئله از جمله‌ای وسطِ آن زاده شد و جای همان جمله (bmid/boff) — مرزِ مالکیتِ همان پیام (bornFrom26، ST.planOwner) */
     try { var lr26 = A.liveRec ? A.liveRec(pid) : null; if (um0 && lr26 && lr26.p) { var bx = stmtOff26(String(um0.text || ""), String(lr26.p.statement || lr26.p.title || "")); if (bx > 0) { L.chatImp.bmid = mid(um0); L.chatImp.boff = bx; } } } catch (e) { }
-    if (cut24) L.chatImp.cut = win.from;
+    if (cut24) L.chatImp.cut = win.from; if (other27) L.chatImp.other27 = true;
     L.chatImpItems = items24.map(function (x) { return { k: x.k, t: x.t, at: x.at, mid: x.mid, pieces: x.pieces, n: x.n, fin: x.fin, ph: x.ph }; });
-    if (E.unk && (!cut24 || items24.some(function (x) { return x.k === "u" || x.k === "whole"; }))) L.chatUnk = E.unk;
-    if (E.prior && !L.prior && !cut24) L.prior = JSON.parse(JSON.stringify(E.prior));   // دورِ ۲۴ (R8): کارِ پیشینِ سنجیده با همان حکم‌ها به مسئلهٔ زنده می‌رود (مالِ مسئلهٔ پیشینِ گفت‌وگو نه)
+    if (E.unk && !other27 && (!cut24 || items24.some(function (x) { return x.k === "u" || x.k === "whole"; }))) L.chatUnk = E.unk;
+    if (E.prior && !L.prior && !cut24 && !other27) L.prior = JSON.parse(JSON.stringify(E.prior));   // دورِ ۲۴ (R8): کارِ پیشینِ سنجیده با همان حکم‌ها به مسئلهٔ زنده می‌رود (مالِ مسئلهٔ پیشینِ گفت‌وگو نه)
     /* پشتهٔ پیش‌نیازِ بازِ گفت‌وگو (اگر هست) با همان حالت به مسئلهٔ زنده می‌رود — جای منتظر گم نمی‌شود (پشتهٔ مسئلهٔ پیشینِ گفت‌وگو نه) */
-    try { var P = cut24 ? null : (C.pre22 || {})[pk]; if (P && (P.st || []).length && A.PRE && A.PRE.store) { var R = A.PRE.store({ pid: pid }); if (R && !(R.X.st || []).length) { R.X.st = JSON.parse(JSON.stringify(P.st)); R.X.n = P.n || R.X.st.length; R.X.from = { sess: s.id, pk: pk }; } } } catch (e) { }
+    try { var P = cut24 || other27 ? null : (C.pre22 || {})[pk]; if (P && (P.st || []).length && A.PRE && A.PRE.store) { var R = A.PRE.store({ pid: pid }); if (R && !(R.X.st || []).length) { R.X.st = JSON.parse(JSON.stringify(P.st)); R.X.n = P.n || R.X.st.length; R.X.from = { sess: s.id, pk: pk }; } } } catch (e) { }
     S.put(pg);
     if (items24.length) feed(pid, s, items24, lastUser(s));
   }
