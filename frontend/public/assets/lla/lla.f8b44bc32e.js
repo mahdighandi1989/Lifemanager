@@ -53009,7 +53009,14 @@ APP.goFromURL = function (q) {
       hist: (x.fixHist || []).map(function (y) { return { at: y.at, old: y.old, new: y.new, why: y.why }; }) }); });
     /* دورِ ۲۱ (R4، D·11/C21-13، bank #93/#107/#108): رویدادِ کارنامه با برچسبِ فارسی و پیامِ منبعش — هرگز کلیدِ خام («chat|»، «chatok|»، «rebook:»، «more») */
     var ROW = { u: "فهم", p: "طرح‌ریزی", c: "اجرا", b: "بازنگری" }, HOW = { selfcorr: "خود-اصلاح", plan: "برنامه", own: "به حرفِ خودت", guess: "حدس", check: "وارسی", result: "نتیجه", stuck: "گیر", restate: "بیانِ تازه" };
+    /* دورِ ۲۷b (history، D27-9 arD1 «کارنامه درست، 📜 نه» — دو صدا): رویدادِ گفت‌وگویی که کارنامهٔ ذهن (A.MIND.phases — یک منبع) نشمرد، در 📜 «+» نمی‌گیرد؛
+       همان را می‌گوید: «در کارنامه شمرده نشد» و چرا (نتیجه‌ای که حسابِ صفحه در همان پیام نمی‌خواند، رویدادِ تکراریِ همان کار، …) */
+    var MA27 = null; try { MA27 = {}; ((A.MIND && A.MIND.phases ? A.MIND.phases({}) : { rows: [] }).rows || []).forEach(function (r0) { (r0.acts || []).forEach(function (a) { MA27[a.id] = a; }); }); } catch (e27) { MA27 = null; }
+    var why27 = function (e) { try { if (e.ok && e.how === "res" && e.msg && A.STORY && A.STORY.arithChk && A.STORY.arithNote) { var m = (se.msgs || []).filter(function (m0) { return m0 && m0.role === "user" && (String(m0.id || "") === String(e.msg) || (m0.seq != null && "u" + m0.seq === String(e.msg))); })[0];
+      if (m && A.STORY.arithNote(A.STORY.arithChk(String(m.text || ""))).bad) return "حسابِ صفحه در همین پیام نمی‌خواند (✗)"; } } catch (x) { } return ""; };
     ((se.coachEv || [])).forEach(function (e) { if (!e || !e.at) return; var sm = e.msg ? msgRef(sid, e.msg) : null, row = ROW[e.ph] || "";
+      var id27 = "ev:" + sid + ":" + (e.msg || "") + ":" + e.key, gone27 = !!(MA27 && !e.wd && !e.pend && e.ok && !e.act && (e.src === "chat" || e.src === "chatok" || e.src === "prior") && !MA27[id27]);
+      if (gone27) { var w27 = why27(e); add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [(row ? row + " — " : "") + "در کارنامه شمرده نشد" + (HOW[e.how] ? " (" + HOW[e.how] + ")" : "")], src: sm && sm.text ? sm : null, out: w27 ? "چرا: " + w27 : "", mind: [] }); return; }
       var line = e.fa && !/^(?:chat|chatok|rebook)\b|\|/.test(String(e.fa)) ? val(e.fa) : (row ? row + " " + (e.ok ? "+" : (e.cause === "prereq" || e.cause === "sys") ? "— گیر (ضعفِ مرحله شمرده نشد)" : "−") : "") + (HOW[e.how] ? " — " + HOW[e.how] : "") + (e.rebook ? " — با مقدارِ درست دوباره ثبت شد" : "");
       add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [line].concat(sm && sm.text ? [] : []).filter(Boolean), src: sm && sm.text ? sm : null, withdrawn: !!e.wd, out: e.wd ? "پس گرفته شد" : !e.ok && e.cause === "prereq" ? "علت: نبودِ پیش‌نیازِ «" + (e.preC || "") + "» — ضعفِ مرحله شمرده نشد" : !e.ok && e.cause === "sys" ? "علت: " + (e.causeWhy || "کمبودِ ابزار در سامانه") + " — ضعفِ تو شمرده نشد" : "", mind: !e.ok && (e.cause === "prereq" || e.cause === "sys") ? [] : [{ row: row, sign: e.ok ? "+" : "−", withdrawn: !!e.wd }] }); });   // دورِ ۲۲ (P1)
     /* دورِ ۲۱ (R4، B·D5/C21-13، bank #97/#98/#105): تمرین‌هایی که در این گفت‌وگو گزارش شد (practice_log) و پیش‌بینی‌های 🎯 ِ همان پرونده‌ها — هر کدام یک بار */
@@ -59354,6 +59361,9 @@ APP.goFromURL = function (q) {
       return "حسابِ صفحه: " + (N.bad ? "✗ " : N.ask ? "؟ " : N.unread && !ck.some(function (c) { return c.ok && !c.ask; }) ? "— " : "✓ ") + N.chk; } catch (e) { return ""; }
   }
   ST.markOf27 = markOf27;
+  /* دورِ ۲۷b (history، D27-10 arD1 «چهار نقطهٔ یکسانِ کارِ پیشینِ تو (از گفت‌وگو) برای یک گام»): رویدادِ به‌روزرسانیِ دفترِ «کارِ پیشین» نامِ خودش را دارد —
+     کدام گام و چه شد («کارِ پیشین — به‌روز شد: گامِ ۲ حکم رد شد») — تا در 🧭 و 📜 هر رخداد از دیگری جدا خوانده شود */
+  function title27(it) { var t = String(it && it.t || ""); if (it && it.k === "prior" && /^کارِ پیشینِ تو — به‌روز شد:/.test(t)) return clip(t.replace(/^کارِ پیشینِ تو/, "کارِ پیشین").replace(/\s*·\s*(?:ازسرگیری از گامِ \S+|بقیه درست|همه درست)\s*$/, ""), 110); return EV_T[it.k]; }
   function logEv(s, pid, it, um, key) {
     if (!A.EVLOG || !A.EVLOG.add) return;
     var lines = it.k === "prior" ? (it.lines || priorLines(it.prior)) : it.k === "other" ? [it.t, "از زبانِ «" + it.who + "» — صفحه می‌سنجد و نشان می‌دهد، ولی نتیجه یا گامِ تو شمرده نمی‌شود (C57)"] : [it.t].concat(it.k === "plan" && (it.pieces || []).length > 1 ? it.pieces.map(function (p, i) { return "گامِ " + fa(i + 1) + ": " + p; }) : []).concat(it.q ? ["پرسش: «" + clip(it.q, 120) + "»"] : []);
@@ -59361,7 +59371,7 @@ APP.goFromURL = function (q) {
        با همان جملهٔ «برای خودش» ِ ST.arithNote (عددِ درستِ ✗ لو نمی‌رود)؛ سطری که حسابی ندارد نشانی نمی‌گیرد */
     var mk27 = markOf27(it, um); if (mk27) lines = lines.concat([mk27]);
     var src = um ? { sess: s.id, mid: mid(um), text: um.text, at: um.at || "", title: s.title || "" } : null;
-    try { A.EVLOG.add(Object.assign(pid ? { pid: pid } : { sess: s.id }, { id: "st23_" + key.replace(/[^\w]/g, "_") + "_" + it.k + "_" + it.n, k: EV_K[it.k], at: it.at, title: EV_T[it.k], lines: lines, out: "", src: src, by: "coach" })); } catch (e) { }
+    try { A.EVLOG.add(Object.assign(pid ? { pid: pid } : { sess: s.id }, { id: "st23_" + key.replace(/[^\w]/g, "_") + "_" + it.k + "_" + it.n, k: EV_K[it.k], at: it.at, title: title27(it), lines: lines, out: "", src: src, by: "coach" })); } catch (e) { }
   }
   /* پرسشِ بازنگری ⇐ خانهٔ فرمِ بازنگری */
   function lbField(q) { var x = nz(q); return /راه\S*\s*دیگر/.test(x) ? "other" : /یک\s*نگاه/.test(x) ? "glance" : /وارسی|چک/.test(x) ? "chkHow" : /(?:کجای\s*دیگر|جای\s*دیگر|به\s*کار\s*(?:می|ببر))/.test(x) ? "use" : ""; }

@@ -319,6 +319,9 @@
       return "حسابِ صفحه: " + (N.bad ? "✗ " : N.ask ? "؟ " : N.unread && !ck.some(function (c) { return c.ok && !c.ask; }) ? "— " : "✓ ") + N.chk; } catch (e) { return ""; }
   }
   ST.markOf27 = markOf27;
+  /* دورِ ۲۷b (history، D27-10 arD1 «چهار نقطهٔ یکسانِ کارِ پیشینِ تو (از گفت‌وگو) برای یک گام»): رویدادِ به‌روزرسانیِ دفترِ «کارِ پیشین» نامِ خودش را دارد —
+     کدام گام و چه شد («کارِ پیشین — به‌روز شد: گامِ ۲ حکم رد شد») — تا در 🧭 و 📜 هر رخداد از دیگری جدا خوانده شود */
+  function title27(it) { var t = String(it && it.t || ""); if (it && it.k === "prior" && /^کارِ پیشینِ تو — به‌روز شد:/.test(t)) return clip(t.replace(/^کارِ پیشینِ تو/, "کارِ پیشین").replace(/\s*·\s*(?:ازسرگیری از گامِ \S+|بقیه درست|همه درست)\s*$/, ""), 110); return EV_T[it.k]; }
   function logEv(s, pid, it, um, key) {
     if (!A.EVLOG || !A.EVLOG.add) return;
     var lines = it.k === "prior" ? (it.lines || priorLines(it.prior)) : it.k === "other" ? [it.t, "از زبانِ «" + it.who + "» — صفحه می‌سنجد و نشان می‌دهد، ولی نتیجه یا گامِ تو شمرده نمی‌شود (C57)"] : [it.t].concat(it.k === "plan" && (it.pieces || []).length > 1 ? it.pieces.map(function (p, i) { return "گامِ " + fa(i + 1) + ": " + p; }) : []).concat(it.q ? ["پرسش: «" + clip(it.q, 120) + "»"] : []);
@@ -326,7 +329,7 @@
        با همان جملهٔ «برای خودش» ِ ST.arithNote (عددِ درستِ ✗ لو نمی‌رود)؛ سطری که حسابی ندارد نشانی نمی‌گیرد */
     var mk27 = markOf27(it, um); if (mk27) lines = lines.concat([mk27]);
     var src = um ? { sess: s.id, mid: mid(um), text: um.text, at: um.at || "", title: s.title || "" } : null;
-    try { A.EVLOG.add(Object.assign(pid ? { pid: pid } : { sess: s.id }, { id: "st23_" + key.replace(/[^\w]/g, "_") + "_" + it.k + "_" + it.n, k: EV_K[it.k], at: it.at, title: EV_T[it.k], lines: lines, out: "", src: src, by: "coach" })); } catch (e) { }
+    try { A.EVLOG.add(Object.assign(pid ? { pid: pid } : { sess: s.id }, { id: "st23_" + key.replace(/[^\w]/g, "_") + "_" + it.k + "_" + it.n, k: EV_K[it.k], at: it.at, title: title27(it), lines: lines, out: "", src: src, by: "coach" })); } catch (e) { }
   }
   /* پرسشِ بازنگری ⇐ خانهٔ فرمِ بازنگری */
   function lbField(q) { var x = nz(q); return /راه\S*\s*دیگر/.test(x) ? "other" : /یک\s*نگاه/.test(x) ? "glance" : /وارسی|چک/.test(x) ? "chkHow" : /(?:کجای\s*دیگر|جای\s*دیگر|به\s*کار\s*(?:می|ببر))/.test(x) ? "use" : ""; }

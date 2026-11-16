@@ -128,6 +128,26 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     await ev(async () => { __wipe(); __fresh(); const thu = __nextDow(4); await __turn('پنجشنبه یادم بنداز قبضِ برق رو بدم.', [{ do: 'deadline', what: 'یادآور: قبضِ برق', date: thu }, cs({})]); await __turn('آره', [cs({})]); });
     const D = await sdos(); return [D.some(x => /^deadline/.test(x) && /قبضِ برق/.test(x)), J(D)]; };
 
+  /* ---------- D27-9 (arD1): 📜 و کارنامهٔ ذهن یک صدا — نتیجهٔ ✗دار «اجرا +» نمی‌گیرد ---------- */
+  K.D27_9 = async () => { const r = await ev(async () => { __wipe(); __fresh();
+      await __turn('قبضِ برقمون ۵۰۰ هزار تومن شده، می‌خوام بفهمم سهمِ بخاری چقدره.', [cs({ ph: 'u', said: ['u'] })]);
+      await __turn('بخاری ۲ کیلوواته، روزی ۶ ساعت. پس ماهی ۲ × ۶ × ۳۰ = ۳۰۰ کیلووات ساعت', [cs({ ph: 'c', said: ['result'], result: '۲ × ۶ × ۳۰ = ۳۰۰ کیلووات ساعت' })]);
+      await __turn('بخاری اتاق ۲ کیلوواته، ۶ ساعت روزی، ماهی ۲ × ۶ × ۳۰ = ۳۶۰ کیلووات ساعت', [cs({ ph: 'c', said: ['result'], result: '۲ × ۶ × ۳۰ = ۳۶۰ کیلووات ساعت' })]);
+      const s = __cur(), row = (APP.MIND.phases({}).rows || []).filter(x => /اجرا/.test(x.fa))[0] || {};
+      return { plus: (row.acts || []).filter(a => a.ok).length, d: (APP.dossier(s.id).events || []).filter(e => e.k === 'mind').map(e => e.lines.join(' / ') + ' :: ' + (e.out || '')) }; });
+    const plus = r.d.filter(x => /^اجرا \+/.test(x)).length;   // منفی در همین بخش: نتیجهٔ درست (۳۶۰) «+» می‌ماند
+    return [r.plus === 1 && plus === 1 && r.d.some(x => /شمرده نشد/.test(x) && /✗/.test(x)), J(r)]; };
+
+  /* ---------- D27-10 (arD1): نقطه‌های 🧭 ِ «کارِ پیشین» برای ردِ حکم و پس‌گرفتن یکسان نیستند ---------- */
+  K.D27_10 = async () => { const pts = await ev(async () => { __wipe(); __fresh();
+      const pr1 = [{ step: 'مصرف', quote: '۲ × ۶ × ۳۰ = ۳۶۰ کیلووات ساعت', verdict: 'ok' }, { step: 'سهم', quote: '۳۶۰ تقسیم بر ۵۰۰ میشه ۰٫۷۲', verdict: 'wrong', why: 'واحد' }];
+      await __turn('خودم حساب کردم: بخاری ۲ کیلوواته و روزی ۶ ساعت، پس ۲ × ۶ × ۳۰ = ۳۶۰ کیلووات ساعت؛ ۳۶۰ تقسیم بر ۵۰۰ میشه ۰٫۷۲. درسته؟', [cs({ ph: 'e', said: [], prior: pr1 })]);
+      await __turn('نه، گامِ ۲ درسته، ۰٫۷۲ همون سهمه', [cs({ ph: 'e', said: [] })]);
+      await __turn('ببخشید، حرفمو پس می‌گیرم، گامِ ۲ غلطه', [cs({ ph: 'e', said: [] })]);
+      const M = APP.ROUTE.model(__cur().id); return M ? M.pts.filter(q => q.k === 'cprior').map(q => q.title) : []; });
+    const T = pts.filter(t => !/^کارِ پیشین — گامِ/.test(t));   // منفی: نقطه‌های گام‌ها همان‌اند
+    return [T.length >= 2 && new Set(T).size === T.length && !T.includes('کارِ پیشینِ تو (از گفت‌وگو)') && pts.filter(t => /^کارِ پیشین — گامِ/.test(t)).length === 2, J(pts)]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------
