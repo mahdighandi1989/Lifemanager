@@ -2683,7 +2683,7 @@
       if (C.length === 1) { if (cnt28(clean28(s)) < 2 && si > 0 && claimOk(S[si - 1])) { item(S[si - 1] + "؛ " + s, C[0], si); return; } item(s, C[0], si); return; }
       var tl = TAIL28.exec(w); if (tl && (msgPred || FUT28.test(s.slice(0, s.length - tl[0].length))) && FUT28.test(s) && toks(s.slice(0, s.length - tl[0].length)).length >= 2) { item(s, { p: +tl[1] }, si); return; }
       var bm = BARE28.exec(w); if (bm && +bm[1] <= 100) { if (si > 0 && claimOk(S[si - 1]) && FUT28.test(S[si - 1]) && !past27(S[si - 1]) && !out.some(function (z) { return z.si === si - 1; })) { item(S[si - 1] + "؛ " + s, { p: +bm[1] }, si); return; } out.push({ bare: +bm[1], si: si }); return; }
-      var vm = VAGUE28.exec(s); if (vm && !/[0-9۰-۹٪%]/.test(s) && FUT28.test(s.slice(vm.index + vm[0].length)) && !past27(s)) out.push({ vague: vm[1], raw: s, claim: clean28(s), si: si }); });
+      var vm = VAGUE28.exec(s); if (vm && !/[0-9۰-۹٪%]/.test(s) && (FUT28.test(s.slice(vm.index + vm[0].length)) || (/\s/.test(vm[1]) && /(?:^|\s)(?:ن?یست|هست|است|ه)(?=$|[\s.!،؛])/.test(s.slice(vm.index + vm[0].length)))) && !past27(s) && cnt28(s.slice(vm.index + vm[0].length)) >= 2) out.push({ vague: vm[1], raw: s, claim: clean28(s), si: si }); });
     return out;
   }
   PR.read28 = read28;
