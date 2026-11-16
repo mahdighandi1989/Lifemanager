@@ -115,6 +115,19 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
       await APP.ASSIST.send('اشتباه گفتم: ۱۸ هفته تا عروسی برادرم مونده نه ۱۶.'); __q.length = 0; });
     const R = await retEv(); const h = (R[0] || [])[0] || ''; return [/^«۱۸ هفته تا عروسی برادرم مونده»/.test(h), J(R)]; };
 
+  /* ---------- C52/C73 (گزارشِ dates «📜 still lists it separately»): ⏰ ِ پیوسته به 📌 در 📜 سطرِ همان برنامه است ---------- */
+  await ev(() => { window.__wd = (d) => { const p = d.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).getDay(); };
+    window.__nextDow = (dow) => { const t = APP.today(); let k = (dow - __wd(t) + 7) % 7; if (!k) k = 7; return APP.addDays(t, k); }; });
+  const sdos = () => ev(() => (APP.dossier(__cur().id).events || []).map(e => e.k + ' | ' + (e.title || '') + ' ¦ ' + (e.lines || []).join(' ¦ ')));
+  K.C52_attached = async () => { await ev(async () => { __wipe(); __fresh(); const thu = __nextDow(4), fri = __nextDow(5);
+      await __turn('جمعه قرارداد رو امضا می‌کنم.', [cs({ said: ['plan'], plan: { text: 'جمعه قرارداد رو امضا می‌کنم', when: fri } })]); await __turn('آره', [cs({})]);
+      await __turn('پنجشنبه یادم بنداز که مدارکِ امضا رو آماده کنم.', [{ do: 'deadline', what: 'یادآور: آماده‌کردنِ مدارکِ امضا', date: thu }, cs({})]); await __turn('آره', [cs({})]); });
+    const D = await sdos(), dl = await ev(() => APP.S.all('deadline').filter(d => !d.done && d.plan).length);
+    return [dl === 1 && !D.some(x => /^deadline/.test(x)) && D.filter(x => /^cplan/.test(x) && /قرارداد/.test(x) && /⏰ یادآور \(همین برنامه\)/.test(x)).length === 1, J([dl, D])]; };
+  K.C52_neg = async () => {   // منفی: یادآورِ بی برنامه رویدادِ خودش را دارد
+    await ev(async () => { __wipe(); __fresh(); const thu = __nextDow(4); await __turn('پنجشنبه یادم بنداز قبضِ برق رو بدم.', [{ do: 'deadline', what: 'یادآور: قبضِ برق', date: thu }, cs({})]); await __turn('آره', [cs({})]); });
+    const D = await sdos(); return [D.some(x => /^deadline/.test(x) && /قبضِ برق/.test(x)), J(D)]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------

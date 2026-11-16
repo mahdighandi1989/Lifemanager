@@ -52796,6 +52796,7 @@ APP.goFromURL = function (q) {
           hist: f && (f.verdictHist || []).length ? f.verdictHist.map(function (h0) { return { was: h0.was || "هنوز باز", at: h0.at || "", why: h0.why || "" }; }) : undefined,
           out: o ? o + (x.out && x.out.quote ? " — به گفتهٔ خودت: «" + clip(x.out.quote, 120) + "»" : "") + (f && (f.verdictHist || []).length ? " (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : "") : f && (f.verdictHist || []).length ? "داوری برگشت — دوباره باز (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : due ? "هنوز داوری نشده" : "هنوز داوری نشده — موعدی نگفتی", src: sm && sm.text ? msgRef(sid, A.liveMsgId ? A.liveMsgId(sm) : "") : null, own27: x.prob || null };
   }
+  function attached27(se, q) { try { return S.all("deadline", function (r) { return r && r.plan && r.plan.id === q.id && (!r.plan.sess || r.plan.sess === se.id); }); } catch (e) { return []; } }
   function addSessEvents(add, se, opt) {
     opt = opt || {}; var pid = opt.pid || "";
     var own23 = function (at, ev) { try { return A.STORY && A.STORY.owns ? A.STORY.owns(se, pid, at, ev) : chatScope(se, pid); } catch (e) { return chatScope(se, pid); } };
@@ -52806,7 +52807,9 @@ APP.goFromURL = function (q) {
          فقط در پروندهٔ تنها مسئلهٔ همان سشن می‌آید، نه در هر مسئله (پیش‌تر: planPid ِ خالی ⇒ همهٔ مسئله‌ها) */
       if (pid && !(lk && lk.pid)) { var po26 = A.STORY && A.STORY.planOwner ? A.STORY.planOwner(se, q, q.src ? msgRef(se.id, typeof q.src === "object" ? q.src.mid || q.src.msg : q.src) : null) : planPid(se, q); if (po26 ? po26 !== pid : !!(A.STORY && A.STORY.planOwner) && !chatScope(se, pid)) return; }
       var sm = q.src ? msgRef(se.id, q.src) : null;
-      add({ k: "cplan", at: (sm && sm.at) || q.at || "", title: "برنامهٔ خودت (از گفت‌وگو)", lines: [q.text].concat(q.when ? ["موعد: " + whenFa(q.when)] : []), from: "از گفت‌وگو", src: sm && sm.text ? sm : null,
+      /* دورِ ۲۷b (history، C52/C73؛ گزارشِ dates «📜 still lists it separately»): ⏰ ِ پیوسته به همین 📌 (r.plan) یک تعهد است — سطرِ همین برنامه، نه رویدادِ جدا */
+      var al27 = attached27(se, q).map(function (r) { return "⏰ یادآور (همین برنامه): " + val(r.date) + (r.time ? "، ساعت " + fa(r.time) : "") + (r.done ? " — " + (r.doneBy && r.doneBy.kind === "replaced" ? "جایش را تاریخِ تازه گرفت" : "بسته شد") : ""); });
+      add({ k: "cplan", at: (sm && sm.at) || q.at || "", title: "برنامهٔ خودت (از گفت‌وگو)", lines: [q.text].concat(q.when ? ["موعد: " + whenFa(q.when)] : []).concat(al27), from: "از گفت‌وگو", src: sm && sm.text ? sm : null,
         hist: (q.corr || []).map(function (c) { return { at: c.at, old: val(c.old) + (c.oldWhen && c.oldWhen !== q.when ? " (" + whenFa(c.oldWhen) + ")" : ""), new: val(c["new"]) + (c.oldWhen && c.oldWhen !== q.when ? " (" + whenFa(q.when) + ")" : ""), why: c.note || "" }; }) });
       if (q.done || q.state === "done" || q.state === "notdone") add({ k: "cplandone", at: q.doneAt || "", title: "برنامهٔ خودت — سرانجام", lines: [q.text], out: q.state === "notdone" || q.done === false ? "انجام نشد" : "انجام شد" });
     });
@@ -53002,7 +53005,7 @@ APP.goFromURL = function (q) {
     var first = (se.msgs || []).filter(function (m) { return m && m.role === "user"; })[0];
     if (first) add({ k: "stmt", at: first.at || "", title: "آغازِ گفت‌وگو", lines: [clip(first.text, 400)] });
     addSessEvents(add, se, {});
-    S.all("deadline", function (x) { return x && x.src && x.src.sess === sid; }).forEach(function (x) { var sm = msgRef(sid, x.src.mid); add({ k: "deadline", at: (sm && sm.at) || x.src.at || "", title: "موعد/یادآور", lines: [x.what, "موعد: " + val(x.date) + (x.time ? "، ساعت " + fa(x.time) : "")], out: x.done ? "انجام شد" : "", src: sm && sm.text ? sm : null,
+    S.all("deadline", function (x) { return x && x.src && x.src.sess === sid && !(x.plan && x.plan.id && (!x.plan.sess || x.plan.sess === sid) && chatPlans(se).some(function (q) { return q.id === x.plan.id; })); }).forEach(function (x) { var sm = msgRef(sid, x.src.mid); add({ k: "deadline", at: (sm && sm.at) || x.src.at || "", title: "موعد/یادآور", lines: [x.what, "موعد: " + val(x.date) + (x.time ? "، ساعت " + fa(x.time) : "")], out: x.done ? "انجام شد" : "", src: sm && sm.text ? sm : null,
       hist: (x.fixHist || []).map(function (y) { return { at: y.at, old: y.old, new: y.new, why: y.why }; }) }); });
     /* دورِ ۲۱ (R4، D·11/C21-13، bank #93/#107/#108): رویدادِ کارنامه با برچسبِ فارسی و پیامِ منبعش — هرگز کلیدِ خام («chat|»، «chatok|»، «rebook:»، «more») */
     var ROW = { u: "فهم", p: "طرح‌ریزی", c: "اجرا", b: "بازنگری" }, HOW = { selfcorr: "خود-اصلاح", plan: "برنامه", own: "به حرفِ خودت", guess: "حدس", check: "وارسی", result: "نتیجه", stuck: "گیر", restate: "بیانِ تازه" };
