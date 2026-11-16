@@ -2428,6 +2428,8 @@
     /* دورِ ۲۷ (C77؛ بانکِ R27 #217): همان پیش‌بینی با عددِ تازه ⇒ همان 🎯 عددِ تازه را می‌گیرد و عددِ پیشین در تاریخچه می‌ماند — هرگز دو 🎯 ِ باز برای یک پیش‌بینی */
     /* دورِ ۲۸ (C90؛ A28-21 s05 p25، C28-17 pwC2 p36، B28·D4 nB1 p16/dB1 p13، D28-24 tD2 p15): همان پیامد با عددِ تازه ⇒ همان 🎯 با تاریخچه — «الان ۸۰ درصد»، «… رو ۵۰ درصد می‌دم»، «نه ۷۰» */
     if (o28 && o28.p != null) { var sm28 = ex && !ex.out ? ex : !ex ? same28(PD, o28, at) : null;
+      /* همان پیام (نقلِ مدل پیش‌تر ثبتش کرد، a27): عددِ بندِ خودش جای عددِ خوانده‌شده از نقل می‌نشیند — تاریخچه نیست، چون او عددِ دیگری نگفته بود (B28·D3: ۹۰ ِ داداش هرگز عددِ او نبود) */
+      if (sm28 && sm28 === ex && String(ex.at || "") === String(at || "") && sm28.p !== o28.p) { sm28.p = o28.p; var sf0 = fcOf27(sm28); if (sf0 && !sf0.outcome) { sf0.p = o28.p; delete sf0.est; S.put(sf0); } }
       if (sm28 && sm28.p !== o28.p && (sm28 !== ex || sm28.p != null)) { var was28 = sm28.p; (sm28.pHist = sm28.pHist || []).push({ p: sm28.p, at: nowISO(), why: clip(o28.raw || text, 120) }); sm28.p = o28.p;
         var sf28 = fcOf27(sm28); if (sf28 && !sf28.outcome) { (sf28.pHist = sf28.pHist || []).push({ p: sf28.p, at: nowISO() }); sf28.p = o28.p; delete sf28.est; S.put(sf28); } else if (!sf28) { var nf28 = fc27(s0, sm28, ""); sm28.fc0 = nf28.id; }
         sysLine25(s0, "🎯 «" + clip(sm28.text, 60) + "» — اطمینان: " + fa(o28.p) + "٪ (" + (was28 != null ? "پیش‌تر " + fa(was28) + "٪" : "پیش‌تر بی عدد") + "؛ همان پیش‌بینی به‌روز شد و عددِ پیشین در تاریخچه‌اش ماند — رکوردِ دوم ساخته نشد).");
@@ -2665,8 +2667,9 @@
     var item = function (raw, c, sIdx) { var cl = clean28(raw), k = past27(raw) || /مطمئن\s*بودم|بودم(?![آ-ی])/.test(raw) ? "past" : OTH28.test(dg(raw)) ? "other" : "own";
       var w = wpct(raw), np = /[،,]\s*نه\s*(\d{1,3})\s*(?:٪|%|درصد)?\s*[.!]?\s*$/.exec(w);
       out.push({ raw: raw, claim: cl, p: c.p, kind: k, pure: cnt28(cl) < 2, si: sIdx, notP: np ? +np[1] : null, upd: /(?:^|[\s،])(?:الان|حالا|دیگه|راستش|دیگر)(?![آ-ی])|[،,]\s*نه\s*\d/.test(dg(raw)) }); };
-    S.forEach(function (s0, si) { var s = s0.replace(LEAD28, ""); if (qc28(s)) return;
+    S.forEach(function (s0, si) { var s = s0.replace(LEAD28, ""); if (/[؟?]\s*$/.test(s)) return;
       var w = wpct(s), C = confAll28(w);
+      if (!C.length && qc28(s)) return;   /* شرط («اگه تاس رو ۶۰ بار بندازم … ۷۰ درصد مطمئنم») با اطمینانِ خودش پیش‌بینی است؛ بی اطمینان نه */
       /* «داداشم ۹۰ درصد مطمئنه ۲۳ تا بسه، من ۷۰ درصد» (بانکِ R28 #158): اطمینانِ دیگری مالِ او نیست؛ «من N درصد» ِ پایانی اطمینانِ خودش برای همان پیامد است */
       var mine = /[،,]?\s*(?:من|خودم)\s*(?:هم\s*)?(\d{1,3})\s*(?:٪|%|درصد)\s*[.!]?\s*$/.exec(w);
       if (mine && C.length === 1 && OTH28.test(dg(s))) { var oc = C[0], rest = w.slice(oc.j, mine.index); if (cnt28(rest) >= 2) { item(rest, { p: +mine[1] }, si); out[out.length - 1].kind = "own"; return; } }
@@ -2733,7 +2736,9 @@
     return null; }
   var APPROX28 = /(?:^|[\s‌])(?:حدودِ?|حدوداً|حدودا|تقریباً|تقریبا|نزدیکِ?|کمابیش|اینا)(?![آ-ی])/;
   function verdict28(y, x) {
-    var py = dg(strip28(y.text)).replace(/٫/g, "."), d = dg(x);
+    var py = dg(strip28(y.text)).replace(/٫/g, ".");
+    /* «حل شد / تموم شد / ثبت شد» سرانجامِ کارِ دیگری است مگر خودِ ادعا دربارهٔ همان کار باشد (C53، بانکِ R27 #218) */
+    var d = dg(x).replace(DONEW27, function (m0, w0) { return new RegExp(w0).test(py) ? m0 : " "; });
     if (/درست\s*(?:درنیومد|درنیامد|نبود|نشد)|(?:غلط|اشتباه|نادرست)\s*(?:بود|درومد|دراومد|درآمد|از\s*آب)/.test(d)) return "نشد";
     if (/درست\s*(?:درومد|دراومد|درآمد|بود|از\s*آب)|(?:همین|همون|همان)\s*شد(?![آ-ی])|پیش[‌\s]?بینی[^.!؟?،]{0,40}\s+(?:درست\s*)?شد(?![آ-ی]|\s*[0-9۰-۹])/.test(d)) return "شد";
     var v = val28(d), c = cmp28(py), NP = nums27(py);
@@ -2741,6 +2746,7 @@
     var pu28 = NP.length ? (/^\s*([آ-ی]{2,10})/.exec(py.slice(py.indexOf(NP[0]) + NP[0].length)) || [])[1] || "" : "";
     var verb28 = function (w) { return !w || new RegExp("^" + RES28 + "$").test(w) || /^(?:ن?می|ب|ن)[آ-ی]{3,}$/.test(w) || /^(?:شدم|شده|میشم|میشه|بشم|بشه|گرفتم|بگیرم|درمیاد)$/.test(w); };
     if (v && v.u && pu28 && !verb28(v.u) && !verb28(pu28) && !/^(?:تا|عدد|دونه|دانه)$/.test(pu28) && !/^(?:تا|عدد|دونه|دانه)$/.test(v.u) && v.u !== pu28 && !sameW(v.u, pu28)) { var uu = (d.replace(/٫/g, ".").match(new RegExp("\\d+(?:\\.\\d+)?\\s*" + pu28, "g")) || []).map(function (z) { return /\d+(?:\.\d+)?/.exec(z)[0]; }); v = uu.length === 1 ? { v: uu[0], u: pu28 } : null; }
+    if (!v && c) { var nx28 = nums27(strip28(d)).filter(function (k) { return +k !== c.n && NP.indexOf(k) < 0; }); if (nx28.length === 1) v = { v: nx28[0], u: "" }; }   /* «۲۸۰ تا فروختیم» ⇐ «بالای ۳۰۰» */
     if (v && c) { var a = +v.v; return (c.op === ">" ? a > c.n : c.op === ">=" ? a >= c.n : c.op === "<=" ? a <= c.n : a < c.n) ? "شد" : "نشد"; }
     /* C120: «حدودِ N» تلورانسِ ساختگی نمی‌گیرد — برابر ⇒ شد؛ هر مقدارِ دیگر ⇒ صفحه می‌پرسد «این حدودِ N حساب می‌شود؟» (approx28) */
     if (v && NP.length && !c) { if (APPROX28.test(py)) { var am = new RegExp("(?:حدودِ?|حدوداً|حدودا|تقریباً|تقریبا|نزدیکِ?)\\s*(\\d+(?:\\.\\d+)?)").exec(py); return am && +am[1] === +v.v ? "شد" : ""; }
@@ -2774,7 +2780,7 @@
       var gy = got.map(function (g) { return g[0]; }).filter(function (y, i, X) { return X.indexOf(y) === i; });
       if (gy.length >= 1 && got.length) got.forEach(function (g) { add(g[0], g[1]); }); else if (!tie) tie = { c: cand.filter(function (y) { return sc.filter(function (z) { return z.y === y && z.n === sc[0].n; }).length; }), s: s }; });
     var lastAt = String((userMsgs(s0).slice(-1)[0] || {}).at || ""), done = null, askRes = null;
-    hits.forEach(function (h) { var x = h.u.join(" "), out = verdict28(h.y, x);
+    hits.forEach(function (h) { var x = h.u.join(" "), out = verdict28(h.y, x) || (hits.length === 1 && !tie ? verdict28(h.y, t) : "");   /* «… ۳۰٪. درست درومد.» — داوریِ جملهٔ بعد مالِ همان تنها نامزد */
       if (out) { predApply26(s0, h.y, out, x); sysLine25(s0, "🎯 " + predLab26(h.y) + " ⇐ " + out + " — به گفتهٔ خودت: «" + clip(x, 80) + "»."); done = h.y; } else if (!askRes) askRes = h; });
     if (askRes && !after) { s0.predAsk = { kind: "res", msg: lastAt, pred: String(askRes.y.at), pkey: String(askRes.y.key || ""), sent: clip(askRes.u.join(" "), 200), state: "open" };
       var ax28 = approx28(askRes.y, askRes.u.join(" ")); if (ax28) s0.predAsk.approx = true;

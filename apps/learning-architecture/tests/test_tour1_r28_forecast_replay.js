@@ -17,8 +17,8 @@ const DIR = path.join(__dirname, 'fixtures', 'r28_forecast');
   const J = (x) => JSON.stringify(x).slice(0, 900);
   const K = {
     /* D28-8 / D28-9 (oD1 p7–p13): اصلاحِ «۰٫۳ ⇐ ۰٫۲۵» هیچ «شد یا نشد؟» نمی‌سازد؛ «پیش‌بینیم ۱ بود، شد ۳» ⇐ «حداکثر ۱» ⇒ نشد؛ در دفترِ پیش‌بینی زیرِ «داوری‌شده» */
-    D_oD1: async (R) => { const S = await state(R), V = await view(R), f = S.fc.filter(x => /هشدار/.test(x.q));
-      const ok = f.length === 1 && f[0].out === 'نشد' && !S.sys.some(x => /⇐ شد/.test(x) && /هشدار/.test(x)) && !S.sys.some(x => /شد یا نشد/.test(x) && /هشدار/.test(x)) && V.done.some(d => /هشدار/.test(d.t) && d.sel === 'نشد') && !V.open.some(t => /هشدار/.test(t));
+    D_oD1: async (R) => { const S = await state(R), V = await view(R), f = S.fc.filter(x => /حداکثر ۱ هشدار/.test(x.q));
+      const ok = f.length === 1 && f[0].out === 'نشد' && !S.sys.some(x => /⇐ شد/.test(x) && /حداکثر ۱/.test(x)) && !S.sys.some(x => /شد یا نشد/.test(x) && /حداکثر ۱/.test(x)) && V.done.some(d => /حداکثر ۱ هشدار/.test(d.t) && d.sel === 'نشد') && !V.open.some(t => /حداکثر ۱ هشدار/.test(t));
       return [ok, J([f, S.sys, V.open, V.done])]; },
     /* A28-35 / A28-36 (oA1): 🎯 ِ «⇐ شد» در «🎯 دفترِ پیش‌بینی» زیرِ «داوری‌شده»، نه در «باز»؛ «(دورِ ۲۷، C53)» در دیدِ او نیست */
     A_oA1: async (R) => { const S = await state(R), V = await view(R), f = S.fc.filter(x => /ترفیع/.test(x.q));
@@ -26,7 +26,7 @@ const DIR = path.join(__dirname, 'fixtures', 'r28_forecast');
       return [ok, J([f, V.open, V.done])]; },
     /* B28·D2/D3/D4/D5 (nB1 p15–p19): ۷۰ ِ خودش نه ۹۰ ِ داداش؛ «۶۰، نه ۷۰» همان 🎯 با تاریخچه؛ سه سرانجامِ یک پیام هر سه «شد»؛ «۲۳ … درست درومد» هرگز «نشد» */
     B_nB1: async (R) => { const S = await state(R), c23 = S.fc.filter(x => /۲۳/.test(x.q)), V = await view(R);
-      const ok = c23.length === 1 && c23[0].p === 60 && c23[0].h[0] === 70 && c23[0].out === 'شد' && S.fc.some(x => /نصب/.test(x.q) && x.out === 'شد') && S.fc.some(x => /کاشی/.test(x.q) && x.out === 'شد') && !S.sys.some(x => /۲۳/.test(x) && /⇐ نشد/.test(x)) && !V.open.some(t => /۲۳|نصب|کاشی/.test(t));
+      const ok = c23.length === 1 && c23[0].p === 60 && JSON.stringify(c23[0].h) === '[70]' && c23[0].out === 'شد' && S.fc.some(x => /نصب/.test(x.q) && x.out === 'شد') && S.fc.some(x => /کاشی/.test(x.q) && x.out === 'شد') && !S.sys.some(x => /۲۳/.test(x) && /⇐ نشد/.test(x)) && !V.open.some(t => /۲۳|نصب|کاشی/.test(t));
       return [ok, J([S.fc, S.sys.slice(-6)])]; },
     /* C28-15…C28-25 (pwC2 p31–p39): «فکر کنم ۷۰ درصد» یک 🎯؛ «۸۰ درصد.» پاسخِ پرسشِ عدد؛ «الان ۸۰» همان 🎯 ِ «بالای ۱۷»؛ «۱۸ گرفتم» ⇒ شد؛ دو کوییز دو 🎯 با متن؛ «کدام؟» فقط میانِ کوییزها */
     C_pwC2: async (R) => { const S = await state(R), g = S.fc.filter(x => /بالای ۱۷/.test(x.q)), qz = S.fc.filter(x => /کوییز/.test(x.q)), w = S.sys.filter(x => /کدام پیش‌بینی/.test(x) && /کوییز/.test(x)).pop() || '';
