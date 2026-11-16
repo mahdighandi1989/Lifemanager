@@ -3015,7 +3015,7 @@
      test_tour1_r26_classify (بخشِ reg) متن‌های src را می‌خواند و هر صورتِ رده‌بندی‌نشده را خطا می‌گیرد — سطرِ تازه بی رده نمی‌ماند. */
   var POSS26 = ("پیشرفت|موضوع|همکار|اطمینان|چشم|ادعای|توضیح|قلم|پوست|بدن|برداشت|نزدیک|دوست|سر|جلوی|جدول|آزمون|خطای|سنجش|راه‌حل|ابزار|دانش|ببرد|بی‌پاسخ|تصمیم|متن|دست|می‌برم|نشان|توان|فهم|نزدیک‌تر|برهان|کنار|اصلاح|پیشین|تلاش|اول|" +
     "کالیبراسیون|وقت|بزرگ‌تر|نقض|حرکت|دستاورد|رقیب|دقیق|تقریب|کمک|کوتاه|فرمول|روی|دوم|صورت|فرض|نمودار|شکل|پیاپی|آغاز|کوچک|شواهد|رد|استدلال|شهود|قانون|میل|می‌برد|تسلط|پیشنهاد|گوگل|امروز|باور|اسم|فکر|سؤال|سوال|مشکل|حساب|عدد").split("|");
-  var NOTPOSS26 = "هست|است|درست|موقعیت|کارت|حالت|وضعیت|شیت|کجاست|قطعیت|واقعیت|موافقت|کاشت|سلامت|صفت|نیت|منزلت|شدت|مشت|پرت|نفرت|کمیت|هشت|مخالفت|بلیت|استوارت|بست|احتمالات|رسمیت|حکمت|دمت|تاست|‌هایت|کشت|علّیت|جدیت|اوت|کلیت|فعالیت|بهشت|وات|هایت|جمعیت".split("|");
+  var NOTPOSS26 = "نیست|بیست|هست|است|درست|موقعیت|کارت|حالت|وضعیت|شیت|کجاست|قطعیت|واقعیت|موافقت|کاشت|سلامت|صفت|نیت|منزلت|شدت|مشت|پرت|نفرت|کمیت|هشت|مخالفت|بلیت|استوارت|بست|احتمالات|رسمیت|حکمت|دمت|تاست|‌هایت|کشت|علّیت|جدیت|اوت|کلیت|فعالیت|بهشت|وات|هایت|جمعیت".split("|");
   AS.POSS26 = POSS26; AS.NOTPOSS26 = NOTPOSS26;
   SH_RX.push([new RegExp(B0 + "(" + POSS26.join("|") + ")ت" + E0, "g"), "$1تان"]);
   SH_RX.push([new RegExp("([آ-ی])هایت" + E0, "g"), "$1هایتان"]);   // «کارهایت»، «فکرهایت» (بی نیم‌فاصله)
@@ -3657,6 +3657,9 @@
   function planDone18(s, pd) {
     var id = typeof pd === "string" ? pd : pd && (pd.id || pd.plan), ok = !(pd && typeof pd === "object" && (pd.done === false || pd.done === "false"));
     var x = plansAll(s).filter(function (y) { return y.p.id === String(id || "") && !(y.p.state === "done" || y.p.state === "notdone"); })[0]; if (!x) return;
+    /* دورِ ۲۸ (dates، C94؛ D28-7 aD2 p6 — مدل در همان نوبت هم plan ِ «ادامه میدم و تا امتحان ۲۰ دی همینو چک می‌کنم» را گزارش کرد و هم plan_done با شناسهٔ همان برنامه):
+       برنامه‌ای که در همین نوبت به دنیا آمد در همان نوبت «انجام شد/نشد» نمی‌گیرد — گزارشِ مدل با وضعِ صفحه نمی‌خواند */
+    try { var lu28 = lastUserMsg(s); if (lu28 && x.s === s && String(x.p.at || "") === String(lu28.at || "")) return; } catch (e) { }
     x.p.done = true; x.p.state = ok ? "done" : "notdone"; x.p.doneAt = nowIso(); if (x.s !== s) try { S.put(x.s); } catch (e) { }
     /* RN2d/RN3c: همان کار ⇒ گامِ پیوسته هم همین وضع (از راهِ a38، با پیامِ خودش)؛ انجام‌شده ⇒ یک موفقیتِ اجرا با شناسهٔ همان کار */
     var um = lastUserMsg(s), act = x.p.step ? "lstep:" + x.p.step.pid + ":" + x.p.step.id : "pl:" + x.p.id;
@@ -4356,6 +4359,8 @@
       if (nw !== ow && A.PR && typeof A.PR.rebook27 === "function") { try { rb27 = A.PR.rebook27(s, q, { kind: "plan", date: nw, src: v, at: String((R.cur && R.cur.at) || ""), why: ed27 ? "✏️ ِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد" : why23, by: ed27 ? "edit" : "corr", move: !ed27, hist: false, queue: ed27 }); } catch (e) { rb27 = null; } }
       if (nw !== ow && !(rb27 && rb27.moved)) nw = ow;   // C58: بی rebook27 روز دست نمی‌خورد
       corrPush(q, q.text, v, nw !== ow ? Object.assign({ oldWhen: ow }, ctx) : ctx); var oT = q.text; q.text = clip(v, 300); q.rebook20 = R.curId;
+      /* دورِ ۲۸ (dates، C93): ✏️ به روزِ گذشته ⇒ ثبتِ پیشین می‌ماند و فقط روزِ تازه پرسیده می‌شود */
+      if (rb27 && rb27.past) { put("برنامه", oT, v, "روزِ گذشته — روزِ تازه پرسیده شد", chLine20("برنامه", oT, v, " (آن روز گذشته است؛ ثبتِ " + plainD(ow) + " می‌ماند تا روزِ تازه را بگویی)", "")); return; }
       if (rb27 && !rb27.moved) { put("برنامه", oT, v, "روزِ تازه پرسیده شد", chLine20("برنامه", oT, v, " (روزِ تازه پرسیده شد؛ ثبتِ " + plainD(ow) + " کنار رفت)", "")); return; }
       put("برنامه", oT, v, nw !== ow ? "موعد " + plainD(ow) + " ⇐ " + plainD(nw) : "", chLine20("برنامه", oT, v, nw !== ow ? " (موعد " + plainD(nw) + ")" : "", nw !== ow ? "، " + plainD(ow) : "")); });
     /* موعدها/یادآورهایی که از آن پیام ثبت شدند (AS.DO.deadline با src20) — روز یا ساعتِ تازه */
@@ -4371,6 +4376,7 @@
          به روزِ تازه می‌رود با یک سطرِ تاریخچه (fixHist؛ پیش‌تر corr ِ این‌جا + fixHist ِ a38 = دو سطر) */
       if (dd !== dl.date && A.PR && typeof A.PR.rebook27 === "function") { var edD = !!R.edit || /^\s*\[اصلاحِ/.test(cu), dO = plainD(dl.date) + (dl.time ? "، ساعت " + fa(String(dl.time).replace(/^0/, "").replace(/:00$/, "")) : ""), rbD = null;
         try { rbD = A.PR.rebook27(s, dl, { kind: "deadline", date: dd, time: tm || "", what: edD ? undefined : (sub(dl.what, false) || undefined), src: sub(dl.quote || dl.what, false) || dl.quote || dl.what, at: String((R.cur && R.cur.at) || ""), why: edD ? "✏️ ِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد" : why23, by: edD ? "edit" : "corr", move: !edD, queue: edD }); } catch (e) { rbD = null; }
+        if (rbD && rbD.past) { chS.push({ rec: "یادآوری «" + clip(dl.what, 50) + "»", old: dO, "new": "روزِ گذشته — روزِ تازه پرسیده شد", why: why23 }); ch.push("یادآوری «" + clip(dl.what, 50) + "»: آن روز گذشته است؛ ثبتِ " + dO + " می‌ماند تا روزِ تازه را بگویی"); return; }   /* دورِ ۲۸ (C93) */
         if (rbD && !rbD.moved) { chS.push({ rec: "یادآوری «" + clip(dl.what, 50) + "»", old: dO, "new": "روزِ تازه پرسیده شد", why: why23 }); ch.push("یادآوری «" + clip(dl.what, 50) + "»: ثبتِ " + dO + " کنار رفت؛ روزِ تازه (" + plainD(dd) + ") پرسیده شد"); return; }
         if (rbD && rbD.moved) { var dN = plainD(dl.date) + (dl.time ? "، ساعت " + fa(String(dl.time).replace(/^0/, "").replace(/:00$/, "")) : ""); chS.push({ rec: "یادآوری «" + clip(dl.what, 50) + "»", old: dO, "new": dN, why: why23 }); ch.push("یادآوری «" + clip(dl.what, 50) + "»: " + dN + " (اصلاح شد ⇐ «" + dO + "»)"); return; }
         dd = dl.date; if (!tm || tm === dl.time) return; }

@@ -478,3 +478,16 @@ record is closed or already on the new date). The old per-path code is quarantin
 When several handlers can observe the same user event (a reported correction, an edit replay, a scheduler pass), route every mutation of a shared record
 through a single idempotent function whose effects make the record's state answer «already done» to the next handler; test it by counting history
 lines after one event, not just by checking the final value.
+
+## Update 2026-11-16 — a shape field dropped on one path, and a report that contradicts the turn itself (Pólya round 28, «dates»)
+Two date defects of round 28 were not in the reader but on the way from the reader to the record. (1) The date reader marked «بعد از عید» as
+`free` (no day; ask «کدام روز؟»), but the path that stores an ambiguous day on a MODEL-REPORTED plan kept only `wd`/`opts` and filled an empty weekday
+with a default («جمعه»); the ask later built from the plan fell into the «today is Friday» template. Unit tests that called the reader directly, or
+sent her sentence without a model plan action, were green; only the runners' recorded model replies took the broken path. (2) The model reported
+`plan` and `plan_done` for the same plan in one turn; the page accepted both and the plan was «done» at birth.
+
+### How to Apply Elsewhere
+When a value object is copied between layers (reader ⇒ stored record ⇒ re-built request), copy its whole shape through one helper rather than
+picking fields at each site, and never default a missing discriminator to a plausible value. Test with the real upstream payloads (recorded model
+replies through the real harness), not only with the reader's input. And reject model reports that contradict the page's own clock of the same
+turn (a record cannot be created and completed in the same step).
