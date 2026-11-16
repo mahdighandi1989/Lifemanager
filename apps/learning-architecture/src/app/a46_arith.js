@@ -894,6 +894,9 @@
     /* دورِ ۲۷ (C46، D27-2 S1): بندِ فرضی («اگه یه روز صفحه حسابِ درستم رو غلط بخونه، از کجا بفهمم خطا از صفحه‌ست؟») اعتراض نیست — ST.hypoCut (a45، سهمِ «prior») آن را هم‌طول کنار می‌گذارد */
     var mh = ST.hypoCut ? ST.hypoCut(mt) : mt;
     var mk = keyOf(mh), restates = function (e, v) { return mk.indexOf(keyOf(String(e) + "=" + String(v))) >= 0; }, said = CONTEST.test(mh);
+    /* دورِ ۲۸ (prior، C28-4، بانکِ R28 #247): بازنویسیِ عینِ سطرِ ✗ ِ خودش («تانکرِ ۸۰۰۰ لیتری: ۱۰۰۰۰۰ ÷ ۸۰۰۰ = ۱۵ بار») بی هیچ واژهٔ دیگری اعتراض نیست —
+       وقتی کلِ پیام (بی نقطه‌گذاریِ پایان) درونِ پیامِ پیشینِ خودش هست، بازسنجی و «اعتراضِ خودتان» نمی‌آید؛ همان حساب با واژهٔ اعتراض یا اصرار هنوز اعتراض است. */
+    if (!said) { var core28 = String(mh).replace(/[\s.!؟?…]+$/, "").replace(/\s+/g, " ").trim(); if (core28.length >= 6 && (s.msgs || []).some(function (m) { return m && m !== um && m.role === "user" && String(m.text || "").replace(/\s+/g, " ").indexOf(core28) >= 0; })) return null; }
     /* همان حساب با نتیجهٔ دیگر در همین پیام = اصلاحِ خودش (کارِ دفتر، C8)، نه اعتراض */
     var mine = arithChk(mt), fixes = function (e, v) { var k = keyOf(e); return mine.some(function (c) { return keyOf(c.expr) === k && String(c.said) !== String(v); }); };
     steps.forEach(function (x) {
