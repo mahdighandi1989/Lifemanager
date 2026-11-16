@@ -3634,6 +3634,11 @@
     range: "✅ حل شد — جواب: بازه یا «دست‌نیافتنی» (با دلیل)",
     special: "حل شد — ولی از حالتِ خاص به عام بدون استدلال (هنوز ثابت نشده)", verified: "حل شد — وارسی: نتیجه سالم ماند", intuitive: "حل شد — با گامِ شهودیِ هنوز ثابت‌نشده", unverified: "حل شد — وارسی نشد" };
   A.LIVE_VERDICT_FA = VERDICT_FA;   // دورِ ۲۱ (R4): یک واژه‌نامهٔ حکم برای پرونده (هرگز «intuitive» ِ خام)
+  /* دورِ ۲۸ (R7 surface، C100 — A28-39 pwA2 p7 «حکمِ وارسی: «کنار رفت…» (اصلاح شد ⇐ «maybe»)»): حکمِ وارسیِ گفت‌وگو (verified/maybe) در سطرِ «تغییر» با واژهٔ خودِ پرونده
+     (همان VERD_FA ِ a40)، هرگز مقدارِ خامِ انگلیسی؛ VERDICT_FA ِ بستن («maybe» ندارد) دست نمی‌خورد */
+  var CHKVERD_FA28 = { verified: "وارسی شد — با پیام‌های خودت", maybe: "شاید — به گزارشِ گفت‌وگو، از پیام‌هایت سنجیده نشد", unverified: "وارسی نشد" };
+  function chkVerdFa28(v) { return VERDICT_FA[v] || CHKVERD_FA28[v] || "حکمِ پیشین"; }
+  A.liveChkVerdFa28 = chkVerdFa28;
   /* A1 (دورِ ۳، s11/s21/s26): «حدست — اثبات شد» فقط وقتی حدس رد نشده است؛ حدسِ ردشده «رد شد» است، با پاسخِ «چرا شهودت خطا رفت؟» (R5) */
   /* G5 (دورِ ۶، s06): مسئلهٔ یافتنی که همهٔ گام‌هایش ثابت شد «حل شد» است، نه «اثبات شد» (حکمی نبود که ثابت شود)؛ داده همان «proved» می‌ماند */
   function vLabel(vd, ty, b) { if (vd === "proved" && ty === "find") return "✅ حل شد — همهٔ گام‌ها ثابت شدند و بازنگری ایرادی نیافت"; if (vd === "range") return VERDICT_FA.range + (b && b.rangeW ? ": «" + clip(b.rangeW, 120) + "»" : ""); return VERDICT_FA[vd]; }
@@ -4215,7 +4220,7 @@
     var why = "یک داده‌ای که به کار رفته بود عوض شد («" + clip(D.parts ? D.parts.map(function (p) { return p.o; }).join("، ") : D.o, 60) + "» ⇐ «" + clip(D.parts ? D.parts.map(function (p) { return p.n; }).join("، ") : D.n, 60) + "»)";
     if (b && b.verdict && b.verdict !== "unverified" && used(b.uses, "verdict", [b.chkHow, /سالم ماند/.test(String(b.chkRes || "")) ? "" : b.chkRes].concat(b.chkMsgs || []).join(" "))) {
       (b.verdictHist = b.verdictHist || []).push({ verdict: b.verdict, chkRes: b.chkRes || "", chkBy: b.chkBy || "", at: at, why: why, src: (c && c.mid) || "", by: (c && c.by) || "user" });
-      ch.push({ kind: "verdict", label: "حکمِ وارسی", old: VERDICT_FA[b.verdict] || b.verdict, new: "کنار رفت — با مقدارِ درست دوباره وارسی شود", why: why });
+      ch.push({ kind: "verdict", label: "حکمِ وارسی", old: chkVerdFa28(b.verdict), new: "کنار رفت — با مقدارِ درست دوباره وارسی شود", why: why });
       b.superseded = { at: at, was: b.verdict, why: why }; b.verdict = "unverified"; b.chkBy = "superseded";
     }
     if (L.state === "solved" && used(L.solvedUses, "solved", L.chat ? L.chat.solution : "")) {
@@ -4324,7 +4329,7 @@
     function superVerdict(why0) {
       var b = s.b && s.b[1]; if (!b || !(b.verdict === "verified" || b.verdict === "maybe")) return false;
       (b.verdictHist = b.verdictHist || []).push({ verdict: b.verdict, chkRes: b.chkRes || "", chkBy: b.chkBy || "", at: at, why: why0, src: mid, by: by });
-      ch.push({ kind: "verdict", label: "حکمِ وارسی", old: b.verdict, new: "کنار رفت (بر پایهٔ مقدارِ اصلاح‌شده بود)" });
+      ch.push({ kind: "verdict", label: "حکمِ وارسی", old: chkVerdFa28(b.verdict), new: "کنار رفت (بر پایهٔ مقدارِ اصلاح‌شده بود)" });
       b.superseded = { at: at, was: b.verdict, why: why0 }; b.verdict = "unverified"; b.chkBy = "superseded"; return true;
     }
     function run(list) {

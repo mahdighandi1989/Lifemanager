@@ -138,7 +138,7 @@
   }
   A.V.whole = function () {
     var root = h("div", { class: "page orient-whole", dir: "rtl" });
-    root.appendChild(A.head("راهنما", "🧭 این برنامه چیست؟ — از چه ساخته شده و تو کجای آنی",
+    root.appendChild(A.head("راهنما", "🧭 این برنامه چیست؟ — از چه ساخته شده و جای تو در آن کجاست",
       "سه چیزی که به سامانه دادی این‌جا سه «کارِ» واقعی شده‌اند. هر روز فقط یکی از این سه کار را لازم داری؛ بقیهٔ صفحه‌ها یا جزئی از همان کارند یا کارگاهِ سازنده."));
     var grid = h("section", { class: "orient-grid", "aria-label": "منبع، کار، حاصل" });
     grid.appendChild(h("div", { class: "orient-col" }, h("h2", { class: "small muted" }, "۱. آنچه دادی (منبع)"),
@@ -165,7 +165,7 @@
     return root;
   };
   /* نام «🧭 نقشهٔ کل» بود؛ کنارِ «🗺 نقشه‌ها» گیج‌کننده بود (مالک ۲۰۲۶-۱۰-۱۴) — این راهنماست، نه نقشه */
-  A.NAV_WHOLE = ["whole", "🧭 این برنامه چیست؟", "راهنما: از چه ساخته شده، سه کارِ اصلی، و تو کجای آنی"];
+  A.NAV_WHOLE = ["whole", "🧭 این برنامه چیست؟", "راهنما: از چه ساخته شده، سه کارِ اصلی، و جای تو در آن کجاست"];
   if (A.VIEW_FA) A.VIEW_FA.whole = "این برنامه چیست؟";
   /* صفحه‌هایی که در منو نیستند: پدرِ درست تا «📍» ناقص نماند (ممیزی) */
   if (A.NAV_PARENT) { A.NAV_PARENT.journey = "topics"; A.NAV_PARENT.epi_lesson = "epi_course"; A.NAV_PARENT.ksims = "kmap"; A.NAV_PARENT.move = "moves"; }

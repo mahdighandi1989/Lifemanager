@@ -1605,12 +1605,13 @@
   var METHODQ26 = /^(?:خب|پس|حالا|الان|من|باید|\s)*(?:(?:از\s*کجا|چطور(?:ی)?|چجور(?:ی)?|چه[‌\s]?جوری|چگونه)\s*(?:باید\s*)?(?:شروع(?:ش)?\s*کنم|برم\s*جلو|پیش\s*برم|حلش\s*کنم|ادامه\s*بدم)|(?:چیکار|چی\s*کار|چه\s*کار(?:ی)?)\s*(?:باید\s*)?(?:کنم|بکنم|کنیم)|می[‌\s]?شه|میشه|درسته|خوبه)\s*[؟?]*$/;
   ST.methodQ26 = function (t) { return METHODQ26.test(txt(t)); };
   /* بانکِ R26 #167/#168: صورتی که جز پرسشِ روش پرسشی ندارد ⇒ مقصد از خودِ مسئله: جملهٔ خواسته («می‌خوام …»)، وگرنه نخستین جمله‌ای که پرسشِ روش و سلام نیست */
-  function goalSentence26(t) { var S0 = sentences(String(t || "")).map(function (x) { return txt(x).replace(/[.!…]+$/, ""); }).filter(function (x) { return toks(x).length >= 2 && !METHODQ26.test(x) && !/^(?:سلام|درود|وقت\s*بخیر)(?![آ-ی])/.test(x) && !/^برای\s*این[‌\s]*که\s/.test(x); });
+  function goalSentence26(t) { var S0 = sentences(String(t || "")).map(function (x) { return txt(x).replace(/[.!…]+$/, ""); }).filter(function (x) { return toks(x).length >= 2 && !METHODQ26.test(x) && !(AS.sysQ28 && AS.sysQ28(x)) && !/^(?:سلام|درود|وقت\s*بخیر)(?![آ-ی])/.test(x) && !/^برای\s*این[‌\s]*که\s/.test(x); });
     return S0.filter(function (x) { return UNKMARK24.test(x) || /می[‌\s]?خوا(?:م|هم|یم)(?![آ-ی])/.test(x); })[0] || S0[0] || ""; }
   /* دورِ ۲۷b (history، C27-6 pC2 p13): پرسشِ دربارهٔ خودِ صفحه/سامانه («سامانه روشی برای این داره؟») خواستهٔ مسئله نیست — مقصدِ 🧭 نمی‌شود (پرسش‌های صفحه هم مسئله نیستند، R6) */
   var METAQ27 = /(?:^|[\s،])(?:سامانه|صفحه|این\s*(?:برنامه|اپ|سایت|ابزار))(?![آ-ی])[^؟?]{0,50}(?:(?:روش|راه|ابزار|امکان|بخش)\S*\s*(?:ی\s*)?[^؟?]{0,25}(?:داره|داری|دارد|هست)|می[‌\s]?تونه|بلده)\s*[؟?]\s*$/;
-  ST.metaQ27 = function (t) { return METAQ27.test(txt(t)); };
-  function qSentence(t) { var L = String(t || "").match(/[^.!؟?\n]*[؟?]/g) || []; L = L.map(txt).filter(function (x) { return toks(x).length >= 1 && !METHODQ26.test(x) && !METAQ27.test(x); }); return L.length ? L[L.length - 1] : ""; }
+  /* دورِ ۲۸ (R7 surface، C99 — D28-10): هر پرسش دربارهٔ خودِ سامانه (AS.sysQ28 ِ a27: «… خبرم می‌کنی؟»، «… ثبت شد؟» ِ حرفِ خودش) هم، نه فقط شکلِ METAQ27 */
+  ST.metaQ27 = function (t) { return METAQ27.test(txt(t)) || !!(AS.sysQ28 && AS.sysQ28(txt(t))); };
+  function qSentence(t) { var L = String(t || "").match(/[^.!؟?\n]*[؟?]/g) || []; L = L.map(txt).filter(function (x) { return toks(x).length >= 1 && !METHODQ26.test(x) && !ST.metaQ27(x); }); return L.length ? L[L.length - 1] : ""; }
   ST.R26_QUARANTINE.qSentence = function (t) { var L = String(t || "").match(/[^.!؟?\n]*[؟?]/g) || []; L = L.map(txt).filter(function (x) { return toks(x).length >= 1; }); return L.length ? L[L.length - 1] : ""; };   // قرنطینه: آخرین جملهٔ پرسشی، هر چه باشد
   ST.stmtOfSess = function (se) { var C = (se && se.coach) || {}; if (txt(C.stmt)) return txt(C.stmt); var f = ((se && se.msgs) || []).filter(isUser)[0]; return f ? txt(f.text) : ""; };
   ST.dest = function (rid) {

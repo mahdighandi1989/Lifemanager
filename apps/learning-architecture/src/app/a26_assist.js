@@ -335,7 +335,7 @@
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   var clicked = { n: 0, changed: false };
   AS.run = function (actions) {
-    var notes = [], infos = [], moved = false, stale = false, chain = Promise.resolve(), skipped = 0, toasts = [];
+    var notes = [], infos = [], quiet = [], moved = false, stale = false, chain = Promise.resolve(), skipped = 0, toasts = [];
     clicked = { n: 0, changed: false };
     // پیامی که صفحه پس از کارهای دستیار نشان داد (مثلاً «اول خودارزیابی را بزن») به خودِ دستیار هم می‌رسد — وگرنه حدس می‌زد
     var rawToast = A.toast;
@@ -352,7 +352,9 @@
         var fsig = function () { return Array.prototype.map.call(document.querySelectorAll("#main input,#main textarea,#main select"), function (x) { return x.tagName + ":" + (x.id || x.name || x.getAttribute("aria-label") || x.placeholder || ""); }).join("|"); }, g0 = a.do === "click" || a.do === "fill" ? fsig() : "";
         var r = ""; try { r = DO[a.do](a); } catch (e) { r = e.message; }
         /* تورِ پولیا دورِ ۲ (rerunB s20): یادداشتِ آگاهی‌دهنده («✓ …»/«ℹ …» یا {info}) شکست نیست — در گفت‌وگو تأیید می‌شود و نوبتِ «انجام نشد» نمی‌سازد */
-        if (r && typeof r === "object") { if (r.info) infos.push(String(r.info)); r = r.note ? String(r.note) : ""; }
+        /* دورِ ۲۸ (R7 surface، C100 — A28-31 aA3 p8 «موعدِ «…» در موعدهای باز نیست» زیرِ پیامِ او): نتیجهٔ کنش دو خواننده دارد. {note, quiet:true} یادداشتی فقط برای مدل
+           است (ناکامیِ قراردادیِ کنش که برای او چیزی را عوض نکرد) — در «[سامانه: …]» ِ اصلاح به مدل می‌رسد، در حبابِ او نه */
+        if (r && typeof r === "object") { if (r.info) infos.push(String(r.info)); if (r.quiet && r.note) quiet.push(String(r.note)); r = r.note ? String(r.note) : ""; }
         else if (r && /^[✓ℹ]/.test(String(r))) { infos.push(String(r)); r = ""; }
         if (r) notes.push(r);
         // پرکردنی که فیلدِ شرطیِ تازه آورد (مثلاً «تبیینِ رقیبِ بیرونی»): کلیدهای قدیمی با برچسب/ترتیب هنوز درست می‌نشینند (آزمونِ ۳)،
@@ -374,7 +376,7 @@
       var cnt = {}, uniq = []; notes.forEach(function (n) { if (cnt[n]) cnt[n]++; else { cnt[n] = 1; uniq.push(n); } });
       notes = uniq.map(function (n) { return cnt[n] > 1 ? n + " (×" + A.fa(cnt[n]) + ")" : n; });
       var ci = {}; infos = infos.filter(function (n) { if (ci[n]) return false; ci[n] = 1; return true; });
-      return { notes: notes, infos: infos, moved: moved, skipped: skipped, changed: clicked.changed, clicks: clicked.n, toasts: toasts };
+      return { notes: notes, infos: infos, quiet: quiet, moved: moved, skipped: skipped, changed: clicked.changed, clicks: clicked.n, toasts: toasts };
     });
   };
 
@@ -875,7 +877,8 @@
           /* دورِ ۲۱ (R6): پس از اجرای همهٔ کنش‌های پاسخ — صفحه وضع را می‌سنجد (بستنِ جاافتاده، گزارشِ گامِ بی‌شماره)؛ AS.afterTurnHooks.push(fn(s, o, acts, msg)) */
           if (!/^\[سامانه/.test(String(msg || "").trim())) (AS.afterTurnHooks || []).forEach(function (fn) { try { fn(s, o, acts, msg); } catch (e) { console.error(e); } });
           if ((res.infos || []).length) { s.msgs.push({ role: "sys", at: now(), text: res.infos.join(" · ") }); S.put(s); paint(); }
-          if (res.notes.length) { s.msgs.push({ role: "sys", at: now(), text: res.notes.join(" · ") }); S.put(s); paint(); }
+          var herN28 = res.notes.filter(function (n) { return !(res.quiet || []).some(function (q) { return n === q || n.indexOf(q + " (×") === 0; }); });   // دورِ ۲۸ (C100)
+          if (herN28.length) { s.msgs.push({ role: "sys", at: now(), text: herN28.join(" · ") }); S.put(s); paint(); }
           // پنجره‌ای (تأییدِ فرستادن به هوش مصنوعی، پرسشِ ایمنی، …) باز شد: تصمیمِ خودِ کاربر است — دستیار کنار می‌رود و صریح می‌گوید
           var ov = Array.prototype.slice.call(document.querySelectorAll(".overlay, [role=dialog][aria-modal=true]")).filter(function (x) { return !x.closest(".as-root") && x.getClientRects().length > 0; })[0];
           if (ov) {
