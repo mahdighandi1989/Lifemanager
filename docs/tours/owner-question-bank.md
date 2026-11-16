@@ -57,3 +57,13 @@ Columns: question · the system's correct answer today (exists / partial / missi
 | 51 | After one lapse, why is my next reminder three weeks away? | unknown | Q7 (DECISIONS_R26) | from R27 | — |
 | 52 | When my grandchild comes, how do I tell the page it is me or them? | unknown | Q10 (DECISIONS_R26) | from R27 | — |
 | 53 | A sheet that left no step waiting — will you tell me when it is answered? | unknown | Q4 (DECISIONS_R26) | from R27 | — |
+| 54 | When I said yes, which question exactly did I say yes to? | claimed by R27 fixer, to verify (dates: `PR.dateAnswer`) | a41 date asks | from R28 | — |
+| 55 | Which predictions are still open? | partial | 🎯 list (a31), 📜 | from R28 | — |
+| 56 | When two tools arrived and I named one, does the page take my word? | claimed by R27 fixer, to verify (loop) | a44 territory loop | from R28 | — |
+| 57 | If one message corrects a number and also asks a question, does the correction stay? | unknown | retract (a27/a38) | from R28 | — |
+| 58 | If I say «not Thursday, Saturday», is that Thursday booked somewhere else? | claimed by R27 fixer, to verify (dates: negated days) | a41 | from R28 | — |
+| 59 | Why does a date I never confirmed come back with next year's date? | claimed by R27 fixer, to verify (dates: lapse) | a41 | from R28 | — |
+| 60 | Where is the third problem I mentioned mid-work — where is its dossier? | partial | story (a45), 📜 | from R28 | — |
+| 61 | Is a calculation I quoted from someone else filed as mine? | claimed by R27 fixer, to verify (story «کارِ دیگری») | a45 story, coach_state | from R28 | — |
+| 62 | If I say «سرِ برج» or «بعد از عید», which day is booked? | claimed by R27 fixer, to verify (dates: idioms) | a41 `idiom27` | from R28 | — |
+| 63 | Where do I see the page's ✓/✗/؟ beside each calculation of mine? | claimed by R27b fixer, to verify (history: `markOf27`) | 📜 lines, a46 | from R28 | — |
