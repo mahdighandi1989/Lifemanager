@@ -575,8 +575,20 @@
    "history": []
   },
   "a_knowledge_how": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 39,
+     "at": "2026-11-15",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای حوزهٔ «دانستنِ چگونگی»: مدخلِ SEP (بحثِ عقل‌گرایی و ضدعقل‌گرایی، استدلالِ تسلسلِ رایل، استدلالِ زبانیِ استنلی و ویلیامسون، معرفت‌شناسیِ دانستنِ چگونگی و گتیه/گواهی) و مقالهٔ استنلی و ویلیامسون ۲۰۰۱",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Knowledge How» (first published 20 April 2021) — https://plato.stanford.edu/entries/knowledge-how/",
+    "Jason Stanley & Timothy Williamson (2001), «Knowing How», The Journal of Philosophy 98(8): 411–444, doi:10.2307/2678403 — https://ora.ox.ac.uk/objects/uuid:1fcf732b-731b-47e6-943d-aaf34905c02a"
+   ]
   },
   "a_acquaintance": {
    "stage": 4,
@@ -3222,6 +3234,6 @@
    "bookOnly": true
   }
  },
- "round": 38,
- "updated": "2026-11-15"
+ "round": 39,
+ "updated": "2026-11-16"
 }
