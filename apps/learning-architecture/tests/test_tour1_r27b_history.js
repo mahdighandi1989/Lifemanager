@@ -202,6 +202,21 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     const n = await ev(async () => { const A = __one('تنها', 'یه مسئلهٔ تنها دارم که ۲ متره.'); await __turn('شد ۱۲ حالت', [cs({ ph: 'b', said: ['result'], result: 'شد ۱۲ حالت' })]); APP.go('dossier', A); return document.querySelectorAll('#main .lp-dmv').length; });
     return [n === 0, n]; };
 
+  /* ---------- #224 / #244 (D27-17 s30): برنامه و گزارشِ تمرین مالِ پروندهٔ تمرین‌اند، نه مسئلهٔ A ---------- */
+  const withPrc = () => ev(() => { const [A, B] = __base3(); const tp = APP.S.put({ id: APP.uid('tp'), type: 'topic', title: 'خوابِ زود' }), c = APP.PR.start(41, APP.PR.subj('topic', tp.id)); const s = __cur(); s.prcs = [c.id]; APP.S.put(s); return [A, B, c.id]; });
+  E[224] = async () => { const [A, , cid] = await withPrc(); const t = 'برنامهٔ تمرین: هر شب ساعت ۱۰ و نیم گوشی رو می‌ذارم کنار';
+    const o = await ev(async ([A, cid, t]) => { await __turn(t, [cs({ ph: 'p', said: ['plan'], plan: 'هر شب ساعت ۱۰ و نیم گوشی رو می‌ذارم کنار' })]); const c = APP.S.get(cid);
+      APP.go('practice', cid); const n = [...document.querySelectorAll('#main .prc-plan')].filter(x => /گوشی/.test(x.textContent)).length;
+      return { dA: __dos(A).filter(x => /گوشی/.test(x)), plans: (c.plans || []).map(x => x.text), n, ph: APP.liveStoryPhase(A) }; }, [A, cid, t]);
+    return [!o.dA.length && o.plans.length === 1 && o.n === 1 && o.ph !== 'c', J(o)]; };
+  K.D27_17_neg = async () => {   // منفی: برنامه‌ای بی برچسبِ «تمرین» (کارِ خودِ مسئله) زیرِ همان مسئله می‌ماند
+    const [A] = await withPrc(); const o = await ev(async (A) => { await __turn('فردا چوب‌ها رو اندازه می‌گیرم', [cs({ ph: 'p', said: ['plan'], plan: 'فردا چوب‌ها رو اندازه می‌گیرم' })]); return __dos(A).filter(x => /اندازه می‌گیرم/.test(x)); }, A);
+    return [o.length === 1, J(o)]; };
+  E[244] = async () => { const [A, , cid] = await withPrc(); const o = await ev(async ([A, cid]) => { const n0 = APP.STORY.probs26(__cur()).length, e0 = APP.S.all('eprob').length;
+      await __turn('دیشب ساعت ۱۰ و نیم خوابیدم', [{ do: 'practice_log', prc: cid, quote: 'دیشب ساعت ۱۰ و نیم خوابیدم', ok: true }, cs({ ph: 'c' })]);
+      const c = APP.S.get(cid); return { sess: (c.sessions || []).length, n1: APP.STORY.probs26(__cur()).length, n0, e0, e1: APP.S.all('eprob').length, dA: __dos(A).filter(x => /خوابیدم/.test(x)) }; }, [A, cid]);
+    return [o.sess === 1 && o.n1 === o.n0 && o.e1 === o.e0 && !o.dA.length, J(o)]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------

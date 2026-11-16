@@ -98,6 +98,8 @@
     var own23 = function (at, ev) { try { return A.STORY && A.STORY.owns ? A.STORY.owns(se, pid, at, ev) : chatScope(se, pid); } catch (e) { return chatScope(se, pid); } };
     chatPlans(se).forEach(function (q) {
       var lk = q.step || q.will; if (pid && lk && lk.pid && lk.pid !== pid) return;   // پیوندِ برنامه ⇄ گامِ زنده (a41: q.step / q.will)
+      /* دورِ ۲۷b (history، D27-17 s30، بانکِ R27 #224): برنامه‌ای که به پروندهٔ تمرین پیوست (a41 PR.planLink ⇒ q.prc) مالِ همان پرونده است — در 📜 ِ هیچ مسئله‌ای نمی‌آید (پروندهٔ تمرین c.plans نشانش می‌دهد) */
+      if (pid && q.prc) return;
       /* دورِ ۲۱ (ADDENDUM R4+، A21-14 s03): برنامهٔ یک مسئله هرگز در پروندهٔ مسئلهٔ دیگر — مسئلهٔ برنامه = پیوندش، وگرنه مسئله‌ای که سشن در زمانِ برنامه به آن بسته بود */
       /* دورِ ۲۶ (story Q3، U13/D26-6): یک مالک برای هر برنامه (a45 ST.planOwner — مرزِ پیامِ زایش، بسته بودنِ سشن، پنجرهٔ مسئلهٔ گفت‌وگویی که بعدتر ثبت شد)؛ برنامهٔ بی‌مالک
          فقط در پروندهٔ تنها مسئلهٔ همان سشن می‌آید، نه در هر مسئله (پیش‌تر: planPid ِ خالی ⇒ همهٔ مسئله‌ها) */
@@ -316,7 +318,11 @@
     try { var M0 = A.MIND && A.MIND.model ? A.MIND.model() : null, tt = r.p.title;
       ((M0 && M0.events) || []).forEach(function (e) { var mine = e.pid === pid || (e.src && e.src.id === pid) || (tt && String(e.fa || "").indexOf("«" + tt + "»") >= 0); if (!mine) return;
         add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [e.fa], withdrawn: !!e.withdrawn, out: e.withdrawn ? "پس گرفته شد" : "" }); }); } catch (e) { }
-    ev = dedup27(dedupRet22(ev)); ev.forEach(cleanEv); sortEv(ev);
+    ev = dedup27(dedupRet22(ev));
+    /* دورِ ۲۷b (#224): «طرح (از گفت‌وگو)» ِ همان جمله‌ای که برنامهٔ پروندهٔ تمرین شد هم در 📜 ِ این مسئله نمی‌آید */
+    try { var PP27 = []; sessionsOf(pid, r).forEach(function (se) { chatPlans(se).forEach(function (q) { if (q.prc) PP27.push(nzk(q.text)); }); });
+      if (PP27.length) ev = ev.filter(function (e) { if (!e || !/^(?:cplan|cplan23)$/.test(e.k)) return true; var t = nzk((e.lines || [])[0]); return !PP27.some(function (x) { return x && t && (x === t || x.indexOf(t) >= 0 || t.indexOf(x) >= 0); }); }); } catch (x27) { }
+    ev.forEach(cleanEv); sortEv(ev);
     var last = ev.reduce(function (m, e) { return e.at && e.at > m ? e.at : m; }, String(r.updated || ""));
     /* دورِ ۲۰ (RO6، B·D7): یک منبعِ وضع — مرحله‌ها از همان A.livePhase که خطِ «وضع» می‌خواند (مرحلهٔ جاری «در جریان» است، نه «هنوز نرسیده») */
     var ORD = ["u", "p", "c", "b"], pi = ph === "done" ? 4 : Math.max(0, ORD.indexOf(ph));

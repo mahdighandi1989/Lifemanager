@@ -1885,4 +1885,21 @@
     S.put(s); if (from) rePh27(from[1], s); try { var um = (s.msgs || []).filter(function (m) { return isUser(m) && mid(m) === cp.mid; })[0]; feed(toPid, s, [cp], um || null); } catch (e) { } rePh27(toPid, s);
     return { item: cp, id: cpId };
   };
+
+  /* ---------- دورِ ۲۷b (history، D27-17 s30؛ بانکِ R27 #224): «برنامهٔ تمرین: …» مالِ پروندهٔ تمرینِ همین گفت‌وگوست ----------
+     برچسبِ خودش («برنامهٔ تمرین») و یک پروندهٔ تمرینِ بازِ همین گفت‌وگو ⇒ برنامهٔ همین پیام به همان پرونده می‌پیوندد (a41 PR.planLink، همان پیوندِ «همان پرونده؟»)؛
+     طرحِ داستانیِ همان جمله دیگر مرحلهٔ مسئلهٔ زنده را جلو نمی‌برد. دو پروندهٔ باز ⇒ صفحه حدس نمی‌زند (پیوند با کلیکِ خودش در «همان پرونده؟» ِ a41). */
+  var PRCPLAN27 = /^\s*(?:برنامه(?:ٔ|‌ی|ی|\s*ی)?\s*(?:ی\s*)?تمرین|تمرین(?:م)?\s*:)/;
+  ST.prcPlan27 = function (s0) {
+    var PR27 = A.PR; if (!PR27 || !PR27.planLink || !PR27.cases || !s0) return false; var m = lastUser(s0); if (!m || !PRCPLAN27.test(String(m.text || ""))) return false;
+    var ids = {}; (s0.prcs || []).forEach(function (id) { ids[id] = 1; });
+    var C = PR27.cases({}).filter(function (c) { return c && c.state !== "closed" && !c.closed && (ids[c.id] || c.sess === s0.id || (c.from && c.from.sess === s0.id)); }); if (C.length !== 1) return false;
+    var T = nz(m.text), done = false;
+    (s0.plans || []).forEach(function (q) { if (!q || q.prc || !q.text) return; var qt = nz(q.text); if (!(String(q.at || "") === String(m.at || "") || (qt.length >= 8 && T.indexOf(qt.slice(0, 24)) >= 0))) return;
+      if (PR27.planLink({ x: { p: q, s: s0 }, kind: "prc", item: C[0], pid: "", exact: true, txt: "" }, true)) done = true; });
+    var E = ((s0.coach || {}).story) || {}; Object.keys(E).forEach(function (k) { (E[k].items || []).forEach(function (x) { if (x && x.k === "plan" && x.mid === mid(m) && !x.mv27) { x.mv27 = { prc: C[0].id, at: nowIso() }; done = true; var p0 = /^L:(.+)$/.exec(k); if (p0) rePh27(p0[1], s0); } }); });
+    return done;
+  };
+  AS.afterTurnHooks = AS.afterTurnHooks || [];
+  AS.afterTurnHooks.push(function (s) { try { if (ST.prcPlan27(s)) S.put(s); } catch (e) { console.warn(e); } });
 })(APP);

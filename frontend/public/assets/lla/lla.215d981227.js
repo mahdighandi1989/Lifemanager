@@ -52802,6 +52802,8 @@ APP.goFromURL = function (q) {
     var own23 = function (at, ev) { try { return A.STORY && A.STORY.owns ? A.STORY.owns(se, pid, at, ev) : chatScope(se, pid); } catch (e) { return chatScope(se, pid); } };
     chatPlans(se).forEach(function (q) {
       var lk = q.step || q.will; if (pid && lk && lk.pid && lk.pid !== pid) return;   // پیوندِ برنامه ⇄ گامِ زنده (a41: q.step / q.will)
+      /* دورِ ۲۷b (history، D27-17 s30، بانکِ R27 #224): برنامه‌ای که به پروندهٔ تمرین پیوست (a41 PR.planLink ⇒ q.prc) مالِ همان پرونده است — در 📜 ِ هیچ مسئله‌ای نمی‌آید (پروندهٔ تمرین c.plans نشانش می‌دهد) */
+      if (pid && q.prc) return;
       /* دورِ ۲۱ (ADDENDUM R4+، A21-14 s03): برنامهٔ یک مسئله هرگز در پروندهٔ مسئلهٔ دیگر — مسئلهٔ برنامه = پیوندش، وگرنه مسئله‌ای که سشن در زمانِ برنامه به آن بسته بود */
       /* دورِ ۲۶ (story Q3، U13/D26-6): یک مالک برای هر برنامه (a45 ST.planOwner — مرزِ پیامِ زایش، بسته بودنِ سشن، پنجرهٔ مسئلهٔ گفت‌وگویی که بعدتر ثبت شد)؛ برنامهٔ بی‌مالک
          فقط در پروندهٔ تنها مسئلهٔ همان سشن می‌آید، نه در هر مسئله (پیش‌تر: planPid ِ خالی ⇒ همهٔ مسئله‌ها) */
@@ -53020,7 +53022,11 @@ APP.goFromURL = function (q) {
     try { var M0 = A.MIND && A.MIND.model ? A.MIND.model() : null, tt = r.p.title;
       ((M0 && M0.events) || []).forEach(function (e) { var mine = e.pid === pid || (e.src && e.src.id === pid) || (tt && String(e.fa || "").indexOf("«" + tt + "»") >= 0); if (!mine) return;
         add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [e.fa], withdrawn: !!e.withdrawn, out: e.withdrawn ? "پس گرفته شد" : "" }); }); } catch (e) { }
-    ev = dedup27(dedupRet22(ev)); ev.forEach(cleanEv); sortEv(ev);
+    ev = dedup27(dedupRet22(ev));
+    /* دورِ ۲۷b (#224): «طرح (از گفت‌وگو)» ِ همان جمله‌ای که برنامهٔ پروندهٔ تمرین شد هم در 📜 ِ این مسئله نمی‌آید */
+    try { var PP27 = []; sessionsOf(pid, r).forEach(function (se) { chatPlans(se).forEach(function (q) { if (q.prc) PP27.push(nzk(q.text)); }); });
+      if (PP27.length) ev = ev.filter(function (e) { if (!e || !/^(?:cplan|cplan23)$/.test(e.k)) return true; var t = nzk((e.lines || [])[0]); return !PP27.some(function (x) { return x && t && (x === t || x.indexOf(t) >= 0 || t.indexOf(x) >= 0); }); }); } catch (x27) { }
+    ev.forEach(cleanEv); sortEv(ev);
     var last = ev.reduce(function (m, e) { return e.at && e.at > m ? e.at : m; }, String(r.updated || ""));
     /* دورِ ۲۰ (RO6، B·D7): یک منبعِ وضع — مرحله‌ها از همان A.livePhase که خطِ «وضع» می‌خواند (مرحلهٔ جاری «در جریان» است، نه «هنوز نرسیده») */
     var ORD = ["u", "p", "c", "b"], pi = ph === "done" ? 4 : Math.max(0, ORD.indexOf(ph));
@@ -60975,6 +60981,23 @@ APP.goFromURL = function (q) {
     S.put(s); if (from) rePh27(from[1], s); try { var um = (s.msgs || []).filter(function (m) { return isUser(m) && mid(m) === cp.mid; })[0]; feed(toPid, s, [cp], um || null); } catch (e) { } rePh27(toPid, s);
     return { item: cp, id: cpId };
   };
+
+  /* ---------- دورِ ۲۷b (history، D27-17 s30؛ بانکِ R27 #224): «برنامهٔ تمرین: …» مالِ پروندهٔ تمرینِ همین گفت‌وگوست ----------
+     برچسبِ خودش («برنامهٔ تمرین») و یک پروندهٔ تمرینِ بازِ همین گفت‌وگو ⇒ برنامهٔ همین پیام به همان پرونده می‌پیوندد (a41 PR.planLink، همان پیوندِ «همان پرونده؟»)؛
+     طرحِ داستانیِ همان جمله دیگر مرحلهٔ مسئلهٔ زنده را جلو نمی‌برد. دو پروندهٔ باز ⇒ صفحه حدس نمی‌زند (پیوند با کلیکِ خودش در «همان پرونده؟» ِ a41). */
+  var PRCPLAN27 = /^\s*(?:برنامه(?:ٔ|‌ی|ی|\s*ی)?\s*(?:ی\s*)?تمرین|تمرین(?:م)?\s*:)/;
+  ST.prcPlan27 = function (s0) {
+    var PR27 = A.PR; if (!PR27 || !PR27.planLink || !PR27.cases || !s0) return false; var m = lastUser(s0); if (!m || !PRCPLAN27.test(String(m.text || ""))) return false;
+    var ids = {}; (s0.prcs || []).forEach(function (id) { ids[id] = 1; });
+    var C = PR27.cases({}).filter(function (c) { return c && c.state !== "closed" && !c.closed && (ids[c.id] || c.sess === s0.id || (c.from && c.from.sess === s0.id)); }); if (C.length !== 1) return false;
+    var T = nz(m.text), done = false;
+    (s0.plans || []).forEach(function (q) { if (!q || q.prc || !q.text) return; var qt = nz(q.text); if (!(String(q.at || "") === String(m.at || "") || (qt.length >= 8 && T.indexOf(qt.slice(0, 24)) >= 0))) return;
+      if (PR27.planLink({ x: { p: q, s: s0 }, kind: "prc", item: C[0], pid: "", exact: true, txt: "" }, true)) done = true; });
+    var E = ((s0.coach || {}).story) || {}; Object.keys(E).forEach(function (k) { (E[k].items || []).forEach(function (x) { if (x && x.k === "plan" && x.mid === mid(m) && !x.mv27) { x.mv27 = { prc: C[0].id, at: nowIso() }; done = true; var p0 = /^L:(.+)$/.exec(k); if (p0) rePh27(p0[1], s0); } }); });
+    return done;
+  };
+  AS.afterTurnHooks = AS.afterTurnHooks || [];
+  AS.afterTurnHooks.push(function (s) { try { if (ST.prcPlan27(s)) S.put(s); } catch (e) { console.warn(e); } });
 })(APP);
 /* ===== «حسابِ صفحه» — سنجشِ دقیقِ حساب و واحدِ نوشتهٔ خودِ کاربر — دورِ ۲۵ ِ تورِ پولیا، سازوکارِ P2 (DECISIONS_R25؛ D25-12 (S1)، C25-1، A25-8، B25·D5/D14، B_s D1) — a46_arith.js =====
    ریشه (a45_story.js arithChk ِ دورِ ۲۴): یک عبارتِ منظم «عبارت = یک عدد» با ممیزِ شناور. پس
