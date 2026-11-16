@@ -112,3 +112,15 @@ question was pending — after an announced arrival the objection was dropped an
   question) — the negative arm of the new mechanism itself.
 - **How to apply elsewhere:** any matcher that turns textual overlap into a user-visible claim ("this is what you asked for") should ask
   where each matching token came from before counting it, and should never let an announcement be the last word.
+
+## Update 2026-11-16 — a fixer's «done» needs proof in the page, not only in a unit test
+- **Finding (round 28, roadmap §22 metrics):** 10 of 14 S2 families were repeats of items the previous fixers had reported done. Their
+  red-first tests passed on sentences the fixer chose, but the runners' own sentences failed in the live page. Two were not even partly
+  working: a new button was never offered on the lines it was built for, and an «accept the proposal» path did nothing where it was
+  reported built.
+- **Rule:** a fix counts as done only when it is proven three ways: a red-first test from the runner's own turn, every independent bank
+  entry for the mechanism, and a page-level replay through the real harness that checks the DOM or view the runner saw. Anything less is
+  reported «unit-only» and stays open.
+- **How to apply elsewhere:** in any find-fix-retest loop, measure «repeat families» (same mechanism, neighbouring input) separately
+  from new ones. A high repeat share means the proof step is too narrow, not that the testers are too strict — widen the proof to the
+  surface the tester uses, and keep the pass bar where it is.
