@@ -241,6 +241,15 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
   E[233] = async () => ({ nc: 'not built: chronological placement of a line backfilled by ✏️ (B24·D18) needs the ✏️ path to stamp story items with the time of the edited message instead of the edit turn (the ✏️ turn is a system turn that a45 onState skips); a multi-day replay with a moving page clock was not built this round.' });
   E[236] = async () => ({ nc: 'not built: a facet («خبرِ خواب») has no record of its own in the session model (C27-19); a plan cannot land in a record that does not exist — building facet records is a new capability left to the coordinator.' });
 
+  /* ---------- C27-6 (pC2 p13): مقصدِ 🧭 ِ مسئلهٔ گفت‌وگو هرگز پرسشِ دربارهٔ سامانه نیست ---------- */
+  K.C27_6 = async () => { const d = await ev(async () => { __wipe(); __fresh();
+      await __turn('یه تیکهٔ تازه دارم. کنتورِ خونه‌مون هوشمنده و مصرفِ ساعت‌به‌ساعتِ کلِ خونه رو میده؛ می‌خوام سهمِ خودِ بخاری رو از این مصرفِ کل جدا کنم که ببینم واقعاً ماهی ۲۷۰ هزار میشه یا نه. سامانه روشی برای این داره؟', [cs({ ph: 'u', said: [] })]);
+      return APP.STORY.dest({ sess: __cur().id }); });
+    return [!/سامانه/.test(d) && /بخاری/.test(d), d]; };
+  K.C27_6_neg = async () => {   // منفی: پرسشِ خودِ مسئله مقصد می‌ماند
+    const d = await ev(async () => { __wipe(); __fresh(); await __turn('قبضِ برقمون ۵۰۰ هزار تومن شده. سهمِ بخاری از این قبض چقدره؟', [cs({ ph: 'u', said: [] })]); return APP.STORY.dest({ sess: __cur().id }); });
+    return [/سهمِ بخاری از این قبض چقدره/.test(d), d]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------
