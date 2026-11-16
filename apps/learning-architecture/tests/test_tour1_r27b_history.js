@@ -169,6 +169,20 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     for (const t of ['فکر کنم فردا بارون بیاد', 'فکر کنم جوابش ۱۲ باشه', 'به نظرم این سؤال سخته؟']) { await ev(() => __one('کنکور', 'می‌خوام کنکور قبول شم.')); await ev((t) => __turn(t, []), t); out.push(await fcs()); }
     return [out.every(S => !S.preds.length && !S.sys.some(x => /چند درصد مطمئنی/.test(x))), J(out)]; };
 
+  /* ---------- #243 (C26-1): مسئلهٔ بازگفته رکوردِ تازه نیست؛ داده در A می‌نشیند (روی BASE27B هم سبز بود) ---------- */
+  E[243] = async () => { const r = await ev(async () => { const [A] = __base3(); const n0 = APP.S.all('eprob').length;
+      await __turn('یعنی همون مسئلهٔ قفسه‌ها، فقط با ۶ طبقه بجای ۵', [cs({ ph: 'u', said: ['d'] }), { do: 'chat_invent', title: 'قفسه‌ها با ۶ طبقه', statement: 'همون مسئلهٔ قفسه‌ها، فقط با ۶ طبقه بجای ۵' }]);
+      return { n0, n1: APP.S.all('eprob').length, probs: APP.STORY.probs26(__cur()).length, dA: __dos(A) }; });
+    return [r.n1 === r.n0 && r.probs === 2 && r.dA.some(x => /۶ طبقه/.test(x)), J(r)]; };
+  /* ---------- #239: پروندهٔ گفت‌وگو سه مسئله را با نامِ خودشان و پروندهٔ تمرین را جدا می‌شمارد ---------- */
+  E[239] = async () => { const D = await ev(async () => { const [A, B] = __base3(); await __turn('عرضِ هر طبقه ۸۰ سانته', [cs({ ph: 'u', said: ['d'] })]);
+      APP.liveBindSession(B, __cur(), { force: true }); await __turn('سه رنگ داریم، پس ۶ حالت', [cs({ ph: 'b', said: ['result'], result: 'پس ۶ حالت' })]);
+      const C = __mk('جلسهٔ ۴۵ دقیقه‌ای', 'جلسهٔ هفتگی‌مون ۴۵ دقیقه‌ست و ۶ نفر باید حرف بزنن؛ به هر کی چقدر می‌رسه؟'); APP.liveBindSession(C, __cur(), { force: true }); await __turn('۴۵ ÷ ۶ = ۷٫۵ دقیقه', [cs({ ph: 'b', said: ['result'], result: '۴۵ ÷ ۶ = ۷٫۵ دقیقه' })]);
+      const tp = APP.S.put({ id: APP.uid('tp'), type: 'topic', title: 'خوابِ زود' }), c = APP.PR.start(41, APP.PR.subj('topic', tp.id)); const s = __cur(); s.prcs = [c.id]; APP.S.put(s);
+      for (let i = 0; i < 3; i++) await __turn('خوب.', []);
+      const d = APP.dossierSess(s.id); APP.go('dossier', s.id); const btn = document.querySelectorAll('#main .lp-dprc').length; return { pks: (d.pks || []).map(x => x.title), prcs: (d.prcs || []).map(x => x.title), btn }; });
+    return [D.pks.length === 3 && ['قفسه‌های انباری', 'مهره‌های رنگی', 'جلسهٔ ۴۵ دقیقه‌ای'].every(t => D.pks.includes(t)) && D.prcs.length === 1 && D.btn === 1, J(D)]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------

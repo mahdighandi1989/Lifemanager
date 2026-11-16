@@ -463,6 +463,8 @@
     if ((D.pks || []).length > 1) root.appendChild(h("div", { class: "row gap wrap lp-dpks", dir: "rtl", role: "group", "aria-label": "مسئله‌های این گفت‌وگو" }, h("span", { class: "small muted" }, "مسئله‌های این گفت‌وگو: "),
       D.pks.map(function (x, i) { return h("button", { class: "btn ghost sm lp-dpk" + (x.pk === D.pk ? " on" : ""), type: "button", "data-pk": x.pk, onclick: function () { A.go("dossier", D.sid + "|" + x.pk); } }, fa(i + 1) + ") «" + clip(x.title, 40) + "»"); }),
       h("button", { class: "btn ghost sm lp-dpk" + (D.pk === "all" ? " on" : ""), type: "button", "data-pk": "all", onclick: function () { A.go("dossier", D.sid + "|all"); } }, "کلِ گفت‌وگو")));
+    if ((D.prcs || []).length) root.appendChild(h("div", { class: "row gap wrap lp-dprcs", dir: "rtl", role: "group", "aria-label": "پرونده‌های تمرینِ این گفت‌وگو" }, h("span", { class: "small muted" }, "پرونده‌های تمرینِ این گفت‌وگو: "),
+      D.prcs.map(function (x) { return h("button", { class: "btn ghost sm lp-dprc", type: "button", "data-prc": x.id, onclick: function () { A.go("practice", x.id); } }, "🧪 «" + clip(x.title, 40) + "»"); })));
     if (D.sessions.length) root.appendChild(h("div", { class: "card soft small lp-dsess" }, h("strong", {}, "گفت‌وگوهای این مسئله: "), D.sessions.map(function (s, i) { return [i ? " · " : "", h("button", { class: "linkish", type: "button", onclick: function () { openSess(s.id); } }, "💬 " + s.title)]; })));
     var list = h("div", { class: "lp-devents" }), cd = null, box = null;
     D.events.forEach(function (e) {
@@ -584,17 +586,24 @@
   /* ===== دورِ ۲۳ (Q7، سهمِ «today»؛ قراردادِ story: A.STORY.pkAt/pkWindow) — پروندهٔ گفت‌وگو برای هر مسئلهٔ گفت‌وگو جدا =====
      سشنی که چند مسئلهٔ گفت‌وگو داشت (C.pkLog) پیش‌تر همه را در یک پرونده می‌آورد. حالا A.dossierSess(sid, pk): فقط رویدادهای پنجرهٔ همان مسئله
      (A.STORY.pkAt(se, e.at) === pk)؛ بی pk ⇒ آخرین مسئله؛ pk = "all" ⇒ کلِ گفت‌وگو (همان پروندهٔ پیشین). رویدادِ بی زمان فقط در آخرین مسئله. */
+  function prcsOf27(se) { var o = [], PR = A.PR; if (!se || !PR || !PR.cases) return o; try { var ids = {}; (se.prcs || []).forEach(function (id) { ids[id] = 1; });
+      if (PR.events) PR.events(null).forEach(function (e) { if (e && e.src && e.src.sess === se.id && e.prc) ids[e.prc] = 1; });
+      PR.cases({}).forEach(function (c) { if (c && (ids[c.id] || c.sess === se.id || (c.from && c.from.sess === se.id)) && !o.some(function (x) { return x.id === c.id; })) o.push({ id: c.id, title: (PR.subjLabel ? PR.subjLabel(c.subj) : "") || c.title || c.id }); }); } catch (e) { } return o; }
+  A.dossierPrcs27 = prcsOf27;
   var rawSess23 = A.dossierSess;
   A.dossierSess = function (sid, pk) {
     var D = rawSess23.call(this, sid); if (!D) return D; var se = S.get(sid), ST = A.STORY;
-    D.sid = sid;
+    D.sid = sid; D.prcs = prcsOf27(se);   /* دورِ ۲۷b (بانکِ R27 #239): پرونده‌های تمرینِ همین گفت‌وگو کنارِ مسئله‌ها — جدا از شمارِ مسئله‌ها (تمرین مسئله نیست) */
     var L = (((se && se.coach) || {}).pkLog || []).map(function (e) { return e.pk; }).filter(function (x, i, X) { return x && X.indexOf(x) === i; });
     /* دورِ ۲۶ (story Q3، C26-1 «مسئلهٔ ۲ از ۲» برای یک مسئله): شمارش و پنجره‌ها از مسئله‌ها (a45 ST.probGroups)، نه از هر تغییرِ pk */
     var G26 = ST && ST.probGroups ? ST.probGroups(se) : null, at26 = function (a) { return G26 ? ST.probAt(se, a) : ST.pkAt(se, a); };
     if (G26) { if (pk && pk !== "all") pk = ST.probOf(se, pk); L = G26.map(function (g) { return g.pk; }); }
     if (!ST || !ST.pkAt || L.length < 2) return D;
     var U = ((se && se.msgs) || []).filter(function (m) { return m && m.role === "user" && !/^\[/.test(String(m.text || "")); });
-    D.pks = L.map(function (k) { var w = ST.pkWindow(se, k), f = G26 ? U.filter(function (m) { return at26(m.at || "") === k; })[0] : U.filter(function (m) { return String(m.at || "") >= String(w.from || "") && String(m.at || "") < String(w.to || "~"); })[0]; return { pk: k, from: w.from, title: f ? clip(f.text, 60) : k }; });
+    D.pks = L.map(function (k) { var w = ST.pkWindow(se, k), f = G26 ? U.filter(function (m) { return at26(m.at || "") === k; })[0] : U.filter(function (m) { return String(m.at || "") >= String(w.from || "") && String(m.at || "") < String(w.to || "~"); })[0]; /* دورِ ۲۷b (history، بانکِ R27 #239): نامِ هر مسئله نامِ خودِ مسئله است (رکوردِ زنده)، نه نخستین پیامِ پنجره‌اش */
+      var g27 = G26 ? G26.filter(function (g) { return g.pk === k; })[0] : null, lid27 = (/^L:(.+)$/.exec((g27 && g27.id) || "") || /^l:(.+)$/.exec(k) || [])[1], lr27 = lid27 && A.liveRec ? A.liveRec(lid27) : null;
+      return { pk: k, from: w.from, title: lr27 && lr27.p && lr27.p.title ? clip(lr27.p.title, 60) : f ? clip(f.text, 60) : k }; });
+    /* دورِ ۲۷b (#239): پرونده‌های تمرینِ همین گفت‌وگو کنارِ مسئله‌ها — هر پرونده یک بار، جدا از شمارِ مسئله‌ها (تمرین مسئله نیست) */
     var cur = pk === "all" ? "all" : pk && L.indexOf(pk) >= 0 ? pk : L[L.length - 1]; D.pk = cur;
     if (cur === "all") { D.pid = sid + "|all"; return D; }
     var last = L[L.length - 1], me = D.pks.filter(function (x) { return x.pk === cur; })[0];
