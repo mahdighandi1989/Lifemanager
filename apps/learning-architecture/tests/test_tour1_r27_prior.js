@@ -258,10 +258,8 @@ const RUNS = Object.assign({}, JSON.parse(fs.readFileSync(vfile('R26_prior_runs.
           await turn(t, 'خوب.', [csn({ ph: 'e', said: [], prior: [{ step: 'افتِ فشار', quote: 'افتِ فشار رو هم حساب کردم: ۰٫۸ بار', verdict: 'ok' }] })]);
           const pr = await PR(), q = await PQ();
           T(i, !!pr && pr.steps.length === 3 && pr.steps[2].verdict === 'ok' && !/افتِ فشار(?:ِ لوله)? هنوز حساب نشده/.test(q), { q, n: pr && pr.steps.length });
-        } else if (i === 166) {
-          NC(i, 'not mine — reproduced: after a ledger whose steps are all ✓, «عرض = ۶ سانت و طول = ۱۲ سانت» + «وارسی کردم … جور درمیاد» leave the stage at «اجرای طرح»; the whole-answer judgement is story\'s ST.finOf/ST.wholeRes (the unknown «ابعاد» is not matched by «عرض/طول»)');
-        } else if (i === 167) {
-          NC(i, 'not mine — reproduced: the opening\'s ledger rows are right in the story, but 📜 also shows «برنامهٔ خودت (از گفت‌وگو)» and «حدس (از گفت‌وگو)» built in a40 addSessEvents from the chat plan record (chatPlans) and se.coach.guesses of the SAME message; the ledger should own those quotes — dates/story (a40/a41)');
+        } else if (i === 166 || i === 167) {   // دورِ ۲۷b: شمارهٔ ۰-مبنای این فایل = بانکِ ۱-مبنای ۱۶۷/۱۶۸ — در tests/test_tour1_r27b_history.js داوری و سبز شد (fixer «history»)
+          NC(i, 'judged in tests/test_tour1_r27b_history.js as bank #' + (i + 1) + ' (round 27b, fixer «history»)');
         } else NC(i, 'not exercised');
       } catch (ex) { T(i, false, 'exception ' + String(ex).slice(0, 200)); }
     }

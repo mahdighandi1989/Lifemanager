@@ -231,6 +231,16 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     await chatA(); const o = await ev(async () => { const A = __mk('قفسه‌های انباری', 'انباری ۲ متر ارتفاع داره. چند طبقه قفسه توش جا میشه؟'); APP.liveBindSession(A, __cur(), { force: true }); return __dos(A); });
     return [o.some(x => /۴۰ سانت/.test(x)) && o.some(x => /۵ طبقه/.test(x)), J(o)]; };
 
+  /* ---------- #238: مسئلهٔ تازه در بازنگریِ B ⇒ ردیفِ «مسئله‌های تازه» یک بار، B بسته می‌ماند (روی BASE27B هم سبز بود) ---------- */
+  E[238] = async () => { const o = await ev(async () => { const [A, B] = __base3(); APP.liveBindSession(B, __cur(), { force: true });
+      await __turn('سه رنگ داریم، پس ۶ حالت. جواب شد ۶ حالت. حل شد!', [cs({ ph: 'b', said: ['result'], result: 'جواب شد ۶ حالت' }), { do: 'chat_solved', solution: '۶ حالت' }]);
+      await __turn('یه مسئلهٔ تازه از مهره‌ها درومد: اگه ۵ رنگ باشه چی؟', [cs({ ph: 'b', said: [] }), { do: 'chat_invent', title: 'مهره‌ها با ۵ رنگ', statement: 'اگه ۵ رنگ مهره باشه، به چند حالت می‌شه دو مهره برداشت؟' }]);
+      return { st: APP.S.get('eprog_' + B).solve.live.state, rows: __dos(B).filter(x => /۵ رنگ/.test(x)) }; });
+    return [o.st === 'solved' && o.rows.length === 1 && /^newprobs/.test(o.rows[0]), J(o)]; };
+  /* ورودی‌هایی که این دور ساخته نشد — با دلیل (هرگز بی‌صدا) */
+  E[233] = async () => ({ nc: 'not built: chronological placement of a line backfilled by ✏️ (B24·D18) needs the ✏️ path to stamp story items with the time of the edited message instead of the edit turn (the ✏️ turn is a system turn that a45 onState skips); a multi-day replay with a moving page clock was not built this round.' });
+  E[236] = async () => ({ nc: 'not built: a facet («خبرِ خواب») has no record of its own in the session model (C27-19); a plan cannot land in a record that does not exist — building facet records is a new capability left to the coordinator.' });
+
   /*__MORE__*/
 
   // ---------- اجرا ----------
