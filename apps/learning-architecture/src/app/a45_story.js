@@ -209,7 +209,7 @@
   var FIN24 = /(?:^|[\s،.:])(?:جواب(?:ش|م|مون)?|پاسخ(?:ش)?|نتیجه(?:ش|م)?|جوابِ?\s*(?:آخر|نهایی|مسئله|کل))\s*(?:[^.!؟?\n]{0,40}?)(?:شد|میشه|می[‌\s]?شود|می[‌\s]?شه|اینه|این\s*است|درومد|درآمد|دراومد)(?![آ-ی])|(?:^|[\s،.])(?:پس|بنابراین)\s+(?:جواب|کل|در\s*کل|روی\s*هم)|حل\s*شد(?![آ-ی])/;
   ST.finRes = function (t) { return FIN24.test(String(t || "")); };
   function phaseOfItems(I) {
-    var has = {}, pr = ""; (I || []).forEach(function (x) { has[x.k === "res" && x.fin === false ? "resMid" : x.k === "plan" && x.idea ? "idea" : x.k] = 1; if (x.k === "prior" && x.ph) pr = maxPh(pr, x.ph); });
+    var has = {}, pr = ""; (I || []).filter(function (x) { return x && !x.mv27; }).forEach(function (x) { has[x.k === "res" && x.fin === false ? "resMid" : x.k === "plan" && x.idea ? "idea" : x.k] = 1; if (x.k === "prior" && x.ph) pr = maxPh(pr, x.ph); });
     if (has.idea && !has.res && !has.plan && !has.step) return maxPh("p", pr);   // دورِ ۲۵: ایده/طرحِ پرسیده ⇒ «طرح»
     /* دورِ ۲۵ (P5، C25-10 aC4 p4، A25-16 oA1): نتیجهٔ میانی به‌تنهایی مرحله را جابه‌جا نمی‌کند — «اجرا» فقط با طرح یا گامِ سنجیده (پیش‌تر: has.resMid ⇒ «اجرا»،
        و مسئله‌ای که هنوز طرحی نداشت با آزمودنِ حدسِ نخستش «اجرای طرح» می‌شد). قاعدهٔ دورِ ۲۴: ST.phaseOfItemsR24 (REMOVAL_CANDIDATES). */
@@ -1866,4 +1866,23 @@
   };
   AS.afterTurnHooks = AS.afterTurnHooks || [];
   AS.afterTurnHooks.push(function (s) { try { if (ST.vagueGoal27(s)) S.put(s); } catch (e) { console.warn(e); } });
+
+  /* ---------- دورِ ۲۷b (history، C78؛ مالک بانکِ ۴۲، بانکِ R27 #234/#235/#250): جابه‌جاییِ سطرِ 📜 ِ بدجا ----------
+     سطری از 📜 ِ یک مسئله که مالِ مسئلهٔ دیگری است، با رکوردِ داستانی‌اش (دادهٔ/نتیجهٔ/گامِ گفت‌وگو) به آن مسئله می‌رود. هیچ چیز پاک نمی‌شود: قلمِ اصلی در مسئلهٔ نخست
+     با نشانِ mv27 می‌ماند (در مرحله شمرده نمی‌شود) و رونوشتش در مسئلهٔ دوم با mvFrom می‌نشیند؛ برگرداندن نشان‌ها را برعکس می‌کند. مرحلهٔ گفت‌وگوی هر دو مسئله از قلم‌های
+     ماندهٔ خودش دوباره خوانده می‌شود (نتیجهٔ بدجا مسئلهٔ نخست را در «بازنگری» نگه نمی‌دارد). */
+  function evItem27(evId) { var o = null; S.all("achat").forEach(function (s) { if (o) return; var T = ((s.coach || {}).story) || {};
+      Object.keys(T).forEach(function (key) { if (o) return; (T[key].items || []).forEach(function (x) { if (!o && x && ("st23_" + key.replace(/[^\w]/g, "_") + "_" + x.k + "_" + x.n) === evId) o = { s: s, key: key, it: x }; }); }); }); return o; }
+  function rePh27(pid, s) { var pg = S.get("eprog_" + pid); if (!pg || !pg.solve || !pg.solve.live) return; var L = pg.solve.live, ph = phaseOfItems(storyOf(s, "L:" + pid).items.concat(L.chatImpItems || []));
+    if ((ph || "") !== (L.chatPh || "")) { L.chatPh = ph || ""; L.chatPhAt = nowIso(); S.put(pg); } }
+  ST.moveItem27 = function (evId, toPid, back) {
+    var o = evItem27(evId); if (!o || !toPid) return null; var s = o.s, from = /^L:(.+)$/.exec(o.key), at = nowIso(), kB = "L:" + toPid, EB = storyOf(s, kB, true);
+    if (back) { var orig = (storyOf(s, o.it.mvFrom || "").items || []).filter(function (x) { return x && x.mv27 && x.mv27.copy === evId; })[0];
+      o.it.mv27 = { to: o.it.mvFrom, at: at, back: true }; if (orig) { (orig.mvHist = orig.mvHist || []).push({ to: orig.mv27.to, at: orig.mv27.at }, { back: true, at: at }); delete orig.mv27; }
+      var home = /^L:(.+)$/.exec(o.it.mvFrom || ""); S.put(s); rePh27(toPid, s); if (home) rePh27(home[1], s); return { item: orig }; }
+    var cp = Object.assign({}, o.it, { n: EB.items.length + 1, mvFrom: o.key, at: o.it.at }); delete cp.mv27; EB.items.push(cp);
+    var cpId = "st23_" + kB.replace(/[^\w]/g, "_") + "_" + cp.k + "_" + cp.n; o.it.mv27 = { to: kB, at: at, copy: cpId };
+    S.put(s); if (from) rePh27(from[1], s); try { var um = (s.msgs || []).filter(function (m) { return isUser(m) && mid(m) === cp.mid; })[0]; feed(toPid, s, [cp], um || null); } catch (e) { } rePh27(toPid, s);
+    return { item: cp, id: cpId };
+  };
 })(APP);

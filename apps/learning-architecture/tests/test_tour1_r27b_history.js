@@ -183,6 +183,25 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
       const d = APP.dossierSess(s.id); APP.go('dossier', s.id); const btn = document.querySelectorAll('#main .lp-dprc').length; return { pks: (d.pks || []).map(x => x.title), prcs: (d.prcs || []).map(x => x.title), btn }; });
     return [D.pks.length === 3 && ['قفسه‌های انباری', 'مهره‌های رنگی', 'جلسهٔ ۴۵ دقیقه‌ای'].every(t => D.pks.includes(t)) && D.prcs.length === 1 && D.btn === 1, J(D)]; };
 
+  /* ---------- #234/#235/#250 (C78، مالک بانکِ ۴۲): جابه‌جایی و برگرداندنِ سطرِ بدجای 📜 ---------- */
+  const mv = async () => ev(async () => { const [A, B] = __base3(); await __turn('شد ۱۲ حالت، درست درومد', [cs({ ph: 'b', said: ['result'], result: 'شد ۱۲ حالت' })]);
+    const o = { A, B, ph0: APP.liveStoryPhase(A), ev0: ((APP.S.get('eprog_' + A).solve.live.evlog) || []).map(e => e.id) };
+    APP.go('dossier', A); const btn = [...document.querySelectorAll('#main .lp-dmv')].filter(b => /مهره‌های رنگی/.test(b.textContent))[0]; o.btn = !!btn; if (btn) btn.click();
+    o.dA = __dos(A); o.dB = __dos(B); o.phA = APP.liveStoryPhase(A); o.phB = APP.liveStoryPhase(B); o.ev1 = ((APP.S.get('eprog_' + A).solve.live.evlog) || []).map(e => e.id);
+    o.stB = (((__cur().coach || {}).story || {})['L:' + B] || { items: [] }).items.map(x => x.k + ':' + x.t); return o; });
+  E[234] = async () => { const o = await mv(); const a = o.dA.filter(x => /۱۲ حالت/.test(x)), b = o.dB.filter(x => /۱۲ حالت/.test(x));
+    return [o.btn && o.ph0 === 'b' && a.length === 1 && /جابه‌جا شد ⇒ «مهره‌های رنگی»/.test(a[0]) && b.length === 1 && /از «قفسه‌های انباری» جابه‌جا شد/.test(b[0]) && o.stB.some(x => /^res:.*۱۲ حالت/.test(x)) && o.phA !== 'b' && o.phB === 'b', J(o)]; };
+  E[235] = async () => { await mv(); const o = await ev(async () => { const s = __cur(), [A, B] = APP.STORY.probs26(s).map(x => x.id).map(id => id.replace(/^L:/, ''));
+      const pa = APP.S.all('eprob').map(r => r.p.id), A0 = pa.filter(id => APP.liveRec(id).p.title === 'قفسه‌های انباری')[0], B0 = pa.filter(id => APP.liveRec(id).p.title === 'مهره‌های رنگی')[0];
+      APP.go('dossier', B0); const btn = document.querySelector('#main .lp-dunmv'); const had = !!btn; if (btn) btn.click();
+      const evA = (APP.S.get('eprog_' + A0).solve.live.evlog || []).filter(e => /۱۲ حالت/.test((e.lines || []).join(' ')))[0] || {};
+      return { had, dA: __dos(A0).filter(x => /۱۲ حالت/.test(x)), dB: __dos(B0).filter(x => /۱۲ حالت/.test(x)), hist: evA.mvHist || [], phA: APP.liveStoryPhase(A0), phB: APP.liveStoryPhase(B0) }; });
+    return [o.had && o.dA.length === 1 && !/جابه‌جا شد ⇒/.test(o.dA[0].split(' ¦ ').slice(-1)[0]) && o.hist.length === 2 && o.dB.length === 1 && /برگشت به «قفسه‌های انباری»/.test(o.dB[0]) && o.phA === 'b' && o.phB !== 'b', J(o)]; };
+  E[250] = async () => { const o = await mv(); return [o.ev0.every(id => o.ev1.includes(id)) && o.dA.some(x => /جابه‌جا شد ⇒/.test(x)), J([o.ev0, o.ev1])]; };   // منفی: سطرِ اصلی هرگز پاک نمی‌شود
+  K.C78_neg = async () => {   // منفی: سطرِ بی مسئلهٔ دیگر در همان گفت‌وگو دکمهٔ جابه‌جایی ندارد؛ صورتِ مسئله هرگز
+    const n = await ev(async () => { const A = __one('تنها', 'یه مسئلهٔ تنها دارم که ۲ متره.'); await __turn('شد ۱۲ حالت', [cs({ ph: 'b', said: ['result'], result: 'شد ۱۲ حالت' })]); APP.go('dossier', A); return document.querySelectorAll('#main .lp-dmv').length; });
+    return [n === 0, n]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------
