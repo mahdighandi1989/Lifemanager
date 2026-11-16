@@ -84,6 +84,37 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     const s = await strip(), ck = await ev(() => [APP.STORY.arithChk('۵٫۵ + ۱۶٫۵ = ۲۲'), APP.STORY.arithChk('۱۶٫۵ = ۳ × ۵٫۵')].map(c => c.length > 0 && c.every(x => x.ok && !x.ask)));
     return [/اکنون: بازنگری/.test(s) && !/فهمِ مسئله/.test(s) && ck.every(Boolean), J([s.slice(0, 200), ck])]; };
 
+  /* ---------- #231 (A27-14 s07): یک ✏️ یک رویدادِ 📜، یک قراردادِ پیکان ---------- */
+  const S07 = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'r27b_history', 's07.json'), 'utf8')).r.map(r => [null, r]);   // پاسخ‌های ضبط‌شدهٔ مدل در s07 (r1، r2، r7)
+  const S07_U1 = '۵ تا گلدون لوبیا با ۲، ۴، ۶، ۸ و ۱۰ ساعت نور گذاشتم. قدشون بعد از ۳ هفته: ۴، ۹، ۱۳، ۱۶، ۱۷ سانت. استادم گفت «یه قانون پیدا کن». قانونش چیه؟ فکر کنم خطیه، هر ۲ ساعت ۴ سانت.';
+  const S07_U2 = 'تفاضل‌ها ۵، ۴، ۳، ۱ شدن، پس خطی نیست، کند میشه. حدسم اشباعه. یه مقاله هم پیدا کردم دربارهٔ اشباع فتوسنتز. پس ثابت شد دیگه، قانونش اشباعه!';
+  const edit = (n, t, rep) => ev(async ([n, t, rep]) => { const s = __cur(), m = s.msgs.filter(m => m.role === 'user' && !/^\[/.test(m.text))[n - 1]; __q = [rep]; const r = APP.ASSIST.retractEdit(s, m, t);
+    for (let i = 0; i < 80 && APP.ASSIST.busy(); i++) await new Promise(res => setTimeout(res, 100)); await new Promise(res => setTimeout(res, 300)); __q.length = 0; return r && r.ok; }, [n, t, rep]);
+  const retEv = () => ev(() => (APP.dossier(__cur().id).events || []).filter(e => e.k === 'retract').map(e => e.lines));
+  const s07 = async () => { await ev(() => { __wipe(); __fresh(); });
+    const rep = (i) => S07 ? S07[i][1] : JSON.stringify({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] });
+    for (const [u, i] of [[S07_U1, 0], [S07_U2, 1]]) await ev(async ([u, r]) => { __q = [r]; await APP.ASSIST.send(u); __q.length = 0; }, [u, rep(i)]);
+    return rep(2); };
+  E[231] = async () => { const r7 = await s07(); await edit(1, S07_U1.replace('۴، ۹، ۱۳، ۱۶، ۱۷', '۴، ۸، ۱۳، ۱۵، ۱۷'), r7); const R = await retEv(); const all = R.flat().join(' | ');
+    return [R.length === 1 && !/[0-9۰-۹]\s*⇒/.test(all) && !/،»\s*\(اصلاح شد/.test(all) && /«۸، ۱۳، ۱۵» \(اصلاح شد ⇐ «۹، ۱۳، ۱۶»\)/.test(all) && /اندازهٔ ۲/.test(all) && /اندازهٔ ۴/.test(all), J(R)]; };
+  K.A27_14_neg = async () => {   // منفی: دو ✏️ روی دو پیامِ جدا دو رویدادند
+    const r7 = await s07(); await edit(1, S07_U1.replace('۴، ۹، ۱۳، ۱۶، ۱۷', '۴، ۸، ۱۳، ۱۵، ۱۷'), r7);
+    await edit(2, S07_U2.replace('یه مقاله هم', 'دو تا مقاله هم'), JSON.stringify({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] })); const R = await retEv();
+    return [R.length === 2, J(R)]; };
+
+  /* ---------- B27·D11 (s19 p15): سرِ رویدادِ اصلاح همان تغییری است که صفحه اعمال کرد ---------- */
+  const S19 = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'r27b_history', 's19.json'), 'utf8'));
+  K.B27_D11 = async () => { await ev(() => { __wipe(); __fresh(); });
+    for (let i = 0; i < 2; i++) await ev(async ([u, r]) => { __q = [r]; await APP.ASSIST.send(u); __q.length = 0; }, [S19.u[i], S19.r[i]]);
+    const R = await retEv(); const h = (R[0] || [])[0] || '';
+    return [R.length === 1 && /^«۱۸ هفته/.test(h) && /⇐ «۱۶ هفته/.test(h) && !/عروسی ۱۵ اسفنده/.test(h), J(R)]; };
+  K.B27_D11_neg = async () => {   // منفی: «درست» ِ مدل که همان تغییرِ اعمال‌شده است سر می‌ماند
+    await ev(() => { __wipe(); __fresh(); });
+    await ev(async ([u, r]) => { __q = [r]; await APP.ASSIST.send(u); __q.length = 0; }, [S19.u[0], S19.r[0]]);
+    await ev(async () => { __q = [JSON.stringify({ reply: 'باشه.', status: 'related', memory: 'm', actions: [cs({ ph: 'e', said: ['d'], retract: { msg: '۱۶ هفته تا عروسی برادرم مونده', what: 'fact', fix: '۱۸ هفته تا عروسی برادرم مونده', old: '۱۶ هفته' } })] })];
+      await APP.ASSIST.send('اشتباه گفتم: ۱۸ هفته تا عروسی برادرم مونده نه ۱۶.'); __q.length = 0; });
+    const R = await retEv(); const h = (R[0] || [])[0] || ''; return [/^«۱۸ هفته تا عروسی برادرم مونده»/.test(h), J(R)]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------

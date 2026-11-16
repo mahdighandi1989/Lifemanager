@@ -52823,7 +52823,11 @@ APP.goFromURL = function (q) {
       if (pid) { var rp = x.src ? retPids22(x.src) : []; if (x.src && (rp.length ? rp.indexOf(pid) < 0 : !chatScope(se, pid))) return; if (!rp.length && A.STORY && A.STORY.fragAt && !own23(A.STORY.fragAt(se, x.frag || (x.x && x.x.msg) || x.msg || "", x.at))) return; }
       var fr = x.frag || (x.x && x.x.msg) || x.msg || "", fx = x.fix || (x.x && x.x.fix) || "", ch = x.changes || x.ch || [];
       if (segot[nzk(x.src) + "|" + nzk(fx)] && !ch.length) return; if (segot["r|" + nzk(fr) + "|" + nzk(fx)] && !ch.length) return;
-      add({ k: "retract", at: x.at, title: "اصلاحِ پیامِ پیشین", lines: [fr || fx ? chFa24(val(fr), val(fx)) : "اصلاح"].concat(x.err ? ["صفحه نپذیرفت: " + val(x.err)] : ch.length ? ch.map(val) : ["چیزی عوض نشد — از آن تکه رکوردی ساخته نشده بود"]), out: x.edit ? "با ✏️ ِ خودت" : "از گفت‌وگو", src: x.src ? msgRef(se.id, x.src) : null }); });
+      /* دورِ ۲۷b (history، B27·D11 s19 p15): سرِ رویداد همان تغییری است که صفحه اعمال کرد — «تکه/درست» ِ گزارشِ مدل («عروسی ۱۵ اسفنده» ⇐ «۱۶ هفته تا …») وقتی هیچ تغییرِ
+         اعمال‌شده‌ای آن «درست» را ندارد، سر نمی‌شود؛ سرِ رویداد جفتِ نخستین تغییرِ اعمال‌شده است («۱۸ هفته» ⇐ «۱۶ هفته») */
+      var hd27 = fr || fx ? chFa24(val(fr), val(fx)) : "اصلاح", CH27 = ch.map(val), pr27 = CH27.map(function (l) { return /«([^»]*)»\s*\(اصلاح شد ⇐ «([^»]*)»\)/.exec(String(l || "")); }).filter(Boolean);
+      if (fx && pr27.length && !pr27.some(function (m0) { var a = nzk(m0[1]).replace(/…/g, "").trim(), b = nzk(fx).replace(/…/g, "").trim(); return a && b && (a.indexOf(b) >= 0 || b.indexOf(a) >= 0); })) hd27 = chFa24(pr27[0][2], pr27[0][1]);
+      add({ k: "retract", at: x.at, title: "اصلاحِ پیامِ پیشین", lines: [hd27].concat(x.err ? ["صفحه نپذیرفت: " + val(x.err)] : ch.length ? ch.map(val) : ["چیزی عوض نشد — از آن تکه رکوردی ساخته نشده بود"]), out: x.edit ? "با ✏️ ِ خودت" : "از گفت‌وگو", src: x.src ? msgRef(se.id, x.src) : null }); });
     /* دورِ ۲۱ (R4، C21-13/C21-14، bank #93): حدس‌های گفت‌وگو و سرانجامشان (تأیید/رد/کنار رفت) */
     /* دورِ ۲۳ (Q3، A23-32): هر رویدادِ گفت‌وگو مالِ مسئلهٔ خودش — مسئله‌ای که سشن در آن لحظه به آن بسته بود یا مسئلهٔ گفت‌وگویی که بعدتر همین مسئلهٔ زنده شد (A.STORY.owns)؛
        «تنها مسئلهٔ زندهٔ سشن» (chatScope) دیگر کافی نیست: حدسِ ۱۰۰ ِ مهمانی مالِ «پیشنهادِ کار» نبود */
@@ -52876,6 +52880,19 @@ APP.goFromURL = function (q) {
       if (host) { (e.lines || []).slice(1).forEach(function (l) { if ((host.lines || []).indexOf(l) < 0) host.lines.push(l); }); if (!host.src && e.src) host.src = e.src; drop[i] = 1; } });
     var gs = []; ev.forEach(function (e, i) { if (!e || drop[i] || e.k !== "guess") return; var t = (e.lines || [])[0], o = gs.filter(function (j) { return same((ev[j].lines || [])[0], t); })[0];
       if (o == null) { gs.push(i); return; } var a = ev[o], keepE = (e.out && !/هنوز آزموده نشده/.test(e.out)) && !(a.out && !/هنوز آزموده نشده/.test(a.out)); if (keepE) { drop[o] = 1; gs[gs.indexOf(o)] = i; if (!e.src && a.src) e.src = a.src; } else { drop[i] = 1; if (!a.src && e.src) a.src = e.src; } });
+    /* (۴) A27-14 (s07، بانکِ R27 #231): یک ✏️ یک رویداد — ✏️ ِ «۹ ⇐ ۸، ۱۶ ⇐ ۱۵» را صفحه یک بار برای کلِ تکه و یک بار برای هر جفت نوشت (سه «اصلاحِ پیامِ پیشین»).
+       رویدادهای اصلاحِ همان پیام (src.mid)، با همان راه (out) و در همان پنج دقیقه یکی می‌شوند: سطرِ نخست سطرِ پهن‌ترین تکه است، سطرِ نخستِ تکه‌ای که در آن هست تکرار نمی‌شود،
+       و هر برچسب یک بار. پیکان‌های پیشنهادِ «کهنه» («(۵ ⇒ ۴، …)») به قراردادِ همین پرونده («تازه ⇐ پیشین») برگردانده می‌شوند — یک قرارداد در هر سطر. */
+    var R = ev.map(function (e, i) { return drop[i] ? null : e; }), labOf = function (x) { var m0 = /^(.{2,80}?):\s*«/.exec(String(x || "")); return m0 ? nzk(m0[1]) : ""; };
+    var core = function (l) { var m0 = /^«([^»]*)»\s*\(اصلاح شد ⇐ «([^»]*)»\)\s*$/.exec(String(l || "")); return m0 ? [nzk(m0[1]), nzk(m0[2])] : null; };
+    R.forEach(function (e, i) { if (!e || e.k !== "retract" || !(e.src && e.src.mid)) return;
+      for (var j = 0; j < i; j++) { var o = R[j]; if (!o || o.k !== "retract" || !(o.src && o.src.mid === e.src.mid) || (o.out || "") !== (e.out || "") || Math.abs((Date.parse(o.at || "") || 0) - (Date.parse(e.at || "") || 0)) > 5 * 60e3) continue;
+        var a = core((o.lines || [])[0]), c = core((e.lines || [])[0]), wide = function (x, y) { return x && y && x[0].indexOf(y[0]) >= 0 && x[1].indexOf(y[1]) >= 0; };
+        var head = wide(c, a) && !wide(a, c) ? e.lines[0] : o.lines[0], other = head === o.lines[0] ? (e.lines || [])[0] : (o.lines || [])[0], seen = {};
+        var L = [head].concat(wide(core(head), core(other)) ? [] : [other]).concat((o.lines || []).slice(1)).concat((e.lines || []).slice(1)).filter(function (x, k, X) { if (X.indexOf(x) !== k) return false; var lb = labOf(x); if (!lb || k === 0) return true; var key = lb + "|" + (core(String(x).replace(/^[^:]*:\s*/, "")) || [""])[0]; if (seen[key]) return false; seen[key] = 1; return true; });
+        o.lines = L; if (e.at && (!o.at || e.at < o.at)) o.at = e.at; R[i] = null; drop[i] = 1; break; } });
+    var arrow27 = function (l) { return String(l).replace(/([0-9۰-۹][0-9۰-۹.٫\/]*)\s*⇒\s*([0-9۰-۹][0-9۰-۹.٫\/]*)/g, "$2 ⇐ $1"); };
+    ev.forEach(function (e, i) { if (e && !drop[i] && e.k === "retract") e.lines = (e.lines || []).map(arrow27); });
     return ev.filter(function (e, i) { return !drop[i]; });
   }
   A.dossierDedup27 = dedup27;
