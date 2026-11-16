@@ -37534,8 +37534,13 @@ APP.goFromURL = function (q) {
   var SYSPASS28 = /(?:ثبت|اضافه|ذخیره)[\s‌]*(?:شد|شده|شدن|میشه|می[‌\s]?شه|می[‌\s]?شود)(?![آ-ی])|(?:باز|ثبت)[\s‌]*کنم(?![آ-ی])/;
   var SYSOBJ28 = /(?:^|[\s‌«(،])(?:سامانه|صفحه|دستیار|مسئله(?:ٔ|‌ی|ی)?[\s‌]*(?:تازه|جدید|جدا|بسته[‌\s]?شده|دیگه|قبلی))(?![آ-ی])/;
   var MYWORDS28 = /(?:^|[\s‌])(?:گفتم|نوشتم|زدم|فرستادم)(?![آ-ی])/;
+  /* بانکِ R28 (R7 #256–#258): «پیش‌بینی‌هام کجا ثبت میشن؟» (جای ثبت‌های خودش در صفحه)، «چرا تاریخِ پنجشنبه رو … نوشتی؟» (کارِ ثبتِ خودِ دستیار)، «سرکشی‌ها رو کی جواب میده؟»
+     (بخشی از خودِ سامانه). «خبرم کن / یادم بنداز» ِ امری درخواستِ یادآور است، نه پرسش دربارهٔ سامانه (C127) — امری‌ها عمداً بیرون‌اند. */
+  var SYSWHERE28 = /(?:پیش[‌\s]?بینی|برنامه|موعد|یادآور|مسئله|حرف|جواب|درس|کارت|داده)(?:‌?ها|‌?های)?(?:م|مو|مون|ام|یم)?[^؟?]{0,12}کجا[\s‌]*(?:ثبت|نگه|ذخیره|می[‌\s]?مونه|میمونه)/;
+  var SYSDID28 = /(?:نوشتی|ثبت(?:ش|شون)?[\s‌]*کردی|یادداشت[\s‌]*کردی)(?![آ-ی])/;
+  var SYSPART28 = /(?:^|[\s‌«(،])(?:سرکشی|نظارت[\s‌]*و[\s‌]*سرکشی|دفترِ?[\s‌]*پیش[‌\s]?بینی)/;
   function sysQ28(q) { q = String(q || "").replace(/[‏‎]/g, "").replace(/\s+/g, " ").trim(); if (!/[؟?]\s*$/.test(q)) return false;
-    if (SYS2P28.test(q)) return true; return SYSPASS28.test(q) && (SYSOBJ28.test(q) || MYWORDS28.test(q)); }
+    if (SYS2P28.test(q) || SYSWHERE28.test(q) || SYSDID28.test(q) || SYSPART28.test(q)) return true; return SYSPASS28.test(q) && (SYSOBJ28.test(q) || MYWORDS28.test(q)); }
   AS.sysQ28 = sysQ28;
   /* پیامی که جز پرسش‌های دربارهٔ سامانه (و پیش‌درآمدِ کوتاهِ «یه سؤال:»/«راستی») چیزی ندارد ⇒ مسئله نیست (C99) */
   function onlySysQ28(t) { var L = String(t || "").replace(/[‏‎]/g, "").match(/[^.!؟?\n]+[.!؟?\n]*/g) || [], n = 0;
@@ -37579,6 +37584,8 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۳ (Q5، aA1/aA3): پرسشِ خودش با چند عدد از داده‌هایش («به هر کدوممون چندتا رسید؟»، «ساعت‌ها را چطور بچینم؟») مسئله را بیان می‌کند؛ و رابطهٔ «… = n²» */
     var oq = ownText(t);
     if ((x.match(/\d+(?:[.٫]\d+)?/g) || []).length >= 2 && (/(?:^|[\s‌])(?:چند|چندتا|چقدر|چه[\s‌]*قدر|چطور|چطوری|چجوری|چه[\s‌]*جوری|چگونه|کدوم|کدام|کی|کجا)(?![آ-ی])[^.!؟?\n]{0,60}[؟?]/.test(oq) || /(?:^|[\s‌])(?:چطور|چطوری|چجوری|چه[\s‌]*جوری|چگونه)(?![آ-ی])/.test(oq))) return true;
+    /* دورِ ۲۸ (R7، بانکِ R28 #289 «… سه تا قفسه‌ی ۸۰ سانتی تو دیوارِ ۲ متر و ۴۰ جا میشه؟»): پرسشِ آری/نهِ «جا شدن/بس بودن/رسیدن» با دست‌کم دو عدد از داده‌های خودش مسئلهٔ اوست */
+    if ((x.match(/\d+(?:[.٫]\d+)?/g) || []).length >= 2 && /(?:جا[\s‌]*(?:می[‌\s]?شه|میشه|می[‌\s]?شود|می[‌\s]?گیره)|کافی(?:ه|ست|[\s‌]*است)|بس(?:ه|[\s‌]*است)|می[‌\s]?رسه|میرسه)[^.!؟?\n]{0,12}[؟?]/.test(oq)) return true;
     if (/[0-9a-zA-Z)²³]\s*[=<>≤≥]\s*[0-9a-zA-Z(]/.test(x) && /[؟?]|ثابت|اثبات|برهان|بازنگری/.test(oq)) return true;
     if (/(?:چه|چی)[\s‌]*کار[\s‌]*(?:باید[\s‌]*)?(?:ب)?کن(?:م|یم)(?![آ-ی])/.test(oq)) return true;
     if (CHAT_PROB.test(t) || PROVE_RE.test(t) || LIVE_ASK.test(t) || LIVE_STUCK.test(x) || LIVE_RE2.test(t) || FAIL_ME.test(t) || SOUGHT21.test(t) || (typeof HABIT20 !== "undefined" && HABIT20 && HABIT20.test(t)) || EN_PROB.test(t)) return true;
@@ -58662,6 +58669,9 @@ APP.goFromURL = function (q) {
       var d = mine.filter(function (w, k) { return mine.indexOf(w) === k && oth.every(function (L) { return L.indexOf(w) < 0; }); }).slice(0, 3);
       return f + " (" + (d.length ? "با «" + d.join(" ") + "» — " : "") + (ORDFA28[i] || fa(i + 1)) + ")"; }); }
   PRE.sysTieLabels = function (e) { return tieLabels28(tieCands(e)); };
+  /* C129: نام و شرحِ یکسان ⇒ «گویا تکراری‌اند» و پرسیدنِ یکی‌کردن؛ «یکی‌اند/تکراری‌اند» ِ او یعنی همان یکی (نخستین) می‌رسد */
+  function dupTie28(C) { return C.length > 1 && C.every(function (c) { return zk(c.fa) === zk(C[0].fa) && zk(c.text) === zk(C[0].text); }); }
+  var MERGE28 = /(?:^|[\s‌])(?:یکی(?:‌اند|اند|ن|ه|ست|ند|[\s‌]+هستن(?:د)?)|تکراری(?:‌اند|اند|ن|ه)?|هر[\s‌]*دو[\s‌]*(?:یکی|همون|همان))(?![آ-ی])/;
   function askFit(o, e, r, how) {
     var it = r.best.it, TI = (r.tie || []), L28 = tieLabels28([it].concat(TI.map(function (x) { return x.it; }))), mL = L28[0];
     e.ask = { id: it.id, kind: it.kind, fa: clip(it.fa, 80), faL: mL, go: it.go, text: clip(it.text, 600), how: how, w: r.best.w, sn: r.best.sn || 0, at: nowIso(), key: "", n: 0, alt: L28.slice(1), alts: TI.map(candOf) }; delete e.backBy;
@@ -58676,6 +58686,8 @@ APP.goFromURL = function (q) {
     swEv(o.sc, e, "ask", "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + mL + "»" + (e.ask.alt.length ? " یا «" + e.ask.alt.join("» یا «") + "» — کدام همان ابزارِ گام است؟" : " — همان ابزارِ گام است؟"), [(e.late ? "تکهٔ منتظر: «" : "گامِ منتظر: «") + clip(e.step, 120) + "»", "سنجش: " + e.checks[e.checks.length - 1].reason], "پرسیدم؛ تا جوابش گام منتظر می‌ماند", e.ask.evk);
     waitEv(o.sc, e);
     var sh = shE(e);
+    var dup28 = dupTie28([it].concat(TI.map(function (x) { return x.it; })));
+    if (dup28) altT += " — نام و شرحِ هر دو یکی است؛ گویا تکراری‌اند. اگر برای " + (shE(e) ? "شما" : "تو") + " یکی‌اند، بگو «یکی‌اند» تا یکی شمرده شوند؛ وگرنه «اولی» یا «دومی»";
     sysMsg(e, "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + mL + "»" + altT + (e.ask.alt.length ? ". میانِ این‌ها برنمی‌گزینم — نامِ همان را که گامِ «" + clip(e.step, 70) + "» لازم داشت " + (sh ? "بگویید" : "بگو") + " (یا «هیچ‌کدام»)؛ تا آن وقت گام منتظر می‌ماند."
       : ". مطمئن نیستم همان چیزی باشد که گامِ «" + clip(e.step, 70) + "» لازم داشت — پیش از ادامه از " + (sh ? "شما" : "تو") + " می‌پرسم؛ تا آن وقت گام منتظر می‌ماند."));
     o.put();
@@ -59093,6 +59105,7 @@ APP.goFromURL = function (q) {
     waitEv(o.sc, e); o.put();
   }
   function tieAnswer(o, e, m, yes, no, byQuote, span, pickName) {
+    if (dupTie28(tieCands(e)) && MERGE28.test(String(m || "")) && !NONE_T.test(String(m || ""))) { tieChoose(o, e, tieCands(e)[0], span); return true; }   // C129
     var pk = tiePick(e, m), byN = pickName ? tieCands(e).filter(function (c) { return c.id === pickName || zk(c.fa) === zk(pickName); })[0] : null;
     if (pk.one) { tieChoose(o, e, pk.one, span); return true; }
     if (byN && !pk.many && !pk.none && yes) { tieChoose(o, e, byN, span); return true; }   // مدل گزارش می‌دهد (pick)، صفحه نامزد بودنش را می‌سنجد

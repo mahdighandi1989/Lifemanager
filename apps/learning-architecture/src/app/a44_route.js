@@ -1238,6 +1238,9 @@
       var d = mine.filter(function (w, k) { return mine.indexOf(w) === k && oth.every(function (L) { return L.indexOf(w) < 0; }); }).slice(0, 3);
       return f + " (" + (d.length ? "با «" + d.join(" ") + "» — " : "") + (ORDFA28[i] || fa(i + 1)) + ")"; }); }
   PRE.sysTieLabels = function (e) { return tieLabels28(tieCands(e)); };
+  /* C129: نام و شرحِ یکسان ⇒ «گویا تکراری‌اند» و پرسیدنِ یکی‌کردن؛ «یکی‌اند/تکراری‌اند» ِ او یعنی همان یکی (نخستین) می‌رسد */
+  function dupTie28(C) { return C.length > 1 && C.every(function (c) { return zk(c.fa) === zk(C[0].fa) && zk(c.text) === zk(C[0].text); }); }
+  var MERGE28 = /(?:^|[\s‌])(?:یکی(?:‌اند|اند|ن|ه|ست|ند|[\s‌]+هستن(?:د)?)|تکراری(?:‌اند|اند|ن|ه)?|هر[\s‌]*دو[\s‌]*(?:یکی|همون|همان))(?![آ-ی])/;
   function askFit(o, e, r, how) {
     var it = r.best.it, TI = (r.tie || []), L28 = tieLabels28([it].concat(TI.map(function (x) { return x.it; }))), mL = L28[0];
     e.ask = { id: it.id, kind: it.kind, fa: clip(it.fa, 80), faL: mL, go: it.go, text: clip(it.text, 600), how: how, w: r.best.w, sn: r.best.sn || 0, at: nowIso(), key: "", n: 0, alt: L28.slice(1), alts: TI.map(candOf) }; delete e.backBy;
@@ -1252,6 +1255,8 @@
     swEv(o.sc, e, "ask", "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + mL + "»" + (e.ask.alt.length ? " یا «" + e.ask.alt.join("» یا «") + "» — کدام همان ابزارِ گام است؟" : " — همان ابزارِ گام است؟"), [(e.late ? "تکهٔ منتظر: «" : "گامِ منتظر: «") + clip(e.step, 120) + "»", "سنجش: " + e.checks[e.checks.length - 1].reason], "پرسیدم؛ تا جوابش گام منتظر می‌ماند", e.ask.evk);
     waitEv(o.sc, e);
     var sh = shE(e);
+    var dup28 = dupTie28([it].concat(TI.map(function (x) { return x.it; })));
+    if (dup28) altT += " — نام و شرحِ هر دو یکی است؛ گویا تکراری‌اند. اگر برای " + (shE(e) ? "شما" : "تو") + " یکی‌اند، بگو «یکی‌اند» تا یکی شمرده شوند؛ وگرنه «اولی» یا «دومی»";
     sysMsg(e, "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + mL + "»" + altT + (e.ask.alt.length ? ". میانِ این‌ها برنمی‌گزینم — نامِ همان را که گامِ «" + clip(e.step, 70) + "» لازم داشت " + (sh ? "بگویید" : "بگو") + " (یا «هیچ‌کدام»)؛ تا آن وقت گام منتظر می‌ماند."
       : ". مطمئن نیستم همان چیزی باشد که گامِ «" + clip(e.step, 70) + "» لازم داشت — پیش از ادامه از " + (sh ? "شما" : "تو") + " می‌پرسم؛ تا آن وقت گام منتظر می‌ماند."));
     o.put();
@@ -1669,6 +1674,7 @@
     waitEv(o.sc, e); o.put();
   }
   function tieAnswer(o, e, m, yes, no, byQuote, span, pickName) {
+    if (dupTie28(tieCands(e)) && MERGE28.test(String(m || "")) && !NONE_T.test(String(m || ""))) { tieChoose(o, e, tieCands(e)[0], span); return true; }   // C129
     var pk = tiePick(e, m), byN = pickName ? tieCands(e).filter(function (c) { return c.id === pickName || zk(c.fa) === zk(pickName); })[0] : null;
     if (pk.one) { tieChoose(o, e, pk.one, span); return true; }
     if (byN && !pk.many && !pk.none && yes) { tieChoose(o, e, byN, span); return true; }   // مدل گزارش می‌دهد (pick)، صفحه نامزد بودنش را می‌سنجد
