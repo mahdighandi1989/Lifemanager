@@ -30,6 +30,11 @@ nB1, pwC1, tD2; byte copy of the bank `tests/variants/VARIANTS_R28.json`.
 `a46_arith.js` (arith's file) — only `ST.arithContest`: re-typing her own earlier ✗ line word for word with nothing else (C28-4, bank #247)
 is no dispute; returns `null` before the re-check. Any contest word or extra insistence still contests.
 
+Guards found by the whole suite (kept): the single-product small-talk gate in `priorAsk` is skipped for «حساب کرده‌ام» and English own-work
+markers («I computed it myself», bank R27 #156, R25 P1 #3); `prop28` gives no proposal to a dependant she re-wrote in the same message and
+that still does not read (bank R26 #112 — the page does not hand her the number). `newProb28` ignores a message that names a step of the
+closed ledger («تو گامِ ۶ منظورم …», found by the page replay of pwA1 p18) and needs a quantity/choice question for «own unknown».
+
 ## Contract (for the siblings)
 - **story (C97 record side):** the ledger now follows `C.split25` (key of this message) and `C.np28`; when you register a separate problem,
   keep `C.split25`'s `key` = `nz(text).slice(0, 80)` so `splitNow28` sees it. `importChat` picks the ledger by statement overlap; do not
