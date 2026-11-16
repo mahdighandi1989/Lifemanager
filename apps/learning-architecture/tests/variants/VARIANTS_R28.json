@@ -1,0 +1,386 @@
+[
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پولِ پیش‌قسطِ ماشین: ۷ میلیون و ۶۰۰ + ۳ میلیون و ۵۰۰ = ۱۱ میلیون و ۱۰۰",
+  "expect": "OK — only the reading «۶۰۰ هزار + ۵۰۰ هزار = ۱۱ میلیون و ۱۰۰ هزار» fits (7.6 M + 3.5 M = 11.1 M); both-units gives 10 001 100, the mixed ones 10 600 500 and 10 500 600, none of which is either reading of her result; never ✗, never «؟ گرد کرده؟», no scale question; the coach is never told it does not fit",
+  "context": "adult, saving for a car; S1 family (B28·D1 shape: a carry in the M part, so only the thousand reading fits)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲ میلیون و ۴۰۰ + ۶۰۰ هزار = ۳ میلیون",
+  "expect": "OK — thousand reading 2.4 M + 0.6 M = 3 M fits; the units reading gives 2 600 400 and does not; never «؟ دقیقاً ۲٫۶۰۰۴ میلیون … گرد کرده؟», never a false exact value reaching her through the coach",
+  "context": "adult, a used fridge plus delivery; S1 family (C28-13 shape: one operand with an explicit «هزار»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: 4 میلیون و 300 + ۱ میلیون و ۷۰۰ = ۶ میلیون",
+  "expect": "OK — 4.3 M + 1.7 M = 6 M under the thousand reading; both-units 5 001 000, mixed 5 300 700 / 5 700 300 do not fit; read the same with Latin digits; never ✗",
+  "context": "adult; Latin and Persian digits mixed in one line; S1 family (the M parts carry into a whole million)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: از ۱۵ میلیون و ۲۵۰ پس‌انداز، ۴ میلیون و ۷۵۰ رفت برای بیمه: ۱۵ میلیون و ۲۵۰ − ۴ میلیون و ۷۵۰ = ۱۰ میلیون و ۵۰۰",
+  "expect": "OK — 15.25 M − 4.75 M = 10.5 M under the thousand reading; both-units gives 10 999 500, mixed 11 249 250 / 10 250 250; exactly one fitting combination; never ✗, never ASK-SCALE",
+  "context": "adult, household budget; S1 family with a borrow in the M part"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۵ میلیون و ۸۰۰ + ۲ میلیون و ۶۰۰ = ۷ میلیون و ۴۰۰",
+  "expect": "FLAG — no combination fits: thousand 8 400 000, units 7 001 400, mixed 7 800 600 / 7 600 800, against her 7 000 400 / 7 400 000; the ✗ names each reading's exact value in her own scale words (at least «۸ میلیون و ۴۰۰ هزار» and «۷ میلیون و ۱ هزار و ۴۰۰»); never a raw digit string such as «۷۰۰۱۴۰۰», never one value only; the right number is not given away to her",
+  "context": "adult; a genuinely wrong sum; S1 family (C84 «none fits», A28-10 showed one raw value)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: اجارهٔ ده ماه: ۴ میلیون و ۵۰۰ × ۱۰ = ۴۰ میلیون",
+  "expect": "FLAG — thousand reading 45 000 000, units reading 40 005 000, her result 40 000 000 fits neither; ✗ with both values in her words («۴۵ میلیون» and «۴۰ میلیون و ۵ هزار»); never «؟ … گرد کرده؟» — a later «آره» must not be able to turn this wrong line into accepted rounding",
+  "context": "adult; S1 family (C28-12 shape: the units reading is close to her result, so it used to become a rounding question)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سه تا قسط: ۲ میلیون و ۳۰۰ × ۳ = ۶ میلیون و ۹۰۰",
+  "expect": "ASK-SCALE — thousand 6 900 000 = «۶ میلیون و ۹۰۰ هزار» and units 6 000 900 = «۶ میلیون و ۹۰۰» both fit; the page asks ONCE «۹۰۰ هزار یا ۹۰۰ تومان؟» (or the same question in its words); neither ✓ nor ✗ until she answers; no second ask in the same reply",
+  "context": "adult; both consistent readings fit (C84 «two make it right»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سه تا قسط: ۲ میلیون و ۳۰۰ × ۳ = ۶ میلیون و ۹۰۰ ‖ [page: «۹۰۰ هزار یا ۹۰۰ تومان؟»] ‖ U: هزار، ۹۰۰ هزار",
+  "expect": "her answer is read: the line becomes OK under the thousand reading and is stored with it (2.3 M × 3 = 6.9 M); the question is not repeated; 📜 shows ✓ beside her line, not «؟»",
+  "context": "adult; the `m2` answer reader (A28-11: her answer to «کدام خوانش؟» was not read)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۲ میلیون و ۴۰۰ ÷ ۴ = ۳ میلیون و ۱۰۰ ‖ [page: asks which reading of «و ۴۰۰ / و ۱۰۰»] ‖ U: تومن منظورم بود، نه هزار",
+  "expect": "first message ASK-SCALE (thousand 3 100 000 and units 3 000 100 both fit); her answer is read as the units reading: OK (12 000 400 ÷ 4 = 3 000 100); «نه هزار» is not read as a third value; no second ask",
+  "context": "adult; `m2` with a units answer and a negated alternative"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۴ میلیون و ۲۰۰ + ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰",
+  "expect": "ASK-SCALE — thousand 5 700 000 and units 5 000 700 both make her line right; the page asks once which she meant; never ✗, never ✓ by a silent choice",
+  "context": "adult; a sum with no carry, so both consistent readings fit"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱ میلیارد و ۲۰۰ + ۸۰۰ میلیون = ۲ میلیارد",
+  "expect": "OK — 1.2 billion + 0.8 billion = 2 billion under the million reading; the units reading 1 800 000 200 does not fit; the page writes values with «میلیارد / میلیون», never a raw ten-digit string",
+  "context": "adult, a flat deposit; «N میلیارد و M» (M of the next lower named scale = million)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۴ نفر، نفری ۲۵۰ هزار: ۱۴ × ۲۵۰ هزار = ۳ میلیون و ۴۰۰",
+  "expect": "FLAG — 14 × 250 000 = 3 500 000; her result read as 3 000 400 or 3 400 000 fits neither; the coach line writes the exact value with her scale words («۳ میلیون و ۵۰۰ هزار») and both readings of her result; never «حسابِ صفحه: ۳٫۵» with the scale dropped",
+  "context": "adult, a group dinner; D28-15 shape (the scale word was dropped from the page's value)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: کرایه ۳ میلیون و ۷۰۰، با ۳۰۰ هزار انعام: ۳ میلیون و ۷۰۰ + ۳۰۰ هزار = ۴ میلیون",
+  "expect": "OK — 3.7 M + 0.3 M = 4 M under the thousand reading (units 3 300 700 does not fit); never silent: a ✓ line reaches the coach and 📜",
+  "context": "adult, moving costs; A28-9 shape (the correct line got no line at all)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: دو تا لپ‌تاپ: ۸ میلیون و ۵۰۰ × ۲ = ۱۷ میلیون",
+  "expect": "OK — 8.5 M × 2 = 17 M (units 16 001 000 does not fit); no scale question",
+  "context": "teen 17, comparing prices; result without an M part"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: کل خرج: ۲ میلیون و ۲۵۰ + ۱ میلیون و ۸۰۰ + ۹۵۰ هزار = ۵ میلیون",
+  "expect": "OK — only the thousand reading of both M parts fits (2.25 M + 1.8 M + 0.95 M = 5 M); units/mixed give 3 951 050, 4 200 800, 4 750 250; never ✗, never ASK-SCALE",
+  "context": "adult; three terms, two of them «N میلیون و M»"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲۰ تا مداد داریم، هر جعبه ۶ تا: ۶ و ۶ و ۶ میشه ۱۸، ۲ تا می‌مونه",
+  "expect": "OK — 6 + 6 + 6 = 18; «۲ تا می‌مونه» starts its own statement (20 − 18 = 2, true) and is never glued to the sum; the coach never receives «✗ … را «۱۸ و باقی‌ماندهٔ ۲» نوشته»; nothing tells the child the sum is wrong",
+  "context": "child 8, packing pencils; S1 family (A28-40 shape: a remainder clause right after the sum)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۳۰ تا آبنبات بین چهار نفر: ۷ و ۷ و ۷ و ۷ میشه ۲۸، ۲ تا باقی می‌مونه",
+  "expect": "OK — 7 + 7 + 7 + 7 = 28; the remainder clause (30 − 28 = 2) is its own statement, not the sum's result",
+  "context": "child 9, sharing sweets; S1 family; «باقی می‌مونه»"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۳۵ تا صندلی، ۴ ردیف ۸تایی: ۴ × ۸ = ۳۲، ۳ تا اضافه میاد",
+  "expect": "OK — 4 × 8 = 32; «۳ تا اضافه میاد» (35 − 32 = 3) is a separate statement; never «۳۲ و ۳»",
+  "context": "teen 13, a class play; S1 family with «اضافه میاد» after a symbolic product"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۴ تا مهمون داریم ولی بشقاب‌ها: ۵ و ۵ میشه ۱۰، ۴ تا کم میاد",
+  "expect": "OK — 5 + 5 = 10; «۴ تا کم میاد» (14 − 10 = 4) is its own statement; the sum is never ✗",
+  "context": "adult, a family dinner; S1 family with «کم میاد»"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: 9 و 9 میشه 18، 1 تا می‌مونه",
+  "expect": "OK — 9 + 9 = 18; the remainder clause is not an operand; Latin digits read like Persian ones",
+  "context": "child 10; Latin digits throughout; S1 family (19 marbles in two bags)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۸ و ۸ و ۸ میشه ۲۴، ۳ تا میمونه",
+  "expect": "OK — 8 + 8 + 8 = 24; detection of the remainder clause does not depend on the ZWNJ",
+  "context": "child 11; ZWNJ missing in «میمونه»; S1 family (27 stickers)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۶ و ۶ و ۶ میشه ۱۹، ۱ تا می‌مونه",
+  "expect": "FLAG — 6 + 6 + 6 = 18, not 19; the ✗ quotes only «۶ و ۶ و ۶ میشه ۱۹», never «۱۹ و باقی‌ماندهٔ ۱»; the remainder clause is judged on its own (if at all) and does not change the sum's verdict",
+  "context": "child 8; S1 family look-alike that is genuinely wrong in the sum itself"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲۵ تا تخم‌مرغ، ۳ تا شونه‌ی ۷ تایی: ۳ تا ۷ تا میشه ۲۱، ۴ تا می‌مونه",
+  "expect": "OK — 3 × 7 = 21 (C41 «N تا M تا»); «۴ تا می‌مونه» (25 − 21 = 4) is its own statement; the «تا» of the remainder clause is never read as a third factor",
+  "context": "adult; C41 product followed by a remainder clause; S1 family"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۷ تا سیب، هر کیسه ۴ تا: ۴ و ۴ و ۴ و ۴ میشه ۱۶، ۱ تا می‌مونه، پس ۵ تا کیسه لازمه",
+  "expect": "OK — 4 + 4 + 4 + 4 = 16; the remainder and «پس ۵ تا کیسه» are separate statements; the sum is never ✗ and the child is never told the sum was wrong; if the coach later learns the ✗ was false, the false ✗ never existed to withdraw",
+  "context": "child 10; S1 family with a conclusion after the remainder"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: قطرِ صفحه: sqrt(۵۰) ≈ ۷٫۰۷",
+  "expect": "OK — √50 = 7.0710…, 7.07 at her two digits; read exactly like «√۵۰ ≈ ۷٫۰۷»; never «نسنجیده» because of the spelling",
+  "context": "teen 16, geometry homework; «sqrt(…)» typed instead of «√» (A28-7)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: sqrt(20) ≈ 4.72",
+  "expect": "FLAG — √20 = 4.4721…, 4.72 is neither its rounding nor its truncation at two digits",
+  "context": "adult; Latin «sqrt» and Latin digits"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: قطرِ مربعِ ۳ سانتی: ۳√۲ ≈ ۴٫۲۴",
+  "expect": "NOT-FLAG — 3√2 = 4.2426…, so 4.24 is right; OK if the page computes «a√b», UNCHECKED («نسنجیده») if it does not; never silent, never ✗",
+  "context": "teen 15; «a√b ≈ c» (A28-8: such a line got no line at all)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۳ و ۵ دهم ضربدر ۴ میشه ۱۴",
+  "expect": "OK — 3.5 × 4 = 14; «۳ و ۵ دهم» is one operand 3.5, never a C40 sum «۳ و ۵»",
+  "context": "adult, buying fabric (3.5 m per curtain); «A و N دهم» (D26-24)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲ و ۷ دهم کیلو + ۱ و ۸ دهم کیلو = ۴ و ۵ دهم کیلو",
+  "expect": "OK — 2.7 + 1.8 = 4.5; all three «A و N دهم» are read as decimals; the unit «کیلو» is not a factor",
+  "context": "elder 66, register «شما», weighing fruit"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۵√۳ ≈ ۸٫۶۶",
+  "expect": "NOT-FLAG — 5√3 = 8.6602…, 8.66 right at her digits; OK if computed, UNCHECKED if not; never silent, never ✗",
+  "context": "adult, a hexagon's height"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۵ میلیون و ۸۰۰ + ۲ میلیون و ۶۰۰ = ۸ میلیون و ۴۰۰",
+  "expect": "OK — the thousand reading fits (8.4 M) and no other combination does (units 7 001 400 against 8 000 400); never ✗, never ASK-SCALE",
+  "context": "adult; look-alike of the «none fits» entry: the same operands with the right result; S1 family"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲ میلیون و ۴۰۰ + ۶۰۰ هزار = ۳ میلیون و ۲۰۰",
+  "expect": "FLAG — thousand reading gives 3 000 000, units 2 600 400; her 3 000 200 / 3 200 000 fits neither; never OK, never «؟ گرد کرده؟», never ASK-SCALE",
+  "context": "adult; look-alike of the C28-13 entry with a wrong result; S1 family"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۶ میلیون و ۸۰۰ هزار + ۲ میلیون و ۳۰۰ هزار = ۹ میلیون و ۱۰۰ هزار",
+  "expect": "OK — 6.8 M + 2.3 M = 9.1 M; no scale question is asked (nothing is ambiguous)",
+  "context": "adult; every M carries its own «هزار», so there is only one reading"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۴ میلیون و ۵۰۰ × ۱۰ = ۴۵ میلیون",
+  "expect": "OK — thousand reading 45 M fits, units 40 005 000 does not; no ✗, no rounding question, no scale question",
+  "context": "adult; look-alike of the C28-12 entry with the right result"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۳ میلیون و ۶۰۰ ÷ ۲ = ۱ میلیون و ۸۰۰",
+  "expect": "OK — only the thousand reading fits (1.8 M); no scale question",
+  "context": "adult; look-alike of the ASK-SCALE «÷» entry: here the units reading does not fit (3 000 600 ÷ 2 = 1 500 300)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۴ میلیون و ۲۰۰ + ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰ هزار",
+  "expect": "OK — 4.2 M + 1.5 M = 5.7 M; the units reading gives 5 000 700 ≠ 5 700 000; no scale question",
+  "context": "adult; look-alike of the ASK-SCALE «+» entry: the explicit «هزار» on the result leaves one fitting reading"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: سه تا قسط: ۲ میلیون و ۳۰۰ × ۳ = ۶ میلیون و ۹۰۰ ‖ [page: «۹۰۰ هزار یا ۹۰۰ تومان؟»] ‖ U: راستی فردا جلسه‌ی مدرسه دارم",
+  "expect": "the message is not read as an answer: the line stays «؟» (neither ✓ nor ✗), no reading is booked from «فردا», and the page does not invent her choice",
+  "context": "adult; look-alike of the `m2` entries: the next message does not answer the scale question"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: حقوقم ۹ میلیون و ۸۰۰ ـه و اجاره ۴ میلیون",
+  "expect": "SILENT — no arithmetic line (C17); the amounts are data, not a calculation",
+  "context": "adult; amounts with no operation word or symbol"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲۰ − ۱۵ = ۵ تا می‌مونه",
+  "expect": "OK — 20 − 15 = 5; the number after «=» is the claimed value (C18); the word «می‌مونه» does not split it off",
+  "context": "child 10; look-alike of C85: here the remainder number IS the result after «=»"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲۰ تا کارت داشتم: ۶ و ۶ و ۶ میشه ۱۸، ۵ تا می‌مونه",
+  "expect": "the sum line is OK (18) and is never ✗; the false remainder is its own statement and never glued into the sum's verdict; whatever the coach says about the remainder, the sum is not reported as wrong",
+  "context": "child 9; the sum is right and the remainder clause is false (20 − 18 = 2); S1 family look-alike"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۸ و ۸ میشه ۱۶ تا، ۲ تا اضافه آوردم",
+  "expect": "OK — 8 + 8 = 16; the clause after the comma is not an operand or result",
+  "context": "adult; a past-tense remainder clause after a comma"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: sqrt(۴۹) = ۸",
+  "expect": "FLAG — √49 = 7; «sqrt» read like «√»; never UNCHECKED because of the spelling",
+  "context": "teen 14; look-alike of the «sqrt» entries with a wrong exact value"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: sqrt(۲) ≈ ۱٫۴۲",
+  "expect": "FLAG — √2 = 1.41421…, rounds and truncates to 1.41, not 1.42 (C9)",
+  "context": "teen 16; a near miss at her digits"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲√۵ ≈ ۴٫۹۷",
+  "expect": "NOT-OK — 2√5 = 4.4721…; FLAG if the page computes «a√b», UNCHECKED if not; never ✓, never silent",
+  "context": "adult; look-alike of the «a√b ≈ c» entries with a wrong value"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: sqrt رو با ماشین‌حساب زدم، خیالم راحت شد",
+  "expect": "SILENT — nothing to compute; no «نسنجیده» line",
+  "context": "adult; the word «sqrt» with no numbers"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۶ و ۴ دهم ضربدر ۲ میشه ۱۳ و ۸ دهم",
+  "expect": "FLAG — 6.4 × 2 = 12.8, not 13.8; both «… و N دهم» read as decimals",
+  "context": "adult; look-alike of «A و N دهم» with a wrong product"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۷ و ۳ میشه ۱۰، دهم کلاس شدم",
+  "expect": "OK — 7 + 3 = 10 (C40 sum reading); «دهم کلاس» is not a decimal word and is not attached to the result",
+  "context": "teen 15; «دهم» as a rank right after a C40 sum"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۴ × ۲۵۰ هزار = ۳ میلیون و ۵۰۰ هزار",
+  "expect": "OK — 14 × 250 000 = 3 500 000; one reading only; no ✗, no scale question",
+  "context": "adult; look-alike of the D28-15 entry with the right result"
+ }
+]
