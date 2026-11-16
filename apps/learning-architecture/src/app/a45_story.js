@@ -1049,9 +1049,25 @@
   /* دورِ ۲۷ (C56، A27-21): هر گزارشِ بعدی — پیش یا پس از بستن — در همان دفتر ادغام می‌شود، هرگز جایش را نمی‌گیرد.
      ریشه: پس از «✅ حل شد» گفت‌وگو دیگر به مسئلهٔ زنده بسته نیست (boundLive.done)، pid = "" و دفترِ مسئلهٔ بسته دیده نمی‌شد؛ گزارشِ سوم دفترِ تازه‌ای در داستانِ نشست می‌ساخت
      (شماره‌ها از نو، تاریخچه صفر). حالا تا وقتی نشست دفترِ خودش را ندارد و پیام مسئلهٔ تازه‌ای نمی‌آورد، دفترِ کارِ پیشین همان دفترِ مسئلهٔ بسته است. */
+  /* دورِ ۲۸ (C97 سمتِ دفتر؛ پسرفتِ D28-6 dp2 p6): «امروز معلم یه سؤال داد: ماشین … چند متر میره؟ خودم: ۷۲۰۰۰ ÷ ۳۶۰۰ = ۲۰ …» پس از بستنِ مسئلهٔ طوفان
+     «گامِ ۳ و ۴» ِ دفترِ طوفان شد. ریشه: priorPid27 مسئلهٔ تازه را فقط با NEWP27 («یه سؤالِ تازه/جدید/دیگه») می‌شناخت؛ صفحه (a27/story) همین پیام را مسئلهٔ گفت‌وگوییِ
+     تازه‌ای ثبت کرده بود (C.pk ِ تازه با صورتِ خودش) ولی دفترِ کارِ پیشین هنوز دفترِ مسئلهٔ بسته را برمی‌گرداند.
+     حالا: مسئلهٔ کنونیِ گفت‌وگو صورتِ خودش را از همین پیام دارد، زندهٔ همان مسئلهٔ بسته نیست، و پیام مجهولِ خودش را می‌پرسد ⇒ مسئلهٔ دیگری است و دفترِ خودش را می‌گیرد.
+     شبیهِ منفی (A27-21): «یه بارِ دیگه، گزارشِ سوم، کلِ اثبات …» بی پرسشِ مجهولِ تازه، یا «حساب کرده بودم …»، هنوز به دفترِ مسئلهٔ بسته می‌رود. */
+  var UNKQ28 = /(?:چند|چقدر|چه\s*قدر|چه|چطور|چطوری|کدام|کدوم|کی|کجا|آیا)[^.!؟?\n]{0,60}[؟?]|[؟?]\s*$/;
+  function newProb28(s, bl, t) {
+    var C = (s && s.coach) || {}, u = String(t || ""); if (!txt(C.stmt) || !bl || !bl.pid) return false;
+    if (CALLS25.test(u) || /گزارش/.test(u) || (MINE26.test(u) && /بودم/.test(u))) return false;
+    try { if (ST.livedPk && ST.livedPk(s, String(C.pk || "")) === bl.pid) return false; } catch (e) { }
+    var SW = toks(String(C.stmt)).filter(function (w) { return w.length >= 3; }), UW = toks(u);
+    if (!SW.length || SW.filter(function (w) { return hit(w, UW); }).length < Math.ceil(SW.length * 0.6)) return false;   // صورتِ مسئلهٔ کنونی از همین پیام آمده
+    return sentences(u).some(function (x) { return UNKQ28.test(x) && !bareQ28(x); });
+  }
+  ST.newProb28 = newProb28;
   function priorPid27(s, t) {
     try { var bl = AS.boundLive ? AS.boundLive(s) : null; if (!bl || !bl.pid || !bl.done) return "";
       if (NEWP27.test(String(t || ""))) return "";
+      if (newProb28(s, bl, t)) return "";
       var pg = S.get("eprog_" + bl.pid), L = (pg && pg.solve && pg.solve.live) || {}; if (!L.prior) return "";
       var C = (s && s.coach) || {}; if (storyOf(s, String(C.pk || "c:0")).prior) return "";
       return bl.pid; } catch (e) { return ""; }
