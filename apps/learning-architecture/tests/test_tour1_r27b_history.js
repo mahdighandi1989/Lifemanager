@@ -186,7 +186,7 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
   /* ---------- #234/#235/#250 (C78، مالک بانکِ ۴۲): جابه‌جایی و برگرداندنِ سطرِ بدجای 📜 ---------- */
   const mv = async () => ev(async () => { const [A, B] = __base3(); await __turn('شد ۱۲ حالت، درست درومد', [cs({ ph: 'b', said: ['result'], result: 'شد ۱۲ حالت' })]);
     const o = { A, B, ph0: APP.liveStoryPhase(A), ev0: ((APP.S.get('eprog_' + A).solve.live.evlog) || []).map(e => e.id) };
-    APP.go('dossier', A); const btn = [...document.querySelectorAll('#main .lp-dmv')].filter(b => /مهره‌های رنگی/.test(b.textContent))[0]; o.btn = !!btn; if (btn) btn.click();
+    APP.go('dossier', A); const btn = [...document.querySelectorAll('#main li.lp-dev')].filter(li => /۱۲ حالت/.test(li.innerText)).flatMap(li => [...li.querySelectorAll('.lp-dmv')]).filter(b => /مهره‌های رنگی/.test(b.textContent))[0]; o.btn = !!btn; if (btn) btn.click();   // دورِ ۲۸ (C123): صورت هم «↪» دارد — دکمهٔ همان سطر
     o.dA = __dos(A); o.dB = __dos(B); o.phA = APP.liveStoryPhase(A); o.phB = APP.liveStoryPhase(B); o.ev1 = ((APP.S.get('eprog_' + A).solve.live.evlog) || []).map(e => e.id);
     o.stB = (((__cur().coach || {}).story || {})['L:' + B] || { items: [] }).items.map(x => x.k + ':' + x.t); return o; });
   E[234] = async () => { const o = await mv(); const a = o.dA.filter(x => /۱۲ حالت/.test(x)), b = o.dB.filter(x => /۱۲ حالت/.test(x));

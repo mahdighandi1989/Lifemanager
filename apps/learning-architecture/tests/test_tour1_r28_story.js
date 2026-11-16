@@ -112,6 +112,23 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     const isO = R.it.some(x => /^other:/.test(x)), dosO = R.dos.some(x => /کارِ دیگری/.test(x));
     const ok = other ? isO && dosO && R.it.some(x => x.indexOf('@' + who) >= 0) : !isO && !dosO && (who !== 'SRC' || R.dos.some(x => /منبع: به گفتهٔ «فروشنده»/.test(x)));
     return [ok, nm + ' ' + J(R)]; }; });
+  /* ---------- A28-12 (s02 p13/p15, s08 p10, s09 p15) و A28-30 (aA1 p10): حساب‌های خودش و کارِ دیگری بی گزارشِ مدل هم به 📜 می‌رسند ---------- */
+  const truck = () => one('لوله در بارِ وانت', 'یه لوله‌ی ۴ متری رو باید بذارم پشتِ وانت که کفش ۲ در ۱٫۵ متره.');
+  const calcs = (A) => p.evaluate((A) => APP.dossier(A).events.filter(e => /^c(?:calc|res|data|step|other)$/.test(e.k)).map(e => e.k + ' ¦ ' + e.lines.join(' ¦ ')), A);
+  K.A28_12_said_empty = async () => { const A = await truck();
+    await turnA('اگه بار رو سه قسمت کنم: ۴ تقسیم بر ۳ = ۱٫۳۳ متر هر تکه، ۸ ÷ ۳ = ۳ تا میله برای هر تکه. نسبتِ طول به عرضِ بار هم ۱۳/۱۲ = ۱ میشه.', [csx({ ph: 'e', said: [] })]);
+    const R = await calcs(A); return [R.filter(x => /^ccalc/.test(x)).length >= 2 && R.some(x => /۱۳\/۱۲ = ۱[^¦]*¦ حسابِ صفحه: ✗/.test(x)), J(R)]; };
+  K.A28_12_no_state = async () => { const A = await truck();
+    await turnA('یه وانتِ دیگه هم هست: کفش ۱۵ دسی‌متر در ۸ دسی‌متره، پس قطرش √(۱۵² + ۸²) ≈ ۱۷ دسی‌متر.', []);
+    const R = await calcs(A); return [R.some(x => /^ccalc ¦ .*√\(۱۵² \+ ۸²\) ≈ ۱۷/.test(x)), J(R)]; };
+  K.A28_30_no_state = async () => { const A = await one('تقسیمِ شیرینی‌ها', 'مامانم ۳ جعبه شیرینی خرید، هر جعبه ۸ تا.');
+    await turnA('داداشم یه حسابِ دیگه کرد: هر جعبه ۴۰۰ هزار تومن بوده، پس ۳ × ۴۰۰ = ۱۲۰۰ هزار تومن.', []);
+    const R = await calcs(A); return [R.some(x => /^cother ¦ داداشم یه حسابِ دیگه کرد/.test(x)) && !R.some(x => /^ccalc/.test(x)), J(R)]; };
+  // بدلِ منفی: نتیجه‌ای که مدل گزارش کرد دوباره «حسابِ تو» نمی‌شود؛ عددِ بی‌حساب هم سطر نمی‌گیرد
+  K.A28_12_neg = async () => { const A = await truck();
+    await turnA('۴ تقسیم بر ۲ = ۲ متر. کفِ وانت هم ۲ متره.', [csx({ ph: 'e', said: ['result'], result: '۴ تقسیم بر ۲ = ۲ متر' })]);
+    await turnA('فردا ساعت ۸ می‌برمش.', [csx({ ph: 'e', said: [] })]);
+    const R = await calcs(A); return [!R.some(x => /^ccalc/.test(x)) && R.some(x => /^cres/.test(x)), J(R)]; };
   /*@@MORE@@*/
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 900)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }

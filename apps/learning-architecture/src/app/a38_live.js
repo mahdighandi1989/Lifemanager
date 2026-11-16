@@ -5152,7 +5152,7 @@
       ch.push({ kind: "story", label: label, old: oo, new: nn, why: "همان پیام را خودش اصلاح کرد" }); };
     Object.keys(T).forEach(function (key) { ((T[key] && T[key].items) || []).forEach(function (it) { if (!it || it.mid !== mid || it.k === "prior") return; var nv = fixT(it.t); if (nv == null) return; (it.was = it.was || []).push({ t: it.t, at: base.at }); var o0 = it.t; it.t = nv;
       if (Array.isArray(it.pieces)) it.pieces = it.pieces.map(function (p) { return fixT(p) || p; }); note("ثبتِ «از گفت‌وگو»", o0, nv); }); });
-    var evFix = function (L, put) { var hit = false; (L || []).forEach(function (e) { if (!e || !e.src || e.src.mid !== mid || (e.src.sess && e.src.sess !== se.id) || !/^c(?:res|step|plan23|data|unk|whole|cond|tried|lb)$/.test(String(e.k || "")) || !(e.lines || []).length) return;
+    var evFix = function (L, put) { var hit = false; (L || []).forEach(function (e) { if (!e || !e.src || e.src.mid !== mid || (e.src.sess && e.src.sess !== se.id) || !/^c(?:res|step|plan23|data|unk|whole|cond|tried|lb|calc)$/.test(String(e.k || "")) || !(e.lines || []).length) return;
         var nv = fixT(e.lines[0]); if (nv == null) return; var o0 = e.lines[0];
         /* دورِ ۲۸ (story، C86، S1 A28-5): نشانِ صفحه از متنِ تازهٔ سطر دوباره سنجیده می‌شود؛ نشانِ پیشین (بی جایگزینیِ رشته‌ای) به تاریخچه می‌رود (a45 ST.relines28) */
         e.lines = A.STORY && A.STORY.relines28 ? A.STORY.relines28(e, nv, o0, "اصلاح شد ⇐ «" + clip(o0, 160) + "»", fixT) : [nv].concat(e.lines.slice(1).map(function (l) { return /^اصلاح شد ⇐/.test(l) ? l : (fixT(l) || l); })).concat(["اصلاح شد ⇐ «" + clip(o0, 160) + "»"]); hit = true; note(String(e.title || "ثبتِ «از گفت‌وگو»"), o0, nv); }); if (hit && put) put(); };

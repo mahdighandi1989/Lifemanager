@@ -205,7 +205,7 @@
      A.dossierMove27(pid, evId, toPid): سطرِ گفت‌وگوییِ 📜 ِ مسئلهٔ pid (دفترِ رویدادِ L.evlog) با رکوردِ داستانی‌اش (a45 ST.moveItem27) به مسئلهٔ toPid می‌رود.
      هیچ چیز پاک نمی‌شود: سطرِ اصلی در pid می‌ماند با «جابه‌جا شد ⇒ «…»» (تاریخچه)، رونوشت در toPid با «از «…» جابه‌جا شد» و دکمهٔ برگرداندن.
      A.dossierUnmove27(toPid, copyId): برمی‌گرداند — هر دو جابه‌جایی در تاریخچهٔ هر دو سطر می‌مانند. فقط سطرهای گفت‌وگو (داده/نتیجه/گام/طرح/… ِ a45) — 🎯 و دفترِ «کارِ پیشین» نه (هنوز). */
-  var MV27 = { cwhole: 1, cunk: 1, ccond: 1, cdata: 1, cplan23: 1, cstep: 1, cres: 1, cother: 1, clb: 1, ctried: 1 };
+  var MV27 = { cwhole: 1, cunk: 1, ccond: 1, cdata: 1, cplan23: 1, cstep: 1, cres: 1, cother: 1, clb: 1, ctried: 1, ccalc: 1 };
   function titleOf27(pid) { var r = A.liveRec ? A.liveRec(pid) : null; return r && r.p ? r.p.title : pid; }
   function evArr27(pid) { var pg = S.get("eprog_" + pid); if (!pg) return null; var so = pg.solve = pg.solve || {}, L = so.live = so.live || {}; return { L: (L.evlog = L.evlog || []), put: function () { S.put(pg); } }; }
   A.dossierMove27 = function (pid, evId, toPid) {
