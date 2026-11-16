@@ -54,6 +54,34 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     return [M.length >= 1 && M.every(e => /۲۱۷ میلیون/.test(e.l[0]) && e.l.some(l => /^حسابِ صفحه: ✗/.test(l)) && !e.l.some(l => /^حسابِ صفحه: ✓/.test(l))), J(M)]; };
 
 
+
+  /* ---------- F10 / C95 (A28-33 oA1, B28·D11 nB1, C28-23 s24, D28-18 tD1): «↪» روی هر سطرِ 📜، هر 🎯 و هر گامِ دفتر؛ مقصد با رونوشت و «↩»؛ برچسبِ «جابه‌جا شد» با ساعتِ صفحه ---------- */
+  const BIKE = 'سلام، برای تمرینِ دوچرخه خودم حساب کردم: هر دور ۱۵۰ ثانیه طول می‌کشه، ۱۲ دور. ۱۵۰ × ۱۲ = ۱۸۰۰ ثانیه = ۱۸ دقیقه. پس با ۱۸ دقیقه گرم‌کردن کلاً ۳۶ دقیقه. درسته؟';
+  const BIKEP = [{ step: 'زمانِ دورها', quote: 'هر دور ۱۵۰ ثانیه طول می‌کشه، ۱۲ دور', verdict: 'ok', why: 'داده' }, { step: 'جمعِ دورها', quote: '۱۵۰ × ۱۲ = ۱۸۰۰ ثانیه = ۱۸ دقیقه', verdict: 'wrong', why: '۱۸۰۰ ثانیه ۳۰ دقیقه است' }, { step: 'کل', quote: 'با ۱۸ دقیقه گرم‌کردن کلاً ۳۶ دقیقه', verdict: 'incomplete', why: 'وابسته به گامِ ۲' }];
+  const two = () => p.evaluate(() => { __wipe(); __fresh(); const A = __mk('تمرینِ دوچرخه', 'تمرینِ دوچرخه‌ام چقدر طول می‌کشه؟'); APP.liveBindSession(A, __cur(), { force: true });
+    const B = __mk('خریدِ کاشی', 'برای کفِ حمام چند تا کاشی بخرم؟'); return [A, B]; });
+  const dmv = (A, re) => p.evaluate(([A, re]) => { APP.go('dossier', A); return [...document.querySelectorAll('#main li.lp-dev')].filter(li => new RegExp(re).test(li.innerText)).map(li => [...li.querySelectorAll('.lp-dmv')].map(b => b.textContent)); }, [A, re]);
+  const click = (A, re, bre) => p.evaluate(([A, re, bre]) => { APP.go('dossier', A); const li = [...document.querySelectorAll('#main li.lp-dev')].filter(li => new RegExp(re).test(li.innerText))[0]; const b = li && [...li.querySelectorAll(bre === 'unmv' ? '.lp-dunmv' : '.lp-dmv')].filter(b => bre === 'unmv' || new RegExp(bre).test(b.textContent))[0]; if (b) b.click(); return !!b; }, [A, re, bre]);
+  K.C95_step_and_fc = async () => { const [A, B] = await two();
+    await turnA(BIKE, [csx({ ph: 'e', said: [], prior: BIKEP })]);
+    await turnA('فکر کنم تا جمعه تمرین رو کامل انجام می‌دم، ۷۰ درصد مطمئنم.', []);
+    const st = await dmv(A, 'کارِ پیشین'), fc = await dmv(A, '🎯');
+    const okB = st.length >= 1 && [1, 2, 3].every(n => st.some(bs => bs.some(t => t.indexOf('گامِ ' + fa(n) + ' مالِ مسئلهٔ «خریدِ کاشی»') >= 0))) && fc.length >= 1 && fc[0].some(t => /خریدِ کاشی/.test(t));
+    const hit = await click(A, 'کارِ پیشین', 'گامِ ۲ مالِ');
+    const R = await p.evaluate(([A, B]) => { const a = APP.dossier(A), b = APP.dossier(B); return { a: a.events.filter(e => e.k === 'cprior').map(e => e.lines.join(' ¦ ')), b: b.events.filter(e => e.mv28).map(e => ({ t: e.title, l: e.lines, out: e.out, h: (e.hist || []).map(x => [x.lab || '', String(x.at || '').slice(0, 10)]), un: (e.btns || []).map(x => x.cls) })), today: APP.today() }; }, [A, B]);
+    const ok = okB && hit && R.a.some(l => /گامِ ۲[^¦]*— جابه‌جا شد ⇒ «خریدِ کاشی»/.test(l)) && R.b.length === 1 && /۱۵۰ × ۱۲/.test(R.b[0].l[0]) && /از «تمرینِ دوچرخه» جابه‌جا شد/.test(R.b[0].out) && R.b[0].un.indexOf('lp-dunmv') >= 0
+      && R.b[0].h.length === 1 && /^جابه‌جا شد/.test(R.b[0].h[0][0]) && R.b[0].h[0][1] === R.today;
+    return [ok, J({ st, fc, hit, R })]; };
+  K.C95_label_undo = async () => { const [A, B] = await two();
+    await turnA('فکر کنم تا جمعه تمرین رو کامل انجام می‌دم، ۷۰ درصد مطمئنم.', []);
+    const hit = await click(A, '🎯', 'خریدِ کاشی'), un = await click(B, '🎯', 'unmv');
+    const R = await p.evaluate(([A, B]) => { APP.go('dossier', A); const t = document.getElementById('main').innerText; const a = APP.dossier(A).events.filter(e => e.k === 'fcast'); return { a: a.map(e => ({ wd: e.withdrawn, h: (e.hist || []).map(x => x.lab || 'OLD:' + x.old) })), hasFix: /اصلاح شد ⇐ «—»/.test(t), b: APP.dossier(B).events.filter(e => e.mv28).map(e => ({ wd: e.withdrawn, out: e.out })) }; }, [A, B]);
+    return [hit && un && R.a.length === 1 && !R.a[0].wd && R.a[0].h.length === 2 && /^جابه‌جا شد/.test(R.a[0].h[0]) && /^برگشت به «تمرینِ دوچرخه»/.test(R.a[0].h[1]) && !R.hasFix && R.b.length === 1 && R.b[0].wd && /برگشت به/.test(R.b[0].out), J(R)]; };
+  // بدلِ منفی: کسی که مسئلهٔ دیگری ندارد «↪» نمی‌بیند؛ صورتِ مسئله و فرم هرگز
+  K.C95_neg_alone = async () => { const A = await p.evaluate(() => { __wipe(); __fresh(); const A = __mk('تمرینِ دوچرخه', 'تمرینِ دوچرخه‌ام چقدر طول می‌کشه؟'); APP.liveBindSession(A, __cur(), { force: true }); return A; });
+    await turnA('فکر کنم تا جمعه تمرین رو کامل انجام می‌دم، ۷۰ درصد مطمئنم.', []); const n = await p.evaluate((A) => { APP.go('dossier', A); return document.querySelectorAll('#main .lp-dmv').length; }, A);
+    const [A2] = await two(); const st = await dmv(A2, 'صورتِ مسئله');
+    return [n === 0 && st.every(bs => bs.length === 0), J({ n, st })]; };
   /*@@MORE@@*/
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 900)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
