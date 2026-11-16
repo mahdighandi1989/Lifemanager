@@ -67,3 +67,12 @@ Columns: question · the system's correct answer today (exists / partial / missi
 | 61 | Is a calculation I quoted from someone else filed as mine? | claimed by R27 fixer, to verify (story «کارِ دیگری») | a45 story, coach_state | from R28 | — |
 | 62 | If I say «سرِ برج» or «بعد از عید», which day is booked? | claimed by R27 fixer, to verify (dates: idioms) | a41 `idiom27` | from R28 | — |
 | 63 | Where do I see the page's ✓/✗/؟ beside each calculation of mine? | claimed by R27b fixer, to verify (history: `markOf27`) | 📜 lines, a46 | from R28 | — |
+| 64 | If I said «yes» to a proposal built on a wrong number, is my step rewritten with that wrong number? | claimed by R28 fixer, to verify (correction C87) | a38 `accept27`/`accept28` | from R29 | — |
+| 65 | «The seller said 12%» — is that my data or someone else's work? | claimed by R28 fixer, to verify (story C96/C125) | a45 `ST.otherWork27` | from R29 | — |
+| 66 | What exactly did my «ثبتش کن» record? | claimed by R28 fixer, to verify (dates C113) | a41 | from R29 | — |
+| 67 | I said two forecasts in one sentence — were two recorded? | claimed by R28 fixer, to verify (forecast C90) | a41 `read28` | from R29 | — |
+| 68 | When I said «it came out 3», did the page read «my forecast came true» or «3 happened»? | claimed by R28 fixer, to verify (forecast C91) | a41 `verdict28` | from R29 | — |
+| 69 | Why did a ✏️ to a past day go to next year? | claimed by R28 fixer, to verify (dates C93) | a41 `pastDay28` | from R29 | — |
+| 70 | Where is a sentence of mine that was recorded nowhere? | unknown | story `ST.ownCalc28` | from R29 | — |
+| 71 | Where is the line I moved, and how do I bring it back? | claimed by R28 fixer, to verify (story C95) | a40 `mvApply28` | from R29 | — |
+| 72 | Which of my forecasts were not recorded because of how I phrased the confidence? | claimed by R28 fixer, to verify (forecast C90/C118) | a41 | from R29 | — |
