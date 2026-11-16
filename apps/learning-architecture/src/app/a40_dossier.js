@@ -171,7 +171,7 @@
   A.dossierDedupRet = dedupRet22;
   /* دورِ ۲۷b (history، R6 «یک صدا»؛ D26-2 بانکِ R27 #232، D27-15 بانکِ R27 #168): یک جمله یک سطر در 📜.
      (۱) جمله‌ای که دفترِ «کارِ پیشین» (cprior) گامِ خودش کرد نوعِ همان گام را دارد — همان جمله دیگر «برنامهٔ خودت»، «طرح» یا «حدس · آزموده نشده» نمی‌شود (رکوردها دست نمی‌خورند؛ فقط نمایشِ دوباره نمی‌آید).
-     (۲) «برنامهٔ خودت» (a41، با موعد و سرانجام) و «طرح» (داستانِ a45) ِ همان جمله یک سطرند: «برنامهٔ خودت» می‌ماند و گام‌های «طرح» زیرش می‌آید.
+     (۲) «برنامهٔ خودت» (a41، با موعد و سرانجام) و «طرح» (داستانِ a45) ِ همان جمله یک سطرند: «طرح» می‌ماند (🧭 گام‌هایش را می‌خواند) و موعد/⏰/تاریخچهٔ «برنامهٔ خودت» زیرش می‌آید.
      (۳) حدسِ فرم و حدسِ گفت‌وگو با همان متن یک سطرند (آن‌که سرانجام یا منبع دارد). همسانی = متنِ نرمال‌شدهٔ یکی دیگری را (از ۱۲ نویسه به بالا) در بر دارد — هرگز واژهٔ مشترک. */
   function dedup27(ev) {
     var nq = function (t) { return nzk(String(t || "").replace(/…\s*$/, "")).replace(/[«»"]/g, "").replace(/[.،؛:!؟?]+\s*$/, "").trim(); };
@@ -179,9 +179,10 @@
     var Q = []; ev.forEach(function (e) { if (e && e.k === "cprior") (e.lines || []).forEach(function (l) { var m = /^(?:گامِ\s*\S+|گیر \(گامِ\s*\S+\))\s*·[^«]*«(.+?)»/.exec(String(l)); if (m) Q.push(m[1]); }); });
     var drop = {};
     ev.forEach(function (e, i) { if (!e || !/^(?:cplan|cplan23|guess)$/.test(e.k) || e.withdrawn) return; var t = (e.lines || [])[0]; if (Q.some(function (q) { return same(q, t); })) drop[i] = 1; });
-    ev.forEach(function (e, i) { if (!e || drop[i] || e.k !== "cplan23") return; var t = (e.lines || [])[0];
-      var host = ev.filter(function (x, j) { return x && !drop[j] && x.k === "cplan" && same((x.lines || [])[0], t); })[0];
-      if (host) { (e.lines || []).slice(1).forEach(function (l) { if ((host.lines || []).indexOf(l) < 0) host.lines.push(l); }); if (!host.src && e.src) host.src = e.src; drop[i] = 1; } });
+    /* «طرح» (با گام‌هایش — همان که 🧭 گام‌به‌گام می‌خواند) می‌ماند؛ موعد/⏰/تاریخچهٔ «برنامهٔ خودت» ِ همان جمله زیرش می‌آید */
+    ev.forEach(function (e, i) { if (!e || drop[i] || e.k !== "cplan") return; var t = (e.lines || [])[0];
+      var host = ev.filter(function (x, j) { return x && !drop[j] && x.k === "cplan23" && same((x.lines || [])[0], t); })[0];
+      if (host) { (e.lines || []).slice(1).forEach(function (l) { if ((host.lines || []).indexOf(l) < 0) host.lines.push(l); }); if (!host.src && e.src) host.src = e.src; if ((e.hist || []).length) host.hist = (host.hist || []).concat(e.hist); drop[i] = 1; } });
     var gs = []; ev.forEach(function (e, i) { if (!e || drop[i] || e.k !== "guess") return; var t = (e.lines || [])[0], o = gs.filter(function (j) { return same((ev[j].lines || [])[0], t); })[0];
       if (o == null) { gs.push(i); return; } var a = ev[o], keepE = (e.out && !/هنوز آزموده نشده/.test(e.out)) && !(a.out && !/هنوز آزموده نشده/.test(a.out)); if (keepE) { drop[o] = 1; gs[gs.indexOf(o)] = i; if (!e.src && a.src) e.src = a.src; } else { drop[i] = 1; if (!a.src && e.src) a.src = e.src; } });
     /* (۴) A27-14 (s07، بانکِ R27 #231): یک ✏️ یک رویداد — ✏️ ِ «۹ ⇐ ۸، ۱۶ ⇐ ۱۵» را صفحه یک بار برای کلِ تکه و یک بار برای هر جفت نوشت (سه «اصلاحِ پیامِ پیشین»).
