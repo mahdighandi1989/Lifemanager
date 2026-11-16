@@ -60229,8 +60229,10 @@ APP.goFromURL = function (q) {
       if (it.k === "plan" && !(L.plan && L.plan.at) && !txt(L.planDraft) && !L.planChat) { L.planDraft = it.t; L.planChat = { t: it.t, at: it.at, mid: it.mid, st: "ask", pieces: it.pieces || [] }; dirty = true; }
       if (it.k === "lb" && L.state === "solved") { var bd = L.bDraft = L.bDraft || {}, lc = L.lbChat = L.lbChat || {}; if (!lc[it.f] && !txt(bd[it.f])) { bd[it.f] = it.t; lc[it.f] = { t: it.t, at: it.at, mid: it.mid, st: "ask", q: it.q }; dirty = true; } }
     });
-    var ph = phaseOfItems(storyOf(s, keyFor(s, pid)).items.concat(L.chatImpItems || []));
+    var I27 = storyOf(s, keyFor(s, pid)).items, ph = phaseOfItems(I27.concat(L.chatImpItems || []));
     if (ph && ph !== L.chatPh && maxPh(L.chatPh, ph) === ph) { L.chatPh = ph; L.chatPhAt = nowIso(); dirty = true; }
+    /* دورِ ۲۷b (A27-5): پس از «حل شد — کنار رفت، اجرا دوباره باز شد» (a38 L.reopened)، جوابِ کلِ تازه‌ای که پس از بازشدن گفت دوباره «بازنگری» است */
+    else if (ph === "b" && L.chatPh === "b" && L.reopened && String(L.reopened.at || "") > String(L.chatPhAt || "") && I27.some(function (x) { return x.k === "res" && x.fin !== false && String(x.at || "") > String(L.reopened.at || ""); })) { L.chatPhAt = nowIso(); dirty = true; }
     if (dirty) { S.put(pg); try { if (A.liveDraftDrop) A.liveDraftDrop(pid); } catch (e) { } }
   }
   ST.feed = feed;
@@ -60238,6 +60240,9 @@ APP.goFromURL = function (q) {
   A.liveStoryPhase = function (pid) {
     var ph = A.livePhase ? A.livePhase(pid) : ""; if (ph === "b" || ph === "done") return ph;
     var pg = S.get("eprog_" + pid), L = (pg && pg.solve && pg.solve.live) || {}; if (L.state === "solved" || L.state === "abandoned") return ph;
+    /* دورِ ۲۷b (history، A27-5 s02 p10–p14): «حل شد» که با اصلاحِ یک داده کنار رفت (a38 setAsideDeps ⇒ L.reopened) اجرا را دوباره باز می‌کند؛ «بازنگری» ِ داستان که پیش از
+       بازشدن رسیده بود دیگر مرحله نیست — مرحله «اجرا» است تا جوابِ کلِ تازه‌ای پس از بازشدن (feed همان لحظه L.chatPhAt را تازه می‌کند) */
+    if (L.chatPh === "b" && L.reopened && String(L.reopened.at || "") > String(L.chatPhAt || "")) return maxPh(ph, "c");
     return maxPh(ph, L.chatPh || "");
   };
   A.liveStoryAhead = function (pid) { var ph = A.livePhase ? A.livePhase(pid) : "", sp = A.liveStoryPhase(pid); return !!sp && ORD[sp] > ORD[ph || "u"]; };

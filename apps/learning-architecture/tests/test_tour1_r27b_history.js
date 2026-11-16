@@ -148,6 +148,18 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     const T = pts.filter(t => !/^کارِ پیشین — گامِ/.test(t));   // منفی: نقطه‌های گام‌ها همان‌اند
     return [T.length >= 2 && new Set(T).size === T.length && !T.includes('کارِ پیشینِ تو (از گفت‌وگو)') && pts.filter(t => /^کارِ پیشین — گامِ/.test(t)).length === 2, J(pts)]; };
 
+  /* ---------- A27-5 (s02 p8–p14): پس از «حل شد — کنار رفت، اجرا دوباره باز شد» مرحله «اجرا» است، تا جوابِ کلِ تازه ---------- */
+  K.A27_5 = async () => { const r = await ev(async () => { const A = __one('لوله در بارِ وانت', 'یه لوله‌ی صاف ۴ متری دارم، بار وانتم ۳.۲ متر طول، ۱.۸ عرض، ۱.۶ ارتفاع داره. جا میشه یا نه؟');
+      await __turn('قطر کف با ارتفاع: sqrt(3.67^2 + 1.6^2) ≈ 4.005. جا میشه! حلش کردم دیگه، حل شد!', [cs({ ph: 'b', said: ['result'], result: 'جا میشه' })]);
+      const o = { ph0: APP.liveStoryPhase(A) };
+      /* همان کاری که a38 setAsideDeps با اصلاحِ «۱.۶ ⇒ ۱۵۰ سانت» می‌کند (L.state باز، L.reopened) — بی تغییرِ دیگر */
+      const pg = APP.S.get('eprog_' + A), L = pg.solve.live; await new Promise(res => setTimeout(res, 5)); L.reopened = { at: new Date().toISOString(), why: 'یک داده‌ای که به کار رفته بود عوض شد' }; L.state = 'open'; APP.S.put(pg);
+      o.ph1 = APP.liveStoryPhase(A);
+      await __turn('یه لولهٔ کوتاه‌تر هم دارم، ۳٫۹۵ متری؛ ۳٫۹۷ − ۳٫۹۵ = ۰٫۰۲ متر جا دارم', [cs({ ph: 'b', said: ['d'] })]); o.ph2 = APP.liveStoryPhase(A);
+      await __turn('دوباره حساب کردم: sqrt(3.2^2 + 1.8^2 + 1.5^2) ≈ 3.97 — از ۴ کمتره، پس جواب شد: لوله جا نمیشه.', [cs({ ph: 'b', said: ['result'], result: 'جواب شد: لوله جا نمیشه' })]); o.ph3 = APP.liveStoryPhase(A);
+      return o; });
+    return [r.ph0 === 'b' && r.ph1 === 'c' && r.ph2 === 'c' && r.ph3 === 'b', J(r)]; };   // منفی در همان بخش: جوابِ کلِ تازه پس از بازشدن دوباره «بازنگری» است
+
   /*__MORE__*/
 
   // ---------- اجرا ----------
