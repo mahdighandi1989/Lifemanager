@@ -5318,3 +5318,5 @@ dated stability, mind-card feed) under way.
 - 2026-11-16 · DECISION · نقشهٔ راهِ منبع‌ها §۲۲: شاخص‌های پیشرفت کنارِ درصدِ سبز (S1/S2 در هر سناریو، خانوادهٔ تازه/تکراری، نقصِ ادغام، «ساخته نشد» ِ مانده)؛ معیارِ سبز پایین نمی‌آید.
 
 - 2026-11-16 · DECISION · DECISIONS_R28: دورِ ۲۸ ۱۷/۱۰۶ پاس، ۴ S1 (سه خانواده)؛ نخستین جدولِ شاخص‌های §۲۲: ۱۰ از ۱۴ خانوادهٔ S2 تکراری‌اند — کارهایی که با اثباتِ واحد «انجام شد» گزارش شده بود. قاعدهٔ C101: هر اصلاح با بازپخشِ صفحه‌ای هم اثبات شود. FIX28 با هفت اصلاح‌گر.
+
+- 2026-11-16 · CHANGE · Pólya R28 fixer «correction» (C87/C88/C89, F7/F8): correction pair taken from her own words (named X / restated sentence; ask when absent or ambiguous); result fixes never touch a datum; acceptance works in ledger, live and chat problems and names a stale base; proposals use the current value of every corrected datum and only earlier-written sources. Tests: test_tour1_r28_correction.js (8 replays, red on BASE28), R28 bank R2 (see fixer report). WORKLOG 148.

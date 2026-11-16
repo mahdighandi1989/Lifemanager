@@ -31,6 +31,10 @@ const CASES = {
     base: 'no line; step 1 unchanged and its stale mark silently removed',
     check: (x) => { const b = x.books.filter(k => k.steps.some(s => /روز دوم/.test(s.t)))[0] || { steps: [] }, s1 = b.steps[0] || {}, L = x.sys[x.sys.length - 1] || '';
       return { ok: /۱۰ × ۲ = ۲۰/.test(s1.t) && /پذیرفتی — گامِ ۱/.test(L) && /۳۶ ⇒ ۳۰/.test(L), got: { s1, L: L.slice(0, 400) } }; } },
+  // A28-38 (pwA2 p7): «۳ ⇒ ۲٫۵» — آن «۱۲» ِ «۱۲ تقسیم بر ۴ میشه ۳» صفحه‌های مانده بود (هم‌رقمِ «روز اول ۱۲ صفحه» و هم‌رقمِ حاصلِ کهنهٔ «مونده … = ۱۲»)
+  A_pwA2_p7: { fx: 'A_pwA2', upto: 54, name: 'A28-38 pwA2: an operand equal both to the corrected datum and to an earlier stale result has two meanings — «۳» is stale but gets no number (never «۳ ⇒ ۲٫۵»); ۲۴ ⇒ ۲۰، ۳۶ ⇒ ۳۰، ۱۲ ⇒ ۱۸ stay exact',
+    base: '«… ۱۲ ⇒ ۱۸، ۳ ⇒ ۲٫۵»',
+    check: (x) => { const L = corrLines(x).pop() || ''; return { ok: !/۳ ⇒ ۲٫۵/.test(L) && /۲۴ ⇒ ۲۰/.test(L) && /۳۶ ⇒ ۳۰/.test(L) && /۱۲ ⇒ ۱۸/.test(L) && /«۳»/.test(L), got: L.slice(0, 600) }; } },
   // B28·D8 (nB1 p4): «سومی رو قبول دارم …: ۲ میلیون و ۸۰۰ منهای ۵۰۰ هزار میشه ۲ میلیون و ۳۰۰» ⇒ «داده: «۳۰۰» (اصلاح شد ⇐ «۸۰۰»)»
   B_nB1_p4: { fx: 'B_nB1', upto: 4, name: 'B28·D8 nB1: fixing a RESULT changes only the result fragment «۲ میلیون و ۵۰۰ ⇒ ۲ میلیون و ۳۰۰»; the glue datum «۸۰۰» is never touched',
     base: '«داده به حرفِ خودت: «۳۰۰» (اصلاح شد ⇐ «۸۰۰»)»',

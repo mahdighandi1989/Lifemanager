@@ -4763,7 +4763,12 @@
     /* دورِ ۲۷ (R2، B27·D8 s17 «۱۶٫۸ ⇒ ۱۸» = ۲۴ × ۰٫۷۵ در حالی که خودِ ۲۴ از اصلاحِ پیشین کهنه بود ⇒ ۲۱٫۶): عملوندی که اصلاحِ پیشینِ بازمانده کهنه‌اش کرده با مقدارِ تازهٔ همان
        اصلاح در بازحساب می‌آید (۲۱٫۶ × ۰٫۷۵ = ۱۶٫۲)، و اگر آن یکی پرسیده شده بود (بی عدد) بازحسابِ این هم پرسیده می‌شود */
     var PREV27 = opt.prev27 || [], prevOf = function (o) { var k = RC[o.ri].k; return PREV27.filter(function (x) { return x.k === k && veq(x.v, o.v); })[0] || null; };
-    var newV = function (o) { if (o.root) return o.root.q.nore ? null : o.root.q.b / rk26(o); var d = o.der || derOf(o); if (d && !o.given) return d.re; var p27 = prevOf(o); if (p27) return p27.re == null ? null : p27.re; return o.v; };   // مقدارِ «پس از اصلاح»
+    /* دورِ ۲۸ (R2، C89/C110؛ A28-38 pwA2 «۱۲ تقسیم بر ۴ میشه ۳» ⇒ «۳ ⇒ ۲٫۵»: آن «۱۲» صفحه‌های مانده بود — هم‌رقمِ دادهٔ «روز اول ۱۲ صفحه» و هم‌رقمِ حاصلِ کهنهٔ «مونده … = ۱۲» که پیش‌تر نوشته شد):
+       عددی که هم مقدارِ پیشینِ داده است و هم حاصلِ کهنه‌ای که پیش از آن نوشته شد با بازحسابِ دیگر، دو معنا دارد ⇒ کهنه است ولی عددی پیشنهاد نمی‌شود (پرسش) — هرگز یکی را حدس نمی‌زند.
+       فقط بیرون از جملهٔ خودِ داده (جایی که داده نام برده شد، همان داده است) */
+    var amb28 = function (o) { if (!o.root || o.root.q.nore || o.zone === "given") return false;
+      var d = der.filter(function (x) { return veq(x.v, o.v) && x.re != null && !after28(x, o) && !(x.ri28 === o.ri) && ucompat25(x.fu, famU25(o)) && !!x.pct === !!o.pct; })[0]; return !!d && !veq(d.re, o.root.q.b / rk26(o)); };
+    var newV = function (o) { if (o.root) return o.root.q.nore || amb28(o) ? null : o.root.q.b / rk26(o); var d = o.der || derOf(o); if (d && !o.given) return d.re; var p27 = prevOf(o); if (p27) return p27.re == null ? null : p27.re; return o.v; };   // مقدارِ «پس از اصلاح»
     var isStaleOp = function (o) { return !!o.root || !!(o.der || (derOf(o) && !o.given)); };
     var mm = function (o, v) { return o.pct ? v / 100 : v; };
     /* «۲+۲=۴»: در جمعِ خالص، دو عددِ هم‌مقدار شاید دو چیزِ جدا باشند (فقط یکی کهنه) ⇒ صفحه عدد پیشنهاد نمی‌کند (C11)؛ در ضرب/توان همان کمیت است («۱۰×۱۰») */
