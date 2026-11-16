@@ -118,6 +118,9 @@
     (se.retracts || []).forEach(function (x) { if (x && x.copy) return;   // دورِ ۲۲: پاسخِ «بله/نه» رویدادِ «copyans» ِ خودش را دارد
       var key = x.at + "|" + x.mid; seen[key] = 1; var sm = msgRef(se.id, x.mid);
       if (pid && (x.changed || []).length && !(x.changed || []).some(function (c) { return !c.pid || c.pid === pid; })) return;
+      /* دورِ ۲۸ (story، A28-13 s03 📜: اصلاحِ برنامهٔ مسئلهٔ اصلی زیرِ مسئلهٔ فرعیِ «اگر ۴ نقطه باشد…» هم): تغییری که مسئله‌ای ندارد (برنامه/موعدِ سشن) مالِ مسئله‌ای است که
+         پیامِ اصلاح‌شده در زمانِ خودش به آن تعلق داشت (A.STORY.owns) — نه مالِ هر مسئلهٔ همان گفت‌وگو */
+      if (pid && !(x.changed || []).some(function (c) { return c.pid === pid; }) && A.STORY && A.STORY.owns) { var sm28 = msgRef(se.id, x.mid); if (!own23((sm28 && sm28.at) || x.at || "")) return; }
       add({ k: "retract", at: x.at, title: "اصلاحِ پیامِ پیشین", lines: [chFa24(x.frag, x.fix)].concat(x.refused ? ["صفحه نپذیرفت: " + (x.err || "")] : x.dup && !(x.changed || []).length ? ["پیش‌تر از همین پیام اصلاح شده بود؛ چیزِ تازه‌ای عوض نشد"] : (x.changed || []).length ? uniq24(x.changed.map(function (c) { return c.label + (typeof c.old === "string" && (c.old || c.new) ? ": " + chFa24(clip(c.old, 80), clip(typeof c.new === "string" ? c.new : val(c.new), 80)) : ""); })) : ["از آن تکه رکوردی ساخته نشده بود"]),
         src: sm && sm.text ? sm : null, out: x.by === "user" ? "با ✏️ ِ خودت" : "از گفت‌وگو", rk: x.mid + "|" + x.frag + "|" + x.fix }); });
     /* دورِ ۲۱ (R4، C21-14، bank #96): اصلاح‌های گفت‌وگو همه — هم آن‌ها که چیزی را عوض کردند، هم بی‌اثر و ردشده (با همان سطرِ ساده)؛ یک بار برای هر اصلاح */

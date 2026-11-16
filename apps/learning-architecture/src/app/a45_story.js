@@ -480,8 +480,9 @@
        مسئلهٔ تازه‌ای که همین نوبت از جمله‌ای وسطِ همین پیام ساخته شد (chat_invent/live_new) مالکِ هر چیزی است که او از همان جمله به بعد گفت؛ آنچه پیش از آن گفت مالِ
        مسئلهٔ پیشین می‌ماند (پیش‌تر طرحِ مسئلهٔ تازه «گامِ کنونی» ِ مسئلهٔ پیشین شد). */
     var B26 = null; try { B26 = bornFrom26(s, um) || movedTo26(s, um, pid); } catch (e) { B26 = null; }
-    if (B26 && B26.pid !== pid && B26.off > 0) { var kB = "L:" + B26.pid, EB = storyOf(s, kB, true), movedB = [];
-      I = I.filter(function (it) { if (it.k === "prior") return true; var ix = ut.indexOf(String(it.t || "").replace(/…$/, "").slice(0, 16)); if (ix < B26.off) return true;
+    if (B26 && B26.kb) I = I.filter(function (it) { return it.k === "prior"; });
+    else if (B26 && B26.pid !== pid && B26.off >= 0) { var kB = "L:" + B26.pid, EB = storyOf(s, kB, true), movedB = [];
+      I = I.filter(function (it) { if (it.k === "prior") return true; var ix = ut.indexOf(String(it.t || "").replace(/…$/, "").slice(0, 16)); if (B26.off > 0 && ix < B26.off) return true;
         if (!EB.items.some(function (x) { return x.k === it.k && x.mid === m0 && nz(x.t) === nz(it.t); })) { it.at = at; it.mid = m0; it.n = EB.items.length + 1; EB.items.push(it); movedB.push(it); logEv(s, B26.pid, it, um, kB); } return false; });
       if (movedB.length) feed(B26.pid, s, movedB, um); }
     I.forEach(function (it) {
@@ -1286,8 +1287,8 @@
   /* بانکِ R26 #84: کنشِ همین نوبت (chat_invent/live_new) صورتی را از وسطِ همین پیام برداشت و آن را مسئلهٔ **موجودِ** دیگری شناخت («پیش‌تر ثبت شده بود؛ دوباره نساختم») ⇒ همان مرز:
      از همان جمله به بعد مالِ همان مسئله است. C.moved26 = [{ mid, pid, off }] — هم برای دفترِ داستان (onState) و هم مالکِ «برنامهٔ خودت» (ST.planOwner). */
   function movedTo26(se, um, pid) {
-    var k = mid(um), M = (((se && se.coach) || {}).moved26 || []).filter(function (x) { return x && x.mid === k && x.pid !== pid && x.off > 0; }).pop();
-    return M ? { pid: M.pid, off: M.off } : null;
+    var k = mid(um), M = (((se && se.coach) || {}).moved26 || []).filter(function (x) { return x && x.mid === k && x.pid !== pid && x.off >= 0; }).pop();
+    return M ? { pid: M.pid, off: M.off, kb: M.kb } : null;
   }
   ["chat_invent", "live_new"].forEach(function (nm) {
     if (!AS.DO || typeof AS.DO[nm] !== "function" || AS.DO[nm]._r26story) return; var raw = AS.DO[nm];
@@ -1295,8 +1296,14 @@
       var s0 = AS._turnSession, um = s0 ? lastUser(s0) : null, ids0 = {}; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { ids0[r.p.id] = 1; }); } catch (e) { }
       var out = raw.apply(this, arguments);
       try { var stA = txt(a && a.statement), off = um && stA ? stmtOff26(String(um.text || ""), stA) : -1;
-        if (off > 0) { var all = A.liveAll ? A.liveAll() : [], nw = all.filter(function (r) { return !ids0[r.p.id]; })[0], tg = nw ? nw.p.id : ((all.filter(function (r) { return sameProb26(stA, r.p.statement) || (a.title && nz(r.p.title) === nz(a.title)); })[0] || { p: {} }).p.id || "");
-          if (tg) { var C0 = s0.coach = s0.coach || {}; (C0.moved26 = C0.moved26 || []).push({ mid: mid(um), pid: tg, off: off }); if (C0.moved26.length > 30) C0.moved26 = C0.moved26.slice(-30); } } } catch (e) { }
+        /* دورِ ۲۸ (story، A28-27 s08 p8 «خودم یه معما ساختم: … ۹−۵=۴، بعد ۹+۴=۱۳»): پیامی که از نخستین واژه‌اش مسئلهٔ تازه است (off = 0) هم مرزِ همین مسئله است — همهٔ آنچه در آن گفت
+           مالِ مسئلهٔ تازه است، نه مسئلهٔ پیشینِ سشن (پیش‌تر فقط off > 0 ⇒ نتیجهٔ معمای تازه زیرِ معمای مادر هم می‌نشست). off = 0 فقط برای مسئلهٔ تازه‌ساخته، نه پیوند به مسئلهٔ موجود. */
+        var nw0 = (A.liveAll ? A.liveAll() : []).filter(function (r) { return !ids0[r.p.id]; })[0];
+        if (off > 0 || (off === 0 && nw0)) { var all = A.liveAll ? A.liveAll() : [], nw = all.filter(function (r) { return !ids0[r.p.id]; })[0], tg = nw ? nw.p.id : ((all.filter(function (r) { return sameProb26(stA, r.p.statement) || (a.title && nz(r.p.title) === nz(a.title)); })[0] || { p: {} }).p.id || "");
+          if (tg) { var C0 = s0.coach = s0.coach || {}; (C0.moved26 = C0.moved26 || []).push({ mid: mid(um), pid: tg, off: off }); if (C0.moved26.length > 30) C0.moved26 = C0.moved26.slice(-30); } }
+        /* همان پیامِ سراسر تازه که در بازنگریِ مسئلهٔ پیشین نگه داشته شد (keepback، بی رکوردِ زنده): هیچ قلمی از آن در داستانِ مسئلهٔ پیشین نمی‌نشیند — وقتی همان مسئله زنده شود
+           (chat_solved/«باز کن») واردکردنِ گفت‌وگو همین پیام را به خودش می‌برد (A28-27: نتیجهٔ معمای تازه هم زیرِ معمای مادر بود و هم زیرِ خودش) */
+        else if (off === 0 && !nw0 && out && typeof out === "object" && /نگه داشتم/.test(String(out.info || ""))) { var C1 = s0.coach = s0.coach || {}; (C1.moved26 = C1.moved26 || []).push({ mid: mid(um), pid: "", off: 0, kb: 1 }); } } catch (e) { }
       return out;
     };
     Object.keys(raw).forEach(function (k) { AS.DO[nm][k] = raw[k]; }); AS.DO[nm]._r26story = true;
@@ -1310,7 +1317,7 @@
     var at = String((sm && sm.at) || q.at || "");
     try { var bp = null;
       if (sm && sm.mid) S.all("eprog", function (pg) { var I = pg && pg.solve && pg.solve.live && pg.solve.live.chatImp; return !!(I && I.sess === se.id && I.bmid === sm.mid && I.boff > 0); }).forEach(function (pg) { bp = { pid: String(pg.id).replace(/^eprog_/, ""), off: pg.solve.live.chatImp.boff }; });
-      if (!bp && sm && sm.mid) { var mv = (((se && se.coach) || {}).moved26 || []).filter(function (x) { return x && x.mid === sm.mid && x.off > 0; }).pop(); if (mv) bp = { pid: mv.pid, off: mv.off }; }
+      if (!bp && sm && sm.mid) { var mv = (((se && se.coach) || {}).moved26 || []).filter(function (x) { return x && x.mid === sm.mid && x.off >= 0; }).pop(); /* دورِ ۲۸ (A28-27): پیامِ سراسر تازه هم */ if (mv) bp = { pid: mv.pid, off: mv.off }; }
       if (bp) { var ix = String(sm.text || "").indexOf(String(q.text || "").replace(/…$/, "").slice(0, 16)); if (ix >= bp.off) return bp.pid; } } catch (e) { }
     var o = pidAt(se, at); if (o) return o;
     var own = ""; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { if (!own && r && r.p && ST.owns(se, r.p.id, at)) own = r.p.id; }); } catch (e) { }
@@ -1983,7 +1990,9 @@
     var um = lastUser(s); if (!um || !s || isSysT28(um.text)) return false; var C = s.coach = s.coach || {}, ut = String(um.text || ""), m0 = mid(um);
     if (CORRMSG24.test(ut) || (AS.RECALL22 && AS.RECALL22.test(ut)) || (C.ask26 && C.ask26.open && C.ask26.key === nz(ut).slice(0, 80))) return false;
     var so = C.saidOk && C.saidOk.at === String(um.at || "") ? C.saidOk : null, bl = null; try { bl = AS.boundLive ? AS.boundLive(s) : null; } catch (e) { }
-    var pid = (so && so.live) || (bl && !bl.done && bl.pid) || ""; if (!pid && !C.stmt) return false;
+    var pid = (so && so.live) || (bl && !bl.done && bl.pid) || ""; if (!pid && !C.stmt && bl && bl.pid) pid = bl.pid;   // مسئلهٔ بستهٔ همین گفت‌وگو (aA1 p10: حسابِ داداش پس از حلِ مسئله)
+    var mv28 = null; try { mv28 = bornFrom26(s, um) || movedTo26(s, um, pid); } catch (e) { } if (mv28 && mv28.kb) return false; if (mv28 && mv28.pid && mv28.off === 0) pid = mv28.pid;   // پیامِ سراسر تازه مالِ مسئلهٔ خودش است (A28-27)
+    if (!pid && !C.stmt) return false;
     var key = keyFor(s, pid), E = storyOf(s, key, true), mine = function () { var o = []; Object.keys(C.story || {}).forEach(function (k) { (C.story[k].items || []).forEach(function (x) { if (x && x.mid === m0) o.push(x); }); }); return o; };
     var I = [], OW = null; try { OW = ST.otherWork27(ut); } catch (e) { }
     if (OW && /[0-9۰-۹]/.test(OW.text) && !mine().some(function (x) { return x.k === "other"; })) I.push({ k: "other", t: clip(OW.text, 300), who: OW.who });

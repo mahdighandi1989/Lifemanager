@@ -36,6 +36,24 @@ const DIR = path.join(__dirname, 'fixtures', 'r28_story');
       && x.back.length === 1 && /برگشت به «دست‌دادن‌های مهمانی»/.test(x.back[0]) && !/— جابه‌جا شد/.test(x.back[0].split(' ¦ ')[0]) && !R.errors.length;
     return [ok, J(R)]; };
 
+  /* همهٔ سطرهای پرونده‌های همهٔ مسئله‌ها و گفت‌وگوها (همان مدلی که نما می‌سازد) */
+  const ALL = () => { const o = []; const ids = APP.S.all('eprob', r => r && r.live && r.p).map(r => r.p.id).concat(APP.S.all('achat', x => x && x.msgs && x.msgs.length).map(s => s.id));
+    ids.forEach(p => (APP.dossier(p).events || []).forEach(e => o.push([p, e.k, (e.title || '') + ' ¦ ' + (e.lines || []).join(' ¦ ')]))); return o; };
+  /* F9 / C96 — A28-29 + A28-30 (A aA1): جملهٔ خودِ کودک «مامانم کمکم کرد …» مالِ خودش؛ «داداشم یه حسابِ دیگه کرد: … ۳ × ۴۰۰ = ۱۲۰۰» «کارِ دیگری» با نشان (مدل coach_state نفرستاد) */
+  K.A_aA1_C96 = async () => { const R = await run('A_aA1', 0, '(' + ALL.toString() + ')()');
+    const o = R.x.filter(r => r[1] === 'cother'), ok = !o.some(r => /کمکم کرد/.test(r[2])) && o.some(r => /داداشم یه حسابِ دیگه کرد/.test(r[2]) && /حسابِ صفحه: ✓/.test(r[2])) && !R.errors.length;
+    return [ok, J({ o, e: R.errors })]; };
+  /* F9 / C96 — C28-8 (C aC1 p15): «داداشم یه حسابِ دیگه هم کرد: ۴ × ۲۵۰ = ۹۰۰» «کارِ دیگری» با ✗ */
+  K.C_aC1_C96 = async () => { const R = await run('C_aC1', 0, '(' + ALL.toString() + ')()');
+    const o = R.x.filter(r => r[1] === 'cother'); return [o.some(r => /۴ × ۲۵۰ = ۹۰۰/.test(r[2]) && /حسابِ صفحه: ✗/.test(r[2])) && !o.some(r => /^[^¦]*¦ »/.test(r[2])) && !R.errors.length, J(o)]; };
+  /* F9 / C96 — B28·D12 (B s20 p1): پارامترهای خودش با نقلِ بی‌حسابِ استاد «کارِ دیگری» نمی‌شوند */
+  K.B_s20_C96 = async () => { const R = await run('B_s20', 0, '(' + ALL.toString() + ')()'); const o = R.x.filter(r => r[1] === 'cother'); return [!o.length && !R.errors.length, J(o)]; };
+  /* F9 / C125 — D28-11 (D tD1 p2): «فروشنده پرت رو ۱۲ درصد گفته بود» منبعِ داده است، نه «کارِ دیگری»؛ حسابِ داداش (p9) کارِ دیگری می‌ماند */
+  K.D_tD1_C125 = async () => { const R = await run('D_tD1', 0, '(' + ALL.toString() + ')()'); const o = R.x.filter(r => r[1] === 'cother');
+    return [!o.some(r => /فروشنده/.test(r[2])) && o.some(r => /داداشم حساب کرد/.test(r[2])) && !R.errors.length, J(o)]; };
+  /* A28-12 (A s02 p13, p15): حساب‌هایی که مدل گزارش نکرد در پروندهٔ «لوله در بارِ وانت» */
+  K.A_s02_A28_12 = async () => { const R = await run('A_s02', 0, '(' + ALL.toString() + ')()'); const c = R.x.filter(r => /^c(?:calc|res|data|step)$/.test(r[1]) && /^pb_l_/.test(r[0]));
+    return [c.some(r => /۱۳\/۱۲ = ۱/.test(r[2])) && c.some(r => /√\(۱۵² \+ ۸²\) ≈ ۱۷/.test(r[2])) && !R.errors.length, J(c.map(r => r[2].slice(0, 120)))]; };
   /*@@MORE@@*/
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 1500)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }

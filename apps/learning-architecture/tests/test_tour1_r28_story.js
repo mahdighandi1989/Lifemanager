@@ -129,6 +129,21 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await turnA('۴ تقسیم بر ۲ = ۲ متر. کفِ وانت هم ۲ متره.', [csx({ ph: 'e', said: ['result'], result: '۴ تقسیم بر ۲ = ۲ متر' })]);
     await turnA('فردا ساعت ۸ می‌برمش.', [csx({ ph: 'e', said: [] })]);
     const R = await calcs(A); return [!R.some(x => /^ccalc/.test(x)) && R.some(x => /^cres/.test(x)), J(R)]; };
+  /* ---------- F11 / C97 (B28·D10 oB1 c21) و A28-27 (s08 p8): مسئلهٔ جدا رکوردِ خودش؛ پیامی که سراسر مسئلهٔ تازه است در مسئلهٔ مادر نمی‌نشیند ---------- */
+  const closed = (t, st) => p.evaluate(([t, st]) => { __wipe(); __fresh(); const A = __mk(t, st); APP.liveBindSession(A, __cur(), { force: true }); const pg = APP.S.get('eprog_' + A); pg.solve = pg.solve || {}; pg.solve.live = pg.solve.live || {}; pg.solve.live.state = 'solved'; pg.solve.live.stateAt = APP.nowISO(); APP.S.put(pg); return A; }, [t, st]);
+  const lives = () => p.evaluate(() => APP.S.all('eprob', r => r && r.live && r.p).map(r => r.p.title));
+  const newp = (A) => p.evaluate((A) => ((((APP.S.get('eprog_' + A).solve.b || {})[1] || {}).newProbs) || []).map(x => x.title || x.t), A);
+  const OB1 = 'راستی یه مسئله‌ی دیگه هم دارم که به همین بیداری ربط داره ولی جداست: شب‌ها شام رو ساعت ۱۰ می‌خوریم و بعدش خوابم نمی‌بره. می‌خوام اینم حل کنم.';
+  K.C97_oB1 = async () => { const A = await closed('بیدار شدنِ ساعتِ ۶', 'می‌خوام هر روز ساعت ۶ بیدار شم.');
+    await turnA(OB1, [{ do: 'chat_invent', statement: 'شب‌ها شام رو ساعت ۱۰ می‌خوریم و بعدش خوابم نمی‌بره. می‌خوام اینم حل کنم.', title: 'شامِ ساعت ۱۰ و بی‌خوابی', nat: 'life', kind: 'find', from: A }, csx({ ph: 'u', said: [], nat: 'life' })]);
+    const L = await lives(), N = await newp(A); return [L.some(t => /شامِ ساعت ۱۰/.test(t)) && !N.some(t => /شام/.test(t)), J({ L, N })]; };
+  // بدلِ منفی (C126): «اگه … چی؟» در بازنگری همان مسئله می‌ماند — رکوردِ تازه نمی‌شود
+  K.C97_neg_whatif = async () => { const A = await closed('بیدار شدنِ ساعتِ ۶', 'می‌خوام هر روز ساعت ۶ بیدار شم.');
+    await turnA('اگه ساعت ۵ بخوام بیدار شم چی؟ همین روش جواب میده؟', [{ do: 'chat_invent', statement: 'اگه ساعت ۵ بخوام بیدار شم چی؟ همین روش جواب میده؟', title: 'بیداری ساعت ۵', nat: 'life', kind: 'find', from: A }, csx({ ph: 'b', said: [] })]);
+    const L = await lives(); return [!L.some(t => /ساعت ۵/.test(t)), J(L)]; };
+  K.A28_27_s08 = async () => { const A = await closed('ساعت‌شنیِ ۷ و ۱۱ برای ۱۵ دقیقه', 'با ساعت‌شنیِ ۷ و ۱۱ دقیقه‌ای چطور ۱۵ دقیقه اندازه بگیرم؟');
+    await turnA('خودم یه معما ساختم: ساعت‌های ۵ و ۹ دقیقه، چطوری ۱۳ دقیقه؟ حلش کردم: ۹−۵=۴، بعد ۹+۴=۱۳.', [{ do: 'chat_invent', statement: 'خودم یه معما ساختم: ساعت‌های ۵ و ۹ دقیقه، چطوری ۱۳ دقیقه؟', title: 'ساعت‌شنیِ ۵ و ۹ برای ۱۳ دقیقه', nat: 'objective', kind: 'find', from: A }, csx({ ph: 'b', said: ['result'], nat: 'objective' })]);
+    const D = await p.evaluate((A) => __dos(A).filter(x => /۹−۵|۹ − ۵/.test(x)), A), N = await newp(A); return [!D.length && N.length === 1, J({ D, N })]; };
   /*@@MORE@@*/
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 900)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }

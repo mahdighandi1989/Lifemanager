@@ -1,0 +1,329 @@
+{
+"from": "round28A/aA1",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام من یاسمنم کلاس سومم. یه سوال از کتاب ریاضیمون دارم. مامانم ۳ تا جعبه شیرینی خرید هر جعبه ۸ تا شیرینی داشت. مهمونا ۵ تا خوردن. بقیه رو مامانم بین من و دوتا داداشام مساوی تقسیم کرد. به هر کدوممون چندتا رسید؟ من ۸ تا گرفتم ولی نمیدونم درسته یا نه"
+},
+{
+"eval": "(()=>{const c=document.querySelector(\".age-ask\");return c?c.innerText:\"NOCARD\"})()"
+},
+{
+"eval": "(()=>{const c=document.querySelector('.age-ask');if(!c)return 'NOCARD';const i=c.querySelector('.age-in');i.focus();i.value='۳۱ اسفند ۹۵';i.dispatchEvent(new Event('input',{bubbles:true}));c.querySelector('.btn.sm:not(.ghost)').click();const c2=document.querySelector('.age-ask');return 'INVALID AGE='+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' | card='+(c2?c2.innerText.slice(-220):'GONE')})()"
+},
+{
+"eval": "(()=>{const c=document.querySelector('.age-ask');if(!c)return 'NOCARD';const i=c.querySelector('.age-in');i.focus();i.value='1395/12/12';i.dispatchEvent(new Event('input',{bubbles:true}));c.querySelector('.btn.sm:not(.ghost)').click();const c2=document.querySelector('.age-ask');return 'LATIN AGE='+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' | card='+(c2?c2.innerText.slice(-220):'GONE')})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return (s.msgs||[]).slice(-3).map(m=>m.role+': '+m.text).join('\\n')})()"
+},
+{
+"say": "مامانم کمکم کرد تاریخ رو نوشت. تولدم ۱۲ اسفند ۹۵ ـه. سوال میگه به هر کدوم از ما سه تا بچه چندتا شیرینی رسید"
+},
+{
+"say": "۳ تا جعبه. ۸ تا شیرینی تو هر جعبه. ۵ تا رو مهمونا خوردن. ۳ تا بچه ایم من و داداشام. اااا من ۵ تا رو حساب نکرده بودم! خانم رضایی معلممون تو دبستان شهید بهشتی گفته فردا جوابشو ببریم"
+},
+{
+"say": "اول همه شیرینیا رو میشمارم. ۳ تا ۸ تا میشه ۲۴. بعد ۵ تا رو کم میکنم میشه ۱۹. بعد ۱۹ رو تقسیم بر ۳ میکنم... ولی ۱۹ تقسیم بر ۳ نمیشه! ۳ تا ۶ تا میشه ۱۸ نه ۱۹. گیر کردم"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify({sc:sc&&{k:sc.k||sc.kind,pk:sc.pk},all:APP.PRE.all(sc),rec:APP.PRE.rec&&APP.PRE.rec(sc)&&APP.PRE.rec(sc).id})})()"
+},
+{
+"say": "هر کدوم ۳ تا میگیرن، ۳ و ۳ میشه ۶. یکی اضافه میمونه. ولی مگه میشه؟ خانممون گفته تقسیم باید درست دربیاد"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"🧭 نقشهٔ مسیرِ مسئله\"),t.indexOf(\"🧭 نقشهٔ مسیرِ مسئله\")+1500)})()"
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[2];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');t&&t.scrollIntoView({block:'center'});return g.length+' pts | '+x.getAttribute('aria-label')+' || TIP: '+(t?t.innerText:'')})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"say": "هر کدوم ۳ تا. ۳ تا ۳ تا میشه ۹. یکی باقی‌مانده میشه"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+300)})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+900)})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"say": "۳ تا ۶ تا میشه ۱۸. پس به هر کدوممون ۶ تا میرسه و ۱ دونه باقی‌مانده میمونه. پس ۸ غلط بود!"
+},
+{
+"say": "۶ و ۶ و ۶ میشه ۱۸. با اون یکی باقی‌مانده میشه ۱۹. با ۵ تای مهمونا میشه ۲۴! درسته! حالا اون یکی اضافه رو کی میخوره؟ 😄"
+},
+{
+"say": "کشیدم! هر کدوم ۶ تا شد یکی هم موند. یاد گرفتم همه‌ی عددای سوال رو بنویسم که یکیشو جا نندازم، و اینکه تقسیم میتونه باقی‌مانده داشته باشه. اون سوالت که گفتی همه‌ی عددا رو بنویس بیشتر از همه کمکم کرد. از این سوالا خوشم میاد، مثل معما بود"
+},
+{
+"clock": "2026-10-17"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"سن:\");const j=t.indexOf(\"علتِ\");return t.slice(Math.max(0,i-50),i+900)+\"\\n-----\\n\"+(j>=0?t.slice(j-200,j+900):\"NO CAUSES\")})()"
+},
+{
+"eval": "(()=>{APP.go(\"psy_item\");const m=document.getElementById(\"main\");return m.innerText.slice(0,1500)+\"\\nBTN:\"+[...m.querySelectorAll(\"button,input\")].map(b=>(b.innerText||b.value||b.type).slice(0,30)).join(\" | \")})()"
+},
+{
+"eval": "(()=>{const m=document.getElementById(\"main\");const r=[...m.querySelectorAll(\"input[type=radio]\")];r[1].click();const t=m.querySelector(\"input[type=text],input[type=number]\");if(t){t.value=\"60\";t.dispatchEvent(new Event(\"input\",{bubbles:true}))};const b=[...m.querySelectorAll(\"button\")].find(b=>/ثبتِ پاسخ/.test(b.innerText));b.click();return m.innerText.slice(m.innerText.indexOf(\"🧩 معمای امروز\",200),m.innerText.indexOf(\"🧩 معمای امروز\",200)+900)})()"
+},
+{
+"eval": "(()=>{const m=document.getElementById(\"main\");return m.innerText.slice(-1500)})()"
+},
+{
+"eval": "(()=>{const m=document.getElementById(\"main\");const t=m.innerText;const i=t.indexOf(\"استدلالِ سیال\\tمسئله\");return t.slice(i,i+500)})()"
+},
+{
+"eval": "JSON.stringify({dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what,x.date]),sys:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.role==\"sys\"&&/📅/.test(m.text)).map(m=>m.text.slice(0,200)))})"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvb5ltkw5uh7t');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id+\" \"+r.p.title+\" | \"+(r.live&&r.live.state||\"\")).join(\"\\n\")"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqn8v1z8i\");const t=document.getElementById(\"main\").innerText;return \"N=\"+(t.split(\"از گفت‌وگو\").length-1)+\" | \"+t.slice(t.indexOf(\"🔭\"),t.indexOf(\"🔭\")+2600)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvb5lxkmz7w55');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvb5lxidheqex');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlth6ey93h');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "JSON.stringify(APP.STORY.arithChk(\"۳ تا ۸ تا میشه ۲۴. بعد ۵ تا رو کم میکنم میشه ۱۹\"))"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltnqbzj0j');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "داداشم یه حسابِ دیگه کرد: هر جعبه ۴۰۰ هزار تومن بوده، پس ۳ × ۴۰۰ = ۱۲۰۰ هزار تومن."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const m=s.msgs;let i=m.length-1;while(i>0&&m[i].role!=\"user\")i--;return m.slice(i+1).filter(x=>x.role==\"sys\").map(x=>\"SYS: \"+x.text).join(\"\\n\")||\"(no sys)\"})()"
+},
+{
+"say": "منم همینو قبول دارم، ۱۲۰۰ هزار تومن."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const m=s.msgs;let i=m.length-1;while(i>0&&m[i].role!=\"user\")i--;return m.slice(i+1).filter(x=>x.role==\"sys\").map(x=>\"SYS: \"+x.text).join(\"\\n\")||\"(no sys)\"})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltcicwild');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqn8v1z8i');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"سلام یاسمن! چه خوب که خودت حلش کردی و حالا می‌خوای مطمئن بشی. من نمی‌گم ۸ درسته یا نه؛ با هم نگاهش می‌کنیم. اول بگو: کلِ سؤال رو تو یه جمله و با حرفِ خودت می‌گی؟\", \"title\": \"تقسیمِ شیرینی‌ها\", \"memory\": \"یاسمن، کلاس سوم؛ سؤالِ شیرینی‌ها (۳ جعبهٔ ۸تایی، ۵ تا خورده شد، بین ۳ بچه)؛ خودش ۸ گرفته و مطمئن نیست؛ پرسیدم کلِ سؤال را در یک جمله بگوید.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"result\"], \"result\": \"من ۸ تا گرفتم\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"guess\": {\"text\": \"من ۸ تا گرفتم\"}}]}",
+"{\"reply\": \"آفرین، گفتی سؤال چی می‌خواد: به هر کدوم از شما سه تا بچه چند تا شیرینی رسید. حالا بگو: تو سؤال چه چیزهایی رو می‌دونیم — همهٔ عددهاش رو یکی‌یکی می‌نویسی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"۱۲ اسفند ۹۵\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"چه خوب که همهٔ عددها رو نوشتی و خودت دیدی ۵ تای مهمون‌ها جا مونده بود! حالا با همهٔ این عددها، اول چی کار می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [\"u2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"err_stage\": {\"ph\": \"u\", \"quote\": \"من ۵ تا رو حساب نکرده بودم\"}}]}",
+"{\"reply\": \"تا این‌جا رو خودت درست رفتی: ۲۴ تا شیرینی، ۵ تا کم شد، موند ۱۹ تا. گیرت از خنگی نیست؛ این گام یه چیزِ کوچیک لازم داره که اسمش «تقسیمِ با باقی‌مانده» ـه. بذار ببینم: اگه ۷ تا مداد رو بینِ ۲ نفر مساوی تقسیم کنی، به هر کدوم چند تا می‌رسه و چند تا اضافه می‌مونه؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prereq\": {\"concept\": \"تقسیمِ با باقی‌مانده\", \"step\": \"تقسیمِ ۱۹ شیرینی بینِ ۳ بچه\", \"quote\": \"۱۹ تقسیم بر ۳ نمیشه\"}}]}",
+"{\"reply\": \"حسابت درست بود: هر کدوم ۳ تا و یکی اضافه. بله که می‌شه! اسمش «تقسیمِ با باقی‌مانده» ـه: وقتی چیزها قشنگ تموم نمی‌شن، هر کس سهمِ مساوی‌شو می‌گیره و اونی که می‌مونه «باقی‌مانده» ـه. مثلاً ۹ تا سیب بینِ ۲ نفر: هر کدوم ۴ تا، و ۱ سیب باقی‌مانده. حالا تو بگو: ۱۰ تا بادکنک بینِ ۳ نفر — به هر کدوم چند تا می‌رسه و چند تا باقی‌مانده می‌مونه؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"missing\", \"quote\": \"یکی اضافه میمونه. ولی مگه میشه؟\"}}]}",
+"{\"reply\": \"درسته: هر کدوم ۳ تا و ۱ باقی‌مانده — خودت گفتی «باقی‌مانده»! برگردیم به سؤالِ شیرینی‌ها، همون‌جا که بودی: ۱۹ تا شیرینی بینِ ۳ تا بچه. تا این‌جا داشتی: ۲۴ تا شیرینی، ۵ تا کم شد، موند ۱۹. حالا ۱۹ تا رو چطوری بینِ شما سه تا تقسیم می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prereq_res\": {\"id\": \"pq1\", \"mastery\": \"yes\", \"quote\": \"هر کدوم ۳ تا. ۳ تا ۳ تا میشه ۹. یکی باقی‌مانده میشه\"}}]}",
+"{\"reply\": \"گام رو خودت برداشتی: ۶ تا برای هر کدوم و ۱ باقی‌مانده — و خودت دیدی ۸ جور درنمی‌اومد. من نمی‌گم تموم شد؛ خودت وارسی کن: اگه از جوابت برگردی عقب و همه رو جمع بزنی، به همون ۲۴ تا شیرینیِ اول می‌رسی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"به هر کدوممون ۶ تا میرسه و ۱ دونه باقی‌مانده میمونه\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}}]}",
+"{\"reply\": \"وارسیِ خودت قشنگ بود: ۱۸ و ۱ می‌شه ۱۹، با ۵ تا می‌شه ۲۴ — همهٔ عددهای سؤال تو جوابت اومد. اون یکیِ اضافه رو هم خودتون تصمیم می‌گیرین 😊 یه چیزِ دیگه: می‌تونی همین جواب رو از یه راهِ دیگه هم ببینی، مثلاً با کشیدنِ شیرینی‌ها؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"check\"], \"ans\": [\"b4\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"check\": {\"msgs\": [\"۶ و ۶ و ۶ میشه ۱۸. با اون یکی باقی‌مانده میشه ۱۹. با ۵ تای مهمونا میشه ۲۴\"]}}]}",
+"{\"reply\": \"با کشیدن هم همون شد: هر کدوم ۶ تا و یکی باقی‌مانده. درسِ خودت خیلی خوبه — همهٔ عددهای سؤال رو بنویسی، و این‌که تقسیم می‌تونه باقی‌مانده داشته باشه. سؤال، وارسی، درست، اون پرسشی که کمکت کرد و این‌که این سؤال‌ها رو دوست داری ثبت می‌کنم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"تقسیمِ شیرینی‌ها\", \"statement\": \"مامانم ۳ تا جعبه شیرینی خرید هر جعبه ۸ تا شیرینی داشت. مهمونا ۵ تا خوردن. بقیه رو مامانم بین من و دوتا داداشام مساوی تقسیم کرد. به هر کدوممون چندتا رسید؟\", \"kind\": \"find\", \"lesson\": \"همه‌ی عددای سوال رو بنویسم که یکیشو جا نندازم، و اینکه تقسیم میتونه باقی‌مانده داشته باشه\", \"check\": \"۶ و ۶ و ۶ میشه ۱۸. با اون یکی باقی‌مانده میشه ۱۹. با ۵ تای مهمونا میشه ۲۴\", \"bestQ\": \"اون سوالت که گفتی همه‌ی عددا رو بنویس\", \"taste\": \"از این سوالا خوشم میاد، مثل معما بود\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"check\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"taste\": {\"text\": \"از این سوالا خوشم میاد، مثل معما بود\"}}]}",
+"{\"reply\": \"داداشت پولِ جعبه‌ها را حساب کرده. تو خودت چه فکر می‌کنی — این حساب با تعدادِ جعبه‌ها جور است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"باشد. حالا که پولِ جعبه‌ها را داری، به سؤالِ کتاب برگردیم: جوابِ نهایی‌ات را یک بار دیگر بنویس.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}"
+],
+"keys": [
+"سلام من یاسمنم کلاس سومم. یه سوال از کتاب ریاضیمون دارم. مامانم ۳ تا جعبه شیرینی خرید هر جعبه ۸ تا شیرینی داشت. مهمونا ۵ تا خوردن. بقیه رو مامانم بین من و دوتا داداشام مساوی تقسیم کرد. به هر کدوممون چندتا رسید؟ من ۸ تا گرفتم ولی نمیدونم درس",
+"مامانم کمکم کرد تاریخ رو نوشت. تولدم ۱۲ اسفند ۹۵ ـه. سوال میگه به هر کدوم از ما سه تا بچه چندتا شیرینی رسید",
+"۳ تا جعبه. ۸ تا شیرینی تو هر جعبه. ۵ تا رو مهمونا خوردن. ۳ تا بچه ایم من و داداشام. اااا من ۵ تا رو حساب نکرده بودم! خانم رضایی معلممون تو دبستان شهید بهشتی گفته فردا جوابشو ببریم",
+"اول همه شیرینیا رو میشمارم. ۳ تا ۸ تا میشه ۲۴. بعد ۵ تا رو کم میکنم میشه ۱۹. بعد ۱۹ رو تقسیم بر ۳ میکنم... ولی ۱۹ تقسیم بر ۳ نمیشه! ۳ تا ۶ تا میشه ۱۸ نه ۱۹. گیر کردم",
+"هر کدوم ۳ تا میگیرن، ۳ و ۳ میشه ۶. یکی اضافه میمونه. ولی مگه میشه؟ خانممون گفته تقسیم باید درست دربیاد",
+"هر کدوم ۳ تا. ۳ تا ۳ تا میشه ۹. یکی باقی‌مانده میشه",
+"۳ تا ۶ تا میشه ۱۸. پس به هر کدوممون ۶ تا میرسه و ۱ دونه باقی‌مانده میمونه. پس ۸ غلط بود!",
+"۶ و ۶ و ۶ میشه ۱۸. با اون یکی باقی‌مانده میشه ۱۹. با ۵ تای مهمونا میشه ۲۴! درسته! حالا اون یکی اضافه رو کی میخوره؟ ",
+"کشیدم! هر کدوم ۶ تا شد یکی هم موند. یاد گرفتم همه‌ی عددای سوال رو بنویسم که یکیشو جا نندازم، و اینکه تقسیم میتونه باقی‌مانده داشته باشه. اون سوالت که گفتی همه‌ی عددا رو بنویس بیشتر از همه کمکم کرد. از این سوالا خوشم میاد، مثل معما بود",
+"داداشم یه حسابِ دیگه کرد: هر جعبه ۴۰۰ هزار تومن بوده، پس ۳ × ۴۰۰ = ۱۲۰۰ هزار تومن.",
+"منم همینو قبول دارم، ۱۲۰۰ هزار تومن."
+]
+}
