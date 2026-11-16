@@ -157,6 +157,24 @@
     return out;
   }
   A.dossierDedupRet = dedupRet22;
+  /* دورِ ۲۷b (history، R6 «یک صدا»؛ D26-2 بانکِ R27 #232، D27-15 بانکِ R27 #168): یک جمله یک سطر در 📜.
+     (۱) جمله‌ای که دفترِ «کارِ پیشین» (cprior) گامِ خودش کرد نوعِ همان گام را دارد — همان جمله دیگر «برنامهٔ خودت»، «طرح» یا «حدس · آزموده نشده» نمی‌شود (رکوردها دست نمی‌خورند؛ فقط نمایشِ دوباره نمی‌آید).
+     (۲) «برنامهٔ خودت» (a41، با موعد و سرانجام) و «طرح» (داستانِ a45) ِ همان جمله یک سطرند: «برنامهٔ خودت» می‌ماند و گام‌های «طرح» زیرش می‌آید.
+     (۳) حدسِ فرم و حدسِ گفت‌وگو با همان متن یک سطرند (آن‌که سرانجام یا منبع دارد). همسانی = متنِ نرمال‌شدهٔ یکی دیگری را (از ۱۲ نویسه به بالا) در بر دارد — هرگز واژهٔ مشترک. */
+  function dedup27(ev) {
+    var nq = function (t) { return nzk(String(t || "").replace(/…\s*$/, "")).replace(/[«»"]/g, "").replace(/[.،؛:!؟?]+\s*$/, "").trim(); };
+    var same = function (a, b) { a = nq(a); b = nq(b); if (a.length < 12 || b.length < 12) return a === b && !!a; return a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0; };
+    var Q = []; ev.forEach(function (e) { if (e && e.k === "cprior") (e.lines || []).forEach(function (l) { var m = /^(?:گامِ\s*\S+|گیر \(گامِ\s*\S+\))\s*·[^«]*«(.+?)»/.exec(String(l)); if (m) Q.push(m[1]); }); });
+    var drop = {};
+    ev.forEach(function (e, i) { if (!e || !/^(?:cplan|cplan23|guess)$/.test(e.k) || e.withdrawn) return; var t = (e.lines || [])[0]; if (Q.some(function (q) { return same(q, t); })) drop[i] = 1; });
+    ev.forEach(function (e, i) { if (!e || drop[i] || e.k !== "cplan23") return; var t = (e.lines || [])[0];
+      var host = ev.filter(function (x, j) { return x && !drop[j] && x.k === "cplan" && same((x.lines || [])[0], t); })[0];
+      if (host) { (e.lines || []).slice(1).forEach(function (l) { if ((host.lines || []).indexOf(l) < 0) host.lines.push(l); }); if (!host.src && e.src) host.src = e.src; drop[i] = 1; } });
+    var gs = []; ev.forEach(function (e, i) { if (!e || drop[i] || e.k !== "guess") return; var t = (e.lines || [])[0], o = gs.filter(function (j) { return same((ev[j].lines || [])[0], t); })[0];
+      if (o == null) { gs.push(i); return; } var a = ev[o], keepE = (e.out && !/هنوز آزموده نشده/.test(e.out)) && !(a.out && !/هنوز آزموده نشده/.test(a.out)); if (keepE) { drop[o] = 1; gs[gs.indexOf(o)] = i; if (!e.src && a.src) e.src = a.src; } else { drop[i] = 1; if (!a.src && e.src) a.src = e.src; } });
+    return ev.filter(function (e, i) { return !drop[i]; });
+  }
+  A.dossierDedup27 = dedup27;
   /* کدام مسئله‌ها اصلاحی از این پیام را در دفترِ خودشان (L.retracts) دارند */
   function retPids22(mid) { var o = []; S.all("eprog", function (pg) { var L = pg && pg.solve && pg.solve.live; return !!(L && (L.retracts || []).some(function (x) { return x && x.mid === mid; })); }).forEach(function (pg) { o.push(String(pg.id).replace(/^eprog_/, "")); }); return o; }
   function chatScope(se, pid) { var ps = {}; if (se.lprob) ps[se.lprob] = 1; (se.lprobLog || []).forEach(function (e) { if (e && e.p) ps[e.p] = 1; }); var k = Object.keys(ps); return k.length === 1 && k[0] === pid; }
@@ -239,7 +257,7 @@
     try { var M0 = A.MIND && A.MIND.model ? A.MIND.model() : null, tt = r.p.title;
       ((M0 && M0.events) || []).forEach(function (e) { var mine = e.pid === pid || (e.src && e.src.id === pid) || (tt && String(e.fa || "").indexOf("«" + tt + "»") >= 0); if (!mine) return;
         add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [e.fa], withdrawn: !!e.withdrawn, out: e.withdrawn ? "پس گرفته شد" : "" }); }); } catch (e) { }
-    ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
+    ev = dedup27(dedupRet22(ev)); ev.forEach(cleanEv); sortEv(ev);
     var last = ev.reduce(function (m, e) { return e.at && e.at > m ? e.at : m; }, String(r.updated || ""));
     /* دورِ ۲۰ (RO6، B·D7): یک منبعِ وضع — مرحله‌ها از همان A.livePhase که خطِ «وضع» می‌خواند (مرحلهٔ جاری «در جریان» است، نه «هنوز نرسیده») */
     var ORD = ["u", "p", "c", "b"], pi = ph === "done" ? 4 : Math.max(0, ORD.indexOf(ph));
@@ -279,7 +297,7 @@
           out: f.outcome === "yes" || f.outcome === "درست" ? "شد" : f.outcome === "no" || f.outcome === "نادرست" ? "نشد" : f.outcome ? val(f.outcome) : "هنوز داوری نشده" }); }); } } catch (e) { console.warn(e); }
     /* دورِ ۲۵ (P7، A25-14): پیش‌بینی‌های خودش در همین گفت‌وگو (a41 coach.preds) و سرانجامشان — همان یک رکورد؛ آن‌که 🎯 اش به پروندهٔ تمرینِ همین سشن بسته شد بالا آمده است */
     try { var csP = (typeof cs === "object" && cs) || {}; (((se.coach || {}).preds) || []).forEach(function (x) { if (!x || !x.text) return; var f = predFc27(x); if (f && f.prc && csP[f.prc]) return; add(predEv27(se, x)); }); } catch (e) { console.warn(e); }
-    ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
+    ev = dedup27(dedupRet22(ev)); ev.forEach(cleanEv); sortEv(ev);
     var title = se.title || (first ? clip(first.text, 60) : "گفت‌وگو");
     /* دورِ ۲۱ (R4، C21-13، bank #94): سشنی که مسئلهٔ زنده دارد ⇒ عنوانِ درست و پیوند به پروندهٔ همان مسئله */
     var lv = []; [se.lprob].concat((se.lprobLog || []).map(function (e) { return e && e.p; })).forEach(function (p) { var r = p && A.liveRec && A.liveRec(p); if (r && !lv.some(function (x) { return x.pid === p; })) lv.push({ pid: p, title: r.p.title }); });
