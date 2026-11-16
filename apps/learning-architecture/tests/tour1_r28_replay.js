@@ -36,16 +36,17 @@ async function replay(browser, name, opt) {
     if (t == null || t === '') t = NEUTRAL; note(t); await sync(); return sub(t); });
   await p.clock.install({ time: new Date(fx.t0) });
   if (fx.inject) await ctx.addInitScript(fx.inject + ';window.__off=window.__off||(' + (fx.base || 0) + '*864e5);');
-  const boot = async () => { await p.goto(FILE); await p.waitForSelector('.nav'); if (fx.inject) await p.evaluate(fx.inject);
+  const boot = async () => { await p.evaluate(() => { try { window.__save28 && window.__save28(); } catch (e) { } }).catch(() => { }); await p.goto(FILE); await p.waitForSelector('.nav'); if (fx.inject) await p.evaluate(fx.inject);
     await p.evaluate(() => { APP.S.loaded = true; try { window.__sheets = JSON.parse(localStorage.getItem('__sheets28') || 'null') || window.__sheets || {}; } catch (e) { window.__sheets = window.__sheets || {}; }
       let num = Math.max(100, ...Object.values(window.__sheets).map(x => +x.number || 0));
+      window.__save28 = () => { try { localStorage.setItem('__sheets28', JSON.stringify(window.__sheets || {})); } catch (e) { } };   // merge28 gate: write at once, not only every 200 ms (a reload under load lost the last write)
       if (!window.__sv28) window.__sv28 = setInterval(() => { try { localStorage.setItem('__sheets28', JSON.stringify(window.__sheets || {})); } catch (e) { } }, 200);
       const ask = async (sys, user, opts) => { const t = await window.__ask26({ user, task: (opts || {}).task || '' }); return opts && opts.withMeta ? { text: t, files: [] } : t; };
       APP.HOST = { ai: ask, files: async () => [], mirror: async () => ({ ok: true }), mirrorList: async () => [], mirrorSync: async () => ({ ok: true }),
-        report: async (o) => { const id = 'sh' + (++num); __sheets[id] = { id, number: num, status: 'open', urgent: o.urgent, title: o.text.split('\n')[0], text: o.text, notes: [{ id: 'n0', by: 'owner', at: new Date().toISOString(), text: o.text }] }; return { id, number: num }; },
+        report: async (o) => { const id = 'sh' + (++num); __sheets[id] = { id, number: num, status: 'open', urgent: o.urgent, title: o.text.split('\n')[0], text: o.text, notes: [{ id: 'n0', by: 'owner', at: new Date().toISOString(), text: o.text }] }; window.__save28(); return { id, number: num }; },
         sheets: async () => Object.values(__sheets).map(s => ({ id: s.id, number: s.number, title: s.title, status: s.status, urgent: s.urgent })), sheet: async (id) => __sheets[id] || null,
-        note: async (id, text) => { const s = __sheets[id]; if (s) { s.notes.push({ id: 'o' + Date.now(), by: 'owner', at: new Date().toISOString(), text }); if (s.status === 'answered' || s.status === 'approved') s.status = 'open'; } return { ok: true }; },
-        status: async (id, st) => { if (st !== 'open' && st !== 'approved') throw new Error('422'); if (__sheets[id]) __sheets[id].status = st; return { ok: true }; },
+        note: async (id, text) => { const s = __sheets[id]; if (s) { s.notes.push({ id: 'o' + Date.now(), by: 'owner', at: new Date().toISOString(), text }); if (s.status === 'answered' || s.status === 'approved') s.status = 'open'; } window.__save28(); return { ok: true }; },
+        status: async (id, st) => { if (st !== 'open' && st !== 'approved') throw new Error('422'); if (__sheets[id]) __sheets[id].status = st; window.__save28(); return { ok: true }; },
         remind: async () => ({ ok: true }), unremind: async () => ({ ok: true }), mail: async () => ({ status: 'sent' }) };
       APP.callAI = ask; APP.render(); }); };
   const settle = async () => { try { await p.waitForFunction(() => !(window.APP && APP.ASSIST && APP.ASSIST.busy && APP.ASSIST.busy()), null, { timeout: 15000 }); } catch (e) { } await wait(120); };
