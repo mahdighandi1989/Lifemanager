@@ -92,17 +92,25 @@
           hist: f && (f.verdictHist || []).length ? f.verdictHist.map(function (h0) { return { was: h0.was || "هنوز باز", at: h0.at || "", why: h0.why || "" }; }) : undefined,
           out: o ? o + (x.out && x.out.quote ? " — به گفتهٔ خودت: «" + clip(x.out.quote, 120) + "»" : "") + (f && (f.verdictHist || []).length ? " (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : "") : f && (f.verdictHist || []).length ? "داوری برگشت — دوباره باز (پیش‌تر: «" + f.verdictHist.map(function (h0) { return h0.was || "هنوز باز"; }).join("» ⇐ «") + "»)" : due ? "هنوز داوری نشده" : "هنوز داوری نشده — موعدی نگفتی", src: sm && sm.text ? msgRef(sid, A.liveMsgId ? A.liveMsgId(sm) : "") : null, own27: x.prob || null };
   }
+  function attached27(se, q) { try { return S.all("deadline", function (r) { return r && r.plan && r.plan.id === q.id && (!r.plan.sess || r.plan.sess === se.id); }); } catch (e) { return []; } }
   function addSessEvents(add, se, opt) {
     opt = opt || {}; var pid = opt.pid || "";
     var own23 = function (at, ev) { try { return A.STORY && A.STORY.owns ? A.STORY.owns(se, pid, at, ev) : chatScope(se, pid); } catch (e) { return chatScope(se, pid); } };
     chatPlans(se).forEach(function (q) {
       var lk = q.step || q.will; if (pid && lk && lk.pid && lk.pid !== pid) return;   // پیوندِ برنامه ⇄ گامِ زنده (a41: q.step / q.will)
+      /* دورِ ۲۷b (history، D27-17 s30، بانکِ R27 #224): برنامه‌ای که به پروندهٔ تمرین پیوست (a41 PR.planLink ⇒ q.prc) مالِ همان پرونده است — در 📜 ِ هیچ مسئله‌ای نمی‌آید (پروندهٔ تمرین c.plans نشانش می‌دهد) */
+      if (pid && q.prc) return;
+      /* دورِ ۲۷b (#223): برنامه‌ای که پیش از ثبتِ این مسئله دربارهٔ مسئلهٔ دیگرِ گفت‌وگو گفته شد (a45 importChat ⇒ chatImp.other27) مالِ این مسئله نیست */
+      if (pid && !(lk && lk.pid)) { var im27 = ((prog(pid).live || {}).chatImp) || null, qa27 = (q.src ? (msgRef(se.id, typeof q.src === "object" ? q.src.mid || q.src.msg : q.src) || {}).at : "") || q.at || "";
+        if (im27 && im27.other27 && im27.sess === se.id && qa27 && String(qa27) < String(im27.from || "")) return; }
       /* دورِ ۲۱ (ADDENDUM R4+، A21-14 s03): برنامهٔ یک مسئله هرگز در پروندهٔ مسئلهٔ دیگر — مسئلهٔ برنامه = پیوندش، وگرنه مسئله‌ای که سشن در زمانِ برنامه به آن بسته بود */
       /* دورِ ۲۶ (story Q3، U13/D26-6): یک مالک برای هر برنامه (a45 ST.planOwner — مرزِ پیامِ زایش، بسته بودنِ سشن، پنجرهٔ مسئلهٔ گفت‌وگویی که بعدتر ثبت شد)؛ برنامهٔ بی‌مالک
          فقط در پروندهٔ تنها مسئلهٔ همان سشن می‌آید، نه در هر مسئله (پیش‌تر: planPid ِ خالی ⇒ همهٔ مسئله‌ها) */
       if (pid && !(lk && lk.pid)) { var po26 = A.STORY && A.STORY.planOwner ? A.STORY.planOwner(se, q, q.src ? msgRef(se.id, typeof q.src === "object" ? q.src.mid || q.src.msg : q.src) : null) : planPid(se, q); if (po26 ? po26 !== pid : !!(A.STORY && A.STORY.planOwner) && !chatScope(se, pid)) return; }
       var sm = q.src ? msgRef(se.id, q.src) : null;
-      add({ k: "cplan", at: (sm && sm.at) || q.at || "", title: "برنامهٔ خودت (از گفت‌وگو)", lines: [q.text].concat(q.when ? ["موعد: " + whenFa(q.when)] : []), from: "از گفت‌وگو", src: sm && sm.text ? sm : null,
+      /* دورِ ۲۷b (history، C52/C73؛ گزارشِ dates «📜 still lists it separately»): ⏰ ِ پیوسته به همین 📌 (r.plan) یک تعهد است — سطرِ همین برنامه، نه رویدادِ جدا */
+      var al27 = attached27(se, q).map(function (r) { return "⏰ یادآور (همین برنامه): " + val(r.date) + (r.time ? "، ساعت " + fa(r.time) : "") + (r.done ? " — " + (r.doneBy && r.doneBy.kind === "replaced" ? "جایش را تاریخِ تازه گرفت" : "بسته شد") : ""); });
+      add({ k: "cplan", at: (sm && sm.at) || q.at || "", title: "برنامهٔ خودت (از گفت‌وگو)", lines: [q.text].concat(q.when ? ["موعد: " + whenFa(q.when)] : []).concat(al27), from: "از گفت‌وگو", src: sm && sm.text ? sm : null,
         hist: (q.corr || []).map(function (c) { return { at: c.at, old: val(c.old) + (c.oldWhen && c.oldWhen !== q.when ? " (" + whenFa(c.oldWhen) + ")" : ""), new: val(c["new"]) + (c.oldWhen && c.oldWhen !== q.when ? " (" + whenFa(q.when) + ")" : ""), why: c.note || "" }; }) });
       if (q.done || q.state === "done" || q.state === "notdone") add({ k: "cplandone", at: q.doneAt || "", title: "برنامهٔ خودت — سرانجام", lines: [q.text], out: q.state === "notdone" || q.done === false ? "انجام نشد" : "انجام شد" });
     });
@@ -119,7 +127,11 @@
       if (pid) { var rp = x.src ? retPids22(x.src) : []; if (x.src && (rp.length ? rp.indexOf(pid) < 0 : !chatScope(se, pid))) return; if (!rp.length && A.STORY && A.STORY.fragAt && !own23(A.STORY.fragAt(se, x.frag || (x.x && x.x.msg) || x.msg || "", x.at))) return; }
       var fr = x.frag || (x.x && x.x.msg) || x.msg || "", fx = x.fix || (x.x && x.x.fix) || "", ch = x.changes || x.ch || [];
       if (segot[nzk(x.src) + "|" + nzk(fx)] && !ch.length) return; if (segot["r|" + nzk(fr) + "|" + nzk(fx)] && !ch.length) return;
-      add({ k: "retract", at: x.at, title: "اصلاحِ پیامِ پیشین", lines: [fr || fx ? chFa24(val(fr), val(fx)) : "اصلاح"].concat(x.err ? ["صفحه نپذیرفت: " + val(x.err)] : ch.length ? ch.map(val) : ["چیزی عوض نشد — از آن تکه رکوردی ساخته نشده بود"]), out: x.edit ? "با ✏️ ِ خودت" : "از گفت‌وگو", src: x.src ? msgRef(se.id, x.src) : null }); });
+      /* دورِ ۲۷b (history، B27·D11 s19 p15): سرِ رویداد همان تغییری است که صفحه اعمال کرد — «تکه/درست» ِ گزارشِ مدل («عروسی ۱۵ اسفنده» ⇐ «۱۶ هفته تا …») وقتی هیچ تغییرِ
+         اعمال‌شده‌ای آن «درست» را ندارد، سر نمی‌شود؛ سرِ رویداد جفتِ نخستین تغییرِ اعمال‌شده است («۱۸ هفته» ⇐ «۱۶ هفته») */
+      var hd27 = fr || fx ? chFa24(val(fr), val(fx)) : "اصلاح", CH27 = ch.map(val), pr27 = CH27.map(function (l) { return /«([^»]*)»\s*\(اصلاح شد ⇐ «([^»]*)»\)/.exec(String(l || "")); }).filter(Boolean);
+      if (fx && pr27.length && !pr27.some(function (m0) { var a = nzk(m0[1]).replace(/…/g, "").trim(), b = nzk(fx).replace(/…/g, "").trim(); return a && b && (a.indexOf(b) >= 0 || b.indexOf(a) >= 0); })) hd27 = chFa24(pr27[0][2], pr27[0][1]);
+      add({ k: "retract", at: x.at, title: "اصلاحِ پیامِ پیشین", lines: [hd27].concat(x.err ? ["صفحه نپذیرفت: " + val(x.err)] : ch.length ? ch.map(val) : ["چیزی عوض نشد — از آن تکه رکوردی ساخته نشده بود"]), out: x.edit ? "با ✏️ ِ خودت" : "از گفت‌وگو", src: x.src ? msgRef(se.id, x.src) : null }); });
     /* دورِ ۲۱ (R4، C21-13/C21-14، bank #93): حدس‌های گفت‌وگو و سرانجامشان (تأیید/رد/کنار رفت) */
     /* دورِ ۲۳ (Q3، A23-32): هر رویدادِ گفت‌وگو مالِ مسئلهٔ خودش — مسئله‌ای که سشن در آن لحظه به آن بسته بود یا مسئلهٔ گفت‌وگویی که بعدتر همین مسئلهٔ زنده شد (A.STORY.owns)؛
        «تنها مسئلهٔ زندهٔ سشن» (chatScope) دیگر کافی نیست: حدسِ ۱۰۰ ِ مهمانی مالِ «پیشنهادِ کار» نبود */
@@ -157,6 +169,77 @@
     return out;
   }
   A.dossierDedupRet = dedupRet22;
+  /* دورِ ۲۷b (history، R6 «یک صدا»؛ D26-2 بانکِ R27 #232، D27-15 بانکِ R27 #168): یک جمله یک سطر در 📜.
+     (۱) جمله‌ای که دفترِ «کارِ پیشین» (cprior) گامِ خودش کرد نوعِ همان گام را دارد — همان جمله دیگر «برنامهٔ خودت»، «طرح» یا «حدس · آزموده نشده» نمی‌شود (رکوردها دست نمی‌خورند؛ فقط نمایشِ دوباره نمی‌آید).
+     (۲) «برنامهٔ خودت» (a41، با موعد و سرانجام) و «طرح» (داستانِ a45) ِ همان جمله یک سطرند: «طرح» می‌ماند (🧭 گام‌هایش را می‌خواند) و موعد/⏰/تاریخچهٔ «برنامهٔ خودت» زیرش می‌آید.
+     (۳) حدسِ فرم و حدسِ گفت‌وگو با همان متن یک سطرند (آن‌که سرانجام یا منبع دارد). همسانی = متنِ نرمال‌شدهٔ یکی دیگری را (از ۱۲ نویسه به بالا) در بر دارد — هرگز واژهٔ مشترک. */
+  function dedup27(ev) {
+    var nq = function (t) { return nzk(String(t || "").replace(/…\s*$/, "")).replace(/[«»"]/g, "").replace(/[.،؛:!؟?]+\s*$/, "").trim(); };
+    var same = function (a, b) { a = nq(a); b = nq(b); if (a.length < 12 || b.length < 12) return a === b && !!a; return a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0; };
+    var Q = []; ev.forEach(function (e) { if (e && e.k === "cprior") (e.lines || []).forEach(function (l) { var m = /^(?:گامِ\s*\S+|گیر \(گامِ\s*\S+\))\s*·[^«]*«(.+?)»/.exec(String(l)); if (m) Q.push(m[1]); }); });
+    var drop = {};
+    ev.forEach(function (e, i) { if (!e || !/^(?:cplan|cplan23|guess)$/.test(e.k) || e.withdrawn) return; var t = (e.lines || [])[0]; if (Q.some(function (q) { return same(q, t); })) drop[i] = 1; });
+    /* «طرح» (با گام‌هایش — همان که 🧭 گام‌به‌گام می‌خواند) می‌ماند؛ موعد/⏰/تاریخچهٔ «برنامهٔ خودت» ِ همان جمله زیرش می‌آید */
+    ev.forEach(function (e, i) { if (!e || drop[i] || e.k !== "cplan") return; var t = (e.lines || [])[0];
+      var host = ev.filter(function (x, j) { return x && !drop[j] && x.k === "cplan23" && same((x.lines || [])[0], t); })[0];
+      if (host) { (e.lines || []).slice(1).forEach(function (l) { if ((host.lines || []).indexOf(l) < 0) host.lines.push(l); }); if (!host.src && e.src) host.src = e.src; if ((e.hist || []).length) host.hist = (host.hist || []).concat(e.hist); drop[i] = 1; } });
+    var gs = []; ev.forEach(function (e, i) { if (!e || drop[i] || e.k !== "guess") return; var t = (e.lines || [])[0], o = gs.filter(function (j) { return same((ev[j].lines || [])[0], t); })[0];
+      if (o == null) { gs.push(i); return; } var a = ev[o], keepE = (e.out && !/هنوز آزموده نشده/.test(e.out)) && !(a.out && !/هنوز آزموده نشده/.test(a.out)); if (keepE) { drop[o] = 1; gs[gs.indexOf(o)] = i; if (!e.src && a.src) e.src = a.src; } else { drop[i] = 1; if (!a.src && e.src) a.src = e.src; } });
+    /* (۴) A27-14 (s07، بانکِ R27 #231): یک ✏️ یک رویداد — ✏️ ِ «۹ ⇐ ۸، ۱۶ ⇐ ۱۵» را صفحه یک بار برای کلِ تکه و یک بار برای هر جفت نوشت (سه «اصلاحِ پیامِ پیشین»).
+       رویدادهای اصلاحِ همان پیام (src.mid)، با همان راه (out) و در همان پنج دقیقه یکی می‌شوند: سطرِ نخست سطرِ پهن‌ترین تکه است، سطرِ نخستِ تکه‌ای که در آن هست تکرار نمی‌شود،
+       و هر برچسب یک بار. پیکان‌های پیشنهادِ «کهنه» («(۵ ⇒ ۴، …)») به قراردادِ همین پرونده («تازه ⇐ پیشین») برگردانده می‌شوند — یک قرارداد در هر سطر. */
+    var R = ev.map(function (e, i) { return drop[i] ? null : e; }), labOf = function (x) { var m0 = /^(.{2,80}?):\s*«/.exec(String(x || "")); return m0 ? nzk(m0[1]) : ""; };
+    var core = function (l) { var m0 = /^«([^»]*)»\s*\(اصلاح شد ⇐ «([^»]*)»\)\s*$/.exec(String(l || "")); return m0 ? [nzk(m0[1]), nzk(m0[2])] : null; };
+    R.forEach(function (e, i) { if (!e || e.k !== "retract" || !(e.src && e.src.mid)) return;
+      for (var j = 0; j < i; j++) { var o = R[j]; if (!o || o.k !== "retract" || !(o.src && o.src.mid === e.src.mid) || (o.out || "") !== (e.out || "") || Math.abs((Date.parse(o.at || "") || 0) - (Date.parse(e.at || "") || 0)) > 5 * 60e3) continue;
+        var a = core((o.lines || [])[0]), c = core((e.lines || [])[0]), wide = function (x, y) { return x && y && x[0].indexOf(y[0]) >= 0 && x[1].indexOf(y[1]) >= 0; };
+        var head = wide(c, a) && !wide(a, c) ? e.lines[0] : o.lines[0], other = head === o.lines[0] ? (e.lines || [])[0] : (o.lines || [])[0], seen = {};
+        var L = [head].concat(wide(core(head), core(other)) ? [] : [other]).concat((o.lines || []).slice(1)).concat((e.lines || []).slice(1)).filter(function (x, k, X) { if (X.indexOf(x) !== k) return false; var lb = labOf(x); if (!lb || k === 0) return true; var key = lb + "|" + (core(String(x).replace(/^[^:]*:\s*/, "")) || [""])[0]; if (seen[key]) return false; seen[key] = 1; return true; });
+        o.lines = L; if (e.at && (!o.at || e.at < o.at)) o.at = e.at; R[i] = null; drop[i] = 1; break; } });
+    var arrow27 = function (l) { return String(l).replace(/([0-9۰-۹][0-9۰-۹.٫\/]*)\s*⇒\s*([0-9۰-۹][0-9۰-۹.٫\/]*)/g, "$2 ⇐ $1"); };
+    ev.forEach(function (e, i) { if (e && !drop[i] && e.k === "retract") e.lines = (e.lines || []).map(arrow27); });
+    return ev.filter(function (e, i) { return !drop[i]; });
+  }
+  A.dossierDedup27 = dedup27;
+  /* ---------- دورِ ۲۷b (history، C78؛ مالک بانکِ ۴۲؛ بانکِ R27 #234/#235/#250): «این سطر مالِ مسئلهٔ دیگری است» ----------
+     A.dossierMove27(pid, evId, toPid): سطرِ گفت‌وگوییِ 📜 ِ مسئلهٔ pid (دفترِ رویدادِ L.evlog) با رکوردِ داستانی‌اش (a45 ST.moveItem27) به مسئلهٔ toPid می‌رود.
+     هیچ چیز پاک نمی‌شود: سطرِ اصلی در pid می‌ماند با «جابه‌جا شد ⇒ «…»» (تاریخچه)، رونوشت در toPid با «از «…» جابه‌جا شد» و دکمهٔ برگرداندن.
+     A.dossierUnmove27(toPid, copyId): برمی‌گرداند — هر دو جابه‌جایی در تاریخچهٔ هر دو سطر می‌مانند. فقط سطرهای گفت‌وگو (داده/نتیجه/گام/طرح/… ِ a45) — 🎯 و دفترِ «کارِ پیشین» نه (هنوز). */
+  var MV27 = { cwhole: 1, cunk: 1, ccond: 1, cdata: 1, cplan23: 1, cstep: 1, cres: 1, cother: 1, clb: 1, ctried: 1 };
+  function titleOf27(pid) { var r = A.liveRec ? A.liveRec(pid) : null; return r && r.p ? r.p.title : pid; }
+  function evArr27(pid) { var pg = S.get("eprog_" + pid); if (!pg) return null; var so = pg.solve = pg.solve || {}, L = so.live = so.live || {}; return { L: (L.evlog = L.evlog || []), put: function () { S.put(pg); } }; }
+  A.dossierMove27 = function (pid, evId, toPid) {
+    if (!pid || !toPid || pid === toPid || !evArr27(toPid)) return null; var a0 = evArr27(pid); if (!a0) return null;
+    var e0 = a0.L.filter(function (x) { return x && x.id === evId; })[0]; if (!e0 || e0.moved || !MV27[e0.k]) return null;
+    var at = new Date().toISOString(), mi = A.STORY && A.STORY.moveItem27 ? A.STORY.moveItem27(evId, toPid) : null;
+    var a = evArr27(pid), b = evArr27(toPid), e = a.L.filter(function (x) { return x && x.id === evId; })[0], cid = (mi && mi.id) || (evId + "_mv" + ((e.mvHist || []).length + 1));
+    var cp = Object.assign({}, e, { id: cid, pid: toPid, mvFrom: { pid: pid, at: at, id: evId }, mvHist: (e.mvHist || []).slice() }); delete cp.undone; delete cp.moved;
+    var j = b.L.map(function (x) { return x && x.id; }).indexOf(cid); if (j >= 0) b.L[j] = cp; else b.L.push(cp); b.put();
+    e.moved = { to: toPid, at: at, copy: cid }; (e.mvHist = e.mvHist || []).push({ to: toPid, at: at }); a.put();
+    return { id: cid };
+  };
+  A.dossierUnmove27 = function (toPid, copyId) {
+    var b = evArr27(toPid); if (!b) return null; var cp = b.L.filter(function (x) { return x && x.id === copyId; })[0]; if (!cp || !cp.mvFrom || cp.undone) return null;
+    var a = evArr27(cp.mvFrom.pid); if (!a) return null; var e = a.L.filter(function (x) { return x && x.id === cp.mvFrom.id; })[0]; var at = new Date().toISOString();
+    try { if (A.STORY && A.STORY.moveItem27) A.STORY.moveItem27(copyId, toPid, true); } catch (x0) { }
+    cp.undone = { at: at }; (cp.mvHist = cp.mvHist || []).push({ to: toPid, at: cp.mvFrom.at }, { back: cp.mvFrom.pid, at: at }); b.put();
+    if (e) { (e.mvHist = e.mvHist || []).push({ back: cp.mvFrom.pid, at: at }); delete e.moved; a.put(); }
+    return { id: e ? e.id : "" };
+  };
+  function mvHistFa27(H) { return (H || []).map(function (x) { return { at: x.at, old: "", new: x.back ? "برگشت به «" + titleOf27(x.back) + "»" : "جابه‌جا شد ⇒ «" + titleOf27(x.to) + "»", why: "" }; }); }
+  function mvView27(pid, e, r) {
+    var H = mvHist27(e);
+    if (e.moved) return Object.assign(e, { withdrawn: true, out: "جابه‌جا شد ⇒ «" + titleOf27(e.moved.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)", hist: H, btns: [] });
+    if (e.undone) return Object.assign(e, { withdrawn: true, out: "برگشت به «" + titleOf27(e.mvFrom.pid) + "» (جابه‌جایی پس گرفته شد)", hist: H, btns: [] });
+    if (e.mvFrom) return Object.assign(e, { out: (e.out ? e.out + " · " : "") + "از «" + titleOf27(e.mvFrom.pid) + "» جابه‌جا شد (به گفتهٔ خودت)", hist: H,
+      btns: [{ label: "↩ برگرداندنِ این سطر به «" + clip(titleOf27(e.mvFrom.pid), 40) + "»", cls: "lp-dunmv", go: function () { A.dossierUnmove27(pid, e.id); A.go("dossier", pid); } }] });
+    if (!MV27[e.k]) return e;
+    var others = []; try { sessionsOf(pid, r).forEach(function (se) { [se.lprob].concat((se.lprobLog || []).map(function (x) { return x && x.p; })).forEach(function (p0) { if (p0 && p0 !== pid && others.indexOf(p0) < 0 && A.liveRec && A.liveRec(p0)) others.push(p0); }); }); } catch (x0) { }
+    if (H.length) e.hist = (e.hist || []).concat(H);
+    if (others.length) e.btns = others.map(function (p0) { return { label: "↪ این سطر مالِ مسئلهٔ «" + clip(titleOf27(p0), 40) + "» است", cls: "lp-dmv", pid: p0, go: function () { A.dossierMove27(pid, e.id, p0); A.go("dossier", pid); } }; });
+    return e;
+  }
+  function mvHist27(e) { return mvHistFa27(e.mvHist); }
   /* کدام مسئله‌ها اصلاحی از این پیام را در دفترِ خودشان (L.retracts) دارند */
   function retPids22(mid) { var o = []; S.all("eprog", function (pg) { var L = pg && pg.solve && pg.solve.live; return !!(L && (L.retracts || []).some(function (x) { return x && x.mid === mid; })); }).forEach(function (pg) { o.push(String(pg.id).replace(/^eprog_/, "")); }); return o; }
   function chatScope(se, pid) { var ps = {}; if (se.lprob) ps[se.lprob] = 1; (se.lprobLog || []).forEach(function (e) { if (e && e.p) ps[e.p] = 1; }); var k = Object.keys(ps); return k.length === 1 && k[0] === pid; }
@@ -231,7 +314,7 @@
     incs.forEach(function (x) { add({ k: "incub", at: x.at, title: "کنار گذاشته تا فردا (مکث)", lines: [x.back ? "بازگشت: " + val(x.back) : "هنوز برنگشته‌ای"] }); if (x.back && x.back.at) add({ k: "incubback", at: x.back.at, title: "بازگشت پس از مکث", lines: [val(x.back.t) || "—"] }); });
     (L.checkins || []).forEach(function (x) { add({ k: "checkin", at: x.at, title: "میانهٔ راه: چه آموختی؟", lines: [x.prob ? "دربارهٔ مسئله: " + val(x.prob) : "", x.self ? "دربارهٔ خودت: " + val(x.self) : "", x.want ? "هنوز همان را می‌خواهی؟ " + (WANT_FA[x.want] || val(x.want)) : ""].filter(Boolean) }); });
     if (r.woke) add({ k: "woke", at: r.woke, title: "برگشتی سراغِ مسئلهٔ خفته", lines: [r.dormant ? "موعدِ برگشت: " + A.fdate(r.dormant) : ""].filter(Boolean) });
-    (L.evlog || []).forEach(function (e) { add(Object.assign({}, e, { k: e.k || "act" })); });
+    (L.evlog || []).forEach(function (e) { add(mvView27(pid, Object.assign({}, e, { k: e.k || "act" }), r)); });
     /* گفت‌وگوهای همین مسئله: برنامه‌ها، اصلاح‌ها (یک بار — همان که در L.retracts هست تکرار نمی‌شود)، پرسش‌های باز و دفترِ رویدادِ سشن */
     var have = {}; ev.forEach(function (e) { if (e.rk) have[e.rk] = 1; });
     sessionsOf(pid, r).forEach(function (se) { addSessEvents(function (o) { if (o.rk && have[o.rk]) return; if (o.rk) have[o.rk] = 1; add(o); }, se, { pid: pid }); });
@@ -239,7 +322,11 @@
     try { var M0 = A.MIND && A.MIND.model ? A.MIND.model() : null, tt = r.p.title;
       ((M0 && M0.events) || []).forEach(function (e) { var mine = e.pid === pid || (e.src && e.src.id === pid) || (tt && String(e.fa || "").indexOf("«" + tt + "»") >= 0); if (!mine) return;
         add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [e.fa], withdrawn: !!e.withdrawn, out: e.withdrawn ? "پس گرفته شد" : "" }); }); } catch (e) { }
-    ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
+    ev = dedup27(dedupRet22(ev));
+    /* دورِ ۲۷b (#224): «طرح (از گفت‌وگو)» ِ همان جمله‌ای که برنامهٔ پروندهٔ تمرین شد هم در 📜 ِ این مسئله نمی‌آید */
+    try { var PP27 = []; sessionsOf(pid, r).forEach(function (se) { chatPlans(se).forEach(function (q) { if (q.prc) PP27.push(nzk(q.text)); }); });
+      if (PP27.length) ev = ev.filter(function (e) { if (!e || !/^(?:cplan|cplan23)$/.test(e.k)) return true; var t = nzk((e.lines || [])[0]); return !PP27.some(function (x) { return x && t && (x === t || x.indexOf(t) >= 0 || t.indexOf(x) >= 0); }); }); } catch (x27) { }
+    ev.forEach(cleanEv); sortEv(ev);
     var last = ev.reduce(function (m, e) { return e.at && e.at > m ? e.at : m; }, String(r.updated || ""));
     /* دورِ ۲۰ (RO6، B·D7): یک منبعِ وضع — مرحله‌ها از همان A.livePhase که خطِ «وضع» می‌خواند (مرحلهٔ جاری «در جریان» است، نه «هنوز نرسیده») */
     var ORD = ["u", "p", "c", "b"], pi = ph === "done" ? 4 : Math.max(0, ORD.indexOf(ph));
@@ -263,11 +350,18 @@
     var first = (se.msgs || []).filter(function (m) { return m && m.role === "user"; })[0];
     if (first) add({ k: "stmt", at: first.at || "", title: "آغازِ گفت‌وگو", lines: [clip(first.text, 400)] });
     addSessEvents(add, se, {});
-    S.all("deadline", function (x) { return x && x.src && x.src.sess === sid; }).forEach(function (x) { var sm = msgRef(sid, x.src.mid); add({ k: "deadline", at: (sm && sm.at) || x.src.at || "", title: "موعد/یادآور", lines: [x.what, "موعد: " + val(x.date) + (x.time ? "، ساعت " + fa(x.time) : "")], out: x.done ? "انجام شد" : "", src: sm && sm.text ? sm : null,
+    S.all("deadline", function (x) { return x && x.src && x.src.sess === sid && !(x.plan && x.plan.id && (!x.plan.sess || x.plan.sess === sid) && chatPlans(se).some(function (q) { return q.id === x.plan.id; })); }).forEach(function (x) { var sm = msgRef(sid, x.src.mid); add({ k: "deadline", at: (sm && sm.at) || x.src.at || "", title: "موعد/یادآور", lines: [x.what, "موعد: " + val(x.date) + (x.time ? "، ساعت " + fa(x.time) : "")], out: x.done ? "انجام شد" : "", src: sm && sm.text ? sm : null,
       hist: (x.fixHist || []).map(function (y) { return { at: y.at, old: y.old, new: y.new, why: y.why }; }) }); });
     /* دورِ ۲۱ (R4، D·11/C21-13، bank #93/#107/#108): رویدادِ کارنامه با برچسبِ فارسی و پیامِ منبعش — هرگز کلیدِ خام («chat|»، «chatok|»، «rebook:»، «more») */
     var ROW = { u: "فهم", p: "طرح‌ریزی", c: "اجرا", b: "بازنگری" }, HOW = { selfcorr: "خود-اصلاح", plan: "برنامه", own: "به حرفِ خودت", guess: "حدس", check: "وارسی", result: "نتیجه", stuck: "گیر", restate: "بیانِ تازه" };
+    /* دورِ ۲۷b (history، D27-9 arD1 «کارنامه درست، 📜 نه» — دو صدا): رویدادِ گفت‌وگویی که کارنامهٔ ذهن (A.MIND.phases — یک منبع) نشمرد، در 📜 «+» نمی‌گیرد؛
+       همان را می‌گوید: «در کارنامه شمرده نشد» و چرا (نتیجه‌ای که حسابِ صفحه در همان پیام نمی‌خواند، رویدادِ تکراریِ همان کار، …) */
+    var MA27 = null; try { MA27 = {}; ((A.MIND && A.MIND.phases ? A.MIND.phases({}) : { rows: [] }).rows || []).forEach(function (r0) { (r0.acts || []).forEach(function (a) { MA27[a.id] = a; }); }); } catch (e27) { MA27 = null; }
+    var why27 = function (e) { try { if (e.ok && e.how === "res" && e.msg && A.STORY && A.STORY.arithChk && A.STORY.arithNote) { var m = (se.msgs || []).filter(function (m0) { return m0 && m0.role === "user" && (String(m0.id || "") === String(e.msg) || (m0.seq != null && "u" + m0.seq === String(e.msg))); })[0];
+      if (m && A.STORY.arithNote(A.STORY.arithChk(String(m.text || ""))).bad) return "حسابِ صفحه در همین پیام نمی‌خواند (✗)"; } } catch (x) { } return ""; };
     ((se.coachEv || [])).forEach(function (e) { if (!e || !e.at) return; var sm = e.msg ? msgRef(sid, e.msg) : null, row = ROW[e.ph] || "";
+      var id27 = "ev:" + sid + ":" + (e.msg || "") + ":" + e.key, gone27 = !!(MA27 && !e.wd && !e.pend && e.ok && !e.act && (e.src === "chat" || e.src === "chatok" || e.src === "prior") && !MA27[id27]);
+      if (gone27) { var w27 = why27(e); add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [(row ? row + " — " : "") + "در کارنامه شمرده نشد" + (HOW[e.how] ? " (" + HOW[e.how] + ")" : "")], src: sm && sm.text ? sm : null, out: w27 ? "چرا: " + w27 : "", mind: [] }); return; }
       var line = e.fa && !/^(?:chat|chatok|rebook)\b|\|/.test(String(e.fa)) ? val(e.fa) : (row ? row + " " + (e.ok ? "+" : (e.cause === "prereq" || e.cause === "sys") ? "— گیر (ضعفِ مرحله شمرده نشد)" : "−") : "") + (HOW[e.how] ? " — " + HOW[e.how] : "") + (e.rebook ? " — با مقدارِ درست دوباره ثبت شد" : "");
       add({ k: "mind", at: e.at, title: "رویدادِ کارنامهٔ ذهن", lines: [line].concat(sm && sm.text ? [] : []).filter(Boolean), src: sm && sm.text ? sm : null, withdrawn: !!e.wd, out: e.wd ? "پس گرفته شد" : !e.ok && e.cause === "prereq" ? "علت: نبودِ پیش‌نیازِ «" + (e.preC || "") + "» — ضعفِ مرحله شمرده نشد" : !e.ok && e.cause === "sys" ? "علت: " + (e.causeWhy || "کمبودِ ابزار در سامانه") + " — ضعفِ تو شمرده نشد" : "", mind: !e.ok && (e.cause === "prereq" || e.cause === "sys") ? [] : [{ row: row, sign: e.ok ? "+" : "−", withdrawn: !!e.wd }] }); });   // دورِ ۲۲ (P1)
     /* دورِ ۲۱ (R4، B·D5/C21-13، bank #97/#98/#105): تمرین‌هایی که در این گفت‌وگو گزارش شد (practice_log) و پیش‌بینی‌های 🎯 ِ همان پرونده‌ها — هر کدام یک بار */
@@ -279,7 +373,7 @@
           out: f.outcome === "yes" || f.outcome === "درست" ? "شد" : f.outcome === "no" || f.outcome === "نادرست" ? "نشد" : f.outcome ? val(f.outcome) : "هنوز داوری نشده" }); }); } } catch (e) { console.warn(e); }
     /* دورِ ۲۵ (P7، A25-14): پیش‌بینی‌های خودش در همین گفت‌وگو (a41 coach.preds) و سرانجامشان — همان یک رکورد؛ آن‌که 🎯 اش به پروندهٔ تمرینِ همین سشن بسته شد بالا آمده است */
     try { var csP = (typeof cs === "object" && cs) || {}; (((se.coach || {}).preds) || []).forEach(function (x) { if (!x || !x.text) return; var f = predFc27(x); if (f && f.prc && csP[f.prc]) return; add(predEv27(se, x)); }); } catch (e) { console.warn(e); }
-    ev = dedupRet22(ev); ev.forEach(cleanEv); sortEv(ev);
+    ev = dedup27(dedupRet22(ev)); ev.forEach(cleanEv); sortEv(ev);
     var title = se.title || (first ? clip(first.text, 60) : "گفت‌وگو");
     /* دورِ ۲۱ (R4، C21-13، bank #94): سشنی که مسئلهٔ زنده دارد ⇒ عنوانِ درست و پیوند به پروندهٔ همان مسئله */
     var lv = []; [se.lprob].concat((se.lprobLog || []).map(function (e) { return e && e.p; })).forEach(function (p) { var r = p && A.liveRec && A.liveRec(p); if (r && !lv.some(function (x) { return x.pid === p; })) lv.push({ pid: p, title: r.p.title }); });
@@ -418,6 +512,8 @@
     if ((D.pks || []).length > 1) root.appendChild(h("div", { class: "row gap wrap lp-dpks", dir: "rtl", role: "group", "aria-label": "مسئله‌های این گفت‌وگو" }, h("span", { class: "small muted" }, "مسئله‌های این گفت‌وگو: "),
       D.pks.map(function (x, i) { return h("button", { class: "btn ghost sm lp-dpk" + (x.pk === D.pk ? " on" : ""), type: "button", "data-pk": x.pk, onclick: function () { A.go("dossier", D.sid + "|" + x.pk); } }, fa(i + 1) + ") «" + clip(x.title, 40) + "»"); }),
       h("button", { class: "btn ghost sm lp-dpk" + (D.pk === "all" ? " on" : ""), type: "button", "data-pk": "all", onclick: function () { A.go("dossier", D.sid + "|all"); } }, "کلِ گفت‌وگو")));
+    if ((D.prcs || []).length) root.appendChild(h("div", { class: "row gap wrap lp-dprcs", dir: "rtl", role: "group", "aria-label": "پرونده‌های تمرینِ این گفت‌وگو" }, h("span", { class: "small muted" }, "پرونده‌های تمرینِ این گفت‌وگو: "),
+      D.prcs.map(function (x) { return h("button", { class: "btn ghost sm lp-dprc", type: "button", "data-prc": x.id, onclick: function () { A.go("practice", x.id); } }, "🧪 «" + clip(x.title, 40) + "»"); })));
     if (D.sessions.length) root.appendChild(h("div", { class: "card soft small lp-dsess" }, h("strong", {}, "گفت‌وگوهای این مسئله: "), D.sessions.map(function (s, i) { return [i ? " · " : "", h("button", { class: "linkish", type: "button", onclick: function () { openSess(s.id); } }, "💬 " + s.title)]; })));
     var list = h("div", { class: "lp-devents" }), cd = null, box = null;
     D.events.forEach(function (e) {
@@ -428,7 +524,7 @@
         e.out ? h("p", { class: "small lp-dout" }, "سرانجام: ", mx(e.out)) : null,
         (e.hist || []).length ? h("ul", { class: "small muted lp-dhist" }, e.hist.map(function (x) { return h("li", {}, "اصلاح شد ⇐ «", mx(typeof x.old === "string" ? hv(x.old) : x.old && x.old.done ? (DONE_FA[x.old.done] || x.old.done) + (x.old.what ? " — " + x.old.what : "") : A.dossierVal(x.old)), "» → «", mx(typeof x.new === "string" || x.new == null ? hv(x.new, true) : x.new.done ? (DONE_FA[x.new.done] || x.new.done) : A.dossierVal(x.new)), "»" + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); })) : null,
         e.src && e.src.unknown ? h("p", { class: "small muted lp-dsrc" }, "منبع: نامعلوم (پیامی که این از آن آمد پیدا نشد)") : e.src && e.src.text ? h("p", { class: "small muted lp-dsrc" }, "از پیامِ گفت‌وگو: «", mx(clip(e.src.text, 200)), "» ", h("button", { class: "linkish small", type: "button", onclick: function () { openSess(e.src.sess); } }, "💬 باز کردنِ سشن")) : null,
-        (e.btns || []).length ? h("p", { class: "row gap wrap small" }, e.btns.map(function (b0) { return h("button", { class: "btn ghost sm lp-dnewp", type: "button", onclick: b0.go }, b0.label); })) : null,
+        (e.btns || []).length ? h("p", { class: "row gap wrap small" }, e.btns.map(function (b0) { return h("button", { class: "btn ghost sm " + (b0.cls || "lp-dnewp"), type: "button", onclick: b0.go }, b0.label); })) : null,
         (e.mind || []).length ? h("p", { class: "small lp-dmind" }, "کارنامهٔ ذهن: ", e.mind.map(function (m) { return h("span", { class: "chip" + (m.withdrawn ? " lp-dwd" : ""), "data-row": m.row, "data-sign": m.sign || "" }, m.row + " " + (m.sign || "") + (m.withdrawn ? " (پس گرفته شد)" : "")); })) : null));
     });
     if (!D.events.length) list.appendChild(A.empty("هنوز رکوردی نیست."));
@@ -539,17 +635,24 @@
   /* ===== دورِ ۲۳ (Q7، سهمِ «today»؛ قراردادِ story: A.STORY.pkAt/pkWindow) — پروندهٔ گفت‌وگو برای هر مسئلهٔ گفت‌وگو جدا =====
      سشنی که چند مسئلهٔ گفت‌وگو داشت (C.pkLog) پیش‌تر همه را در یک پرونده می‌آورد. حالا A.dossierSess(sid, pk): فقط رویدادهای پنجرهٔ همان مسئله
      (A.STORY.pkAt(se, e.at) === pk)؛ بی pk ⇒ آخرین مسئله؛ pk = "all" ⇒ کلِ گفت‌وگو (همان پروندهٔ پیشین). رویدادِ بی زمان فقط در آخرین مسئله. */
+  function prcsOf27(se) { var o = [], PR = A.PR; if (!se || !PR || !PR.cases) return o; try { var ids = {}; (se.prcs || []).forEach(function (id) { ids[id] = 1; });
+      if (PR.events) PR.events(null).forEach(function (e) { if (e && e.src && e.src.sess === se.id && e.prc) ids[e.prc] = 1; });
+      PR.cases({}).forEach(function (c) { if (c && (ids[c.id] || c.sess === se.id || (c.from && c.from.sess === se.id)) && !o.some(function (x) { return x.id === c.id; })) o.push({ id: c.id, title: (PR.subjLabel ? PR.subjLabel(c.subj) : "") || c.title || c.id }); }); } catch (e) { } return o; }
+  A.dossierPrcs27 = prcsOf27;
   var rawSess23 = A.dossierSess;
   A.dossierSess = function (sid, pk) {
     var D = rawSess23.call(this, sid); if (!D) return D; var se = S.get(sid), ST = A.STORY;
-    D.sid = sid;
+    D.sid = sid; D.prcs = prcsOf27(se);   /* دورِ ۲۷b (بانکِ R27 #239): پرونده‌های تمرینِ همین گفت‌وگو کنارِ مسئله‌ها — جدا از شمارِ مسئله‌ها (تمرین مسئله نیست) */
     var L = (((se && se.coach) || {}).pkLog || []).map(function (e) { return e.pk; }).filter(function (x, i, X) { return x && X.indexOf(x) === i; });
     /* دورِ ۲۶ (story Q3، C26-1 «مسئلهٔ ۲ از ۲» برای یک مسئله): شمارش و پنجره‌ها از مسئله‌ها (a45 ST.probGroups)، نه از هر تغییرِ pk */
     var G26 = ST && ST.probGroups ? ST.probGroups(se) : null, at26 = function (a) { return G26 ? ST.probAt(se, a) : ST.pkAt(se, a); };
     if (G26) { if (pk && pk !== "all") pk = ST.probOf(se, pk); L = G26.map(function (g) { return g.pk; }); }
     if (!ST || !ST.pkAt || L.length < 2) return D;
     var U = ((se && se.msgs) || []).filter(function (m) { return m && m.role === "user" && !/^\[/.test(String(m.text || "")); });
-    D.pks = L.map(function (k) { var w = ST.pkWindow(se, k), f = G26 ? U.filter(function (m) { return at26(m.at || "") === k; })[0] : U.filter(function (m) { return String(m.at || "") >= String(w.from || "") && String(m.at || "") < String(w.to || "~"); })[0]; return { pk: k, from: w.from, title: f ? clip(f.text, 60) : k }; });
+    D.pks = L.map(function (k) { var w = ST.pkWindow(se, k), f = G26 ? U.filter(function (m) { return at26(m.at || "") === k; })[0] : U.filter(function (m) { return String(m.at || "") >= String(w.from || "") && String(m.at || "") < String(w.to || "~"); })[0]; /* دورِ ۲۷b (history، بانکِ R27 #239): نامِ هر مسئله نامِ خودِ مسئله است (رکوردِ زنده)، نه نخستین پیامِ پنجره‌اش */
+      var g27 = G26 ? G26.filter(function (g) { return g.pk === k; })[0] : null, lid27 = (/^L:(.+)$/.exec((g27 && g27.id) || "") || /^l:(.+)$/.exec(k) || [])[1], lr27 = lid27 && A.liveRec ? A.liveRec(lid27) : null;
+      return { pk: k, from: w.from, title: lr27 && lr27.p && lr27.p.title ? clip(lr27.p.title, 60) : f ? clip(f.text, 60) : k }; });
+    /* دورِ ۲۷b (#239): پرونده‌های تمرینِ همین گفت‌وگو کنارِ مسئله‌ها — هر پرونده یک بار، جدا از شمارِ مسئله‌ها (تمرین مسئله نیست) */
     var cur = pk === "all" ? "all" : pk && L.indexOf(pk) >= 0 ? pk : L[L.length - 1]; D.pk = cur;
     if (cur === "all") { D.pid = sid + "|all"; return D; }
     var last = L[L.length - 1], me = D.pks.filter(function (x) { return x.pk === cur; })[0];

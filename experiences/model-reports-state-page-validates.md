@@ -448,3 +448,33 @@ that replace questions, never as answers.
 When a UI shows a question, record "shown at" and treat the next user turn as a candidate answer, gated by explicit reference (name,
 ordinal) unless it is the newest question; prefer set inclusion over count thresholds for "clearly best"; give every incoming item one
 visible outcome; build reproductions from the logged state, including state that looks irrelevant.
+
+## Update 2026-11-16 (round 27b, «history») — a derived history speaks with the record's voice, and a misfiled line moves, never vanishes
+A history view (the 📜 dossier) that is assembled from several writers drifts into "two voices": the coach's verdict next to a line the page
+judged ✗, a header taken from the model's `{frag, fix}` report although the page applied a different change, a mind-card "+" the mind card
+itself never counted, and one sentence shown three times under three kinds (plan, guess, ledger step) because three writers each logged it.
+What fixed it, as one rule: **every line of the derived view takes its verdict, kind and wording from the one record that owns the fact** —
+the arithmetic engine's own check beside her line; the ledger step's kind for any sentence the ledger quotes; the applied change (not the
+report) as the header of a correction; the mind model's own act list for "+/−". Duplicates are merged by sentence identity (normalised
+containment of ≥ 12 characters), never by shared words. A line filed under the wrong item is **moved with its record** and the original stays
+as a history note ("moved ⇒ X"), so the move is reversible and nothing is deleted.
+
+### How to Apply Elsewhere
+For any timeline/audit view built from several producers: render each line from the owning record (recompute, do not copy a second
+producer's label); merge by identity of the underlying sentence/record, not by keyword overlap; derive headers from what was applied, not
+from what was requested; give "misfiled" a move+undo that keeps the original as history; and add a look-alike negative for every merge rule
+(two genuinely different items must stay two).
+## Update 2026-11-16 (round 27B, leftovers) — one record change, one function: corrections of a booked date
+**What happened.** A person had booked «Friday» with her own yes, then corrected it («Thursday, not Friday», or a ✏️ on the bubble). Three code paths
+reacted to the same correction: the correction applier moved the date and wrote a history line, the page's own ✏️ replay moved it again with its own
+history line, and the date-ask engine then closed the (already moved) record and asked again. One correction ⇒ two or three history lines, and on the
+✏️ path a day was booked without her yes before being asked.
+
+**Rule.** Every path that changes the date of a booked record calls ONE function, which decides the mode (an edited message ⇒ close as «replaced» and
+ask once; her chat correction that names the new day ⇒ move once), writes exactly one history line, and leaves nothing for a later path to do (the
+record is closed or already on the new date). The old per-path code is quarantined, not deleted.
+
+### How to Apply Elsewhere
+When several handlers can observe the same user event (a reported correction, an edit replay, a scheduler pass), route every mutation of a shared record
+through a single idempotent function whose effects make the record's state answer «already done» to the next handler; test it by counting history
+lines after one event, not just by checking the final value.

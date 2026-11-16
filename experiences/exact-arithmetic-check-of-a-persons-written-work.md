@@ -140,3 +140,21 @@ find it correct; «not found» is «not checked», never «correct». (3) A verd
 ### How to Apply Elsewhere
 Any verify-on-demand path (re-check, appeal, retry) must recompute from the complete original input and treat a missing reading as unknown, never as a pass;
 and intent detection must not fire on words inside a conditional or a question about the system itself.
+
+## Update 2026-11-16 (round 27B, leftovers) — an offset map instead of length tricks; two readings decide only when the verdict depends on them
+**What happened.** After the 2026-11-15 rule, the new rewrites kept their length, but the older ones («درصد ⇒ %», «میشه ⇒ ＝», «ضرب در ⇒ *»,
+thousands separators, «…») still shortened or lengthened the text, so every `pos/pe` after such a word pointed a few characters off in her own text.
+Separately, «۲ میلیون و ۸۰۰ ÷ ۸ = ۳۵۰ هزار» has two readings of the bare «۸۰۰» (units or thousands); the reader used the first one and gave ✗.
+And the stale engine had its own little lexer that stopped at «میلیون», so a correction never reached «۲ میلیون و ۸۰۰ هزار ÷ ۸».
+
+**Rule.** (1) Make the normalizer return a position map (every rewrite records, for each output character, the input character it came from) and translate
+every reported offset back before returning it; the normal form itself stays byte-identical, so no consumer of the text changes. This is safer than
+padding each rewrite, because some rewrites (removing a thousands separator inside a number) cannot keep their length. (2) A phrase with two readings
+is resolved by the written result: exactly one reading fits ⇒ use it; one reading fits only up to scale or rounding ⇒ ask which was meant; no reading
+fits ⇒ the verdict is ✗ in every reading, so say ✗ and show the value of each reading. (3) A second reader of the same text (here the stale engine)
+must parse the same shapes (magnitude words, compound amounts) or it silently drops relations the first reader sees; when it cannot reconcile the
+result's scale, it records no relation rather than guessing one.
+
+### How to Apply Elsewhere
+Any pipeline that normalizes text and reports spans should carry an index map through every substitution and convert spans at the boundary; and any
+ambiguity resolver should ask only when the outcome actually depends on the reading, never when every reading gives the same verdict.

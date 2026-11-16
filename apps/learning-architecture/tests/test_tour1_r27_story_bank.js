@@ -123,22 +123,12 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
     await turn('برگردیم به مهره‌ها', []); await turn('درباره‌ی جلسه: ۴۵ ÷ ۶ = ۷٫۵ دقیقه', [cs({ ph: 'b', said: ['result'], result: '۴۵ ÷ ۶ = ۷٫۵ دقیقه' })]); const S = await st(); return [S.focus === Cid && !inStory(S, B, /۷٫۵/), J([Cid, S.focus, S.story])]; };
   E[237] = async () => { await base3(); await turn('درباره‌ی مهره‌ها: فکر کنم جوابش ۱۲ نیست ۱۶ ـه', [cs({ ph: 'p', said: ['guess'], guess: { text: 'جوابش ۱۲ نیست ۱۶ ـه' } })]); const S = await st(); return [S.lprob === B, J([S.lprob === B])]; };
   /* ورودی‌هایی که این دور ساخته نشد — با دلیل */
-  const NC = {
-    223: 'not built this round: the 📜 window start of a problem registered after chat lines about another (aB2) needs a replay of aB2 to reproduce; no change was made to the window start, so it is reported, not claimed.',
-    224: 'not built: routing a practice plan («برنامهٔ تمرین: …») to the practice dossier needs the practice-plan classifier in a41/a43 (plan recorder); the story layer files plans by problem owner only (ST.planOwner). Left open (D27-17).',
-    230: 'not built: the ✓/✗/؟ marks beside her own lines in 📜 (A27-4) — the dossier rows do not yet carry the a46 verdict of each line. Left open; listed in the handoff note.',
-    231: 'not built: one 📜 event per ✏️ (A27-14) is the correction family\'s history display (a40 retract rows); not touched by story.',
-    232: 'not built: «برنامهٔ خودت» + «طرح» for one sentence (D26-2) is a dedup between a41 chat plans and a45 plan items; not attempted this round.',
-    233: 'not built: chronological placement of a ✏️-backfilled line (B24·D18) — dossier sort is by event time; the edit-time/history link change was not attempted.',
-    234: 'not built: moving a misfiled 📜 line to another problem (owner bank 42, C78) is a new capability (UI + record move + history); not attempted this round — reported as open.',
-    235: 'not built: undo of a 📜 move depends on #234.',
-    236: 'not built: a facet («خبرِ خواب») has no record of its own in this session model; the plan cannot land in a facet record that does not exist (C27-19). Left open.',
-    238: 'not built: a new problem born in a closed problem\'s look-back is the loop/look-back family (a38 newProbs); not touched.',
-    239: 'not built: the session dossier count including the practice dossier; probGroups counts problems only. Not attempted.',
-    243: 'not verified this round: a restated A («یعنی همون مسئلهٔ قفسه‌ها، فقط با ۶ طبقه») needs the classify family\'s restatement reader; not touched by story.',
-    244: 'not built: a practice report routed to the practice dossier (classify/practice families).',
-    250: 'not built: depends on #234 (move a 📜 line).',
-  };
+  // دورِ ۲۷b (fixer «history»): ورودی‌هایی که این‌جا «not built» بودند در tests/test_tour1_r27b_history.js ساخته و سبز شدند (۲۲۳، ۲۲۴، ۲۳۰، ۲۳۱، ۲۳۲، ۲۳۴، ۲۳۵، ۲۳۸، ۲۳۹، ۲۴۳، ۲۴۴، ۲۵۰)؛
+  // ۲۳۳ و ۲۳۶ همان‌جا با دلیل «not built» مانده‌اند. این فایل فقط نشانی می‌دهد (هر ورودی یک بار داوری می‌شود).
+  const NC = {};
+  [223, 224, 230, 231, 232, 234, 235, 238, 239, 243, 244, 250].forEach(n => { NC[n] = 'judged in tests/test_tour1_r27b_history.js (round 27b, fixer «history»)'; });
+  [233, 236].forEach(n => { NC[n] = 'not built — reason in tests/test_tour1_r27b_history.js (round 27b, fixer «history»)'; });
+
   Object.keys(NC).forEach(n => { E[n] = async () => ({ nc: NC[n] }); });
   const want = BANK.map((x, i) => [i + 1, x]).filter(([i, x]) => /^R[56]\./.test(x.rc));
   for (const [n] of want) { if (process.env.ONLY && !process.env.ONLY.split(',').map(Number).includes(n)) continue; info.n++;
