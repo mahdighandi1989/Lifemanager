@@ -1,6 +1,6 @@
 {
  "round": 39,
- "at": "2026-11-15",
+ "at": "2026-11-16",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1607,8 +1607,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 182,
-   "fullAfter": 182
+   "fullBefore": 181,
+   "fullAfter": 181
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1617,8 +1617,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 182,
-   "fullAfter": 182
+   "fullBefore": 181,
+   "fullAfter": 181
   },
   "p_found_scope": null
  },
