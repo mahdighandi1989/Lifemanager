@@ -1,0 +1,445 @@
+{
+"from": "round28A/s08",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "فقط دوتا ساعت شنی داریم، یکی ۷ دقیقه یکی ۱۱ دقیقه. تخم‌مرغ باید دقیقاً ۱۵ دقیقه بپزه. چطوری؟ نصفه روزه دارم امتحان می‌کنم: ۷+۷=۱۴، ۱۱+۷=۱۸، ۱۱+۱۱=۲۲ … هیچی جور نمیشه. اعصابم خورده."
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='2012-05-30';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()"
+},
+{
+"say": "نه... نمی‌دونم."
+},
+{
+"say": "..."
+},
+{
+"say": "خب... ۴ دقیقه رو میشه! وقتی ۷ تموم شد، ۱۱ هنوز ۴ دقیقه داره. ۱۵ = ۱۱ + ۴! پس اول هر دو رو برمی‌گردونم، ۷ که تموم شد تخم‌مرغ رو می‌ذارم … نه صبر کن. ۴ = ۱۱ − ۷."
+},
+{
+"say": "فردا. نوشتم: هر دو رو با هم برمی‌گردونم؛ ۷ که تموم شد تخم‌مرغ رو می‌ذارم؛ ۱۱ که تموم شد (۴ دقیقه بعد) برش می‌گردونم؛ وقتی دوباره تموم شد ۴+۱۱=۱۵. ولی یه چیزی عجیبه: من از ۱۵ شروع کردم به عقب، ولی اجرا از اول به آخره. چرا برعکس؟",
+"eval0": "(()=>{0;return 1})()",
+"clock": "2026-10-17"
+},
+{
+"say": "فکر کنم چون عقب‌گرد از چیزی که می‌خوام شروع می‌کنه، ولی ساعت‌ها فقط از اول کار می‌کنن؛ پس آخرین چیزی که پیدا کردم (۴ دقیقهٔ ته ۱۱) اولین کاری بود که باید می‌کردم. درسم اینه: وقتی رو به جلو گیر کردم، از جواب شروع کنم و برگردم عقب. وارسی هم کردم: ۴ + ۱۱ = ۱۵ و هر لحظه‌ش با ساعت‌ها جور درمیاد."
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title]))"
+},
+{
+"say": "اون که گفتی «از آخر شروع کن، فرض کن تخم‌مرغ همین حالا ۱۵ دقیقه پخته» از همه بیشتر کمک کرد."
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>{const b=((r.p.solve||{}).b||[])[1]||{};return [r.p.title,b.bestQ,b.bestKind,b.taste]}))"
+},
+{
+"eval": "(()=>{const r=APP.liveAll()[0];return JSON.stringify(Object.keys(r))+\" P:\"+JSON.stringify(Object.keys(r.p))+\" \"+JSON.stringify(r.s&&r.s.b||r.solve&&r.solve.b||null).slice(0,800)})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const b=((pg.solve||{}).b||[])[1]||{};return [r.p.title,b.done,b.from,b.bestQ,b.bestKind,b.taste,b.lesson||b.use,APP.chatLookMissing?APP.chatLookMissing(r.p.id):null]}))"
+},
+{
+"say": "خودم یه معما ساختم: ساعت‌های ۵ و ۹ دقیقه، چطوری ۱۳ دقیقه؟ حلش کردم: ۹−۵=۴، بعد ۹+۴=۱۳.",
+"eval0": "(()=>{0;return JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveClosure(r.p.id).label,APP.liveKindInfo(r.p.id).kind]))})()",
+"clock": "2026-10-18"
+},
+{
+"say": "آره وارسی کردم: هر دو رو برمی‌گردونم، ۵ تموم شد شروع، ۹ تموم شد (۴ دقیقه) برش می‌گردونم، ۹ دقیقه دیگه: ۱۳. درسم همونه: از آخر به عقب."
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveClosure(r.p.id).label,APP.liveClosure(r.p.id).verdict,r.origin,APP.liveKindInfo(r.p.id).kind,r.p.from||r.p.parent||\"\"]))\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQItems(r.p.id)]))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const b=((pg.solve||{}).b||[])[1]||{};return [r.p.title,b.done,b.from,b.bestQ,b.bestKind,b.taste,b.lesson||b.use,APP.chatLookMissing?APP.chatLookMissing(r.p.id):null]}))"
+},
+{
+"eval": "(()=>{const r=APP.liveAll()[0];APP.go('lprob',r.p.id);const m=document.getElementById('main').innerText;const i=m.indexOf('بازنگری:');return r.p.title+' || '+(i>=0?m.slice(i-50,i+900):'NO CARD')+' || SEL:'+[...document.querySelectorAll('#main select')].filter(s=>/lb|Rest|best/i.test(s.id)).map(s=>s.id+'['+[...s.options].map(o=>o.textContent.slice(0,90)).join(' / ')+']').join(' ## ')})()"
+},
+{
+"eval": "(()=>{const r=APP.liveAll()[1];APP.go('lprob',r.p.id);const m=document.getElementById('main').innerText;const i=m.indexOf('بازنگری:');return r.p.title+' || '+(i>=0?m.slice(i-50,i+900):'NO CARD')+' || SEL:'+[...document.querySelectorAll('#main select')].filter(s=>/lb|Rest|best/i.test(s.id)).map(s=>s.id+'['+[...s.options].map(o=>o.textContent.slice(0,90)).join(' / ')+']').join(' ## ')})()"
+},
+{
+"eval": "(()=>{const r=APP.liveAll()[0];APP.go('lprob',r.p.id);const m=document.getElementById('main').innerText;const i=m.indexOf('بازنگری:');return r.p.title+' || '+(i>=0?m.slice(Math.max(0,i-50),i+900):'NO CARD')+' || SEL:'+[...document.querySelectorAll('#main select')].map(s=>s.id+'['+[...s.options].map(o=>o.textContent.slice(0,90)).join(' / ')+']').join(' ## ')})()"
+},
+{
+"eval": "(()=>{const r=APP.liveAll()[1];APP.go('lprob',r.p.id);const m=document.getElementById('main').innerText;const i=m.indexOf('بازنگری:');return r.p.title+' || '+(i>=0?m.slice(Math.max(0,i-50),i+900):'NO CARD')+' || SEL:'+[...document.querySelectorAll('#main select')].map(s=>s.id+'['+[...s.options].map(o=>o.textContent.slice(0,90)).join(' / ')+']').join(' ## ')})()"
+},
+{
+"eval": "(()=>{const c=[...document.querySelectorAll(\"#main *\")].find(e=>/^بازنگری: /.test((e.textContent||\"\").trim())&&e.children.length<2);const box=c&&c.closest(\"div,section\");const b=box&&box.parentElement;return b?[...b.querySelectorAll(\"textarea,select,button,input\")].map(e=>e.tagName+\"#\"+e.id+\"[\"+(e.getAttribute(\"aria-label\")||e.textContent||\"\").slice(0,60)+\"]\").join(\" | \"):\"none\"})()"
+},
+{
+"fill": [
+"#lpRTaste",
+"معمای ساعت‌شنی رو دوست داشتم چون آخرش یهو جور شد؛ امتحانِ کورکورانهٔ اول رو نه."
+]
+},
+{
+"click": "text=ثبتِ پاسخ‌های بازنگری"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const b=((pg.solve||{}).b||[])[1]||{};return [r.p.title,b.done,b.from,b.bestQ,b.bestKind,b.taste,b.lesson||b.use,APP.chatLookMissing?APP.chatLookMissing(r.p.id):null]}))"
+},
+{
+"eval": "(()=>{const m=document.getElementById(\"main\").innerText;const i=m.indexOf(\"سلیقه\");return (m.indexOf(\"بازنگری: \")>=0?\"CARD STILL\":\"card gone\")+\" | \"+m.slice(Math.max(0,i-200),i+150)})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t||x)]),null,0)"
+},
+{
+"eval": "JSON.stringify({mx:[...document.querySelectorAll(\".as-msg .mx\")].map(e=>e.getAttribute(\"data-src\")),s:APP.ASSIST.sessions().map(s=>({g:(s.coach||{}).guess&&s.coach.guess.text,ck:(s.coach||{}).checkRep,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>m.guess)})),b:APP.liveAll().map(r=>{const pg=APP.S.get(\"eprog_\"+r.p.id)||{};const b=((pg.solve||{}).b||[])[1]||{};return [r.p.title,b.verdict,b.chkBy,b.chkMsgs]})})"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "APP.today()"
+},
+{
+"eval": "APP.liveAll().map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"
+},
+{
+"eval": "\"clock->2026-10-25\"",
+"clock": "2026-10-25"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");const j=t.indexOf(\"⚫ نقطه\");return t.slice(i,j+400)})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlthvhls68');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltdh0bgi4');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt2yfxohg');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt8cpnz1h');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlup01vkun');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({age:APP.AGE.age(),reg:s.coach&&s.coach.reg,sys:s.msgs.filter(m=>m.role==\"sys\").slice(-3).map(m=>m.text.slice(0,160))})})()"
+},
+{
+"eval": "(()=>{const f=APP.STORY.arithChk;const T=[\"حلش کردم: ۹−۵=۴، بعد ۹+۴=۱۳.\",\"۱۸ × ۱٫۲۲ = ۲۱٫۹۶ میلیون\",\"۱۸ میلیون × ۱٫۲۲ = ۲۱٫۹۶ میلیون\",\"۱۱ / ۵ = ۲٫۲ میلیارد\",\"۲ × ۳ = ۶ تا\",\"۱۲ + ۲۴ = ۳۶ صفحه\",\"۳ × ۴ = ۱۲ هزار تومن\",\"۵ × ۲۰۰ = ۱۰۰۰ گرم = ۱ کیلو\"];return JSON.stringify(T.map(t=>[t,(f(t)||[]).map(c=>c.expr+\"=\"+c.said+\":\"+c.ok+(c.unit?\" u=\"+c.unit:\"\"))]))})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltk86ba3a');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "یه حساب دیگه: اگه هر دو رو پشت سرِ هم بذارم ۷ + ۱۱ = ۱۷ دقیقه میشه. یه فیلمِ ۲۹۴۳۰۰ فریمی با ۴۸ فریم در ثانیه هم ۲۹۴۳۰۰ ÷ ۴۸ = ۶۱۳۱ ثانیه، حدودِ ۱۰۲ دقیقه‌ست."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltol52jcx');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltra0t69m');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlhfybdwn');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61kf333h');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"نیم‌روز ترکیب آزمودی و حالا می‌دانی جمع‌های ساده به ۱۵ نمی‌رسند — این خودش گام است. پیش‌تر همین معما را — یا همین را به شکلِ کمی دیگر — دیده‌ای؟\", \"title\": \"ساعت‌شنیِ ۷ و ۱۱\", \"pinned\": \"پختنِ تخم‌مرغ دقیقاً ۱۵ دقیقه با ساعت‌شنی‌های ۷ و ۱۱\", \"memory\": \"معمای ساعت‌شنیِ ۷ و ۱۱ برای ۱۵ دقیقه؛ کاربر ترکیب‌های جمع را آزموده و عصبانی است. پرسیدم مسئلهٔ مشابه دیده؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": true, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"از آخر شروع کن: فرض کن تخم‌مرغ همین حالا دقیقاً ۱۵ دقیقه پخته است — یک لحظه پیش از آن، روی میز و در ساعت‌ها چه دیده می‌شد که از آن به ۱۵ می‌رسیدی؟\", \"memory\": \"معمای ۷/۱۱ ⇒ ۱۵؛ کاربر مسئلهٔ مشابه را نمی‌شناسد. پرسشِ کار به عقب را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"کوتاه‌تر: درست پیش از آخرین برگرداندن، در یکی از ساعت‌ها چند دقیقه شن باید مانده باشد تا با آن به ۱۵ برسی؟\", \"memory\": \"معمای ۷/۱۱ ⇒ ۱۵؛ سکوت؛ همان پرسشِ کار به عقب را کوتاه‌تر پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"۴ = ۱۱ − ۷ یافتهٔ کلیدیِ خودت است. حالا هر گام را وارسی کن: روشن می‌بینی که هر گامت درست است — از کدام لحظه تا کدام لحظه تخم‌مرغ روی آتش است؟\", \"memory\": \"معمای ۷/۱۱ ⇒ ۱۵؛ کاربر ۴ = ۱۱−۷ و ۱۵ = ۱۱+۴ را یافت؛ پرسیدم گام‌ها را وارسی کند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [\"p4\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"۱۵ = ۱۱ + ۴\", \"q\": \"روشن می‌بینی که هر گامت درست است — از کدام لحظه تا کدام لحظه تخم‌مرغ روی آتش است؟\"}}]}",
+"{\"reply\": \"پرسشِ خوبی است و جوابِ آماده نمی‌دهم. پیش از هر توضیحی: خودت فکر می‌کنی چرا؟\", \"memory\": \"معمای ۷/۱۱ ⇒ ۱۵: کاربر راه را نوشت و پرسید چرا اجرا برعکسِ کشف است؛ حدسِ خودش را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"result\"], \"ans\": [\"e1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"درس و وارسی‌ات را به قلمِ خودت ثبت کردم تا مرورِ فاصله‌دار بگیرد. یک پرسشِ بازنگری: از پرسش‌هایی که این‌جا پرسیدم، کدام بیشتر از همه کمک کرد؟\", \"memory\": \"معمای ساعت‌شنی حل و بازنگری شد؛ درسِ کاربر: وقتی رو به جلو گیر کردم از جواب به عقب برگردم؛ وارسی: ۴+۱۱=۱۵. پرسیدم کدام پرسش بیشتر کمک کرد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"ساعت‌شنیِ ۷ و ۱۱ برای ۱۵ دقیقه\", \"statement\": \"فقط دوتا ساعت شنی داریم، یکی ۷ دقیقه یکی ۱۱ دقیقه. تخم‌مرغ باید دقیقاً ۱۵ دقیقه بپزه. چطوری؟\", \"kind\": \"find\", \"lesson\": \"وقتی رو به جلو گیر کردم، از جواب شروع کنم و برگردم عقب.\", \"check\": \"۴ + ۱۱ = ۱۵ و هر لحظه‌ش با ساعت‌ها جور درمیاد.\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [\"b1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"check\": {\"msgs\": [\"وقتی دوباره تموم شد ۴+۱۱=۱۵\", \"وارسی هم کردم: ۴ + ۱۱ = ۱۵ و هر لحظه‌ش با ساعت‌ها جور درمیاد\"]}}]}",
+"{\"reply\": \"ثبتش کردم: «از آخر شروع کن» برایت بیشترین کمک بود. و یک پرسشِ دیگرِ بازنگری: این نوع معما برایت چطور بود — کدام بخشش را دوست داشتی و کدامش را نه؟\", \"memory\": \"کاربر گفت پرسشِ «از آخر شروع کن، فرض کن ۱۵ دقیقه پخته» بیشتر کمک کرد؛ ثبت شد. پرسیدم سلیقه‌اش.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_lookback\", \"pid\": \"pb_l_mvc61kf333h\", \"bestQ\": \"از آخر شروع کن، فرض کن تخم‌مرغ همین حالا ۱۵ دقیقه پخته\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [\"b5\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"معمای خودت را ساختی و حل کردی — نگهش داشتم. «حل شد» را نه تأیید می‌کنم نه رد؛ بازنگری مهم‌ترین بخشِ کار است: می‌توانی نتیجه را وارسی کنی — لحظه‌به‌لحظه با دو ساعتِ ۵ و ۹، کِی تخم‌مرغ روی آتش است و کِی برمی‌داری؟\", \"memory\": \"معمای ۷/۱۱ حل و ثبت شد؛ بهترین پرسش ثبت شد. کاربر معمای تازهٔ ۵/۹ ⇒ ۱۳ را ساخت و حل کرد؛ ثبتش کردم. سلیقه‌اش دربارهٔ معمای ۷/۱۱ را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_invent\", \"statement\": \"خودم یه معما ساختم: ساعت‌های ۵ و ۹ دقیقه، چطوری ۱۳ دقیقه؟\", \"title\": \"ساعت‌شنیِ ۵ و ۹ برای ۱۳ دقیقه\", \"nat\": \"objective\", \"kind\": \"find\", \"from\": \"pb_l_mvc61kf333h\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"وارسی و درست را ثبت کردم. یک پرسش برای بعد: آیا معمای تو با هر دو ساعتی همیشه جواب دارد؟\", \"memory\": \"دو معما حل و ثبت شد (۷/۱۱⇒۱۵ و ۵/۹⇒۱۳، ساختهٔ خودِ کاربر).\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"ساعت‌شنیِ ۵ و ۹ برای ۱۳ دقیقه\", \"statement\": \"خودم یه معما ساختم: ساعت‌های ۵ و ۹ دقیقه، چطوری ۱۳ دقیقه؟\", \"kind\": \"find\", \"lesson\": \"از آخر به عقب.\", \"check\": \"هر دو رو برمی‌گردونم، ۵ تموم شد شروع، ۹ تموم شد (۴ دقیقه) برش می‌گردونم، ۹ دقیقه دیگه: ۱۳.\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [\"b1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"check\": {\"msgs\": [\"هر دو رو برمی‌گردونم، ۵ تموم شد شروع، ۹ تموم شد (۴ دقیقه) برش می‌گردونم، ۹ دقیقه دیگه: ۱۳\"]}}]}",
+"{\"reply\": \"۶۱۳۱ ثانیه حدودِ ۱۰۲ دقیقه می‌خواند. ولی جمعِ «۷ + ۱۱» با ۱۷ نمی‌خواند — دوباره بزنش. و ۲۹۴۳۰۰ بر ۴۸ دقیقاً ۶۱۳۱٫۲۵ است: ۶۱۳۱ را گرد کردی یا همین را می‌خواستی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"فقط دوتا ساعت شنی داریم، یکی ۷ دقیقه یکی ۱۱ دقیقه. تخم‌مرغ باید دقیقاً ۱۵ دقیقه بپزه. چطوری؟ نصفه روزه دارم امتحان می‌کنم: ۷+۷=۱۴، ۱۱+۷=۱۸، ۱۱+۱۱=۲۲ … هیچی جور نمیشه. اعصابم خورده.",
+"نه... نمی‌دونم.",
+"...",
+"خب... ۴ دقیقه رو میشه! وقتی ۷ تموم شد، ۱۱ هنوز ۴ دقیقه داره. ۱۵ = ۱۱ + ۴! پس اول هر دو رو برمی‌گردونم، ۷ که تموم شد تخم‌مرغ رو می‌ذارم … نه صبر کن. ۴ = ۱۱ − ۷.",
+"فردا. نوشتم: هر دو رو با هم برمی‌گردونم؛ ۷ که تموم شد تخم‌مرغ رو می‌ذارم؛ ۱۱ که تموم شد (۴ دقیقه بعد) برش می‌گردونم؛ وقتی دوباره تموم شد ۴+۱۱=۱۵. ولی یه چیزی عجیبه: من از ۱۵ شروع کردم به عقب، ولی اجرا از اول به آخره. چرا برعکس؟",
+"فکر کنم چون عقب‌گرد از چیزی که می‌خوام شروع می‌کنه، ولی ساعت‌ها فقط از اول کار می‌کنن؛ پس آخرین چیزی که پیدا کردم (۴ دقیقهٔ ته ۱۱) اولین کاری بود که باید می‌کردم. درسم اینه: وقتی رو به جلو گیر کردم، از جواب شروع کنم و برگردم عقب. وارسی هم ک",
+"اون که گفتی «از آخر شروع کن، فرض کن تخم‌مرغ همین حالا ۱۵ دقیقه پخته» از همه بیشتر کمک کرد.",
+"خودم یه معما ساختم: ساعت‌های ۵ و ۹ دقیقه، چطوری ۱۳ دقیقه؟ حلش کردم: ۹−۵=۴، بعد ۹+۴=۱۳.",
+"آره وارسی کردم: هر دو رو برمی‌گردونم، ۵ تموم شد شروع، ۹ تموم شد (۴ دقیقه) برش می‌گردونم، ۹ دقیقه دیگه: ۱۳. درسم همونه: از آخر به عقب.",
+"یه حساب دیگه: اگه هر دو رو پشت سرِ هم بذارم ۷ + ۱۱ = ۱۷ دقیقه میشه. یه فیلمِ ۲۹۴۳۰۰ فریمی با ۴۸ فریم در ثانیه هم ۲۹۴۳۰۰ ÷ ۴۸ = ۶۱۳۱ ثانیه، حدودِ ۱۰۲ دقیقه‌ست."
+]
+}

@@ -150,7 +150,9 @@ const RUNS = JSON.parse(fs.readFileSync(vfile('R28_prior_runs.json'), 'utf8'));
     const P = o[9].pr, s5 = P && P.steps[4];
     chk(!!s5 && s5.verdict === 'ok' && s5.fixed && /۷٫۷/.test(s5.fixed.t) && P.resume !== 5, 'B28·D9 REGRESSION (pwB2 p9 «… شیراز = ۲٫۷ + ۱٫۶ + ۱٫۲ + ۰٫۸ + ۱٫۴ = ۷٫۷»): her fix lands on step 5 (r27: «✓ … نشست»), resume moves on :: ' + JSON.stringify(stepsOf(P)) + ' resume ' + (P && P.resume));
     const ow = await p.evaluate(() => [APP.STORY.otherWork27('داداشم حساب کرد نصب ۳ روز × ۴۰۰ هزار = ۱۲۰۰ هزار تومن میشه.'), APP.STORY.otherWork27('مادرم اولش نه گفت، ولی بعد گفت امتحانش می‌کنم. پس نمره‌ی مادر میشه ۷. شیراز = ۷٫۷.')].map(o => o && o.text));
-    chk(/۱۲۰۰/.test(ow[0] || '') && !!ow[1] && !/۷٫۷|نمره/.test(ow[1]), 'B28·D9 root (a45 ST.otherWork27): «… گفت … . پس …» — her own inference after reported speech is hers; look-alike «داداشم حساب کرد … = ۱۲۰۰ …» stays the brother\'s work :: ' + JSON.stringify(ow));
+    // merge28 (story × prior): story's C96/C125 rewrite of ST.otherWork27 files «مادرم … گفت امتحانش می‌کنم» (a saying verb, no calculation) as
+    // no other-work span at all (null); the requirement here is only that her «پس … = ۷٫۷» is never someone else's work.
+    chk(/۱۲۰۰/.test(ow[0] || '') && !/۷٫۷|نمره/.test(ow[1] || ''), 'B28·D9 root (a45 ST.otherWork27): «… گفت … . پس …» — her own inference after reported speech is hers; look-alike «داداشم حساب کرد … = ۱۲۰۰ …» stays the brother\'s work :: ' + JSON.stringify(ow));
     const n = await run('nB1', 14);
     const floor = Object.keys(n[14].all).map(k => [k, n[14].all[k]]).filter(([k, Q]) => Q.steps.some(x => /کارتن|۳۰ ÷ ۱٫۵|۶ متر در ۵ متر/.test(String(x.fixed ? x.fixed.t : x.quote))));
     const shelves = Object.keys(n[14].all).map(k => [k, n[14].all[k]]).filter(([k, Q]) => Q.steps.some(x => /قفسه|۶۰ تا میشه ۳۰۰|۵ تا ۶۰/.test(String(x.fixed ? x.fixed.t : x.quote))));

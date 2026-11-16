@@ -479,3 +479,8 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R27 C58 + FIX27B «C58 one path»: a correction of a booked record goes through ONE function (`PR.rebook27`): one history
   entry; a ✏️ asks once for the new day; a chat correction moves the record once.
 - **Status:** (1) and (2) reachable, not called. Delete only with the owner's approval.
+
+## 2026-11-16 — `ST.otherWork27R27` (a45_story.js) — quarantined by fixer «story» (round 28)
+- **What:** the round-27 «کارِ دیگری» reader: any «X گفت/میگه/نوشت/حساب کرد» within four words of a relation word made the span from that sentence to the end of the message someone else's work.
+- **Why replaced:** DECISIONS_R28 C96/C125 — «کارِ دیگری» only when another person is the doer of the calculation or claim; a quoted value is her datum with a source; her own sentence that mentions a helper stays hers; the span is the sentence (or the list it introduces). Replaced by the new `ST.otherWork27` + `ST.dataSrc28`.
+- **Status:** reachable as `A.STORY.otherWork27R27`, not called. Delete only with the owner's approval.

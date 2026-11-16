@@ -5157,8 +5157,10 @@
       ch.push({ kind: "story", label: label, old: oo, new: nn, why: "همان پیام را خودش اصلاح کرد" }); };
     Object.keys(T).forEach(function (key) { ((T[key] && T[key].items) || []).forEach(function (it) { if (!it || it.mid !== mid || it.k === "prior") return; var nv = fixT(it.t); if (nv == null) return; (it.was = it.was || []).push({ t: it.t, at: base.at }); var o0 = it.t; it.t = nv;
       if (Array.isArray(it.pieces)) it.pieces = it.pieces.map(function (p) { return fixT(p) || p; }); note("ثبتِ «از گفت‌وگو»", o0, nv); }); });
-    var evFix = function (L, put) { var hit = false; (L || []).forEach(function (e) { if (!e || !e.src || e.src.mid !== mid || (e.src.sess && e.src.sess !== se.id) || !/^c(?:res|step|plan23|data|unk|whole|cond|tried|lb)$/.test(String(e.k || "")) || !(e.lines || []).length) return;
-        var nv = fixT(e.lines[0]); if (nv == null) return; var o0 = e.lines[0]; e.lines = [nv].concat(e.lines.slice(1).map(function (l) { return /^اصلاح شد ⇐/.test(l) ? l : (fixT(l) || l); })).concat(["اصلاح شد ⇐ «" + clip(o0, 160) + "»"]); hit = true; note(String(e.title || "ثبتِ «از گفت‌وگو»"), o0, nv); }); if (hit && put) put(); };
+    var evFix = function (L, put) { var hit = false; (L || []).forEach(function (e) { if (!e || !e.src || e.src.mid !== mid || (e.src.sess && e.src.sess !== se.id) || !/^c(?:res|step|plan23|data|unk|whole|cond|tried|lb|calc)$/.test(String(e.k || "")) || !(e.lines || []).length) return;
+        var nv = fixT(e.lines[0]); if (nv == null) return; var o0 = e.lines[0];
+        /* دورِ ۲۸ (story، C86، S1 A28-5): نشانِ صفحه از متنِ تازهٔ سطر دوباره سنجیده می‌شود؛ نشانِ پیشین (بی جایگزینیِ رشته‌ای) به تاریخچه می‌رود (a45 ST.relines28) */
+        e.lines = A.STORY && A.STORY.relines28 ? A.STORY.relines28(e, nv, o0, "اصلاح شد ⇐ «" + clip(o0, 160) + "»", fixT) : [nv].concat(e.lines.slice(1).map(function (l) { return /^اصلاح شد ⇐/.test(l) ? l : (fixT(l) || l); })).concat(["اصلاح شد ⇐ «" + clip(o0, 160) + "»"]); hit = true; note(String(e.title || "ثبتِ «از گفت‌وگو»"), o0, nv); }); if (hit && put) put(); };
     evFix(se.evlog, null);
     pidsOf(se).forEach(function (pid) { var pg = pgOf(pid); if (!pg) return; var L = live(solOf(pg)); evFix(L.evlog, function () { S.put(pg); });
       var h2 = false; (L.chatImpItems || []).forEach(function (it) { if (!it || it.mid !== mid) return; var nv = fixT(it.t); if (nv == null) return; (it.was = it.was || []).push(it.t); it.t = nv; h2 = true; }); if (h2) S.put(pg); });
@@ -5590,7 +5592,7 @@
           dep.push({ kind: "stmt", label: "عنوانِ مسئله", old: t0, new: nt0, why: "پیرو صورتِ مسئله (به تأییدِ خودت)" }); } } }
     /* دورِ ۲۳ (Q4، D23-9): حدسی که با «بله» پیروِ دادهٔ درست شد — سرانجامی که بر متنِ پیشینش داوری شده بود با دلیل کنار می‌رود */
     if (yes && f && q.path === "g.guess" && q.d) dep = dep.concat(setAsideDeps(q.pid, q.d, { at: at, mid: q.mid, by: "user", rests: ["guess"] }));
-    if (yes && f && f.st26) { try { var id26 = "st23_" + f.st26.key.replace(/[^\w]/g, "_") + "_" + f.st26.k + "_" + f.st26.n, fx26 = function (LG) { var h = false; (LG || []).forEach(function (e) { if (e && e.id === id26 && (e.lines || []).length) { e.lines = [q.new].concat(e.lines.slice(1)).concat(["اصلاح شد ⇐ «" + clip(q.old, 160) + "» (به تأییدِ خودت)"]); h = true; } }); return h; };
+    if (yes && f && f.st26) { try { var id26 = "st23_" + f.st26.key.replace(/[^\w]/g, "_") + "_" + f.st26.k + "_" + f.st26.n, fx26 = function (LG) { var h = false; (LG || []).forEach(function (e) { if (e && e.id === id26 && (e.lines || []).length) { e.lines = A.STORY && A.STORY.relines28 ? A.STORY.relines28(e, q.new, q.old, "اصلاح شد ⇐ «" + clip(q.old, 160) + "» (به تأییدِ خودت)") : [q.new].concat(e.lines.slice(1)).concat(["اصلاح شد ⇐ «" + clip(q.old, 160) + "» (به تأییدِ خودت)"]); h = true; } }); return h; };
         fx26(se.evlog); pidsOf(se).forEach(function (p0) { var pg0 = pgOf(p0); if (pg0 && fx26(live(solOf(pg0)).evlog)) S.put(pg0); }); } catch (e26) { console.warn(e26); } }
     if (yes && f && f.cg) { var C0 = se.coach || {}; if (C0.guess && nz(C0.guess.text) === nz(q.old)) C0.guess.text = q.new;
       if (f.obj.res) { var oR = f.obj.res; f.obj.resRecheck = { at: at, was: oR, by: q.mid || "" }; f.obj.res = ""; dep.push({ kind: "guess", label: "سرانجامِ حدس", old: oR === "confirmed" ? "تأیید شد" : "رد شد", new: "کنار رفت — با مقدارِ درست دوباره آزموده شود", why: "متنِ حدس پیروِ دادهٔ درست شد" }); } }
@@ -5997,6 +5999,7 @@
        · keepback (بی خواسته، ولی در بازنگریِ مسئلهٔ همین گفت‌وگو ⇒ مسئلهٔ تازهٔ بازنگری همان‌جا می‌ماند، بی مسئلهٔ زنده) · refuse (بی خواسته: فقط پیشنهاد) */
     var CUR_REF = /(?:همین|این|همون)\s*(?:مسئله|مساله|معما|سوال|سؤال|تصمیم|موضوع|مورد)|(?:^|\s)(?:اینو|اینها|اینا|همینو|همینا|اینم)(?:\s|$)/, OTHER_REF = /(?:یه|یک)\s*(?:مسئله|مساله|معما|سوال|سؤال)(?:\s*ی)?\s*(?:دیگه|دیگر|تازه|جدید)|مسئله(?:\s*ی)?\s*(?:دیگه|دیگر)/;   // متنِ نرمال: نیم‌فاصله ⇒ فاصله
     var TESTS24 = /(?:چک|امتحان|حساب|وارسی|آزمون)(?:ش|شون|اش)?\s*(?:کردم|کردیم)|(?:بذار|بزار|بگذار|می‌?\s*خوام)\s*(?:امتحان|چک|حساب|وارسی)(?:ش)?\s*کنم|تاش(?:و|ون)?\s*(?:رو\s*)?(?:چک|امتحان|حساب)\s*کردم/, OWNCONJ24 = /(?:^|\s)(?:حدس(?:م|ِ?\s*من)|فکر\s*کنم)(?![آ-ی])|(?:خودم|من)\s+[^.!؟?]{0,60}(?:ساختم|درست\s*کردم)/;
+    var SEP28 = /(?:^|\s)(?:جدا(?:ست|ئه|یه|ه)?|جداگانه(?:ست|ه)?|یه\s*چیزِ?\s*جدا)(?![آ-ی])|(?:یه|یک)\s*(?:مسئله|مساله|معما|سوال|سؤال)(?:\s*(?:ی|ٔ|‌ی))?\s*(?:دیگه|دیگر)(?![آ-ی])/, WANT28 = /می\s*‌?\s*خوام\s+[^.!؟?]{0,30}(?:حل|کار|درست)\s*(?:کنم|کنیم)|(?:بیا|بریم)\s+[^.!؟?]{0,20}(?:حل|روش)/;
     function herTests24(x, st0) { if (!AS.DO.live_new || !OWNCONJ24.test(x) || !TESTS24.test(x)) return false; var u = ctoks(st0).filter(function (w, i, X) { return X.indexOf(w) === i; }); return u.length >= 3 && overlapN(st0, x) / u.length >= 0.6; }
     function inventGate(a, se) {
       var st0 = txt(a && a.statement), ut = lastUserText(se), sg = A.liveReqSignals(ut), x = ownTx(ut);
@@ -6020,6 +6023,9 @@
           if (best24 && bn24 >= 2) return { k: "promote", pid: bp, id: best24.id }; }
         return { k: "live" };
       }
+      /* دورِ ۲۸ (story R5، C97؛ B28·D10 oB1 c21 «یه مسئله‌ی دیگه هم دارم که به همین بیداری ربط داره ولی جداست: … می‌خوام اینم حل کنم»): مسئله‌ای که خودش «جدا» یا «یه مسئلهٔ دیگه»
+         می‌خواندش رکورد و دفترِ خودش را می‌گیرد («تازه/جدید» ِ بازنگری نه — همان R9 ِ دورِ ۲۱: مسئلهٔ تازهٔ بازنگری در بازنگری می‌ماند) — هرگز یادداشتِ بازنگریِ مسئلهٔ بسته (keepback) یا گامِ دفترِ دیگری نیست؛ «می‌خوام … حل کنم» ⇒ همین حالا زنده */
+      if (!sg.req && SEP28.test(x)) return { k: AS.DO.live_new && WANT28.test(x) ? "live" : "raw" };
       if (!sg.req && !inBack && A.PR && A.PR.backPendOk && A.PR.backPendOk(se, a)) return { k: "backpend" };
       if (!sg.req) return inBack ? { k: "keepback", pid: bp } : { k: "refuse" };
       if (sg.notNow || OTHER_REF.test(x)) return { k: "raw" };   // «برای بعد» یا «یه مسئلهٔ دیگه» ⇒ همان نگه‌داشتن برای بعد

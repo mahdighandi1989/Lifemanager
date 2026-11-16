@@ -189,6 +189,9 @@
     if (ev && ev.not25 && ev.not25.indexOf(pid) >= 0) return false;   // دورِ ۲۵ (P5، A25-16): تکه‌ای از پیامِ مرزی که مالِ مسئلهٔ پیشینِ همان گفت‌وگوست
     var pg = S.get("eprog_" + pid), I = (pg && pg.solve && pg.solve.live && pg.solve.live.chatImp) || null;
     if (I && I.sess === se.id && a >= String(I.from || "") && a <= String(I.to || "~")) return true;
+    /* دورِ ۲۸ (story، A28-27 s08): قلمی که بی مسئلهٔ زنده (کلیدِ «c:N» ِ مسئلهٔ گفت‌وگو) ثبت شد و پنجره‌اش را مسئلهٔ زندهٔ دیگری که بعدتر از همان گفت‌وگو ساخته شد وارد کرده
+       (chatImp)، مالِ همان مسئله است — نه مالِ مسئله‌ای که سشن در آن لحظه به آن بسته بود (نتیجهٔ معمای تازه زیرِ معمای مادر هم می‌آمد) */
+    if (a && ev && /^st23_c_/.test(String(ev.id || "")) && (A.liveAll ? A.liveAll() : []).some(function (r) { if (!r || !r.p || r.p.id === pid) return false; var g = S.get("eprog_" + r.p.id), J = g && g.solve && g.solve.live && g.solve.live.chatImp; return !!(J && J.sess === se.id && a >= String(J.from || "") && a <= String(J.to || "~")); })) return false;
     if (!a) return pidAt(se, "~") === pid;
     return pidAt(se, a) === pid;
   };
@@ -308,10 +311,10 @@
   var PROVERB25 = /(?:انجام(?:ش|شون)?|تموم(?:ش)?|تمام(?:ش)?|این\s*کار(?:و|\s*را|\s*رو)?|همین\s*کار(?:و|\s*را|\s*رو)?)\s*(?:می[‌\s]?(?:دم|دهم|کنم)|میدم|میکنم|بدم|بدهم|کنم)|بر[‌\s]?می[‌\s]?گردم|خبر(?:ت|تون)?\s*می[‌\s]?(?:دم|دهم)/g;
   function planHasWhat(t) { return toks(String(t || "").replace(PROVERB25, " ").replace(WHEN25, " ")).length >= 1; }
   ST.planHasWhat = planHasWhat;
-  var EV_T = { whole: "کل در یک جمله (از گفت‌وگو)", u: "مجهول (از گفت‌وگو)", c: "شرط (از گفت‌وگو)", d: "داده (از گفت‌وگو)", plan: "طرح (از گفت‌وگو)", step: "گام (از گفت‌وگو)", res: "نتیجه (از گفت‌وگو)", other: "کارِ دیگری (از گفت‌وگو) — نه نتیجهٔ تو", lb: "بازنگری (از گفت‌وگو)", prior: "کارِ پیشینِ تو (از گفت‌وگو)", tried: "امتحانِ ردشده (از گفت‌وگو)" };
-  var EV_K = { whole: "cwhole", u: "cunk", c: "ccond", d: "cdata", plan: "cplan23", step: "cstep", res: "cres", other: "cother", lb: "clb", prior: "cprior", tried: "ctried" };
+  var EV_T = { whole: "کل در یک جمله (از گفت‌وگو)", u: "مجهول (از گفت‌وگو)", c: "شرط (از گفت‌وگو)", d: "داده (از گفت‌وگو)", plan: "طرح (از گفت‌وگو)", step: "گام (از گفت‌وگو)", res: "نتیجه (از گفت‌وگو)", other: "کارِ دیگری (از گفت‌وگو) — نه نتیجهٔ تو", calc: "حسابِ تو (از گفت‌وگو)", lb: "بازنگری (از گفت‌وگو)", prior: "کارِ پیشینِ تو (از گفت‌وگو)", tried: "امتحانِ ردشده (از گفت‌وگو)" };
+  var EV_K = { whole: "cwhole", u: "cunk", c: "ccond", d: "cdata", plan: "cplan23", step: "cstep", res: "cres", other: "cother", calc: "ccalc", lb: "clb", prior: "cprior", tried: "ctried" };
   ST.EV_K = EV_K;
-  var MARK27 = { d: 1, res: 1, step: 1, other: 1, whole: 1, tried: 1 };
+  var MARK27 = { d: 1, res: 1, step: 1, other: 1, whole: 1, tried: 1, calc: 1 };
   function markOf27(it, um) {
     if (!it || !MARK27[it.k] || !ST.arithChk || !ST.arithNote || !/[0-9۰-۹]/.test(String(it.t || ""))) return "";
     try { var ut = String((um && um.text) || it.t), q = String(it.t || "").replace(/…$/, ""), ck = ST.arithChk(q, ut.indexOf(q) >= 0 ? ut : q);
@@ -319,6 +322,20 @@
       return "حسابِ صفحه: " + (N.bad ? "✗ " : N.ask ? "؟ " : N.unread && !ck.some(function (c) { return c.ok && !c.ask; }) ? "— " : "✓ ") + N.chk; } catch (e) { return ""; }
   }
   ST.markOf27 = markOf27;
+  /* ---------- دورِ ۲۸ (story R5، C86؛ S1 A28-5 s01 📜: «۱۸ میلیون × ۱۲ = ۲۱۶ میلیون» ِ اصلاح‌شده و درست با «✗ … نمی‌خواند») ----------
+     ریشه: نشانِ صفحه هنگامِ ثبت یک بار ساخته و در lines ِ رویداد ذخیره می‌شد؛ اصلاحِ بعدی (a38 storyFollow26 / پذیرشِ «این‌جا هم عوض شود؟») همان سطرِ نشان را با
+     جایگزینیِ رشته‌ای «تازه» می‌کرد — عدد عوض می‌شد و حکم (✗) می‌ماند. حالا یک قاعده برای هر بازنویسیِ سطر: نشان همیشه از **متنِ کنونیِ** سطر دوباره سنجیده می‌شود
+     (همان markOf27 / a46)، و نشانِ پیشین — بی تغییر، همان‌طور که پیش از اصلاح بود — به تاریخچهٔ همان سطر می‌رود («نشانِ پیشینِ صفحه: …»).
+     ST.relines28(e, nv, old, tail): سطرهای تازهٔ رویداد e (k ِ رویدادِ 📜، lines) پس از اصلاحِ سطرِ نخست از old به nv. fix(l) برای سطرهای دیگر (نقلِ همان پیام). */
+  var EVK28 = { cdata: "d", cres: "res", cstep: "step", cother: "other", cwhole: "whole", ctried: "tried", ccalc: "calc" };
+  var MARKL28 = /^حسابِ صفحه:/;
+  ST.relines28 = function (e, nv, old, tail, fix) {
+    var L = (e && e.lines) || [], rest = L.slice(1), oldMk = rest.filter(function (l) { return MARKL28.test(String(l || "")); });
+    var keep = rest.filter(function (l) { return !MARKL28.test(String(l || "")); }).map(function (l) { return /^اصلاح شد ⇐|^نشانِ پیشینِ صفحه/.test(String(l)) || !fix ? l : (fix(l) || l); });
+    var k = EVK28[String(e && e.k || "")] || "", mk = k ? markOf27({ k: k, t: nv }, { text: nv }) : "";
+    var hist = [tail].concat(oldMk.map(function (m) { return "نشانِ پیشینِ صفحه (پیش از این اصلاح): " + String(m).replace(MARKL28, "").trim(); }));
+    return [nv].concat(mk ? [mk] : []).concat(keep).concat(hist.filter(Boolean));
+  };
   /* دورِ ۲۷b (history، D27-10 arD1 «چهار نقطهٔ یکسانِ کارِ پیشینِ تو (از گفت‌وگو) برای یک گام»): رویدادِ به‌روزرسانیِ دفترِ «کارِ پیشین» نامِ خودش را دارد —
      کدام گام و چه شد («کارِ پیشین — به‌روز شد: گامِ ۲ حکم رد شد») — تا در 🧭 و 📜 هر رخداد از دیگری جدا خوانده شود */
   function title27(it) { var t = String(it && it.t || ""); if (it && it.k === "prior" && /^کارِ پیشینِ تو — به‌روز شد:/.test(t)) return clip(t.replace(/^کارِ پیشینِ تو/, "کارِ پیشین").replace(/\s*·\s*(?:ازسرگیری از گامِ \S+|بقیه درست|همه درست)\s*$/, ""), 110); return EV_T[it.k]; }
@@ -328,6 +345,8 @@
     /* دورِ ۲۷b (history، A27-4، بانکِ R27 #230): نشانِ صفحه (✓/✗/؟/—) کنارِ سطرِ خودش در 📜 — همان سنجشِ a46 که مربی در همین نوبت دید (ST.arithChk بر همین تکه در همین پیام)،
        با همان جملهٔ «برای خودش» ِ ST.arithNote (عددِ درستِ ✗ لو نمی‌رود)؛ سطری که حسابی ندارد نشانی نمی‌گیرد */
     var mk27 = markOf27(it, um); if (mk27) lines = lines.concat([mk27]);
+    /* دورِ ۲۸ (C96/C125): دادهٔ او با منبعش — «فروشنده گفت ۱۲٪» دادهٔ مسئلهٔ اوست، نه «کارِ دیگری» */
+    if (it.k === "d" && um) { var ds28 = ""; try { ds28 = ST.dataSrc28(um.text, it.t); } catch (e) { } if (ds28) lines = lines.concat(["منبع: به گفتهٔ «" + ds28 + "»"]); }
     var src = um ? { sess: s.id, mid: mid(um), text: um.text, at: um.at || "", title: s.title || "" } : null;
     try { A.EVLOG.add(Object.assign(pid ? { pid: pid } : { sess: s.id }, { id: "st23_" + key.replace(/[^\w]/g, "_") + "_" + it.k + "_" + it.n, k: EV_K[it.k], at: it.at, title: title27(it), lines: lines, out: "", src: src, by: "coach" })); } catch (e) { }
   }
@@ -341,7 +360,8 @@
   var WHO27 = "(?:برادر|داداش|خواهر|آبجی|پدر|بابا|مادر|مامان|همسر|شوهر|دوست|رفیق|همکار|همسایه|پسر|دختر|معلم|استاد|عمو|دایی|خاله|عمه|هم[‌\\s]?کلاسی|مربی|فروشنده|بنگاهی|مکانیک|دکتر)(?:‌?(?:م|مون|ش|مان))?ِ?";
   var OTHER27 = new RegExp("(?:^|[\\s،,.:«(])(" + WHO27 + ")(?:\\s+[^\\s.!؟?،:]{1,14}){0,4}?\\s+(?:حساب\\s*(?:کرد|کرده)|نوشت|نوشته|درآورد|دراورد|درآورده|حل\\s*(?:کرد|کرده)|گفت|گفته|رسید|رسیده|می[‌\\s]?گه|میگه|می[‌\\s]?گوید|می[‌\\s]?گفت)(?![آ-ی])");
   var MINE27 = /(?:^|[\s،,.])(?:(?:ولی|اما)\s+)?(?:من|خودم)(?![آ-ی])/;   /* «… ولی من خودم دوباره شمردم شد ۱۲» (بانکِ R27 #248): از «من/خودم» به بعد دوباره کارِ خودش است */
-  ST.otherWork27 = function (ut) {
+  /* قرنطینه (دورِ ۲۸، C96 — docs/overhaul/REMOVAL_CANDIDATES.md): نسخهٔ دورِ ۲۷ — هر «X گفت/میگه» را «کارِ دیگری» می‌خواند و تا پایانِ پیام؛ صدا زده نمی‌شود */
+  ST.otherWork27R27 = function (ut) {
     var T = String(ut || ""), m = OTHER27.exec(T); if (!m) return null;
     var S0 = T.slice(0, m.index + 1), from = Math.max(S0.lastIndexOf(". "), S0.lastIndexOf("! "), S0.lastIndexOf("؟ "), S0.lastIndexOf("\n")) + 1, to = T.length;
     var rest = T.slice(m.index + m[0].length), mm = MINE27.exec(rest); if (mm) to = m.index + m[0].length + mm.index;
@@ -351,6 +371,44 @@
     var q28 = /[.!؟?\n]\s*(?:پس|بنابراین|در\s*نتیجه)(?![آ-ی])/.exec(rest); if (q28) { var at28 = m.index + m[0].length + q28.index + 1; if (at28 < to) to = at28; }
     return { who: m[1], from: from, to: to, text: txt(T.slice(from, to)) };
   };
+  /* ---------- دورِ ۲۸ (story R5، C96؛ F9 — A28-29 aA1، A28-30 aA1 p10، B28·D12 s20 p1، C28-8 aC1 p15، D28-11 tD1 p2) ----------
+     ریشه: «کارِ دیگری» با هر «X گفت/میگه/نوشت» ِ نزدیکِ یک نسبت ساخته می‌شد و از آغازِ آن جمله تا پایانِ پیام کش می‌آمد — پس (۱) منبعِ یک داده («فروشنده پرت رو ۱۲ درصد گفته بود»)
+     کارِ دیگری شد، (۲) جملهٔ خودش که از کمک‌کننده نام می‌برد («مامانم کمکم کرد تاریخ رو نوشت») مالِ مادر شد، (۳) نقلِ بی‌حسابِ استاد («استادم میگه «یه ایده بده»») همهٔ
+     پارامترهای خودش را «کارِ دیگری» کرد؛ و (۴) «داداشم یه حسابِ دیگه (هم) کرد: …» اصلاً خوانده نمی‌شد. قاعدهٔ C96: کارِ دیگری فقط وقتی کسِ دیگری کنندهٔ حساب یا ادعاست:
+       • فعلِ حساب («حساب کرد»، «حل کرد»، «درآورد»، «نوشت»، «رسید»، یا «… کرد:» که حسابی پس از خود دارد) ⇒ کارِ دیگری؛
+       • فعلِ گفتن («گفت/میگه/گفته بود») ⇒ کارِ دیگری فقط اگر گفته‌اش خودش حساب یا ادعای جواب یا اطمینانِ عددی است («داداشم گفت ۳ × ۵ = ۱۵»، «جوابش ۱۲ میشه»، «۷۰ درصد مطمئنه»)؛
+         وگرنه منبعِ یک دادهٔ مسئلهٔ اوست (ST.dataSrc28 ⇒ برچسبِ «منبع» کنارِ همان داده)؛
+       • «کمکم کرد» میانِ نسبت و فعل ⇒ جملهٔ خودش؛ فعلِ اول‌شخص («نوشتم») هرگز نسبت نیست؛
+       • دامنه همان جمله است، مگر جمله فهرست پیش بکشد («…:»، «اینا»، «این حساب‌ها»، «نسخه») — آن‌گاه تا پایانِ پیام یا تا جمله‌ای که با «من/خودم» یا فعلِ اول‌شخص برمی‌گردد. */
+  var CALCV28 = "(?:حساب\\s*(?:کرد|کرده)|حل\\s*(?:کرد|کرده)|درآورد|دراورد|درآورده|نوشت|نوشته|رسید|رسیده|کرد(?=\\s*:))";
+  var SAYV28 = "(?:گفت|گفته|گفتن|می[‌\\s]?گه|میگه|می[‌\\s]?گوید|می[‌\\s]?گفت|می[‌\\s]?گن|میگن)";
+  var OTHER28 = new RegExp("(?:^|[\\s،,.:«(])(" + WHO27 + ")((?:\\s+[^\\s.!؟?،:]{1,14}){0,4}?)\\s+(?:(" + CALCV28 + ")|(" + SAYV28 + "))(?![آ-ی])", "g");
+  var SENT28 = /[.!؟?\n؛](?![0-9۰-۹])/g;
+  var CALCX28 = /[0-9۰-۹][0-9۰-۹.٫,٬\/]*\s*(?:[×x*÷\/+\-−–]|ضرب|تقسیم|منها|منهای|به[‌\s]?علاوه|بعلاوه|درصدِ?)\s*[0-9۰-۹(]/;
+  var CLAIM28 = /(?:=|میشه|می[‌\s]?شه|می[‌\s]?شود|درمیاد|درمی[‌\s]?آد|شد(?![آ-ی]))\s*[^.!؟?]{0,12}[0-9۰-۹]|جواب\S*\s+[^.!؟?]{0,20}[0-9۰-۹]|[0-9۰-۹]+\s*(?:درصد|٪|%)?\s*(?:مطمئن|احتمال|شانس)|(?:مطمئن|احتمال|شانس)\S*\s+[^.!؟?]{0,12}[0-9۰-۹]|[0-9۰-۹]+\s*(?:درصد|٪|%)\s+ن?می[‌\s]?[آ-ی]/;
+  var LIST28 = /:\s*\S|(?:^|[\s«])(?:اینا|این[‌\s]?ها|این\s+حساب|همین\s+حساب|حساب[‌]?ها|نسخه)/;
+  var MINEV28 = /(?:^|[\s،,.])(?:(?:ولی|اما)\s+)?(?:من|خودم)(?![آ-ی])|(?:گذاشتم|کردم|گرفتم|نوشتم|رسیدم|درآوردم|شمردم|دیدم|زدم|خریدم|ساختم)(?![آ-ی])/;
+  function sentAt28(T, i) { var a = 0, b = T.length, m; SENT28.lastIndex = 0; while ((m = SENT28.exec(T))) { if (m.index < i) a = m.index + 1; else { b = m.index + 1; break; } } return { a: a, b: b }; }
+  function attr28(ut) { var T = String(ut || ""), m, out = []; OTHER28.lastIndex = 0;
+    while ((m = OTHER28.exec(T))) { var mid0 = m[2] || "", end = m.index + m[0].length, se = sentAt28(T, end - 1), after = T.slice(end, se.b);
+      if (/کمک/.test(mid0)) continue;                                        // «مامانم کمکم کرد تاریخ رو نوشت» — جملهٔ خودش
+      if (m[3] && /^کرد$/.test(m[3]) && !/حساب|ضرب|جمع|تقسیم/.test(mid0)) continue;   // «داداشم فقط نگاه کرد: …» نسبتِ حساب نیست (بانکِ R28 #207)
+      if (/(?:^|[\s،,.])(?:خودم|من)\s+[^.!؟?]{0,20}(?:حساب\s*کردم|نوشتم|درآوردم|شمردم)(?![آ-ی])/.test(T.slice(se.a, m.index))) continue;   // «خودم حساب کردم، داداشم …» — کارِ خودش
+      var calc = !!m[3], claim = CALCX28.test(after) || CLAIM28.test(after);
+      out.push({ who: m[1], at: m.index, end: end, sent: se, calc: calc, claim: claim, other: (calc && /[0-9۰-۹]/.test(T.slice(end, T.length))) || (!calc && claim), say: !calc, after: after }); }
+    return out; }
+  ST.otherWork27 = function (ut) {
+    var T = String(ut || ""), A0 = attr28(T).filter(function (x) { return x.other; })[0]; if (!A0) return null;
+    var from = A0.sent.a, to = A0.sent.b, S0 = T.slice(A0.sent.a, A0.sent.b);
+    if (LIST28.test(T.slice(A0.end, A0.sent.b)) || /(?:^|[\s«])(?:اینا|این[‌\s]?ها|این\s+حساب|نسخه)/.test(S0)) { to = T.length; var rest = T.slice(A0.sent.b), sm = null, k = A0.sent.b;
+      rest.split(SENT28).some(function (x) { if (MINEV28.test(x)) { sm = k; return true; } k += x.length + 1; return false; }); if (sm != null) to = sm; }
+    else { var mm = MINE27.exec(T.slice(A0.end, to)); if (mm) to = A0.end + mm.index; }
+    while (to > from && /\s/.test(T.charAt(to - 1))) to--; while (from < to && /[\s»«"'،,:]/.test(T.charAt(from))) from++;
+    return { who: A0.who, from: from, to: to, text: txt(T.slice(from, to)) };
+  };
+  /* منبعِ یک داده (C96): «فروشنده گفت ۱۲٪»، «استادم میگه …» — نامِ نسبت اگر جملهٔ همین داده آن را به گوینده‌ای نسبت می‌دهد و آن گفته کارِ دیگری نیست */
+  ST.dataSrc28 = function (ut, d) { var T = String(ut || ""), i = d ? T.indexOf(String(d).replace(/…$/, "").slice(0, 16)) : -1;
+    var A0 = attr28(T).filter(function (x) { return x.say && !x.other && /[0-9۰-۹]/.test(x.after) && (i < 0 || (i >= x.sent.a && i < x.sent.b)); })[0]; return A0 ? A0.who : ""; };
   /* q (نقلِ نتیجهٔ مدل) درونِ تکهٔ دیگری است؛ بی q: هیچ عددی بیرون از آن تکه نیست */
   ST.otherOwns27 = function (ut, q) {
     var O = ST.otherWork27(ut); if (!O) return false; var T = String(ut || "");
@@ -434,8 +492,9 @@
        مسئلهٔ تازه‌ای که همین نوبت از جمله‌ای وسطِ همین پیام ساخته شد (chat_invent/live_new) مالکِ هر چیزی است که او از همان جمله به بعد گفت؛ آنچه پیش از آن گفت مالِ
        مسئلهٔ پیشین می‌ماند (پیش‌تر طرحِ مسئلهٔ تازه «گامِ کنونی» ِ مسئلهٔ پیشین شد). */
     var B26 = null; try { B26 = bornFrom26(s, um) || movedTo26(s, um, pid); } catch (e) { B26 = null; }
-    if (B26 && B26.pid !== pid && B26.off > 0) { var kB = "L:" + B26.pid, EB = storyOf(s, kB, true), movedB = [];
-      I = I.filter(function (it) { if (it.k === "prior") return true; var ix = ut.indexOf(String(it.t || "").replace(/…$/, "").slice(0, 16)); if (ix < B26.off) return true;
+    if (B26 && B26.kb) I = I.filter(function (it) { return it.k === "prior"; });
+    else if (B26 && B26.pid !== pid && B26.off >= 0) { var kB = "L:" + B26.pid, EB = storyOf(s, kB, true), movedB = [];
+      I = I.filter(function (it) { if (it.k === "prior") return true; var ix = ut.indexOf(String(it.t || "").replace(/…$/, "").slice(0, 16)); if (B26.off > 0 && ix < B26.off) return true;
         if (!EB.items.some(function (x) { return x.k === it.k && x.mid === m0 && nz(x.t) === nz(it.t); })) { it.at = at; it.mid = m0; it.n = EB.items.length + 1; EB.items.push(it); movedB.push(it); logEv(s, B26.pid, it, um, kB); } return false; });
       if (movedB.length) feed(B26.pid, s, movedB, um); }
     I.forEach(function (it) {
@@ -1330,8 +1389,8 @@
   /* بانکِ R26 #84: کنشِ همین نوبت (chat_invent/live_new) صورتی را از وسطِ همین پیام برداشت و آن را مسئلهٔ **موجودِ** دیگری شناخت («پیش‌تر ثبت شده بود؛ دوباره نساختم») ⇒ همان مرز:
      از همان جمله به بعد مالِ همان مسئله است. C.moved26 = [{ mid, pid, off }] — هم برای دفترِ داستان (onState) و هم مالکِ «برنامهٔ خودت» (ST.planOwner). */
   function movedTo26(se, um, pid) {
-    var k = mid(um), M = (((se && se.coach) || {}).moved26 || []).filter(function (x) { return x && x.mid === k && x.pid !== pid && x.off > 0; }).pop();
-    return M ? { pid: M.pid, off: M.off } : null;
+    var k = mid(um), M = (((se && se.coach) || {}).moved26 || []).filter(function (x) { return x && x.mid === k && x.pid !== pid && x.off >= 0; }).pop();
+    return M ? { pid: M.pid, off: M.off, kb: M.kb } : null;
   }
   ["chat_invent", "live_new"].forEach(function (nm) {
     if (!AS.DO || typeof AS.DO[nm] !== "function" || AS.DO[nm]._r26story) return; var raw = AS.DO[nm];
@@ -1339,8 +1398,14 @@
       var s0 = AS._turnSession, um = s0 ? lastUser(s0) : null, ids0 = {}; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { ids0[r.p.id] = 1; }); } catch (e) { }
       var out = raw.apply(this, arguments);
       try { var stA = txt(a && a.statement), off = um && stA ? stmtOff26(String(um.text || ""), stA) : -1;
-        if (off > 0) { var all = A.liveAll ? A.liveAll() : [], nw = all.filter(function (r) { return !ids0[r.p.id]; })[0], tg = nw ? nw.p.id : ((all.filter(function (r) { return sameProb26(stA, r.p.statement) || (a.title && nz(r.p.title) === nz(a.title)); })[0] || { p: {} }).p.id || "");
-          if (tg) { var C0 = s0.coach = s0.coach || {}; (C0.moved26 = C0.moved26 || []).push({ mid: mid(um), pid: tg, off: off }); if (C0.moved26.length > 30) C0.moved26 = C0.moved26.slice(-30); } } } catch (e) { }
+        /* دورِ ۲۸ (story، A28-27 s08 p8 «خودم یه معما ساختم: … ۹−۵=۴، بعد ۹+۴=۱۳»): پیامی که از نخستین واژه‌اش مسئلهٔ تازه است (off = 0) هم مرزِ همین مسئله است — همهٔ آنچه در آن گفت
+           مالِ مسئلهٔ تازه است، نه مسئلهٔ پیشینِ سشن (پیش‌تر فقط off > 0 ⇒ نتیجهٔ معمای تازه زیرِ معمای مادر هم می‌نشست). off = 0 فقط برای مسئلهٔ تازه‌ساخته، نه پیوند به مسئلهٔ موجود. */
+        var nw0 = (A.liveAll ? A.liveAll() : []).filter(function (r) { return !ids0[r.p.id]; })[0];
+        if (off > 0 || (off === 0 && nw0)) { var all = A.liveAll ? A.liveAll() : [], nw = all.filter(function (r) { return !ids0[r.p.id]; })[0], tg = nw ? nw.p.id : ((all.filter(function (r) { return sameProb26(stA, r.p.statement) || (a.title && nz(r.p.title) === nz(a.title)); })[0] || { p: {} }).p.id || "");
+          if (tg) { var C0 = s0.coach = s0.coach || {}; (C0.moved26 = C0.moved26 || []).push({ mid: mid(um), pid: tg, off: off }); if (C0.moved26.length > 30) C0.moved26 = C0.moved26.slice(-30); } }
+        /* همان پیامِ سراسر تازه که در بازنگریِ مسئلهٔ پیشین نگه داشته شد (keepback، بی رکوردِ زنده): هیچ قلمی از آن در داستانِ مسئلهٔ پیشین نمی‌نشیند — وقتی همان مسئله زنده شود
+           (chat_solved/«باز کن») واردکردنِ گفت‌وگو همین پیام را به خودش می‌برد (A28-27: نتیجهٔ معمای تازه هم زیرِ معمای مادر بود و هم زیرِ خودش) */
+        else if (off === 0 && !nw0 && out && typeof out === "object" && /نگه داشتم/.test(String(out.info || ""))) { var C1 = s0.coach = s0.coach || {}; (C1.moved26 = C1.moved26 || []).push({ mid: mid(um), pid: "", off: 0, kb: 1 }); } } catch (e) { }
       return out;
     };
     Object.keys(raw).forEach(function (k) { AS.DO[nm][k] = raw[k]; }); AS.DO[nm]._r26story = true;
@@ -1354,7 +1419,7 @@
     var at = String((sm && sm.at) || q.at || "");
     try { var bp = null;
       if (sm && sm.mid) S.all("eprog", function (pg) { var I = pg && pg.solve && pg.solve.live && pg.solve.live.chatImp; return !!(I && I.sess === se.id && I.bmid === sm.mid && I.boff > 0); }).forEach(function (pg) { bp = { pid: String(pg.id).replace(/^eprog_/, ""), off: pg.solve.live.chatImp.boff }; });
-      if (!bp && sm && sm.mid) { var mv = (((se && se.coach) || {}).moved26 || []).filter(function (x) { return x && x.mid === sm.mid && x.off > 0; }).pop(); if (mv) bp = { pid: mv.pid, off: mv.off }; }
+      if (!bp && sm && sm.mid) { var mv = (((se && se.coach) || {}).moved26 || []).filter(function (x) { return x && x.mid === sm.mid && x.off >= 0; }).pop(); /* دورِ ۲۸ (A28-27): پیامِ سراسر تازه هم */ if (mv) bp = { pid: mv.pid, off: mv.off }; }
       if (bp) { var ix = String(sm.text || "").indexOf(String(q.text || "").replace(/…$/, "").slice(0, 16)); if (ix >= bp.off) return bp.pid; } } catch (e) { }
     var o = pidAt(se, at); if (o) return o;
     var own = ""; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { if (!own && r && r.p && ST.owns(se, r.p.id, at)) own = r.p.id; }); } catch (e) { }
@@ -1999,12 +2064,16 @@
       Object.keys(T).forEach(function (key) { if (o) return; (T[key].items || []).forEach(function (x) { if (!o && x && ("st23_" + key.replace(/[^\w]/g, "_") + "_" + x.k + "_" + x.n) === evId) o = { s: s, key: key, it: x }; }); }); }); return o; }
   function rePh27(pid, s) { var pg = S.get("eprog_" + pid); if (!pg || !pg.solve || !pg.solve.live) return; var L = pg.solve.live, ph = phaseOfItems(storyOf(s, "L:" + pid).items.concat(L.chatImpItems || []));
     if ((ph || "") !== (L.chatPh || "")) { L.chatPh = ph || ""; L.chatPhAt = nowIso(); S.put(pg); } }
+  function dlMv28(pid, it, mv) { var pg = S.get("eprog_" + pid), L = pg && pg.solve && pg.solve.live, d = L && L.uDraft; if (!d) return; var hit = false;
+    (d.dl || []).forEach(function (x) { if (x && (nz(x.t) === nz(it.t) || (x.chat && x.chat.mid === it.mid && nz(x.chat.t) === nz(it.t)))) { if (mv) x.mv28 = mv; else delete x.mv28; hit = true; } }); if (hit) S.put(pg); }
   ST.moveItem27 = function (evId, toPid, back) {
     var o = evItem27(evId); if (!o || !toPid) return null; var s = o.s, from = /^L:(.+)$/.exec(o.key), at = nowIso(), kB = "L:" + toPid, EB = storyOf(s, kB, true);
     if (back) { var orig = (storyOf(s, o.it.mvFrom || "").items || []).filter(function (x) { return x && x.mv27 && x.mv27.copy === evId; })[0];
       o.it.mv27 = { to: o.it.mvFrom, at: at, back: true }; if (orig) { (orig.mvHist = orig.mvHist || []).push({ to: orig.mv27.to, at: orig.mv27.at }, { back: true, at: at }); delete orig.mv27; }
-      var home = /^L:(.+)$/.exec(o.it.mvFrom || ""); S.put(s); rePh27(toPid, s); if (home) rePh27(home[1], s); return { item: orig }; }
+      var home = /^L:(.+)$/.exec(o.it.mvFrom || ""); S.put(s); rePh27(toPid, s); if (home) { rePh27(home[1], s); if (o.it.k === "d") dlMv28(home[1], o.it, null); } return { item: orig }; }
     var cp = Object.assign({}, o.it, { n: EB.items.length + 1, mvFrom: o.key, at: o.it.at }); delete cp.mv27; EB.items.push(cp);
+    /* دورِ ۲۸ (C95، بانکِ R28 #214): دادهٔ جابه‌جاشده در پیش‌نویسِ فرمِ فهمِ مبدأ هم دیگر شمرده نمی‌شود (سطرِ پیش‌نویس با نشانِ mv28 می‌ماند، پاک نمی‌شود) */
+    if (from && o.it.k === "d") dlMv28(from[1], o.it, { to: toPid, at: at });
     var cpId = "st23_" + kB.replace(/[^\w]/g, "_") + "_" + cp.k + "_" + cp.n; o.it.mv27 = { to: kB, at: at, copy: cpId };
     S.put(s); if (from) rePh27(from[1], s); try { var um = (s.msgs || []).filter(function (m) { return isUser(m) && mid(m) === cp.mid; })[0]; feed(toPid, s, [cp], um || null); } catch (e) { } rePh27(toPid, s);
     return { item: cp, id: cpId };
@@ -2026,4 +2095,39 @@
   };
   AS.afterTurnHooks = AS.afterTurnHooks || [];
   AS.afterTurnHooks.push(function (s) { try { if (ST.prcPlan27(s)) S.put(s); } catch (e) { console.warn(e); } });
+
+  /* ---------- دورِ ۲۸ (story R5؛ A28-12 s02 p13/p15–p16، s08 p10، s09 p15؛ A28-30 aA1 p10) ----------
+     ریشه: 📜 فقط آنچه را می‌گرفت که گزارشِ مدل (coach_state.said) نام برده بود؛ نوبتی که مدل said ِ خالی داد یا اصلاً coach_state نفرستاد، حساب‌های خودِ او و کارِ
+     کسِ دیگری که در همان پیام بود در هیچ پرونده‌ای نمی‌نشست — هرچند صفحه همان‌ها را سنجیده و به مربی نشان داده بود («مدل گزارش می‌دهد، صفحه می‌سنجد»: آنچه صفحه خودش
+     در متنِ او می‌خواند گزارشِ مدل لازم ندارد). حالا پس از هر نوبتِ مسئله‌دار: هر جملهٔ او که حسابی دارد و هیچ قلمِ همان پیام عددهایش را پوشش نمی‌دهد «حسابِ تو (از گفت‌وگو)»
+     می‌شود (با نشانِ صفحه، بی اثر بر مرحله)، و کارِ کسِ دیگر (C96) «کارِ دیگری». پیامِ اصلاح، یادآوری و پیامی که صفحه برایش «کدام مسئله؟» پرسیده کنار می‌مانند. */
+  ST.ownCalc28 = function (s) {
+    var um = lastUser(s); if (!um || !s || isSysT28(um.text)) return false; var C = s.coach = s.coach || {}, ut = String(um.text || ""), m0 = mid(um);
+    if (CORRMSG24.test(ut) || (AS.RECALL22 && AS.RECALL22.test(ut)) || (C.ask26 && C.ask26.open && C.ask26.key === nz(ut).slice(0, 80))) return false;
+    var so = C.saidOk && C.saidOk.at === String(um.at || "") ? C.saidOk : null, bl = null; try { bl = AS.boundLive ? AS.boundLive(s) : null; } catch (e) { }
+    var pid = (so && so.live) || (bl && !bl.done && bl.pid) || ""; if (!pid && !C.stmt && bl && bl.pid) pid = bl.pid;   // مسئلهٔ بستهٔ همین گفت‌وگو (aA1 p10: حسابِ داداش پس از حلِ مسئله)
+    var mv28 = null; try { mv28 = bornFrom26(s, um) || movedTo26(s, um, pid); } catch (e) { } if (mv28 && mv28.kb) return false; if (mv28 && mv28.pid && mv28.off === 0) pid = mv28.pid;   // پیامِ سراسر تازه مالِ مسئلهٔ خودش است (A28-27)
+    if (!pid && !C.stmt) return false;
+    var key = keyFor(s, pid), E = storyOf(s, key, true), mine = function () { var o = []; Object.keys(C.story || {}).forEach(function (k) { (C.story[k].items || []).forEach(function (x) { if (x && x.mid === m0) o.push(x); }); }); return o; };
+    var I = [], OW = null; try { OW = ST.otherWork27(ut); } catch (e) { }
+    if (OW && /[0-9۰-۹]/.test(OW.text) && !mine().some(function (x) { return x.k === "other"; })) I.push({ k: "other", t: clip(OW.text, 300), who: OW.who });
+    if (mine().some(function (x) { return x.k === "prior"; }) || (C.prLast25 && C.prLast25.at === String(um.at || ""))) return I.length ? (I.forEach(function (it) { it.at = String(um.at || nowIso()); it.mid = m0; it.n = E.items.length + 1; E.items.push(it); logEv(s, pid, it, um, key); }), true) : false;   // دفترِ کارِ پیشین همین پیام را دارد
+    var have = mine().concat(I);
+    sentences(ut).forEach(function (x) { var i = ut.indexOf(x); if (OW && i >= OW.from && i < OW.to) return; var ck = []; try { ck = ST.arithChk(x, ut) || []; } catch (e) { }
+      if (!(ck.length || (ck.unread || []).length)) return; var N = numsOf(x); if (!N.length) return;
+      if (have.some(function (y) { var Y = numsOf(y.t); return N.every(function (n) { return Y.indexOf(n) >= 0; }); })) return;
+      var it = { k: "calc", t: clip(x, 300) }; I.push(it); have.push(it); });
+    /* دادهٔ بی‌گزارش (بانکِ R28 #201، D28-17 tD1 p17 «هزینهٔ جمع کردنِ موکتِ قدیمی هم ۵۰۰ هزار تومنه»): جملهٔ خبریِ او با یک مقدار و واحدش، بی حساب و بی پرسش و بی فعلِ آینده،
+       که هیچ قلمِ همان پیام پوشش نمی‌دهد ⇒ «داده (از گفت‌وگو)» */
+    sentences(ut).forEach(function (x) { var i = ut.indexOf(x); if (OW && i >= OW.from && i < OW.to) return; if (/[؟?]\s*$/.test(x) || FUTURE.test(x) || !QTY28.test(x)) return; var st28 = nz(stmtOf(s, pid) || C.stmt || ""); if (st28 && st28.indexOf(nz(x).slice(0, 30)) >= 0) return; var ck = []; try { ck = ST.arithChk(x, ut) || []; } catch (e) { } if (ck.length) return;
+      var N = numsOf(x); if (!N.length || have.some(function (y) { var Y = numsOf(y.t); return N.every(function (n) { return Y.indexOf(n) >= 0; }); })) return;
+      var it = { k: "d", t: clip(x, 300) }; I.push(it); have.push(it); });
+    if (!I.length) return false; var at = String(um.at || nowIso());
+    I.forEach(function (it) { it.at = at; it.mid = m0; it.n = E.items.length + 1; E.items.push(it); logEv(s, pid, it, um, key); });
+    return true;
+  };
+  var QTY28 = /[0-9۰-۹][0-9۰-۹.٫,٬]*\s*(?:هزار|میلیون|میلیارد)?\s*(?:تومن|تومان|ریال|متر|سانت|کیلو|لیتر|گرم|درصد|٪)/;
+  function isSysT28(t) { return /^\s*\[(?:سامانه|اصلاحِ پیامِ قبلی)/.test(String(t || "")); }
+  AS.afterTurnHooks = AS.afterTurnHooks || [];
+  AS.afterTurnHooks.push(function (s) { try { if (ST.ownCalc28(s)) S.put(s); } catch (e) { console.warn(e); } });
 })(APP);
