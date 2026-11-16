@@ -1,0 +1,217 @@
+{
+"from": "round28B/tB1",
+"t0": "2026-10-30T09:00:00",
+"base": 0,
+"inject": "(()=>{if(window.__RD)return;const RD=Date;window.__RD=RD;window.__off=0;function D(...a){if(!new.target)return new RD(RD.now()+window.__off).toString();return a.length?new RD(...a):new RD(RD.now()+window.__off)}D.prototype=RD.prototype;D.now=()=>RD.now()+window.__off;D.UTC=RD.UTC;D.parse=RD.parse;window.Date=D;window.__adv=(d)=>{window.__off+=d*864e5;try{APP.render()}catch(e){};return new D().toISOString()};})();\nwindow.__fx={set(sel,v){const e=typeof sel==='string'?document.querySelector(sel):sel;if(!e)return 'NOEL '+sel;const pr=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(pr,'value').set.call(e,v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'},\nbtn(re,root){const b=[...(root?document.querySelector(root):document).querySelectorAll('button')].filter(b=>b.getClientRects().length).find(b=>re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,60)},\nfields(){return [...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>e.getClientRects().length).map(e=>(e.id||e.name||'?')+'|'+e.type+'|'+(e.getAttribute('aria-label')||e.placeholder||'').slice(0,70)+'|'+String(e.value).slice(0,40))},\nbtns(){return [...document.querySelectorAll('#main button')].filter(b=>b.getClientRects().length).map(b=>b.textContent.trim().slice(0,50))},\nmain(n){return document.getElementById('main').innerText.slice(0,n||3000)}};'fx'\n\n;(function(){try{var L=JSON.parse(localStorage.getItem('__areas28')||'[]');if(!window.SYS_TERR)return;(window.SYS_TERR.systems||[]).forEach(function(S0){(S0.groups||[]).forEach(function(G){G.areas=(G.areas||[]).filter(function(a){return !a._r28;});});});L.forEach(function(a){var S0=(window.SYS_TERR.systems||[]).filter(function(x){return x.id===a._s;})[0];if(!S0)return;var G=(S0.groups||[]).filter(function(g){return g.id===a._g;})[0]||S0.groups[0];var o=Object.assign({},a,{_r28:1});delete o._s;delete o._g;(G.areas=G.areas||[]).push(o);});}catch(e){}})();\n",
+"steps": [
+{
+"say": "سلام. یه ایده دارم و می‌خوام از ایده برسم به یه برنامه‌ی واقعی برای ساختنش: یه جعبه‌قرص هوشمند برای مادرم که با یه ترازوی کوچیک زیر هر خونه می‌فهمه قرص رو برداشته یا نه، و اگه سر ساعت برنداشت به گوشی من پیام میده. از کجا شروع کنم؟",
+"c": 1
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await w(700);const i=document.querySelector('.age-ask .age-in');if(!i)return 'NOCARD age='+APP.AGE.age();i.scrollIntoView({block:'center'});const st=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;st.call(i,\"1995-07-14\");i.dispatchEvent(new Event('input',{bubbles:true}));await w(300);[...document.querySelectorAll('.age-ask button')].find(b=>b.textContent.trim()==='ثبت').click();await w(700);const m=document.querySelector('.age-ask .bad');return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' err='+(m?m.textContent:'')+' card='+!!document.querySelector('.age-ask')})()",
+"c": 2
+},
+{
+"say": "یه جعبه‌قرص که خودش بفهمه مادرم قرصش رو برداشته یا نه و اگه برنداشت به من خبر بده — ارزون، و بدون اینکه مادرم کار اضافه‌ای بکنه.",
+"c": 3
+},
+{
+"say": "اگه ماهی بیشتر از یه بار هشدار اشتباه بده مادرم کلافه میشه، پس حداکثر یکی در ماه. چیزایی که می‌دونم: هر قرص حدود ۰.۳ گرمه، یه برد آردوینو دارم، ترازوی دیجیتال ارزون پیدا میشه. چیزایی که نمی‌دونم: (۱) ترازوی ارزون اون‌قدر دقیق هست که ۰.۳ گرم رو ببینه؟ (۲) چطور به گوشی پیام بده؟ (۳) قبلاً کسی همینو ساخته یا ثبت اختراع کرده؟ برای سومی اصلاً نمی‌دونم چطوری باید گشت.",
+"c": 4
+},
+{
+"say": "ترازوهای ارزونی که دیدم دقتشون ۰.۱ گرمه. پس ۰.۳ گرم یعنی ۳ تا پله؛ فکر کنم کافیه.",
+"c": 5
+},
+{
+"say": "امتحان کردم: یه قرص رو ۲۰ بار گذاشتم و برداشتم. ۱۹ بار ۰.۲ یا ۰.۳ نشون داد، یه بار ۰.۰. اگه روزی دو تا قرص باشه، ماهی ۶۰ بار؛ با ۱ از ۲۰ یعنی ماهی ۳ تا هشدار اشتباه — از معیارم بیشتره! پس باید دو بار پشت سر هم بخونه.",
+"c": 6
+},
+{
+"say": "اگه مستقل باشن، هر دو اشتباه یعنی ۱/۲۰ × ۱/۲۰ = ۱/۴۰۰؛ ماهی ۶۰ بار، یعنی ۰.۱۵ هشدار در ماه. زیر معیاره! برای (۲) هم یه ماژول وای‌فای ESP8266 دارم، با تلگرام‌بات پیام می‌فرستم؛ اینو قبلاً تو یه پروژه‌ی دیگه کار کردم. حالا جمع‌بندی کن ببینم کجام.",
+"c": 7
+},
+{
+"say": "این جعبه‌قرص رو به‌عنوانِ مسئله‌ی خودم ثبت کن که مرحله‌هاش و اون قسمتِ منتظر بمونه.",
+"c": 8
+},
+{
+"eval": "(()=>JSON.stringify((APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({sc:o.sc.pid||o.sc.sess,id:o.e.id,number:o.e.number,state:o.e.state,step:o.e.step,stepBy:o.e.stepBy}))))()",
+"c": 9
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"lprob\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 10
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"lprob\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);{const el=[...document.querySelectorAll('#main *')].filter(e=>e.children.length<6&&e.getClientRects().length&&\"\\u0645\\u0646\\u062a\\u0638\\u0631|\\u23f8|\\u0628\\u0631\\u06af\\u0647\\u0654\".split('|').some(t=>e.textContent.includes(t))).pop();if(el)el.scrollIntoView({block:'center'});}await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 11
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"WAIT\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 12
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);{const el=[...document.querySelectorAll('#main *')].filter(e=>e.children.length<6&&e.getClientRects().length&&\"\\u0645\\u0646\\u062a\\u0638\\u0631|\\u23f8|\\u0628\\u0631\\u06af\\u0647\".split('|').some(t=>e.textContent.includes(t))).pop();if(el)el.scrollIntoView({block:'center'});}await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 13
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh101'];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #۱۰۱: نمودارِ پیشرفتِ هفتگی در «کارنامهٔ ذهن» بهتر شد و حالا روندِ چهار هفته را نشان می‌دهد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 14
+},
+{
+"eval": "(async()=>{await APP.PRE.sysSweep(true);APP.render();return 'swept'})()",
+"c": 14
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));__adv(1);APP.ASSIST.toggle(false);APP.go('today');await w(4000);APP.render();await w(3000);APP.go('today');await w(1500);const L=(APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({id:o.e.id,state:o.e.state,how:o.e.how,ruled:o.e.ruled,ask:o.e.ask&&{id:o.e.ask.id,fa:o.e.ask.fa},rejected:o.e.rejected,checks:(o.e.checks||[]).map(c=>c.reason||c)}));const s=APP.ASSIST.cur();let sh=null;try{sh=await APP.HOST.sheet('sh101');sh={status:sh.status,notes:sh.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400))}}catch(e){}return JSON.stringify({sys:L,sheet:sh,msgs:(s.msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text),today:document.getElementById('main').innerText.split('\\n').filter(l=>/ابزار|برگه|🛎|⛔|⚠️|❓|⏸/.test(l)).slice(0,8)})})()",
+"c": 14
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh101'];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #۱۰۱: حوزهٔ pr_creativity (خلاقیت و تفکرِ واگرا) کامل‌تر شد و برای همین نیاز به کار می‌آید.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 15
+},
+{
+"eval": "(async()=>{await APP.PRE.sysSweep(true);APP.render();return 'swept'})()",
+"c": 15
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));__adv(1);APP.ASSIST.toggle(false);APP.go('today');await w(4000);APP.render();await w(3000);APP.go('today');await w(1500);const L=(APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({id:o.e.id,state:o.e.state,how:o.e.how,ruled:o.e.ruled,ask:o.e.ask&&{id:o.e.ask.id,fa:o.e.ask.fa},rejected:o.e.rejected,checks:(o.e.checks||[]).map(c=>c.reason||c)}));const s=APP.ASSIST.cur();let sh=null;try{sh=await APP.HOST.sheet('sh101');sh={status:sh.status,notes:sh.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400))}}catch(e){}return JSON.stringify({sys:L,sheet:sh,msgs:(s.msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text),today:document.getElementById('main').innerText.split('\\n').filter(l=>/ابزار|برگه|🛎|⛔|⚠️|❓|⏸/.test(l)).slice(0,8)})})()",
+"c": 15
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh101'];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #۱۰۱: یک ابزارِ تازه برای تغییر در مسئله‌ها ساخته شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 16
+},
+{
+"eval": "(async()=>{await APP.PRE.sysSweep(true);APP.render();return 'swept'})()",
+"c": 16
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));__adv(1);APP.ASSIST.toggle(false);APP.go('today');await w(4000);APP.render();await w(3000);APP.go('today');await w(1500);const L=(APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({id:o.e.id,state:o.e.state,how:o.e.how,ruled:o.e.ruled,ask:o.e.ask&&{id:o.e.ask.id,fa:o.e.ask.fa},rejected:o.e.rejected,checks:(o.e.checks||[]).map(c=>c.reason||c)}));const s=APP.ASSIST.cur();let sh=null;try{sh=await APP.HOST.sheet('sh101');sh={status:sh.status,notes:sh.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400))}}catch(e){}return JSON.stringify({sys:L,sheet:sh,msgs:(s.msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text),today:document.getElementById('main').innerText.split('\\n').filter(l=>/ابزار|برگه|🛎|⛔|⚠️|❓|⏸/.test(l)).slice(0,8)})})()",
+"c": 16
+},
+{
+"eval": "localStorage.setItem('__areas28', \"[{\\\"claims\\\": [{\\\"basis_fa\\\": \\\"افزودهٔ آزمایشیِ تور (رونوشتِ خراشی)\\\", \\\"fa\\\": \\\"شناختنِ رقیبان، قیمت‌ها و سهمِ بازار برای جایگاه‌یابیِ یک ایدهٔ محصول: چه کسی چه می‌فروشد، به چه قیمتی و به کدام مشتری.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"polya1945\\\"]}], \\\"desc_fa\\\": \\\"شناختنِ رقیبان، قیمت‌ها و سهمِ بازار برای جایگاه‌یابیِ یک ایدهٔ محصول: چه کسی چه می‌فروشد، به چه قیمتی و به کدام مشتری.\\\", \\\"en\\\": \\\"Market and competitor scan\\\", \\\"fa\\\": \\\"بررسیِ بازار و رقیبان\\\", \\\"gap_fa\\\": \\\"\\\", \\\"id\\\": \\\"pr_market_scan\\\", \\\"key_questions_fa\\\": [\\\"رقیبانِ اصلی چه کسانی‌اند و چه قیمتی می‌فروشند؟\\\", \\\"جایگاهِ ایدهٔ من میانِ آن‌ها کجاست؟\\\"], \\\"src\\\": [\\\"polya1945\\\"], \\\"tools\\\": [\\\"view:e_prob\\\"], \\\"_g\\\": \\\"g_problem_structure\\\", \\\"_s\\\": \\\"s_problem\\\"}]\");'areas'",
+"c": 17
+},
+{
+"reload": true,
+"c": 17
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh101'];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #۱۰۱: حوزهٔ «بررسیِ بازار و رقیبان» (pr_market_scan) به قلمروِ حل مسئله افزوده شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 17
+},
+{
+"eval": "(async()=>{await APP.PRE.sysSweep(true);APP.render();return 'swept'})()",
+"c": 17
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));__adv(0);APP.ASSIST.toggle(false);APP.go('today');await w(4000);APP.render();await w(3000);APP.go('today');await w(1500);const L=(APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({id:o.e.id,state:o.e.state,how:o.e.how,ruled:o.e.ruled,ask:o.e.ask&&{id:o.e.ask.id,fa:o.e.ask.fa},rejected:o.e.rejected,checks:(o.e.checks||[]).map(c=>c.reason||c)}));const s=APP.ASSIST.cur();let sh=null;try{sh=await APP.HOST.sheet('sh101');sh={status:sh.status,notes:sh.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400))}}catch(e){}return JSON.stringify({sys:L,sheet:sh,msgs:(s.msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text),today:document.getElementById('main').innerText.split('\\n').filter(l=>/ابزار|برگه|🛎|⛔|⚠️|❓|⏸/.test(l)).slice(0,8)})})()",
+"c": 17
+},
+{
+"say": "نه، «بررسیِ بازار و رقیبان» به کارِ گامِ سوم نمیاد؛ من می‌خوام ببینم کسی قبلاً همین جعبه‌قرص رو ساخته یا ثبت اختراع کرده یا نه، نه اینکه رقیبام چند می‌فروشن.",
+"c": 18
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));__adv(0);APP.ASSIST.toggle(false);APP.go('today');await w(4000);APP.render();await w(3000);APP.go('today');await w(1500);const L=(APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({id:o.e.id,state:o.e.state,how:o.e.how,ruled:o.e.ruled,ask:o.e.ask&&{id:o.e.ask.id,fa:o.e.ask.fa},rejected:o.e.rejected,checks:(o.e.checks||[]).map(c=>c.reason||c)}));const s=APP.ASSIST.cur();let sh=null;try{sh=await APP.HOST.sheet('sh101');sh={status:sh.status,notes:sh.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400))}}catch(e){}return JSON.stringify({sys:L,sheet:sh,msgs:(s.msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text),today:document.getElementById('main').innerText.split('\\n').filter(l=>/ابزار|برگه|🛎|⛔|⚠️|❓|⏸/.test(l)).slice(0,8)})})()",
+"c": 19
+},
+{
+"eval": "localStorage.setItem('__areas28', \"[{\\\"claims\\\": [{\\\"basis_fa\\\": \\\"افزودهٔ آزمایشیِ تور (رونوشتِ خراشی)\\\", \\\"fa\\\": \\\"گشتن در پایگاه‌های ثبتِ اختراع تا معلوم شود کسی همین را ثبتِ اختراع کرده است یا نه.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"polya1945\\\"]}], \\\"desc_fa\\\": \\\"گشتن در پایگاه‌های ثبتِ اختراع تا معلوم شود کسی همین را ثبتِ اختراع کرده است یا نه.\\\", \\\"en\\\": \\\"Patent database search\\\", \\\"fa\\\": \\\"جستجو در پایگاه‌های ثبتِ اختراع\\\", \\\"gap_fa\\\": \\\"\\\", \\\"id\\\": \\\"pr_patent_db\\\", \\\"key_questions_fa\\\": [\\\"کسی همین را ثبتِ اختراع کرده است؟\\\"], \\\"src\\\": [\\\"polya1945\\\"], \\\"tools\\\": [\\\"view:e_prob\\\"], \\\"_g\\\": \\\"g_problem_structure\\\", \\\"_s\\\": \\\"s_problem\\\"}, {\\\"claims\\\": [{\\\"basis_fa\\\": \\\"افزودهٔ آزمایشیِ تور (رونوشتِ خراشی)\\\", \\\"fa\\\": \\\"گشتن میانِ محصول‌های موجود تا معلوم شود کسی همین را ساخته است یا نه.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"polya1945\\\"]}], \\\"desc_fa\\\": \\\"گشتن میانِ محصول‌های موجود تا معلوم شود کسی همین را ساخته است یا نه.\\\", \\\"en\\\": \\\"Existing-product search\\\", \\\"fa\\\": \\\"جستجوی محصول‌های ساخته‌شدهٔ مشابه\\\", \\\"gap_fa\\\": \\\"\\\", \\\"id\\\": \\\"pr_product_db\\\", \\\"key_questions_fa\\\": [\\\"کسی همین را ساخته است؟\\\"], \\\"src\\\": [\\\"polya1945\\\"], \\\"tools\\\": [\\\"view:e_prob\\\"], \\\"_g\\\": \\\"g_problem_structure\\\", \\\"_s\\\": \\\"s_problem\\\"}]\");'areas'",
+"c": 20
+},
+{
+"reload": true,
+"c": 20
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh101'];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #۱۰۱: دو حوزه ساخته شد — «جستجو در پایگاه‌های ثبتِ اختراع» (pr_patent_db) و «جستجوی محصول‌های ساخته‌شدهٔ مشابه» (pr_product_db).\"});s.status='answered';APP.render();return 'note'})()",
+"c": 20
+},
+{
+"eval": "(async()=>{await APP.PRE.sysSweep(true);APP.render();return 'swept'})()",
+"c": 20
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));__adv(0);APP.ASSIST.toggle(false);APP.go('today');await w(4000);APP.render();await w(3000);APP.go('today');await w(1500);const L=(APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({id:o.e.id,state:o.e.state,how:o.e.how,ruled:o.e.ruled,ask:o.e.ask&&{id:o.e.ask.id,fa:o.e.ask.fa},rejected:o.e.rejected,checks:(o.e.checks||[]).map(c=>c.reason||c)}));const s=APP.ASSIST.cur();let sh=null;try{sh=await APP.HOST.sheet('sh101');sh={status:sh.status,notes:sh.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400))}}catch(e){}return JSON.stringify({sys:L,sheet:sh,msgs:(s.msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text),today:document.getElementById('main').innerText.split('\\n').filter(l=>/ابزار|برگه|🛎|⛔|⚠️|❓|⏸/.test(l)).slice(0,8)})})()",
+"c": 20
+},
+{
+"say": "نه، این همون نیست؛ فقط ثبتِ اختراع رو می‌گرده. من می‌خوام محصول‌هایی که ساخته شدن رو هم ببینم.",
+"c": 21
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));__adv(0);APP.ASSIST.toggle(false);APP.go('today');await w(4000);APP.render();await w(3000);APP.go('today');await w(1500);const L=(APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({id:o.e.id,state:o.e.state,how:o.e.how,ruled:o.e.ruled,ask:o.e.ask&&{id:o.e.ask.id,fa:o.e.ask.fa},rejected:o.e.rejected,checks:(o.e.checks||[]).map(c=>c.reason||c)}));const s=APP.ASSIST.cur();let sh=null;try{sh=await APP.HOST.sheet('sh101');sh={status:sh.status,notes:sh.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400))}}catch(e){}return JSON.stringify({sys:L,sheet:sh,msgs:(s.msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text),today:document.getElementById('main').innerText.split('\\n').filter(l=>/ابزار|برگه|🛎|⛔|⚠️|❓|⏸/.test(l)).slice(0,8)})})()",
+"c": 22
+},
+{
+"say": "ببخشید، اشتباهی گفتم نه؛ همون بود. با همون پایگاه‌های ثبتِ اختراع کارم راه می‌افته.",
+"c": 23
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));__adv(0);APP.ASSIST.toggle(false);APP.go('today');await w(4000);APP.render();await w(3000);APP.go('today');await w(1500);const L=(APP.PRE.sysAll?APP.PRE.sysAll():[]).map(o=>({id:o.e.id,state:o.e.state,how:o.e.how,ruled:o.e.ruled,ask:o.e.ask&&{id:o.e.ask.id,fa:o.e.ask.fa},rejected:o.e.rejected,checks:(o.e.checks||[]).map(c=>c.reason||c)}));const s=APP.ASSIST.cur();let sh=null;try{sh=await APP.HOST.sheet('sh101');sh={status:sh.status,notes:sh.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400))}}catch(e){}return JSON.stringify({sys:L,sheet:sh,msgs:(s.msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text),today:document.getElementById('main').innerText.split('\\n').filter(l=>/ابزار|برگه|🛎|⛔|⚠️|❓|⏸/.test(l)).slice(0,8)})})()",
+"c": 24
+},
+{
+"say": "خبرِ خوب: با همون پایگاه‌ها گشتم، چیزی که عیناً همین باشه ثبت نشده بود. جعبه رو ساختم و یک ماهه با دو بار خوندن بی هشدارِ اشتباه کار می‌کنه. این مسئله برام حل شد.",
+"eval0": "__adv(30);1",
+"c": 25
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const R=JSON.parse(localStorage.getItem(\"mla.records.v1\")||\"{}\");const pid=Object.values(R).filter(r=>r&&r.type===\"eprob\"&&r.live).map(r=>r.p.id).pop();APP.ASSIST.toggle(false);APP.go(\"lprob\",pid);await w(1200);const out=[];for(let i=0;i<3;i++){const b=[...document.querySelectorAll(\"#main button\")].filter(b=>b.getClientRects().length).find(b=>/✅ حل شد/.test(b.textContent));if(!b){out.push(\"nobtn\");break}b.scrollIntoView({block:\"center\"});b.click();await w(1200);out.push(b.textContent.trim().slice(0,40))}let cl=null;try{cl=APP.liveClosure(pid)}catch(e){}const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"حل شد\");return JSON.stringify({out,cl:cl&&{state:cl.state,phase:cl.phase,gate:cl.gate},near:t.slice(Math.max(0,i-200),i+500)})})()",
+"c": 26
+},
+{
+"eval": "(()=>{return JSON.stringify(__fx.fields().filter(f=>!/^lp(One|Why|U|D|C|Type|Nat)/.test(f)).slice(0,40))+\" ## \"+__fx.btns().filter(b=>/ثبت|حل شد|بازنگری/.test(b)).join(\" | \")})()",
+"c": 27
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const S=(i,v)=>__fx.set(\"#\"+i,v);const opt=(id,i)=>{const e=document.getElementById(id);if(!e)return \"NO \"+id;return S(id,e.options[i].value)};opt(\"lpBWant\",2);S(\"lpBChk\",\"یک ماه کار کرد و هشدارِ اشتباه نداد\");opt(\"lpBRes\",1);S(\"lpBOther\",\"با شمردنِ هشدارها در دفترچه\");S(\"lpBGlance\",\"دو خواندنِ پیاپی خطا را از ۱/۲۰ به ۱/۴۰۰ می‌برد\");S(\"lpBWorked\",\"آزمودنِ ترازو با ۲۰ بار\");S(\"lpBApprox\",\"فرضِ استقلال بس بود\");S(\"lpBUnits\",\"هشدار در ماه\");opt(\"lpBBest\",1);S(\"lpBUse\",\"پیش از ساختن، خطا را با معیارِ خودم بسنجم\");S(\"lpBTaste\",\"ساختن و آزمودن را دوست داشتم\");await w(300);const r=__fx.btn(/ثبتِ بازنگری/);await w(1500);const R=JSON.parse(localStorage.getItem(\"mla.records.v1\")||\"{}\");const pid=Object.values(R).filter(r=>r&&r.type===\"eprob\"&&r.live).map(r=>r.p.id).pop();let cl=null;try{cl=APP.liveClosure(pid)}catch(e){}const t=document.getElementById(\"main\").innerText;const m=(t.match(/اول این‌ها[^\\n]{0,300}/)||[\"\"])[0];return r+\" \"+JSON.stringify(cl&&{state:cl.state,label:cl.label,gate:cl.gate})+\" \"+m})()",
+"c": 28
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt.rt-dest\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"FINAL\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 29
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 30
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"lprob\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 31
+}
+],
+"replies": [
+"{\"reply\": \"ایدهٔ روشنی است و می‌شود تا برنامهٔ ساختنش رفت. پیش از جزئیات: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی — دقیقاً می‌خواهی چه چیزی ساخته شود؟\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"ایده: جعبه‌قرصی که با ترازوی کوچک برداشتنِ قرص را بفهمد و اگر سرِ ساعت برداشته نشد به گوشیِ او پیام بدهد. کلِ مسئله در یک جمله پرسیده شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}], \"title\": \"جعبه‌قرصِ هوشمند برای مادر\"}",
+"{\"reply\":\"جملهٔ خوبی است: خودش بفهمد، به تو خبر بدهد، ارزان، و بی کارِ اضافه برای مادرت. حالا به خواسته دقیق‌تر نگاه کن: «کار می‌کند» برای تو با چه معیاری سنجیده می‌شود — و از چیزهایی که لازم است، کدام را می‌دانی و کدام را نه؟\",\"memory\":\"کل: جعبه‌قرصی که خودش بفهمد و خبر دهد، ارزان، بی کارِ اضافه برای مادر. پرسیدم معیارِ موفقیت و دانسته/ندانسته‌ها.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"معیار و دانسته‌ها\",\"s\":\"now\",\"view\":\"whole\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"u\",\"said\":[\"u\"],\"ans\":[\"u0\"],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\"}]}",
+"{\"reply\":\"معیارت روشن است: حداکثر یک هشدارِ اشتباه در ماه. سه ندانسته را هم جدا کردی. برای (۳) — گشتن در این‌که کسی همین را ساخته یا ثبت اختراع کرده — در این صفحه ابزاری نیست؛ برای ثبتِ یک برگهٔ کمبود بررسی می‌کنم و آن گام منتظرِ همان برگه می‌ماند. فعلاً از (۱) شروع کنیم: ترازوهای ارزانی که دیده‌ای چه دقتی دارند؟\",\"memory\":\"معیار: ≤ ۱ هشدارِ اشتباه در ماه. دانسته‌ها: قرص ~۰٫۳ گرم، آردوینو، ترازوی ارزان. ندانسته‌ها: (۱) دقتِ ترازو، (۲) پیام به گوشی، (۳) پیشینهٔ اختراع — برای (۳) برگهٔ کمبود درخواست شد.\",\"status\":\"gap\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"(۱) دقتِ ترازو\",\"s\":\"now\",\"view\":\"whole\"},{\"t\":\"(۲) پیام به گوشی\",\"s\":\"todo\",\"view\":\"whole\"},{\"t\":\"(۳) پیشینهٔ اختراع (منتظرِ برگه)\",\"s\":\"todo\",\"view\":\"whole\"}],\"gap\":{\"title\":\"جست‌وجوی پیشینهٔ اختراع برای یک ایدهٔ ساختنی\",\"area\":\"sys-territory\",\"kind\":\"build\",\"abstract\":\"کسی که ایده‌ای برای ساختنِ یک وسیله دارد باید بداند پیش‌تر کسی همان را ساخته یا ثبتِ اختراع کرده یا نه، و ایده‌اش با نزدیک‌ترین نمونه چه فرقی دارد.\",\"missing\":\"حوزه/ابزاری برای جست‌وجوی نظام‌مندِ پیشینهٔ اختراع (واژه‌کلیدِ کارکرد، پایگاه‌های ثبتِ اختراع، مقایسهٔ ادعاها با ویژگی‌های ایده)\",\"where\":\"قلمروِ سامانه‌ها — حلِ مسئله (s_problem)، کنارِ «خلاقیت»\",\"how\":\"حوزه‌ای با پرسش‌های کلیدی، گام‌های جست‌وجو و جدولِ مقایسهٔ ایده با ثبت‌های نزدیک\",\"relations\":\"گامِ (۳) ِ مسئلهٔ جعبه‌قرصِ هوشمند منتظرِ آن است\",\"docs\":\"\",\"why_area\":\"قلمروِ سامانه‌ها جای روش‌های حلِ مسئلهٔ واقعی است\",\"why_not\":\"pr_hypothesis_testing آزمونِ فرضیه است نه جست‌وجوی پیشینه؛ pr_creativity ساختنِ ایده است نه وارسیِ تازگی؛ 💡 جایگاهِ ایده نگه‌داشتنِ ایده است نه جست‌وجو\",\"evidence\":\"در نقشهٔ قلمرو هیچ حوزه‌ای برای پیشینهٔ اختراع یا ثبتِ اختراع نیست\",\"confidence\":0.85,\"step\":\"(۳) قبلاً کسی همینو ساخته یا ثبت اختراع کرده؟\"},\"actions\":[{\"do\":\"coach_state\",\"ph\":\"u\",\"said\":[\"d\",\"c\"],\"ans\":[\"u2\",\"u3\"],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\"}]}",
+"{\"agree\":true,\"area\":\"sys-territory\",\"kind\":\"build\",\"dup_of\":null,\"reason\":\"در قلمروِ سامانه‌ها حوزه‌ای برای جست‌وجوی پیشینهٔ اختراع نیست و هیچ روتینی آن را در کارِ جاری ندارد؛ برگهٔ بازی هم همین را نمی‌گوید.\",\"fix\":{}}",
+"{\"reply\": \"سه پله فاصله نشانهٔ خوبی است، ولی «کافیه» هنوز حدس است و درست یا غلطش را من نمی‌گویم. چطور می‌آزمایی‌اش — با کدام آزمایشِ کوچک روی خودِ ترازو و یک قرص؟\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"معیار: ≤۱ هشدارِ اشتباه در ماه. (۱) ترازوی ۰٫۱ گرمی؛ حدس: برای قرصِ ۰٫۳ گرمی کافی است — آزمونش پرسیده شد. (۲) پیام به گوشی: مانده. (۳) پیشینه/ثبتِ اختراع: برگهٔ فوری #۱۰۱ ثبت شد؛ این گام منتظر است.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"۰.۳ گرم یعنی ۳ تا پله؛ فکر کنم کافیه\", \"q\": \"چطور می‌آزمایی‌اش — با کدام آزمایشِ کوچک روی خودِ ترازو و یک قرص؟\"}}]}",
+"{\"reply\": \"خودت آزمودی و با معیارِ خودت سنجیدی: ماهی ۳ هشدارِ اشتباه از یکی بیشتر است، پس آن حدس رد شد. «دو بار پشتِ سرِ هم بخواند» طرحِ تازهٔ توست: پیش از ساختن، حساب می‌کنی با آن ماهی چند هشدارِ اشتباه می‌ماند؟\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"معیار: ≤۱ هشدارِ اشتباه در ماه. آزمون: ۱ خطا در ۲۰ بار ⇒ ماهی ۳ هشدار (۶۰ خواندن) ⇒ حدسِ «کافیه» رد شد. طرح: دو بار خواندنِ پیاپی؛ حسابش پرسیده شد. (۲) پیام به گوشی: مانده. (۳) پیشینه: منتظرِ برگهٔ #۱۰۱.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\", \"result\"], \"ans\": [], \"stuck\": false, \"fail\": true, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"با ۱ از ۲۰ یعنی ماهی ۳ تا هشدار اشتباه\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}, \"plan\": {\"text\": \"باید دو بار پشت سر هم بخونه\", \"when\": \"next-session\"}}]}",
+"{\"reply\": \"جمع‌بندی: (۱) دقتِ ترازو — با دو خواندنِ پیاپی به ۰٫۱۵ هشدار در ماه می‌رسی، زیرِ معیارت، به شرطِ این‌که دو خواندن مستقل باشند؛ (۲) پیام به گوشی — راهش را داری (ESP8266 و تلگرام‌بات)؛ (۳) پیشینه و ثبتِ اختراع — منتظرِ برگهٔ #۱۰۱ است و بقیهٔ کار را نگه نمی‌دارد. فرضِ «مستقل بودنِ دو خواندن» را چطور می‌آزمایی؟\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"معیار: ≤۱ هشدارِ اشتباه در ماه. (۱) دو خواندنِ پیاپی ⇒ ۱/۴۰۰ ⇒ ۰٫۱۵ در ماه (به شرطِ استقلال؛ آزمونش پرسیده شد). (۲) ESP8266 + تلگرام‌بات (تجربهٔ قبلی). (۳) پیشینه/ثبتِ اختراع: منتظرِ برگهٔ #۱۰۱.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\", \"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"۱/۲۰ × ۱/۲۰ = ۱/۴۰۰؛ ماهی ۶۰ بار، یعنی ۰.۱۵ هشدار در ماه\"}]}",
+"{\"reply\": \"برای ثبت در «🔭 مسئله‌های من» فرستادم؛ صفحه می‌گوید ثبت شد یا نه. سه زیرمسئله و قسمتِ منتظرِ برگهٔ #۱۰۱ همراهش می‌ماند.\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"معیار: ≤۱ هشدارِ اشتباه در ماه. (۱) دو خواندنِ پیاپی ⇒ ۰٫۱۵ در ماه (به شرطِ استقلال). (۲) ESP8266 + تلگرام‌بات. (۳) پیشینه/ثبتِ اختراع: منتظرِ برگهٔ #۱۰۱. خواست مسئله ثبت شود؛ live_new فرستاده شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"live_new\", \"title\": \"جعبه‌قرصِ هوشمند برای مادر\", \"statement\": \"یه جعبه‌قرص که خودش بفهمه مادرم قرصش رو برداشته یا نه و اگه برنداشت به من خبر بده — ارزون، و بدون اینکه مادرم کار اضافه‌ای بکنه.\", \"nat\": \"practical\"}, {\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"درست می‌گویی: دانستنِ قیمتِ رقیبان همان گشتنِ پیشینه و ثبتِ اختراع نیست. جوابت را برای صفحه فرستادم؛ گامِ سوم منتظر می‌ماند و صفحه می‌گوید برگه چه شد. در این فاصله، آزمونِ مستقل بودنِ دو خواندن را انجام دادی؟\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"(۱) دو خواندنِ پیاپی ⇒ ۰٫۱۵ در ماه (به شرطِ استقلال؛ آزمونش مانده). (۲) ESP8266 + تلگرام‌بات. (۳) پیشینه/ثبتِ اختراع: منتظرِ برگهٔ #۱۰۱ — «بررسیِ بازار و رقیبان» آمد ولی خودش گفت همان نیست.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"sys_fit\": {\"sheet\": 101, \"fit\": false, \"quote\": \"«بررسیِ بازار و رقیبان» به کارِ گامِ سوم نمیاد\"}}]}",
+"{\"reply\": \"پذیرفتم: آن ابزار فقط ثبتِ اختراع را می‌گردد و همهٔ نیازِ گامِ سوم نیست؛ اعلامِ «آمد» نادرست بود. گامِ سوم دوباره منتظرِ برگهٔ #۱۰۱ است و بقیهٔ کار ادامه دارد. آزمونِ مستقل بودنِ دو خواندن را کِی انجام می‌دهی؟\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"(۱) دو خواندنِ پیاپی ⇒ ۰٫۱۵ در ماه (آزمونِ استقلال مانده). (۲) ESP8266 + تلگرام‌بات. (۳) منتظرِ برگهٔ #۱۰۱ — «بررسیِ بازار» و «جستجو در پایگاه‌های ثبتِ اختراع» هر دو به گفتهٔ خودش همان نبودند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"باشد؛ پس گرفتنِ «نه» را برای صفحه فرستادم و خودِ صفحه می‌گوید گامِ سوم با همان ابزار از سر گرفته شد یا نه. با «جستجو در پایگاه‌های ثبتِ اختراع»، اول با کدام واژه‌ها می‌گردی؟\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"(۱) دو خواندنِ پیاپی ⇒ ۰٫۱۵ در ماه (آزمونِ استقلال مانده). (۲) ESP8266 + تلگرام‌بات. (۳) برگهٔ #۱۰۱: «بررسیِ بازار» همان نبود؛ «جستجو در پایگاه‌های ثبتِ اختراع» را اول رد کرد و بعد گفت اشتباهی بود و همان است.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"sys_fit\": {\"sheet\": 101, \"fit\": true, \"quote\": \"اشتباهی گفتم نه؛ همون بود\"}}]}",
+"{\"reply\": \"هم گامِ سوم را با همان ابزار برداشتی و هم نتیجه را یک ماه با واقعیت سنجیدی: بی هشدارِ اشتباه. «حل شد» را خودت در صفحهٔ مسئله با «✅ حل شد» می‌زنی و بازنگری همان‌جاست. از این ساختن، کدام درس را برای ایدهٔ بعدی نگه می‌داری؟\", \"pinned\": \"از ایدهٔ جعبه‌قرصِ هوشمند (ترازو زیرِ هر خانه + پیام به گوشی) تا برنامهٔ واقعیِ ساختن\", \"memory\": \"هر سه زیرمسئله برداشته شد: (۱) دو خواندن، یک ماه بی هشدارِ اشتباه؛ (۲) پیام با ESP8266 و تلگرام؛ (۳) پیشینه با «جستجو در پایگاه‌های ثبتِ اختراع» — چیزی عینِ همین ثبت نشده بود. خودش گفت حل شد؛ بازنگری در صفحه مانده.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"کارِ همین گفت‌وگو\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"یک ماهه با دو بار خوندن بی هشدارِ اشتباه کار می‌کنه\", \"check\": {\"msgs\": [\"یک ماهه با دو بار خوندن بی هشدارِ اشتباه کار می‌کنه\"]}}]}"
+],
+"keys": [
+"سلام. یه ایده دارم و می‌خوام از ایده برسم به یه برنامه‌ی واقعی برای ساختنش: یه جعبه‌قرص هوشمند برای مادرم که با یه ترازوی کوچیک زیر هر خونه می‌فهمه قرص رو برداشته یا نه، و اگه سر ساعت برنداشت به گوشی من پیام میده. از کجا شروع کنم؟",
+"یه جعبه‌قرص که خودش بفهمه مادرم قرصش رو برداشته یا نه و اگه برنداشت به من خبر بده — ارزون، و بدون اینکه مادرم کار اضافه‌ای بکنه.",
+"اگه ماهی بیشتر از یه بار هشدار اشتباه بده مادرم کلافه میشه، پس حداکثر یکی در ماه. چیزایی که می‌دونم: هر قرص حدود ۰.۳ گرمه، یه برد آردوینو دارم، ترازوی دیجیتال ارزون پیدا میشه. چیزایی که نمی‌دونم: (۱) ترازوی ارزون اون‌قدر دقیق هست که ۰.۳ گرم",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"ترازوهای ارزونی که دیدم دقتشون ۰.۱ گرمه. پس ۰.۳ گرم یعنی ۳ تا پله؛ فکر کنم کافیه.",
+"امتحان کردم: یه قرص رو ۲۰ بار گذاشتم و برداشتم. ۱۹ بار ۰.۲ یا ۰.۳ نشون داد، یه بار ۰.۰. اگه روزی دو تا قرص باشه، ماهی ۶۰ بار؛ با ۱ از ۲۰ یعنی ماهی ۳ تا هشدار اشتباه — از معیارم بیشتره! پس باید دو بار پشت سر هم بخونه.",
+"اگه مستقل باشن، هر دو اشتباه یعنی ۱/۲۰ × ۱/۲۰ = ۱/۴۰۰؛ ماهی ۶۰ بار، یعنی ۰.۱۵ هشدار در ماه. زیر معیاره! برای (۲) هم یه ماژول وای‌فای ESP8266 دارم، با تلگرام‌بات پیام می‌فرستم؛ اینو قبلاً تو یه پروژه‌ی دیگه کار کردم. حالا جمع‌بندی کن ببینم ک",
+"این جعبه‌قرص رو به‌عنوانِ مسئله‌ی خودم ثبت کن که مرحله‌هاش و اون قسمتِ منتظر بمونه.",
+"نه، «بررسیِ بازار و رقیبان» به کارِ گامِ سوم نمیاد؛ من می‌خوام ببینم کسی قبلاً همین جعبه‌قرص رو ساخته یا ثبت اختراع کرده یا نه، نه اینکه رقیبام چند می‌فروشن.",
+"نه، این همون نیست؛ فقط ثبتِ اختراع رو می‌گرده. من می‌خوام محصول‌هایی که ساخته شدن رو هم ببینم.",
+"ببخشید، اشتباهی گفتم نه؛ همون بود. با همون پایگاه‌های ثبتِ اختراع کارم راه می‌افته.",
+"خبرِ خوب: با همون پایگاه‌ها گشتم، چیزی که عیناً همین باشه ثبت نشده بود. جعبه رو ساختم و یک ماهه با دو بار خوندن بی هشدارِ اشتباه کار می‌کنه. این مسئله برام حل شد."
+]
+}

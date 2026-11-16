@@ -1228,20 +1228,37 @@
   /* نه روشن، نه صفر ⇒ پیش از از سر گرفتن از خودِ او (وضع «منتظر» می‌ماند تا جواب دهد) */
   function setAlso(e, r) { e._also = (r.all || []).filter(function (x) { return x !== r.best && (x.n >= 1 || x.a >= 1); }).map(function (x) { return x.it.fa; }); }
   function candOf(x) { return { id: x.it.id, kind: x.it.kind, fa: clip(x.it.fa, 80), go: x.it.go, text: clip(x.it.text, 600), sn: x.sn || 0, w: x.w || [] }; }
+  /* دورِ ۲۸ (R7، A28-32 tA1؛ بانکِ مالک ۵۶): دو نامزدِ هم‌امتیاز با نامِ یکسان («ثبتِ اختراع و جست‌وجوی سابقه» و «ثبتِ اختراع و جست‌وجوی سابقه») — او نمی‌توانست یکی را
+     با نام برگزیند و دکمه‌ها هم یکی بودند. نامِ نمایشیِ هر نامزد: نامِ خودش؛ اگر نامِ نامزدِ دیگری عینِ آن است، واژه‌هایی از شرحِ خودش که در شرحِ آن دیگری نیست (تا سه
+     واژه، بی واژهٔ لاتین) و همیشه شمارهٔ ترتیبش در همین پرسش («اولی/دومی» — همان که tiePick می‌خواند، C81). نام و شرحِ یکسان ⇒ فقط شماره (چیزِ دیگری برای جدا کردن نیست). */
+  var ORDFA28 = ["اولی", "دومی", "سومی", "چهارمی"];
+  function tieLabels28(C) {
+    return C.map(function (c, i) { var f = clip(c.fa, 60), twin = C.filter(function (c2, j) { return j !== i && zk(c2.fa) === zk(c.fa); }); if (!twin.length) return f;
+      var mine = rawW(c.text).filter(function (w) { return w.length >= 4 && !/[a-zA-Z]/.test(w) && rawW(c.fa).indexOf(w) < 0; }), oth = twin.map(function (c2) { return rawW(c2.text); });
+      var d = mine.filter(function (w, k) { return mine.indexOf(w) === k && oth.every(function (L) { return L.indexOf(w) < 0; }); }).slice(0, 3);
+      return f + " (" + (d.length ? "با «" + d.join(" ") + "» — " : "") + (ORDFA28[i] || fa(i + 1)) + ")"; }); }
+  PRE.sysTieLabels = function (e) { return tieLabels28(tieCands(e)); };
+  /* C129: نام و شرحِ یکسان ⇒ «گویا تکراری‌اند» و پرسیدنِ یکی‌کردن؛ «یکی‌اند/تکراری‌اند» ِ او یعنی همان یکی (نخستین) می‌رسد */
+  function dupTie28(C) { return C.length > 1 && C.every(function (c) { return zk(c.fa) === zk(C[0].fa) && zk(c.text) === zk(C[0].text); }); }
+  var MERGE28 = /(?:^|[\s‌])(?:یکی(?:‌اند|اند|ن|ه|ست|ند|[\s‌]+هستن(?:د)?)|تکراری(?:‌اند|اند|ن|ه)?|هر[\s‌]*دو[\s‌]*(?:یکی|همون|همان))(?![آ-ی])/;
   function askFit(o, e, r, how) {
-    var it = r.best.it, TI = (r.tie || []); e.ask = { id: it.id, kind: it.kind, fa: clip(it.fa, 80), go: it.go, text: clip(it.text, 600), how: how, w: r.best.w, sn: r.best.sn || 0, at: nowIso(), key: "", n: 0, alt: TI.map(function (x) { return clip(x.it.fa, 60); }), alts: TI.map(candOf) }; delete e.backBy;
+    var it = r.best.it, TI = (r.tie || []), L28 = tieLabels28([it].concat(TI.map(function (x) { return x.it; }))), mL = L28[0];
+    e.ask = { id: it.id, kind: it.kind, fa: clip(it.fa, 80), faL: mL, go: it.go, text: clip(it.text, 600), how: how, w: r.best.w, sn: r.best.sn || 0, at: nowIso(), key: "", n: 0, alt: L28.slice(1), alts: TI.map(candOf) }; delete e.backBy;
     TI.forEach(function (x) { if ((e.asked = e.asked || []).indexOf(x.it.id) < 0) e.asked.push(x.it.id); });
     var altT = e.ask.alt.length ? " (هم‌امتیاز با «" + e.ask.alt.join("» و «") + "» آمد — اگر این نیست و آن است، همان را بگو)" : "";
     /* دورِ ۲۶ (بانکِ R26 #184، D26-19): دلیل واژهٔ خودِ گامِ او را از واژهٔ متنِ برگه جدا می‌گوید؛ و گرهِ واقعی «روشن هم‌خوان نیست» نیست — هر دو می‌خوانند و صفحه برنمی‌گزیند */
     var qw = function (L) { return L.slice(0, 4).map(function (x) { return "«" + x + "»"; }).join("، "); }, stW = r.best.st || [], shW = (r.best.w || []).filter(function (x) { return stW.indexOf(x) < 0; });
     var wT = !stW.length && !shW.length && (r.best.fw || []).length ? " (فقط واژه‌های قابِ خودِ برگه مشترک است: " + qw(r.best.fw) + " — صفحه از آن داوری نمی‌کند)" : stW.length || shW.length ? " (" + [stW.length ? "واژهٔ مشترک با خودِ گام: " + qw(stW) : "", shW.length ? (stW.length ? "با متنِ برگه: " : "واژهٔ مشترک فقط با متنِ برگه: ") + qw(shW) : ""].filter(Boolean).join("؛ ") + ")" : "";
-    (e.checks = e.checks || []).push({ at: nowIso(), ok: null, ask: true, how: how, item: it.kind + ":" + it.id, reason: (e.ask.alt.length && (r.best.sn || 0) >= 2 ? "«" + clip(it.fa, 60) + "» و «" + e.ask.alt.join("» و «") + "» هر کدام به‌تنهایی با نیازِ گامِ «" + clip(e.step, 60) + "» می‌خواند" + wT + " — صفحه میانشان برنمی‌گزیند؛ از خودش می‌پرسم کدام"
-      : "«" + clip(it.fa, 60) + "» با نیازِ گامِ «" + clip(e.step, 60) + "» روشن هم‌خوان نیست" + wT + (e.ask.alt.length ? " — هم‌امتیاز با «" + e.ask.alt.join("» و «") + "»" : "") + " — از خودش می‌پرسم") });
+    (e.checks = e.checks || []).push({ at: nowIso(), ok: null, ask: true, how: how, item: it.kind + ":" + it.id, reason: (e.ask.alt.length && (r.best.sn || 0) >= 2 ? "«" + mL + "» و «" + e.ask.alt.join("» و «") + "» هر کدام به‌تنهایی با نیازِ گامِ «" + clip(e.step, 60) + "» می‌خواند" + wT + " — صفحه میانشان برنمی‌گزیند؛ از خودش می‌پرسم کدام"
+      : "«" + mL + "» با نیازِ گامِ «" + clip(e.step, 60) + "» روشن هم‌خوان نیست" + wT + (e.ask.alt.length ? " — هم‌امتیاز با «" + e.ask.alt.join("» و «") + "»" : "") + " — از خودش می‌پرسم") });
     e.ask.evk = idN("ask", nOf(e, function (c) { return c.ask; }));
-    swEv(o.sc, e, "ask", "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + clip(it.fa, 60) + "»" + (e.ask.alt.length ? " یا «" + e.ask.alt.join("» یا «") + "» — کدام همان ابزارِ گام است؟" : " — همان ابزارِ گام است؟"), [(e.late ? "تکهٔ منتظر: «" : "گامِ منتظر: «") + clip(e.step, 120) + "»", "سنجش: " + e.checks[e.checks.length - 1].reason], "پرسیدم؛ تا جوابش گام منتظر می‌ماند", e.ask.evk);
+    swEv(o.sc, e, "ask", "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + mL + "»" + (e.ask.alt.length ? " یا «" + e.ask.alt.join("» یا «") + "» — کدام همان ابزارِ گام است؟" : " — همان ابزارِ گام است؟"), [(e.late ? "تکهٔ منتظر: «" : "گامِ منتظر: «") + clip(e.step, 120) + "»", "سنجش: " + e.checks[e.checks.length - 1].reason], "پرسیدم؛ تا جوابش گام منتظر می‌ماند", e.ask.evk);
     waitEv(o.sc, e);
     var sh = shE(e);
-    sysMsg(e, "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + clip(it.fa, 60) + "»" + altT + (e.ask.alt.length ? ". میانِ این‌ها برنمی‌گزینم — نامِ همان را که گامِ «" + clip(e.step, 70) + "» لازم داشت " + (sh ? "بگویید" : "بگو") + " (یا «هیچ‌کدام»)؛ تا آن وقت گام منتظر می‌ماند."
+    var CC28 = [it].concat(TI.map(function (x) { return x.it; })), dup28 = dupTie28(CC28), tw28 = CC28.map(function (c, i) { return CC28.some(function (c2, j) { return j !== i && zk(c2.fa) === zk(c.fa) && zk(c2.text) === zk(c.text); }) ? L28[i] : ""; }).filter(Boolean);
+    if (dup28) altT += " — نام و شرحِ هر دو یکی است؛ گویا تکراری‌اند. اگر برای " + (shE(e) ? "شما" : "تو") + " یکی‌اند، بگو «یکی‌اند» تا یکی شمرده شوند؛ وگرنه «اولی» یا «دومی»";
+    else if (tw28.length) altT += " — «" + tw28.join("» و «") + "» نام و شرحِ یکسان دارند؛ گویا تکراری‌اند (برای انتخاب، شماره‌شان را بگو)";
+    sysMsg(e, "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + mL + "»" + altT + (e.ask.alt.length ? ". میانِ این‌ها برنمی‌گزینم — نامِ همان را که گامِ «" + clip(e.step, 70) + "» لازم داشت " + (sh ? "بگویید" : "بگو") + " (یا «هیچ‌کدام»)؛ تا آن وقت گام منتظر می‌ماند."
       : ". مطمئن نیستم همان چیزی باشد که گامِ «" + clip(e.step, 70) + "» لازم داشت — پیش از ادامه از " + (sh ? "شما" : "تو") + " می‌پرسم؛ تا آن وقت گام منتظر می‌ماند."));
     o.put();
   }
@@ -1646,7 +1663,7 @@
   function tieChoose(o, e, c, span) {
     var rest = tieCands(e).filter(function (x) { return x.id !== c.id; });
     rest.forEach(function (x) { if ((e.passed = e.passed || []).indexOf(x.id) < 0) e.passed.push(x.id); });
-    e.ask = Object.assign({}, e.ask, { id: c.id, kind: c.kind, fa: c.fa, go: c.go, text: c.text, sn: c.sn || 0, w: c.w || [], alt: [], alts: [] });
+    e.ask = Object.assign({}, e.ask, { id: c.id, kind: c.kind, fa: c.fa, faL: clip(c.fa, 60), go: c.go, text: c.text, sn: c.sn || 0, w: c.w || [], alt: [], alts: [] });
     arrive(o, e, c, "ask", c.w || [], " — از میانِ هم‌امتیازها خودش همین را برگزید" + (span ? " («" + clip(span, 120) + "»)" : "") + "؛ «" + rest.map(function (x) { return clip(x.fa, 50); }).join("» و «") + "» برگزیده نشد");
   }
   function tieNone(o, e, byQuote, span) { var C = tieCands(e); herNo(o, e, C[0], C[0].sn, byQuote, span, C.slice(1)); }
@@ -1654,10 +1671,11 @@
     var C = tieCands(e).filter(function (c) { return !D.some(function (d) { return d.id === c.id; }); }); if (!C.length) { tieNone(o, e, false, span); return; }
     D.forEach(function (d) { if ((e.rejected = e.rejected || []).indexOf(d.id) < 0) e.rejected.push(d.id); });
     (e.checks = e.checks || []).push({ at: nowIso(), ok: null, drop: true, item: D.map(function (d) { return d.kind + ":" + d.id; }).join(","), reason: "«" + D.map(function (d) { return clip(d.fa, 50); }).join("» و «") + "» — خودش گفت این یکی نیست" + (span ? " («" + clip(span, 120) + "»)" : "") + "؛ دربارهٔ «" + C.map(function (c) { return clip(c.fa, 50); }).join("» و «") + "» هنوز جواب نداده" });
-    e.ask = Object.assign({}, e.ask, { id: C[0].id, kind: C[0].kind, fa: C[0].fa, go: C[0].go, text: C[0].text, sn: C[0].sn || 0, w: C[0].w || [], alt: C.slice(1).map(function (c) { return clip(c.fa, 60); }), alts: C.slice(1), key: "", n: 0, which: 0 });
+    var L28 = tieLabels28(C); e.ask = Object.assign({}, e.ask, { id: C[0].id, kind: C[0].kind, fa: C[0].fa, faL: L28[0], go: C[0].go, text: C[0].text, sn: C[0].sn || 0, w: C[0].w || [], alt: L28.slice(1), alts: C.slice(1), key: "", n: 0, which: 0 });
     waitEv(o.sc, e); o.put();
   }
   function tieAnswer(o, e, m, yes, no, byQuote, span, pickName) {
+    if (dupTie28(tieCands(e)) && MERGE28.test(String(m || "")) && !NONE_T.test(String(m || ""))) { tieChoose(o, e, tieCands(e)[0], span); return true; }   // C129
     var pk = tiePick(e, m), byN = pickName ? tieCands(e).filter(function (c) { return c.id === pickName || zk(c.fa) === zk(pickName); })[0] : null;
     if (pk.one) { tieChoose(o, e, pk.one, span); return true; }
     if (byN && !pk.many && !pk.none && yes) { tieChoose(o, e, byN, span); return true; }   // مدل گزارش می‌دهد (pick)، صفحه نامزد بودنش را می‌سنجد
@@ -1784,7 +1802,7 @@
       else L.push(CTX + "پس از پیش‌نیاز: " + q);
     }
     if (Q.length) {
-      var eq = Q[0], aq = eq.ask, qq = "«این ابزارِ تازه همان است که برای گامِ «" + noq(clip(eq.step, 70)) + "» لازم بود؟» — ابزار: «" + noq(clip(aq.fa, 60)) + "»" + ((aq.alt || []).length ? " (هم‌امتیاز با «" + noq(aq.alt.join("» و «")) + "» آمد — هر دو را با نام بگو و بپرس کدام. نام‌بردن یا نشان‌دادنِ یکی («اولی/دومی/آن یکی») **همان جوابِ اوست**: صفحه خودش از حرفش می‌خواند و همان را می‌پذیرد؛ دوباره نپرس و برای آن دیگری «رد» نفرست ⇒ fit:true با \"pick\":\"نامِ همان که برگزید\". «هیچ‌کدام» ⇒ fit:false. «آره» ِ بی‌نام جواب نیست ⇒ فقط بپرس کدام‌یک" + (aq.which && aq.which === k ? "؛ همین حالا بی نام‌بردن «آره» گفت یا هر دو را خواست — صفحه برنگزید، بپرس کدام‌یک" : "") + ")" : "") + " (برگهٔ " + nn(eq) + ")" + (aq.go && aq.go[0] ? "، جایش: {\"do\":\"go\",\"view\":\"" + aq.go[0] + "\"" + (aq.go[1] ? ",\"arg\":\"" + aq.go[1] + "\"" : "") + "}" : "") + ". صفحه مطمئن نیست همان باشد؛ تا جوابِ او گام منتظر می‌ماند و از سر گرفته نمی‌شود. جوابش ⇒ {\"do\":\"coach_state\",\"sys_fit\":{\"sheet\":" + (eq.number || 0) + ",\"fit\":true|false,\"quote\":\"عینِ حرفش\"}}";
+      var eq = Q[0], aq = eq.ask, qq = "«این ابزارِ تازه همان است که برای گامِ «" + noq(clip(eq.step, 70)) + "» لازم بود؟» — ابزار: «" + noq(aq.faL || clip(aq.fa, 60)) + "»" + ((aq.alt || []).length ? " (هم‌امتیاز با «" + noq(aq.alt.join("» و «")) + "» آمد — هر دو را با نام بگو و بپرس کدام. نام‌بردن یا نشان‌دادنِ یکی («اولی/دومی/آن یکی») **همان جوابِ اوست**: صفحه خودش از حرفش می‌خواند و همان را می‌پذیرد؛ دوباره نپرس و برای آن دیگری «رد» نفرست ⇒ fit:true با \"pick\":\"نامِ همان که برگزید\". «هیچ‌کدام» ⇒ fit:false. «آره» ِ بی‌نام جواب نیست ⇒ فقط بپرس کدام‌یک" + (aq.which && aq.which === k ? "؛ همین حالا بی نام‌بردن «آره» گفت یا هر دو را خواست — صفحه برنگزید، بپرس کدام‌یک" : "") + ")" : "") + " (برگهٔ " + nn(eq) + ")" + (aq.go && aq.go[0] ? "، جایش: {\"do\":\"go\",\"view\":\"" + aq.go[0] + "\"" + (aq.go[1] ? ",\"arg\":\"" + aq.go[1] + "\"" : "") + "}" : "") + ". صفحه مطمئن نیست همان باشد؛ تا جوابِ او گام منتظر می‌ماند و از سر گرفته نمی‌شود. جوابش ⇒ {\"do\":\"coach_state\",\"sys_fit\":{\"sheet\":" + (eq.number || 0) + ",\"fit\":true|false,\"quote\":\"عینِ حرفش\"}}";
       if (!busy && !V.length && (!aq.n || aq.key === k)) { L.push("- **پرسشِ این نوبت همین است:** (پیش از از سر گرفتنِ گامِ منتظرِ ابزار) " + qq); if (k && aq.key !== k) { aq.key = k; aq.n = (aq.n || 0) + 1; dirty = true; } }
       else L.push(CTX + "پرسیده شده و هنوز بی‌جواب: " + qq);
     }
@@ -1822,7 +1840,7 @@
           var go = function () { if (sc.pid) A.go("lprob", sc.pid); else { try { localStorage.setItem("lla.assist.cur", sc.sess); } catch (er) { } if (AS.toggle) AS.toggle(true); } };
           if (e.state === "arrived") items.unshift({ k: "warn", txt: "🛎 ابزارِ لازم آمد: «" + clip((e.tool || {}).fa || "", 50) + "» — گامِ «" + clip(e.step, 50) + "»", sub: "مسئلهٔ «" + ttl + "» · برگهٔ " + nn(e) + " — همان گام را از سر بگیر", go: go, sys23: e.id });
           /* دورِ ۲۶ (U62 = B26x·D28): گره در «امروز» هم هر دو نام را دارد؛ (U61 = B26·D28) سطر به جایی می‌برد که می‌شود همان‌جا جواب داد (دکمه‌های کارتِ 🔭، یا گفت‌وگو) */
-          else if (e.state === "wait" && e.ask) items.push({ k: "p", txt: "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + clip(e.ask.fa, 50) + "»" + ((e.ask.alt || []).length ? " یا «" + e.ask.alt.map(function (a) { return clip(a, 50); }).join("» یا «") + "» — کدام همان ابزارِ گامِ «" + clip(e.step, 50) + "» است؟" : " — همان ابزارِ گامِ «" + clip(e.step, 50) + "» است؟"), sub: "مسئلهٔ «" + ttl + "» — تا جوابت گام منتظر می‌ماند" + (sc.pid ? "؛ همان‌جا با دکمه جواب بده" : "؛ در همان گفت‌وگو جواب بده"), go: go, sys23: e.id });
+          else if (e.state === "wait" && e.ask) items.push({ k: "p", txt: "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + clip(e.ask.faL || e.ask.fa, 60) + "»" + ((e.ask.alt || []).length ? " یا «" + e.ask.alt.map(function (a) { return clip(a, 60); }).join("» یا «") + "» — کدام همان ابزارِ گامِ «" + clip(e.step, 50) + "» است؟" : " — همان ابزارِ گامِ «" + clip(e.step, 50) + "» است؟"), sub: "مسئلهٔ «" + ttl + "» — تا جوابت گام منتظر می‌ماند" + (sc.pid ? "؛ همان‌جا با دکمه جواب بده" : "؛ در همان گفت‌وگو جواب بده"), go: go, sys23: e.id });
           /* دورِ ۲۵ (S1): ابزاری که آمد و خودش گفت همان نیست ⇒ «امروز» می‌گوید گام دوباره منتظر است (تا سرانجامِ بعدی) */
           else if (backNow(e)) items.push({ k: "p", txt: "⏸ گامِ «" + clip(e.step, 50) + "» دوباره منتظرِ برگهٔ " + nn(e) + " است — «" + clip(e.backBy.fa, 50) + "» همان نبود", sub: "مسئلهٔ «" + ttl + "» — به گفتهٔ " + (shE(e) ? "خودتان" : "خودت") + "؛ زیرِ برگه نوشتم و دوباره باز شد", go: go, sys23: e.id });
           else if (e.state === "declined" && !e.ack) items.push({ k: "p", txt: "⛔ برگهٔ " + nn(e) + " بی ساختن بسته شد — گامِ «" + clip(e.step, 50) + "» را از راهِ دیگری ادامه بده", sub: "مسئلهٔ «" + ttl + "»", go: go, sys23: e.id });
@@ -1860,11 +1878,11 @@
     return h("section", { class: "card soft lp-syscard", dir: "rtl" }, h("h4", {}, anyW ? "⏸ گام‌های منتظرِ ابزار (کمبودِ سامانه)" : "گام‌هایی که منتظرِ ابزار بودند (کمبودِ سامانه)"),
       h("ul", { class: "small" }, Y.map(function (e) {
         var tie = e.ask && (e.ask.alt || []).length;
-        var li = h("li", { "data-state": e.state, "data-sheet": String(e.number || "") }, "«" + e.step + "» — " + (e.state === "wait" ? "منتظرِ برگهٔ " + nn(e) + " (از " + A.fdate(String(e.at).slice(0, 10)) + ")" + (e.ask ? (tie ? " · دو ابزارِ هم‌امتیاز آمد: «" + [e.ask.fa].concat(e.ask.alt).join("» و «") + "» — پرسیدم کدام همان است" : " · ابزاری آمد: «" + e.ask.fa + "» — پرسیدم همان است یا نه") : backNow(e) ? " · «" + e.backBy.fa + "» آمد و به گفتهٔ " + (shE(e) ? "خودتان" : "خودت") + " همان نبود — برگه دوباره باز شد" : "") : SW_FA[e.state] + " · برگهٔ " + nn(e)) + (e.tool && e.tool.fa ? " · ابزار: «" + e.tool.fa + "»" : ""));
+        var li = h("li", { "data-state": e.state, "data-sheet": String(e.number || "") }, "«" + e.step + "» — " + (e.state === "wait" ? "منتظرِ برگهٔ " + nn(e) + " (از " + A.fdate(String(e.at).slice(0, 10)) + ")" + (e.ask ? (tie ? " · دو ابزارِ هم‌امتیاز آمد: «" + [e.ask.faL || e.ask.fa].concat(e.ask.alt).join("» و «") + "» — پرسیدم کدام همان است" : " · ابزاری آمد: «" + e.ask.fa + "» — پرسیدم همان است یا نه") : backNow(e) ? " · «" + e.backBy.fa + "» آمد و به گفتهٔ " + (shE(e) ? "خودتان" : "خودت") + " همان نبود — برگه دوباره باز شد" : "") : SW_FA[e.state] + " · برگهٔ " + nn(e)) + (e.tool && e.tool.fa ? " · ابزار: «" + e.tool.fa + "»" : ""));
         /* دورِ ۲۶ (U61 = B26·D28): سطرِ «❓» ِ «امروز» به همین کارت می‌آورد و این‌جا راهی برای جواب نبود. جوابِ خودِ او با دکمه همان راهِ جوابِ گفت‌وگو را می‌رود (fitAnswer / گره). */
         if (e.state === "wait" && e.ask) {
           var ans = function (pick) { return function () { cardAnswer(sc, e.id, pick); }; }, box = h("div", { class: "row", style: "gap:6px;margin-top:4px;flex-wrap:wrap", "data-sysask": String(e.number || "") });
-          if (tie) { tieCands(e).forEach(function (c) { box.appendChild(h("button", { class: "btn sm", type: "button", "data-fit": c.id, onclick: ans(c.id) }, "✓ «" + clip(c.fa, 40) + "» همان است")); }); box.appendChild(h("button", { class: "btn sm", type: "button", "data-fit": "none", onclick: ans("none") }, "✗ هیچ‌کدام")); }
+          if (tie) { var TL28 = tieLabels28(tieCands(e)); tieCands(e).forEach(function (c, i) { box.appendChild(h("button", { class: "btn sm", type: "button", "data-fit": c.id, onclick: ans(c.id) }, "✓ «" + (TL28[i] !== clip(c.fa, 60) ? TL28[i] : clip(c.fa, 40)) + "» همان است")); }); box.appendChild(h("button", { class: "btn sm", type: "button", "data-fit": "none", onclick: ans("none") }, "✗ هیچ‌کدام")); }
           else { box.appendChild(h("button", { class: "btn sm", type: "button", "data-fit": "yes", onclick: ans("yes") }, "✓ همان است")); box.appendChild(h("button", { class: "btn sm", type: "button", "data-fit": "no", onclick: ans("no") }, "✗ همان نیست")); }
           li.appendChild(box);
         }

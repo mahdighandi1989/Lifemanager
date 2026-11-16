@@ -60,9 +60,10 @@
   };
   /* {"do":"deadline_done","what":"…"} — کاربر خودش گفت انجام شد (همان کارِ دکمهٔ «انجام شد» در «امروز»)؛ یادآورهایش برداشته می‌شود */
   AS.DO.deadline_done = function (a) {
-    var w = String((a && (a.what || a.id)) || "").trim(); if (!w) return "«what» (همان عنوانِ موعد) لازم است";
+    /* دورِ ۲۸ (R7 surface، C100 — A28-31): ناکامیِ قراردادیِ این کنش فقط برای مدل است ({quiet}) — موعدی که باز نبود برای او چیزی را عوض نکرد */
+    var w = String((a && (a.what || a.id)) || "").trim(); if (!w) return { note: "«what» (همان عنوانِ موعد) لازم است", quiet: true };
     var open = S.all("deadline", function (x) { return !x.done; }), r = open.filter(function (x) { return x.id === w || x.what === w; })[0] || open.filter(function (x) { return x.what.indexOf(w) >= 0 || w.indexOf(x.what) >= 0; })[0];
-    if (!r) return "موعدِ «" + clip(w, 40) + "» در موعدهای باز نیست";
+    if (!r) return { note: "موعدِ «" + clip(w, 40) + "» در موعدهای باز نیست", quiet: true };
     markDone(r); return "";
   };
   function markDone(r) { r.done = true; r.doneAt = nowIso(); S.put(r); unsync(r); }

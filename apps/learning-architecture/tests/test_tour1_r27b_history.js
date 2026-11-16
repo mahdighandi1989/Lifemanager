@@ -150,6 +150,9 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
 
   /* ---------- A27-5 (s02 p8–p14): پس از «حل شد — کنار رفت، اجرا دوباره باز شد» مرحله «اجرا» است، تا جوابِ کلِ تازه ---------- */
   K.A27_5 = async () => { const r = await ev(async () => { const A = __one('لوله در بارِ وانت', 'یه لوله‌ی صاف ۴ متری دارم، بار وانتم ۳.۲ متر طول، ۱.۸ عرض، ۱.۶ ارتفاع داره. جا میشه یا نه؟');
+      /* دورِ ۲۸ (arith، A28-7 «sqrt(…)» حالا خوانده می‌شود): «۳.۶۷» گردِ خودِ او از پیامِ پیشینِ همین اجرا است (s02 p4: «sqrt(3.2^2 + 1.8^2) ≈ 3.67») — بی آن پیام
+         «≈ 4.005» با ۳.۶۷ ِ دقیق (۴٫۰۰۳۶) به حکمِ C9 نادرست است و «حل شد» به حساب نمی‌آید؛ با آن (C13 در همان گفت‌وگو) همان جمله درست است. انتظارِ مرحله‌ها همان است */
+      await __turn('کف رو حساب کردم: sqrt(3.2^2 + 1.8^2) ≈ 3.67. باز هم از ۴ کمتره! گیر کردم.', [cs({ ph: 'u', stuck: true })]);
       await __turn('قطر کف با ارتفاع: sqrt(3.67^2 + 1.6^2) ≈ 4.005. جا میشه! حلش کردم دیگه، حل شد!', [cs({ ph: 'b', said: ['result'], result: 'جا میشه' })]);
       const o = { ph0: APP.liveStoryPhase(A) };
       /* همان کاری که a38 setAsideDeps با اصلاحِ «۱.۶ ⇒ ۱۵۰ سانت» می‌کند (L.state باز، L.reopened) — بی تغییرِ دیگر */
@@ -186,7 +189,7 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
   /* ---------- #234/#235/#250 (C78، مالک بانکِ ۴۲): جابه‌جایی و برگرداندنِ سطرِ بدجای 📜 ---------- */
   const mv = async () => ev(async () => { const [A, B] = __base3(); await __turn('شد ۱۲ حالت، درست درومد', [cs({ ph: 'b', said: ['result'], result: 'شد ۱۲ حالت' })]);
     const o = { A, B, ph0: APP.liveStoryPhase(A), ev0: ((APP.S.get('eprog_' + A).solve.live.evlog) || []).map(e => e.id) };
-    APP.go('dossier', A); const btn = [...document.querySelectorAll('#main .lp-dmv')].filter(b => /مهره‌های رنگی/.test(b.textContent))[0]; o.btn = !!btn; if (btn) btn.click();
+    APP.go('dossier', A); const btn = [...document.querySelectorAll('#main li.lp-dev')].filter(li => /۱۲ حالت/.test(li.innerText)).flatMap(li => [...li.querySelectorAll('.lp-dmv')]).filter(b => /مهره‌های رنگی/.test(b.textContent))[0]; o.btn = !!btn; if (btn) btn.click();   // دورِ ۲۸ (C123): صورت هم «↪» دارد — دکمهٔ همان سطر
     o.dA = __dos(A); o.dB = __dos(B); o.phA = APP.liveStoryPhase(A); o.phB = APP.liveStoryPhase(B); o.ev1 = ((APP.S.get('eprog_' + A).solve.live.evlog) || []).map(e => e.id);
     o.stB = (((__cur().coach || {}).story || {})['L:' + B] || { items: [] }).items.map(x => x.k + ':' + x.t); return o; });
   E[234] = async () => { const o = await mv(); const a = o.dA.filter(x => /۱۲ حالت/.test(x)), b = o.dB.filter(x => /۱۲ حالت/.test(x));

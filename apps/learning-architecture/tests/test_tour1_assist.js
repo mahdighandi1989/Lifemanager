@@ -370,7 +370,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     return out;
   });
   chk(/خوانا نیست/.test(info.dl.bad) && info.dl.time === '08:00' && info.dl.dayOf && info.dl.pre && info.dl.notMoved && info.dl.dateOnly, '14: a time-of-day deadline reminds before the time; remind_hour never moves it past the time ' + JSON.stringify(info.dl));
-  chk(info.dl.hook && info.dl.done && /نیست/.test(info.dl.doneBad), '14: the assistant can mark a deadline done (reminders removed) ' + JSON.stringify(info.dl));
+  /* دورِ ۲۸ (DECISIONS_R28 C100): ناکامیِ deadline_done یادداشتِ فقط-مدل است ({note, quiet}) — همان متن، دیگر رشتهٔ خام نیست */
+  chk(info.dl.hook && info.dl.done && /نیست/.test(typeof info.dl.doneBad === 'string' ? info.dl.doneBad : (info.dl.doneBad || {}).note) && (typeof info.dl.doneBad === 'string' || info.dl.doneBad.quiet === true), '14: the assistant can mark a deadline done (reminders removed) ' + JSON.stringify(info.dl));
   chk(info.dl.plain && info.dl.recon, '14: review cards get a push, and a reconstruction card asks to rebuild without looking ' + JSON.stringify(info.dl));
 
   // ---------- 15) وجهِ ایستاده ⇒ یادآور روی نردبانِ سامانه ----------

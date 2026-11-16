@@ -1,0 +1,322 @@
+{
+"from": "round28A/pwA2",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام من آرمانم هشت سالمه. معلممون این سؤالو داده: یه کتاب ۴۸ صفحه داره. روز اول ۱۲ صفحه خوندم، روز دوم دو برابر روز اول خوندم. چند صفحه مونده؟ اگه از روز سوم روزی ۵ صفحه بخونم چند روز دیگه کتاب تموم میشه؟\nمن این جوری حل کردم:\nروز دوم: ۱۲ × ۲ = ۲۴\nدو روز با هم: ۱۲ + ۲۴ = ۳۴\nمونده: ۴۸ − ۳۴ = ۱۴\nروزی ۵ تا: ۱۴ تقسیم بر ۵ میشه ۲ و یه چیزی. پس ۲ روز.\nدرسته؟",
+"c": 1
+},
+{
+"eval": "JSON.stringify(APP.STORY.priorFor(APP.ASSIST.cur(),null)).slice(0,2500)",
+"c": 2
+},
+{
+"say": "اِ! ۱۲ و ۲۴ میشه ۳۶. پس مونده ۴۸ − ۳۶ = ۱۲.",
+"c": 3
+},
+{
+"eval": "JSON.stringify(APP.STORY.priorFor(APP.ASSIST.cur(),null)).slice(0,1500)",
+"c": 4
+},
+{
+"say": "روز اول ۵، روز دوم ۵، میشه ۱۰. ۲ تا می‌مونه. پس ۲ روز؟",
+"c": 5
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);document.querySelectorAll(\"#main details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+1800)})()",
+"c": 6
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[1];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');return (t?t.innerText:'').slice(0,300)})()",
+"c": 7
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[2];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');return (t?t.innerText:'').slice(0,300)})()",
+"c": 8
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[3];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');return (t?t.innerText:'').slice(0,300)})()",
+"c": 9
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[4];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');return (t?t.innerText:'').slice(0,300)})()",
+"c": 10
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[6];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');return (t?t.innerText:'').slice(0,300)})()",
+"c": 11
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];return g.map((x,i)=>{x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');return i+': '+(t?t.innerText.replace(/\\n/g,' / '):'')}).join('\\n').slice(0,3000)})()",
+"c": 12
+},
+{
+"say": "آهان اون ۲ تا رو هم باید یه روز دیگه بخونم. پس ۳ روز! ۵ و ۵ و ۲ میشه ۱۲.",
+"c": 13
+},
+{
+"say": "۱۲ تقسیم بر ۴ میشه ۳ تا ۴ تا، هیچی نمی‌مونه، پس ۳ روز. یاد گرفتم اون «یه چیزی» که می‌مونه هم یه روز حساب میشه. این سؤالا رو دوست دارم چون مثل بازیه.",
+"c": 14
+},
+{
+"say": "راستی تولدم ۱۰ مهره.",
+"c": 15
+},
+{
+"eval": "JSON.stringify({age:APP.AGE.age(),md:(APP.S.get(\"settings\")||{}).profile})",
+"c": 16
+},
+{
+"eval": "JSON.stringify({age:APP.AGE.age(),band:(APP.AGE.band(APP.AGE.age())||{}).id,prof:(APP.S.get(\"settings\")||{}).profile})",
+"c": 17
+},
+{
+"eval": "(APP.ASSIST.cur().msgs.slice(-3).map(m=>m.role+\": \"+m.text).join(\"\\n\"))",
+"c": 18
+},
+{
+"eval": "(()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{d.open=true});const m=document.getElementById('main');const i=[...m.querySelectorAll('input')].find(i=>(i.getAttribute('aria-label')||'').includes('تاریخِ تولد'));if(!i)return 'NOFIELD';i.scrollIntoView({block:'center'});i.value='۳۱ مهر ۹۷';i.dispatchEvent(new Event('input',{bubbles:true}));const b=i.parentElement.querySelector('button');b&&b.click();const p=i.parentElement.parentElement.innerText;return 'birth='+APP.AGE.birth()+' | '+p.slice(0,300)+' | '+TT()})()",
+"c": 19
+},
+{
+"eval": "(()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{d.open=true});const m=document.getElementById('main');const i=[...m.querySelectorAll('input')].find(i=>(i.getAttribute('aria-label')||'').includes('تاریخِ تولد'));if(!i)return 'NOFIELD';i.scrollIntoView({block:'center'});i.value='1397/7/10';i.dispatchEvent(new Event('input',{bubbles:true}));const b=i.parentElement.querySelector('button');b&&b.click();const p=i.parentElement.parentElement.innerText;return 'birth='+APP.AGE.birth()+' | '+p.slice(0,300)+' | '+TT()})()",
+"c": 20
+},
+{
+"eval": "(()=>{const p=APP.liveAll().map(r=>r.p.id);APP.go(\"lprob\",p[0]);return p.join(\",\")+\"\\n\"+MT(\"🔭\",2500)})()",
+"c": 21
+},
+{
+"eval": "(()=>{const s=[...document.querySelectorAll(\"#main select\")].find(x=>[...x.options].some(o=>/کِی می‌خوانی/.test(o.text)));if(!s)return \"NOSEL\";const o=[...s.options].find(o=>/کِی می‌خوانی/.test(o.text));s.value=o.value;s.dispatchEvent(new Event(\"change\",{bubbles:true}));const r=CT(\"ثبتِ پاسخ‌های بازنگری\");return r+\" | \"+TT()})()",
+"c": 22
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 23
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 24
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqmv4tbyp');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 25
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 26
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvnlzive7xs3m');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 27
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 28
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 29
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 30
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqmv4tbyp');const t=document.getElementById('main').innerText;return t})()",
+"c": 31
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 32
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({age:APP.AGE.age(),b:APP.AGE.birth&&APP.AGE.birth(),sys:s.msgs.filter(m=>m.role==\"sys\").map(m=>m.text.slice(0,200))})})()",
+"c": 33
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 34
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqmv4tbyp');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 35
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 36
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltdwa4x15');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 37
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 38
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 39
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 40
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqmv4tbyp');const t=document.getElementById('main').innerText;return t})()",
+"c": 41
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 42
+},
+{
+"eval": "JSON.stringify({sys:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.role==\"sys\"&&/📅|معلم|مدرسه/.test(m.text)).map(m=>m.text.slice(0,200))),dl:APP.S.all(\"deadline\",x=>1).length,titles:APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.title)})",
+"c": 43
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 44
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqmv4tbyp');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 45
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 46
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsymk5ueb');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 47
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 48
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 49
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 50
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqmv4tbyp');const t=document.getElementById('main').innerText;return t})()",
+"c": 51
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 52
+},
+{
+"eval": "(()=>{const m=APP.ASSIST.cur().msgs;return m.filter(x=>x.role==\"user\").map(x=>x.text.slice(0,150)).join(\"\\n\")})()",
+"c": 53
+},
+{
+"say": "ببخشید، روز اول ۱۰ صفحه خوندم نه ۱۲.",
+"c": 54
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const m=s.msgs;let i=m.length-1;while(i>0&&m[i].role!=\"user\")i--;return m.slice(i+1).filter(x=>x.role==\"sys\").map(x=>\"SYS: \"+x.text).join(\"\\n\")||\"(no sys)\"})()",
+"c": 55
+},
+{
+"eval": "(()=>{const m=APP.ASSIST.cur().msgs;return m[m.length-1].text})()",
+"c": 56
+},
+{
+"say": "آره، همون ۲۰ درسته.",
+"c": 57
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const m=s.msgs;let i=m.length-1;while(i>0&&m[i].role!=\"user\")i--;return m.slice(i+1).filter(x=>x.role==\"sys\").map(x=>\"SYS: \"+x.text).join(\"\\n\")||\"(no sys)\"})()",
+"c": 58
+},
+{
+"say": "آره، روز دوم ۱۰ × ۲ = ۲۰ میشه. دو روز با هم ۱۰ + ۲۰ = ۳۰.",
+"c": 59
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const m=s.msgs;let i=m.length-1;while(i>0&&m[i].role!=\"user\")i--;return m.slice(i+1).filter(x=>x.role==\"sys\").map(x=>\"SYS: \"+x.text).join(\"\\n\")||\"(no sys)\"})()",
+"c": 60
+},
+{
+"say": "مونده ۴۸ − ۳۰ = ۱۸. روزی ۵ تا: ۵ و ۵ و ۵ میشه ۱۵، ۳ تا می‌مونه، پس ۴ روز.",
+"c": 61
+},
+{
+"say": "نه! ۵ و ۵ و ۵ میشه ۱۵ دیگه، دوباره شمردم. ۳ تا هم از ۱۸ می‌مونه.",
+"c": 62
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const m=s.msgs;let i=m.length-1;while(i>0&&m[i].role!=\"user\")i--;return m.slice(i+1).filter(x=>x.role==\"sys\").map(x=>\"SYS: \"+x.text).join(\"\\n\")||\"(no sys)\"})()",
+"c": 63
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 64
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqmv4tbyp');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 65
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 67
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt1q49lke');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 68
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 70
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 72
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 74
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqmv4tbyp');const t=document.getElementById('main').innerText;return t})()",
+"c": 75
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 77
+}
+],
+"replies": [
+"{\"reply\": \"سلام آرمان! چه خوب که خودت تا این‌جا حلش کردی. گامِ ۱ (روز دوم: ۱۲ × ۲ = ۲۴) درسته. گامِ ۲ (دو روز با هم: ۱۲ + ۲۴ = ۳۴) با حسابِ صفحه جور درنمیاد؛ گامِ ۳ و ۴ هم به همین گام وصلن، پس بعداً دوباره نگاهشون می‌کنیم. جواب رو من نمی‌گم. گامِ ۲ رو خودت یه بار دیگه جمع می‌زنی — ۱۲ و ۲۴ با هم چند می‌شه؟\", \"title\": \"کتابِ ۴۸ صفحه‌ای\", \"memory\": \"آرمان، هشت ساله؛ سؤالِ کتابِ ۴۸ صفحه‌ای را تا نیمه حل کرده؛ گامِ ۲ (۱۲+۲۴=۳۴) با حسابِ صفحه نمی‌خواند؛ گامِ ۴ باقی‌مانده را جا انداخته؛ از گامِ ۲ ادامه می‌دهیم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prior\": [{\"step\": \"روزِ دوم\", \"quote\": \"روز دوم: ۱۲ × ۲ = ۲۴\", \"verdict\": \"ok\", \"why\": \"دو برابرِ ۱۲ می‌شود ۲۴\"}, {\"step\": \"دو روز با هم\", \"quote\": \"دو روز با هم: ۱۲ + ۲۴ = ۳۴\", \"verdict\": \"wrong\", \"why\": \"جمع با حسابِ صفحه نمی‌خواند\"}, {\"step\": \"مانده\", \"quote\": \"مونده: ۴۸ − ۳۴ = ۱۴\", \"verdict\": \"incomplete\", \"why\": \"تفریق درست است ولی بر عددِ گامِ ۲ تکیه دارد\", \"dep\": [2]}, {\"step\": \"چند روز\", \"quote\": \"روزی ۵ تا: ۱۴ تقسیم بر ۵ میشه ۲ و یه چیزی. پس ۲ روز\", \"verdict\": \"incomplete\", \"why\": \"«یه چیزی» که می‌ماند هنوز خوانده نشده؛ و بر عددِ گامِ ۳ تکیه دارد\", \"dep\": [3]}]}]}",
+"{\"reply\": \"آفرین، خودت پیداش کردی: ۱۲ و ۲۴ می‌شه ۳۶، و مونده‌ش ۴۸ − ۳۶ = ۱۲ — این با حسابِ صفحه هم جوره. حالا گامِ آخر با عددِ تازه: ۱۲ صفحه مونده و روزی ۵ تا می‌خونی. روز به روز بشمار — بعد از هر روز چند صفحه مونده؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"۱۲ و ۲۴ میشه ۳۶. پس مونده ۴۸ − ۳۶ = ۱۲\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prior\": [{\"n\": 2, \"quote\": \"۱۲ و ۲۴ میشه ۳۶\", \"verdict\": \"ok\", \"why\": \"جمعِ تازه درست است\"}, {\"n\": 3, \"quote\": \"پس مونده ۴۸ − ۳۶ = ۱۲\", \"verdict\": \"ok\", \"why\": \"تفریق با عددِ درستِ گامِ ۲ و حسابِ صفحه می‌خواند\"}]}]}",
+"{\"reply\": \"شمردنت خوبه: دو روز می‌شه ۱۰ صفحه و ۲ تا می‌مونه. من نمی‌گم ۲ روز درسته یا نه. فقط بگو: اون ۲ صفحه‌ای که مونده رو کِی می‌خونی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"روز اول ۵، روز دوم ۵، میشه ۱۰. ۲ تا می‌مونه\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"guess\": {\"text\": \"پس ۲ روز\", \"q\": \"اون ۲ صفحه‌ای که مونده رو کِی می‌خونی؟\"}}]}",
+"{\"reply\": \"خودت دیدی: اون ۲ صفحه هم یه روز می‌خواد، پس ۳ روز — و با «۵ و ۵ و ۲ می‌شه ۱۲» وارسی‌اش هم کردی. حالا یه سؤالِ هم‌خانواده برای این‌که ببینی روشت همیشه کار می‌کنه: اگه روزی ۴ صفحه می‌خوندی، چند روز می‌شد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\", \"check\"], \"result\": \"پس ۳ روز! ۵ و ۵ و ۲ میشه ۱۲\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prior\": [{\"n\": 4, \"quote\": \"اون ۲ تا رو هم باید یه روز دیگه بخونم. پس ۳ روز! ۵ و ۵ و ۲ میشه ۱۲\", \"verdict\": \"ok\", \"why\": \"باقی‌مانده هم یک روز می‌خواهد؛ ۵ + ۵ + ۲ = ۱۲\"}], \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}, \"check\": {\"msgs\": [\"۵ و ۵ و ۲ میشه ۱۲\"]}}]}",
+"{\"reply\": \"این یکی رو هم خودت حل کردی: ۳ تا ۴ تا می‌شه ۱۲ و هیچی نمی‌مونه، پس ۳ روز. درست هم خیلی خوبه: اون «یه چیزی» که می‌مونه هم یه روز حساب می‌شه. سؤال، وارسی، درست و این‌که این سؤال‌ها رو دوست داری ثبت می‌کنم. کدوم سؤالِ من بیشتر کمکت کرد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"کتابِ ۴۸ صفحه‌ای\", \"statement\": \"یه کتاب ۴۸ صفحه داره. روز اول ۱۲ صفحه خوندم، روز دوم دو برابر روز اول خوندم. چند صفحه مونده؟ اگه از روز سوم روزی ۵ صفحه بخونم چند روز دیگه کتاب تموم میشه؟\", \"kind\": \"find\", \"lesson\": \"اون «یه چیزی» که می‌مونه هم یه روز حساب میشه\", \"check\": \"۵ و ۵ و ۲ میشه ۱۲\", \"taste\": \"این سؤالا رو دوست دارم چون مثل بازیه\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"۱۲ تقسیم بر ۴ میشه ۳ تا ۴ تا، هیچی نمی‌مونه، پس ۳ روز\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"taste\": {\"text\": \"این سؤالا رو دوست دارم چون مثل بازیه\"}}]}",
+"{\"reply\": \"مرسی که گفتی؛ تولدت رو همون‌طور که گفتی برای ثبت فرستادم. صفحه خودش نشونت می‌ده چی ثبت شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"۱۰ مهر\", \"age\": 8}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"اصلاحِ «۱۰ صفحه» را فرستادم؛ صفحه می‌گوید کدام گام‌هایت به آن وابسته‌اند. با ۱۰ صفحه، روز دوم چند صفحه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"retract\": {\"msg\": \"روز اول ۱۲ صفحه خوندم\", \"key\": \"datum:روز اول\", \"what\": \"said\", \"fix\": \"۱۰ صفحه\", \"rests\": []}}]}",
+"{\"reply\": \"باشد. حالا دو روز با هم چند صفحه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": []}]}",
+"{\"reply\": \"هر دو درست. حالا چند صفحه مانده؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"prior\": [{\"n\": 1, \"quote\": \"روز دوم ۱۰ × ۲ = ۲۰ میشه\", \"verdict\": \"ok\", \"why\": \"دو برابرِ ۱۰\"}, {\"n\": 2, \"quote\": \"دو روز با هم ۱۰ + ۲۰ = ۳۰\", \"verdict\": \"ok\", \"why\": \"جمعِ درست\"}]}]}",
+"{\"reply\": \"۴۸ − ۳۰ = ۱۸ درسته. ولی جمعِ «۵ و ۵ و ۵» با چیزی که نوشتی جور درنمیاد — یه بار دیگه آروم جمعش کن، چند می‌شه؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"prior\": [{\"n\": 3, \"quote\": \"مونده ۴۸ − ۳۰ = ۱۸\", \"verdict\": \"ok\", \"why\": \"تفریقِ درست\"}]}]}",
+"{\"reply\": \"حق با توست: ۵ و ۵ و ۵ می‌شه ۱۵، و ۳ تا از ۱۸ می‌مونه، پس روزِ چهارم هم لازمه — ۴ روز. وارسی کن: ۵ + ۵ + ۵ + ۳ همون ۱۸ می‌شه؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"۴ روز\", \"prior\": [{\"n\": 4, \"quote\": \"روزی ۵ تا: ۵ و ۵ و ۵ میشه ۱۵، ۳ تا می‌مونه، پس ۴ روز\", \"verdict\": \"ok\", \"why\": \"۱۵ + ۳ = ۱۸\"}]}]}"
+],
+"keys": [
+"سلام من آرمانم هشت سالمه. معلممون این سؤالو داده: یه کتاب ۴۸ صفحه داره. روز اول ۱۲ صفحه خوندم، روز دوم دو برابر روز اول خوندم. چند صفحه مونده؟ اگه از روز سوم روزی ۵ صفحه بخونم چند روز دیگه کتاب تموم میشه؟\nمن این جوری حل کردم:\nروز دوم: ۱۲ × ",
+"اِ! ۱۲ و ۲۴ میشه ۳۶. پس مونده ۴۸ − ۳۶ = ۱۲.",
+"روز اول ۵، روز دوم ۵، میشه ۱۰. ۲ تا می‌مونه. پس ۲ روز؟",
+"آهان اون ۲ تا رو هم باید یه روز دیگه بخونم. پس ۳ روز! ۵ و ۵ و ۲ میشه ۱۲.",
+"۱۲ تقسیم بر ۴ میشه ۳ تا ۴ تا، هیچی نمی‌مونه، پس ۳ روز. یاد گرفتم اون «یه چیزی» که می‌مونه هم یه روز حساب میشه. این سؤالا رو دوست دارم چون مثل بازیه.",
+"راستی تولدم ۱۰ مهره.",
+"ببخشید، روز اول ۱۰ صفحه خوندم نه ۱۲.",
+"آره، همون ۲۰ درسته.",
+"آره، روز دوم ۱۰ × ۲ = ۲۰ میشه. دو روز با هم ۱۰ + ۲۰ = ۳۰.",
+"مونده ۴۸ − ۳۰ = ۱۸. روزی ۵ تا: ۵ و ۵ و ۵ میشه ۱۵، ۳ تا می‌مونه، پس ۴ روز.",
+"نه! ۵ و ۵ و ۵ میشه ۱۵ دیگه، دوباره شمردم. ۳ تا هم از ۱۸ می‌مونه."
+]
+}

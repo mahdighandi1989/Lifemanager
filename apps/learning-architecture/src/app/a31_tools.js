@@ -83,14 +83,21 @@
         S.put({ id: A.uid("fc"), type: "fcast", q: q.value.trim(), p: num(p.value), due: d.value || A.addDays(A.today(), 30), dim: dim.value }); A.render();
       } }, "ثبتِ پیش‌بینی")));
     var all = S.all("fcast").sort(function (a, b) { return String(a.due || "").localeCompare(String(b.due || "")); }), br = A.fcastBrier(all);
-    root.appendChild(h("section", { class: "card" }, h("h2", {}, "پیش‌بینی‌ها (" + fa(all.length) + ")" + (br ? " · Brier = " + fa(br.brier) + " از " + fa(br.n) + " نتیجه" : "")),
-      all.length ? h("ul", { class: "plain" }, all.map(function (x) {
+    /* دورِ ۲۸ (forecast R4، C91؛ A28-35 oA1): 🎯 ِ داوری‌شده از فهرستِ «باز» بیرون می‌رود — زیرِ «داوری‌شده» با سرانجام و نقلِ خودش، و همان گزینه برای تغییرِ داوری (هیچ کنشی حذف نشد).
+       پیش‌تر هر دو با یک «— هنوز — / شد / نشد» کنارِ هم بودند و 🎯 ِ «⇐ شد» باز دیده می‌شد. */
+    var judged = function (x) { return x.outcome === "شد" || x.outcome === "نشد" || (x.live && x.live.pid && !!x.outcome); }, openL = all.filter(function (x) { return !judged(x); }), doneL = all.filter(judged);
+    var row = function (x) {
         /* پیش‌بینیِ گامِ «🔭 مسئلهٔ حل‌نشدهٔ خودم»: نتیجه را خودِ گام ثبت می‌کند (شد/نشد/تاحدی/انجام نشد) — این‌جا فقط نشان داده و به گام پیوند داده می‌شود تا دو جا ناهم‌خوان نشوند */
-        if (x.live && x.live.pid) return h("li", { class: "row gap wrap fc-live", dir: "rtl" }, h("span", {}, x.q + " — " + (x.p != null ? fa(x.p) + "٪ · " : "") + (x.due ? "موعد " + A.fdate(x.due) : "بی موعد (دورِ ۲۷، C53) — داوری با گزارشِ خودت")),
+        var jd = judged(x), how = jd ? " ⇐ " + x.outcome + (x.judgedBy && x.judgedBy.quote ? " — به گفتهٔ خودت: «" + String(x.judgedBy.quote).slice(0, 80) + "»" : "") : "";
+        if (x.live && x.live.pid) return h("li", { class: "row gap wrap fc-live" + (jd ? " fc-done" : " fc-open"), dir: "rtl" }, h("span", {}, x.q + " — " + (x.p != null ? fa(x.p) + "٪ · " : "") + (x.due ? "موعد " + A.fdate(x.due) : "بی موعد — داوری با گزارشِ خودت") + how),
           h("span", { class: "chip fc-liveout" }, x.outcome || "— هنوز —"), h("button", { class: "btn ghost sm fc-golive", type: "button", onclick: function () { A.go("lprob", x.live.pid, "exec"); } }, "🔭 نتیجه در گامِ همان مسئله"));
-        return h("li", { class: "row gap wrap" }, h("span", {}, x.q + " — " + (x.p != null ? fa(x.p) + "٪ · " : "") + (x.due ? "موعد " + A.fdate(x.due) : "بی موعد (دورِ ۲۷، C53) — داوری با گزارشِ خودت")),
-          h("select", { "aria-label": "نتیجهٔ «" + x.q + "»", onchange: function (e) { x.outcome = e.target.value; x.outcomeAt = A.nowISO(); S.put(x); A.render(); } }, ["", "شد", "نشد"].map(function (o) { return h("option", { value: o, selected: (x.outcome || "") === o ? true : null }, o || "— هنوز —"); })));
-      })) : h("p", { class: "small muted" }, "هنوز پیش‌بینی‌ای ثبت نشده.")));
+        return h("li", { class: "row gap wrap " + (jd ? "fc-done" : "fc-open") }, h("span", {}, x.q + " — " + (x.p != null ? fa(x.p) + "٪ · " : "") + (x.due ? "موعد " + A.fdate(x.due) : "بی موعد — داوری با گزارشِ خودت") + how),
+          jd ? h("label", { class: "small muted" }, "تغییرِ داوری: ") : null,
+          h("select", { "aria-label": "نتیجهٔ «" + x.q + "»", onchange: function (e) { x.outcome = e.target.value; x.outcomeAt = A.nowISO(); S.put(x); A.render(); } }, ["", "شد", "نشد"].map(function (o) { return h("option", { value: o, selected: (x.outcome || "") === o ? true : null }, o || (jd ? "— دوباره باز —" : "— هنوز —")); })));
+    };
+    root.appendChild(h("section", { class: "card" }, h("h2", {}, "پیش‌بینی‌ها (" + fa(all.length) + ")" + (br ? " · Brier = " + fa(br.brier) + " از " + fa(br.n) + " نتیجه" : "")),
+      all.length ? h("div", {}, h("h3", { class: "fc-open-h" }, "باز (" + fa(openL.length) + ")"), openL.length ? h("ul", { class: "plain fc-openl" }, openL.map(row)) : h("p", { class: "small muted" }, "پیش‌بینیِ بازی نمانده."),
+        doneL.length ? h("h3", { class: "fc-done-h" }, "داوری‌شده (" + fa(doneL.length) + ")") : null, doneL.length ? h("ul", { class: "plain fc-donel" }, doneL.map(row)) : null) : h("p", { class: "small muted" }, "هنوز پیش‌بینی‌ای ثبت نشده.")));
     return root;
   };
 
