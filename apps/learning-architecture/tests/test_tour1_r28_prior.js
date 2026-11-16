@@ -142,11 +142,14 @@ const RUNS = JSON.parse(fs.readFileSync(vfile('R28_prior_runs.json'), 'utf8'));
     const o = await run('pwB2', 9);
     const P = o[9].pr, s5 = P && P.steps[4];
     chk(!!s5 && s5.verdict === 'ok' && s5.fixed && /۷٫۷/.test(s5.fixed.t) && P.resume !== 5, 'B28·D9 REGRESSION (pwB2 p9 «… شیراز = ۲٫۷ + ۱٫۶ + ۱٫۲ + ۰٫۸ + ۱٫۴ = ۷٫۷»): her fix lands on step 5 (r27: «✓ … نشست»), resume moves on :: ' + JSON.stringify(stepsOf(P)) + ' resume ' + (P && P.resume));
+    const ow = await p.evaluate(() => [APP.STORY.otherWork27('داداشم حساب کرد نصب ۳ روز × ۴۰۰ هزار = ۱۲۰۰ هزار تومن میشه.'), APP.STORY.otherWork27('مادرم اولش نه گفت، ولی بعد گفت امتحانش می‌کنم. پس نمره‌ی مادر میشه ۷. شیراز = ۷٫۷.')].map(o => o && o.text));
+    chk(/۱۲۰۰/.test(ow[0] || '') && !!ow[1] && !/۷٫۷|نمره/.test(ow[1]), 'B28·D9 root (a45 ST.otherWork27): «… گفت … . پس …» — her own inference after reported speech is hers; look-alike «داداشم حساب کرد … = ۱۲۰۰ …» stays the brother\'s work :: ' + JSON.stringify(ow));
     const n = await run('nB1', 14);
     const floor = Object.keys(n[14].all).map(k => [k, n[14].all[k]]).filter(([k, Q]) => Q.steps.some(x => /کارتن|۳۰ ÷ ۱٫۵|۶ متر در ۵ متر/.test(String(x.fixed ? x.fixed.t : x.quote))));
     const shelves = Object.keys(n[14].all).map(k => [k, n[14].all[k]]).filter(([k, Q]) => Q.steps.some(x => /قفسه|۶۰ تا میشه ۳۰۰|۵ تا ۶۰/.test(String(x.fixed ? x.fixed.t : x.quote))));
     chk(floor.length >= 1 && !floor.some(([k, Q]) => Q.steps.some(x => /قفسه|۶۰ تا میشه ۳۰۰/.test(String(x.fixed ? x.fixed.t : x.quote)))), 'B28·D9 (nB1 p14): the floor problem keeps its own ledger (stale marks, accepted 20.83) — never the shelves steps :: ' + JSON.stringify(Object.keys(n[14].all).map(k => [k, stepsOf(n[14].all[k])])).slice(0, 700));
-    chk(!priorBlk(n[14].user) || !/قفسه|۶۰ تا میشه ۳۰۰/.test(priorBlk(n[14].user)), 'B28·D9 (nB1 p14 «برگردیم به سرامیکِ کف …»): the prior block shown for the floor is not the shelves ledger :: ' + priorBlk(n[14].user).slice(0, 400));
+    chk(floor.some(([k, Q]) => /^eprog_/.test(k) && Q.steps.length >= 4), 'B28·D9 (nB1 p12–p14): the floor live problem carries its own ≥4-step ledger :: ' + JSON.stringify(floor.map(([k, Q]) => [k, Q.steps.length])));
+    chk(!priorBlk(n[14].user) ||!/قفسه|۶۰ تا میشه ۳۰۰/.test(priorBlk(n[14].user)), 'B28·D9 (nB1 p14 «برگردیم به سرامیکِ کف …»): the prior block shown for the floor is not the shelves ledger :: ' + priorBlk(n[14].user).slice(0, 400));
     chk(!shelves.some(([k, Q]) => Q.steps.some(x => /کارتن/.test(String(x.fixed ? x.fixed.t : x.quote)))), 'B28·D9 / C97: the shelves ledger has no floor step :: ' + JSON.stringify(shelves.map(([k, Q]) => stepsOf(Q))).slice(0, 300));
   });
 

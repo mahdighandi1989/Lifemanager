@@ -59604,6 +59604,10 @@ APP.goFromURL = function (q) {
     var T = String(ut || ""), m = OTHER27.exec(T); if (!m) return null;
     var S0 = T.slice(0, m.index + 1), from = Math.max(S0.lastIndexOf(". "), S0.lastIndexOf("! "), S0.lastIndexOf("؟ "), S0.lastIndexOf("\n")) + 1, to = T.length;
     var rest = T.slice(m.index + m[0].length), mm = MINE27.exec(rest); if (mm) to = m.index + m[0].length + mm.index;
+    /* دورِ ۲۸ (prior، B28·D9 pwB2 p9 — پسرفت): «مادرم اولش نه گفت، … گفت امتحانش می‌کنم. پس نمره‌ی مادر برای شیراز میشه ۷ نه ۲. شیراز = … = ۷٫۷» —
+       جمله‌ای که با «پس / بنابراین / در نتیجه» آغاز می‌شود استنتاجِ خودِ اوست، نه ادامهٔ حرفِ آن دیگری؛ پیش‌تر تکهٔ «دیگری» تا پایانِ پیام می‌رفت و اصلاحِ گامِ دفترِ خودش
+       (نتیجهٔ «۷٫۷») «کارِ دیگری» شد و ننشست. فقط مرزِ پایانِ تکه عوض شد؛ آغازِ تکه و نسبت‌دادن همان است (سهمِ story: C96). */
+    var q28 = /[.!؟?\n]\s*(?:پس|بنابراین|در\s*نتیجه)(?![آ-ی])/.exec(rest); if (q28) { var at28 = m.index + m[0].length + q28.index + 1; if (at28 < to) to = at28; }
     return { who: m[1], from: from, to: to, text: txt(T.slice(from, to)) };
   };
   /* q (نقلِ نتیجهٔ مدل) درونِ تکهٔ دیگری است؛ بی q: هیچ عددی بیرون از آن تکه نیست */
@@ -59740,8 +59744,7 @@ APP.goFromURL = function (q) {
             old.steps.forEach(function (y) { if (y.n > x.n && y.dep.indexOf(x.n) < 0 && (x.said || []).concat(resNums(curText(x))).some(function (n) { return n && numRe(n).test(digs(curText(y))); })) y.dep.push(x.n); }); } }); });
       relink(old);
       /* گام/نتیجهٔ سنجیدهٔ مدل در پاسخ به پرسشِ ازسرگیریِ همان گام (یا با نامِ خودِ گام) ⇒ اصلاحِ خودش — فقط اگر حسابِ صفحه بخواند (C8) */
-      var its = I.filter(function (x) { return x.k === "step" || (x.k === "res" && !/[؟?]\s*$/.test(x.t)); });
-      if (its.length && !ch.some(function (c) { return /^(?:fix|retry|flip|re|say|rework|restate|drop)$/.test(c.k); }) && a.fail !== true && !STUCK25.test(ut)) {   // دورِ ۲۶: گامی که مدل همین نوبت با شماره‌اش گزارش کرد (هر حکمی) از راهِ step/result دوباره «اصلاح» نمی‌شود
+      var its = I.filter(function (x) { return x.k === "step" || (x.k === "res" && !/[؟?]\s*$/.test(x.t)); });      if (its.length && !ch.some(function (c) { return /^(?:fix|retry|flip|re|say|rework|restate|drop)$/.test(c.k); }) && a.fail !== true && !STUCK25.test(ut)) {   // دورِ ۲۶: گامی که مدل همین نوبت با شماره‌اش گزارش کرد (هر حکمی) از راهِ step/result دوباره «اصلاح» نمی‌شود
         var ns = stepNs(ut), tn = ns.length === 1 ? ns[0] : (asked.n || 0), x0 = tn ? old.steps[tn - 1] : null;
         /* دورِ ۲۶ (A26-14): نتیجهٔ میانی یا بی‌ربط «اصلاحِ خودش» ِ گامِ ازسرگیری نیست. بی نامِ گام، فقط وقتی می‌نشیند که (۱) همین نوبت حدس/پرسشِ باز دربارهٔ آن ندارد،
            و (۲) به خودِ آن گام می‌خورد (گامِ حسابی: همان حساب یا مقدارِ درستِ صفحه، یا جمله‌ای بی حسابِ دیگر با واژهٔ مشترک؛ گامِ غیرعددی: واژهٔ مشترک با نقل/نامِ گام). وگرنه چیزی ثبت نمی‌شود و پرسشِ ازسرگیری می‌ماند. */
@@ -60594,7 +60597,15 @@ APP.goFromURL = function (q) {
     if (cut24) L.chatImp.cut = win.from; if (other27) L.chatImp.other27 = true;
     L.chatImpItems = items24.map(function (x) { return { k: x.k, t: x.t, at: x.at, mid: x.mid, pieces: x.pieces, n: x.n, fin: x.fin, ph: x.ph }; });
     if (E.unk && !other27 && (!cut24 || items24.some(function (x) { return x.k === "u" || x.k === "whole"; }))) L.chatUnk = E.unk;
-    if (E.prior && !L.prior && !cut24 && !other27) L.prior = JSON.parse(JSON.stringify(E.prior));   // دورِ ۲۴ (R8): کارِ پیشینِ سنجیده با همان حکم‌ها به مسئلهٔ زنده می‌رود (مالِ مسئلهٔ پیشینِ گفت‌وگو نه)
+    /* دورِ ۲۸ (prior، B28·D9 nB1 p12–p14؛ C97 سمتِ دفتر): «هر دو تا مسئله رو، کف و قفسه‌ها، … جدا ثبت کن» — دو مسئلهٔ زنده در یک نوبت؛ هر دو دفترِ «قفسه‌ها» (pk ِ کنونی)
+       را گرفتند و دفترِ چهارگامیِ کف (با نشانِ کهنه و ۲۰٫۸۳ ِ پذیرفته) از دست رفت. ریشه: دفتر همیشه از pk ِ کنونیِ گفت‌وگو می‌آمد، نه از مسئلهٔ گفت‌وگوییِ همین مسئلهٔ زنده.
+       حالا: دفترِ مسئلهٔ زنده از مسئلهٔ گفت‌وگویی‌ای می‌آید که صورتش با صورتِ همین مسئلهٔ زنده بیشترین واژهٔ مشترک را دارد (C.probs26)؛ اگر آن مسئلهٔ دیگری است، دفترِ خودِ آن
+       (بی بریدنِ پنجره) — هرگز دفترِ مسئلهٔ دیگری. */
+    var pkL28 = pk; try { var lrP = A.liveRec ? A.liveRec(pid) : null, PW = lrP && lrP.p ? toks(String(lrP.p.statement || "") + " " + String(lrP.p.title || "")).filter(function (w, i, X) { return w.length >= 3 && X.indexOf(w) === i; }) : [], P26 = C.probs26 || {};
+        var sc28 = function (k) { var st0 = k === pk && txt(C.stmt) ? String(C.stmt) : String((P26[k] || {}).stmt || ""); var W = toks(st0); return PW.filter(function (w) { return hit(w, W); }).length; };
+        if (PW.length) { var best = pk, bs = sc28(pk); Object.keys(P26).forEach(function (k) { if (k !== pk && storyOf(s, k).prior) { var v = sc28(k); if (v > bs) { best = k; bs = v; } } }); if (best !== pk && bs >= 2) pkL28 = best; } } catch (e) { pkL28 = pk; }
+    var EP28 = pkL28 === pk ? E : storyOf(s, pkL28);
+    if (EP28.prior && !L.prior && (pkL28 !== pk || (!cut24 && !other27))) { L.prior = JSON.parse(JSON.stringify(EP28.prior)); if (pkL28 !== pk) L.priorPk28 = pkL28; }   // دورِ ۲۴ (R8): کارِ پیشینِ سنجیده با همان حکم‌ها به مسئلهٔ زنده می‌رود (مالِ مسئلهٔ پیشینِ گفت‌وگو نه)
     /* پشتهٔ پیش‌نیازِ بازِ گفت‌وگو (اگر هست) با همان حالت به مسئلهٔ زنده می‌رود — جای منتظر گم نمی‌شود (پشتهٔ مسئلهٔ پیشینِ گفت‌وگو نه) */
     try { var P = cut24 || other27 ? null : (C.pre22 || {})[pk]; if (P && (P.st || []).length && A.PRE && A.PRE.store) { var R = A.PRE.store({ pid: pid }); if (R && !(R.X.st || []).length) { R.X.st = JSON.parse(JSON.stringify(P.st)); R.X.n = P.n || R.X.st.length; R.X.from = { sess: s.id, pk: pk }; } } } catch (e) { }
     S.put(pg);
