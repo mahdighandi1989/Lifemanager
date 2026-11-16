@@ -67,6 +67,23 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
       await __turn('گامِ ۱: برای n = 2 درسته. حدسم اینه که برای همهٔ nهای فرد هم درسته', [cs({ ph: 'e', said: ['guess'], guess: { text: 'برای همهٔ nهای فرد هم درسته' }, prior: [{ step: 'n = 2', quote: 'برای n = 2 درسته', verdict: 'ok' }] })]); return __dos(A); });
     return [D.some(x => /^guess/.test(x) && /nهای فرد/.test(x)) && D.some(x => /^cprior/.test(x) && /گامِ ۱ ·/.test(x) && !/گیر \(/.test(x)), J(D)]; };
 
+  /* ---------- B27·D2 (pwB3 p2–p3) و #167: نتیجهٔ «ابعاد» مرحله را جلو می‌برد ---------- */
+  const RUNS = JSON.parse(fs.readFileSync(path.join(__dirname, 'variants', 'R27_prior_runs.json'), 'utf8'));
+  const strip = () => ev(() => { APP.go('home'); const g = document.querySelector('#main .rt-geo'); return g ? g.textContent : ''; });
+  const replay = async (sid, upto) => { await ev(() => { __wipe(); __fresh(); }); for (const t of RUNS[sid].turns.filter(t => t.p <= upto && !t.sys)) await ev(async ([u, r]) => { __q = [JSON.stringify(r)]; await APP.ASSIST.send(u); __q.length = 0; }, [t.u, t.r]); };
+  K.B27_D2 = async () => { await replay('pwB3', 2); const s2 = await strip(); await replay('pwB3', 3); const s3 = await strip();
+    return [/اکنون: بازنگری/.test(s2) && /اکنون: بازنگری/.test(s3) && !/اکنون: فهمِ مسئله/.test(s3), J([s2.slice(0, 200), s3.slice(0, 200)])]; };
+  K.B27_D2_neg = async () => {   // منفی: یک اندازهٔ تنها («عرض ۶ سانت») هنوز جوابِ «ابعاد» نیست
+    await replay('pwB3', 1); await ev(async () => { __q = [JSON.stringify({ reply: 'خوب.', status: 'related', memory: 'm', actions: [cs({ ph: 'e', said: ['result'], result: 'عرض ۶ سانت' })] })]; await APP.ASSIST.send('خب، پس عرض ۶ سانت میاد.'); __q.length = 0; });
+    const s = await strip(); return [!/اکنون: بازنگری/.test(s), s.slice(0, 200)]; };
+  E[167] = async () => { await ev(async () => { __wipe(); __fresh();
+      __q = [JSON.stringify({ reply: 'خوب.', status: 'related', memory: 'm', actions: [cs({ ph: 'u', said: ['u'], prior: [{ step: 'نصفِ محیط', quote: 'نصفِ محیط میشه طول + عرض = ۲۲ سانت', verdict: 'ok' }] })] })];
+      await APP.ASSIST.send('یه قاب عکس با ۴۴ سانت چوب می‌خوام بسازم؛ طولش سه برابرِ عرضش باشه. ابعادش چند میشه؟ گامِ اول رو خودم رفتم: نصفِ محیط میشه طول + عرض = ۲۲ سانت.');
+      __q = [JSON.stringify({ reply: 'خوب.', status: 'related', memory: 'm', actions: [cs({ ph: 'e', said: ['result'], result: 'عرض ۵٫۵ و طول ۱۶٫۵ سانت' })] })];
+      await APP.ASSIST.send('جواب شد عرض ۵٫۵ و طول ۱۶٫۵ سانت؛ گذاشتم تو معادله، جور درومد'); __q.length = 0; });
+    const s = await strip(), ck = await ev(() => [APP.STORY.arithChk('۵٫۵ + ۱۶٫۵ = ۲۲'), APP.STORY.arithChk('۱۶٫۵ = ۳ × ۵٫۵')].map(c => c.length > 0 && c.every(x => x.ok && !x.ask)));
+    return [/اکنون: بازنگری/.test(s) && !/فهمِ مسئله/.test(s) && ck.every(Boolean), J([s.slice(0, 200), ck])]; };
+
   /*__MORE__*/
 
   // ---------- اجرا ----------

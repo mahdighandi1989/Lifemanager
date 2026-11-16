@@ -242,9 +242,16 @@
       if (!pid) { (String(C.stmtRaw24 || C.stmt || "").match(/[^.!؟?\n]*[؟?]/g) || []).forEach(function (x) { o.push(x); }); if (C.unkBy && C.pk) o.push(C.unkBy[C.pk]); } } catch (e) { }
     return o.map(txt).filter(Boolean);
   }
+  /* دورِ ۲۷b (history، B27·D2 pwB3 p2، بانکِ R27 #167): «ابعاد» ِ یک شکل یعنی همان اندازه‌هایش (طول، عرض، ارتفاع/عمق) — واژه‌نامه، نه قرارداد.
+     مجهولِ «ابعادش چند میشه؟» با نتیجه‌ای که برای دست‌کم دو اندازهٔ جدا عدد می‌دهد («عرض = ۶ سانت و طول = ۱۲ سانت») جواب گرفته است؛ یک اندازهٔ تنها («عرض ۶») هنوز میانی است. */
+  var DIMQ27 = /(?:^|\s)(?:ابعاد|اندازه[‌\s]?ها)/, DIMW27 = ["طول", "عرض", "ارتفاع", "عمق", "قطر", "ضلع"];
+  function dimAns27(q, N) { if (!DIMQ27.test(nz(q))) return false; var W = N.split(" "), got = {};
+    W.forEach(function (w, i) { var d = DIMW27.filter(function (x) { return w === x || w === x + "ش" || w.indexOf(x + "ِ") === 0; })[0]; if (!d) return;
+      for (var j = i + 1; j <= i + 3 && j < W.length; j++) if (/^[0-9]+(?:[.٫\/][0-9]+)?$/.test(W[j])) { got[d] = 1; break; } });
+    return Object.keys(got).length >= 2; }
   function ansUnk(s, pid, rx) {
     var N = nz(rx); if (!/[0-9]/.test(N)) return false; var R = toks(rx).map(vcore), W = N.split(" ");
-    return unkTexts(s, pid).some(function (q) { var v = verbOf(q); if (v && R.indexOf(v) >= 0) return true;
+    return unkTexts(s, pid).some(function (q) { var v = verbOf(q); if (v && R.indexOf(v) >= 0) return true; if (dimAns27(q, N)) return true;
       /* کمیتِ پرسیده: «چند X» در مجهول ⇐ «عدد X» در نتیجه («پمپ چند ساعته پر می‌کنه؟» ⇐ «۴ ساعته») */
       /* دورِ ۲۶ (Q6، U11 — aB1 p3 «۱۰ تا! … خب اون ده تا... پیاده میان؟» پس از «چند تا اتوبوس لازمه»): واژهٔ شمارش («تا»، «عدد»، «دونه») خودِ کمیتِ پرسیده نیست —
          «چند تا اتوبوس» ⇐ «۵ تا اتوبوس»، نه هر «N تا»؛ کمیتِ پرسیده نامِ پس از واژهٔ شمارش است (پیش‌تر «۱۰ تا» ِ باقی‌مانده جوابِ «چند تا اتوبوس» شمرده و مرحله «بازنگری» شد) */
