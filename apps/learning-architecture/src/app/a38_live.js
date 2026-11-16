@@ -3993,6 +3993,8 @@
   function named28(cur, fix) { try {
       var own = String(cur || ""); if (/^\s*\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]/.test(own)) return null; own = own.replace(/«[^»]*»|"[^"]*"/g, " ");
       var fv = numOccs(String(fix || "")).map(function (o) { return o.v; }); if (!fv.length) return null;
+      /* عبارتِ چندعددی («۸ در ۸ بود نه ۱۰ در ۱۰»، «۲۵ در ۳۵ نبود، ۳۰ در ۴۰») کارِ numParts ِ پیشین است، نه این خواننده */
+      if (/[0-9۰-۹][\s\u200c]*(?:در|×|x|\*)[\s\u200c]*[0-9۰-۹]/.test(own)) return null;
       var P = tokPos(own), val = function (a, b) { var o = numOccs(own.slice(P[a].s, P[b].e)); return o.length ? o[0].v : null; }, cl = function (a, b) { for (var k = Math.min(a, b); k < Math.max(a, b); k++) if (/[.!؟?؛;\n]/.test(own.slice(P[k].e, P[k + 1].s))) return false; return true; };
       var unitW = function (k) { var w = P[k] && nz(P[k].t); return !!w && k > 0 && !/[.!؟?؛;،,\n:]/.test(own.slice(P[k - 1].e, P[k].s)) && !isNum(w) && !MAG28.test(w) && FUNC_W.indexOf(w) < 0 && !/^(?:نیست|نبود|نه|بود|است|هست|میشه|شد)/.test(w) && w.length >= 2; };
       for (var i = 0; i < P.length; i++) { var w = nz(P[i].t);
@@ -4017,7 +4019,12 @@
     if (!hits.length && X.length > 1 && isNum(X[0]) && !X.slice(1).some(isNum)) { var r1 = locate28(frag, { o: X[0], n: (tokz(nm.n).filter(isNum)[0] || nm.n) }, fix); return r1 && r1.o ? r1 : { many: !!(r1 && r1.many) }; }
     if (hits.length !== 1) return { many: hits.length > 1 };
     var s = hits[0], e2 = s + X.length - 1, o = String(frag).slice(F[s].s, F[e2].e - (X.length === 1 && /[²³]$/.test(F[s].t) ? 1 : 0)), n = String(nm.n).trim(), FX = tokz(fix);
-    if (isNum(F[e2].t) && F[e2 + 1] && !isNum(F[e2 + 1].t) && FX.some(function (t) { return eqT(t, F[e2 + 1].t); }) && !tokz(n).some(function (t) { return eqT(t, F[e2 + 1].t); })) { o = String(frag).slice(F[s].s, F[e2 + 1].e); n = n + " " + F[e2 + 1].t; }
+    var a0 = s, b0 = e2, nPre = "", nPost = "";
+    if (isNum(F[e2].t) && F[e2 + 1] && !isNum(F[e2 + 1].t)) { var fx1 = FX.filter(function (t) { return eqT(t, F[e2 + 1].t) || (!isNum(t) && stem28(t) === stem28(F[e2 + 1].t)); })[0];
+      if (fx1 && !tokz(n).some(function (t) { return eqT(t, fx1); })) { b0 = e2 + 1; nPost = " " + fx1; } }
+    /* عددِ تنهای نام‌برده با همسایهٔ معنادارش که در مقدارِ درست هم هست («دقیقه‌ای ۲ لیتره» ⇐ «دقیقه‌ای ۱٫۶ لیتر») — جای همان کمیت، نه هر «۲ لیتر» */
+    if (X.length === 1 && s > 0 && !isNum(F[s - 1].t) && !MAG28.test(nz(F[s - 1].t)) && FX.some(function (t) { return eqT(t, F[s - 1].t); }) && !tokz(n).some(function (t) { return eqT(t, F[s - 1].t); })) { a0 = s - 1; nPre = F[s - 1].t + " "; }
+    if (a0 !== s || b0 !== e2) { o = String(frag).slice(F[a0].s, F[b0].e); n = nPre + n + nPost; }
     return { o: o, n: n }; }
   /* (۲) بازگفت: بندی از پیامِ کنونی که همان تکه است با یک بازهٔ عددیِ متفاوت (هم‌ترازیِ واژه‌به‌واژه) */
   function restate28(frag, cur) { try { var own = String(cur || ""); if (/^\s*\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]/.test(own)) return null; var F = tokPos(String(frag || "")); if (F.length < 4) return null; var best = null;
@@ -4038,7 +4045,8 @@
     P.forEach(function (p, i) { if (!eqT(p.t, X[0])) return; if (P[i + 1] && MAG28.test(nz(P[i + 1].t)) && nz(P[i + 1].t) !== "و") return; if (P[i - 1] && (isNum(P[i - 1].t) || (MAG28.test(nz(P[i - 1].t)) && (nz(P[i - 1].t) !== "و" || (P[i - 2] && (isNum(P[i - 2].t) || MAG28.test(nz(P[i - 2].t)))))))) return;
       var a = Math.max(0, i - 1), b = Math.min(P.length - 1, i + 1); out.push(String(t).slice(P[a].s, P[b].e)); }); return out; };
   var coreDiff27 = coreDiff;
-  coreDiff = function (frag, fix, cur) { try { var nm = named28(cur, fix); if (nm) { var L = locate28(frag, nm, fix); if (L && L.o) return { o: L.o, n: L.n, c88: "named" }; if (L && !L.many) return { o: nm.o, n: nm.n, c88: "named", absent28: true }; }
+  coreDiff = function (frag, fix, cur) { try { var nm = named28(cur, fix); if (nm) { var L = locate28(frag, nm, fix);
+        if (L && L.o) return { o: L.o, n: L.n, c88: "named" }; }   // ناپیدا ⇒ راهِ پیشین (a27 retractCheck خودش «کدام عدد؟» را برای X ِ بی‌یکای ناپیدا می‌پرسد)
       var rs = restate28(frag, cur); if (rs) return { o: rs.o, n: rs.n, c88: "restate" }; } catch (e) { console.warn(e); } return coreDiff27(frag, fix, cur); };
   A.liveCoreDiff = coreDiff;
   /* الگوی مبهمِ یک متن: رقم در هر سه خط، ی/ک، فاصله/نیم‌فاصله، «ه» ِ محاوره‌ایِ پایانی اختیاری؛ مرزِ واژه/عدد */
@@ -4735,9 +4743,11 @@
     var mag27 = function (o) { var m = /^[\s\u200c]*(هزار|میلیون|میلیارد|میلیار)(?:ه|ی|ـه)?(?![\u0621-\u06cc])/.exec(RC[o.ri].t.slice(o.e, o.e + 14)); return m ? (m[1] === "هزار" ? 1e3 : m[1] === "میلیون" ? 1e6 : 1e9) : 0; };
     /* دورِ ۲۸ (R2، C89؛ بانکِ R28 #48 «۲ × (۵ + ۴) × ۳ = ۵۴» ⇒ ۷۳٫۵: «۳» ِ ارتفاع هم‌رقمِ حاصلِ گامِ ۴ «۱۲ ÷ ۴ = ۳ قوطی» بود و با ۳٫۵ ِ آن بازحساب شد؛ A28-38): عددی که پس از این عدد نوشته شد
        (در همان پیام/همان متنِ خانه، یا در رکوردِ بعدی) هرگز منبعِ آن نیست — وابستگی فقط از نوشته‌شدهٔ پیشین */
-    var after28 = function (d, o) { if (d.ri28 == null || o.ri == null || typeof homeOf !== "function") return false; var ab = function (ri, s0) { var hm = homeOf(ri); if (hm < 0 && RC[ri].zone !== "ctx" && RC[ri].zone !== "given") { var t0 = nz(RC[ri].t); if (t0.length >= 8) RC.forEach(function (rc, i) { if (hm < 0 && i !== ri && (rc.zone === "given" || rc.zone === "ctx") && nz(rc.t).indexOf(t0) >= 0) hm = i; }); }
+    var after28 = function (d, o, strict) { if (d.ri28 == null || o.ri == null || typeof homeOf !== "function") return false; var ab = function (ri, s0) { var hm = homeOf(ri); if (hm < 0 && RC[ri].zone !== "ctx" && RC[ri].zone !== "given") { var t0 = nz(RC[ri].t); if (t0.length >= 8) RC.forEach(function (rc, i) { if (hm < 0 && i !== ri && (rc.zone === "given" || rc.zone === "ctx") && nz(rc.t).indexOf(t0) >= 0) hm = i; }); }
         if (hm >= 0) { var off = RC[hm].t.indexOf(RC[ri].t); if (off >= 0) return [hm, off + s0]; } return [ri, s0]; };
-      var A0 = ab(d.ri28, d.s28), B0 = ab(o.ri, o.s); return A0[0] === B0[0] ? A0[1] > B0[1] : A0[0] > B0[0]; };
+      /* در همان جمله رابطهٔ نوشته‌شده هر دو سو را دارد («a(20 − a) = ۱۰۰ − (a − 10)²») — فقط جملهٔ بعدی منبع نیست */
+      var A0 = ab(d.ri28, d.s28), B0 = ab(o.ri, o.s); if (A0[0] !== B0[0]) return strict ? A0[0] > B0[0] : false;   // رکوردهای جدا بی خانهٔ مشترک: ترتیبِ نوشتن دانسته نیست (C25-4: رابطهٔ نوشته‌شده در رکوردِ دیگر) if (A0[1] <= B0[1]) return false;
+      return /[.؛;!؟?\n](?=\s|$)/.test(String(RC[A0[0]].t).slice(B0[1], A0[1])); };
     /* … و میانِ چند منبعِ هم‌مقدارِ پیشین، دفترِ کارِ پیشین برای گامِ همان دفتر مقدم است (زنجیرهٔ «dep» ِ خودش با مقدارِ جاریِ هر داده — C89)، نه نسخهٔ همان حساب در صورت/پیام */
     var kind28 = function (ri) { return ri == null || !RC[ri] ? "" : /^prior:/.test(String(RC[ri].k)) ? "prior" : "x"; };
     var derOf = function (o) { var C0 = der.filter(function (d) { return veq(d.v, o.v) && ucompat25(d.fu, famU25(o)) && !!d.pct === !!o.pct && (!d.loc27 || d.loc27.ri === o.ri && d.loc27.sent === o.sent) && !after28(d, o); });
@@ -4767,7 +4777,7 @@
        عددی که هم مقدارِ پیشینِ داده است و هم حاصلِ کهنه‌ای که پیش از آن نوشته شد با بازحسابِ دیگر، دو معنا دارد ⇒ کهنه است ولی عددی پیشنهاد نمی‌شود (پرسش) — هرگز یکی را حدس نمی‌زند.
        فقط بیرون از جملهٔ خودِ داده (جایی که داده نام برده شد، همان داده است) */
     var amb28 = function (o) { if (!o.root || o.root.q.nore || o.zone === "given") return false;
-      var d = der.filter(function (x) { return veq(x.v, o.v) && x.re != null && !after28(x, o) && !(x.ri28 === o.ri) && ucompat25(x.fu, famU25(o)) && !!x.pct === !!o.pct; })[0]; return !!d && !veq(d.re, o.root.q.b / rk26(o)); };
+      var d = der.filter(function (x) { return veq(x.v, o.v) && x.re != null && !after28(x, o, true) && !(x.ri28 === o.ri) && ucompat25(x.fu, famU25(o)) && !!x.pct === !!o.pct; })[0]; return !!d && !veq(d.re, o.root.q.b / rk26(o)); };
     var newV = function (o) { if (o.root) return o.root.q.nore || amb28(o) ? null : o.root.q.b / rk26(o); var d = o.der || derOf(o); if (d && !o.given) return d.re; var p27 = prevOf(o); if (p27) return p27.re == null ? null : p27.re; return o.v; };   // مقدارِ «پس از اصلاح»
     var isStaleOp = function (o) { return !!o.root || !!(o.der || (derOf(o) && !o.given)); };
     var mm = function (o, v) { return o.pct ? v / 100 : v; };

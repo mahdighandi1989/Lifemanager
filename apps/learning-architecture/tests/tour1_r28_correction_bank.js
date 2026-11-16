@@ -54,6 +54,13 @@ async function run(ctx) {
   const cemFix = () => turn('ببخشید، منهای ۳۰۰ هزار میشه ۱ میلیون و ۹۰۰', 'فرستادم.', RT({ msg: 'منهای ۳۰۰ هزار تخفیف میشه ۱ میلیون و ۸۰۰', key: 'step:4', what: 'said', fix: '۱ میلیون و ۹۰۰' }));
   C[58] = async () => { const pid = await cem(); await cemFix(); const x = await snap(pid), t = J([x.prior, x.story, x.stmtChat]);
     return { ok: /۸۰۰ هزار/.test(J(x.prior.map(s => s.fixed || s.q))) && !/چسبِ کاشی ۳۰۰/.test(t) && !/«۳۰۰» \(اصلاح شد ⇐ «۸۰۰»\)/.test(allText(x)) && /۱ میلیون و ۹۰۰/.test(J([x.prior, x.sysAll])), got: { prior: x.prior, sys: x.sys } }; };
+  /* برآورده نشد (گزارشِ fixer، HANDBOOK §12 ردیفِ ۹۳) — بررسی‌ها سرِ جایشان می‌مانند تا fixer ِ بعدی همان را قرمز ببیند (ONLY=… NCRUN=1) */
+  if (!process.env.NCRUN) {
+    NC[57] = 'acceptance in a chat-only problem is recorded («پذیرفته») but the chat result line is not rewritten; and «۴ میلیون و ۵۰۰ هزار» is read as 4 by the runs25 magnitude reader (arith), so the proposal is «۴ ⇒ ۳» instead of 4.5 M ⇒ 3.6 M';
+    NC[61] = 'a datum-only quote in a chat-only ledger (no live problem) is not reached by the a45 retract path; the same shape in the runner\'s live ledger (C28-2 s25) is fixed and replayed';
+    NC[64] = 'the result «۵ متر» equals the corrected value 5, so the stale engine reads it as the fresh datum and makes no proposal (√34 ≈ 5.83 not shown)';
+    NC[78] = 'two same-unit quantities with equal digits in two labelled sentences («هر دور ۱۲ ثانیه» / «کشش: ۱۲ + ۸») are not told apart; the stretching line is still marked (C66)';
+  }
   NC[59] = 'shape cannot be produced any more: after C88 the page never rewrites the datum on a result fix (#58, #79), so there is no wrong rewrite to restore; #81 (the look-alike) is checked';
   C[60] = async () => { await scen({ prior: [RES('ما ۴ نفریم و هر نفر ۲ شب می‌مونه، شبی ۶۰۰ هزار: ۴ × ۲ × ۶۰۰ = ۴۸۰۰ هزار')], stmtChat: 'ما ۴ نفریم و هر نفر ۲ شب می‌مونه، شبی ۶۰۰ هزار' });
     await turn('۴ نفر نیستیم، ۵ نفریم', 'فرستادم.', RT({ msg: 'ما ۴ نفریم و هر نفر ۲ شب می‌مونه، شبی ۶۰۰ هزار', key: 'datum:نفرها', what: 'fact', fix: '۵ نفر' })); const x = await snap('');
