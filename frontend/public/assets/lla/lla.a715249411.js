@@ -60347,12 +60347,14 @@ APP.goFromURL = function (q) {
      تازه‌ای ثبت کرده بود (C.pk ِ تازه با صورتِ خودش) ولی دفترِ کارِ پیشین هنوز دفترِ مسئلهٔ بسته را برمی‌گرداند.
      حالا: مسئلهٔ کنونیِ گفت‌وگو صورتِ خودش را از همین پیام دارد، زندهٔ همان مسئلهٔ بسته نیست، و پیام مجهولِ خودش را می‌پرسد ⇒ مسئلهٔ دیگری است و دفترِ خودش را می‌گیرد.
      شبیهِ منفی (A27-21): «یه بارِ دیگه، گزارشِ سوم، کلِ اثبات …» بی پرسشِ مجهولِ تازه، یا «حساب کرده بودم …»، هنوز به دفترِ مسئلهٔ بسته می‌رود. */
-  var UNKQ28 = /(?:چند|چقدر|چه\s*قدر|چه|چطور|چطوری|کدام|کدوم|کی|کجا|آیا)[^.!؟?\n]{0,60}[؟?]|[؟?]\s*$/;
+  var UNKQ28 = /(?:چند|چقدر|چه\s*قدر|چه\s+(?:مقدار|اندازه|عددی)|کدام|کدوم|کجا)[^.!؟?\n]{0,60}[؟?]/;   // مجهولِ تازه = پرسشِ کمیت/گزینه؛ «کلِ اثبات خراب میشه؟» (pwA1 p18) مجهولِ تازه نیست
   /* «امروز معلم یه سؤال داد: …»، «یه تمرین دارم: …» — قابِ مسئلهٔ تازه بی «؟» (بانکِ R28 #219): مسئلهٔ دیگری است اگر واژه‌های پیام بیشترشان در صورت و دفترِ مسئلهٔ بسته نباشند */
   var FRAME28 = /(?:یه|یک)\s*(?:سؤال|سوال|مسئله|مساله|تمرین)(?:ِ|ٔ|‌ی|ی)?\s*(?:[^.!؟?\n:]{0,12}\s)?(?:داد|دادن|داده|آورد|دارم|داریم|گفت)(?![آ-ی])/;
   function newProb28(s, bl, t) {
     var C = (s && s.coach) || {}, u = String(t || ""); if (!bl || !bl.pid) return false;
     if (CALLS25.test(u) || /گزارش/.test(u) || (MINE26.test(u) && /بودم/.test(u))) return false;
+    /* نامِ گامی از دفترِ همان مسئله («تو گامِ ۶ منظورم …»، pwA1 p18) ⇒ دربارهٔ همان مسئله است */
+    try { var pgS = S.get("eprog_" + bl.pid), PS = pgS && pgS.solve && pgS.solve.live && pgS.solve.live.prior; if (PS && stepNs(u).some(function (n) { return n >= 1 && n <= PS.steps.length; })) return false; } catch (e) { }
     if (FRAME28.test(u)) { try { var r0 = A.liveRec ? A.liveRec(bl.pid) : null, pg0 = S.get("eprog_" + bl.pid), P0 = pg0 && pg0.solve && pg0.solve.live && pg0.solve.live.prior;
         var OW = toks([r0 && r0.p ? r0.p.statement + " " + r0.p.title : ""].concat(P0 ? P0.steps.map(curText) : []).join(" ")), UW0 = toks(u.replace(/[0-9۰-۹.٫,]/g, " ")).filter(function (w, i, X) { return w.length >= 3 && X.indexOf(w) === i; });
         if (UW0.length >= 3 && UW0.filter(function (w) { return hit(w, OW); }).length * 2 < UW0.length) return true; } catch (e) { } }

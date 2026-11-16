@@ -138,6 +138,9 @@ const RUNS = JSON.parse(fs.readFileSync(vfile('R28_prior_runs.json'), 'utf8'));
       const car = 'امروز معلم یه سؤال داد: ماشین با سرعتِ ۷۲ کیلومتر بر ساعت میره، تو ۱۰ ثانیه چند متر میره؟';
       return [f(car, car), f('اگه ۶ نفر باشیم چی میشه', 'اگه ۶ نفر باشیم چی میشه؟'), f('اگه ۶ نفر باشیم چی میشه', 'یه مسئلهٔ جدا: اگه ۶ نفر باشیم چی میشه؟'), f(car, 'یه بارِ دیگه، گزارشِ سوم: ' + car)]; });
     chk(np[0] === true && np[1] === false && np[2] === true && np[3] === false, 'D28-6 / C126 look-alikes (ST.newProb28): a new statement with its own unknown ⇒ new ledger; «اگه ۶ نفر باشیم چی؟» is a hypothetical of the same problem unless she calls it separate; a self-labelled «گزارشِ سوم» stays in the old ledger :: ' + JSON.stringify(np));
+    // look-alike found by the page-level replay (pwA1 p18, after closure): «اگه گامِ ۲ غلط باشه چی؟ کلِ اثبات خراب میشه؟ … تو گامِ ۶ منظورم …» is about the SAME problem — no second ledger
+    const w = await run('pwA1', 18); const L18 = w[18].all, extra = Object.keys(L18).filter(k => L18[k].steps.some(x => /منظورم n\/2 نبود/.test(String(x.fixed ? x.fixed.t : x.quote))) && L18[k].steps.length === 1);
+    chk(!extra.length, 'D28-6 look-alike (pwA1 p18): a question naming steps of the closed proof opens no new ledger :: ' + JSON.stringify(Object.keys(L18).map(k => [k, L18[k].steps.length])));
     chk(!/گامِ ۱ · .*۳۴۰ ضربدر ۶/.test(priorBlk(o[7].user)), 'D28-6: the next turn\'s prior block is the car ledger, not the thunder one :: ' + priorBlk(o[7].user).slice(0, 400));
   });
 
