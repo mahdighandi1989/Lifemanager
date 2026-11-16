@@ -59921,7 +59921,8 @@ APP.goFromURL = function (q) {
     if (typeof A.livePriorStale !== "function") return;
     pr.steps.forEach(function (z) { if (!z.fixed || String(z.fixed.at) !== String(at) || !okNow(Object.assign({}, z, { depStale: [] })) || z.stale) return;
       var o = resNums(String(z.fixed.was || "")).pop(), n = resNums(String(z.fixed.t || "")).pop(); if (!o || !n || Math.abs(parseFloat(o) - parseFloat(n)) < 1e-9) return;
-      var deps = pr.steps.filter(function (y) { return y.n > z.n && !y.stale && !(y.fixed && String(y.fixed.at) >= String(at)) && ((y.dep || []).indexOf(z.n) >= 0 || (y.depStale || []).indexOf(z.n) >= 0); }); if (!deps.length) return;
+      /* گامی که خودش در همین پیام دوباره نوشت و هنوز نمی‌خواند (retry) پیشنهاد نمی‌گیرد — عددِ درست را به او نمی‌دهیم (C29، بانکِ R26 #112) */
+      var deps = pr.steps.filter(function (y) { return y.n > z.n && !y.stale && !(y.retry && String(y.retry.at) === String(at)) && !(y.fixed && String(y.fixed.at) >= String(at)) && ((y.dep || []).indexOf(z.n) >= 0 || (y.depStale || []).indexOf(z.n) >= 0); }); if (!deps.length) return;
       var EN = null; try { EN = A.livePriorStale({ old: fa(o).replace(/\./g, "٫"), fix: fa(n).replace(/\./g, "٫"), cur: cur || "", steps: pr.steps.map(function (y) { return { n: y.n, t: curText(y), dep: y.dep || [] }; }) }); } catch (e) { EN = null; }
       if (!EN) return;
       deps.forEach(function (y) { var nums = (EN[y.n] || []).filter(function (q) { return q && q.re != null; }); if (!nums.length) return;
@@ -60453,7 +60454,7 @@ APP.goFromURL = function (q) {
     if (bareMsg28(t, own27)) return false;   // دورِ ۲۸ (C98): «۷ × ۸ = ۵۶ بود دیگه؟» — در آغاز یا وسطِ گفت‌وگو
     /* دورِ ۲۸ (بانکِ R28 #243): یک حاصل‌ضرب در گپِ روزمره («۲ × ۳ = ۶ تا تخم‌مرغ خریدم برای کیک») بی نشانهٔ مسئله یا کارِ خودش کارِ پیشین نیست؛
        زنجیرهٔ چند رابطه («… یعنی ۲۰۰۰۰ … = ۱۰۰۰۰۰ … = ۱۵ بار») کارِ پیشین است حتی بی «؟» (بانک #238) */
-    if (!own27 && !probSig27(t) && sentences(t).filter(function (x) { return STRONG25.test(x) || worked27(x, false); }).length < 2) return false;
+    if (!own27 && !probSig27(t) && !CALLS25_R25.test(t) && !/حساب(?:ش)?\s*(?:رو|را)?\s*کرد(?:م|ه[‌\s]*ام|ه\s*بودم)|\bI\s+(?:computed|calculated|worked|did)\b|\bmyself\b/i.test(t) && sentences(t).filter(function (x) { return STRONG25.test(x) || worked27(x, false); }).length < 2) return false;
     /* حالتِ آزموده («دارم امتحان می‌کنم: ۷+۷=۱۴، ۱۱+۷=۱۸ … جور نمیشه») گام نیست؛ آزمونی که خودش «درسته» خواند («امتحان کردم: … 16−1=15 درسته») گامِ اوست (C25-7) */
     if (!sentences(t).some(function (x) { return (STRONG25.test(x) && !TEST25.test(x)) || (worked27(x, own27) && (own27 || probSig27(t)) && (!TEST25.test(x) || TESTOK27.test(x))); })) return false;
     if (OTHER26.test(t) && !MINE26.test(t)) return false;   // دورِ ۲۶ (بانکِ R26 #127): کارِ کسِ دیگر — مگر کارِ خودش هم در همان پیام باشد
