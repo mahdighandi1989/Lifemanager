@@ -524,6 +524,7 @@
         h("p", {}, h("span", { class: "small muted" }, hm(e.at) ? hm(e.at) + " · " : ""), h("strong", {}, e.title), e.from ? h("span", { class: "small muted" }, " — " + e.from) : null, e.withdrawn ? h("span", { class: "small bad" }, " — " + (e.wdLab || "پس گرفته شد")) : null),
         evLines(e).length ? h("ul", { class: "small" }, evLines(e).map(function (l) { return h("li", {}, mx(l)); })) : null,
         e.out ? h("p", { class: "small lp-dout" }, "سرانجام: ", mx(e.out)) : null,
+        e.ask28 ? h("p", { class: "small lp-dmvask", role: "status" }, e.ask28) : null,
         (e.hist || []).length ? h("ul", { class: "small muted lp-dhist" }, e.hist.map(function (x) { if (x.lab) return h("li", { class: "lp-dmvh" }, x.lab + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); return h("li", {}, "اصلاح شد ⇐ «", mx(typeof x.old === "string" ? hv(x.old) : x.old && x.old.done ? (DONE_FA[x.old.done] || x.old.done) + (x.old.what ? " — " + x.old.what : "") : A.dossierVal(x.old)), "» → «", mx(typeof x.new === "string" || x.new == null ? hv(x.new, true) : x.new.done ? (DONE_FA[x.new.done] || x.new.done) : A.dossierVal(x.new)), "»" + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); })) : null,
         e.src && e.src.unknown ? h("p", { class: "small muted lp-dsrc" }, "منبع: نامعلوم (پیامی که این از آن آمد پیدا نشد)") : e.src && e.src.text ? h("p", { class: "small muted lp-dsrc" }, "از پیامِ گفت‌وگو: «", mx(clip(e.src.text, 200)), "» ", h("button", { class: "linkish small", type: "button", onclick: function () { openSess(e.src.sess); } }, "💬 باز کردنِ سشن")) : null,
         (e.btns || []).length ? h("p", { class: "row gap wrap small" }, e.btns.map(function (b0) { return h("button", { class: "btn ghost sm " + (b0.cls || "lp-dnewp"), type: "button", onclick: b0.go }, b0.label); })) : null,
@@ -679,7 +680,8 @@
      هیچ چیز پاک نمی‌شود: سطر در مبدأ با «جابه‌جا شد ⇒ «…»» می‌ماند (پس‌گرفته، با تاریخچه)، رونوشتش در مقصد با «از «…» جابه‌جا شد» و «↩ برگرداندن» می‌آید؛ هر دو جابه‌جایی
      در تاریخچهٔ هر دو با برچسبِ خودشان («جابه‌جا شد» / «برگشت»، نه «اصلاح شد») و با ساعتِ صفحه. رکوردِ داستانیِ سطر (a45 ST.moveItem27) هم وقتی مقصد زنده است جابه‌جا می‌شود؛
      سطرِ L.evlog همان مسیرِ رکورددارِ A.dossierMove27 را می‌گیرد. جابه‌جایی‌ها در مبدأ ذخیره می‌شوند (L.mv28 ِ مسئلهٔ زنده یا se.mv28 ِ گفت‌وگو). */
-  var NOMV28 = { stmt: 1, u: 1, uold: 1, udraft: 1, state: 1, mind: 1, retract: 1, copyask: 1, copyans: 1, newprobs: 1, verdict: 1, restate: 1, woke: 1, incub: 1, incubback: 1, checkin: 1, pre: 1, prediag: 1, preok: 1, back: 1, practice: 1 };
+  /* C123: صورت و سطرهای خودش «↪» می‌گیرند؛ سطرهای ساختهٔ صفحه (فرم، حکم، کارنامه، وضع، اصلاح) پیروِ رکوردِ خودشان‌اند */
+  var NOMV28 = { u: 1, uold: 1, udraft: 1, state: 1, mind: 1, retract: 1, copyask: 1, copyans: 1, newprobs: 1, verdict: 1, restate: 1, woke: 1, incub: 1, incubback: 1, checkin: 1, pre: 1, prediag: 1, preok: 1, back: 1, practice: 1 };
   var MVG28 = false;
   function mvOwn28(key) { var m = /^(achat_[^|]+)(?:\|(.+))?$/.exec(String(key || ""));
     if (m) { var se = S.get(m[1]); return se ? { arr: (se.mv28 = se.mv28 || []), put: function () { S.put(se); } } : null; }
@@ -714,12 +716,16 @@
     var m = own.arr.filter(function (x) { return x.id === id; })[0]; if (!m) return null; m.undone = { at: A.nowISO() };
     try { if (m.item && A.STORY && A.STORY.moveItem27) A.STORY.moveItem27(m.item, m.to, true); } catch (x) { }
     own.put(); return m; };
+  /* C124: گامی که وابسته دارد («وابسته به گامِ n» در سطرِ گامِ دیگر) بی پرسش جابه‌جا نمی‌شود — صفحه وابسته‌ها را نام می‌برد و می‌پرسد */
+  var ASK28 = {};
+  function deps28(e, n) { var o = []; evLines(e).forEach(function (l) { var m0 = stepN28(l), x = /وابسته به گامِ\s*([۰-۹0-9،,\s]+)/.exec(String(l)); if (m0 && m0 !== n && x && nzk(x[1]).split(/[،,\s]+/).map(Number).indexOf(n) >= 0 && o.indexOf(m0) < 0) o.push(m0); }); return o; }
   function stepN28(l) { var x = /^(?:گامِ|گیر \(گامِ)\s*([۰-۹0-9]+)/.exec(String(l || "")); return x ? +nzk(x[1]) : 0; }
   function mvApply28(D) {
     if (!D || !D.events || MVG28 || !D.pid) return D; var me = D.pid, M = allMv28(), out = M.filter(function (m) { return m.from === me; }), inn = M.filter(function (m) { return m.to === me; }), DS = null;
     var dests = function () { if (!DS) { var g0 = MVG28; MVG28 = true; try { DS = dests28(D); } catch (e) { DS = []; } MVG28 = g0; } return DS; };
     var btn = function (e, d, step) { var t = clip(titleOf28(d.key), 40); return { label: "↪ " + (step ? "گامِ " + fa(step) + " مالِ" : "این سطر مالِ") + " مسئلهٔ «" + t + "» است", cls: "lp-dmv", pid: d.key,
-      go: function () { if (!step && e.mvEv27 && e.id && A.liveRec && A.liveRec(d.key) && !/\|/.test(me)) A.dossierMove27(me, e.id, d.key); else A.dossierMove28(me, e, d.key, step); A.go("dossier", me); } }; };
+      go: function () { var dp = step ? deps28(e, step) : []; if (dp.length) { ASK28[me] = { step: step, to: d.key, deps: dp, ev: key28(e) }; A.go("dossier", me); return; }
+        if (!step && e.mvEv27 && e.id && A.liveRec && A.liveRec(d.key) && !/\|/.test(me)) A.dossierMove27(me, e.id, d.key); else A.dossierMove28(me, e, d.key, step); A.go("dossier", me); } }; };
     D.events.forEach(function (e) {
       var k = key28(e), mine = out.filter(function (m) { return m.key === k; });
       if (mine.length) { e.hist = (e.hist || []).concat([].concat.apply([], mine.map(mvH28))); var act = mine.filter(function (m) { return !m.undone; }).pop();
@@ -730,6 +736,12 @@
       if (sn.length) { var gone = {}; out.forEach(function (m) { if (m.step && !m.undone) gone[m.step] = m; });
         e.lines = (e.lines || []).map(function (l) { var n = stepN28(l), g = n && gone[n]; return g ? l + " — جابه‌جا شد ⇒ «" + titleOf28(g.to) + "»" : l; });
         sn = sn.filter(function (n) { return !gone[n]; }); }
+      var q = ASK28[me]; if (q && q.ev === k && sn.length) { var tq = clip(titleOf28(q.to), 40);
+        e.ask28 = "گامِ " + fa(q.step) + " وابسته دارد: " + q.deps.map(function (n) { return "گامِ " + fa(n); }).join("، ") + " — آن‌ها هم به «" + tq + "» بروند؟";
+        e.btns = (e.btns || []).filter(function (b) { return b.cls !== "lp-dmv"; }).concat([
+          { label: "همه با هم به «" + tq + "»", cls: "lp-dmvall", go: function () { delete ASK28[me]; [q.step].concat(q.deps).forEach(function (n) { A.dossierMove28(me, e, q.to, n); }); A.go("dossier", me); } },
+          { label: "فقط گامِ " + fa(q.step), cls: "lp-dmvone", go: function () { delete ASK28[me]; A.dossierMove28(me, e, q.to, q.step); A.go("dossier", me); } },
+          { label: "هیچ‌کدام", cls: "lp-dmvno", go: function () { delete ASK28[me]; A.go("dossier", me); } }]); return; }
       var mk = function (more) { var B = []; ds.filter(function (d) { return d.more === more; }).forEach(function (d) { if (sn.length) sn.forEach(function (n) { B.push(btn(e, d, n)); }); else B.push(btn(e, d, 0)); }); return B; };
       e.btns = (e.btns || []).filter(function (b) { return b.cls !== "lp-dmv"; }).concat(mk(false)); var bm = mk(true); if (bm.length) e.btnsMore = bm; });
     inn.forEach(function (m) { var sn = m.snap || {};

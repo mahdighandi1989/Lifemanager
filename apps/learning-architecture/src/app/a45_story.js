@@ -342,6 +342,8 @@
     /* دورِ ۲۷b (history، A27-4، بانکِ R27 #230): نشانِ صفحه (✓/✗/؟/—) کنارِ سطرِ خودش در 📜 — همان سنجشِ a46 که مربی در همین نوبت دید (ST.arithChk بر همین تکه در همین پیام)،
        با همان جملهٔ «برای خودش» ِ ST.arithNote (عددِ درستِ ✗ لو نمی‌رود)؛ سطری که حسابی ندارد نشانی نمی‌گیرد */
     var mk27 = markOf27(it, um); if (mk27) lines = lines.concat([mk27]);
+    /* دورِ ۲۸ (C96/C125): دادهٔ او با منبعش — «فروشنده گفت ۱۲٪» دادهٔ مسئلهٔ اوست، نه «کارِ دیگری» */
+    if (it.k === "d" && um) { var ds28 = ""; try { ds28 = ST.dataSrc28(um.text, it.t); } catch (e) { } if (ds28) lines = lines.concat(["منبع: به گفتهٔ «" + ds28 + "»"]); }
     var src = um ? { sess: s.id, mid: mid(um), text: um.text, at: um.at || "", title: s.title || "" } : null;
     try { A.EVLOG.add(Object.assign(pid ? { pid: pid } : { sess: s.id }, { id: "st23_" + key.replace(/[^\w]/g, "_") + "_" + it.k + "_" + it.n, k: EV_K[it.k], at: it.at, title: title27(it), lines: lines, out: "", src: src, by: "coach" })); } catch (e) { }
   }
@@ -355,12 +357,49 @@
   var WHO27 = "(?:برادر|داداش|خواهر|آبجی|پدر|بابا|مادر|مامان|همسر|شوهر|دوست|رفیق|همکار|همسایه|پسر|دختر|معلم|استاد|عمو|دایی|خاله|عمه|هم[‌\\s]?کلاسی|مربی|فروشنده|بنگاهی|مکانیک|دکتر)(?:‌?(?:م|مون|ش|مان))?ِ?";
   var OTHER27 = new RegExp("(?:^|[\\s،,.:«(])(" + WHO27 + ")(?:\\s+[^\\s.!؟?،:]{1,14}){0,4}?\\s+(?:حساب\\s*(?:کرد|کرده)|نوشت|نوشته|درآورد|دراورد|درآورده|حل\\s*(?:کرد|کرده)|گفت|گفته|رسید|رسیده|می[‌\\s]?گه|میگه|می[‌\\s]?گوید|می[‌\\s]?گفت)(?![آ-ی])");
   var MINE27 = /(?:^|[\s،,.])(?:(?:ولی|اما)\s+)?(?:من|خودم)(?![آ-ی])/;   /* «… ولی من خودم دوباره شمردم شد ۱۲» (بانکِ R27 #248): از «من/خودم» به بعد دوباره کارِ خودش است */
-  ST.otherWork27 = function (ut) {
+  /* قرنطینه (دورِ ۲۸، C96 — docs/overhaul/REMOVAL_CANDIDATES.md): نسخهٔ دورِ ۲۷ — هر «X گفت/میگه» را «کارِ دیگری» می‌خواند و تا پایانِ پیام؛ صدا زده نمی‌شود */
+  ST.otherWork27R27 = function (ut) {
     var T = String(ut || ""), m = OTHER27.exec(T); if (!m) return null;
     var S0 = T.slice(0, m.index + 1), from = Math.max(S0.lastIndexOf(". "), S0.lastIndexOf("! "), S0.lastIndexOf("؟ "), S0.lastIndexOf("\n")) + 1, to = T.length;
     var rest = T.slice(m.index + m[0].length), mm = MINE27.exec(rest); if (mm) to = m.index + m[0].length + mm.index;
     return { who: m[1], from: from, to: to, text: txt(T.slice(from, to)) };
   };
+  /* ---------- دورِ ۲۸ (story R5، C96؛ F9 — A28-29 aA1، A28-30 aA1 p10، B28·D12 s20 p1، C28-8 aC1 p15، D28-11 tD1 p2) ----------
+     ریشه: «کارِ دیگری» با هر «X گفت/میگه/نوشت» ِ نزدیکِ یک نسبت ساخته می‌شد و از آغازِ آن جمله تا پایانِ پیام کش می‌آمد — پس (۱) منبعِ یک داده («فروشنده پرت رو ۱۲ درصد گفته بود»)
+     کارِ دیگری شد، (۲) جملهٔ خودش که از کمک‌کننده نام می‌برد («مامانم کمکم کرد تاریخ رو نوشت») مالِ مادر شد، (۳) نقلِ بی‌حسابِ استاد («استادم میگه «یه ایده بده»») همهٔ
+     پارامترهای خودش را «کارِ دیگری» کرد؛ و (۴) «داداشم یه حسابِ دیگه (هم) کرد: …» اصلاً خوانده نمی‌شد. قاعدهٔ C96: کارِ دیگری فقط وقتی کسِ دیگری کنندهٔ حساب یا ادعاست:
+       • فعلِ حساب («حساب کرد»، «حل کرد»، «درآورد»، «نوشت»، «رسید»، یا «… کرد:» که حسابی پس از خود دارد) ⇒ کارِ دیگری؛
+       • فعلِ گفتن («گفت/میگه/گفته بود») ⇒ کارِ دیگری فقط اگر گفته‌اش خودش حساب یا ادعای جواب یا اطمینانِ عددی است («داداشم گفت ۳ × ۵ = ۱۵»، «جوابش ۱۲ میشه»، «۷۰ درصد مطمئنه»)؛
+         وگرنه منبعِ یک دادهٔ مسئلهٔ اوست (ST.dataSrc28 ⇒ برچسبِ «منبع» کنارِ همان داده)؛
+       • «کمکم کرد» میانِ نسبت و فعل ⇒ جملهٔ خودش؛ فعلِ اول‌شخص («نوشتم») هرگز نسبت نیست؛
+       • دامنه همان جمله است، مگر جمله فهرست پیش بکشد («…:»، «اینا»، «این حساب‌ها»، «نسخه») — آن‌گاه تا پایانِ پیام یا تا جمله‌ای که با «من/خودم» یا فعلِ اول‌شخص برمی‌گردد. */
+  var CALCV28 = "(?:حساب\\s*(?:کرد|کرده)|حل\\s*(?:کرد|کرده)|درآورد|دراورد|درآورده|نوشت|نوشته|رسید|رسیده|کرد(?=\\s*:))";
+  var SAYV28 = "(?:گفت|گفته|گفتن|می[‌\\s]?گه|میگه|می[‌\\s]?گوید|می[‌\\s]?گفت|می[‌\\s]?گن|میگن)";
+  var OTHER28 = new RegExp("(?:^|[\\s،,.:«(])(" + WHO27 + ")((?:\\s+[^\\s.!؟?،:]{1,14}){0,4}?)\\s+(?:(" + CALCV28 + ")|(" + SAYV28 + "))(?![آ-ی])", "g");
+  var SENT28 = /[.!؟?\n؛](?![0-9۰-۹])/g;
+  var CALCX28 = /[0-9۰-۹][0-9۰-۹.٫,٬\/]*\s*(?:[×x*÷\/+\-−–]|ضرب|تقسیم|منها|منهای|به[‌\s]?علاوه|بعلاوه|درصدِ?)\s*[0-9۰-۹(]/;
+  var CLAIM28 = /(?:=|میشه|می[‌\s]?شه|می[‌\s]?شود|درمیاد|درمی[‌\s]?آد|شد(?![آ-ی]))\s*[^.!؟?]{0,12}[0-9۰-۹]|جواب\S*\s+[^.!؟?]{0,20}[0-9۰-۹]|[0-9۰-۹]+\s*(?:درصد|٪|%)?\s*(?:مطمئن|احتمال|شانس)|(?:مطمئن|احتمال|شانس)\S*\s+[^.!؟?]{0,12}[0-9۰-۹]/;
+  var LIST28 = /:\s*\S|(?:^|[\s«])(?:اینا|این[‌\s]?ها|این\s+حساب|همین\s+حساب|حساب[‌]?ها|نسخه)/;
+  var MINEV28 = /(?:^|[\s،,.])(?:(?:ولی|اما)\s+)?(?:من|خودم)(?![آ-ی])|(?:گذاشتم|کردم|گرفتم|نوشتم|رسیدم|درآوردم|شمردم|دیدم|زدم|خریدم|ساختم)(?![آ-ی])/;
+  function sentAt28(T, i) { var a = 0, b = T.length, m; SENT28.lastIndex = 0; while ((m = SENT28.exec(T))) { if (m.index < i) a = m.index + 1; else { b = m.index + 1; break; } } return { a: a, b: b }; }
+  function attr28(ut) { var T = String(ut || ""), m, out = []; OTHER28.lastIndex = 0;
+    while ((m = OTHER28.exec(T))) { var mid0 = m[2] || "", end = m.index + m[0].length, se = sentAt28(T, end - 1), after = T.slice(end, se.b);
+      if (/کمک/.test(mid0)) continue;                                        // «مامانم کمکم کرد تاریخ رو نوشت» — جملهٔ خودش
+      var calc = !!m[3], claim = CALCX28.test(after) || CLAIM28.test(after);
+      out.push({ who: m[1], at: m.index, end: end, sent: se, calc: calc, claim: claim, other: (calc && /[0-9۰-۹]/.test(T.slice(end, T.length))) || (!calc && claim), say: !calc, after: after }); }
+    return out; }
+  ST.otherWork27 = function (ut) {
+    var T = String(ut || ""), A0 = attr28(T).filter(function (x) { return x.other; })[0]; if (!A0) return null;
+    var from = A0.sent.a, to = A0.sent.b, S0 = T.slice(A0.sent.a, A0.sent.b);
+    if (LIST28.test(T.slice(A0.end, A0.sent.b)) || /(?:^|[\s«])(?:اینا|این[‌\s]?ها|این\s+حساب|نسخه)/.test(S0)) { to = T.length; var rest = T.slice(A0.sent.b), sm = null, k = A0.sent.b;
+      rest.split(SENT28).some(function (x) { if (MINEV28.test(x)) { sm = k; return true; } k += x.length + 1; return false; }); if (sm != null) to = sm; }
+    else { var mm = MINE27.exec(T.slice(A0.end, to)); if (mm) to = A0.end + mm.index; }
+    while (to > from && /\s/.test(T.charAt(to - 1))) to--;
+    return { who: A0.who, from: from, to: to, text: txt(T.slice(from, to)) };
+  };
+  /* منبعِ یک داده (C96): «فروشنده گفت ۱۲٪»، «استادم میگه …» — نامِ نسبت اگر جملهٔ همین داده آن را به گوینده‌ای نسبت می‌دهد و آن گفته کارِ دیگری نیست */
+  ST.dataSrc28 = function (ut, d) { var T = String(ut || ""), i = d ? T.indexOf(String(d).replace(/…$/, "").slice(0, 16)) : -1;
+    var A0 = attr28(T).filter(function (x) { return x.say && !x.other && /[0-9۰-۹]/.test(x.after) && (i < 0 || (i >= x.sent.a && i < x.sent.b)); })[0]; return A0 ? A0.who : ""; };
   /* q (نقلِ نتیجهٔ مدل) درونِ تکهٔ دیگری است؛ بی q: هیچ عددی بیرون از آن تکه نیست */
   ST.otherOwns27 = function (ut, q) {
     var O = ST.otherWork27(ut); if (!O) return false; var T = String(ut || "");
