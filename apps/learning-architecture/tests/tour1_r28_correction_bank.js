@@ -31,7 +31,7 @@ async function run(ctx) {
   C[50] = async () => { const pid = await paint(); await PRICE('قوطی‌ها ۸۵۰ نیستن، ۹۰۰ هزارن'); const x = await snap(pid);
     return { ok: [1, 2, 3, 4].every(n => !marked(x, n)) && PROPS(x, { 5: [2550, 2700], 6: [2850, 3000] }) && noScaled(x, [3017.6470588235293]), got: { prior: x.prior } }; };
   C[51] = async () => { const pid = await paint(); await W('عرضِ اتاق ۴ نیست، ۵٫۵ متره'); await COV('یه چیز دیگه: هر لیتر ۹ نیست، ۱۰ مترمربع رو می‌پوشونه'); const x = await snap(pid);
-    return { ok: PROPS(x, { 1: [54, 63], 2: [6, 6.3], 3: [12, 12.6], 4: [3, 3.15], 5: [2550, 2677.5], 6: [2850, 2977.5] }) && noScaled(x, [5.4, 2.7]), got: { prior: x.prior } }; };
+    return { ok: PROPS(x, { 1: [54, 63], 2: [6, 6.3], 3: [12, 12.6], 4: [3, 3.15], 5: [2550, 2677.5], 6: [2850, 2977.5] }) && noScaled(x, [5.4, 2.7]), got: { prior: x.prior, sys: x.sys } }; };
   C[52] = async () => { const pid = await paint(); await CAN('قوطی‌ها ۴ لیتری نیستن، ۵ لیتری‌ان'); const x = await snap(pid);
     return { ok: [1, 2, 3].every(n => !marked(x, n)) && PROPS(x, { 4: [3, 2.4], 5: [2550, 2040], 6: [2850, 2340] }), got: { prior: x.prior } }; };
   C[53] = async () => { const pid = await paint(); await turn('۴ نیست، ۵ ـه', 'فرستادم.', RT({ msg: 'اتاقم ۵ متر طول و ۴ متر عرض داره', key: 'datum:?', what: 'fact', fix: '۵' })); const x = await snap(pid);
@@ -44,7 +44,7 @@ async function run(ctx) {
   C[56] = async () => { const { x } = await acc('آره، همون ۷ درسته', () => COV('راستی هر لیتر ۱۰ مترمربع رو می‌پوشونه، نه ۹')); const s2 = stN(x, 2);
     return { ok: !/= ۷/.test(s2.fixed || '') && /۶٫۳/.test(allText(x)) && /(?:کهنه|بنا بود|بعداً)/.test(allText(x)), got: { s2, sys: x.sys } }; };
   /* #57: مسئلهٔ گفت‌وگو بی دفتر */
-  C[57] = async () => { await scen({ prior: [RES('اجاره‌ی ویلا ۱۸ میلیون، سهمِ هر نفر: ۱۸ میلیون ÷ ۴ = ۴ میلیون و ۵۰۰ هزار')], stmtChat: 'اجاره‌ی ویلا ۱۸ میلیون، ۴ نفریم' });
+  C[57] = async () => { await scen({ prior: [RES('اجاره‌ی ویلا ۱۸ میلیون، سهمِ هر نفر: ۱۸ میلیون ÷ ۴ = ۴ میلیون و ۵۰۰ هزار')], stmtChat: 'اجاره‌ی ویلا ۱۸ میلیون، سهمِ هر نفر: ۱۸ میلیون ÷ ۴ = ۴ میلیون و ۵۰۰ هزار' });
     await turn('۴ نفر نیستیم، ۵ نفریم', 'فرستادم.', RT({ msg: 'اجاره‌ی ویلا ۱۸ میلیون، سهمِ هر نفر: ۱۸ میلیون ÷ ۴ = ۴ میلیون و ۵۰۰ هزار', key: 'datum:نفرها', what: 'fact', fix: '۵ نفر' }));
     await turn('آره همون ۳ میلیون و ۶۰۰ درسته', 'باشه.'); const x = await snap('');
     return { ok: /پذیرفتی/.test(allText(x)) && /۱۸ میلیون ÷ ۵ = ۳ میلیون و ۶۰۰ هزار/.test(J([x.story, x.sysAll])), got: { s26: x.s26, sys: x.sys, story: x.story } }; };
@@ -68,7 +68,7 @@ async function run(ctx) {
   C[63] = async () => { await scen({ prior: [RES('فروشنده گفته بود ۱۰ درصد تخفیف می‌ده: ۲۰ × ۰٫۹ = ۱۸ میلیون')], stmtChat: 'مبل ۲۰ میلیون، فروشنده گفته بود ۱۰ درصد تخفیف می‌ده' });
     await turn('آهان، فروشنده ۱۲ درصد گفته بود نه ۱۰', 'فرستادم.', RT({ msg: 'فروشنده گفته بود ۱۰ درصد تخفیف می‌ده', key: 'datum:تخفیف', what: 'fact', fix: '۱۲ درصد' })); const x = await snap('');
     return { ok: /18>17\.6(?![\d])/.test(J(x.s26)) && !/کارِ دیگری/.test(J([x.story, x.sys])), got: { s26: x.s26, sys: x.sys, story: x.story } }; };
-  C[64] = async () => { await scen({ prior: [RES('نردبون: √(۳² + ۴²) = ۵ متر')], stmtChat: 'نردبون: ارتفاع ۴ متر، فاصله از دیوار ۳ متر' });
+  C[64] = async () => { await scen({ prior: [RES('نردبون: √(۳² + ۴²) = ۵ متر')], stmtChat: 'نردبون: √(۳² + ۴²) = ۵ متر' });
     await turn('ارتفاع ۴ نیست، ۵ متره', 'فرستادم.', RT({ msg: 'نردبون: √(۳² + ۴²) = ۵ متر', key: 'datum:ارتفاع', what: 'fact', fix: '۵ متر' })); const x = await snap(''), t = J([x.sys, x.ch]);
     return { ok: /√۳۴ ≈ ۵٫۸۳/.test(t) && !/۵ ⇒ ۶(?![٫\d])/.test(t), got: { s26: x.s26, sys: x.sys } }; };
   C[65] = async () => { const pid = await paint(); await COV('هر لیتر ۹ نیست، ۱۰ مترمربع رو می‌پوشونه'); await turn('خب پس ۵۴ ÷ ۱۰ = ۵٫۴ لیتر', 'درسته.'); const x = await snap(pid);
