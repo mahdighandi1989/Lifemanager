@@ -188,7 +188,7 @@
       if (n1.k === "n" && n1.mag && !n1.pct && !n1.cst && w0.k === "w" && w0.t === "و" && n2.k === "n" && !n2.pct && !n2.cst && n2.v.d === ONE && cmp(n2.v, F(p10(n1.mag))) < 0 && !(T[q + 3] && T[q + 3].k === "o" && T[q + 3].t === "/" && !T[q + 3].sp)) {
         var sm = add(n1.v, n2.v); if (sm.d !== ONE) continue;
         var nt = { k: "n", raw: String(sm.n), v: sm, pct: false, mag: 0, cm: n1.cm || n1.mag, int: true, a: n1.a, b: n2.b, sp: n1.sp };
-        if (!n2.mag && !n1.cm && n1.mag >= 6 && n1.mag % 3 === 0 && cmp(n2.v, F(B(1000))) < 0) { nt.alt = add(n1.v, mul(n2.v, F(p10(n1.mag - 3)))); nt.mR = n2.raw; nt.cmT = s.slice(n1.a, n2.b); }
+        if (!n2.mag && !n1.cm && n1.mag >= 6 && n1.mag % 3 === 0 && cmp(n2.v, F(B(1000))) < 0 && !/^\s*(?:تومن|تومان|ریال)(?![آ-ی])/.test(s.slice(n2.b))) { /* C105: «۸۰۰ تومن» خوانشِ واحد را می‌بندد */ nt.alt = add(n1.v, mul(n2.v, F(p10(n1.mag - 3)))); nt.mR = n2.raw; nt.cmT = s.slice(n1.a, n2.b); }
         /* C84 (دورِ ۲۸): خوانشِ برگزیده — «M هزار» (rdK) یا «M واحد» (rdU)؛ هم‌طول، همان جایگاه */
         if (sel && nt.alt) { if (sel[nt.a]) { nt.v = nt.alt; nt.raw = String(nt.alt.n); nt.rdK = true; } else nt.rdU = true; nt.alt = null; }
         T.splice(q, 3, nt); q--; } }
@@ -642,7 +642,7 @@
       var L = Rd[i - 1].trail, R = Rd[i].lead;
       if (!L || !R) { members = []; if (numeric(i)) unread(i, ""); continue; }
       /* C85 (دورِ ۲۸؛ S1 A28-40): «… میشه ۱۵، ۳ تا می‌مونه» — «N تا می‌مونه / باقی‌مانده» جملهٔ خودش است، نه بخشی از نتیجهٔ جمع/ضربِ پیش از آن؛ فقط پس از تقسیم باقی‌ماندهٔ همان تقسیم است */
-      if (R.rem != null && R.remW && !L.div2) R = Object.assign({}, R, { rem: null, b: R.remW.b, t: R.remW.t, remW: null });
+      var remCl = null; if (R.rem != null && R.remW && !L.div2) { remCl = { n: R.rem, a: segs[i].at + R.remW.b, e: segs[i].at + R.b }; R = Object.assign({}, R, { rem: null, b: R.remW.b, t: R.remW.t, remW: null }); }
       if (L.pctMix || R.pctMix) { members = []; unread(i, "درصدِ چه؟"); continue; }
       if (uwMix(L) || uwMix(R)) { members = []; unread(i, "واحدهای ناهم‌سان"); continue; }
       if (L.never) { members = []; unread(i, "واژه میانِ عددها"); continue; }
@@ -663,7 +663,7 @@
          نتیجه: همین، در agree (tk.alt). اگر حکم به خوانش بسته است (خوانشِ «هزار» فقط تا مقیاس یا گرد کردن می‌خواند) صفحه نه ✓ می‌دهد نه ✗ — «کدام را نوشتی؟» (قاعدهٔ C24)؛
          اگر با هیچ خوانشی نمی‌خواند حکم روشن است (✗ در هر خوانش؛ بانکِ R26 s09 p15) و مقدارِ صفحه برای هر دو خوانش گفته می‌شود */
       /* C84 (دورِ ۲۸؛ S1 B28·D1 = C28-13، C28-11/12، A28-9/10، D28-15 — جای سازوکارِ یک‌عددیِ m2L ِ دورِ ۲۷ب): هر «N میلیون و M» ِ عملوند و نتیجه به هر دو خوانش (M واحد، M هزار)
-         خوانده می‌شود و همهٔ ترکیب‌ها سنجیده می‌شوند (حداکثر ۵ عددِ مرکب). دقیقاً یک ترکیب درست ⇒ ✓ با همان خوانش؛ دو یا بیشتر ⇒ یک بار «کدام؟» (kind m2، m2Both)؛
+         خوانده می‌شود و همهٔ ترکیب‌ها سنجیده می‌شوند (حداکثر ۵ عددِ مرکب). ترتیبِ حکم در C102 (پایین) — خوانشِ «هزار» نخست؛ m2Both (دو خوانش ⇒ پرسش) دیگر ساخته نمی‌شود و فقط برای «؟» های کهنه مانده؛
          هیچ‌کدام ⇒ ✗ با مقدارِ هر خوانش به زبانِ خودش. گرد کردن (C25) فقط در خوانشِ «همه هزار» پرسش است — «گرد کردنِ» خوانشِ واحد همان M ِ گم‌شده است (C28-12)، نه گرد کردنِ او؛
          خوانشِ «همه هزار» که فقط تا مقیاس می‌خواند ⇒ «کدام را نوشتی؟» (C63، همان m2 ِ پیشین) */
       var C84 = null;
@@ -681,8 +681,10 @@
           if (cmb.length === (1 << nC)) {
             var fits = cmb.filter(function (x) { return x.h === "eq" || x.h === "floor" || x.h === "rem"; }), kAll = cmb[cmb.length - 1], uAll = cmb[0];
             C84 = { cL: cL, cR: cR, all: cL.concat(cR), fits: fits, k: kAll, u: uAll, n: nC };
-            if (fits.length === 1) { C84.pick = fits[0]; how = fits[0].h; }
-            else if (fits.length > 1) { C84.both = true; C84.pick = fits.indexOf(kAll) >= 0 ? kAll : fits[0]; how = ""; }
+            /* C102 (جای «دو خوانش ⇒ پرسش» ِ C84): «N میلیون و M» نخست «M هزار» خوانده می‌شود — می‌خواند ⇒ ✓ بی پرسش (حتی اگر خوانشِ واحد هم بخواند)؛
+               فقط خوانشِ دیگری می‌خواند ⇒ ✓ با نشان دادنِ همان خوانش («یعنی ۸۰۰ ِ واحد»)؛ هیچ‌کدام ⇒ ✗ (C103) */
+            if (fits.indexOf(kAll) >= 0) { C84.pick = kAll; how = kAll.h; }
+            else if (fits.length) { C84.pick = fits.indexOf(uAll) >= 0 ? uAll : fits[0]; C84.other = true; how = C84.pick.h; }
             else if (kAll.h === "ask") { C84.pick = kAll; how = "ask"; }
             else if (kAll.h) { C84.sc = true; C84.pick = kAll; how = ""; }
             else { C84.none = true; C84.pick = cL.length ? uAll : kAll; how = ""; }
@@ -739,7 +741,8 @@
         var lab84 = function (k) { return C84.cL.map(function (x) { return "«" + fa(pretty(x.cmT)) + (k ? " " + w84(x) : "") + "»"; }).join("، "); };
         c.rdC = C84.all.map(function (x, k) { var K = C84.pick.m & (1 << k); return "«" + fa(pretty(x.cmT)) + (K ? " " + w84(x) : "") + "»" + (K ? "" : " ِ واحد"); }).join("، ");
         var uT84 = vT84(C84.u), kT84 = vT84(C84.k), two84 = C84.cL.length > 0 && uT84 !== kT84;
-        if (C84.none) { c.valT = two84 ? uT84 + " (با " + lab84(false) + " ِ واحد) یا " + kT84 + " (با " + lab84(true) + ")" : kT84;
+        if (C84.other) c.rdShow = true;   // C102: ✓ فقط با خوانشی جز «هزار» ⇒ همان خوانش به خودش هم نشان داده می‌شود
+        if (C84.none) { c.valT = two84 ? kT84 + " (با " + lab84(true) + ") یا " + uT84 + " (با " + lab84(false) + " ِ واحد)" : kT84;   // C103: هزار و واحد، بی ترکیب‌های درهم
           var rK84 = C84.cR.length && C84.k.R.v ? fmtCm(C84.k.R.v, g84) : null, rU84 = C84.cR.length && C84.u.R.v ? fmtCm(C84.u.R.v, g84) : null;   // نوشتهٔ او هم به هر دو خوانش (D28-15)
           if (rK84 && rU84 && rK84 !== rU84) c.valT += "؛ نوشتهٔ او «" + fa(pretty(C84.cR[0].cmT)) + "» نه " + rK84 + " است نه " + rU84; }
         if (C84.both || C84.sc) { var x84 = C84.all[0]; c.ok = true; c.ask = true; c.kind = "m2"; c.m2Both = !!C84.both; c.m2T = pretty(x84.cmT); c.m2W = w84(x84);
@@ -771,6 +774,11 @@
       }
       if (!c.ok && disowned(t, c.pos, segs[i].at + R.b)) continue;
       out.push(c);
+      /* C108 (دورِ ۲۸): جملهٔ «M تا می‌مونه» جدا سنجیده می‌شود فقط وقتی کلّ را خودش در همین پیام پیش از حساب گفته («۲۰ تا مداد … ۶ و ۶ و ۶ میشه ۱۸، ۲ تا می‌مونه»):
+         واپسین «N تا» ِ پیش از حساب که از نتیجه بزرگ‌تر است. وگرنه سطری نمی‌گیرد */
+      if (remCl && R.single && pt(R.v) && R.v.lo.d === ONE) { var T84 = tokens(t), p84 = segs[i - 1].at + L0.a, tot = null;
+        for (var q84 = 0; q84 + 1 < T84.length && T84[q84].b <= p84; q84++) { var x84t = T84[q84]; if (x84t.k === "n" && x84t.int && !x84t.mag && T84[q84 + 1].k === "w" && T84[q84 + 1].t === "تا" && cmp(x84t.v, R.v.lo) > 0) tot = x84t; }
+        if (tot) { var rv84 = sub(tot.v, R.v.lo); out.push({ expr: tot.raw + " − " + R.lits[0].raw, said: String(remCl.n), saidT: String(remCl.n), val: num(rv84), valT: fmtF(rv84), ok: cmp(rv84, F(remCl.n)) === 0, kind: "remc", pos: remCl.a, pe: remCl.e, sx: false }); } }
       /* عددی که خودش گرد کرد، در حسابِ بعدی همان بازه است */
       if (note && c.ok && !c.ask && !Lm0.length && !c.unitRead && R.single && !R.lits[0].mag && !R.lits[0].pct && pt(L0.v) && cmp(L0.v.lo, R.lits[0].v) !== 0 && how === "eq") note(R.lits[0].raw, hull(iv(R.lits[0].v), L0.v));
     }
@@ -884,8 +892,8 @@
     if (c.kind === "andmul") return "«" + fa(c.expr) + "» را جمع بخوانی " + c.valT + " می‌شود و با «" + fa(c.saidT || c.said) + "» نمی‌خواند؛ ضرب بخوانی می‌خواند" + (coach ? " — «و» دو خوانش دارد: نه ✓ و نه ✗؛ از خودش بپرس «ضرب کردی؟»" : " — ضرب کردی؟");
     if (c.kind === "m2" && c.m2Both) return "«" + fa(c.m2T) + "» دو خوانش دارد («" + fa(c.m2T) + "» ِ واحد، یا «" + fa(c.m2T) + " " + c.m2W + "») و «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» با هر دو می‌خواند (" + c.m2A[0] + " یا " + c.m2A[1] + ")" +
       (coach ? " — حساب در هر دو خوانش درست است، ولی عددش به خوانش بسته است: نه ✓ و نه ✗ تا خودش بگوید؛ یک بار بپرس «" + fa(c.m2M[0]) + " " + c.m2W + " یا خودِ " + fa(c.m2M[0]) + "؟»" : " — «" + fa(c.m2M[0]) + " " + c.m2W + "» یا خودِ «" + fa(c.m2M[0]) + "»؟");   // C84 (دورِ ۲۸؛ C28-11)
-    if (c.kind === "m2") return "«" + fa(c.m2T) + "» دو خوانش دارد («" + fa(c.m2T) + "» ِ واحد، یا «" + fa(c.m2T) + " " + c.m2W + "») — «" + fa(c.expr) + "» به ترتیب " + c.m2A[0] + " یا " + c.m2A[1] + " می‌شود؛ با خوانشِ دوم «" + fa(c.saidT || c.said) + "» فقط تا مقیاس/گرد کردن می‌خواند" +
-      (coach ? " — نه ✓ و نه ✗ (حکم به خوانش بسته است)؛ از خودش بپرس کدام را نوشت" : " — کدام را نوشتی؟");
+    if (c.kind === "m2") return "«" + fa(c.m2T) + "» دو خوانش دارد (اولی «" + fa(c.m2T) + " " + c.m2W + "»، دومی «" + fa(c.m2T) + "» ِ واحد) — «" + fa(c.expr) + "» به ترتیب " + c.m2A[1] + " یا " + c.m2A[0] + " می‌شود؛ با خوانشِ «" + c.m2W + "» «" + fa(c.saidT || c.said) + "» فقط تا مقیاس/گرد کردن می‌خواند" +
+      (coach ? " — نه ✓ و نه ✗ (حکم به خوانش بسته است)؛ از خودش بپرس کدام را نوشت" : " — کدام را نوشتی؟");   // دورِ ۲۸ (C106): ترتیبِ ثابت — «اولی» = هزار، «دومی» = واحد
     if (c.kind === "scale") return "عددهای «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» می‌خوانند، ولی مقیاسش (هزار/میلیون/میلیارد) را صفحه نسنجیده" + (coach ? " — نه ✓ و نه ✗؛ از خودش بپرس کدام مقیاس را می‌خواست" : "");
     return "«" + fa(c.expr) + "» " + (/^≈/.test(c.valT) ? "" : "دقیقاً ") + c.valT + " می‌شود" + (c.remT ? " (خارج‌قسمتِ صحیح " + c.remT + ")" : "") + " و «" + fa(c.saidT || c.said) + "» نوشته شده" + (coach ? " — نه ✓ و نه ✗؛ مقدارِ دقیق را بگو و بپرس گرد کرده یا همین را می‌خواست" : " — گرد شده؟");
   }
@@ -914,7 +922,7 @@
     var L = (ck || []).map(function (c) { var l = lineOf(c); return c.other ? l.replace(/^(\S+ )/, function (m) { return m + whoT(c); }) : l; });
     function lineOf(c) {
       if (c.ask) return "؟ " + askT(c, true);
-      if (c.ok) return "✓ «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» می‌خواند" + (c.rdC ? " (با خوانشِ " + c.rdC + ")" : "") + (c.unitUnread ? " (فقط عدد؛ واحدش نسنجیده)" : c.unitRead ? " (با واحدِ " + c.unitRead + ")" : "") +
+      if (c.ok) return "✓ «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» می‌خواند" + (c.rdC ? (c.rdShow ? " — یعنی " + c.rdC + " (فقط با این خوانش می‌خواند؛ همین را به خودش هم بگو)" : " (با خوانشِ " + c.rdC + ")") : "") + (c.unitUnread ? " (فقط عدد؛ واحدش نسنجیده)" : c.unitRead ? " (با واحدِ " + c.unitRead + ")" : "") +
         (c.unitQ ? " — فقط برای تو (مربی): حساب جمع است و می‌خواند، ولی واحدِ نتیجه «" + c.unitQ + "» است؛ اگر به کار می‌آید یک بار بپرس منظورش ضربِ دو اندازه بود؟ (این ✗ نیست)" : "");
       return "✗ " + (c.unit ? "واحد (" + c.unit + "): «" + fa(c.expr) + "» را «" + fa(c.saidT || c.said) + "» نوشته — با تبدیل " + c.valT + " می‌شود" : "«" + fa(c.expr) + "» را «" + fa(c.saidT || c.said) + "» نوشته — حسابِ صفحه: " + c.valT);
     }
@@ -1025,6 +1033,8 @@
       while ((mm = g.exec(d))) { if (/^هزار/.test(mm[1])) K = true; else if (/^(?:تومن|تومان|ریال|واحد)/.test(mm[1])) U = true; }
       if (new RegExp("خود(?:ِ|ش)?\\s*(?:همون\\s*|همین\\s*)?" + M + "(?![\\d.])(?!\\s*هزار)").test(d)) U = true;
     });
+    if (!K && !U && /(?:^|[\s،,])(?:همون\s*|همین\s*)?اولی(?![آ-ی])/.test(d) && !/دومی/.test(d)) K = true;   // C106: «اولی / همون اولی» = هزار (ترتیبِ askT)
+    if (!K && !U && /(?:^|[\s،,])(?:همون\s*|همین\s*)?دومی(?![آ-ی])/.test(d) && !/اولی/.test(d)) U = true;
     if (!K && !U && !/\d/.test(d)) { if (/هزار/.test(d) && !/(?:^|\s)نه[،,\s]+هزار|هزار\s*نه(?![آ-ی])/.test(d)) K = true; else if (/تومن|تومان|ریال/.test(d)) U = true; }
     return K === U ? "" : K ? "k" : "u";
   }

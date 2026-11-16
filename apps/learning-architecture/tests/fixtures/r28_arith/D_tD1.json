@@ -1,0 +1,89 @@
+{
+"from": "round28D/tD1",
+"t0": "2026-10-17T09:00:00",
+"base": 0,
+"inject": "(()=>{const R=window.__R0||Date;window.__R0=R;let off=+localStorage.getItem('__d26off');if(!off){off=R.parse('2026-11-16T07:00:00Z')-R.now();localStorage.setItem('__d26off',String(off))}function D(...a){if(!(this instanceof D))return new R(R.now()+off).toString();return a.length?new R(...a):new R(R.now()+off)}D.prototype=R.prototype;D.now=()=>R.now()+off;D.UTC=R.UTC;D.parse=R.parse;window.Date=D;try{APP.render()}catch(e){}})()",
+"steps": [
+{
+"eval0": "window.__setf=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NO '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};window.__btn=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>b.offsetParent&&re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,40)};1\n;window.__seli=(id,i)=>{const e=document.getElementById(id);if(!e)return 'NO '+id;e.selectedIndex=i;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return e.value};window.__opts=id=>[...document.getElementById(id).options].map((o,i)=>i+'='+o.text.slice(0,40)).join(' | ');1\n;window.__w=ms=>new Promise(r=>setTimeout(r,ms));window.__bad=()=>[...document.querySelectorAll('#main p.bad,#main .bad,.toast.bad')].filter(x=>x.offsetParent).map(x=>x.textContent).join(' ;; ');\nwindow.__step=async(o)=>{const r=[];r.push(__setf('lpStep',o.step));const cl=document.getElementById('lpClear');if(cl)r.push(__seli('lpClear',o.clear||1));r.push(__setf('lpPrem',o.prem||''));r.push(__setf('lpPred',o.pred));const cf=document.getElementById('lpConf');if(cf){const i=[...cf.options].findIndex(x=>x.value==String(o.conf||60));r.push(__seli('lpConf',i<0?2:i))}r.push(__setf('lpWhen',o.when||'فردا'));(o.d||[]).forEach(i=>{const e=document.getElementById('lpSD_'+i);e&&!e.checked&&e.click()});await __w(200);r.push(__btn(/^ثبتِ گام/));await __w(500);r.push('BAD:'+__bad());return r.join(',')};\nwindow.__out=async(o)=>{const r=[];if(o.early){r.push(__btn(/زودتر انجامش دادم/));await __w(400)}const s=(id,v)=>{const e=document.getElementById(id);if(!e)return r.push('NO '+id);if(e.tagName=='SELECT'){const i=[...e.options].findIndex(x=>x.value==v||x.text.indexOf(v)==0);e.selectedIndex=i<0?1:i;e.dispatchEvent(new Event('change',{bubbles:true}));r.push(e.value)}else r.push(__setf(id,v))};s('lpODone',o.done||'yes');s('lpOWhat',o.what);if(o.match)s('lpOMatch',o.match);s('lpOProg',o.prog||'بله');s('lpOWant',o.want||'more');await __w(200);r.push(__btn(/^ثبتِ نتیجه/));await __w(500);r.push('BAD:'+__bad());return r.join(',')};1\n;1",
+"say": "سلام. می‌خوام کفِ پذیرایی رو پارکت کنم و ببینم با پس‌اندازم می‌رسه یا باید وام بگیرم. خودم تا یه جایی حساب کردم:\nگام ۱: پذیرایی ۵ متر در ۴ متر = ۲۰ مترمربع.\nگام ۲: با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲ مترمربع پارکت لازمه.\nگام ۳: هر مترمربع ۸۵۰ هزار تومنه، پس ۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰ تومن.\nگام ۴: دستمزدِ نصب متری ۱۵۰ هزار: ۲۰ × ۱۵۰ = ۳۰۰۰ هزار تومن.\nگام ۵: جمع ۱۸٫۷ + ۳ = ۲۲٫۷ میلیون؛ پس‌اندازم ۱۸ میلیونه، پس ۴ میلیون و ۷۰۰ کم دارم.\nگام ۶: اگه ۵ میلیون وام بگیرم با سودِ ۲۳ درصد و ۱۲ قسط، قسطش رو هنوز حساب نکردم."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const lp=APP.liveAll().map(r=>r.p.id);const id=lp.length?lp[lp.length-1]:s.id;APP.ASSIST.toggle(false);APP.go('route',id);await w(1500);const m=APP.ROUTE.model(id);const rt=document.getElementById('main').innerText;const i=rt.indexOf('اکنون:');APP.go('dossier',id);await w(1500);const d=document.getElementById('main').innerText;const j=d.indexOf('کارِ پیشینِ تو');return JSON.stringify({route:rt.slice(i,i+700),pts:m.pts.map(p=>p.title.slice(0,140)),dossier:j<0?'NO prior in dossier':d.slice(j,j+900),leak:/لو نده|coach|مربی‌ویژه/.test(rt+d)})})()"
+},
+{
+"say": "اگه پرت ۱۰ درصد نباشه چی؟ آهان، اصلاً فروشنده پرت رو ۱۲ درصد گفته بود، نه ۱۰."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const lp=APP.liveAll().map(r=>r.p.id);const id=lp.length?lp[lp.length-1]:s.id;APP.ASSIST.toggle(false);APP.go('route',id);await w(1500);const m=APP.ROUTE.model(id);const rt=document.getElementById('main').innerText;const i=rt.indexOf('اکنون:');APP.go('dossier',id);await w(1500);const d=document.getElementById('main').innerText;const j=d.indexOf('کارِ پیشینِ تو');return JSON.stringify({route:rt.slice(i,i+700),pts:m.pts.map(p=>p.title.slice(0,140)),dossier:j<0?'NO prior in dossier':d.slice(j,j+900),leak:/لو نده|coach|مربی‌ویژه/.test(rt+d)})})()"
+},
+{
+"say": "آره، همون ۲۲٫۴ درسته."
+},
+{
+"say": "این مسئلهٔ پارکت رو تو «مسئله‌های من» ثبتش کن."
+},
+{
+"say": "راستی طولِ پذیرایی رو اشتباه گفتم: ۵ متر نیست، ۵٫۵ متره."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const lp=APP.liveAll().map(r=>r.p.id);const id=lp.length?lp[lp.length-1]:s.id;APP.ASSIST.toggle(false);APP.go('route',id);await w(1500);const m=APP.ROUTE.model(id);const rt=document.getElementById('main').innerText;const i=rt.indexOf('اکنون:');APP.go('dossier',id);await w(1500);const d=document.getElementById('main').innerText;const j=d.indexOf('کارِ پیشینِ تو');return JSON.stringify({route:rt.slice(i,i+700),pts:m.pts.map(p=>p.title.slice(0,140)),dossier:j<0?'NO prior in dossier':d.slice(j,j+900),leak:/لو نده|coach|مربی‌ویژه/.test(rt+d)})})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const lp=APP.liveAll().map(r=>r.p.id);const id=lp.length?lp[lp.length-1]:s.id;APP.ASSIST.toggle(false);APP.go('route',id);await w(1500);const m=APP.ROUTE.model(id);const rt=document.getElementById('main').innerText;const i=rt.indexOf('اکنون:');APP.go('dossier',id);await w(1500);const d=document.getElementById('main').innerText;const j=d.indexOf('کارِ پیشینِ تو');return JSON.stringify({route:rt.slice(i,i+700),pts:m.pts.map(p=>p.title.slice(0,140)),dossier:j<0?'NO prior in dossier':d.slice(j,j+900),leak:/لو نده|coach|مربی‌ویژه/.test(rt+d)})})()"
+},
+{
+"say": "نه، اون ۱۹ میلیون و ۴۰ نیست؛ قیمت رو باید دوباره از فروشنده بپرسم."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const lp=APP.liveAll().map(r=>r.p.id);const id=lp.length?lp[lp.length-1]:s.id;APP.ASSIST.toggle(false);APP.go('route',id);await w(1500);const m=APP.ROUTE.model(id);const rt=document.getElementById('main').innerText;const i=rt.indexOf('اکنون:');APP.go('dossier',id);await w(1500);const d=document.getElementById('main').innerText;const j=d.indexOf('کارِ پیشینِ تو');return JSON.stringify({route:rt.slice(i,i+700),pts:m.pts.map(p=>p.title.slice(0,140)),dossier:j<0?'NO prior in dossier':d.slice(j,j+900),leak:/لو نده|coach|مربی‌ویژه/.test(rt+d)})})()"
+},
+{
+"say": "آره، همون ۴۱۲۵ درسته."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const lp=APP.liveAll().map(r=>r.p.id);const id=lp.length?lp[lp.length-1]:s.id;APP.ASSIST.toggle(false);APP.go('route',id);await w(1500);const m=APP.ROUTE.model(id);const rt=document.getElementById('main').innerText;const i=rt.indexOf('اکنون:');APP.go('dossier',id);await w(1500);const d=document.getElementById('main').innerText;const j=d.indexOf('کارِ پیشینِ تو');return JSON.stringify({route:rt.slice(i,i+700),pts:m.pts.map(p=>p.title.slice(0,140)),dossier:j<0?'NO prior in dossier':d.slice(j,j+900),leak:/لو نده|coach|مربی‌ویژه/.test(rt+d)})})()"
+},
+{
+"say": "نه، ۲۷٫۵ نیست. منظورم طول بود: ۵٫۵ متر در ۴ متر میشه ۲۲ مترمربع."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const lp=APP.liveAll().map(r=>r.p.id);const id=lp.length?lp[lp.length-1]:s.id;APP.ASSIST.toggle(false);APP.go('route',id);await w(1500);const m=APP.ROUTE.model(id);const rt=document.getElementById('main').innerText;const i=rt.indexOf('اکنون:');APP.go('dossier',id);await w(1500);const d=document.getElementById('main').innerText;const j=d.indexOf('کارِ پیشینِ تو');return JSON.stringify({route:rt.slice(i,i+700),pts:m.pts.map(p=>p.title.slice(0,140)),dossier:j<0?'NO prior in dossier':d.slice(j,j+900),leak:/لو نده|coach|مربی‌ویژه/.test(rt+d)})})()"
+},
+{
+"say": "راستی داداشم حساب کرد چسب و زیرسازی ۳ × ۴۰۰ = ۱۲۰۰ هزار تومن میشه."
+},
+{
+"say": "منم همینو قبول دارم؛ چسب و زیرسازی ۱۲۰۰ هزار."
+},
+{
+"say": "قرنیز: دورِ پذیرایی ۲ × (۵ + ۴) = ۱۸ متره و متری ۱۶۰ هزار، پس ۱۸ × ۱۶۰ = ۲ میلیون و ۸۸۰. نصبِ قرنیز هم ۱۸ × ۱۵۰ هزار = ۲ میلیون و ۶۰۰."
+}
+],
+"replies": [
+"{\"reply\":\"گام‌های ۱ تا ۴ درست است: ۲۰ مترمربع، ۲۲ مترمربع با پرت، ۱۸ میلیون و ۷۰۰ برای پارکت و ۳ میلیون دستمزد. گامِ ۵ («جمع ۱۸٫۷ + ۳ = ۲۲٫۷ میلیون») با حسابِ صفحه نمی‌خواند، و «۴ میلیون و ۷۰۰ کم دارم» هم بر همان تکیه دارد؛ گامِ ۶ هنوز باز است. از گامِ ۵ شروع کن: ۱۸٫۷ و ۳ را دوباره جمع می‌کنی؟\",\"memory\":\"پارکتِ پذیرایی: ۵×۴=۲۰ م²؛ با ۱۰٪ پرت ۲۲ م²؛ ۸۵۰ هزار/م² ⇒ ۱۸٫۷ میلیون؛ دستمزد ۱۵۰ هزار×۲۰ = ۳ میلیون. گامِ ۵ جمع نادرست (۲۲٫۷)، کسری وابسته؛ گامِ ۶ (قسطِ وامِ ۵ میلیونی ۲۳٪، ۱۲ قسط) ناقص. پس‌انداز ۱۸ میلیون.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"گامِ ۵: جمعِ هزینه\",\"s\":\"now\",\"view\":\"lprob\"},{\"t\":\"گامِ ۶: قسطِ وام\",\"s\":\"todo\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"plan\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\",\"prior\":[{\"step\":\"مساحتِ پذیرایی\",\"quote\":\"پذیرایی ۵ متر در ۴ متر = ۲۰ مترمربع\",\"verdict\":\"ok\",\"why\":\"طول در عرض\",\"dep\":[]},{\"step\":\"پارکت با پرت\",\"quote\":\"با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲ مترمربع پارکت لازمه\",\"verdict\":\"ok\",\"why\":\"۱۰٪ بیشتر از مساحت\",\"dep\":[1]},{\"step\":\"هزینهٔ پارکت\",\"quote\":\"هر مترمربع ۸۵۰ هزار تومنه، پس ۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰ تومن\",\"verdict\":\"ok\",\"why\":\"مقدار در قیمتِ واحد\",\"dep\":[2]},{\"step\":\"دستمزدِ نصب\",\"quote\":\"دستمزدِ نصب متری ۱۵۰ هزار: ۲۰ × ۱۵۰ = ۳۰۰۰ هزار تومن\",\"verdict\":\"ok\",\"why\":\"مساحت در دستمزدِ متری\",\"dep\":[1]},{\"step\":\"جمع و کسری\",\"quote\":\"جمع ۱۸٫۷ + ۳ = ۲۲٫۷ میلیون؛ پس‌اندازم ۱۸ میلیونه، پس ۴ میلیون و ۷۰۰ کم دارم\",\"verdict\":\"wrong\",\"why\":\"جمعِ ۱۸٫۷ و ۳ نادرست نوشته شده و کسری بر همان بنا شده\",\"dep\":[3,4]},{\"step\":\"قسطِ وام\",\"quote\":\"اگه ۵ میلیون وام بگیرم با سودِ ۲۳ درصد و ۱۲ قسط، قسطش رو هنوز حساب نکردم\",\"verdict\":\"incomplete\",\"why\":\"قسط حساب نشده؛ اندازهٔ وام هم به جمعِ درستِ گامِ ۵ بسته است\",\"dep\":[5]}]}]}",
+"{\"reply\":\"اصلاحِ پرت را فرستادم: ۱۲ درصد به‌جای ۱۰؛ این‌که کدام عددهای قبلی عوض می‌شوند را صفحه زیرِ همین پیام می‌گوید. با پرتِ ۱۲ درصد، مقدارِ پارکتِ لازم را خودت چند درمی‌آوری؟\",\"memory\":\"پارکتِ پذیرایی؛ اصلاح: پرت ۱۲٪ (نه ۱۰٪) — گام‌های ۲، ۳، ۵ وابسته. گامِ ۵ جمعِ نادرست؛ گامِ ۶ قسطِ وام ناقص.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"گامِ ۲ با پرتِ ۱۲٪\",\"s\":\"now\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"fact\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\",\"retract\":{\"msg\":\"با ۱۰ درصد پرت\",\"key\":\"step:2\",\"what\":\"fact\",\"fix\":\"۱۲ درصد\",\"rests\":[]}}]}",
+"{\"reply\":\"آره، ۲۰ × ۱٫۱۲ = ۲۲٫۴ مترمربع درست است. حالا گامِ ۳ هم بر همین مقدار بنا شده بود — با ۲۲٫۴ مترمربع، هزینهٔ پارکت را خودت چند درمی‌آوری؟\",\"memory\":\"پارکتِ پذیرایی؛ پرت ۱۲٪ ⇒ ۲۲٫۴ م² (حسابِ خودش). گام‌های ۳ و ۵ باید با ۲۲٫۴ دوباره حساب شوند؛ گامِ ۶ ناقص.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"گامِ ۳ با ۲۲٫۴\",\"s\":\"now\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"result\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\"}]}",
+"{\"reply\":\"پارکتِ پذیرایی را در «🔭 مسئله‌های من» ثبت کردم تا گام‌ها و حساب‌هایت همان‌جا بماند.\",\"memory\":\"پارکتِ پذیرایی در 🔭 ثبت شد (به خواستهٔ خودش).\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"live_new\",\"title\":\"پارکتِ پذیرایی: پس‌انداز یا وام\",\"statement\":\"می‌خوام کفِ پذیرایی رو پارکت کنم و ببینم با پس‌اندازم می‌رسه یا باید وام بگیرم.\",\"nat\":\"practical\"}]}",
+"{\"reply\":\"اصلاحِ طول را فرستادم: ۵٫۵ متر به‌جای ۵ متر؛ صفحه زیرِ همین پیام می‌گوید کدام عددهای قبلی بر آن بنا بودند. با ۵٫۵ متر، مساحتِ پذیرایی را خودت چند درمی‌آوری؟\",\"memory\":\"پارکتِ پذیرایی (🔭)؛ اصلاح: طول ۵٫۵ متر (نه ۵)؛ پرت ۱۲٪. گام‌های ۱–۵ وابسته؛ گامِ ۶ ناقص.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"گامِ ۱ با ۵٫۵ متر\",\"s\":\"now\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"fact\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\",\"retract\":{\"msg\":\"پذیرایی ۵ متر در ۴ متر\",\"key\":\"step:1\",\"what\":\"fact\",\"fix\":\"۵٫۵ متر\",\"rests\":[]}}]}",
+"{\"reply\":\"درست می‌گویی، ۱۹ میلیون و ۴۰ را کسی ثبت نکرده و قیمت را از فروشنده می‌پرسی. یک چیز را ببین: صفحه اصلاحت را روی عرضِ «۴ متر» نشاند، نه روی طولِ «۵ متر»؛ پس پیشنهادهایش (مثلِ ۲۰ ⇒ ۲۷٫۵) بر عددِ نادرست است. مساحت با طولِ ۵٫۵ و عرضِ ۴ چند می‌شود؟\",\"memory\":\"پارکتِ پذیرایی (🔭). اصلاحِ طول ۵ ⇒ ۵٫۵ را صفحه روی عرضِ ۴ نشاند (خطای صفحه)؛ پیشنهادهای ۲۷٫۵، ۳۰٫۲۵، ۲۵، ۴۱۲۵ بر عددِ نادرست. قیمت را از فروشنده می‌پرسد.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"مساحت با ۵٫۵ در ۴\",\"s\":\"now\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"plan\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\"}]}",
+"{\"reply\":\"۴۱۲۵ از ضربِ ۲۷٫۵ در ۱۵۰ درآمده، و ۲۷٫۵ همان مساحتی است که صفحه با عرضِ اشتباه ساخت. پیش از پذیرفتنش، مساحتِ درست را بگو: طولِ ۵٫۵ در عرضِ ۴ چند مترمربع است؟\",\"memory\":\"پارکتِ پذیرایی (🔭). پیشنهادِ ۴۱۲۵ بر مساحتِ نادرستِ ۲۷٫۵ (۵ × ۵٫۵). مساحتِ درست با ۵٫۵ × ۴ هنوز گفته نشده.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"مساحت با ۵٫۵ در ۴\",\"s\":\"now\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\"}]}",
+"{\"reply\":\"درست است: ۵٫۵ متر در ۴ متر همان ۲۲ مترمربع است، پس ۲۷٫۵ و پیشنهادهای ساخته از آن کنار می‌روند؛ اصلاح را برای صفحه فرستادم تا عرض همان ۴ بماند و طول ۵٫۵ شود. با ۲۲ مترمربع و پرتِ ۱۲ درصد، پارکتِ لازم چند مترمربع می‌شود؟\",\"memory\":\"پارکتِ پذیرایی (🔭): ۵٫۵ × ۴ = ۲۲ م² (خودش)؛ پرت ۱۲٪. پیشنهادِ ۲۷٫۵ و ۴۱۲۵ را رد کرد؛ صفحه گامِ ۴ را با ۴۱۲۵ بازنوشته بود.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"پارکت با ۲۲ م² و پرتِ ۱۲٪\",\"s\":\"now\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"result\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\",\"retract\":{\"msg\":\"پذیرایی ۵ متر در ۴ متر\",\"key\":\"step:1\",\"what\":\"fact\",\"fix\":\"۵٫۵ متر در ۴ متر\",\"old\":\"۵ متر\",\"rests\":[]}}]}",
+"{\"reply\":\"حسابِ برادرت درست است: ۳ × ۴۰۰ همان ۱۲۰۰ هزار تومن است؛ صفحه آن را «کارِ برادرت» نگه می‌دارد، نه گامِ تو. خودت این هزینه را در جمعِ کار حساب می‌کنی یا نه؟\",\"memory\":\"پارکتِ پذیرایی (🔭): ۲۲ م²، پرت ۱۲٪. برادرش: چسب و زیرسازی ۳ × ۴۰۰ = ۱۲۰۰ هزار (کارِ دیگری).\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"other\",\"nat\":\"practical\"}]}",
+"{\"reply\":\"پس چسب و زیرسازی ۱۲۰۰ هزار تومن را خودت هم پذیرفتی و در هزینه می‌آید. حالا با ۲۲ مترمربع و پرتِ ۱۲ درصد، پارکتِ لازم را چند درمی‌آوری؟\",\"memory\":\"پارکتِ پذیرایی (🔭): ۲۲ م²، پرت ۱۲٪؛ چسب و زیرسازی ۱۲۰۰ هزار (حسابِ برادر، پذیرفتهٔ خودش).\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"پارکت با ۲۲ م² و پرتِ ۱۲٪\",\"s\":\"now\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"result\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\"}]}",
+"{\"reply\":\"دورِ ۱۸ متر و قرنیزِ ۲ میلیون و ۸۸۰ هزار می‌خواند. حسابِ نصبِ قرنیز با حسابِ صفحه نمی‌خواند؛ یک نکته هم: طول را ۵٫۵ کردی، ولی دور را هنوز با ۵ حساب کرده‌ای. اول دورِ اتاق را با ۵٫۵ و ۴ دوباره حساب می‌کنی؟\",\"memory\":\"پارکتِ پذیرایی (🔭): ۲۲ م²، پرت ۱۲٪؛ چسب ۱۲۰۰ هزار. قرنیز: دور با ۵ حساب شد (۱۸)، باید با ۵٫۵ (۱۹)؛ نصبِ قرنیز نمی‌خواند.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"دورِ اتاق با ۵٫۵\",\"s\":\"now\",\"view\":\"lprob\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"result\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\"}]}"
+],
+"keys": [
+"سلام. می‌خوام کفِ پذیرایی رو پارکت کنم و ببینم با پس‌اندازم می‌رسه یا باید وام بگیرم. خودم تا یه جایی حساب کردم:\nگام ۱: پذیرایی ۵ متر در ۴ متر = ۲۰ مترمربع.\nگام ۲: با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲ مترمربع پارکت لازمه.\nگام ۳: هر مترمربع ۸۵۰ هزا",
+"اگه پرت ۱۰ درصد نباشه چی؟ آهان، اصلاً فروشنده پرت رو ۱۲ درصد گفته بود، نه ۱۰.",
+"آره، همون ۲۲٫۴ درسته.",
+"این مسئلهٔ پارکت رو تو «مسئله‌های من» ثبتش کن.",
+"راستی طولِ پذیرایی رو اشتباه گفتم: ۵ متر نیست، ۵٫۵ متره.",
+"نه، اون ۱۹ میلیون و ۴۰ نیست؛ قیمت رو باید دوباره از فروشنده بپرسم.",
+"آره، همون ۴۱۲۵ درسته.",
+"نه، ۲۷٫۵ نیست. منظورم طول بود: ۵٫۵ متر در ۴ متر میشه ۲۲ مترمربع.",
+"راستی داداشم حساب کرد چسب و زیرسازی ۳ × ۴۰۰ = ۱۲۰۰ هزار تومن میشه.",
+"منم همینو قبول دارم؛ چسب و زیرسازی ۱۲۰۰ هزار.",
+"قرنیز: دورِ پذیرایی ۲ × (۵ + ۴) = ۱۸ متره و متری ۱۶۰ هزار، پس ۱۸ × ۱۶۰ = ۲ میلیون و ۸۸۰. نصبِ قرنیز هم ۱۸ × ۱۵۰ هزار = ۲ میلیون و ۶۰۰."
+]
+}

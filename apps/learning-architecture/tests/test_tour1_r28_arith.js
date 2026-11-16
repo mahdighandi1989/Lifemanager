@@ -67,8 +67,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
   await section('engine', async () => {
     // ---- S1 B28·D1 (B nB1 p3): «۹ میلیون و ۹۰۰ + ۲ میلیون و ۸۰۰ = ۱۲ میلیون و ۷۰۰» — فقط خوانشِ «هزار» می‌خواند ⇒ ✓ ----
     let r = await AC('چسب هم ۲ میلیون و ۸۰۰ میشه؛ با سرامیک روی هم: ۹ میلیون و ۹۰۰ + ۲ میلیون و ۸۰۰ = ۱۲ میلیون و ۷۰۰. نصفش رو الان می‌دم: ۲ میلیون و ۸۰۰ تقسیم بر ۲ میشه ۱ میلیون و ۴۰۰ برای چسب. و از پولِ چسب ۵۰۰ هزار تخفیف گرفتم: ۲ میلیون و ۸۰۰ منهای ۵۰۰ هزار میشه ۲ میلیون و ۵۰۰.');
-    chk(JSON.stringify(sts(r)) === '["OK","ASKm2","FLAG"]' && /۹ میلیون و ۹۰۰ هزار/.test(r.lines[0]) && !/۱۱٫۰۰۱۷/.test(r.lines.join(' ')),
-      'S1 B28·D1 nB1 p3 (C84): the only fitting reading (all «هزار») is ✓ with that reading named; «÷ ۲ = ۱ میلیون و ۴۰۰» fits both ⇒ asked once; «− ۵۰۰ هزار = ۲ میلیون و ۵۰۰» fits none ⇒ ✗ with both values :: ' + J(r));
+    chk(JSON.stringify(sts(r)) === '["OK","OK","FLAG"]' && /۹ میلیون و ۹۰۰ هزار/.test(r.lines[0]) && !/۱۱٫۰۰۱۷/.test(r.lines.join(' ')) && !/دو خوانش/.test(r.lines[1]),
+      'S1 B28·D1 nB1 p3 (C84/C102): the thousand reading fits ⇒ ✓; «÷ ۲ = ۱ میلیون و ۴۰۰» fits it too ⇒ ✓ with no question (C102 replaces C84 «two fit ⇒ ask»); «− ۵۰۰ هزار = ۲ میلیون و ۵۰۰» fits none ⇒ ✗ with both values :: ' + J(r));
     chk(/۲ میلیون و ۳۰۰ هزار/.test(r.c[2].valT) && /۱ میلیون و ۵۰۰ هزار و ۸۰۰/.test(r.c[2].valT), 'C84 none-fits (B28·D8 line): the ✗ names each reading\'s exact value in her scale words :: ' + r.c[2].valT);
     await want('۹ میلیون و ۹۰۰ + ۲ میلیون و ۸۰۰ = ۱۲ میلیون و ۵۰۰', 'FLAG', 'neg C84: the same operands with a result no reading gives are ✗', r => /۱۲ میلیون و ۷۰۰ هزار/.test(r.c[0].valT) && /۱۱ میلیون و ۱ هزار و ۷۰۰/.test(r.c[0].valT));
     // ---- S1 C28-13 (C aC3 p30): «۱ میلیون و ۲۰۰ + ۸۰۰ هزار = ۲ میلیون» ⇒ ✓، هرگز «؟ دقیقاً ۱٫۸۰۰۲ میلیون … گرد کرده؟» ----
@@ -77,13 +77,16 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
     await want('۱ میلیون و ۲۰۰ + ۸۰۰ هزار = ۲ میلیون و ۱۰۰', 'FLAG', 'neg C28-13: a wrong result with the same operands is ✗');
     // ---- C28-12 / C28-11 (C aC3 p29): ✗ با هر دو مقدار؛ هر دو خوانش ⇒ پرسش ----
     r = await AC('قسطِ بیمه رو حساب کردم: ۲ میلیون و ۸۰۰ × ۱۲ = ۳۳ میلیون و ۶۰۰ در سال. نصفش هم میشه: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰. اگه به‌جای ۶ میلیون ماهی ۶ میلیون و ۵۰۰ کنار بذارم: ۶ میلیون و ۵۰۰ × ۱۰ = ۶۰ میلیون.');
-    chk(JSON.stringify(sts(r)) === '["OK","ASKm2","FLAG"]' && /۶۵ میلیون/.test(r.c[2].valT) && /۶۰ میلیون و ۵ هزار/.test(r.c[2].valT) && !/گرد کرده/.test(r.lines[2]),
-      'C28-12 + C28-11 aC3 p29: «× ۱۰ = ۶۰ میلیون» ✗ with both values (never a rounding «؟»); «÷ ۲ = ۱ میلیون و ۴۰۰» asks which reading :: ' + J(r));
-    chk(/یک بار بپرس «۸۰۰ هزار یا خودِ ۸۰۰؟»/.test(r.lines[1]), 'C84 «two fit»: one question «۸۰۰ هزار یا خودِ ۸۰۰؟» :: ' + r.lines[1]);
+    chk(JSON.stringify(sts(r)) === '["OK","OK","FLAG"]' && /^۶۵ میلیون/.test(r.c[2].valT) && /۶۰ میلیون و ۵ هزار/.test(r.c[2].valT) && !/گرد کرده/.test(r.lines[2]),
+      'C28-12 + C28-11 aC3 p29: «× ۱۰ = ۶۰ میلیون» ✗ with both values, thousands first (C103; never a rounding «؟»); «÷ ۲ = ۱ میلیون و ۴۰۰» ✓ with no question (C102 replaces RUNNER28 T15 / C84 «ask») :: ' + J(r));
+    await want('۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰۰', 'FLAG', 'neg C102: a result that fits no reading is still ✗');
+    r = await AC('۱ میلیون و ۵۰۰ − ۵۰۰ = ۱ میلیون'); chk(JSON.stringify(sts(r)) === '["OK"]' && /یعنی «۱ میلیون و ۵۰۰» ِ واحد/.test(r.lines[0]), 'C102: right only under the units reading ⇒ ✓ and the page shows that reading :: ' + J(r));
+    await want('۲ میلیون و ۸۰۰ تومن + ۲۰۰ = ۲ میلیون و ۱۰۰۰', 'OK', 'C105: «۸۰۰ تومن» fixes the units reading (no thousand alternative)');
+    await want('۲ میلیون و ۸۰۰ تومن + ۲۰۰ هزار = ۳ میلیون', 'FLAG', 'neg C105: with «تومن» the thousand reading is not tried');
     await want('۶ میلیون و ۵۰۰ × ۱۰ = ۶۵ میلیون', 'OK', 'neg C28-12: the right product is ✓ (no rounding question)');
     // ---- A (s02 p17/p18): A28-9 ✓ (نه «واحدِ ناشناخته»)، A28-10 ✗ با هر دو مقدار در مقیاسِ خودش، A28-8 «۲√۳ ≈ …» نسنجیده ----
     r = await AC('دقیق‌ترش: ۲√۳ ≈ ۳٫۴۶ دسی‌متر. کرایه: ۲ میلیون و ۸۰۰ + ۲۰۰ هزار انعام = ۳ میلیون. سهمِ من: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰. سهمِ برادرم با کارگر: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۵۰۰.');
-    chk(JSON.stringify(sts(r)) === '["OK","ASKm2","FLAG"]' && !/واحدش نسنجیده|واحدِ ناشناخته/.test(r.lines[0]) && /۱ میلیون و ۴۰۰ هزار/.test(r.c[2].valT) && !/۱۰۰۰۴۰۰/.test(r.c[2].valT) && r.u.length === 1 && /2√3|۲√۳/.test(r.u[0]),
+    chk(JSON.stringify(sts(r)) === '["OK","OK","FLAG"]' && !/واحدش نسنجیده|واحدِ ناشناخته/.test(r.lines[0]) && /۱ میلیون و ۴۰۰ هزار/.test(r.c[2].valT) && !/۱۰۰۰۴۰۰/.test(r.c[2].valT) && r.u.length === 1 && /2√3|۲√۳/.test(r.u[0]),
       'A28-8/9/10 s02 p17: «… + ۲۰۰ هزار انعام = ۳ میلیون» ✓; «÷ ۲ = ۱ میلیون و ۵۰۰» ✗ with both values in her words; «۲√۳ ≈ ۳٫۴۶» «نسنجیده», never silent :: ' + J(r));
     r = await AC('آهان برادرم هم ۱ میلیون و ۴۰۰. رفت‌وبرگشت: ۲ میلیون و ۸۰۰ × ۲ = ۵ میلیون و ۶۰۰. توی دفترم نوشتم ۲ میلیون و ۸۰۰ ÷ ۲ = ۱۴۰۰.');
     chk(JSON.stringify(sts(r)) === '["OK","ASKm2"]' && !/۱۰۰۰۴۰۰|۱۴۰۰۰۰۰/.test(r.lines.join(' ')), 'A s02 p18: one-reading product ✓; «÷ ۲ = ۱۴۰۰» is the scale-bound «کدام را نوشتی؟», values in her words :: ' + J(r));
@@ -97,6 +100,9 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
     await want('۵ و ۵ و ۵ میشه ۱۶، ۳ تا می‌مونه', 'FLAG', 'neg C85: a wrong sum stays ✗, quoting only the sum', r => r.c[0].said === '16');
     await want('۱۸ ÷ ۵ = ۳، ۳ تا می‌مونه', 'OK', 'neg C85: after a division the clause IS the remainder (and right)');
     await want('۱۸ ÷ ۵ = ۳، ۲ تا می‌مونه', 'FLAG', 'neg C85: a wrong remainder of a division is still ✗');
+    await seq('۲۰ تا کارت داشتم: ۶ و ۶ و ۶ میشه ۱۸، ۵ تا می‌مونه', ['OK', 'FLAG'], 'C108: her total («۲۰ تا») gives the clause its operands ⇒ the sum ✓ and the remainder judged on its own (✗)', r => r.c[1].kind === 'remc' && r.c[0].said === '18');
+    await seq('۲۰ تا مداد داریم، هر جعبه ۶ تا: ۶ و ۶ و ۶ میشه ۱۸، ۲ تا می‌مونه', ['OK', 'OK'], 'C108: a true remainder clause is ✓ on its own');
+    await seq('۵ و ۵ و ۵ میشه ۱۵ و ۳ تا می‌مونه', ['OK'], 'C109: with no separator the sum ends at its result; no total ⇒ the clause gets no line');
     // ---- A28-7: «sqrt(…)» مثلِ «√» ----
     r = await AC('یه لولهٔ کوتاه‌تر هم دارم، ۳٫۹۵ متری. خودم حساب کردم: ۳٫۲² = ۱۰٫۲۴، با ۱٫۸² میشه ۱۳٫۴۸، با ۱٫۵² میشه ۱۵٫۷۳. ۱۵۰ سانت = ۱٫۵ متر. قطر = sqrt(15.73) ≈ ۳٫۹۷ و ۳٫۹۷ − ۳٫۹۵ = ۰٫۰۲ متر = ۲ سانت جا دارم.');
     chk(!r.u.length && r.c.some(c => /^sqrt/.test(c.expr) && c.st === 'ok'), 'A28-7 s02 p10: «sqrt(15.73) ≈ ۳٫۹۷» is computed like «√» (✓) :: ' + J(r));
@@ -129,8 +135,15 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
     chk(/✗ به گفتهٔ خودش خودِ «۸۰۰» \(واحد\) بود/.test(B) && A0[0].re.to === 'wrong' && !/۱ میلیون و ۴۰۰/.test(B), 'm2 units answer: under her own reading the line does not fit ⇒ ✗, the right number not told :: ' + B);
     // neg: «آره» ِ تنها به «کدام؟» نمی‌خورد
     await wipe(); await fresh();
-    await turn('۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰', 'کدام را نوشتی؟', [csn({})]);
+    await turn('۲ میلیون و ۸۰۰ ÷ ۲ = ۱۴۰۰', 'کدام را نوشتی؟', [csn({})]);
     u = await turn('آره', 'باشه.', [csn({})]); A0 = await askOf(); chk(!A0.some(a => a.re), 'neg m2: a bare «آره» picks no reading :: ' + JSON.stringify(A0));
+    u = await turn('همون اولی', 'باشه.', [csn({})]); A0 = await askOf(); chk(A0[0].re && A0[0].re.rd === 'k' && A0[0].re.to === 'ok', 'C106: «همون اولی» picks the first reading named (هزار) :: ' + JSON.stringify(A0));
+    await wipe(); await fresh();
+    await turn('۲ میلیون و ۸۰۰ ÷ ۲ = ۱۴۰۰', 'کدام را نوشتی؟', [csn({})]);
+    u = await turn('هزار', 'باشه.', [csn({})]); A0 = await askOf(); chk(A0[0].re && A0[0].re.rd === 'k', 'C106: a bare scale word «هزار» is an answer :: ' + JSON.stringify(A0));
+    await wipe(); await fresh();
+    await turn('۲ میلیون و ۸۰۰ ÷ ۲ = ۱۴۰۰', 'کدام را نوشتی؟', [csn({})]);
+    u = await turn('راستی فردا جلسه‌ی مدرسه دارم', 'باشه.', [csn({})]); A0 = await askOf(); chk(!A0[0].re, 'neg C106: an unrelated next message is no answer :: ' + JSON.stringify(A0));
   });
 
   // ================= block — آنچه مربی در همان نوبت می‌بیند (S1 ها) =================
@@ -163,19 +176,21 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
         parts.forEach(x => { if (/^U:/.test(x)) us.push({ t: x.replace(/^U:\s*/, ''), r: 'باشه.' }); else if (/^\[page:/.test(x) && us.length) us[us.length - 1].r = x.replace(/^\[page:\s*/, '').replace(/\]$/, ''); });
         await wipe(); await fresh(); let u = null; for (const x of us) u = await turn(x.t, x.r, [csn({})]);
         const A0 = await askOf(), B = blockOf(u.user, '# جوابِ او به «؟» ِ صفحه'); let ok;
-        if (/^her answer is read/.test(e.expect) || /is read as the units reading/.test(e.expect)) ok = A0.length === 1 && A0[0].re && A0[0].re.to === 'ok' && A0[0].re.rd === (/units/.test(e.expect) ? 'u' : 'k') && /✓ به گفتهٔ خودش/.test(B);
-        else ok = A0.length === 1 && !A0[0].re && !B;   // نه جواب
+        /* C102: «۲ میلیون و ۳۰۰ × ۳ = ۶ میلیون و ۹۰۰» و «۱۲ میلیون و ۴۰۰ ÷ ۴ = ۳ میلیون و ۱۰۰» با خوانشِ هزار می‌خوانند ⇒ ✓ بی پرسش؛ پس «؟» ای نیست که جواب بگیرد یا باز بماند.
+           آنچه از این ورودی‌ها هنوز معنا دارد سنجیده می‌شود: سطر ✓ است (نه «؟»، نه ✗)، هیچ پرسشی باز نیست، و هیچ پیامی «جواب» خوانده نمی‌شود */
+        const first = await AC(us[0].t), okLine = sts(first).length === 1 && sts(first)[0] === 'OK';
+        ok = okLine && !A0.length && !B; info.nc[i + 1] = 'C102: the first line fits under the thousands reading ⇒ ✓ with no question, so there is no «؟» to answer or keep open (asserted: ✓, no open ask, no answer block)';
         info.bank[i] = !!ok; chk(ok, 'bank#' + (i + 1) + ' «' + e.text.slice(0, 100) + '» → ' + e.expect.slice(0, 100) + ' :: ' + B + ' :: ' + JSON.stringify(A0)); continue;
       }
       const t = e.text.replace(/^U:\s*/, ''), r = await AC(t), v = verdict(r), S = sts(r);
       let ok;
       if (t0 === 'OK') ok = S.length > 0 && S.every(x => x === 'OK') && !r.u.length;
       else if (t0 === 'FLAG') ok = S.includes('FLAG');
-      else if (t0 === 'ASK-SCALE') ok = S.length === 1 && S[0] === 'ASKm2';
+      else if (t0 === 'ASK-SCALE') { ok = S.length === 1 && S[0] === 'OK' && /با خوانشِ .*هزار/.test(r.lines[0]); if (ok) info.nc[i + 1] = 'C102 replaces C84 «two fit ⇒ ask»: the line fits under the thousands reading ⇒ ✓ with no question (asserted)'; }
       else if (t0 === 'NOT-FLAG') ok = (v === 'OK' || v === 'UNCHECKED');
       else if (t0 === 'NOT-OK') ok = (v === 'FLAG' || v === 'UNCHECKED');
       else if (t0 === 'SILENT') ok = v === 'SILENT';
-      else if (/^the sum line is OK/.test(e.expect)) ok = S.length === 1 && S[0] === 'OK';
+      else if (/^the sum line is OK/.test(e.expect)) ok = S[0] === 'OK' && S.slice(1).every(x => x === 'FLAG') && r.c.slice(1).every(c => c.kind === 'remc');   // C108: the false remainder is its own ✗ line
       else ok = false;
       if (ok && vals[i]) ok = !!vals[i](r);
       if (ok && /S1 family/.test(e.context || '') && t0 === 'OK') ok = noX(r) && !/گرد کرده|باقی‌ماندهٔ/.test(r.lines.join(' '));
@@ -185,7 +200,7 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
   });
 
   const nb = Object.keys(info.bank).length, nbOk = Object.values(info.bank).filter(Boolean).length;
-  console.log('bank R1 (R28): ' + nbOk + '/' + nb + ' pass');
+  console.log('bank R1 (R28): ' + nbOk + '/' + nb + ' pass; nc: ' + Object.keys(info.nc).length + ' ' + JSON.stringify(info.nc));
   if (errors.length) { console.log('ERRORS (' + errors.length + '):\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
   await b.close();
 })();
