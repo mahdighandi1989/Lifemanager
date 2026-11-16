@@ -112,3 +112,18 @@ question was pending — after an announced arrival the objection was dropped an
   question) — the negative arm of the new mechanism itself.
 - **How to apply elsewhere:** any matcher that turns textual overlap into a user-visible claim ("this is what you asked for") should ask
   where each matching token came from before counting it, and should never let an announcement be the last word.
+
+## Update 2026-11-16 (Pólya round 28, fixer «surface»: page-level proof)
+
+- **Replay the runner's own run, not a re-staged unit.** A recorded run (control steps + recorded model replies keyed by the turn text) is
+  replayed on the new build; the check reads the same view or DOM the runner saw. Two things a faithful replay needs that a unit harness
+  lacks: a **persistent host** (sheets and notes survive a page reload; new sheet numbers continue from the highest) and the runner's
+  **out-of-band events** (routine notes, page swaps that add registry entries) turned into fixture steps.
+- **Timing is part of the scenario.** One «still broken» verdict (a throttled 2-minute sweep that never ran because the harness reloaded
+  and asked again within the window) was a harness artifact: replaying with time passing as it does for a real person showed the right
+  behaviour. Record both variants and say which one is the person's reality.
+- **Every page text has two readers.** A result string written for the model (field names, «not found in open deadlines», raw enum values)
+  must be routed to the model only; her view gets page-authored Persian. Encode the two readers in the result shape (`{note, quiet}`),
+  not by filtering sentences afterwards.
+- A look-alike negative for each positive is still mandatory; for «a question about the system» the look-alikes are another doer
+  («دکتر خبرم می‌کنه؟»), her own real-world registry («سندِ خونه کی ثبت میشه؟») and arithmetic verbs addressed to the coach.
