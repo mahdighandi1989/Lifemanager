@@ -136,3 +136,45 @@ New owner-like questions 64–70 (from D) and the runners' lists, to add to the 
 ## Fixer split (seven, one concern each; FIX27 isolation; C101 binding)
 arith (R1) · correction (R2) · dates (R3) · forecast (R4) · story (R5) · prior (R6) · surface (R7). Merge order: arith ⇒ correction ⇒
 prior ⇒ dates ⇒ forecast ⇒ story ⇒ surface; the families' tests re-run after each merge, the full gate once on the whole merge (WORKLOG 137/145: clashes show only after merging).
+
+### Clarifications after the independent bank (C102–C131; answers to the bank writer's 30 ambiguities, same order)
+- **C102 (replaces the «two fit ⇒ ask» part of C84; ambiguity 3).** «N میلیون و M» (M < 1000, no unit after M) is read first as M
+  thousand — that is what the phrase means in Persian, not a chosen number. If her line is right under that reading, it is ✓ with no
+  question, even when the units reading also fits. If it is right only under another reading, it is ✓ and the page shows that reading
+  («یعنی ۸۰۰ تومان»). If it is right under none, ✗ with C103. So everyday sums with no carry are never asked.
+- **C103 (2).** A ✗ names the value under the thousands reading and under the units reading, in her words; mixed readings are not listed.
+- **C104 (1).** «N هزار و M»: M is units (there is no named scale below هزار).
+- **C105 (4).** «تومن / تومان / ریال» right after M fixes the units reading.
+- **C106 (5).** The `m2` reader (still used where C102 leaves a real choice, and for older asks) accepts an ordinal («اولی / دومی»), the
+  restated amount, a bare scale word («هزار»), «تومن», and «همون اولی».
+- **C107 (6).** «a√b ≈ c»: the page may compute it exactly (or as a narrow interval) and judge ✓/✗; if it cannot, «نسنجیده». Never silent.
+- **C108 (7).** A C85 remainder clause is judged as its own statement when her text gives its operands («۱۸ تا داشتیم … ۳ تا می‌مونه»);
+  otherwise it gets no line.
+- **C109 (8).** With no separator, the sum ends at the result number after «میشه / =»; «و N تا می‌مونه» starts the next statement.
+- **C110 (9).** One quantity written twice with the same meaning: both change, with one history line naming both places. Different
+  meanings: the page asks.
+- **C111 (10).** Wording is free, but the line must name the stale base and its current value («این پیشنهاد روی ۵ ِ کهنه ساخته شده — الان
+  ۴ است»).
+- **C112 (11).** Show the exact value. Mention whole items only if her own text counts whole items; never invent a rounding.
+- **C113 (12).** «ثبتش کن» with an explicit object: the named object wins.
+- **C114 (13).** «وسطِ ماه» ⇒ «کدام روز؟» with no suggested day (C92).
+- **C115 (14).** «عید» said any month is dated as C50 (the coming 1 Farvardin) with the same single confirm question.
+- **C116 (15).** If the day-said rule lands in the past, C93's question applies.
+- **C117 (16).** «زنگ زدم» with two open call plans ⇒ «کدام؟» naming both; nothing closes until she answers.
+- **C118 (17, extends C90).** A bare «N درصد» in the same clause as a future outcome, or as the clause right after it, is its confidence.
+- **C119 (18).** Plain «مطمئنم» without a number ⇒ the page asks the number once (as «تقریباً مطمئنم»).
+- **C120 (19).** No invented tolerance for «حدودِ N»: an outcome equal to N settles «شد»; any other value ⇒ the page asks «این حدودِ N
+  حساب می‌شود؟».
+- **C121 (20).** A 🎯 is filed under the problem it is about (C53); the live problem only when none matches.
+- **C122 (21).** A bare «۶۰» answering the page's «چند درصد؟» is accepted.
+- **C123 (22).** «↪» is offered on her own lines and on the statement line; page-authored lines follow the record they belong to.
+- **C124 (23).** Moving a ledger step that has dependants: the page lists them and asks whether they move too; nothing moves silently.
+- **C125 (24).** «X گفت» + a calculation ⇒ «کارِ دیگری» (X is the doer); «X گفت» + a bare value ⇒ a datum with source X.
+- **C126 (25).** «اگه ۶ نفر باشیم چی؟» is a hypothetical inside the same problem (C46), not a new record, unless she calls it separate or
+  adopts it.
+- **C127 (26).** «خبرم کن / یادم بنداز» is a reminder request (a plan), not a question about the system.
+- **C128 (27).** Latin words («sqrt», «mod», «maybe») never appear in page text; a variable she wrote («x») may be quoted.
+- **C129 (28).** Tie candidates are told apart by their own distinct words or by order («اولی / دومی»). If two descriptions are identical,
+  the page says they look like duplicates and asks whether to merge.
+- **C130 (29).** The «شما» wording follows the page's existing register (C55); the fixer keeps it consistent with nearby labels.
+- **C131 (30).** For entries that move the clock, the replay of the group that saw the defect, with its clock shim, is the real replay.
