@@ -137,9 +137,9 @@ const HELPERS = () => {
   /* ===== بانکِ R27 #317 — گزارشِ خبریِ بی جزءِ مسئله صورتِ گفت‌وگو نمی‌شود؛ همانندِ منفی: «ماشینم صبح روشن نشد» می‌شود ===== */
   if (SEC('narr')) {
     const stmt = (t) => E(async (t) => { __wipe(); await __say(t, 'خوب.'); return { stmt: (__cur().coach || {}).stmt || '', bubble: (__cur().msgs || []).filter(m => m.role === 'user').map(m => m.text)[0] }; }, t);
-    await T('narr', async () => { await fresh(0); const a = await stmt('خیابونِ ولیعصر خیلی ترافیک بود'), b = await stmt('ماشینم صبح روشن نشد'), c = await stmt('یه مثلث با ضلع‌های ۳ و ۴ و ۵ داریم'), d = await stmt('قیمتِ بلیت چند برابر شده، چطور سفر رو ارزون‌تر کنم؟');
+    await T('narr', async () => { await fresh(0); const a = await stmt('خیابونِ ولیعصر خیلی ترافیک بود'), b = await stmt('ماشینم صبح روشن نشد'), c = await stmt('یه مثلث با ضلع‌های ۳ و ۴ و ۵ داریم'), d = await stmt('قیمتِ بلیت چند برابر شده، چطور سفر رو ارزون‌تر کنم؟'), e = await stmt('راهش تخصص دیگران است، حالا داوری را بزن');
       X('#317: a narrative remark with no unknown, goal or tie to her is not the talk\'s matter; her bubble byte-exact', !a.stmt && a.bubble === 'خیابونِ ولیعصر خیلی ترافیک بود', a);
-      X('#317 negatives: her own trouble, a data statement and a question stay the matter', !!b.stmt && !!c.stmt && !!d.stmt, { b, c, d }); });
+      X('#317 negatives: her own trouble, a data statement, a question and an imperative stay the matter', !!b.stmt && !!c.stmt && !!d.stmt && !!e.stmt, { b, c, d, e }); });
   }
 
   /* ===== D27-24 — گامِ فرمی که زمانِ ثبت ندارد پرسشِ بی‌عدد نمی‌گیرد؛ همانندِ منفی: همان گام با زمانِ پس از داده پرسیده می‌شود، و رابطهٔ نوشته پیشنهادِ دقیقش را دارد ===== */

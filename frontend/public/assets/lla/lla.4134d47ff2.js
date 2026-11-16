@@ -37936,6 +37936,9 @@ APP.goFromURL = function (q) {
   function narr27(mt) { var t = ownText(String(mt || "")).replace(/[‏‎]/g, "").trim(); if (!t || /[؟?0-9۰-۹=<>≤≥%٪]/.test(t)) return false;
     if (t.split(/[.!؛\n]+/).filter(function (x) { return x.trim(); }).length !== 1 || tk22(t).length > 12) return false;
     if (NARR_GOAL27.test(t) || NARR_ME27.test(t) || CHAT_PROB.test(t)) return false;
+    /* فقط جملهٔ خبریِ سوم‌شخص (به فعلِ گزارشی ختم می‌شود: «… ترافیک بود») — فرمان («… داوری را بزن») یا جملهٔ ناتمام خبر نیست */
+    var lw = (t.replace(/[\s.!،,؛:…]+$/, "").split(/[\s‌]+/).pop() || "").replace(/\u200c/g, "");
+    if (!/^(?:ن?(?:بود|بودن|بودند|بوده|است|هست|هستن|هستند|شد|شدن|شدند|شده|داشت|داشتن|داره|دارن|اومد|اومدن|آمد|رفت|رفتن|کرد|کردن|کرده)|نیست|نیستن|میاد|میان|میشد|میشه|می‌شد|می‌شه|می‌آید)$/.test(lw)) return false;
     try { if (statesProblem(t)) return false; } catch (e) { }
     return true; }
   AS.narr27 = narr27;
