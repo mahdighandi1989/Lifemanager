@@ -463,8 +463,7 @@
     /* دورِ ۲۸ (C98): گامی که نقلش در جملهٔ «پرسشِ خالی» ِ حساب است («راستی ۷ × ۸ = ۵۶ بود دیگه؟») گامِ هیچ دفتری نیست — نه دفترِ تازه، نه گامِ افزوده */
     var own28 = OWNSTEP27.test(ut) || MINE26.test(ut) || STUCK27.test(ut);
     if (rep && !own28) { var BQ = sentences(ut).filter(bareQ28); if (BQ.length) { rep.steps = rep.steps.filter(function (x) { var q = String(x.quote || ""); return !q || !BQ.some(function (b) { return quoteIn(q, b); }); }); if (!rep.steps.length) rep = null; else if (!old) rep.steps.forEach(function (x, i) { x.n = i + 1; }); } }
-    if (bareMsg28(ut, own28)) open0 = false;
-    /* دورِ ۲۷: دفترِ تازه فقط با آغازِ مسئله یا درخواستِ خودش (A26-7)؛ «حساب کرده بودم» فقط به دفترِ موجود گام می‌افزاید (open) */
+    if (bareMsg28(ut, own28)) open0 = false;    /* دورِ ۲۷: دفترِ تازه فقط با آغازِ مسئله یا درخواستِ خودش (A26-7)؛ «حساب کرده بودم» فقط به دفترِ موجود گام می‌افزاید (open) */
     if (!old) { if (!rep || !open0) return; var real = rep.steps.filter(function (x) { return !x.test; }); if (!real.length) return;   // حالت‌های آزموده دفتر نیستند (A25-4)
       old = rep; isNew = true; rep.steps.forEach(function (x) { delete x.mn; }); if (G.L) G.L.prior = old; else storyOf(s, key, true).prior = old; }
     else {
