@@ -11,5 +11,11 @@
  "what": "Fast-forward merge onto main of supervisor-pending/backtest-2026-11-14 (backtest round 38, commits c276a5e9+75114957, authored by the backtest routine, Routine: backtest). Content unchanged by urgent; only transported through ship.sh gate. Backtest routine: verify round 38 landed as intended.",
  "procedure": "URGENT_PROMPT.md §1.2",
  "commit": "75114957",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-11-15T23:24:12Z",
+  "note": "دورِ ۳۸ کامل روی main است (c276a5e9+75114957): ledger ردیفِ ۳۸، reviews/round-0038.json، territory و foundation؛ status/audit تمیز در دورِ ۳۹ بازسنجیده شد.",
+  "commit": ""
+ }
 }
