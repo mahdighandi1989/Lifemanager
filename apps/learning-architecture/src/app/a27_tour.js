@@ -2199,6 +2199,17 @@
   function bareAns27(s, mt) { var t = String(mt || "").trim(); if (!t || /[؟?0-9۰-۹]/.test(t) || tk22(t).length > 2) return false;
     var M = (s && s.msgs) || [], seen = false; for (var i = M.length - 1; i >= 0; i--) { var m = M[i]; if (!m) continue; if (m.role === "user") { if (!seen && String(m.text || "").trim() === t) { seen = true; continue; } return false; } if (m.role === "ai") return /[؟?]\s*$/.test(String(m.text || "").trim()); }
     return false; }
+  /* دورِ ۲۷ب (leftovers؛ بانکِ R27 #317 «خیابونِ ولیعصر خیلی ترافیک بود»): گزارشِ کوتاهِ یک جملهٔ خبری که هیچ جزءِ مسئله ندارد — نه مجهول/پرسش (؟، چطور، چرا، چند، کدام، آیا)،
+     نه خواسته یا گیرِ خودش (می‌خوام، باید، نمی‌دونم، مشکل، کمک)، نه نسبتی با خودش (من/ما، فعل یا ضمیرِ اول‌شخص: «ماشینم»، «رفتم»)، نه عدد یا رابطه — صورتِ مسئلهٔ گفت‌وگو
+     نمی‌شود (پولیا: مسئله بی مجهول نیست). متن خودش داوری می‌کند؛ هر جمله‌ای که یکی از این‌ها را دارد همان قاعدهٔ پیشین را می‌گیرد («ماشینم صبح روشن نشد» مسئله می‌ماند). */
+  var NARR_GOAL27 = /(?:^|[\s‌،,])(?:چطور|چطوری|چگونه|چرا|چند|چندتا|کدوم|کدام|آیا|چی|چه|کی|کجا|باید|نباید|بتونم|بتوانم|کمک|مشکل|راهی|راه[‌\s]?حل|تصمیم)(?![آ-ی])|می[‌\s]?(?:خوا|خواه)|نمی[‌\s]?(?:دون|دان|تون|توان)|ثابت|مسئله|معما/;
+  var NARR_ME27 = /(?:^|[\s‌،,])(?:من|ما|خودم|خودمون|خودمان|مون|مان|منو|مرا|ما\s*را)(?![آ-ی])|[آ-ی]{2,}(?:م|یم|مون|مان)(?![آ-ی])/;
+  function narr27(mt) { var t = ownText(String(mt || "")).replace(/[‏‎]/g, "").trim(); if (!t || /[؟?0-9۰-۹=<>≤≥%٪]/.test(t)) return false;
+    if (t.split(/[.!؛\n]+/).filter(function (x) { return x.trim(); }).length !== 1 || tk22(t).length > 12) return false;
+    if (NARR_GOAL27.test(t) || NARR_ME27.test(t) || CHAT_PROB.test(t)) return false;
+    try { if (statesProblem(t)) return false; } catch (e) { }
+    return true; }
+  AS.narr27 = narr27;
   function coachPhase0(s, mt, b) {
     var C = s.coach = s.coach || {};
     /* مسئلهٔ زندهٔ باز ⇒ مرحله فقط از صفحه (A.liveCoach): «حل شد» ِ گفت‌وگو مرحله را عوض نمی‌کند (R5 — بستن فقط با «✅ حل شد» و بازنگریِ صفحه) */
@@ -2242,7 +2253,7 @@
     /* دورِ ۲۶ (story Q3، C21 — oB1 p29/p31، B26x oB1 p25/p28): او با نام به مسئلهٔ بسته‌ای برگشته (a45 ST.namedClosed) ⇒ حرفِ این نوبت دربارهٔ همان مسئله است (اصلاح، نتیجهٔ
        دیرآمده، سرانجامِ پیش‌بینی)، نه صورتِ یک مسئلهٔ تازهٔ گفت‌وگو — مسئلهٔ تازه فقط با معرفیِ خودش («یه مسئلهٔ دیگه دارم: …») */
     try { if (closedHere23 && A.STORY && A.STORY.namedClosed && A.STORY.namedClosed(s)) afterClose23 = true; } catch (e) { }
-    var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23;
+    var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23 && !narr27(mt);
     /* تورِ پولیا (RM6c، B·D1 s11): «پس X = n» ِ الگو (RESULT_WEAK) به‌تنهایی مرحله را به بازنگری نمی‌برد — فرمول/عدد درونِ ادعا یا هنگامِ گفتنِ
        صورت نتیجه نیست؛ مرحله فقط با گزارشِ مدل (said:result) یا نتیجهٔ ثبت‌شده؛ الگو فقط پیشنهاد می‌کند (C.prev.weakRes ⇒ سطرِ زمینه) */
     var said = solvedSaid(mt, { intro: true }) && !OTHER18_RE.test(mt) && !guessNow(mt, teach) && !(teach && SELF_SOLVED_RE.test(mt)), uns = unsolvedNow(mt, ph0), stuck = STUCK_RE.test(mt) || NOTKNOW_RE.test(mt);
@@ -2254,7 +2265,7 @@
     if (sp.u) st.u = 1; if (sp.d) st.d = 1; if (sp.c) st.c = 1;
     /* پرسشِ فهمی که پرسیده شد و جوابِ واقعی گرفت (دفتر یا پشتیبان) هم «گفته‌شده» است */
     var asked = askedInChat(s); phaseQs("u", C.cls || "any").forEach(function (q) { if (qParts(q).length && answeredQ(s, q, asked)) qParts(q).forEach(function (x) { st[x] = 1; }); });
-    if (!C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23 && !bareAns27(s, mt)) { C.stmt = clip(stripIntro23(mt), 400); C.stmtRaw24 = statesProblem(mt) ? clip(mt, 400) : ""; }   // دورِ ۲۳ (Q1): بی سلام/معرفی   // دورِ ۲۲ (P5، A22-5/C22-4)
+    if (!C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23 && !bareAns27(s, mt) && !narr27(mt)) { C.stmt = clip(stripIntro23(mt), 400); C.stmtRaw24 = statesProblem(mt) ? clip(mt, 400) : ""; }   // دورِ ۲۳ (Q1): بی سلام/معرفی   // دورِ ۲۲ (P5، A22-5/C22-4)
     /* دورِ ۲۳ (Q5، A23-3/A22-12): «ثابتش کردم، ولی می‌خوام بفهمم چرا / دوباره نگاه کنم» ⇒ بازنگری («در یک نگاه می‌بینی‌اش؟»)، نه طرح‌ریزی؛
        «امتحان کردم … درمیاد ولی نمی‌دونم چطور ثابتش کنم» ⇒ هنوز حل نشده (آزمودنِ نمونه‌ها برهان نیست) */
     if (PROVE_ASK23.test(ownText(mt))) said = false;
@@ -2276,7 +2287,7 @@
     if (!ph || (ph === "u" && st.u && st.d && st.c)) ph = st.u && st.d && st.c ? "p" : "u";
     /* خواندنِ پشتیبانِ همین پیام؛ گزارشِ مدل (اگر آمد) جایش را می‌گیرد — از همین وضعِ پیش از پیام؛ ولی نتیجهٔ بی‌ابهامِ خودش (strong) را به عقب برنمی‌گرداند */
     C.pk = "c:" + (C.gen || 0);
-    C.prev = { key: mkey(mt), ph0: ph0 || "u", st0: st0, pasted: pasted, intro: intro, work: pasted && workIn(mt), strong: said && !uns ? "b" : "", pk: C.pk, weakRes: weakRes || undefined };
+    C.prev = { key: mkey(mt), ph0: ph0 || "u", st0: st0, pasted: pasted, intro: intro, work: pasted && workIn(mt), strong: said && !uns && solvedSaid(ownText(mt), { intro: true }) ? "b" : "", pk: C.pk, weakRes: weakRes || undefined };
     /* دورِ ۲۶ (story Q6، C26-16 — s25 p13/p14، s23 p5/p7/p8، s29 p3–p5: «# وضعِ کنونی … (بسته شد)» کنارِ «مرحلهٔ محتمل: فهمِ مسئله» و «u1) مجهول … چیست؟»): مسئلهٔ این گفت‌وگو
        بسته است و این پیام مسئلهٔ تازه‌ای نیاورد (صورتی پذیرفته نشد) ⇒ مسئلهٔ بازی در کار نیست و کارتِ مرحله/فهرستِ پرسش پیشنهاد نمی‌شود — همان C.prev.noPh ِ RM6f که
        پیش‌تر فقط برای پیامِ کوتاهِ بی‌پرسش بود (پرسشِ بازتابی، درخواستِ تمرین یا «کجا نگهش دارم؟» از آن جا می‌ماند). مسئلهٔ بسته چیزی پیشنهاد نمی‌کند. */
@@ -2657,6 +2668,10 @@
     else if (cl && ORD[cl] < ORD[ph0]) ph = stuck || said.length ? cl : ph0;          // عقب: فقط با گیر یا حرفِ تازه
     else if (fwd) ph = "p";
     /* دورِ ۵ (F1، s31): نشانهٔ قوی‌ترِ پیشین (نتیجهٔ بی‌ابهامِ خودش) با گزارشِ مدل به عقب برنمی‌گردد، مگر مدل شکست گزارش کند */
+    /* دورِ ۲۷ب (leftovers؛ B27·D18 tB1z p16 «یه چیز دیگه: «حل شد» روی نقشه‌ی مسیر … یه معنا داره؟»): «گذر از مرحله» فقط وقتی کارنامه را می‌گیرد که حرکتِ مرحله از
+       گزارشِ سنجیدهٔ همین نوبت باشد (said/ans/طرح/شکست — رکوردِ خودِ صفحه از حرفِ او)، نه از بالا کشیدنِ الگوی «نتیجهٔ قوی» (P.strong) که مدل در همان نوبت تأییدش نکرد;
+       و «حل شد» ِ درونِ گیومهٔ پرسشش دیگر «نتیجهٔ قوی» نیست (coachPhase0: ownText) */
+    var phRep27 = ph;
     if (P && P.strong && !fail && !sub25 && !nw26 && ORD[ph] < ORD[P.strong]) ph = P.strong;
     if (!(P && P.live)) { C.ph = ph; C.st = st; }
     /* دورِ ۵ (F2): نشانه‌های همین پیام برای نوبتِ بعد (A.liveCoach(pid,{turn})): گیر/شکست یک نوبت؛ «نتیجه گفت» برای مسئلهٔ زنده تا صفحه ثبتش کند یا شکستی بیاید */
@@ -2685,7 +2700,7 @@
         var hasRes = said.indexOf("result") >= 0 && (P && P.live ? true : (ph === "b" || nw26)), hasPlan = said.indexOf("plan") >= 0;
         if (hasRes) okSt.c = "res";
         if (hasPlan) okSt.p = "plan";
-        if (!hasRes && !hasPlan && !(P && P.live) && ORD[ph] > ORD[ph0]) okSt[ph0] = "pass";
+        if (!hasRes && !hasPlan && !(P && P.live) && ORD[phRep27] > ORD[ph0]) okSt[ph0] = "pass";
         if ((said.indexOf("u") >= 0 || said.indexOf("c") >= 0) && !pasted && tokN(ownText(ut)).length >= 2 && !okSt.u) okSt.u = "own";
         Object.keys(okSt).forEach(function (k) { coachEv(s, k, "chatok", ut, true, Object.assign({ pk: pk, how: okSt[k], res: okSt[k] === "res" || undefined }, act19 && k === "c" ? { act: act19 } : {})); });
       }
@@ -4291,9 +4306,14 @@
     var pS = (s.plans || []).filter(function (q) { return fromMsg(q, R); }).map(function (q) { return { k: "plan:" + q.id, span: q.text }; });
     (s.plans || []).forEach(function (q) { if (!fromMsg(q, R) || !aff("plan:" + q.id, q.text, pS)) return; var v = sub(q.text, R.what === "plan"); if (v == null || v === q.text) return;
       var ow = q.when, nw = ow; if (ow && ow !== "next-session" && WD19b.test(String(v))) { var d = planDate18(v); if (d && d >= A.today() && d !== planDate18(q.text)) nw = d; }
-      corrPush(q, q.text, v, Object.assign({ oldWhen: ow }, ctx)); var oT = q.text; q.text = clip(v, 300); q.rebook20 = R.curId;
-      if (nw !== ow) { q.when = nw; delete q.askKey; delete q.gAskKey;
-        try { S.all("deadline", function (x) { return x && !x.done && x.date === ow && (x.sess === s.id || quoteIn(clip(oT, 40), String(x.what || ""))); }).forEach(function (dl) { corrPush(dl, dl.date, nw, ctx); dl.date = nw; S.put(dl); }); } catch (e) { } }
+      /* دورِ ۲۷ب (C58 «یک راه»): روزِ برنامهٔ ثبت‌شده را همان یک تابعِ a41 (PR.rebook27) عوض می‌کند — ✏️: ثبتِ پیشین «جایگزین شد» و روزِ تازه یک بار پرسیده می‌شود؛
+         اصلاحِ گفت‌وگو: همان برنامه به روزِ تازه می‌رود. یک سطرِ تاریخچه: corr ِ همین‌جا (با oldWhen، که 📜 می‌خواند) — نه سطرِ دوم. جابه‌جاییِ پیشینِ موعدهای پیوسته
+         (corr ِ جدا برای هر موعد) قرنطینه است: AS.R27B_QUARANTINE.planMove27 */
+      var ed27 = !!R.edit || /^\s*\[اصلاحِ/.test(cu), rb27 = null;
+      if (nw !== ow && A.PR && typeof A.PR.rebook27 === "function") { try { rb27 = A.PR.rebook27(s, q, { kind: "plan", date: nw, src: v, at: String((R.cur && R.cur.at) || ""), why: ed27 ? "✏️ ِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد" : why23, by: ed27 ? "edit" : "corr", move: !ed27, hist: false, queue: ed27 }); } catch (e) { rb27 = null; } }
+      if (nw !== ow && !(rb27 && rb27.moved)) nw = ow;   // C58: بی rebook27 روز دست نمی‌خورد
+      corrPush(q, q.text, v, nw !== ow ? Object.assign({ oldWhen: ow }, ctx) : ctx); var oT = q.text; q.text = clip(v, 300); q.rebook20 = R.curId;
+      if (rb27 && !rb27.moved) { put("برنامه", oT, v, "روزِ تازه پرسیده شد", chLine20("برنامه", oT, v, " (روزِ تازه پرسیده شد؛ ثبتِ " + plainD(ow) + " کنار رفت)", "")); return; }
       put("برنامه", oT, v, nw !== ow ? "موعد " + plainD(ow) + " ⇐ " + plainD(nw) : "", chLine20("برنامه", oT, v, nw !== ow ? " (موعد " + plainD(nw) + ")" : "", nw !== ow ? "، " + plainD(ow) : "")); });
     /* موعدها/یادآورهایی که از آن پیام ثبت شدند (AS.DO.deadline با src20) — روز یا ساعتِ تازه */
     var nxt = null; (function () { var M = s.msgs || [], i = M.indexOf(R.src); for (var j = i + 1; j < M.length; j++) if (isUser(M[j])) { nxt = M[j]; break; } })();
@@ -4304,6 +4324,13 @@
       if (hm && (/ساعت|صبح|ظهر|عصر|شب|:/.test(R.fix) || dl.time)) { var hh = +hm[1], mm = hm[2] ? +hm[2] : 0; if (hm[3] && /عصر|بعد|شب/.test(hm[3]) && hh < 12) hh += 12; if (hh <= 23 && mm <= 59) tm = (hh < 10 ? "0" : "") + hh + ":" + (mm < 10 ? "0" : "") + mm; }
       var wdx = WD19b.exec(R.fix); if (wdx) { var d2 = planDate18(wdx[0]); if (d2 && d2 >= A.today()) dd = d2; }
       if ((!tm || tm === dl.time) && dd === dl.date) return;
+      /* دورِ ۲۷ب (C58 «یک راه»): روزِ موعدِ ثبت‌شده عوض شد ⇒ همان یک تابع (PR.rebook27) — ✏️: بسته «جایگزین شد» و روزِ تازه یک بار پرسیده می‌شود؛ اصلاحِ گفت‌وگو: همان موعد
+         به روزِ تازه می‌رود با یک سطرِ تاریخچه (fixHist؛ پیش‌تر corr ِ این‌جا + fixHist ِ a38 = دو سطر) */
+      if (dd !== dl.date && A.PR && typeof A.PR.rebook27 === "function") { var edD = !!R.edit || /^\s*\[اصلاحِ/.test(cu), dO = plainD(dl.date) + (dl.time ? "، ساعت " + fa(String(dl.time).replace(/^0/, "").replace(/:00$/, "")) : ""), rbD = null;
+        try { rbD = A.PR.rebook27(s, dl, { kind: "deadline", date: dd, time: tm || "", what: edD ? undefined : (sub(dl.what, false) || undefined), src: sub(dl.quote || dl.what, false) || dl.quote || dl.what, at: String((R.cur && R.cur.at) || ""), why: edD ? "✏️ ِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد" : why23, by: edD ? "edit" : "corr", move: !edD, queue: edD }); } catch (e) { rbD = null; }
+        if (rbD && !rbD.moved) { chS.push({ rec: "یادآوری «" + clip(dl.what, 50) + "»", old: dO, "new": "روزِ تازه پرسیده شد", why: why23 }); ch.push("یادآوری «" + clip(dl.what, 50) + "»: ثبتِ " + dO + " کنار رفت؛ روزِ تازه (" + plainD(dd) + ") پرسیده شد"); return; }
+        if (rbD && rbD.moved) { var dN = plainD(dl.date) + (dl.time ? "، ساعت " + fa(String(dl.time).replace(/^0/, "").replace(/:00$/, "")) : ""); chS.push({ rec: "یادآوری «" + clip(dl.what, 50) + "»", old: dO, "new": dN, why: why23 }); ch.push("یادآوری «" + clip(dl.what, 50) + "»: " + dN + " (اصلاح شد ⇐ «" + dO + "»)"); return; }
+        dd = dl.date; if (!tm || tm === dl.time) return; }
       var dlOld = plainD(dl.date) + (dl.time ? "، ساعت " + fa(String(dl.time).replace(/^0/, "").replace(/:00$/, "")) : "");
       corrPush(dl, (dl.date || "") + (dl.time ? " " + dl.time : ""), dd + (tm ? " " + tm : (dl.time ? " " + dl.time : "")), ctx);
       if (AS.DO.deadline) { var o2 = AS.DO.deadline({ what: dl.what, date: dd, time: tm || dl.time || "" }); if (o2) { dl.date = dd; if (tm) dl.time = tm; S.put(dl); } } else { dl.date = dd; if (tm) dl.time = tm; S.put(dl); }
@@ -4574,6 +4601,9 @@
       (ls22.changed || []).forEach(function (c) { var o0 = typeof c.old === "string" ? c.old : "", n0 = typeof c["new"] === "string" ? c["new"] : ""; chS.push({ rec: String(c.label || c.rec || "رکورد"), old: clip(plainTx(o0), 160), "new": clip(plainTx(n0), 160), why: String(c.why || "") }); ch.push(o0 || n0 ? chLine20(String(c.label || c.rec || "رکورد"), o0, n0) : String(c.label || "")); }); } catch (e) { console.warn(e); } }
     return { ch: ch, pend: pend, nEv: nE };
   }
+  /* دورِ ۲۷ب (C58): جابه‌جاییِ مستقیمِ روزِ برنامهٔ ثبت‌شده و موعدهایش در retractApply (بی «آره» ِ او) — قرنطینه، صدا زده نمی‌شود */
+  AS.R27B_QUARANTINE = { planMove27: function (s, q, ow, nw, oT, ctx) { q.when = nw; delete q.askKey; delete q.gAskKey;
+    try { S.all("deadline", function (x) { return x && !x.done && x.date === ow && (x.sess === s.id || quoteIn(clip(oT, 40), String(x.what || ""))); }).forEach(function (dl) { corrPush(dl, dl.date, nw, ctx); dl.date = nw; S.put(dl); }); } catch (e) { } } };
   AS.R19B_QUARANTINE = { retractCheck: retractCheckR19b, retractApply: retractApplyR19b, subst: subst19b };
   /* قرنطینه (دورِ ۲۱، REMOVAL_CANDIDATES): قاعدهٔ «کلِ درس» ِ دورِ ۲۰ — تکه‌ای که نیمی از واژه‌های درس را داشت کلِ درس را با fix جایگزین می‌کرد (D·s38) */
   AS.R21_QUARANTINE = Object.assign(AS.R21_QUARANTINE || {}, { twoQ20: function (t) { return twoQ20R20(t); }, lessonWhole: function (frag, use, what, lesL) { return hasTok20(frag, use) || (hasTok20(use, frag) && tok20(frag).length * 2 >= tok20(use).length) || (what === "lesson" && !lesL); } });

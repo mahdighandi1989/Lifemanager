@@ -470,3 +470,12 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R27 C47 «Proposals are never made by text replacement» (B27·D8 «۲۴ × ۰٫۷۵ = ۱۶.۸»).
 - **Status:** called by `fixVal` and by the `D.parts` recursion.
   Delete only with the owner's approval.
+## 2026-11-16 — Tour 1 round 27B, fixer «leftovers»: C58 «one path» quarantines
+- **What:** (1) in `apps/learning-architecture/src/app/a41_practice.js` the round-27 (dates) body of `editBooked27` is kept unchanged as
+  `PR.R27_QUARANTINE.editBooked27a` (it closed a booked record itself and, after the corrector had already moved the date, wrote a second history line);
+  (2) in `apps/learning-architecture/src/app/a27_tour.js` the direct move of a booked plan's day inside `retractApply` (plan `when` + every same-day
+  deadline moved with its own `corr` line, without her yes) is kept as `AS.R27B_QUARANTINE.planMove27`; (3) in `a38_live.js` `retractSess` keeps its
+  old weekday/Jalali date move only for the case `A.PR.rebook27` is missing.
+- **Why replaced:** DECISIONS_R27 C58 + FIX27B «C58 one path»: a correction of a booked record goes through ONE function (`PR.rebook27`): one history
+  entry; a ✏️ asks once for the new day; a chat correction moves the record once.
+- **Status:** (1) and (2) reachable, not called. Delete only with the owner's approval.
