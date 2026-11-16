@@ -38,4 +38,10 @@ checked in `tests/tour1_r27_correction_bank.js` (no longer NC), bank #317 in `te
    only step that shares its quantity word; resting on a stale step makes it stale with no number.
 
 ## Not done (reported)
-See the fixer report `docs/tours/polya-batch1/reports/fix27b/leftovers.md`.
+- C68 is built for the prior ledger only; accepting a chat-only stale proposal (no ledger) or a copy-ask «بله» does not create new dependants' proposals
+  (the original correction's proposals stay).
+- The `m2` «کدام خوانش؟» line has no answer reader in `ST.arithAnswer` yet — the coach asks.
+- Tier (د) stays except for a number the text shows as the rounding/restatement of a written result (nine R24–R26 bank entries depend on it).
+- A ✏️ that moves a booked day into the past asks nothing and keeps the booking.
+- `rebook27` move mode (her chat correction) books the new day without a new «درست است؟» — the same behaviour the R22/R25 banks assert; it does not
+  go through `PR.dateAnswer`.

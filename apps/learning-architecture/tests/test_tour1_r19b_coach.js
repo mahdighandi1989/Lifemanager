@@ -137,7 +137,9 @@ function strictScan(user) {
     await turn('اون برنامه رو اصلاح کن، منظورم پنج‌شنبه بود', 'باشه، پنج‌شنبه.', [cs({ retract: { msg: 'سه‌شنبه با صاحبخونه حرف بزنم', what: 'plan', fix: 'پنج‌شنبه' } })]);
     s = await st(); x = await p.evaluate(() => APP.S.get('dl_r19b'));
     chk(s.plans.length === 1 && /^پنج‌شنبه با صاحبخونه/.test(s.plans[0].text) && s.plans[0].when === '2026-10-22' && hasNote(s.plans[0].corr) && s.plans[0].corr[0].oldWhen === '2026-10-20', 'inf15 plan 3 back: text + date move (Tue → Thu), Tue kept as history ' + JSON.stringify(s.plans));
-    chk(x && x.date === '2026-10-22' && hasNote(x.corr), 'inf15: the follow-up reminder tied to the plan moves too, with history ' + JSON.stringify(x));
+    /* دورِ ۲۷ب (DECISIONS_R27 C58 + FIX27B «C58 one path»): جابه‌جاییِ موعد از یک راه (PR.rebook27) با **یک** سطرِ تاریخچه (fixHist، همان که 📜 می‌خواند) —
+       پیشین: hasNote(x.corr) (corr ِ a27 + fixHist ِ a38 = دو سطر برای یک اصلاح) */
+    chk(x && x.date === '2026-10-22' && (x.fixHist || []).length === 1 && !(x.corr || []).length, 'inf15: the follow-up reminder tied to the plan moves too, with history ' + JSON.stringify(x));
     // ۴) فرمی که کنشِ دستیار در صفحه پر کرد (دفترِ واقعیِ fill) ⇒ همان فیلد در همان صفحه برمی‌گردد و درست می‌نشیند
     await wipe(); await fresh(); await p.evaluate(() => APP.go('home')); await p.waitForTimeout(100);
     const k = await p.evaluate(() => { const i = document.createElement('input'); i.id = 'r19b_unk'; i.setAttribute('aria-label', 'مجهولِ آزمون'); document.getElementById('main').appendChild(i); APP.ASSIST.scan(); return i.getAttribute('data-ai-k'); });
