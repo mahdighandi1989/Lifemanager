@@ -319,6 +319,20 @@
       return "حسابِ صفحه: " + (N.bad ? "✗ " : N.ask ? "؟ " : N.unread && !ck.some(function (c) { return c.ok && !c.ask; }) ? "— " : "✓ ") + N.chk; } catch (e) { return ""; }
   }
   ST.markOf27 = markOf27;
+  /* ---------- دورِ ۲۸ (story R5، C86؛ S1 A28-5 s01 📜: «۱۸ میلیون × ۱۲ = ۲۱۶ میلیون» ِ اصلاح‌شده و درست با «✗ … نمی‌خواند») ----------
+     ریشه: نشانِ صفحه هنگامِ ثبت یک بار ساخته و در lines ِ رویداد ذخیره می‌شد؛ اصلاحِ بعدی (a38 storyFollow26 / پذیرشِ «این‌جا هم عوض شود؟») همان سطرِ نشان را با
+     جایگزینیِ رشته‌ای «تازه» می‌کرد — عدد عوض می‌شد و حکم (✗) می‌ماند. حالا یک قاعده برای هر بازنویسیِ سطر: نشان همیشه از **متنِ کنونیِ** سطر دوباره سنجیده می‌شود
+     (همان markOf27 / a46)، و نشانِ پیشین — بی تغییر، همان‌طور که پیش از اصلاح بود — به تاریخچهٔ همان سطر می‌رود («نشانِ پیشینِ صفحه: …»).
+     ST.relines28(e, nv, old, tail): سطرهای تازهٔ رویداد e (k ِ رویدادِ 📜، lines) پس از اصلاحِ سطرِ نخست از old به nv. fix(l) برای سطرهای دیگر (نقلِ همان پیام). */
+  var EVK28 = { cdata: "d", cres: "res", cstep: "step", cother: "other", cwhole: "whole", ctried: "tried" };
+  var MARKL28 = /^حسابِ صفحه:/;
+  ST.relines28 = function (e, nv, old, tail, fix) {
+    var L = (e && e.lines) || [], rest = L.slice(1), oldMk = rest.filter(function (l) { return MARKL28.test(String(l || "")); });
+    var keep = rest.filter(function (l) { return !MARKL28.test(String(l || "")); }).map(function (l) { return /^اصلاح شد ⇐|^نشانِ پیشینِ صفحه/.test(String(l)) || !fix ? l : (fix(l) || l); });
+    var k = EVK28[String(e && e.k || "")] || "", mk = k ? markOf27({ k: k, t: nv }, { text: nv }) : "";
+    var hist = [tail].concat(oldMk.map(function (m) { return "نشانِ پیشینِ صفحه (پیش از این اصلاح): " + String(m).replace(MARKL28, "").trim(); }));
+    return [nv].concat(mk ? [mk] : []).concat(keep).concat(hist.filter(Boolean));
+  };
   /* دورِ ۲۷b (history، D27-10 arD1 «چهار نقطهٔ یکسانِ کارِ پیشینِ تو (از گفت‌وگو) برای یک گام»): رویدادِ به‌روزرسانیِ دفترِ «کارِ پیشین» نامِ خودش را دارد —
      کدام گام و چه شد («کارِ پیشین — به‌روز شد: گامِ ۲ حکم رد شد») — تا در 🧭 و 📜 هر رخداد از دیگری جدا خوانده شود */
   function title27(it) { var t = String(it && it.t || ""); if (it && it.k === "prior" && /^کارِ پیشینِ تو — به‌روز شد:/.test(t)) return clip(t.replace(/^کارِ پیشینِ تو/, "کارِ پیشین").replace(/\s*·\s*(?:ازسرگیری از گامِ \S+|بقیه درست|همه درست)\s*$/, ""), 110); return EV_T[it.k]; }
