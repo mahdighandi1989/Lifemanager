@@ -479,3 +479,12 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R27 C58 + FIX27B «C58 one path»: a correction of a booked record goes through ONE function (`PR.rebook27`): one history
   entry; a ✏️ asks once for the new day; a chat correction moves the record once.
 - **Status:** (1) and (2) reachable, not called. Delete only with the owner's approval.
+
+## 2026-11-16 — Tour 1 round 28, fixer «dates»: `didIt27` kept as `PR.R28_QUARANTINE.didIt27`
+- **What:** in `apps/learning-architecture/src/app/a41_practice.js` the round-27 «done report» reader `didIt27` (any first-person past verb — even the copula
+  «بود» — plus one shared word closed a pending date ask) is no longer called; `lapse27` calls `didIt28` (built on `did28`). The old body stays in the file
+  and is exported as `PR.R28_QUARANTINE.didIt27`.
+- **Why replaced:** DECISIONS_R28 C94 (+ C117): the past tense of the ACT'S OWN verb closes that act; «میانگین ۱۲ بود» closed «پنجشنبه یه آزمونِ کوتاه
+  می‌گیرم» (B28·D14 dB1 p2), and «زنگ زدم» did not close a booked plan (A27-19).
+- **Status:** reachable, not called. Delete only with the owner's approval.
+
