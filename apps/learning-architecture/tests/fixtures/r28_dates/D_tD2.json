@@ -1,0 +1,181 @@
+{
+"from": "round28D/tD2",
+"t0": "2026-11-16T09:00:00",
+"base": 0,
+"inject": "(()=>{const R=window.__R0||Date;window.__R0=R;let off=+localStorage.getItem('__d26off');if(!off){off=R.parse('2026-11-16T07:00:00Z')-R.now();localStorage.setItem('__d26off',String(off))}function D(...a){if(!(this instanceof D))return new R(R.now()+off).toString();return a.length?new R(...a):new R(R.now()+off)}D.prototype=R.prototype;D.now=()=>R.now()+off;D.UTC=R.UTC;D.parse=R.parse;window.Date=D;try{APP.render()}catch(e){}})()",
+"steps": [
+{
+"say": "سلام. ماهِ دیگه باید اسباب‌کشی کنم و می‌خوام برنامه‌ش رو درست بچینم که هیچی جا نمونه: کارتن، کارگر، قطع و وصلِ گاز و تسویه با صاحبخونه.",
+"eval0": "window.__setf=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NO '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};window.__btn=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>b.offsetParent&&re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,40)};1\n;window.__seli=(id,i)=>{const e=document.getElementById(id);if(!e)return 'NO '+id;e.selectedIndex=i;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return e.value};window.__opts=id=>[...document.getElementById(id).options].map((o,i)=>i+'='+o.text.slice(0,40)).join(' | ');1\n;window.__w=ms=>new Promise(r=>setTimeout(r,ms));window.__bad=()=>[...document.querySelectorAll('#main p.bad,#main .bad,.toast.bad')].filter(x=>x.offsetParent).map(x=>x.textContent).join(' ;; ');\nwindow.__step=async(o)=>{const r=[];r.push(__setf('lpStep',o.step));const cl=document.getElementById('lpClear');if(cl)r.push(__seli('lpClear',o.clear||1));r.push(__setf('lpPrem',o.prem||''));r.push(__setf('lpPred',o.pred));const cf=document.getElementById('lpConf');if(cf){const i=[...cf.options].findIndex(x=>x.value==String(o.conf||60));r.push(__seli('lpConf',i<0?2:i))}r.push(__setf('lpWhen',o.when||'فردا'));(o.d||[]).forEach(i=>{const e=document.getElementById('lpSD_'+i);e&&!e.checked&&e.click()});await __w(200);r.push(__btn(/^ثبتِ گام/));await __w(500);r.push('BAD:'+__bad());return r.join(',')};\nwindow.__out=async(o)=>{const r=[];if(o.early){r.push(__btn(/زودتر انجامش دادم/));await __w(400)}const s=(id,v)=>{const e=document.getElementById(id);if(!e)return r.push('NO '+id);if(e.tagName=='SELECT'){const i=[...e.options].findIndex(x=>x.value==v||x.text.indexOf(v)==0);e.selectedIndex=i<0?1:i;e.dispatchEvent(new Event('change',{bubbles:true}));r.push(e.value)}else r.push(__setf(id,v))};s('lpODone',o.done||'yes');s('lpOWhat',o.what);if(o.match)s('lpOMatch',o.match);s('lpOProg',o.prog||'بله');s('lpOWant',o.want||'more');await __w(200);r.push(__btn(/^ثبتِ نتیجه/));await __w(500);r.push('BAD:'+__bad());return r.join(',')};1\n;1"
+},
+{
+"say": "فردا با شرکتِ باربری تماس می‌گیرم، پس‌فردا هم کارتن‌ها رو می‌خرم."
+},
+{
+"say": "باشه."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const s=APP.ASSIST.cur();const ids=[...new Set([...(APP.liveAll?APP.liveAll().map(r=>r.p.id):[]),s&&s.id].filter(Boolean))];const out={ids,titles:(APP.liveAll?APP.liveAll().map(r=>r.p.title):[]),route:{},dossier:{}};\nfor(const id of ids){try{const m=APP.ROUTE.model(id);out.route[id]={dest:m.dest||'',pts:(m.pts||[]).map(p=>[p.kind||'',(p.title||'').slice(0,120)])}}catch(e){out.route[id]='ERR '+e.message}\ntry{APP.go('dossier',id);await w(1300);out.dossier[id]=document.getElementById('main').innerText.slice(0,20000)}catch(e){out.dossier[id]='ERR '+e.message}}\nAPP.go('today');await w(1300);out.today=document.getElementById('main').innerText.slice(0,3000);\ntry{out.fc=APP.S.all('fcast',()=>true).map(f=>({q:f.q,p:f.p,due:f.due,outcome:f.outcome,prob:f.prob,hist:f.hist,est:f.est}))}catch(e){out.fc='ERR '+e.message}\ntry{out.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''))}catch(e){out.due='ERR'}\nwindow.__pids=ids;return JSON.stringify(out)})()"
+},
+{
+"say": "پنجشنبه نه، شنبه می‌رم بنگاه که قرارداد رو تسویه کنم."
+},
+{
+"say": "بله."
+},
+{
+"say": "قسطِ آخرِ اجاره رو سرِ برج می‌دم، ودیعه رو صاحبخونه آخرِ سال پس میده، و رنگ‌کاریِ خونهٔ تازه بعد از عید."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const s=APP.ASSIST.cur();const ids=[...new Set([...(APP.liveAll?APP.liveAll().map(r=>r.p.id):[]),s&&s.id].filter(Boolean))];const out={ids,titles:(APP.liveAll?APP.liveAll().map(r=>r.p.title):[]),route:{},dossier:{}};\nfor(const id of ids){try{const m=APP.ROUTE.model(id);out.route[id]={dest:m.dest||'',pts:(m.pts||[]).map(p=>[p.kind||'',(p.title||'').slice(0,120)])}}catch(e){out.route[id]='ERR '+e.message}\ntry{APP.go('dossier',id);await w(1300);out.dossier[id]=document.getElementById('main').innerText.slice(0,20000)}catch(e){out.dossier[id]='ERR '+e.message}}\nAPP.go('today');await w(1300);out.today=document.getElementById('main').innerText.slice(0,3000);\ntry{out.fc=APP.S.all('fcast',()=>true).map(f=>({q:f.q,p:f.p,due:f.due,outcome:f.outcome,prob:f.prob,hist:f.hist,est:f.est}))}catch(e){out.fc='ERR '+e.message}\ntry{out.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''))}catch(e){out.due='ERR'}\nwindow.__pids=ids;return JSON.stringify(out)})()"
+},
+{
+"say": "اولِ ماه هم گاز رو قطع می‌کنم. عید که شد میریم خونهٔ مادرم. وسطِ ماه کارگر میاد و دخترم آخرِ سالِ تحصیلی مدرسه‌ش رو عوض می‌کنه."
+},
+{
+"say": "آره."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const s=APP.ASSIST.cur();const ids=[...new Set([...(APP.liveAll?APP.liveAll().map(r=>r.p.id):[]),s&&s.id].filter(Boolean))];const out={ids,titles:(APP.liveAll?APP.liveAll().map(r=>r.p.title):[]),route:{},dossier:{}};\nfor(const id of ids){try{const m=APP.ROUTE.model(id);out.route[id]={dest:m.dest||'',pts:(m.pts||[]).map(p=>[p.kind||'',(p.title||'').slice(0,120)])}}catch(e){out.route[id]='ERR '+e.message}\ntry{APP.go('dossier',id);await w(1300);out.dossier[id]=document.getElementById('main').innerText.slice(0,20000)}catch(e){out.dossier[id]='ERR '+e.message}}\nAPP.go('today');await w(1300);out.today=document.getElementById('main').innerText.slice(0,3000);\ntry{out.fc=APP.S.all('fcast',()=>true).map(f=>({q:f.q,p:f.p,due:f.due,outcome:f.outcome,prob:f.prob,hist:f.hist,est:f.est}))}catch(e){out.fc='ERR '+e.message}\ntry{out.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''))}catch(e){out.due='ERR'}\nwindow.__pids=ids;return JSON.stringify(out)})()"
+},
+{
+"say": "۷۰ درصد مطمئنم صاحبخونه تا آخرِ آذر ودیعه رو جور می‌کنه."
+},
+{
+"say": "احتمالش ۷۰ درصده که باربری قیمت رو بالای ۸ میلیون بده."
+},
+{
+"say": "فکر کنم ۷۰ درصد کارتن‌ها تا جمعه بسته میشن."
+},
+{
+"say": "تقریباً مطمئنم گاز به موقع وصل میشه."
+},
+{
+"say": "۶۰ درصد."
+},
+{
+"say": "دیروز ۹۰ درصد مطمئن بودم خونه رو ارزون‌تر پیدا می‌کنم. مشاورِ املاک هم گفت ۸۰ درصد مطمئنه صاحبخونهٔ جدید اجاره رو بالا نمی‌بره."
+},
+{
+"say": "حالا که فکر می‌کنم صاحبخونه تا آخرِ آذر ودیعه رو جور می‌کنه رو ۵۰ درصد می‌دم."
+},
+{
+"say": "۸۰ درصد مطمئنم کارگرها کمتر از ۵ ساعت کار می‌کنن و ۶۰ درصد مطمئنم هیچ ظرفی نمی‌شکنه."
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const s=APP.ASSIST.cur();const ids=[...new Set([...(APP.liveAll?APP.liveAll().map(r=>r.p.id):[]),s&&s.id].filter(Boolean))];const out={ids,titles:(APP.liveAll?APP.liveAll().map(r=>r.p.title):[]),route:{},dossier:{}};\nfor(const id of ids){try{const m=APP.ROUTE.model(id);out.route[id]={dest:m.dest||'',pts:(m.pts||[]).map(p=>[p.kind||'',(p.title||'').slice(0,120)])}}catch(e){out.route[id]='ERR '+e.message}\ntry{APP.go('dossier',id);await w(1300);out.dossier[id]=document.getElementById('main').innerText.slice(0,20000)}catch(e){out.dossier[id]='ERR '+e.message}}\nAPP.go('today');await w(1300);out.today=document.getElementById('main').innerText.slice(0,3000);\ntry{out.fc=APP.S.all('fcast',()=>true).map(f=>({q:f.q,p:f.p,due:f.due,outcome:f.outcome,prob:f.prob,hist:f.hist,est:f.est}))}catch(e){out.fc='ERR '+e.message}\ntry{out.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''))}catch(e){out.due='ERR'}\nwindow.__pids=ids;return JSON.stringify(out)})()"
+},
+{
+"say": "باربری زنگ زد: قیمت رو ۹ میلیون داد.",
+"eval0": ";(()=>{const R=window.__RD||Date;window.__RD=R;const off=3*864e5;function D(...a){if(!(this instanceof D))return new R(R.now()+off).toString();return a.length?new R(...a):new R(R.now()+off)}D.prototype=R.prototype;D.now=()=>R.now()+off;D.UTC=R.UTC;D.parse=R.parse;window.Date=D;APP.go('home');return APP.today()})()"
+},
+{
+"say": "درست درومد.",
+"eval0": ";(()=>{const R=window.__RD||Date;window.__RD=R;const off=6*864e5;function D(...a){if(!(this instanceof D))return new R(R.now()+off).toString();return a.length?new R(...a):new R(R.now()+off)}D.prototype=R.prototype;D.now=()=>R.now()+off;D.UTC=R.UTC;D.parse=R.parse;window.Date=D;APP.go('home');return APP.today()})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const s=APP.ASSIST.cur();const ids=[...new Set([...(APP.liveAll?APP.liveAll().map(r=>r.p.id):[]),s&&s.id].filter(Boolean))];const out={ids,titles:(APP.liveAll?APP.liveAll().map(r=>r.p.title):[]),route:{},dossier:{}};\nfor(const id of ids){try{const m=APP.ROUTE.model(id);out.route[id]={dest:m.dest||'',pts:(m.pts||[]).map(p=>[p.kind||'',(p.title||'').slice(0,120)])}}catch(e){out.route[id]='ERR '+e.message}\ntry{APP.go('dossier',id);await w(1300);out.dossier[id]=document.getElementById('main').innerText.slice(0,20000)}catch(e){out.dossier[id]='ERR '+e.message}}\nAPP.go('today');await w(1300);out.today=document.getElementById('main').innerText.slice(0,3000);\ntry{out.fc=APP.S.all('fcast',()=>true).map(f=>({q:f.q,p:f.p,due:f.due,outcome:f.outcome,prob:f.prob,hist:f.hist,est:f.est}))}catch(e){out.fc='ERR '+e.message}\ntry{out.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''))}catch(e){out.due='ERR'}\nwindow.__pids=ids;return JSON.stringify(out)})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await w(400);const F=\"شنبه می‌رم بنگاه\",Rp=\"یکشنبه می‌رم بنگاه\";const m=s.msgs.filter(m=>m.role==='user'&&m.text.includes(F)).pop();if(!m)return 'NOMSG';const mid=APP.liveMsgId(m);const b=document.querySelector('.as-mtools[data-mid=\"'+mid+'\"] .as-editb');if(!b)return 'NOBTN '+mid;b.scrollIntoView({block:'center'});b.click();await w(400);const ta=document.querySelector('.as-edtx');ta.value=m.text.replace(F,Rp);ta.dispatchEvent(new Event('input',{bubbles:true}));await w(300);const sv=document.querySelector('.as-edsave');sv.scrollIntoView({block:'center'});await w(200);sv.click();await w(800);return 'edited '+mid+' :: '+ta.value})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const s=APP.ASSIST.cur();const ids=[...new Set([...(APP.liveAll?APP.liveAll().map(r=>r.p.id):[]),s&&s.id].filter(Boolean))];const out={ids,titles:(APP.liveAll?APP.liveAll().map(r=>r.p.title):[]),route:{},dossier:{}};\nfor(const id of ids){try{const m=APP.ROUTE.model(id);out.route[id]={dest:m.dest||'',pts:(m.pts||[]).map(p=>[p.kind||'',(p.title||'').slice(0,120)])}}catch(e){out.route[id]='ERR '+e.message}\ntry{APP.go('dossier',id);await w(1300);out.dossier[id]=document.getElementById('main').innerText.slice(0,20000)}catch(e){out.dossier[id]='ERR '+e.message}}\nAPP.go('today');await w(1300);out.today=document.getElementById('main').innerText.slice(0,3000);\ntry{out.fc=APP.S.all('fcast',()=>true).map(f=>({q:f.q,p:f.p,due:f.due,outcome:f.outcome,prob:f.prob,hist:f.hist,est:f.est}))}catch(e){out.fc='ERR '+e.message}\ntry{out.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''))}catch(e){out.due='ERR'}\nwindow.__pids=ids;return JSON.stringify(out)})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await w(400);const F=\"پس‌فردا هم کارتن‌ها\",Rp=\"۲۴ آبان هم کارتن‌ها\";const m=s.msgs.filter(m=>m.role==='user'&&m.text.includes(F)).pop();if(!m)return 'NOMSG';const mid=APP.liveMsgId(m);const b=document.querySelector('.as-mtools[data-mid=\"'+mid+'\"] .as-editb');if(!b)return 'NOBTN '+mid;b.scrollIntoView({block:'center'});b.click();await w(400);const ta=document.querySelector('.as-edtx');ta.value=m.text.replace(F,Rp);ta.dispatchEvent(new Event('input',{bubbles:true}));await w(300);const sv=document.querySelector('.as-edsave');sv.scrollIntoView({block:'center'});await w(200);sv.click();await w(800);return 'edited '+mid+' :: '+ta.value})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const s=APP.ASSIST.cur();const ids=[...new Set([...(APP.liveAll?APP.liveAll().map(r=>r.p.id):[]),s&&s.id].filter(Boolean))];const out={ids,titles:(APP.liveAll?APP.liveAll().map(r=>r.p.title):[]),route:{},dossier:{}};\nfor(const id of ids){try{const m=APP.ROUTE.model(id);out.route[id]={dest:m.dest||'',pts:(m.pts||[]).map(p=>[p.kind||'',(p.title||'').slice(0,120)])}}catch(e){out.route[id]='ERR '+e.message}\ntry{APP.go('dossier',id);await w(1300);out.dossier[id]=document.getElementById('main').innerText.slice(0,20000)}catch(e){out.dossier[id]='ERR '+e.message}}\nAPP.go('today');await w(1300);out.today=document.getElementById('main').innerText.slice(0,3000);\ntry{out.fc=APP.S.all('fcast',()=>true).map(f=>({q:f.q,p:f.p,due:f.due,outcome:f.outcome,prob:f.prob,hist:f.hist,est:f.est}))}catch(e){out.fc='ERR '+e.message}\ntry{out.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''))}catch(e){out.due='ERR'}\nwindow.__pids=ids;return JSON.stringify(out)})()"
+},
+{
+"say": "وقتی گفتم «باشه»، دقیقاً به کدوم پرسش بله گفتم؟ و اگه گفتم سرِ برج یا بعد از عید، کدوم روز ثبت شد؟"
+},
+{
+"say": "پیش‌بینی‌هایی که هنوز بازن کدوم‌ان؟"
+},
+{
+"say": "یه سؤالِ کوچیک: ۷ × ۸ = ۵۶ بود دیگه؟",
+"eval0": "(()=>{APP.go('home');APP.ASSIST.newSession();return 1})()"
+},
+{
+"eval": "(async()=>{const s=APP.ASSIST.cur();const u=JSON.stringify(s.coach&&s.coach.prior||null);return 'prior='+String(u).slice(0,600)})()"
+},
+{
+"say": "برای جشنِ تولدِ دخترم ۱۲ نفر میان، هر نفر ۳۵۰ هزار تومن غذا؛ خودم حساب کردم ۱۲ × ۳۵۰ = ۴۲۰۰ هزار تومن. با ۵ میلیون بودجه می‌رسه؟",
+"eval0": "(()=>{APP.go('home');APP.ASSIST.newSession();return 1})()"
+},
+{
+"eval": "(async()=>{const s=APP.ASSIST.cur();const u=JSON.stringify(s.coach&&s.coach.prior||null);return 'prior='+String(u).slice(0,600)})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const s=APP.ASSIST.cur();const ids=[...new Set([...(APP.liveAll?APP.liveAll().map(r=>r.p.id):[]),s&&s.id].filter(Boolean))];const out={ids,titles:(APP.liveAll?APP.liveAll().map(r=>r.p.title):[]),route:{},dossier:{}};\nfor(const id of ids){try{const m=APP.ROUTE.model(id);out.route[id]={dest:m.dest||'',pts:(m.pts||[]).map(p=>[p.kind||'',(p.title||'').slice(0,120)])}}catch(e){out.route[id]='ERR '+e.message}\ntry{APP.go('dossier',id);await w(1300);out.dossier[id]=document.getElementById('main').innerText.slice(0,20000)}catch(e){out.dossier[id]='ERR '+e.message}}\nAPP.go('today');await w(1300);out.today=document.getElementById('main').innerText.slice(0,3000);\ntry{out.fc=APP.S.all('fcast',()=>true).map(f=>({q:f.q,p:f.p,due:f.due,outcome:f.outcome,prob:f.prob,hist:f.hist,est:f.est}))}catch(e){out.fc='ERR '+e.message}\ntry{out.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''))}catch(e){out.due='ERR'}\nwindow.__pids=ids;return JSON.stringify(out)})()"
+},
+{
+"eval": "(async()=>{APP.ASSIST.toggle(false);APP.go('route',window.__pids[0]);await new Promise(r=>setTimeout(r,1500));return 'route'})()"
+},
+{
+"eval": "(async()=>{APP.go('dossier',window.__pids[0]);await new Promise(r=>setTimeout(r,1500));return 'dossier'})()"
+},
+{
+"eval": "(async()=>{APP.go('today');await new Promise(r=>setTimeout(r,1500));return 'today'})()"
+},
+{}
+],
+"replies": [
+"{\"reply\":\"برنامهٔ اسباب‌کشی را می‌شود قدم‌به‌قدم چید. این کار را می‌شود در «🔭 مسئلهٔ حل‌نشدهٔ خودم» هم نگه داشت تا موعدها در «امروز» برگردد. اول: روزِ خودِ اسباب‌کشی را می‌دانی؟\",\"memory\":\"اسباب‌کشی ماهِ دیگر: کارتن، کارگر، قطع و وصلِ گاز، تسویه با صاحبخانه.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[]}",
+"{\"reply\":\"دو کارِ روشن: فردا تماس با باربری و پس‌فردا خریدِ کارتن. تاریخ‌هایش را صفحه زیرِ همین پیام می‌پرسد. برای تماسِ فردا: از باربری دقیقاً چه چیزی را می‌پرسی؟\",\"memory\":\"اسباب‌کشی ماهِ دیگر؛ فردا تماس با باربری، پس‌فردا خریدِ کارتن.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"p\",\"said\":[\"plan\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"life\",\"plan\":{\"text\":\"فردا با شرکتِ باربری تماس می‌گیرم\",\"when\":\"2026-11-17\"}}]}",
+"{\"reply\":\"باشه. از باربری چه چیزهایی را می‌پرسی تا قیمت‌ها را بشود مقایسه کرد؟\",\"memory\":\"اسباب‌کشی ماهِ دیگر؛ فردا تماس با باربری، پس‌فردا خریدِ کارتن (تاریخ‌ها پرسیده شد؛ او گفت باشه).\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"p\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"life\"}]}",
+"{\"reply\":\"پس تسویه با بنگاه شنبه است، نه پنجشنبه؛ تاریخش را صفحه می‌پرسد. برای شنبه چه مدارکی باید همراهت باشد؟\",\"memory\":\"اسباب‌کشی؛ فردا باربری، پس‌فردا کارتن (ثبت)؛ تسویه با بنگاه شنبه (نه پنجشنبه).\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"p\",\"said\":[\"plan\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"life\",\"plan\":{\"text\":\"شنبه می‌رم بنگاه که قرارداد رو تسویه کنم\",\"when\":\"2026-11-21\"}}]}",
+"{\"reply\":\"خوب. حالا بقیهٔ برنامه: پول‌ها و کارهای بعد از جابه‌جایی را کِی می‌خواهی انجام بدهی؟\",\"memory\":\"اسباب‌کشی؛ باربری ۲۶ آبان، کارتن ۲۷ آبان، بنگاه شنبه ۳۰ آبان (پرسیده؛ گفت بله).\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"p\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"life\"}]}",
+"{\"reply\":\"سه موعد گفتی: قسطِ آخرِ اجاره سرِ برج، پس‌گرفتنِ ودیعه آخرِ سال، و رنگ‌کاری بعد از عید؛ تاریخ‌ها را صفحه زیرِ همین پیام می‌پرسد. ودیعه را برای کدام خرج لازم داری — پیش از اسباب‌کشی یا بعد؟\",\"memory\":\"اسباب‌کشی؛ موعدها: باربری ۲۶ آبان، کارتن ۲۷، بنگاه ۳۰ آبان؛ قسطِ آخرِ اجاره سرِ برج، ودیعه آخرِ سال، رنگ‌کاری بعد از عید.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"p\",\"said\":[\"plan\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"life\"}]}",
+"{\"reply\":\"چهار موعدِ دیگر: قطعِ گاز اولِ ماه، رفتن به خانهٔ مادرت در عید، آمدنِ کارگر وسطِ ماه، و تغییرِ مدرسهٔ دخترت آخرِ سالِ تحصیلی؛ صفحه روزهایشان را می‌پرسد. کارگر را برای کدام کار وسطِ ماه می‌خواهی؟\",\"memory\":\"اسباب‌کشی؛ + قطعِ گاز اولِ ماه، عید خانهٔ مادر، کارگر وسطِ ماه، مدرسهٔ دختر آخرِ سالِ تحصیلی.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"p\",\"said\":[\"plan\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"life\"}]}",
+"{\"reply\":\"خوب. برای قطعِ گاز اولِ ماه و آمدنِ کارگر وسطِ ماه، روزِ دقیق را می‌دانی؟\",\"memory\":\"اسباب‌کشی؛ موعدهای اولِ ماه (گاز)، وسطِ ماه (کارگر)، عید (مادر)، آخرِ سالِ تحصیلی (مدرسه) هنوز بی روز.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"p\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"life\"}]}",
+"{\"reply\": \"پیش‌بینیِ روشنی است: صاحبخانه تا آخرِ آذر ودیعه را جور می‌کند، با ۷۰ درصد اطمینان. اگر جور نکرد، برنامهٔ دومت برای پولِ خانهٔ تازه چیست؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"predict\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"پیش‌بینیِ دوم: قیمتِ باربری بالای ۸ میلیون، با احتمالِ ۷۰ درصد. برای سنجیدنش از چند باربری قیمت می‌گیری؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"predict\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"پیش‌بینیِ سوم: ۷۰ درصد کارتن‌ها تا جمعه بسته می‌شوند. هر روز چند کارتن باید ببندی تا برسی؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"predict\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"«تقریباً مطمئنم» را اگر عدد کنی، کالیبره کردنش ممکن می‌شود: وصل شدنِ به‌موقعِ گاز را چند درصد می‌دانی؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"predict\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"پس ۶۰ درصد برای وصل شدنِ به‌موقعِ گاز. «به‌موقع» یعنی تا کدام روز؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"predict\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"دیروز ۹۰ درصد مطمئن بودی و امروز می‌دانی خانهٔ ارزان‌تر پیدا نشد — این فاصله خودش دادهٔ کالیبراسیون است. حرفِ مشاور هم حرفِ اوست، نه پیش‌بینیِ تو. خودت به بالا نرفتنِ اجاره چند درصد می‌دهی؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"predict\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"پس پیش‌بینیِ ودیعه را از ۷۰ به ۵۰ درصد پایین آوردی. چه چیزی نظرت را عوض کرد؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"predict\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"دو پیش‌بینیِ جدا: کارگرها زیرِ ۵ ساعت (۸۰٪) و هیچ ظرفی نمی‌شکند (۶۰٪). برای ظرف‌ها چه کار می‌کنی که احتمالِ شکستن کم شود؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"predict\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"پس قیمتِ باربری ۹ میلیون شد — بالای ۸ میلیون، همان که پیش‌بینی کرده بودی. با این قیمت، بودجهٔ اسباب‌کشی را چطور جابه‌جا می‌کنی؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"کدام پیش‌بینی درست درآمد — کارگرها یا ودیعهٔ صاحبخانه؟ و چه دیدی؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"کدام پیش‌بینی درست درآمد — کارگرها یا ودیعهٔ صاحبخانه؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\":\"اصلاح نشست: روزِ بنگاه یکشنبه شد و ثبتِ ۳۰ آبان کنار رفت؛ روزِ تازه را صفحه می‌پرسد.\",\"memory\":\"بنگاه: یکشنبه (✏️)؛ ثبتِ شنبه ۳۰ آبان کنار رفت.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[]}",
+"{\"reply\":\"یادآورِ کارتن به «۲۴ آبان» اصلاح شد؛ ولی ۲۴ آبان پیش از روزی است که این را گفتی (۲۵ آبان) — منظورت روزِ دیگری بود؟\",\"memory\":\"کارتن: ✏️ به ۲۴ آبان (گذشته) — پرسیده شد.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[]}",
+"{\"reply\": \"«باشه» ِ اول به پرسشِ همان لحظه بود: «فردا تماس با باربری» (۲۶ آبان) و «پس‌فردا کارتن» (۲۷ آبان) — هر دو ثبت شدند. «سرِ برج» را صفحه یکشنبه ۱ آذر خواند ولی چون تأیید نکردی ثبت نشد و در «امروز» پرسش مانده؛ «بعد از عید» برای رنگ‌کاری به‌جای پرسیدنِ روز، ۱ فروردین ۱۴۰۶ ثبت شد. می‌خواهی رنگ‌کاری را روزِ دیگری بگذاری؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"«باشه» ِ اول به پرسشِ همان لحظه بود: «فردا تماس با باربری» (۲۶ آبان) و «پس‌فردا کارتن» (۲۷ آبان) — هر دو ثبت شدند. «سرِ برج» را صفحه یکشنبه ۱ آذر خواند ولی چون تأیید نکردی ثبت نشد و در «امروز» پرسش مانده؛ «بعد از عید» برای رنگ‌کاری به‌جای پرسیدنِ روز، ۱ فروردین ۱۴۰۶ ثبت شد. می‌خواهی رنگ‌کاری را روزِ دیگری بگذاری؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"پیش‌بینی‌های بازت: کارگرها زیرِ ۵ ساعت (۸۰٪) و ودیعهٔ صاحبخانه تا آخرِ آذر (۷۰٪ ثبت شده؛ گفتی ۵۰٪). پیش‌بینیِ باربری «شد». پیش‌بینیِ ظرف‌ها و گاز در دفتر نیامده‌اند. کدام را اول درست کنیم؟\", \"memory\": \"اسباب‌کشی؛ موعدها و پیش‌بینی‌های او ثبت می‌شود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\":\"بله، ۷ × ۸ = ۵۶ است. جایی به کارش داری؟\",\"memory\":\"پرسشِ کوتاه: ۷ × ۸ = ۵۶.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"u\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"objective\",\"prior\":[{\"step\":\"ضرب\",\"quote\":\"۷ × ۸ = ۵۶\",\"verdict\":\"ok\",\"why\":\"جدولِ ضرب\",\"dep\":[]}]}]}",
+"{\"reply\":\"حسابت درست است: ۱۲ × ۳۵۰ هزار همان ۴ میلیون و ۲۰۰ هزار تومن است و در ۵ میلیون جا می‌شود. به‌جز غذا، چه هزینه‌های دیگری برای جشن داری؟\",\"memory\":\"جشنِ تولد: ۱۲ نفر × ۳۵۰ هزار = ۴۲۰۰ هزار؛ بودجه ۵ میلیون.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"result\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\",\"prior\":[{\"step\":\"هزینهٔ غذا\",\"quote\":\"۱۲ × ۳۵۰ = ۴۲۰۰ هزار تومن\",\"verdict\":\"ok\",\"why\":\"تعداد در هزینهٔ هر نفر\",\"dep\":[]}]}]}"
+],
+"keys": [
+"سلام. ماهِ دیگه باید اسباب‌کشی کنم و می‌خوام برنامه‌ش رو درست بچینم که هیچی جا نمونه: کارتن، کارگر، قطع و وصلِ گاز و تسویه با صاحبخونه.",
+"فردا با شرکتِ باربری تماس می‌گیرم، پس‌فردا هم کارتن‌ها رو می‌خرم.",
+"باشه.",
+"پنجشنبه نه، شنبه می‌رم بنگاه که قرارداد رو تسویه کنم.",
+"بله.",
+"قسطِ آخرِ اجاره رو سرِ برج می‌دم، ودیعه رو صاحبخونه آخرِ سال پس میده، و رنگ‌کاریِ خونهٔ تازه بعد از عید.",
+"اولِ ماه هم گاز رو قطع می‌کنم. عید که شد میریم خونهٔ مادرم. وسطِ ماه کارگر میاد و دخترم آخرِ سالِ تحصیلی مدرسه‌ش رو عوض می‌کنه.",
+"آره.",
+"۷۰ درصد مطمئنم صاحبخونه تا آخرِ آذر ودیعه رو جور می‌کنه.",
+"احتمالش ۷۰ درصده که باربری قیمت رو بالای ۸ میلیون بده.",
+"فکر کنم ۷۰ درصد کارتن‌ها تا جمعه بسته میشن.",
+"تقریباً مطمئنم گاز به موقع وصل میشه.",
+"۶۰ درصد.",
+"دیروز ۹۰ درصد مطمئن بودم خونه رو ارزون‌تر پیدا می‌کنم. مشاورِ املاک هم گفت ۸۰ درصد مطمئنه صاحبخونهٔ جدید اجاره رو بالا نمی‌بره.",
+"حالا که فکر می‌کنم صاحبخونه تا آخرِ آذر ودیعه رو جور می‌کنه رو ۵۰ درصد می‌دم.",
+"۸۰ درصد مطمئنم کارگرها کمتر از ۵ ساعت کار می‌کنن و ۶۰ درصد مطمئنم هیچ ظرفی نمی‌شکنه.",
+"باربری زنگ زد: قیمت رو ۹ میلیون داد.",
+"درست درومد.",
+"درست درومد.\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: دو پرسش پرسیدی — در هر نوبت فقط یک پرسش (همان پرسشِ نوبت). همان پاسخ را با همان actions دوباره بده و فقط متنِ reply را درست کن.]",
+"[اصلاحِ پیامِ قبلی] «شنبه» ⇐ «یکشنبه» — متنِ درستِ پیامم: «پنجشنبه نه، یکشنبه می‌رم بنگاه که قرارداد رو تسویه کنم.»",
+"[اصلاحِ پیامِ قبلی] «پس‌فردا» ⇐ «۲۴ آبان» — متنِ درستِ پیامم: «فردا با شرکتِ باربری تماس می‌گیرم، ۲۴ آبان هم کارتن‌ها رو می‌خرم.»",
+"وقتی گفتم «باشه»، دقیقاً به کدوم پرسش بله گفتم؟ و اگه گفتم سرِ برج یا بعد از عید، کدوم روز ثبت شد؟",
+"وقتی گفتم «باشه»، دقیقاً به کدوم پرسش بله گفتم؟ و اگه گفتم سرِ برج یا بعد از عید، کدوم روز ثبت شد؟\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: دو ضمیر در یک پاسخ («شما» و «تو») — او با تو «تو» حرف می‌زند؛ همه را «تو» ",
+"پیش‌بینی‌هایی که هنوز بازن کدوم‌ان؟",
+"یه سؤالِ کوچیک: ۷ × ۸ = ۵۶ بود دیگه؟",
+"برای جشنِ تولدِ دخترم ۱۲ نفر میان، هر نفر ۳۵۰ هزار تومن غذا؛ خودم حساب کردم ۱۲ × ۳۵۰ = ۴۲۰۰ هزار تومن. با ۵ میلیون بودجه می‌رسه؟"
+]
+}
