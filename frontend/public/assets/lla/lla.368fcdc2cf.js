@@ -38709,7 +38709,7 @@ APP.goFromURL = function (q) {
      test_tour1_r26_classify (بخشِ reg) متن‌های src را می‌خواند و هر صورتِ رده‌بندی‌نشده را خطا می‌گیرد — سطرِ تازه بی رده نمی‌ماند. */
   var POSS26 = ("پیشرفت|موضوع|همکار|اطمینان|چشم|ادعای|توضیح|قلم|پوست|بدن|برداشت|نزدیک|دوست|سر|جلوی|جدول|آزمون|خطای|سنجش|راه‌حل|ابزار|دانش|ببرد|بی‌پاسخ|تصمیم|متن|دست|می‌برم|نشان|توان|فهم|نزدیک‌تر|برهان|کنار|اصلاح|پیشین|تلاش|اول|" +
     "کالیبراسیون|وقت|بزرگ‌تر|نقض|حرکت|دستاورد|رقیب|دقیق|تقریب|کمک|کوتاه|فرمول|روی|دوم|صورت|فرض|نمودار|شکل|پیاپی|آغاز|کوچک|شواهد|رد|استدلال|شهود|قانون|میل|می‌برد|تسلط|پیشنهاد|گوگل|امروز|باور|اسم|فکر|سؤال|سوال|مشکل|حساب|عدد").split("|");
-  var NOTPOSS26 = "هست|است|درست|موقعیت|کارت|حالت|وضعیت|شیت|کجاست|قطعیت|واقعیت|موافقت|کاشت|سلامت|صفت|نیت|منزلت|شدت|مشت|پرت|نفرت|کمیت|هشت|مخالفت|بلیت|استوارت|بست|احتمالات|رسمیت|حکمت|دمت|تاست|‌هایت|کشت|علّیت|جدیت|اوت|کلیت|فعالیت|بهشت|وات|هایت|جمعیت".split("|");
+  var NOTPOSS26 = "نیست|بیست|هست|است|درست|موقعیت|کارت|حالت|وضعیت|شیت|کجاست|قطعیت|واقعیت|موافقت|کاشت|سلامت|صفت|نیت|منزلت|شدت|مشت|پرت|نفرت|کمیت|هشت|مخالفت|بلیت|استوارت|بست|احتمالات|رسمیت|حکمت|دمت|تاست|‌هایت|کشت|علّیت|جدیت|اوت|کلیت|فعالیت|بهشت|وات|هایت|جمعیت".split("|");
   AS.POSS26 = POSS26; AS.NOTPOSS26 = NOTPOSS26;
   SH_RX.push([new RegExp(B0 + "(" + POSS26.join("|") + ")ت" + E0, "g"), "$1تان"]);
   SH_RX.push([new RegExp("([آ-ی])هایت" + E0, "g"), "$1هایتان"]);   // «کارهایت»، «فکرهایت» (بی نیم‌فاصله)
@@ -56676,7 +56676,9 @@ APP.goFromURL = function (q) {
     var x = nrm26(t); if (CORRW27.test(x)) return 0;
     var V = verbs28(what), best = 0;
     if (!V.length) return 0;
-    sentsOf25(t).forEach(function (c) { if (best === 2) return; var xc = nrm26(c); if (THIRD26.test(xc) && !FIRST26.test(xc)) return;
+    /* بند به بند («زنگ زدم، گفت پس‌فردا میاد» — بندِ دوم حرفِ دیگری است، نه چیزِ دیگری برای همان زنگ) */
+    var CL = []; sentsOf25(t).forEach(function (c) { String(c).split(/\s*[،,؛]\s*/).forEach(function (z) { if (z.trim()) CL.push(z); }); });
+    CL.forEach(function (c) { if (best === 2) return; var xc = nrm26(c); if (THIRD26.test(xc) && !FIRST26.test(xc)) return;
       V.forEach(function (v) { v.past.forEach(function (ps) { if (best === 2) return;
         var pe = v.pre ? v.pre.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : "", r = new RegExp("(?:^| )" + (pe ? "(?:" + pe + "(?:ش)?) (?:[آ-ی]+ ){0,2}" : "") + ps + "(?:م|یم|مش|یمش)(?![آ-ی])"), m = r.exec(xc); if (!m) return;
         var rest = (xc.slice(0, m.index) + " " + xc.slice(m.index + m[0].length)).replace(DATEW27, " ").replace(/(?:^| )(?:امروز|دیروز|پریروز|بالاخره|الان|همین|هم|رو|را|به|با|که|و|بهش|باهاش|اونو|اینو|اون|این|دیگه|آره|بله|سلام|خب|خوب|راستی|صبح|عصر|ظهر|شب|امشب|امروزصبح)(?![آ-ی])/g, " ");
@@ -56788,7 +56790,7 @@ APP.goFromURL = function (q) {
     var lu28 = userMsgs(s0).slice(-1)[0], ed28 = !!(lu28 && /^\s*\[اصلاحِ/.test(String(lu28.text || ""))) && !o.move, past28 = "";
     if (ed28 && x.pastAsk28 && (x.pastAsk28 === String(lu28.at || "") || x.pastAsk28 === norm(String(o.src || "")))) return null;   /* همان ✏️ از راهِ دوم (a27 سپس editBooked27) — یک پرسش */
     if (ed28 && o.src) { var said28 = isPl ? String(x.d || "") : ((x.src && x.src.at && A.localDay) ? A.localDay(x.src.at) : (x.created && A.localDay ? A.localDay(x.created) : ""));
-      if (/^\d{4}-\d\d-\d\d$/.test(said28) && said28 <= td) { var Ie28 = null; try { Ie28 = PR.whenInfo(String(o.src), said28); } catch (e) { } if (Ie28 && Ie28.date) I = Ie28; past28 = pastDay28(o.src, said28);
+      if (/^\d{4}-\d\d-\d\d$/.test(said28) && said28 <= td) { var Ie28 = null; try { Ie28 = PR.whenInfo(String(o.src), said28); } catch (e) { } if (Ie28 && Ie28.date && (said28 < td || !I)) I = Ie28; past28 = pastDay28(o.src, said28);   /* همان روز ⇒ خوانشِ فراخوان (بانکِ R20 #68) */
         /* «دیروز / پریروز» را whenInfo روزِ کار نمی‌خواند (گذشته است) — در ✏️ همان روزِ گذشته است */
         var pr28 = /(?:^| )(دیروز|پریروز)(?![آ-ی])/.exec(nrm26(String(o.src))); if (!past28 && pr28 && !(Ie28 && Ie28.date)) past28 = add(said28, pr28[1] === "دیروز" ? -1 : -2); }
       if ((past28 || (I && I.date && !I.amb && I.date < td)) && (past28 || I.date) !== cur) {
