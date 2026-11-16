@@ -734,6 +734,7 @@
   function near27(z, q) { var b = String(q || "").replace(/^\s*گام(?:ِ|‌ِ)?\s*[0-9۰-۹]+\s*[:：—\-–]\s*/, ""), T = [z.quote, z.fixed ? z.fixed.t : "", z.step].join(" "),
       W = toks(T.replace(/[0-9۰-۹.٫]/g, " ")).filter(function (w) { return w.length >= 3; }), M = function (x) { return (digs(x).match(/[A-Za-z0-9][A-Za-z0-9\/\^\[\]()]{2,}/g) || []); }, MT = M(T);
     return toks(b.replace(/[0-9۰-۹.٫]/g, " ")).some(function (w) { return w.length >= 3 && hit(w, W); }) || M(b).some(function (f) { return MT.indexOf(f) >= 0; }); }
+  var REF27B = /(?:^|[\s‌،,])(?:(?:همون|همان)(?![آ-ی])|(?:اون|آن|همین)[\s‌]*(?:مقدار|عدد|اندازه|حاصل|جواب|نتیجه)(?:ِ|‌ی|ی)?(?![آ-ی]))/;
   function priorMerge(old, rep, o) {
     var at = rep.at, ch = [], hold = function (a, b) { var x = nz(a), y = nz(b); return !!x && !!y && (x === y || (x.length >= 8 && y.indexOf(x) >= 0) || (y.length >= 8 && x.indexOf(y) >= 0)); }, used27 = {};
     rep.steps.forEach(function (y) {
@@ -741,7 +742,16 @@
       if (!x) x = old.steps.filter(function (z) { return nz(z.quote) === nz(y.quote) || (z.fixed && nz(z.fixed.t) === nz(y.quote)); })[0] || old.steps.filter(function (z) { return hold(z.quote, y.quote) || (z.fixed && hold(z.fixed.t, y.quote)); })[0] || null;
       if (!x && y.lab && old.steps[y.lab - 1] && !used27[y.lab] && near27(old.steps[y.lab - 1], y.quote)) x = old.steps[y.lab - 1];
       if (x) used27[x.n] = 1;
-      if (!x) { if (!o.open || y.test) return; y.n = old.steps.length + 1; delete y.mn; old.steps.push(y); ch.push({ n: y.n, k: "new" }); return; }
+      if (!x) { if (!o.open || y.test) return; y.n = old.steps.length + 1; delete y.mn;
+        /* دورِ ۲۷ب (leftovers؛ بانکِ R27 #84، C47): گامِ تازه‌ای که فقط با واژه به گامِ پیشین تکیه دارد («مساحت همون مقدارِ قبل بود …، پس سود رو هم با همون بگیر») — بی رقم،
+           با واژهٔ ارجاع («همون/همان/اون مقدار/قبلی»). وابستگی: dep ِ مدل (فقط وقتی همین واژهٔ ارجاع در گام هست — مدل گزارش می‌دهد، صفحه می‌سنجد)، وگرنه تنها گامی که اسمِ
+           کمیتِ پس از «همون» را دارد. گامِ تازه‌ای که به گامِ «کهنه» تکیه دارد خودش هم کهنه است — بی عددِ پیشنهادی (پرسش)، مثلِ هر وابسته */
+        try { var q27 = String(y.quote || ""); if (!/[0-9۰-۹]/.test(q27) && REF27B.test(q27)) {
+            if (!(y.dep || []).length) { var nn27 = toks(q27.replace(REF27B, " ")).filter(function (w) { return w.length >= 3; }), c27 = old.steps.filter(function (z) { return nn27.some(function (w) { return hit(w, toks(curText(z))); }); }); if (c27.length === 1) y.dep = [c27[0].n]; }
+            var st27 = (y.dep || []).map(function (d) { return old.steps[d - 1]; }).filter(function (z) { return z && z.stale; })[0];
+            if (st27) { y.stale = { frag: st27.stale.frag, fix: st27.stale.fix, at: at, nums: [], via: st27.n }; y.her = ""; } }
+        } catch (e27) { }
+        old.steps.push(y); ch.push({ n: y.n, k: "new" }); return; }
       var was = x.verdict, same = hold(curText(x), y.quote) || hold(x.quote, y.quote);
       if (same) {
         var flip = was !== y.verdict;

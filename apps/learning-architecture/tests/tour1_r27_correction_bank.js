@@ -29,7 +29,7 @@ async function run(ctx) {
   C[70] = async () => { await scen({ prior: [RES('ما ۵ نفریم و ۴ میلیون پول داریم: ۴ ÷ ۵ = ۰٫۸ میلیون هر نفر')], stmtChat: 'ما ۵ نفریم و ۴ میلیون پول داریم' });
     await turn('۴ نفریم نه ۵ — حالا سهمِ هر نفر چقدر میشه؟', 'اصلاح را فرستادم؛ با ۴ نفر خودت حساب کن.', RT({ msg: 'ما ۵ نفریم و ۴ میلیون پول داریم', key: 'datum:شمارِ نفرها', what: 'fact', fix: '۴', old: '۵' }));
     const x = await snap(''); return { ok: !x.refused && !/فرقی نداشت|انجام نشد/.test(allText(x)) && /0\.8>1(?![.\d])/.test(x.sstale) && !/(?:^| )4>/.test(x.sstale), got: { sstale: x.sstale, sys: x.sys, refused: x.refused } }; };
-  NC[71] = 'not satisfied (reported): «۲ میلیون و ۸۰۰ هزار ÷ ۸ = ۳۵۰ هزار» — the «N میلیون و M هزار» operand is not read as one number (2 800 000) by the arithmetic reader (a46, fixer «arith», DECISIONS_R27 R1/C41); the correction itself lands (8 ⇒ 7), the stale engine follows once the reader returns the written expression. Check kept as C71 below for when it does.';
+  /* #71: دورِ ۲۷ب (leftovers) — «N میلیون و M هزار» در عبارتِ نوشته یک عدد است (a38 runs25 ِ بزرگی‌دار؛ C63)؛ دیگر NC نیست */
   C[71] = async () => { await scen({ prior: [RES('۸ نفر بودیم، ۲ میلیون و ۸۰۰ هزار ÷ ۸ = ۳۵۰ هزار هر نفر')], stmtChat: '۸ نفر بودیم' });
     await turn('۷ تاییم نه ۸ تا', 'فرستادم.', RT({ msg: '۸ نفر بودیم', key: 'datum:نفرها', what: 'fact', fix: '۷', old: '۸' }));
     const x = await snap(''); return { ok: !x.refused && /350>400(?![.\d])/.test(x.sstale), got: { sstale: x.sstale, sys: x.sys, refused: x.refused } }; };
@@ -74,7 +74,10 @@ async function run(ctx) {
   C[83] = async () => { await scen({ prior: [RES('۱۶ نفر ثبت‌نام کردن: ۱۶ × ۸۵ = ۱۳۶۰ هزار'), RES('۱۳۶۰ ÷ ۴ = ۳۴۰ هزار هر هفته')], stmtChat: '۱۶ نفر ثبت‌نام کردن' });
     await turn('۱۸ نفر ثبت‌نام کردن نه ۱۶', 'فرستادم.', RT({ msg: '۱۶ نفر ثبت‌نام کردن', key: 'datum:نفرها', what: 'fact', fix: '۱۸ نفر', old: '۱۶ نفر' }));
     const x = await snap(''); return { ok: /1360>1530(?![\d])/.test(x.sstale) && /340>382\.5/.test(x.sstale), got: { ev: x.ev, sstale: x.sstale } }; };
-  NC[84] = 'not built: a ledger step that refers to step 1 only by words («همون مقدار») with no digits — the ledger records dependency only for steps the a45 prior reader linked (dep), and this turn arrives as a new report; linking a reference-only step is the prior-ledger reader (fixer «prior», a45), not the stale engine';
+  /* #84 — دورِ ۲۷ب (leftovers): گامِ تازهٔ بی رقم که با واژه («همون مقدارِ قبل») به گامِ ۱ تکیه دارد (dep ِ مدل، سنجیده با واژهٔ ارجاع؛ a45 priorMerge) کهنه است، بی عدد */
+  C[84] = async () => { const pid = await tile(); await tileFix(); const q84 = 'مساحت همون مقدارِ قبل بود که حساب کردم، پس سود رو هم با همون بگیر';
+    await turn(q84, 'باشه.', [{ do: 'coach_state', ph: 'c', said: [], prior: [{ quote: q84, step: 'سود با همان مساحت', verdict: 'ok', dep: [1] }] }]); const x = await snap(pid), s6 = stN(x, 6);
+    return { ok: marked(x, 6) && (s6.stale || []).every(z => z.re == null) && marked(x, 1), got: { prior: x.prior } }; };
   C[85] = async () => { const { x } = await T1(); return { ok: !x.stale.some(z => near(z.v, 3) && /msg|stmt/.test(z.k) && /دیوار|چسب/.test(z.ctx || '')) && !/ارتفاعِ دیوار|کیسه چسب/.test(J(x.asks)) && marked(x, 2), got: { stale: x.stale, asks: x.asks } }; };
   C[86] = async () => { const pid = await tile(); await turn('۲۵ درصد اضافه بگیر نه ۲۰ درصد', 'فرستادم.', RT({ msg: '۲۰ درصد اضافه برای برش', key: 'datum:اضافه', what: 'fact', fix: '۲۵ درصد', old: '۲۰ درصد' }));
     const x = await snap(pid); return { ok: near(reOf(stN(x, 4), 4.32), 4.5) && !marked(x, 2) && !marked(x, 1), got: { prior: x.prior } }; };

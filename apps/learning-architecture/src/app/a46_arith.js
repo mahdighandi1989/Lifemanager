@@ -88,34 +88,56 @@
   /* ---------- یکدست‌سازیِ متن ---------- */
   var APX = "(?:حدود(?:ِ|اً|ا)?|تقریباً|تقریبا|نزدیک(?:ِ|\\s*به)?)";
   function digs(t) { return String(t == null ? "" : t).replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 1776); }).replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 1632); }).replace(/٫/g, ".").replace(/(\d)٬(?=\d)/g, "$1"); }
-  function norm(q) {
-    var t = digs(q).replace(/\r/g, "").replace(/−/g, "-").replace(/\.{3,}/g, "…")
-      .replace(/(^|[^\d.,])(\d{1,3}(?:,\d{3})+)(?![\d,])/g, function (m, a, b) { return a + b.replace(/,/g, ""); })
-      .replace(/(\d)\s+–\s+(?=\d)/g, "$1 - ")                                   // خطِ تیرهٔ فاصله\u200cدار میانِ دو عدد = منها؛ بی\u200cفاصله («۱۰–۲۰») بازه است
-      .replace(/(\d)(\s*در\s+صد)(?![آ-ی])/g, function (m, d, w) { return d + new Array(w.length - 3).join(" ") + "درصد"; })   /* دورِ ۲۷ (بانکِ R27 #50): «۸ در صد» = «۸ درصد» — هم‌طول */
-      .replace(/(\d)\s*درصدِ\s*(?=\d)/g, "$1%ِ ").replace(/(\d)\s*(?:درصد(?:ِ)?|٪|%)/g, "$1%").replace(/%\s*از\s*(?=\d)/g, "% * ").replace(/(\d)%ِ\s*(?=\d)/g, "$1% * ")
-      .replace(/منفی(?:ِ)?\s*(?=\d)/g, "-")
-      .replace(/ضرب\s*در|ضربدر/g, " * ").replace(/تقسیم\s*بر/g, " / ").replace(/منهای/g, " ~ ")
-      .replace(/به[\u200c\s]?علاوه[ٔۀ]?(?:\u200c?ی)?|بعلاوه[ٔۀ]?(?:\u200c?ی)?|به[\u200c\s]?اضافه[ٔۀ]?(?:\u200c?ی)?/g, " + ")
-      .replace(/[×⋅·∙]/g, "*")   /* C26: «÷» تقسیم است، هرگز «/» ِ کسرِ چسبیده یا ممیز — در متن می‌ماند (هم‌طول، تا pos/pe ِ هر سنجش جای همان متنِ او باشد: convs25 ِ اصلاح) و توکن‌ساز آن را «/» ِ فاصله‌دار می‌خواند */
-      .replace(/(\d%?)\s*[xX]\s*(?=\d)/g, "$1 * ").replace(/(\d%?)\s+در\s+(?=\d)/g, "$1 * ")
-      .replace(/(^|[\s،,.؛:])(?:میشه|می[\u200c\s]?شه|می[\u200c\s]?شود|میشود|می[\u200c\s]?شد|شد)(?=$|[\s،,.؛:!؟?]|\d)/g, "$1 ＝ ")   /* «＝» = برشی که از واژه آمده («میشه»): دورِ ۲۶ (C18) — «میشه» میانِ دو عبارت «می‌شود/تبدیل می‌شود» است، نه لزوماً تساوی */
-      .replace(/[≃≅]/g, "≈");
-    t = darProd(t);
-    t = t.replace(new RegExp(APX + "\\s*[=＝]\\s*", "g"), "≈ ").replace(new RegExp("[=＝]\\s*" + APX + "\\s*", "g"), "≈ ");
-    /* «۴ از ۲۶ میشه ۱۵٪»: «از» پیش از نتیجهٔ درصدی، نسبت است (D26-24) */
-    return t.replace(/(\d)(\s+از\s+)(\d+(?:\.\d+)?)(?=(?:\s+[^\d\s=＝≈.؟?!]+){0,4}\s*[،,]?\s*[=＝≈]\s*\d+(?:\.\d+)?%)/g, function (m, a, w, b) { return a + " ∕" + new Array(w.length - 1).join(" ") + b; });   /* هم‌طول (experiences/exact-arithmetic-check… «Update 2026-11-15») */   /* دورِ ۲۷ (بانکِ R27 #35): «۹ از ۲۲ نفر قبول شدن، میشه ۴۱ درصد» */
+  /* دورِ ۲۷ب (leftovers؛ WORKLOG 137، «Update 2026-11-15»): بازنویسی‌های قدیمیِ norm («درصد ⇒ %»، «میشه ⇒ ＝»، «ضرب در»، «تقسیم بر»، «منفی»، جداکنندهٔ هزارگان، «…»، «حدود =»)
+     طولِ متن را عوض می‌کردند و pos/pe ِ هر سنجش در متنِ او جابه‌جا می‌شد. حالا هر بازنویسی نقشهٔ جای‌ها را نگه می‌دارد (normM ⇒ {t, m}: m[i] = جای نویسهٔ i در متنِ خودِ او)
+     و arithChk جای‌ها را پیش از بازگرداندن به متنِ خودِ او برمی‌گرداند — هیچ بازنویسی‌ای دیگر روی مسیرِ جای‌ها نیست. متنِ یکدست‌شده (norm) همان است که بود. */
+  function rpM(st, re, rep) {
+    var t = st.t, M = st.m, out = "", OM = [], last = 0, k, mm; re.lastIndex = 0; var g = re.global;
+    while ((mm = re.exec(t))) { var a = mm.index, mt = mm[0], args = mm.slice(); args.push(a, t);
+      var r = typeof rep === "function" ? rep.apply(null, args) : rep.replace(/\$(\d)/g, function (z, j) { return mm[+j] == null ? "" : mm[+j]; });
+      out += t.slice(last, a); for (k = last; k < a; k++) OM.push(M[k]);
+      out += r; for (k = 0; k < r.length; k++) OM.push(mt.length ? M[a + Math.min(k, mt.length - 1)] : (a < M.length ? M[a] : (M.length ? M[M.length - 1] + 1 : 0)));
+      last = a + mt.length; if (!g) break; if (!mt.length) re.lastIndex++; }
+    out += t.slice(last); for (k = last; k < t.length; k++) OM.push(M[k]);
+    return { t: out, m: OM };
   }
-
+  function normM(q) {
+    var s0 = String(q == null ? "" : q), st = { t: s0, m: [] }; for (var k = 0; k < s0.length; k++) st.m.push(k);
+    var R = function (re, rep) { st = rpM(st, re, rep); };
+    R(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 1776); }); R(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 1632); }); R(/٫/g, "."); R(/(\d)٬(?=\d)/g, "$1");
+    R(/\r/g, ""); R(/−/g, "-"); R(/\.{3,}/g, "…");
+    R(/(^|[^\d.,])(\d{1,3}(?:,\d{3})+)(?![\d,])/g, function (m, a, b) { return a + b.replace(/,/g, ""); });
+    R(/(\d)\s+–\s+(?=\d)/g, "$1 - ");                                   // خطِ تیرهٔ فاصله\u200cدار میانِ دو عدد = منها؛ بی\u200cفاصله («۱۰–۲۰») بازه است
+    R(/(\d)(\s*در\s+صد)(?![آ-ی])/g, function (m, d, w) { return d + new Array(w.length - 3).join(" ") + "درصد"; });   /* دورِ ۲۷ (بانکِ R27 #50): «۸ در صد» = «۸ درصد» — هم‌طول */
+    R(/(\d)\s*درصدِ\s*(?=\d)/g, "$1%ِ "); R(/(\d)\s*(?:درصد(?:ِ)?|٪|%)/g, "$1%"); R(/%\s*از\s*(?=\d)/g, "% * "); R(/(\d)%ِ\s*(?=\d)/g, "$1% * ");
+    R(/منفی(?:ِ)?\s*(?=\d)/g, "-");
+    R(/ضرب\s*در|ضربدر/g, " * "); R(/تقسیم\s*بر/g, " / "); R(/منهای/g, " ~ ");
+    R(/به[\u200c\s]?علاوه[ٔۀ]?(?:\u200c?ی)?|بعلاوه[ٔۀ]?(?:\u200c?ی)?|به[\u200c\s]?اضافه[ٔۀ]?(?:\u200c?ی)?/g, " + ");
+    R(/[×⋅·∙]/g, "*");   /* C26: «÷» تقسیم است، هرگز «/» ِ کسرِ چسبیده یا ممیز — در متن می‌ماند و توکن‌ساز آن را «/» ِ فاصله‌دار می‌خواند */
+    R(/(\d%?)\s*[xX]\s*(?=\d)/g, "$1 * "); R(/(\d%?)\s+در\s+(?=\d)/g, "$1 * ");
+    R(/(^|[\s،,.؛:])(?:میشه|می[\u200c\s]?شه|می[\u200c\s]?شود|میشود|می[\u200c\s]?شد|شد)(?=$|[\s،,.؛:!؟?]|\d)/g, "$1 ＝ ");   /* «＝» = برشی که از واژه آمده («میشه»): دورِ ۲۶ (C18) */
+    R(/[≃≅]/g, "≈");
+    R(/\s+در\s+(?=\d)/g, darProdF);
+    R(new RegExp(APX + "\\s*[=＝]\\s*", "g"), "≈ "); R(new RegExp("[=＝]\\s*" + APX + "\\s*", "g"), "≈ ");
+    /* «۴ از ۲۶ میشه ۱۵٪»: «از» پیش از نتیجهٔ درصدی، نسبت است (D26-24) — هم‌طول؛ دورِ ۲۷ (بانکِ R27 #35) */
+    R(/(\d)(\s+از\s+)(\d+(?:\.\d+)?)(?=(?:\s+[^\d\s=＝≈.؟?!]+){0,4}\s*[،,]?\s*[=＝≈]\s*\d+(?:\.\d+)?%)/g, function (m, a, w, b) { return a + " ∕" + new Array(w.length - 1).join(" ") + b; });
+    return st;
+  }
+  function norm(q) { return normM(q).t; }
+  /* جای‌های یک سنجش (در متنِ یکدست‌شده) ⇒ جای‌ها در متنِ خودِ او */
+  function backPos(M, list) { var f = function (x) { return x < 0 ? x : x < M.length ? M[x] : (M.length ? M[M.length - 1] + 1 : 0); }, fe = function (x) { return x <= 0 ? x : x - 1 < M.length ? M[x - 1] + 1 : (M.length ? M[M.length - 1] + 1 : 0); };
+    (list || []).concat((list && list.unread) || []).forEach(function (c) { if (!c || c.bp27) return; c.bp27 = true; if (c.pos != null) c.pos = f(c.pos); if (c.pe != null) c.pe = fe(c.pe); if (c.cut != null) c.cut = f(c.cut); }); return list; }
+  ST.arithNormM = normM;
   /* دورِ ۲۷ (C41؛ D27-5، A27-3، B27·D9، C27-25): «۳ متر در ۴ متر» ضرب است، مثلِ «ضربدر» — فقط وقتی هر دو سو عدد با واحدِ طول‌اند (پیش از «در» واحدِ کاملِ طول، پس از آن عدد).
      «۱۲۰ کیلومتر در ۲ ساعت» («در» = ظرفِ زمان) ضرب نیست و دست نمی‌خورد. جایگزینی هم‌طول است (« در » ⇒ « *  ») تا pos/pe ِ هر سنجش همان جای متنِ او بماند. */
-  function darProd(t) {
-    return t.replace(/\s+در\s+(?=\d)/g, function (m, at, all) {
+  function darProd(t) { return t.replace(/\s+در\s+(?=\d)/g, darProdF); }
+  function darProdF(m, at, all) {
+    return (function () {
       var bf = all.slice(Math.max(0, at - 40), at), mm = /(\d+(?:\.\d+)?)(\s*[^\d\s][^\d]*)$/.exec(bf); if (!mm) return m;
       var u1 = unitAt(mm[2]); if (!u1 || u1.len !== mm[2].length || u1.dim !== "طول") return m;
       var af = all.slice(at + m.length), mn = /^\d+(?:\.\d+)?(?:\/\d+)?/.exec(af), u2 = mn ? unitAt(af.slice(mn[0].length)) : null; if (!u2 || u2.dim !== "طول") return m;
       return " *" + new Array(m.length - 1).join(" ");
-    });
+    })();
   }
   /* ---------- نشانه‌ها ---------- */
   var FA_L = /[ء-غف-ٰٕپچژکگۀیے\u200cـ]/, LAT = /[A-Za-zÀ-ɏͰ-Ͽ]/;
@@ -141,6 +163,7 @@
       } else if (c === "÷") { tk = { k: "o", t: "/", a: i, b: i + 1, sp: true, spA: true };
       } else if (c === "∕") { tk = { k: "o", t: "/", of: true, a: i, b: i + 1, sp: sp, spA: /\s/.test(s[i + 1] || " ") };
       } else if ("+-*/~^".indexOf(c) >= 0) tk = { k: "o", t: c, a: i, b: i + 1, sp: sp, spA: /\s/.test(s[i + 1] || " ") };
+      else if (c === "√") tk = { k: "f", t: "sqrt", a: i, b: i + 1, sp: sp };   /* C67 (دورِ ۲۷ب): «√(۱۵² + ۸²)» خوانده می‌شود — جذرِ دقیق یا بازهٔ گویای بسیار تنگ */
       else if (c === "²" || c === "³") tk = { k: "w2", t: c === "²" ? 2 : 3, a: i, b: i + 1, sp: sp };
       else if (c === "(") tk = { k: "(", a: i, b: i + 1, sp: sp };
       else if (c === ")") tk = { k: ")", a: i, b: i + 1, sp: sp };
@@ -200,7 +223,16 @@
       var t = T[i]; if (!t) return null;
       if (t.k === "n") return { v: lit(t, X), e: i + 1 };
       if (t.k === "(") { var r = expr(i + 1, X, true); if (!r || !T[r.e] || T[r.e].k !== ")") return null; X.par++; return { v: r.v, e: r.e + 1 }; }
+      if (t.k === "f" && T[i + 1] && (T[i + 1].k === "n" || T[i + 1].k === "(") && !(T[i + 1].k === "n" && (T[i + 1].pct || T[i + 1].mag || T[i + 1].cst))) {   // C67
+        var ra = atom(i + 1, X); if (!ra) return null; var sq = isqrtIv(ra.v); if (!sq) return null; X.ops++; X.sqrt = (X.sqrt || 0) + 1; if (!pt(sq)) X.irr = true; X.rad = ra.v; X.radE = ra.e; return { v: sq, e: ra.e }; }
       return null;
+    }
+    /* C67: جذرِ گویا — دقیق وقتی صورت×مخرج مربعِ کامل است؛ وگرنه بازهٔ [⌊√⌋، ⌈√⌉] با ۱۵ رقمِ اعشار (گنگ: «≈» در شکلِ نوشتهٔ او) */
+    function isqrtB(n) { if (n < Z) return null; if (n < B(2)) return n; var x = n, y = (x + ONE) / B(2); while (y < x) { x = y; y = (x + n / x) / B(2); } return x; }
+    function isqrtIv(v) {
+      if (!pt(v)) { var a = isqrtIv(iv(v.lo)), b = isqrtIv(iv(v.hi)); return a && b ? iv(a.lo, b.hi) : null; }
+      var q = v.lo; if (q.n < Z) return null; var nd = q.n * q.d, r = isqrtB(nd); if (r * r === nd) return iv(F(r, q.d));
+      var S = p10(15), r2 = isqrtB(nd * S * S); return iv(F(r2, q.d * S), F(r2 + ONE, q.d * S));
     }
     function pow(v, k) { var r = iv(F(ONE)); for (var q = 0; q < k; q++) r = iMul(r, v); return r; }
     function factor(i, X) {
@@ -233,7 +265,7 @@
     }
     return function (i) {
       var X = { lits: [], ops: 0, un: 0, par: 0, divs: 0, muls: 0, adds: 0, tsl: 0, terms: [], mops: [] }, r = expr(i, X, false); if (!r) return null;
-      X.v = r.v; X.s = i; X.e = r.e; X.a = T[i].a; X.b = T[r.e - 1].b;
+      X.v = r.v; X.s = i; X.e = r.e; X.a = T[i].a; X.b = T[r.e - 1].b; X.sqrtTop = T[i].k === "f" && X.sqrt === 1 && X.radE === r.e;
       X.single = X.lits.length === 1 && !X.ops && !X.par;
       X.mags = X.lits.filter(function (l) { return l.mag; }).map(function (l) { return l.mag; });
       X.frac = X.adds > 0 && X.divs > 0 && !X.muls && X.lits.every(function (l) { return l.int; });   /* جمع/تفریقِ کسرها: تساویِ عددهای گویای دقیق (C16) */
@@ -262,7 +294,7 @@
     if (nx.k === "w" && !nx.sp && nx.t.length === 1 && nx.t !== "و") return false;      // «۰٫۲۵ح»: ضریبِ یک مجهول
     if (nx.k === "o" && nx.of) return true;                                           // «… = ۳٫۲۵ از ۲۵ میشه ۱۳٪»: عددِ پیش از «از» نتیجهٔ همان تساوی است
     if (nx.k === "(" && nx.sp && T[e + 1] && (T[e + 1].k === "w" || T[e + 1].k === "L") && !FUNC_EN.test(T[e + 1].t || "")) return true;   // «… + ۱/۶ (پمپ …)»: پرانتزِ توضیح، نه ضرب
-    if (nx.k === "o" || nx.k === "(" || nx.k === "w2") return false;
+    if (nx.k === "o" || nx.k === "(" || nx.k === "w2" || nx.k === "f") return false;
     if (nx.k === ")" && nx.ok) return false;
     if (nx.k === "L") return nx.sp && nx.t.length > 1 && !FUNC_EN.test(nx.t);
     if (nx.k === "p" && MATH.test(nx.t)) return false;
@@ -270,9 +302,10 @@
   }
   function okPrev(T, s) {
     var pv = T[s - 1]; if (!pv) return true;
-    if (pv.k === "o" || pv.k === "(" || pv.k === "w2") return false;
+    if (pv.k === "o" || pv.k === "(" || pv.k === "w2" || pv.k === "f") return false;
     if (pv.k === ")" && pv.ok) return false;
     if (pv.k === "n" && T[s].k === "(" && !T[s].sp) return false;                 // «۲(۱+۲)»: ضربِ ضمنی
+    if (pv.k === "n" && T[s].k === "f") return false;                               // C67: «۲√۳» ضربِ ضمنی است — خوانده نمی‌شود (نسنجیده)
     if (pv.k === "L") return T[s].sp && pv.t.length > 1 && !FUNC_EN.test(pv.t);
     if (pv.k === "p" && (MATH.test(pv.t) || (pv.t === "…" && T[s].k === "o"))) return false;   // «… + ۲۰»: دنبالهٔ یک جمعِ سه‌نقطه‌ای، نه عبارتِ کامل
     if (pv.k === "w" && FUNC_FA.test(pv.t) && !(/^توان/.test(pv.t) && !(T[s - 2] && T[s - 2].k === "w" && T[s - 2].t === "به"))) return false;
@@ -303,7 +336,7 @@
   function leadOf(seg, T, o) {
     /* دورِ ۲۷ (D26-24 aD4): «سه تا ۸۰ میشه درست ۲۴۰» — قیدِ «درست/دقیقاً/همون» پیش از عددِ نتیجه بخشی از عدد نیست */
     var s0 = T.length > 1 && T[0].k === "w" && /^(?:درست|دقیقاً|دقیقا|همون|همان|کلاً|کلا|جمعاً|جمعا)$/.test(T[0].t) && T[1].k === "n" ? 1 : 0;
-    if (!T.length || (T[s0].k !== "n" && T[s0].k !== "(" && T[s0].k !== "o")) return null;   // (apAt پایین منهای آغازین را هم می‌خواند — C64)
+    if (!T.length || (T[s0].k !== "n" && T[s0].k !== "(" && T[s0].k !== "o" && T[s0].k !== "f")) return null;   // (apAt پایین منهای آغازین را هم می‌خواند — C64)
     var Xa = apAt(T, s0, seg); if (Xa) return okNext(T, Xa.e) ? Xa : null;   // C42: «۵۵ = ۱ + ۲ + … + ۱۰»
     var X = parser(T, Object.assign({}, o, { noOf: true }))(s0); if (!X || !okNext(T, X.e)) return null;
     var rest = seg.slice(X.b), m;
@@ -330,7 +363,7 @@
   function trailOf(seg, T, o, lead) {
     var P = parser(T, o), n = T.length;
     for (var i = 0; i < n; i++) {
-      var t = T[i]; if (t.k !== "n" && t.k !== "(" && !(t.k === "o" && (t.t === "-" || t.t === "+"))) continue;
+      var t = T[i]; if (t.k !== "n" && t.k !== "(" && t.k !== "f" && !(t.k === "o" && (t.t === "-" || t.t === "+"))) continue;
       if (t.k === "o" && T[i - 1] && T[i - 1].k === "n" && !(t.sp && !t.spA)) continue;   // منهای دوتایی آغازِ عبارت نیست
       if (t.k === "n" || (t.k === "o" && t.t === "-")) { var Xa = apAt(T, i, seg); if (Xa && Xa.e === n) { if (!okPrev(T, i)) return null; return Xa; } }
       var X = P(i); if (!X || X.e !== n) continue;
@@ -476,7 +509,7 @@
       var exact = plain && !apx && tk.raw.indexOf(".") < 0 && !R.bang, best = "", fracNo = false;   /* C44 (دورِ ۲۷؛ D27-23): درصدِ صحیح بی واژهٔ تقریب («۴ از ۲۶ میشه ۱۵٪») هم همین پرسش را دارد */
       for (var ci = 0; ci < cands.length; ci++) { var c0 = cands[ci];
         if (!c0.A.some(function (v) { return near(v, c0.s, c0.t, sym); })) continue;
-        if (exact && c0.A.every(pt) && !c0.A.some(function (v) { return cmp(v.lo, c0.s) === 0; })) { if (L.frac || L.fr1) fracNo = true; else best = best || "ask"; continue; }
+        if (exact && (c0.A.every(pt) || L.irr) && !c0.A.some(function (v) { return pt(v) && cmp(v.lo, c0.s) === 0; })) { if (L.frac || L.fr1) fracNo = true; else best = best || "ask"; continue; }
         if (c0.g && mixS) { best = best || "reading" + c0.g; continue; }
         return "eq"; }
       if (best) return best; if (fracNo) return "";
@@ -486,7 +519,8 @@
       if (R.bang && tk.v.n >= Z && tk.v.n <= B(60) && hit(function (v) { return meet(v, iv(F(factB(tk.v.n)))); })) return "eq";   // «= ۵!»
       /* عددها می‌خوانند و فقط توانِ هزار فرق دارد ⇒ مقیاس را صفحه نمی‌تواند داوری کند (C15: هرگز ✗ به‌خاطرِ واژه) */
       /* C23: وقتی عملوندها هم واژهٔ مقیاس دارند، مقیاس جزوِ حساب است — «۲ میلیون × ۳ = ۶ هزار» نادرست است؛ پرسشِ مقیاس فقط برای واژه‌ای است که تنها کنارِ نتیجه یا تنها کنارِ عملوندهاست */
-      if (plain && (tk.mag || tk.cm || Lm.length) && !(Lm.length && (tk.mag || tk.cm))) for (var cj = 0; cj < cands.length; cj++) for (var kk = 3; kk <= 12; kk += 3) { var up = F(p10(kk)), dn = F(ONE, p10(kk)), cc = cands[cj];
+      var LmC = Lm.length || (L.lits || []).some(function (l) { return l.cm || l.cm2; });   // دورِ ۲۷ب (C15/C63): عددِ مرکبِ «N میلیون و M» هم واژهٔ مقیاسِ عملوند است
+      if (plain && (tk.mag || tk.cm || LmC) && !(LmC && (tk.mag || tk.cm))) for (var cj = 0; cj < cands.length; cj++) for (var kk = 3; kk <= 12; kk += 3) { var up = F(p10(kk)), dn = F(ONE, p10(kk)), cc = cands[cj];
         if (cc.A.some(function (v) { return near(iScale(v, up), cc.s, cc.t, sym) || near(iScale(v, dn), cc.s, cc.t, sym); })) return "scale"; }
       return "";
     }
@@ -538,7 +572,7 @@
   function hasNum(A) { return A.some(function (x) { return x.k === "n"; }); }
   function hasOp(A) {
     for (var j = 0; j < A.length; j++) { var x = A[j], bf = A.slice(0, j).some(function (y) { return y.k === "n" || y.k === ")"; });
-      if (x.k === "o" && bf) return true; if (x.k === "w2" || (x.k === "p" && MATH.test(x.t))) return true;
+      if (x.k === "o" && bf) return true; if (x.k === "w2" || x.k === "f" || (x.k === "p" && MATH.test(x.t))) return true;
       if (x.k === "w" && (FUNC_FA.test(x.t) || (x.t === "با" && A[j + 1] && A[j + 1].k === "n" && !A[j + 1].pct && bf === false))) return true;
       if (x.k === "L" && FUNC_EN.test(x.t)) return true; }
     return false;
@@ -602,6 +636,13 @@
         if (!MG) { MG = {}; tokens(t).forEach(function (x) { if (x.k === "n" && x.mag && !x.pct) (MG[x.raw] = MG[x.raw] || {})[x.mag] = 1; }); }
         var rn0 = rdNums(members[members.length - 1]); if (rn0.length && rn0.every(function (l) { return MG[l.raw] && MG[l.raw][rdG]; })) how = "eq"; }
       if (!how && L.mulAlt && members.length === 1 && agree({ alts: [L.mulAlt], v: L.mulAlt, lits: L.lits, mags: L.mags, run: true }, R, apx, null)) how = "andmul";   // C40
+      /* C63 (دورِ ۲۷ب، leftovers): «N میلیون و M» با M ِ بی‌بزرگی دو خوانش دارد (M واحد یا M هزار). عملوند: اگر فقط خوانشِ «هزار» حاصلِ او را درست کند همان خوانش است (✓)؛
+         نتیجه: همین، در agree (tk.alt). اگر حکم به خوانش بسته است (خوانشِ «هزار» فقط تا مقیاس یا گرد کردن می‌خواند) صفحه نه ✓ می‌دهد نه ✗ — «کدام را نوشتی؟» (قاعدهٔ C24)؛
+         اگر با هیچ خوانشی نمی‌خواند حکم روشن است (✗ در هر خوانش؛ بانکِ R26 s09 p15) و مقدارِ صفحه برای هر دو خوانش گفته می‌شود */
+      var m2L = null, m2V = null, m2H = ""; if (!how && members.length === 1) { m2L = (L.lits || []).filter(function (l) { return l.alt && !l.cm2; })[0] || null;
+        if (m2L) { var Tm2 = Rd[i - 1].T, hit2 = Tm2.indexOf(m2L) >= 0;
+          var L2 = hit2 ? trailOf(segs[i - 1].s, Tm2.map(function (x) { return x === m2L ? Object.assign({}, x, { v: x.alt, alt: null, cm2: true, raw: String(x.alt.n) }) : x; }), { reg: reg, wcut: cutW[i - 1] }, Rd[i - 1].lead) : null;
+          if (L2 && L2.a === L.a) { m2H = agree(L2, R, apx, Rd[i].leadW); if (m2H === "eq") { how = "eq"; L = L2; members = [L2]; m2L = null; } else m2V = L2.v; } else m2L = null; } }
       if (!how) {   // خوانش‌های طبیعیِ دیگرِ همان نوشته
         var a1 = read(i - 1, true) || Rd[i - 1], a2 = read(i, true) || Rd[i];
         /* خوانشِ دیگری درست درمی‌آید ولی همان نوشته با خوانشِ نخست نادرست است («۱/۲ + ۱/۳ = ۲/۵»: کسر یا ممیز؟) ⇒ نه «درست»، نه «نادرست»: به مربی «نسنجیده» (دورِ ۲۶، C17) */
@@ -628,6 +669,8 @@
         valT: (/\//.test(said) || ((L0.frac || L0.fr1) && tkS && tkS.int)) && pt(L0.v) && L0.v.lo.d !== ONE && String(L0.v.lo.d).length <= 9 ? fa(String(L0.v.lo.n) + "/" + String(L0.v.lo.d)) : tkS ? fmtSc(dv0, dtk, magW) : fmtV(L0.v),
         ok: !!how, kind: L0.run ? "run" : R.floor ? "floor" : "chain", pos: segs[i - 1].at + L0.a, pe: segs[i].at + R.b, sx: !R.single || !!R.floor || R.rem != null || !!R.mixed || !!R.comp };
       if (how === "ask" || how === "scale") { c.ask = true; c.kind = how === "scale" ? "scale" : "round"; }
+      if (!how && m2V) { c.m2T = pretty(segs[i - 1].s.slice(m2L.a, m2L.b)); c.m2W = MAGW[m2L.cm - 3] || "هزار"; c.m2A = [c.valT, tkS ? fmtSc(m2V, dtk, magW) : fmtV(m2V)];   // C63
+        if (m2H) { c.ok = true; c.ask = true; c.kind = "m2"; } else c.valT = c.m2A[0] + " (با «" + fa(c.m2T) + " " + c.m2W + "»: " + c.m2A[1] + ")"; }
       if (how === "andmul") { c.ask = true; c.kind = "andmul"; c.mulT = tkS ? fmtLike(L0.mulAlt, tkS, magW) : fmtV(L0.mulAlt); }   // C40: نه ✓ نه ✗ — «ضرب کردی؟»
       if (how === "reading") {   // C24: خوانشِ معمول (هر مقیاس روی عددِ کنارش) نمی‌خواند و خوانشِ «همه در یک مقیاس» می‌خواند ⇒ همان خوانش نشان داده و پرسیده می‌شود
         c.ask = true; c.kind = "reading"; c.rdW = MAGW[rdG] || ""; c.rdN = rdNums(L0).map(function (l) { return l.raw; });
@@ -640,7 +683,9 @@
       if (L0.div2 && !L0.fr1 && L0.lits[0].v.d === ONE && L0.lits[1].v.d === ONE && L0.lits[1].v.n > Z && L0.lits[0].v.n >= Z) { var qn = L0.lits[0].v.n / L0.lits[1].v.n, rn = L0.lits[0].v.n % L0.lits[1].v.n, remT = fa(String(qn)) + (rn ? " با باقی‌ماندهٔ " + fa(String(rn)) : "");
         if (how === "floor" || how === "rem" || (!how && R.single && R.lits[0].int && !(R.floor && R.ref))) c.valT = remT; else if (c.ask && c.kind === "round" && !(tkS && tkS.pct)) c.remT = remT; }
       if (!how && R.floor && R.ref && pt(L0.v)) c.valT = fmtLike(L0.v, { raw: R.ref.raw, mag: 0, pct: false }, "");                                   // ناهم‌خوانی در «یعنی ۲٫۹» است: مقدار به شکلِ همان اعشار
-      if (c.ask && c.kind === "round" && tkS) c.valT = fmtSc(dv0, { raw: tkS.raw + ".0", mag: dtk.mag, pct: !!tkS.pct }, magW);                  // C16: مقدارِ دقیق به اعشار (یک رقم بیش از «یک رقمِ اعشار»)
+      if (c.ask && c.kind === "round" && tkS) c.valT = fmtSc(dv0, { raw: tkS.raw + ".0", mag: dtk.mag, pct: !!tkS.pct }, magW);
+      /* C67 (دورِ ۲۷ب): بازحسابِ گنگ در شکلِ او — دقیق و تقریبی («√۲۰۸ ≈ ۱۴٫۴۲»)، با همان رقم‌های اعشارِ خودش (کمینه دو) */
+      if (L0.sqrtTop && L0.irr && L0.rad && pt(L0.rad) && tkS && !tkS.pct && !tkS.mag) { c.valT = "√" + fmtF(L0.rad.lo) + " ≈ " + fmtD(L0.v.lo, Math.max(2, (tkS.raw.split(".")[1] || "").length)); c.irr = true; }                  // C16: مقدارِ دقیق به اعشار (یک رقم بیش از «یک رقمِ اعشار»)
       /* واحد (C10/C15): واحدِ هر عدد از واژهٔ کنارِ خودش یا از نوشتهٔ خودش در همین پیام. همه خوانا و هم‌بُعد با واحدِ نتیجه ⇒ با ضریب‌ها سنجیده می‌شود؛ عددها می‌خوانند و واحد ناخواناست ⇒ «فقط عدد»؛
          عددها نمی‌خوانند ⇒ خوانشِ پیشوندِ واحدِ نتیجه («۲۴۷۰ × ۸ ≈ ۱۹٫۸ کیلووات‌ساعت»، C26-9)؛ واحدِ ناشناخته کنارِ عددِ ناهم‌خوان ⇒ نسنجیده. برچسبِ «واحد» فقط وقتی عددِ بی‌تبدیل همان نوشتهٔ اوست (B_x D15) */
       if (plainR && !L0.run && !c.ask) {
@@ -757,15 +802,15 @@
   function arithChk(q, ctx) {
     var reg = {}, note = function (raw, v) { reg[raw] = reg[raw] ? hull(reg[raw], v) : v; };
     /* عددهایی که خودش «حدود/تقریباً» نوشته یا گرد کرده (در همهٔ پیام، نه فقط همین نقل) */
-    var t0 = norm(ctx || q), ra = new RegExp("(?:≈|" + APX + ")\\s*(\\d+(?:\\.\\d+)?)(?!\\d|\\.\\d|[\\/%])", "g"), m;
+    var N0 = normM(ctx || q), t0 = N0.t, ra = new RegExp("(?:≈|" + APX + ")\\s*(\\d+(?:\\.\\d+)?)(?!\\d|\\.\\d|[\\/%])", "g"), m;
     while ((m = ra.exec(t0))) { var tk = { raw: m[1], mag: 0, pct: false }; note(m[1], wide(iv(dec(m[1])), tolSaid(tk, false))); }
     run(t0, {}, note, null);
     /* واحدِ هر عدد از نوشتهٔ خودش (یک واحد برای یک عدد؛ دو واحدِ ناهم‌سان ⇒ ناخوانا) */
     var CU = {}; quants(t0).forEach(function (x) { if (x.mag) return; var o = CU[x.raw]; CU[x.raw] = o === undefined || (o && o.dim === x.u.dim && cmp(o.f, x.u.f) === 0) ? x.u : null; });
     /* نقلِ یک گام درونِ پیامش: همان پیام سنجیده می‌شود و فقط حساب‌هایی که در همین نقل تمام می‌شوند برمی‌گردند — جمعِ پیاپی («با ۱/۲۰ میشه ۴/۵») عددِ پیشینش را از پیام می‌گیرد */
     var tq = norm(q).trim(), at = ctx && tq ? t0.indexOf(tq) : -1;
-    if (at >= 0 && ctx) { var all = run(t0, reg, null, CU), In = function (c) { return c.pe > at && c.pe <= at + tq.length && (c.kind === "run" || c.pos >= at); }, part = all.filter(In); part.unread = (all.unread || []).filter(In); return part; }
-    return run(norm(q), reg, null, CU);
+    if (at >= 0 && ctx) { var all = run(t0, reg, null, CU), In = function (c) { return c.pe > at && c.pe <= at + tq.length && (c.kind === "run" || c.pos >= at); }, part = all.filter(In); part.unread = (all.unread || []).filter(In); return backPos(N0.m, part); }
+    var Nq = ctx ? normM(q) : N0; return backPos(Nq.m, run(Nq.t, reg, null, CU));
   }
   ST.arithChk = arithChk;
   /* عددهای نتیجه برای ردگیریِ وابستگیِ گام‌ها (نه تبدیل، نه سمتِ راستِ عبارتی) */
@@ -779,6 +824,8 @@
     if (c.kind === "reading") return "با خوانشِ معمول (هر مقیاس روی عددِ کنارِ خودش) «" + fa(c.expr) + "» " + (coach ? c.valT + " می‌شود، نه «" + fa(c.saidT || c.said) + "»" : "با «" + fa(c.saidT || c.said) + "» نمی‌خواند") +
       "؛ اگر «" + c.rdN.map(fa).join("»، «") + "» را هم «" + c.rdW + "» بخوانی می‌خواند" + (coach ? " — نه ✓ و نه ✗؛ همین خوانش را نشانش بده و بپرس «این‌طور حساب کردی؟»" : " — این‌طور حساب کردی؟");
     if (c.kind === "andmul") return "«" + fa(c.expr) + "» را جمع بخوانی " + c.valT + " می‌شود و با «" + fa(c.saidT || c.said) + "» نمی‌خواند؛ ضرب بخوانی می‌خواند" + (coach ? " — «و» دو خوانش دارد: نه ✓ و نه ✗؛ از خودش بپرس «ضرب کردی؟»" : " — ضرب کردی؟");
+    if (c.kind === "m2") return "«" + fa(c.m2T) + "» دو خوانش دارد («" + fa(c.m2T) + "» ِ واحد، یا «" + fa(c.m2T) + " " + c.m2W + "») — «" + fa(c.expr) + "» به ترتیب " + c.m2A[0] + " یا " + c.m2A[1] + " می‌شود؛ با خوانشِ دوم «" + fa(c.saidT || c.said) + "» فقط تا مقیاس/گرد کردن می‌خواند" +
+      (coach ? " — نه ✓ و نه ✗ (حکم به خوانش بسته است)؛ از خودش بپرس کدام را نوشت" : " — کدام را نوشتی؟");
     if (c.kind === "scale") return "عددهای «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» می‌خوانند، ولی مقیاسش (هزار/میلیون/میلیارد) را صفحه نسنجیده" + (coach ? " — نه ✓ و نه ✗؛ از خودش بپرس کدام مقیاس را می‌خواست" : "");
     return "«" + fa(c.expr) + "» " + (/^≈/.test(c.valT) ? "" : "دقیقاً ") + c.valT + " می‌شود" + (c.remT ? " (خارج‌قسمتِ صحیح " + c.remT + ")" : "") + " و «" + fa(c.saidT || c.said) + "» نوشته شده" + (coach ? " — نه ✓ و نه ✗؛ مقدارِ دقیق را بگو و بپرس گرد کرده یا همین را می‌خواست" : " — گرد شده؟");
   }

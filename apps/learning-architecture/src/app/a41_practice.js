@@ -3152,9 +3152,57 @@
       out.push(alt ? { what: r.quote || r.what, date: alt, src: "her", was: r.date } : { what: r.quote || r.what, date: add(td, 1), amb: true, free: true, wd: "", why: "neg", was: r.date }); });
     return out;
   }
-  /* C58 بر ثبت‌شده‌ها (بانکِ R27 #107، B27·D10): ✏️ ِ روزِ پیامی که برنامه یا موعدش با «آره» ثبت شده بود ⇒ ثبت «جایگزین شد» (تاریخچه می‌ماند) و روزِ تازه
-     یک بار پرسیده می‌شود — روزِ تازه هرگز بی «آره» ِ او ثبت نمی‌شود (حتی اگر اصلاحگر روزِ رکورد را پیش‌تر جابه‌جا کرده باشد) */
+  /* دورِ ۲۷ب (leftovers؛ C58 «یک راه»): اصلاحِ روزِ رکوردی که با «آره» ِ او ثبت شده بود — برنامه (📌) یا موعد (⏰) — از همین یک تابع می‌گذرد، از هر راهی که آمده باشد:
+     ✏️ ِ خودش (a41 editBooked27، a27 retractApply با R.edit، a38 retractSess ِ ✏️) یا اصلاحِ گفت‌وگو («تا ۲۰ آذره»، گزارشِ retract ِ مدل: a27 retractApply / a38 retractSess).
+     پیش‌تر هر راه روز را جدا جابه‌جا می‌کرد و تاریخچهٔ خودش را می‌نوشت (corr در a27، fixHist در a38) و در ✏️ سپس editBooked27 همان رکورد را می‌بست و دوباره می‌پرسید —
+     دو یا سه سطرِ تاریخچه برای یک اصلاح. حالا یک تابع، یک سطرِ تاریخچه:
+       • ✏️ (C58): ثبتِ پیشین «جایگزین شد» (بسته) و روزِ تازه **یک** بار پرسیده می‌شود — هرگز بی «آره» ِ او ثبت نمی‌شود؛
+       • اصلاحِ گفت‌وگو (o.move — حرفِ خودش روزِ تازه را گفته و تعهد پیش‌تر «آره» گرفته بود؛ بانک‌های R22 #69/#73/#87، R25 A25-21): همان رکورد به روزِ تازه می‌رود.
+     راهِ دوم که پس از راهِ نخست می‌رسد چیزی نمی‌بیند (رکورد بسته است یا روزش همان است). x: برنامه (o.kind = "plan") یا موعد؛
+     o = {src: متنِ تازه، date?: روزِ تازه اگر اصلاحگر آن را دانسته، base: روزِ گفتن، at: پیامِ اصلاح، why, by, move, time?, queue: پرسش در صفِ s0._re26 (راهِ بیرون از datePend)} */
+  function rebook27(s0, x, o) {
+    if (!s0 || !x || !o) return null; var td = today(), isPl = o.kind === "plan";
+    if (isPl ? (!/^\d{4}-\d\d-\d\d$/.test(String(x.when || "")) || x.done || (x.state && x.state !== "open")) : (x.done || !x.date)) return null;
+    var cur = isPl ? x.when : x.date, I = null;
+    if (o.date && /^\d{4}-\d\d-\d\d$/.test(String(o.date))) I = { date: o.date };
+    else { try { I = PR.whenInfo(String(o.src || ""), o.base && o.base <= td ? o.base : td); } catch (e) { I = null; } }
+    if (!I || !I.date || (!I.amb && I.date === cur)) return null;
+    var why = o.why || (o.move ? "اصلاحِ خودش" : "اصلاحِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد"), what = String(o.src || (isPl ? x.text : (x.quote || x.what)) || "");
+    if (o.move) { if (I.amb) return null;   // روزِ دوپهلو را صفحه حدس نمی‌زند
+      if (isPl) { if (o.hist !== false) (x.whenHist = x.whenHist || []).push({ was: cur, now: I.date, at: nowISO(), why: why, msg: o.at || "" }); x.when = I.date;   // hist:false ⇒ سطرِ تاریخچه همان corr ِ فراخوان است (oldWhen، که 📜 می‌خواند) delete x.askKey; delete x.gAskKey;
+        try { S.all("deadline", function (r) { return r && !r.done && r.plan && r.plan.id === x.id && r.date === cur; }).forEach(function (r) { r.date = I.date; S.put(r); try { if (A.ASSIST && A.ASSIST.deadlineSync) A.ASSIST.deadlineSync(r); } catch (e) { } }); } catch (e) { } }
+      else { var oT = (A.fdate ? A.fdate(cur) : cur) + (x.time ? "، ساعت " + fa(String(x.time).replace(/^0/, "").replace(/:00$/, "")) : ""), oW = x.what; x.date = I.date; if (o.time) x.time = o.time;
+        if (typeof o.what === "string" && o.what.trim() && o.what !== x.what) { x.what = String(o.what).slice(0, 120); oT += " — " + oW; }   // «چه» ِ همان اصلاح در همان یک سطر
+        (x.fixHist = x.fixHist || []).push({ at: nowISO(), field: "deadline", old: o.oldT || oT, new: (A.fdate ? A.fdate(x.date) : x.date) + (x.time ? "، ساعت " + fa(String(x.time).replace(/^0/, "").replace(/:00$/, "")) : ""), why: why, msg: o.at || "", src: o.src20 || "", d: o.d || "" });
+        S.put(x); try { if (A.ASSIST && A.ASSIST.deadlineSync) A.ASSIST.deadlineSync(x); } catch (e) { } }
+      return { moved: true, was: cur, date: I.date }; }
+    if (!I.amb && I.date < td) return null;   // روزِ گذشته پرسیدنی نیست — ثبتِ پیشین دست نمی‌خورد
+    if (isPl) {
+      (x.whenHist = x.whenHist || []).push({ was: cur, at: nowISO(), why: why, msg: o.at || "" }); x.when = "next-session"; delete x.dateBy; delete x.askKey; delete x.gAskKey; x.dateAsk = true;
+      /* یک تعهد، یک رکورد (C52): ⏰ ِ پیوسته به همین 📌 هم با آن بسته می‌شود — سطرِ تاریخچهٔ جدا نمی‌گیرد */
+      try { S.all("deadline", function (r) { return r && !r.done && r.plan && r.plan.id === x.id && r.date === cur; }).forEach(function (r) { r.done = true; r.doneAt = nowISO(); r.doneBy = { kind: "replaced", plan: x.id }; S.put(r); }); } catch (e) { }
+      if (I.amb) { x.whenAsk = I.wd || "جمعه"; x.whenAskO = I.opts ? { date: I.date, opts: I.opts } : undefined; } else x.whenPend = { date: I.date, src: "her" };
+    } else { (x.fixHist = x.fixHist || []).push({ at: nowISO(), field: "deadline", old: cur, new: "", why: why, msg: o.at || "" }); x.done = true; x.doneAt = nowISO(); x.doneBy = { kind: "replaced", why: o.by || "edit" }; S.put(x); }
+    var it = I.amb ? { what: what, date: I.date, amb: true, wd: I.wd || "", opts: I.opts || undefined, was: cur } : { what: what, date: I.date, src: "her", was: cur };
+    if (isPl) it.plan = x.id;
+    if (o.queue) s0._re26 = (s0._re26 || []).concat([it]);
+    return { it: it, was: cur, date: I.date, amb: !!I.amb };
+  }
+  PR.rebook27 = rebook27;
+  /* C58 بر ثبت‌شده‌ها (بانکِ R27 #107، B27·D10): ✏️ ِ روزِ پیامی که برنامه یا موعدش با «آره» ثبت شده بود ⇒ همان یک راه (rebook27). بدنهٔ پیشین (که خودش می‌بست و
+     پس از جابه‌جاییِ اصلاحگر سطرِ دومِ تاریخچه می‌ساخت) قرنطینه است: PR.R27_QUARANTINE.editBooked27a (docs/overhaul/REMOVAL_CANDIDATES.md) */
   function editBooked27(s0, ed, at) {
+    var out = []; if (!ed || !ed.at) return out; var td = today(), b0 = (A.localDay ? A.localDay(ed.at) : "") || td, base = b0 <= td ? b0 : td, why = "✏️ ِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد";
+    (s0.plans || []).forEach(function (q) { if (!q || String(q.at || "") !== String(ed.at)) return;
+      var r = rebook27(s0, q, { kind: "plan", src: ed.apply(q.text), base: q.d && q.d <= td ? q.d : base, at: at, why: why, by: "edit" }); if (r && r.it) out.push(r.it); });
+    S.all("deadline", function (r) { return r && !r.done && /^her/.test(String(r.by || "")) && r.src && String(r.src.at || "") === String(ed.at); }).forEach(function (r) {
+      var z = rebook27(s0, r, { kind: "deadline", src: ed.apply(r.quote || r.what), base: base, at: at, why: why, by: "edit" }); if (z && z.it) out.push(z.it); });
+    return out;
+  }
+  PR.editBooked27 = editBooked27;
+  PR.R27_QUARANTINE = PR.R27_QUARANTINE || {};
+  /* دورِ ۲۷ (dates) — بدنهٔ پیشینِ editBooked27 (قرنطینه، صدا زده نمی‌شود؛ دورِ ۲۷ب C58 «یک راه» جایش را گرفت) */
+  PR.R27_QUARANTINE.editBooked27a = function editBooked27a(s0, ed, at) {
     var out = []; if (!ed || !ed.at) return out; var td = today(), b0 = (A.localDay ? A.localDay(ed.at) : "") || td, base = b0 <= td ? b0 : td;
     var nd = function (src, b1) { var I = null; try { I = PR.whenInfo(src, b1 && b1 <= td ? b1 : base); } catch (e) { } return I && I.date ? I : null; };
     (s0.plans || []).forEach(function (q) { if (!q || String(q.at || "") !== String(ed.at) || !/^\d{4}-\d\d-\d\d$/.test(String(q.when || "")) || q.done || (q.state && q.state !== "open")) return;
@@ -3168,8 +3216,7 @@
       r.date = orig; r.done = true; r.doneAt = nowISO(); r.doneBy = { kind: "replaced", why: "edit" }; S.put(r);
       if (I.amb) out.push({ what: src, date: I.date, amb: true, wd: I.wd || "", opts: I.opts || undefined, was: orig }); else if (I.date >= td) out.push({ what: src, date: I.date, src: "her", was: orig }); });
     return out;
-  }
-  PR.editBooked27 = editBooked27;
+  };
   /* ب) تاریخ‌های تازهٔ همین نوبت: حرفِ خودش، برنامهٔ گزارش‌شده (a27 plan18 ⇒ q.whenPend)، کنشِ deadline ِ مدل (s0._dq26) — یک کار، یک پرسش */
   PR.datePend = function (s0) {
     var U = userMsgs(s0), m = U[U.length - 1]; if (!m || !s0) return false; var t = String(m.text || ""), at = String(m.at || ""), dirty = false;
