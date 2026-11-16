@@ -189,6 +189,9 @@
     if (ev && ev.not25 && ev.not25.indexOf(pid) >= 0) return false;   // دورِ ۲۵ (P5، A25-16): تکه‌ای از پیامِ مرزی که مالِ مسئلهٔ پیشینِ همان گفت‌وگوست
     var pg = S.get("eprog_" + pid), I = (pg && pg.solve && pg.solve.live && pg.solve.live.chatImp) || null;
     if (I && I.sess === se.id && a >= String(I.from || "") && a <= String(I.to || "~")) return true;
+    /* دورِ ۲۸ (story، A28-27 s08): قلمی که بی مسئلهٔ زنده (کلیدِ «c:N» ِ مسئلهٔ گفت‌وگو) ثبت شد و پنجره‌اش را مسئلهٔ زندهٔ دیگری که بعدتر از همان گفت‌وگو ساخته شد وارد کرده
+       (chatImp)، مالِ همان مسئله است — نه مالِ مسئله‌ای که سشن در آن لحظه به آن بسته بود (نتیجهٔ معمای تازه زیرِ معمای مادر هم می‌آمد) */
+    if (a && ev && /^st23_c_/.test(String(ev.id || "")) && (A.liveAll ? A.liveAll() : []).some(function (r) { if (!r || !r.p || r.p.id === pid) return false; var g = S.get("eprog_" + r.p.id), J = g && g.solve && g.solve.live && g.solve.live.chatImp; return !!(J && J.sess === se.id && a >= String(J.from || "") && a <= String(J.to || "~")); })) return false;
     if (!a) return pidAt(se, "~") === pid;
     return pidAt(se, a) === pid;
   };

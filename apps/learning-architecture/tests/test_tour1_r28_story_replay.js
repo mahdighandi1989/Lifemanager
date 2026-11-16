@@ -54,6 +54,20 @@ const DIR = path.join(__dirname, 'fixtures', 'r28_story');
   /* A28-12 (A s02 p13, p15): حساب‌هایی که مدل گزارش نکرد در پروندهٔ «لوله در بارِ وانت» */
   K.A_s02_A28_12 = async () => { const R = await run('A_s02', 0, '(' + ALL.toString() + ')()'); const c = R.x.filter(r => /^c(?:calc|res|data|step)$/.test(r[1]) && /^pb_l_/.test(r[0]));
     return [c.some(r => /۱۳\/۱۲ = ۱/.test(r[2])) && c.some(r => /√\(۱۵² \+ ۸²\) ≈ ۱۷/.test(r[2])) && !R.errors.length, J(c.map(r => r[2].slice(0, 120)))]; };
+  const LIVES = () => APP.S.all('eprob', r => r && r.live && r.p).map(r => [r.p.id, r.p.title, (APP.dossier(r.p.id).events || []).map(e => e.k + ' ¦ ' + (e.title || '') + ' ¦ ' + (e.lines || []).join(' ¦ '))]);
+  /* A28-13 (A s03): اصلاحِ «چهارشنبه ⇐ پنجشنبه» ِ برنامهٔ مسئلهٔ اصلی فقط در پروندهٔ مسئلهٔ اصلی — نه در «اگر ۴ نقطه باشد …» */
+  const PKS = () => { const o = []; APP.S.all('achat', x => x && x.msgs && x.msgs.length).forEach(se => { const D0 = APP.dossier(se.id); (D0.pks || []).forEach(k => { const D = APP.dossier(se.id + '|' + k.pk); o.push([k.title, (D.events || []).map(e => e.k + ' ¦ ' + (e.lines || []).join(' ¦ '))]); }); }); return o; };
+  K.A_s03_A28_13 = async () => { const R = await run('A_s03', 0, '(() => [(' + LIVES.toString() + ')(), (' + PKS.toString() + ')()])()');
+    const L = R.x[0].filter(x => x[2].some(l => /^retract .*پنجشنبه/.test(l))).map(x => x[1]), P = R.x[1].filter(x => x[1].some(l => /^retract .*پنجشنبه/.test(l))).map(x => x[0]), side = R.x[1].filter(x => /۴ نقطه/.test(x[0])).length;
+    /* بازپخشِ امروز مسئلهٔ فرعیِ «اگر ۴ نقطه …» را جدا نمی‌سازد (C126: «اگه … چی؟» درونِ همان مسئله) — پس فقط «اصلاح فقط زیرِ مسئلهٔ اصلی» سنجیده می‌شود */
+    return [L.length === 1 && !/۴ نقطه/.test(L[0]) && P.every(t => t === L[0]) && !R.errors.length, J({ L, P, side, pk: R.x[1].map(x => x[0]) })]; };
+  /* A28-27 (A s08 p8): نتیجهٔ معمای تازهٔ «۵ و ۹» فقط زیرِ خودش، نه زیرِ «۷ و ۱۱» */
+  K.A_s08_A28_27 = async () => { const R = await run('A_s08', 0, '(' + LIVES.toString() + ')()');
+    const w = R.x.map(x => [x[1], x[2].filter(l => /^c(?:res|calc|data) .*۹−۵/.test(l)).length]); const old = w.filter(x => /۷ و ۱۱/.test(x[0])), nw = w.filter(x => /۵ و ۹/.test(x[0]));
+    return [old.length === 1 && old[0][1] === 0 && nw.length === 1 && nw[0][1] >= 1 && !R.errors.length, J(w)]; };
+  /* F11 / C97 — B28·D10 (B oB1 c21): «یه مسئله‌ی دیگه … ولی جداست … می‌خوام اینم حل کنم» رکوردِ زندهٔ خودش؛ نه یادداشتِ بازنگریِ مسئلهٔ بیداری */
+  K.B_oB1_C97 = async () => { const R = await run('B_oB1', 21, '(' + LIVES.toString() + ')()');
+    const t = R.x.map(x => x[1]), np = R.x.filter(x => x[2].some(l => /^newprobs .*شام/.test(l))).length; return [t.some(x => /شام/.test(x)) && np === 0 && !R.errors.length, J(t)]; };
   /*@@MORE@@*/
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 1500)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }

@@ -665,7 +665,7 @@
     var last = L[L.length - 1], me = D.pks.filter(function (x) { return x.pk === cur; })[0];
     /* دورِ ۲۷ (story R5، C53؛ D27-14 pwD2): پیش‌بینی‌ای که مسئلهٔ خودش را دارد (own27) زیرِ همان مسئله — نه زیرِ پنجرهٔ زمانیِ پیامش */
     var own27 = function (o) { if (!G26) return o.pk || ""; var id = o.pid ? "L:" + o.pid : ""; var g = G26.filter(function (x) { return (id && x.id === id) || (o.pk && x.pks.indexOf(o.pk) >= 0); })[0]; return g ? g.pk : ""; };
-    D.events = D.events.filter(function (e) { if (e.k === "stmt") return false; if (e.own27) { var g27 = own27(e.own27); if (g27) return g27 === cur; } if (!e.at) return cur === last; return at26(e.at) === cur; });
+    D.events = D.events.filter(function (e) { if (e.k === "stmt") return false; if (e.own27) { var g27 = own27(e.own27); if (g27) return g27 === cur; } if (!e.at) return cur === last; /* دورِ ۲۸ (A28-13 s03): اصلاحِ یک پیام مالِ مسئلهٔ همان پیام است، نه مسئله‌ای که لحظهٔ اصلاح در جریان بود */ if (e.k === "retract" && e.src && e.src.at) return at26(e.src.at) === cur; return at26(e.at) === cur; });
     var f0 = U.filter(function (m) { return at26(m.at || "") === cur; })[0];
     if (f0) D.events.unshift({ k: "stmt", at: f0.at || "", title: "آغازِ این مسئلهٔ گفت‌وگو", lines: [clip(f0.text, 400)], i: -1 });
     D.events.forEach(function (e, j) { e.i = j; });
