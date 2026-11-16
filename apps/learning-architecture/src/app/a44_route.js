@@ -1255,8 +1255,9 @@
     swEv(o.sc, e, "ask", "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + mL + "»" + (e.ask.alt.length ? " یا «" + e.ask.alt.join("» یا «") + "» — کدام همان ابزارِ گام است؟" : " — همان ابزارِ گام است؟"), [(e.late ? "تکهٔ منتظر: «" : "گامِ منتظر: «") + clip(e.step, 120) + "»", "سنجش: " + e.checks[e.checks.length - 1].reason], "پرسیدم؛ تا جوابش گام منتظر می‌ماند", e.ask.evk);
     waitEv(o.sc, e);
     var sh = shE(e);
-    var dup28 = dupTie28([it].concat(TI.map(function (x) { return x.it; })));
+    var CC28 = [it].concat(TI.map(function (x) { return x.it; })), dup28 = dupTie28(CC28), tw28 = CC28.map(function (c, i) { return CC28.some(function (c2, j) { return j !== i && zk(c2.fa) === zk(c.fa) && zk(c2.text) === zk(c.text); }) ? L28[i] : ""; }).filter(Boolean);
     if (dup28) altT += " — نام و شرحِ هر دو یکی است؛ گویا تکراری‌اند. اگر برای " + (shE(e) ? "شما" : "تو") + " یکی‌اند، بگو «یکی‌اند» تا یکی شمرده شوند؛ وگرنه «اولی» یا «دومی»";
+    else if (tw28.length) altT += " — «" + tw28.join("» و «") + "» نام و شرحِ یکسان دارند؛ گویا تکراری‌اند (برای انتخاب، شماره‌شان را بگو)";
     sysMsg(e, "❓ برگهٔ " + nn(e) + " جواب گرفت: «" + mL + "»" + altT + (e.ask.alt.length ? ". میانِ این‌ها برنمی‌گزینم — نامِ همان را که گامِ «" + clip(e.step, 70) + "» لازم داشت " + (sh ? "بگویید" : "بگو") + " (یا «هیچ‌کدام»)؛ تا آن وقت گام منتظر می‌ماند."
       : ". مطمئن نیستم همان چیزی باشد که گامِ «" + clip(e.step, 70) + "» لازم داشت — پیش از ادامه از " + (sh ? "شما" : "تو") + " می‌پرسم؛ تا آن وقت گام منتظر می‌ماند."));
     o.put();
