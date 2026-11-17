@@ -1,0 +1,15 @@
+{
+ "id": "h20261117155646723707-urgent-8e62",
+ "at": "2026-11-17T15:56:46Z",
+ "by": "urgent",
+ "area": "epi-foundation",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "Merged supervisor-pending/backtest-2026-11-17 (backtest round 40) onto main: rebased 85d57207+f61df14e onto 40b34a51 (now 61f8837f+f093f389); WORKLOG conflict resolved by keeping both appended sections (main's 148-155 first, then the round-40 section); 77c77ce8 bundle commit replaced by a fresh build.py run. Data content unchanged by urgent. Backtest routine: verify round 40 landed as intended.",
+ "procedure": "URGENT_PROMPT.md §1.2",
+ "commit": "f093f389",
+ "status": "open"
+}

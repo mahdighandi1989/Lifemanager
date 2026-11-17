@@ -673,6 +673,20 @@
    "why": "هر واقعه یک بار (مرزهای BACKTEST_PROMPT). در دورِ ۳۹ دو موردِ تازه (مربیانِ پروازِ کانمن؛ یادِ چلنجرِ نایسر) از نگهبانِ امضا/عنوان گذشتند چون عنوانشان فرق داشت؛ بازبینِ مستقل تکراری‌های قدیمی‌تر را هم یافت: خاطراتِ هیتلر (r5، r16، r32)، LTCM (r5، r16، r19، r26)، کانمن (r4، r14). بیرون‌گذاشتنِ آن‌ها شمارش‌ها و retest ِ یافته‌های قدیمی را جابه‌جا می‌کند ⇒ تصمیمِ مالک دربارهٔ این‌که کدام نسخه بماند.",
    "evidence": "reviews/round-0039.json بند ۵؛ corpus/round-0039.json (دو excluded).",
    "finding": null
+  },
+  {
+   "id": "p_encode_open_scope_incomplete",
+   "title": "تصدیقِ استقرایی با «گسترهٔ کلیِ نامحدود» خودبه‌خود «استقراءِ ناقص» است — ind_complete=false از scope لازم آید (در رمزگذاری یا در موتور)",
+   "why": "دامنهٔ نامحدود را نمی‌توان همه‌اش دید؛ پس «همهٔ افراد بررسی شده» برای scope=«کلی نامحدود» به حکمِ s50/s51 («در مصادیقِ نامحدود … نسبتِ شمارش‌های محدود به کلِ حالات همواره نزدیک به صفر است») و A1 کاذب است. امروز r_istiqra_universal (s51، T_universal) شرطِ ind_complete=false را صریح می‌خواهد و رمزگذارِ کور وقتی متن «همه را ندیدیم» نمی‌گوید آن را نمی‌نویسد (قاعدهٔ «آنچه متن نمی‌گوید ننویس») ⇒ قاعده خاموش می‌ماند. همین الگو در f_r5_ltcm_1998 / f_r5_abs_lender_model با افزودنِ دستیِ ind_complete=false «fixed» شد و در دورِ ۴۰ دوباره دیده شد.",
+   "evidence": "r40_svb_deposits_2022: f = {way: استقراء، scope: کلی نامحدود، conf: 85} بی ind_complete ⇒ st_istiqra پرچم نخورد (حکمِ نادرست را st_conflict/st_background گرفتند، مکان ناقص). سنجشِ پیش در حافظه (دورِ ۴۰): در کلِ پیکرهٔ excluded‌نشده ۸ تصدیق scope=«کلی نامحدود» بی ind_complete و بی vazraf دارند (r14_fcic_ratings_2007، r14_kahneman_flight_instructors، r14_abs_flood_insurer، r22_mozart_effect_georgia_1998، r35_abs_food_diary_pvalue، r37_fisher_plateau_1929، r37_abs_rent_plateau_loan، r40_svb_deposits_2022) — همه truth.ok=false ⇒ هیچ حکمِ درستِ سالمی خراب نمی‌شود؛ در بذرها (epi_cases_*) هر scope=«کلی نامحدود» ind_complete دارد. اجرای کاملِ موتور با این استلزام پس از پذیرش، با وقایعِ تازه تأیید شود. (یافته‌ای برای SVB باز نشد چون ابزار مکانِ ناقص را «ok» می‌شمارد — p_partial_location_findings.)",
+   "finding": null
+  },
+  {
+   "id": "p_partial_location_findings",
+   "title": "مکانِ ناقص (حکمِ درست، ولی ایستگاهِ برچسب پرچم نخورد) هم یافته باز کند، و retest فقط وقتی «درست» بشمارد که ایستگاهِ خودِ آن یافته پیدا شده باشد",
+   "why": "اصلِ «تأیید فقط با دادهٔ برون‌نمونه» (BACKTEST_PROMPT، جدولِ اصلِ کار) فقط وقتی معنا دارد که شمارشِ retest همان خطا را بسنجد. امروز در epi_backtest.js، v.kind برای حکمِ درست با مکانِ ناقص «ok» است: (۱) هیچ یافته‌ای باز نمی‌شود و تشخیصِ مکانِ ناقص جایی ثبت نمی‌شود (بندِ ۶ ِ دستور: تشخیصِ هر یافته)؛ (۲) همان پرونده در retest ِ یافته‌های دیگر freshOk شمرده می‌شود، حتی وقتی دقیقاً ایستگاهِ همان یافته را از دست داده.",
+   "evidence": "دورِ ۴۰ (بازبینیِ مستقل، بندهای ۱–۳): r40_svb_deposits_2022 (برچسب st_istiqra/st_conflict، پرچم st_conflict/st_background) در retest ِ f_r26_ltcm_models_1998 و f_r26_abs_lender_boom_model — که هر دو دربارهٔ همین الگوی استقراءِ نامحدودند — «درست» شمرده شد؛ r40_richard_jewell_1996 (برچسب st_aql/st_resp، پرچم st_expert/st_resp) در retest ِ f_r35_*، f_r38_abs_home_drug_test و f_r39_sabbatai_zevi_1665. تغییر فقط در ابزار است (نه قاعده/سقف) ولی معیارِ «تأییدشده» را عوض می‌کند ⇒ تصمیمِ مالک.",
+   "finding": null
   }
  ]
 }
