@@ -2281,7 +2281,7 @@
     var sent = sents.filter(function (x) { return ASK_ME.test(x) && LATER_ME.test(x) && !/^\s*نه[\s،]/.test(x); })[0]; if (!sent) return null;
     /* دورِ ۲۹ (B29·D22 dB2 p16، بانکِ R29 #172؛ C113/C52): «اینو ثبتش کن: جمعه ساعت ۱۰ کلاس …» — روزِ درونِ خواسته روزِ خودِ کار است، نه «بعداً»؛ همان را خواننده‌ی
        تاریخ می‌پرسد و با «آره» ِ او ثبت می‌کند (یک تعهد، یک رکورد). خواستهٔ عقب‌افتادهٔ جدا («↩ … برای بعد») از آن ساخته نمی‌شود */
-    try { if (PR.herDates(String(m.text || ""), s0).some(function (o) { return o && !o.past; })) return null; } catch (e) { }
+    try { if (/(?:ثبت|یادداشت|اضافه)(?:ش|اش)?\s*(?:کن|بکن)\s*[:：]/.test(sent) && PR.herDates(String(m.text || ""), s0).some(function (o) { return o && !o.past; })) return null; } catch (e) { }   /* فقط «ثبتش کن: ⟨کارِ روزدار⟩»؛ «فردا یادم بنداز …» همان قولِ بانکِ R23 #175 است */
     var P = s0.promises = s0.promises || [], ask = clip(sent.trim(), 200);
     if (P.some(function (x) { return !x.done && (x.at === String(m.at || "") || norm(x.ask) === norm(ask)); })) return null;
     var M = s0.msgs || [], ai = null; for (var i = M.indexOf(m) - 1; i >= 0; i--) if (M[i] && M[i].role === "ai") { ai = M[i]; break; }
@@ -3122,7 +3122,7 @@
          همین جمله را بازمی‌گوید ⇒ ردیفِ «کدام روز؟» ِ اصطلاح کنار می‌رود و فقط روزِ خودش (با حرفِ خودش) یک بار پرسیده می‌شود — یک کار، یک پرسش */
       if (got.some(function (g) { return !g.I.amb && bare29(g.c); }) && got.some(function (g) { return g.I.amb && g.I.free; })) { got = got.filter(function (g) { return !(g.I.amb && g.I.free); }); got.forEach(function (g) { if (!g.I.amb && bare29(g.c)) g.self29 = g.c.trim(); }); }
       got.forEach(function (g) { if (g.I.amb) return; var p29 = pastDay28(g.c, today()); if (p29 && A.daysBetween(p29, today()) < A.daysBetween(today(), g.I.date)) g.past29 = p29; });
-      got.forEach(function (g) { var lab = (toks(g.c).length >= 3 || got.length > 1) && !bare29(g.c) ? g.c : st;   /* دورِ ۲۹ (بانکِ R29 #148/#153): دو بندِ تاریخ‌دار در یک جمله دو کارند — هر کدام برچسبِ خودش (پیش‌تر هر دو کلِ جمله ⇒ یک رکورد) */ if (g.past29) { out.push({ what: clip(lab.replace(/[.!\s]+$/, ""), 120), date: today(), amb: true, free: true, wd: "", fq: "این روز (" + fdate(g.past29) + ") گذشته — کدام روز؟", past: g.past29, first: !!g.first }); return; } out.push({ self29: g.self29 || undefined, what: clip(lab.replace(/[.!\s]+$/, ""), 120), date: g.I.date, amb: !!g.I.amb, wd: g.I.wd || "", opts: g.I.opts || undefined, free: g.I.free || undefined, fq: g.I.fq || undefined, first: !!g.first }); });
+      got.forEach(function (g) { var lab = (toks(g.c).length >= 3 || got.length > 1) && !bare29(g.c) ? g.c : st;   /* دورِ ۲۹ (بانکِ R29 #148/#153): دو بندِ تاریخ‌دار در یک جمله دو کارند — هر کدام برچسبِ خودش (پیش‌تر هر دو کلِ جمله ⇒ یک رکورد) */ if (g.past29) { out.push({ what: clip(lab.replace(/[.!\s]+$/, ""), 120), date: today(), amb: true, free: true, wd: "", fq: "این روز (" + fdate(g.past29) + ") گذشته — کدام روز؟", past: g.past29, next29: g.I.date, first: !!g.first }); return; } out.push({ self29: g.self29 || undefined, what: clip(lab.replace(/[.!\s]+$/, ""), 120), date: g.I.date, amb: !!g.I.amb, wd: g.I.wd || "", opts: g.I.opts || undefined, free: g.I.free || undefined, fq: g.I.fq || undefined, first: !!g.first }); });
     });
     out = out.filter(function (x, i, X) { return X.findIndex(function (y) { return y.date === x.date && y.what === x.what; }) === i; });
     out.neg = neg; return out;
@@ -3241,6 +3241,8 @@
       var I = null; try { I = PR.whenInfo(c); } catch (e) { } if (!I || !I.date || I.free) return;
       /* دورِ ۲۹ (C147، A29-12 s03 c103 «… امروز خسته‌ام»): بندِ حال و حس روزِ هیچ کاری نیست */
       if (state29(c)) return;
+      /* دورِ ۲۹ (C147؛ بانکِ R22 #73 «… ۸ آبان نیست، ۱۰ آبانه» پس از ۱۰ آبان): روزِ بی‌سالی که نزدیک‌ترین رخدادش گذشته است، روزِ آینده (سالِ بعد) نیست */
+      try { var p29 = pastDay28(c, td); if (p29 && I.date > td && A.daysBetween(p29, td) < A.daysBetween(td, I.date)) return; } catch (e) { }
       var xc = nrm26(c), sp = dateSpan26(xc) || { i: 0, j: 0 }, after = xc.slice(sp.j);
       var neg = /(?:^|[ ،])نه[،,]? ?$/.test(xc.slice(0, sp.i)) || /^ ?(?:ی ?)?(?:هم ?)?(?:نه|نیست|نبود|نمیشه|نمی شه)(?![آ-ی])/.test(after) || NEGV27.test(after) ||
         (R.corr && /(?:^| )(?:گفتم|نوشتم|گفته بودم|نوشته بودم)(?![آ-ی])/.test(xc) && !/منظورم/.test(xc));
@@ -3856,9 +3858,12 @@
       items.push({ what: h ? h.what : z.what, date: z.date, dl: { what: z.what, time: z.time || "" }, src: h ? "her" : "model" }); });
     delete s0._dq26;
     /* حرفِ خودش که هیچ‌کدام از بالایی‌ها نبود */
-    own.forEach(function (it) { if (items.some(function (z) { return (z.date === it.date && !z.amb && (norm(z.what) === norm(it.what) || z.plan || z.dl || z.pred || !newObj29(it.what, z.what))) || (z.amb && it.amb); })) return;   /* دورِ ۲۹ (بانکِ R29 #153): کارِ دیگری در همان روز («بنگاه … بانک هم …») پرسشِ خودش را دارد */
+    own.forEach(function (it) { if (items.some(function (z) { return (z.date === it.date && !z.amb && (norm(z.what) === norm(it.what) || z.plan || z.dl || z.pred || z.was || !newObj29(it.what, z.what))) || (z.amb && it.amb); })) return;   /* دورِ ۲۹ (بانکِ R29 #153): کارِ دیگری در همان روز («بنگاه … بانک هم …») پرسشِ خودش را دارد */
       /* دورِ ۲۹ (C49 «یک کار، یک پرسش»؛ B29·D20 dB2 c14: «… — این روز (۳ آذر) گذشته — کدام روز؟ · از حرفِ خودت: «سه‌شنبه …» — سه‌شنبه ۱۰ آذر»): ردیفِ دوم برای همان کار نه */
       if (items.some(function (z) { return (z.past || z.was) && (norm(z.what) === norm(it.what) || (ovD27(z.what, it.what) >= 1 && sameAct28(it.what, z.what))); })) return;
+      /* دورِ ۲۹ (C136 ِ منفی، بانکِ R26 U50 aB3 p9 «اولیش ۱ اردیبهشت» در مهر — دونده درست داوری کرده بود): وقتی برنامهٔ گزارش‌شدهٔ همین پیام همان روز را با سالِ بعد دارد،
+         همان یک پرسش («… ۱ اردیبهشت ۱۴۰۶ — درست است؟») می‌ماند و پرسشِ «گذشته» دومی نمی‌شود (یک کار، یک پرسش) */
+      if (it.past && it.next29 && items.some(function (z) { return z.plan && !z.amb && z.date === it.next29; })) return;
       if ((s0.plans || []).some(function (q) { return q && String(q.at || "") === at && q.when === it.date; })) return; if (!it.amb && covered25(s0, it, m)) return; if (noD.indexOf(it.date) >= 0 && !it.first) return; items.push(it); });
     /* دورِ ۲۸ (C92، D28-22 tD2 p7 «اولِ ماه هم گاز رو قطع می‌کنم» کنارِ پرسشِ «قسطِ … سرِ برج» با همان ۱ آذر): پرسش‌ها برای هر کار جدا — کارِ دیگری در همان روز
        پرسیده می‌شود؛ فقط همان کار با همان روز دوباره پرسیده نمی‌شود (پیش‌تر همان «روز» هر کارِ تازه‌ای را بی‌صدا می‌انداخت) */
