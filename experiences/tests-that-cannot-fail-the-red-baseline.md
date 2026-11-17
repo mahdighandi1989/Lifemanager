@@ -191,3 +191,17 @@ handler behind it never ran — again invisible to any test that typed Latin dig
 input surface and reaches the verdict through the real prefill/encoding path, never from a
 hand-built feature object; and type the user's actual script (here Persian digits) into numeric
 fields — prefer `type=text` + `inputmode=numeric` + explicit normalisation over `type=number`.
+
+## Update 2026-11-17 — a "fails on base too" claim from a test that ignores the build-under-test switch
+
+A fixer reported that a regression test (`test_fixes_1015b` #12) "also fails on the
+base commit", so its red was pre-existing. It was not: the test read the bundle from
+its own fixed path and ignored the `LLA_FILE` variable that the other tests use to
+point at a different build. The "base" run therefore re-tested the fixer's own
+build and of course failed the same way. The real cause was the fixer's change.
+
+**How to apply:** before accepting "it is red on base too", prove the test actually
+loaded the base artefact — check out the base in a separate worktree and build it
+there, or make the test honour the switch and print which file it loaded. A test
+that cannot be pointed at another build cannot testify about another build.
+Count such a slip as a merge-introduced defect, not as baseline noise.
