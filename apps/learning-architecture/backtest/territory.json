@@ -571,8 +571,20 @@
    ]
   },
   "a_knowledge_first": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 41,
+     "at": "2026-11-17",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای حوزهٔ «معرفت‌شناسیِ معرفت‌محور»: کتابِ ویلیامسون (معرفت حالتی ذهنی و تحلیل‌ناپذیر است، نه «باورِ صادقِ موجه + شرط»؛ شاهد = معرفت (E=K)؛ معرفت هنجارِ ادعا؛ نادرخشانیِ حالت‌های ذهنی/استدلالِ ضد KK) و مدخلِ IEP (نظریه‌های توجیهِ معرفت‌محور پس از ۲۰۰۰: J=K، JuJu ِ برد، JPK ِ ایچیکاوا، دلیل‌محور، منظرمحور، فضیلت‌محور؛ اشکال‌ها: باورِ موجهِ کاذب، مواردِ گتیه، شیطانِ فریبکارِ تازه)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Timothy Williamson (2000), Knowledge and Its Limits, Oxford University Press — https://global.oup.com/academic/product/knowledge-and-its-limits-9780199256563",
+    "Internet Encyclopedia of Philosophy, «Knowledge-First Theories of Justification», Paul Silva Jr. (University of Cologne) — https://iep.utm.edu/knowledge-first/"
+   ]
   },
   "a_knowledge_how": {
    "stage": 1,
@@ -3246,6 +3258,6 @@
    "bookOnly": true
   }
  },
- "round": 40,
+ "round": 41,
  "updated": "2026-11-17"
 }
