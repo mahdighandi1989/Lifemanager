@@ -56639,7 +56639,9 @@ APP.goFromURL = function (q) {
   function outcome28(s0, t, open, after) {
     if (!open.length) return null; var hits = [], tie = null;
     var add = function (y, u) { var h = hits.filter(function (z) { return z.y === y; })[0]; if (h) h.u.push(u); else hits.push({ y: y, u: [u] }); };
-    sents28(t).forEach(function (s) { if (!isRep28(s)) return;
+    /* دورِ ۲۹ (A29-24 pA3 c60 «۷٫۲ متر مربع = ۷۲۰۰۰ سانتی‌متر مربع»؛ بانکِ R29 #216): تبدیلِ واحد (عدد و واحد = عدد و واحد، بی عملگر) گزارشِ سرانجام نیست — از جمله کنار می‌رود */
+    var CONV29 = /(?:^|[\s:،])[0-9۰-۹]+(?:[.٫][0-9۰-۹]+)?\s*(?:[آ-ی][آ-ی‌]*\s*){1,3}=\s*[0-9۰-۹]+(?:[.٫,][0-9۰-۹]+)*\s*(?:[آ-ی][آ-ی‌]*\s*){0,3}(?=$|[.!،؛])/g;
+    sents28(t).forEach(function (s) { s = s.replace(CONV29, " ").trim(); if (!s || !isRep28(s)) return;
       var sc = open.map(function (y) { return { y: y, n: score28(y, s, open.length === 1) }; }).filter(function (z) { return z.n > 0; }).sort(function (a, b) { return b.n - a.n; });
       var VD28 = /درست\s*(?:درومد|دراومد|درآمد|بود|درنیومد|نبود)|(?:غلط|اشتباه)\s*(?:بود|درومد|دراومد)/g, nv = (dg(s).match(VD28) || []).length;
       if (nv >= 2) { chunks28(s).forEach(function (c) { var cs = open.map(function (y) { return { y: y, n: score28(y, c, false) }; }).filter(function (z) { return z.n > 0; }).sort(function (a, b) { return b.n - a.n; }); if (cs.length && (cs.length === 1 || cs[0].n > cs[1].n)) add(cs[0].y, c); }); return; }
