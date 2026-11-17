@@ -2410,7 +2410,7 @@
         var H = mx > 0 && Hn.filter(function (n) { return n === mx; }).length === 1 ? [P[Hn.indexOf(mx)]] : [];
         if (H.length === 1) f = H[0].id;
         /* C121: «مسئلهٔ زنده فقط وقتی هیچ‌کدام نخواند» — پیش‌بینی‌ای که دربارهٔ هیچ مسئلهٔ این گفت‌وگو نیست زیرِ مسئلهٔ زندهٔ بسته‌شده می‌نشیند، نه زیرِ مسئلهٔ گفت‌وگوییِ کانونِ همان نوبت (C28-19 pwC2) */
-        else if (s0 && s0.lprob && P.some(function (z) { return z.id === s0.lprob; })) f = s0.lprob; } } catch (e) { }
+        else { var LV29 = P.filter(function (z) { return z.kind === "live" && !z.done; }); if (s0 && s0.lprob && LV29.some(function (z) { return z.id === s0.lprob; })) f = s0.lprob; else if (LV29.length === 1) f = LV29[0].id; } } } catch (e) { }
     if (!f) { if (s0 && s0.lprob) f = s0.lprob; else return null; } return /^c:/.test(String(f)) ? { sess: s0.id, pk: String(f) } : { sess: s0.id, pid: String(f) }; }
   PR.probOf27 = probOf27;
   /* یک پیش‌بینی، یک 🎯: رکوردِ بی‌موعدی که پیش‌تر ساخته شد (x.fc0) همان است که موعد می‌گیرد — هرگز رکوردِ دوم */
