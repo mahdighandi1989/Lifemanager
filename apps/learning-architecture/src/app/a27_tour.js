@@ -4414,6 +4414,9 @@
     var inWin = function (x) { var c = String(x.created || x.at || ""); return !!c && x.sess === s.id && c >= String(R.src.at || "") && (!nxt || c < String(nxt.at || "~")); };
     try { S.all("deadline", function (x) { return x && !x.done && ((x.src20 && x.src20.msg === R.srcId && x.src20.sess === s.id) || (!x.src20 && inWin(x))); }).forEach(function (dl) { if (!dl.src20) dl.src20 = { sess: s.id, msg: R.srcId, span: dl.what, key: "deadline:" + dl.id };
       if (!(R.what === "plan" || aff("deadline:" + dl.id, dl.src20.span || dl.what, []) || over(dl.what))) return;
+      /* دورِ ۲۹ (dates، C144؛ B29·D21 dB2 c12–c14، بانکِ R29 #147): ✏️ فقط رکوردی را عوض می‌کند که متنش با همین ✏️ عوض شد — موعدِ آزمونِ همان پیام («تا ۲۵ آذر …»)
+         با «پنجشنبه ⇐ سه‌شنبه» ِ جلسه جابه‌جا یا «جایگزین» نمی‌شود (پیش‌تر R.what === "plan" همهٔ موعدهای پیام را به newDay134 می‌داد) */
+      if (!!R.edit || /^\s*\[اصلاحِ/.test(cu)) { var t29 = String(dl.quote || dl.what || ""), v29 = null; try { v29 = sub(t29, false); } catch (e) { v29 = null; } if (v29 == null || String(v29).replace(/\s+/g, " ").trim() === t29.replace(/\s+/g, " ").trim()) return; }
       var hm = /(?:ساعت[\s‌]*)?([0-9۰-۹]{1,2})(?:[:٫.]([0-9۰-۹]{2}))?[\s‌]*(صبح|ظهر|عصر|بعد[\s‌]*از[\s‌]*ظهر|شب)?/.exec(faDigits(R.fix)), tm = "", dd = dl.date;
       if (hm && (/ساعت|صبح|ظهر|عصر|شب|:/.test(R.fix) || dl.time)) { var hh = +hm[1], mm = hm[2] ? +hm[2] : 0; if (hm[3] && /عصر|بعد|شب/.test(hm[3]) && hh < 12) hh += 12; if (hh <= 23 && mm <= 59) tm = (hh < 10 ? "0" : "") + hh + ":" + (mm < 10 ? "0" : "") + mm; }
       /* دورِ ۲۸ (C134): روزِ تازه از هفتهٔ همان تاریخِ ثبت‌شده (نه از امروز)، و اصلاحِ «چه» با همان واژهٔ روز روز را عوض نمی‌کند. خوانشِ پیشین (planDate18 از امروز)
