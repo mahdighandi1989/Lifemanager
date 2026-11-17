@@ -687,8 +687,20 @@
    ]
   },
   "a_reliabilism": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 40,
+     "at": "2026-11-16",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای حوزهٔ «اعتمادگرایی»: مدخلِ SEP (معیارِ گلدمن: باورِ موجه = باورِ برآمده از فرایندِ شناختیِ قابلِ‌اعتماد با نسبتِ صدقِ بالا، شرطِ تاریخیِ ورودی‌های استنتاج؛ اشکال‌های روشن‌بینیِ بونژور، شیطانِ فریبکارِ تازه، مسئلهٔ کلیت، خودراه‌اندازی) و مدخلِ IEP (همان معیار برای معرفت و توجیه؛ اشکال‌های ناکافی‌بودن، نالازم‌بودن، معرفتِ آسان، مسئلهٔ ارزش، مسئلهٔ کلیت)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Reliabilist Epistemology», Alvin Goldman & Bob Beddor (first published 21 April 2008; substantive revision 21 May 2021) — https://plato.stanford.edu/entries/reliabilism/",
+    "Internet Encyclopedia of Philosophy, «Reliabilism», Kelly Becker (University of New Mexico) — https://iep.utm.edu/reliabil/"
+   ]
   },
   "a_proper_functionalism": {
    "stage": 0,
@@ -3234,6 +3246,6 @@
    "bookOnly": true
   }
  },
- "round": 39,
- "updated": "2026-11-16"
+ "round": 40,
+ "updated": "2026-11-17"
 }
