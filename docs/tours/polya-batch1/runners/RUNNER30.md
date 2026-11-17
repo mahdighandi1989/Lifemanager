@@ -1,6 +1,6 @@
 # Tour batch 1 (Pólya) — ROUND 30 (read RUNNER.md … RUNNER29.md incl. all ADDENDA, then this; this overrides)
 
-Page: main MAINHASH (the seven round-29 fixers + the story integration pass + two gate fixes; `build.py --check` in sync, dist newer — else
+Page: main 38ce2710 (the seven round-29 fixers + the story integration pass + two gate fixes, plus backtest round-40 data merged from main; `build.py --check` in sync, dist newer — else
 STOP). What changed: DECISIONS_R29.md (families F1–F19, R1–R7, Clarifications C136–C175 — C168 AMENDS C148; C135 revokes C105; C118 narrowed),
 the fixers' hand-backs reports/fix29/*.md (each item «proven (a+b+c) in <groups>» / «unit-only»), the handoff notes
 docs/overhaul/handoff-notes/_pending_tour1_R29_*_2026-11-17.md, WORKLOG 156–163, and the ruling C176 below.
