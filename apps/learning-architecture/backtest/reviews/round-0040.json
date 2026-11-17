@@ -1,0 +1,67 @@
+{
+ "round": 40,
+ "reviewer": "زیرعاملِ جدا",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": false,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": false
+ },
+ "checkedWhy": {
+  "events_real": "All 8 real events exist and their key facts hold up. Comte, Cours t.II, leçon 19 (1835): shapes/distances/sizes/motions knowable, chemical/mineralogical composition never. Fraunhofer 1814 (~574 lines), Kirchhoff-Bunsen 1859-60, helium 1868. Jewell: bomb 27 Jul 1996; AJC special edition 30 Jul ('fits the profile of the lone bomber'); cleared by letter 26 Oct 1996; Rudolph plea Apr 2005. Sherrod: Breitbart clip 19 Jul 2010 (~2.5 min) of the Mar 2010 NAACP speech, phone resignation the same day, full ~43-min video, events 24 years earlier before her federal job, the Spooners' statements, Vilsack and White House apologies 21 Jul. SVB: Fed (Barr) report Apr 2023, checked against the PDF text. It confirms 'removed interest rate hedges' (began Mar 2022, the rest in Jul 2022), 'changed its own risk-management assumptions to reduce how these risks were measured rather than fully addressing the underlying risks', and the 8 Mar 2023 $21bn AFS sale / $1.8bn after-tax loss. The $42bn withdrawal on 9 Mar and the 10 Mar closure are standard facts. DHMO: Zohner, 14, Eagle Rock Jr High, Idaho Falls, 'How Gullible Are We?', 43 of 50 ninth-graders; the listed claims match the standard petition. Gigerenzer: 160 gynecologists in German CME sessions; 1%/90%/9%; options 81/90/10/1; 21% chose ~10%; 90% was the modal answer (~47% in the PSPI figure). Kirchhoff, Oct 1859 Monatsberichte paper (Berlin 662-665): sodium flame plus Drummond limelight gave dark D lines. Hutcheson: MP for Hastings; the 1720 'Some calculations relating to the proposals made by the South-Sea Company and the Bank of England…' is confirmed by the Grub Street record T17254; the price went ~£1000 in summer to ~£150-200 by end of September. Only minor nuances (see problems): Kirchhoff's 'expected / instead got darker' framing, and Jewell 'one killed' (1 killed by the bomb plus 1 heart-attack death; 111 injured).",
+  "encoding_blind": "Corpus commit 85d57207 ('blind-encoded before run') came before the run, and the working-tree corpus is identical to that commit, so nothing was edited after the run. Every f value can be traced to the title/story/claim text: Comte doubt_pat=انحصار راه‌ها and matter=اثبات‌نشده come from the claim wording; Sherrod context_ignored/inquiry come from the story's 'the full video existed and was not viewed'; mammography form=نامعتبر is computable from the numbers given. Two borderline values. (a) DHMO worlds_mix=true: the story never says DHMO = water, so the encoder used general knowledge that is exactly the twist in truth.why (not outcome leakage strictly, but it effectively hands over the label). (b) The SVB story embeds the Fed's hindsight verdict ('measured risk fell, not the risk itself'), which drives conflict_ignored/bg_undue. That is author-side leakage into the story, not encoder leakage. I cannot independently confirm the encoder was a separate agent; nothing in the diff contradicts it.",
+  "frames_unselected": "No new sampling frame this round. There is no samples/ diff, the ledger shows newSamples=0 and samples=3, and baseMeasured stays at 3/11. On sampling there is nothing to violate. However, BACKTEST_PROMPT §مسیر ۱ says this path 'اختیاری نیست' (at least one frame per round), so skipping it without a recorded reason is a procedural gap.",
+  "verified_by_real": "n/a: no frame, so no verified_by items.",
+  "proofs_from_axioms": "There is no new theorem or beyond:true proposal. One new proposal, p_encode_open_scope_incomplete (an unbounded universal scope implies incomplete induction, citing s50/s51/A1), is a logically sound encoding entailment and not a new axiom. Its evidence claim checks out: exactly 8 non-excluded claims have scope=کلی نامحدود with no ind_complete and no vazraf, all truth.ok=false (r14_fcic_ratings_2007, r14_kahneman_flight_instructors, r14_abs_flood_insurer, r22_mozart_effect_georgia_1998, r35_abs_food_diary_pvalue, r37_fisher_plateau_1929, r37_abs_rent_plateau_loan, r40_svb_deposits_2022). It awaits the owner. Its finding field is null.",
+  "no_conventional": "node tools/epi_backtest.js audit returns violations: [] and warnings: []; the ledger shows conventional 0 and audit 0.",
+  "territory_evidence": "a_reliabilism moved 0→1 with two real sources. SEP 'Reliabilist Epistemology' by Goldman & Beddor (first published 21 Apr 2008, revised 21 May 2021) covers clairvoyance, new evil demon, generality and bootstrapping, as the summary says. IEP 'Reliabilism' by Kelly Becker (Univ. of New Mexico) covers insufficiency, non-necessity, easy knowledge, the value problem and generality, as the summary says. It is a single one-stage step.",
+  "findings_diagnosed": "r40 results: Comte, Sherrod, DHMO, mammography and the supplier abstract are fully located (Sherrod/DHMO/mammography over-flag extra stations). Kirchhoff, Hutcheson and the kettle abstract are clean ok with no flags. Two cases are only partially located (full=false), and the tool opened no finding for either. r40_richard_jewell_1996: expected [st_aql, st_resp], flagged [st_expert, st_resp], so st_aql was missed. No diagnosis is recorded anywhere (no finding, no proposal, no note). r40_svb_deposits_2022: expected [st_istiqra, st_conflict], flagged [st_conflict, st_background]. The p_encode_open_scope_incomplete proposal explains it (no ind_complete), so this one is diagnosed in substance. Both r40 cases are also counted inside older findings' retest 'freshOk' lists, which inflates those retests with a partially located case."
+ },
+ "problems": [
+  {
+   "what": "r40_richard_jewell_1996: partial location (expected st_aql; engine gave st_expert instead) has no diagnosis anywhere. The label is debatable on its face: the actor relied on the FBI's profiling (the encoder chose way=تخصص دیگران, x_method=ضعیف), so st_expert (s49, weak method of the relied-on expert) fits at least as well as st_aql. st_aql could not fire because the encoder set no matter=مقدمه اثبات‌نشده.",
+   "fix": "Record a diagnosis (finding or note): attribution 'برچسب حقیقت پرونده' (incomplete: should have included st_expert) or 'خطای رمزگذاری' (matter missing). Do NOT edit the label post-run; at most add a retest with an independent second blind encoding next round. ⇐ انجام‌شده: تشخیص: برچسبِ st_aql ِ جوئل جای بحث دارد — رمزگذارِ کور راه را «تخصصِ دیگران» با روشِ ضعیف (نیمرخِ اف‌بی‌آی) خواند و st_expert به همان اندازه بجاست؛ st_aql نزد چون matter نوشته نشد. برچسب پس از حکم عوض نشد؛ در WORKLOG و p_partial_location_findings ثبت شد.",
+   "fixed": true
+  },
+  {
+   "what": "r40_svb_deposits_2022: partial location (st_istiqra missed). It is covered only by proposal p_encode_open_scope_incomplete, whose finding field is null, and no finding record exists.",
+   "fix": "Link it: create or attach a finding for r40_svb_deposits_2022 (attribution خطای رمزگذاری / encoder gap) and set the proposal's finding to that id. ⇐ انجام‌شده: تشخیص: خلأ رمزگذاری (scope=کلی نامحدود بی ind_complete) ⇒ پیشنهادِ p_encode_open_scope_incomplete با سنجشِ حافظه (۸ تصدیق، همه ناسالم). یافته باز نشد چون ابزار مکانِ ناقص را ok می‌شمارد ⇒ p_partial_location_findings.",
+   "fixed": true
+  },
+  {
+   "what": "Retest inflation: r40_richard_jewell_1996 and r40_svb_deposits_2022 (full=false) are counted as freshOk in older findings' retest ids (e.g. f_r35_*, f_r38_abs_home_drug_test, f_r39_sabbatai_zevi_1665 lists via 'r40_richard_jewell_1996', and f_r26_ltcm_models_1998 / f_r26_abs_lender_boom_model via 'r40_svb_deposits_2022'). Notably, f_r26_ltcm_models_1998 and f_r26_abs_lender_boom_model are about the very istiqra-on-unbounded-scope pattern that SVB just missed.",
+   "fix": "Check that retest 'ok' uses full location for the station the finding is about. Otherwise SVB should count as a failed retest for the LTCM/lender findings. ⇐ انجام‌شده: پیشنهادِ p_partial_location_findings برای تصمیمِ مالک (تغییرِ معیارِ verified در ابزار — خودسرانه عوض نشد).",
+   "fixed": true
+  },
+  {
+   "what": "Path 1 (sampling frame) skipped this round with no recorded reason (newSamples=0). BACKTEST_PROMPT says it 'اختیاری نیست'.",
+   "fix": "Add one complete pre-defined frame next round, or record in the ledger note which frame was started and why it was not completed. ⇐ انجام‌شده: دلیل در WORKLOG ثبت شد: هر سه جمعیتِ x_field ِ موجود کامل نمونه‌گیری شده‌اند و جمعیتِ تازه به تصمیمِ مالک (p_field_ml2، منتظر) نیاز دارد؛ epi-decisions هنوز ۴۰۱.",
+   "fixed": true
+  },
+  {
+   "what": "r40_mammography_gynecologists_2006: truth.why itself says base-rate neglect is 'نامزدِ «فراتر از جزوه» — قاعدهٔ بیز از A3', but proposals.json has no beyond:true base-rate proposal. The engine caught it only because the encoder computed Bayes and set form=نامعتبر.",
+   "fix": "Either write the path-2 beyond proposal (Bayes theorem from A3/A2, corpus-wide effect measured) or drop that sentence's claim of a gap from the note. ⇐ انجام‌شده: truth.why ِ ماموگرافی اصلاح شد: موتور با قاعده‌های موجود گرفت ⇒ خلأ جزوه نیست (ثبت در edits).",
+   "fixed": true
+  },
+  {
+   "what": "Minor accuracy (S3), r40_kirchhoff_sodium_sun_1859 story: «انتظار داشت خطوطِ روشنِ سدیم جای تاریکِ D را پر کنند، ولی خطوطِ D تاریک‌تر شدند». In Kirchhoff's account the bright lines did appear with dimmed sunlight; the D lines darkened only when the sunlight was strong. His 'expectation' is an unsourced attribution.",
+   "fix": "Rephrase: with weak sunlight bright sodium lines appeared; with sufficiently strong sunlight the D lines became darker than without the flame. ⇐ انجام‌شده: داستانِ کیرشهوف مطابقِ گزارشِ ۱۸۵۹ بازنویسی شد (ثبت در edits؛ f دست نخورد).",
+   "fixed": true
+  },
+  {
+   "what": "Minor accuracy (S3), r40_richard_jewell_1996 story: «یک نفر کشته و بیش از صد نفر زخمی شدند». Sources give 1 killed by the blast plus 1 death from a heart attack (2 deaths), and 111 injured.",
+   "fix": "«یک نفر بر اثرِ انفجار کشته شد (و یک نفر دیگر از سکتهٔ قلبی درگذشت) و ۱۱۱ نفر زخمی شدند». ⇐ انجام‌شده: شمارِ کشته/زخمی ِ جوئل دقیق شد (ثبت در edits).",
+   "fixed": true
+  },
+  {
+   "what": "Author-side hindsight in r40_svb_deposits_2022 story: «فرض‌های مدلِ ریسکِ نرخ را چنان عوض کرد که ریسکِ اندازه‌گیری‌شده کمتر شد، نه خودِ ریسک». This is the Fed's post-collapse evaluation (Apr 2023) placed in the pre-outcome story, and it hands the encoder conflict_ignored/bg_undue.",
+   "fix": "In future stories, state facts available at the time (the bank changed its deposit-duration/model assumptions in 2022) without the evaluative clause, or mark it clearly as a later finding. ⇐ انجام‌شده: پذیرفته برای دورهای بعد: داوریِ پس‌ازسرانجام (مثلِ حکمِ گزارشِ فدرال) در داستان نیاید یا صریحاً «یافتهٔ بعدی» نشان داده شود؛ دادهٔ SVB دست نخورد تا اثرش روی رمزگذاریِ کور پنهان نشود.",
+   "fixed": true
+  }
+ ],
+ "note": "No truth label was edited after the run: the corpus is unchanged since commit 85d57207. There are no duplicates: grepping corpus/ for Comte/Jewell/Sherrod/SVB/DHMO/mammography/Kirchhoff/Hutcheson/South Sea/Fraunhofer finds only round-0040 (Gigerenzer appears in r36 only as a citation in a different case). Audit is clean. Territory sources are verified. Main open issues: Jewell partial location is undiagnosed, the SVB proposal is not linked to a finding, retest counting may treat partial location as ok, and the path-1 frame was skipped."
+}
