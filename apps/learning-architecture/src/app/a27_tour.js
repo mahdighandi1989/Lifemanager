@@ -3909,7 +3909,7 @@
   AS.retractLabel29 = LABEL29;
   /* دورِ ۲۹ (D29-26 arD2 «چراغ ۱۵ متره» ⇒ «چراغ ۱۲ متر»): وقتی پیشین و تازه فقط در عدد فرق دارند (پسوندِ «ـه/است» جزوِ داده نیست) فقط رقم‌ها عوض می‌شوند — نقلِ او بیرون از عدد بایت‌به‌بایت */
   function numOnly29(o, n) { o = String(o); n = String(n); var D0 = /[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g, a = o.match(D0) || [], b = n.match(D0) || []; if (a.length !== 1 || b.length !== 1) return n;
-    var cut = function (t, d) { return t.replace(d, "#").replace(/[\s‌]*(?:ـ?ه|است|هست)[\s‌]*$/, "").replace(/[\s‌]+/g, " ").trim(); };
+    var cut = function (t, d) { return t.replace(d, "#").replace(/[\s‌]*[،,:؛.]+[\s‌]*$/, "").replace(/[\s‌]*(?:ـ?ه|است|هست|اند|ان)[\s‌]*$/, "").replace(/[\s‌]+/g, " ").trim(); };
     return cut(o, a[0]) === cut(n, b[0]) ? o.replace(a[0], b[0]) : n; }
   function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
   function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
@@ -4016,12 +4016,14 @@
     var rep = function (m, x) { return T.slice(0, m.s) + x + T.slice(m.e); }, nx = tok20(X).length;
     var d = diff20(F, X); if (d && d.same) return null;
     if (d && d.oldT) { var mf = findTok20(T, F), ms = findTok20(T, d.oldT, true);
+      if (/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(String(d.oldT).trim())) ms = ms.filter(function (x) { return !LABEL29.test(T.slice(Math.max(0, x.s - 12), x.s)); });   // دورِ ۲۹ (D29-5): برچسبِ گام نه
       if (ms.length) { var pick = (mf && ms.filter(function (x) { return x.s >= mf.s && x.e <= mf.e; })[0]) || ms[0]; return rep(pick, d.newT); } }
     var fo0 = nums19b(F).filter(function (n) { return nums19b(X).indexOf(n) < 0; }), xo0 = rawNums(X).filter(function (n) { return nums19b(F).indexOf(faDigits(n).replace(/٫/g, ".")) < 0; });
     if (fo0.length === 1 && xo0.length === 1 && tok20(X).length === 1) { var r0 = numRe19b(fo0[0]), rp0 = r0 ? repNum29(T, r0, xo0[0]) : null; if (rp0 != null) return rp0; }   // دورِ ۲۹ (D29-5): نه برچسبِ گام
     var Ys = oldsOf20(cur, old);
     for (var i = 0; i < Ys.length; i++) { var y = Ys[i]; if (!y || hasTok20(X, y)) continue; if (F && !hasTok20(F, y) && !old) continue;
       var my = findTok20(T, y); if (!my) continue;
+      if (/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(String(y).trim()) && LABEL29.test(T.slice(Math.max(0, my.s - 12), my.s))) { var rl29 = repNum29(T, numRe19b(String(y).trim()), X); if (rl29 != null && tok20(X).length === 1) return rl29; continue; }   // دورِ ۲۹ (D29-5): برچسبِ گام نه
       var val = X; if (nx > 2) { var wy = WD19b.exec(y), wx0 = WD19b.exec(X), nr = newRun20(F || y, X); if (wy && wx0) val = wx0[0]; else if (nr && tok20(nr).length <= tok20(y).length + 2) val = nr; }
       return rep(my, val); }
     var fo = nums19b(F).filter(function (n) { return nums19b(X).indexOf(n) < 0; }), xo = rawNums(X).filter(function (n) { return nums19b(F).indexOf(faDigits(n).replace(/٫/g, ".")) < 0; });
@@ -4168,6 +4170,11 @@
     if ((!byOld && hasTok20(frag48, fix)) || (typeof A.liveSameVal === "function" && A.liveSameVal(x.old ? txtOf(x.old) : frag48, fix))) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };   // دورِ ۲۲: «۷۴ کیلو» = «۷۴ کیلوئه» به معنا
     /* دورِ ۲۳ (Q4، D23-7 aD3 «اولش که گفتم ۶۷ ماه اشتباه بود؛ درستش ۶۱ و نیمه»): «اشتباه گفتم» (لغزشِ گفتن) با «نتیجه‌ام رد شد» فرق دارد — حدس/نتیجه‌ای که خودش
        آزمود و رد شد بازنویسی نمی‌شود؛ «رد شد» شاهدِ کارِ اوست و مقدارِ تازه نتیجهٔ تازهٔ اوست (✏️ ِ خودِ پیام جداست) */
+    /* دورِ ۲۹ (R2 correction، C142 «پس جوابم غلط بود marks her result as hers-rejected; it never rewrites it» (C74)؛ D29-23 s31 «… با چهار تا ۲.۵^۴ حدود ۳۹. پس جوابم غلط بود!» رکوردِ «۵×۵=۲۵» را بازنویسی کرد):
+       ردِ نتیجهٔ خودش (بی «X نیست، Y» ِ صریح) اصلاحِ گفتار نیست — نتیجه همان می‌ماند و «ردشده به حرفِ خودت» نشان می‌گیرد؛ منفی (بانکِ R29 #98): «جوابم غلط نبود» */
+    if (!edit && REJ29.test(own) && !/غلط[\s‌]*نبود|اشتباه[\s‌]*نبود/.test(own) && !/[0-9۰-۹٠-٩][^.!؟?\n]{0,15}نیست[\s‌]*[،,]/.test(own)) { var nR29 = 0;
+      (s.coachEv || []).forEach(function (e) { if (e && !e.wd && e.ok && (e.how === "res" || e.how === "solved") && (e.msg === msgId19b(src) || (e.src20 && hasTok20(String(e.src20.span || ""), frag)))) { e.rej29 = { at: nowIso(), by: msgId19b(um), why: "ردشده به حرفِ خودت" }; nR29++; } });
+      return { err: "آن نتیجه را خودش آزمود و رد شد («" + clip(frag, 40) + "») — «ردشده به حرفِ خودت» ثبت شد؛ نوشته‌اش همان می‌ماند و مقدارِ تازه نتیجهٔ تازهٔ اوست", refuted: true, rej29: nR29 }; }
     if (!edit) { var refG = refutedTarget23(s, frag, what, key); if (refG) return { err: "آن حدس/نتیجه را خودش آزمود و رد شد («" + clip(refG, 40) + "») — «رد شد» همان می‌ماند و مقدارِ تازه نتیجهٔ تازهٔ اوست، نه اصلاحِ اشتباهِ گفتاری", refuted: true }; }
     /* مقدارِ نادرستی که صریح نام برد («اون شنبه رو یکشنبه کن»، old ِ مدل) باید به‌تنهایی (مرزِ واژه) در آن پیام باشد — «شنبه» درونِ «پنجشنبه» نه */
     var olds = [].concat(x.old ? [txtOf(x.old).trim()] : [], edit ? [] : rooKon20(own, fix).map(function (o) { return o.x; })).filter(Boolean);
@@ -4179,6 +4186,8 @@
   }
   AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
   /* دورِ ۲۳ (Q4، D23-7): هدفِ اصلاح حدسی/نتیجه‌ای است که آزموده و رد شد؟ (حدسِ گفت‌وگو با res=refuted، یا حدسِ مسئلهٔ زنده با سرانجامِ ردشده) */
+  var REJ29 = /(?:جوابم|جوابِ?[\s‌]*من|نتیجه[\s‌]*ام|نتیجم|حسابم)[\s‌]*(?:غلط|اشتباه)[\s‌]*(?:بود|بوده|ه|است|درومد|دراومد|از[\s‌]*آب[\s‌]*دراومد)(?![آ-ی])/;
+  AS.retractRej29 = REJ29;
   function refutedTarget23(s, frag, what, key) {
     var C = (s && s.coach) || {}, kg = /^guess:(.+)$/i.exec(String(key || "")), onG = what === "guess" || what === "ans" || !!kg;
     if (!onG) return ""; var hit = function (t) { return !!t && (hasTok20(t, frag) || hasTok20(frag, t) || quoteIn(frag, t)); };
@@ -4383,7 +4392,14 @@
         if (xm29 && fx29.length === 1) { var xv29 = faDigits(xm29[1]).replace(/٫/g, "."), fr29 = nums19b(R.frag);
           if (fr29.indexOf(xv29) < 0 && A.liveCorrReg29(s.id).some(function (e) { return e && !e.sup && Math.abs(+e.b - +xv29) < 1e-9; })) D21 = { o: xm29[1], n: fx29[0], c88: "chain29" }; } } } catch (e29) { }
     var fullNew21 = R.edit ? ((/متنِ درستِ پیامم:\s*«([\s\S]*)»\s*$/.exec(cu) || [])[1] || "") : "";
+    /* دورِ ۲۹ (R2 correction، C143 «a range «از a تا b» is replaced as one unit or the page asks»؛ C29-15 s25 «منظورم n از ۱ تا ۲۰ بود، نه از ۱ تا ۱۰» ⇒ «۱/(n(n+2)) n … n = ۱ تا ۱۰» ِ درهم):
+       بازهٔ پیشین (از «نه (از) a تا b» ِ جملهٔ خودش، یا تنها بازهٔ تکه) و بازهٔ تازه (از مقدارِ درست) — فقط دو سرِ همان یک بازه در متن عوض می‌شوند؛ چند بازهٔ همانند ⇒ هیچ (پرسیده می‌شود) */
+    var RNG29 = /([0-9۰-۹٠-٩]+)[\s‌]*تا[\s‌]*([0-9۰-۹٠-٩]+)/g, rng29 = function (t) { var o = [], m; RNG29.lastIndex = 0; while ((m = RNG29.exec(String(t || "")))) o.push({ a: faDigits(m[1]), b: faDigits(m[2]), s: m.index, e: m.index + m[0].length, ia: m.index, la: m[1].length, ib: m.index + m[0].length - m[2].length, lb: m[2].length }); return o; };
+    var R29n = rng29(R.fix), R29o = (function () { var m = /(?:^|[\s،,])نه[\s‌]+(?:از[\s‌]+)?([0-9۰-۹٠-٩]+[\s‌]*تا[\s‌]*[0-9۰-۹٠-٩]+)/.exec(ownText(cu)); if (m) return rng29(m[1]); var f = rng29(R.frag); return f.length === 1 ? f : []; })();
+    var rangeSub29 = function (T) { if (R29n.length !== 1 || R29o.length !== 1) return null; var o = R29o[0], nn = R29n[0]; if (o.a === nn.a && o.b === nn.b) return null; var hit = rng29(T).filter(function (x) { return x.a === o.a && x.b === o.b; }); if (hit.length !== 1) return null; var h = hit[0];
+      var na = String(R.fix).slice(nn.ia, nn.ia + nn.la), nb = String(R.fix).slice(nn.ib, nn.ib + nn.lb); return T.slice(0, h.ia) + na + T.slice(h.ia + h.la, h.ib) + nb + T.slice(h.ib + h.lb); };
     var sub = function (T, typed) { var v = null;
+      if (typeof T === "string" && R29n.length === 1 && R29o.length === 1) { var rs29 = rangeSub29(T); if (rs29 != null) return rs29; if (rng29(T).some(function (x) { return x.a === R29o[0].a && x.b === R29o[0].b; })) return null; }
       try { if (D21 && A.liveFixVal && (D21.n || "").trim()) v = A.liveFixVal(T, D21); } catch (e) { v = null; }
       /* دورِ ۲۸ (R2، C88): جفتِ کمینه از حرفِ خودش (D21.c88) که جایگزینیِ درجایش برابریِ نوشته‌شده‌ای را دروغ می‌کرد رد شد — جایگزینیِ زمخت‌تر («۵ متر²)») جایش نمی‌نشیند؛ عددهای کهنه را موتورِ کهنگی می‌گوید */
       if (v == null && D21 && D21.c88 && typeof T === "string" && String(D21.o).trim()) { var esc28 = String(D21.o).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/[.٫]/g, "[.٫]"), re28 = new RegExp("(^|[^0-9۰-۹٠-٩.٫])(" + esc28 + ")(?![0-9۰-۹٠-٩]|[.٫][0-9۰-۹٠-٩])", "g"), m28 = T.match(re28) || [];

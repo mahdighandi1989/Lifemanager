@@ -499,3 +499,12 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R28 C134 — «مهلت سه‌شنبه نیست، چهارشنبه است» on a Tuesday moved next week's Tuesday deadline to tomorrow; the
   replacing weekday belongs to the week of the replaced date, and a what-only correction never moves the date.
 - **Status:** reachable, not called. Delete only with the owner's approval.
+
+## Pólya R29 «correction» — tiers (ج)/(د) of the guessed one-op relation in `staleCore25` (quarantined 2026-11-17)
+- **What:** `a38` `staleCore25` → `implicit(c, 3)` / `implicit(c, 4)` as a proposal source (any two numbers whose one operation gives this
+  number). Behind `A.LIVE_R29_QUARANTINE_C89.on` (default `false`); the function itself is kept (the «unknown operand» guard still uses it in
+  plain mode, and the anchored tier (ج) — the number follows «پس/میشه/یعنی» with co-operands written in the same sentence — still uses it).
+- **Why quarantined:** DECISIONS_R29 C89 «Scaling a number by the ratio of a correction is never a proposal»; R2 «the ratio path is
+  quarantined, not kept as a fallback». A guessed product solved for one factor is exactly that (D29-11 «۱۸ ⇒ ۱۵ = ۲۷۰۰ ÷ ۱۸۰», B29·D13
+  «۶ ⇒ ۶٫۴»).
+- **Status:** reachable (flag), not called on the page path. Delete only with the owner's approval.

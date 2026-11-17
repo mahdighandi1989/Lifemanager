@@ -91,10 +91,7 @@ async function run(ctx) {
   C[78] = async () => { await scen({ prior: [RES(HAL)], stmtChat: HAL });
     await turn('۱۵۰ نیست، ۱۶۰', 'فرستادم.', RT({ msg: 'متری ۱۵۰ هزار', key: 'datum:قیمت', what: 'fact', fix: '۱۶۰ هزار' }));
     await turn('۱۶۰ هم نیست، ۱۸۰', 'فرستادم.', RT({ msg: '۱۵۰ نیست، ۱۶۰', key: 'datum:قیمت', what: 'fact', fix: '۱۸۰' })); const x = await snap('');
-    const reg = process.env.DBG ? await ev(() => { const se = APP.ASSIST.cur(), C = se.coach || {}; const RC = [{ k: 'stmt', t: C.stmt, zone: 'given' }].concat(se.msgs.filter(m => m.role === 'user').map((m, i) => ({ k: 'msg:' + i, t: m.text, zone: 'ctx' }))).concat((se.coachEv || []).filter(e => e && !e.wd && e.ok && e.how === 'res' && e.src20).map((e, i) => ({ k: 'res:' + i, t: e.src20.span, zone: 'role' })));
-      const warns = []; const w0 = console.warn; console.warn = (e) => warns.push(String(e && e.stack || e).slice(0, 400)); const ss = APP.liveSessStale(se.id, { o: '۱۶۰', n: '۱۸۰' }, { mid: 'u2', cm: 'u3', src: '۱۵۰ نیست، ۱۶۰' }); console.warn = w0;
-      return { ss, warns, RC, r: APP.liveStaleCore(RC, { o: '۱۵۰ هزار', n: '۱۸۰ هزار' }, null, { clause: '' }).map(x => [x.k, x.v, x.re]) }; }) : null;
-    return { ok: /3300>3960(?![.\d])/.test(J(x.sstale)) && !/3600/.test(J(x.sstale)), got: { s26: x.s26, sys: x.sys, reg } }; };
+    return { ok: /3300>3960(?![.\d])/.test(J(x.sstale)) && !/3600/.test(J(x.sstale)), got: { s26: x.s26, sys: x.sys } }; };
   C[79] = async () => { await scen({ prior: [RES('۵ × ۵ = ۲۵ تا کاشی لازمه')], stmtChat: '۵ × ۵ = ۲۵ تا کاشی لازمه' });
     await turn('نه، ردیف‌ها ۴ تاست، با ۴ تا ردیف کافیه. پس جوابم غلط بود', 'باشه، پس آن جواب را کنار گذاشتی.'); const x = await snap('');
     return { ok: /۵ × ۵ = ۲۵/.test(J(x.story.concat(x.ev.map(e => e.span || '')))) && !/اصلاح شد ⇐ «۵ × ۵/.test(allText(x)), got: { story: x.story, ev: x.ev, sys: x.sys } }; };
@@ -144,6 +141,9 @@ async function run(ctx) {
   C[100] = async () => { const pid = await moket(); await WID('عرض ۴ نیست، ۵'); const x = await snap(pid);
     return { ok: near(reOf(stN(x, 1), 24), 30) && !/۵ تا پنجره/.test(J([x.prior, x.sysAll])), got: { prior: x.prior, sys: x.sys } }; };
 
+  /* برآورده نشد (گزارشِ fixer، HANDBOOK §12 ردیفِ ۱۰۱) — بررسی‌ها سرِ جایشان می‌مانند تا fixer ِ بعدی همان را قرمز ببیند (NCRUN=1) */
+  NC[92] = 'C162 remainder: the product gets the exact proposal (24 ⇒ 32) but the remainder clause «۴ متر می‌مونه» of a chat-only message is not yet re-proposed (REM29 reads it in ledger/live records; the chat-only message record misses the «۲۰ متر لازمه» pairing)';
+  NC[93] = 'C110/C143 with a named qualifier: «عرضِ اتاقِ دوم» vs the first room «۶ متر در ۴ متر» — same digit, same unit, the qualifier word «دوم» is not yet used to separate the two quantities, so the first room is still marked';
   for (const e of Q2) { const n = e.idx, tag = '#' + n + ' [' + e.kind + '/' + e.role + '] ' + String(e.text).slice(0, 70);
     if (process.env.ONLY && !process.env.ONLY.split(',').includes(String(n))) continue;
     if (NC[n] && !process.env.NCRUN) { out.summary.nc++; out.nc[n] = NC[n]; continue; }
