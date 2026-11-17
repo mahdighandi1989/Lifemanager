@@ -15,6 +15,8 @@ const DIR = path.join(__dirname, 'fixtures', 'r29_surface');
   const chk = (c, m) => { if (!c) errors.push(m); };
   const run = async (name, fx, uptoC, fn, dir, noAll) => { if (process.env.ONLY && !process.env.ONLY.split(',').includes(name)) return;
     let r = null; const b = await chromium.launch(); try { r = await replay(b, fx, { uptoC, dir: dir || DIR, allEval: !noAll });
+      /* as in test_tour1_r28_surface_replay (merge28 gate): a run whose HARNESS lost its fake sheet store (or never filed the scenario's sheet #101 — the setup, not the verdict under test) is invalid, not a page verdict — replayed (at most twice) */
+      if (/^B_tB1/.test(fx) && (run.tries || 0) < 2 && await r.p.evaluate(() => !Object.keys(window.__sheets || {}).length || !(APP.PRE.sysAll() || []).length).catch(() => false)) { run.tries = (run.tries || 0) + 1; info[name + '_harnessRetry'] = run.tries; await r.close().catch(() => { }); await b.close(); r = null; return run(name, fx, uptoC, fn, dir, noAll); }
       info[name] = await fn(r); if (r.errors.length) errors.push(name + ' page errors: ' + r.errors.slice(0, 3).join(' | ')); }
     catch (e) { errors.push(name + ' — exception: ' + String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')); } finally { if (r) await r.close().catch(() => { }); await b.close(); } };
   const view = (p, v, a) => p.evaluate(async ([v, a]) => { APP.ASSIST.toggle(false); APP.go(v, a); await new Promise(r => setTimeout(r, 600)); return document.getElementById('main').innerText; }, [v, a || null]);
