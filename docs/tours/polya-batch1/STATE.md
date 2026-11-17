@@ -348,3 +348,4 @@
 - 2026-11-17: 1015b #12 regression traced to surface merge (green at 23d8eab9) → surface fixer resumed on merge29. Other merge29 tests green (r29 surface+replay, r26_classify, forecast, story replay).
 - 2026-11-17: story integration merged into merge29 (0738105b, 161/158). Waiting: correction, dates (next 162/159, 163/160), surface 1015b #12 fix.
 - 2026-11-17: surface 1015b #12 fix merged (d7a29d38); tests running. Waiting: correction, dates.
+- 2026-11-17: correction merged into merge29 (60968ff7, 162/159); tests running. Waiting: dates only (→ 163/160). Then two-part gate on merge29.
