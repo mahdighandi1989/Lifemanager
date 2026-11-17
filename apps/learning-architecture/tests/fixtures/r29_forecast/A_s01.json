@@ -1,0 +1,597 @@
+{
+"from": "round29A/s01",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"eval0": "document.title+\" \"+typeof APP.liveCoach",
+"say": "سلام. سه ماهه دارم فایل اکسل پر می‌کنم که خونه بخرم یا اجاره‌نشین بمونم. ۴۷ تا ستون داره: نرخ تورم، قیمت متری محله‌ها، وام، اجاره، فاصله تا مهدکودک، ... هر روز یه ستون اضافه می‌کنم و هیچ تصمیمی نمی‌گیرم. فقط بگو بخرم یا نه؟"
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='1992-02-11';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()"
+},
+{
+"eval0": "(()=>{const s=APP.ASSIST&&APP.ASSIST.cur?APP.ASSIST.cur():null;return JSON.stringify(Object.keys(APP.ASSIST||{}).filter(k=>/sess|cur/i.test(k)))})()",
+"say": "آره، ثبتش کن."
+},
+{
+"eval": "JSON.stringify({v:APP.state.view,a:APP.state.arg,ids:APP.liveAll().map(r=>r.p.id),coach:(()=>{try{const S=APP.ASSIST.state?APP.ASSIST.state():null;return S}catch(e){return String(e)}})()})"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.cur().coach)"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))\n"
+},
+{
+"eval0": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,APP.liveKindInfo(r.p.id)]))",
+"say": "خب معلومه دیگه، بهترین تصمیم مالی. همینو می‌خوام. بخرم یا نه؟"
+},
+{
+"eval": "JSON.stringify({reg:APP.ASSIST.cur().coach.reg,plans:APP.ASSIST.cur().plans,prom:APP.ASSIST.cur().promises,sig:APP.ASSIST.regSigns(\"فقط بگو بخرم یا نه؟\")})"
+},
+{
+"say": "هوم... راستش اگه فکر کنم، مهم‌ترینش اینه که پسرم تا هفت سال آینده یه جای امن و ثابت داشته باشه که هی اسباب‌کشی نکنیم، و قسط یا اجاره بیشتر از ۴۰ درصد درآمدمون نشه. سود بیشتر اونقدرا مهم نیست."
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.coachLedger?APP.ASSIST.coachLedger():null)"
+},
+{
+"eval": "typeof APP.ASSIST.coachLedger+\" \"+JSON.stringify(typeof APP.ASSIST.coachLedger==\"function\"?APP.ASSIST.coachLedger.toString().slice(0,300):APP.ASSIST.coachLedger).slice(0,1500)"
+},
+{
+"eval": "var s=APP.ASSIST.cur();JSON.stringify(APP.ASSIST.coachLedger(s,\"l:\"+APP.state.arg))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify({ans:APP.ASSIST.cur().coach.ansBy||APP.ASSIST.cur().coach.ans, ph:APP.ASSIST.cur().coach.ph})+\"\\n\"+JSON.stringify(APP.liveCoach(\"pb_l_mvaqm0d5u3i\"))"
+},
+{
+"eval": "(()=>{S(\"lpNat\",\"practical\");F(\"lpOne\",\"می‌خوام تصمیم بگیرم کجا زندگی کنیم که بچه‌م تا هفت سال امن و ثابت باشه و قسطش کمرمونو نشکنه.\");F(\"lpWhy\",\"چون سه ماهه گیر کردم و هر روز فقط ستون اضافه می‌کنم؛ آرامش خانواده و ثبات پسرم برام مهم‌ترینه.\");C(\".lp-onesave\");return MT(\"از صورتت\",200)})()"
+},
+{
+"eval": "(()=>{const D=['۹۰۰ میلیون تومان پس‌انداز داریم','درآمد ماهانهٔ من و همسرم روی هم حدود ۶۰ میلیون','اجارهٔ فعلی ماهی ۱۸ میلیون با ۳۰۰ میلیون رهن','وام مسکن تا ۱ میلیارد با قسط حدود ۲۵ میلیون در ماه','قیمت متری محله‌های نزدیک مهدکودک حدود ۷۵ میلیون','نرخ تورم امسال حدود ۴۰ درصد'];\nfor(let i=2;i<D.length;i++)C('.lp-dadd');\nconst ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>{F(id,D[i]||'');S(id.replace('lpD_','lpDE_'),'big')});\nF('lpUnk','یه جای امن و ثابت برای پسرم تا ۷ سال آینده که مجبور به اسباب‌کشی نشیم و خرج خونه بیشتر از ۴۰٪ درآمدمون نشه');\nF('lpCond','پسرم تا ۷ سال اسباب‌کشی نکنه\\nقسط یا اجاره بیشتر از ۴۰٪ درآمد ماهانه نشه');\nS('lpSat','unknown');S('lpSuff','کافی است');F('lpSuffW','فکر کنم با این شش تا داده میشه دید کدوم گزینه زیر ۴۰٪ می‌مونه');\nF('lpPrVague','«امن» یعنی چی: یعنی صاحبخانه بیرونمون نکنه و قسطمون عقب نیفته');\nF('lpPrLine','هیچی رو بیرون نمی‌ذارم، همهٔ ۴۷ ستون مهمه و هنوز داده جمع می‌کنم');\nF('lpPrApprox','نمی‌دونم، دلم می‌خواد دقیق باشه');\nF('lpPrPrior','خواهرم دو سال پیش با وام خرید و قسطش زیاد بود');\nF('lpPrMeasure','پرداخت ماهانهٔ خانه تقسیم بر درآمد ماهانه ≤ ۰٫۴ و سال‌های بی‌اسباب‌کشی ≥ ۷');\nF('lpGuess','فکر کنم خرید بهتره چون اجاره هر سال بالا میره');S('lpConf','70');F('lpTest','اگه حساب کنم قسط خرید بیشتر از ۴۰٪ درآمد بشه، رد میشه');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','yes');\nconst sp=document.getElementById('lpSpatial');const spc=sp?sp.checked:null;\nF('lpGContra','اگه قسط خرید با وام از ۴۰٪ درآمدمون بیشتر بشه');C('.lp-usave');C('.sv-g2');\nconst bad=[...document.querySelectorAll('#main .bad,#main [aria-live]')].map(e=>e.textContent.trim()).filter(Boolean).join(' || ');\nreturn 'spatialChecked='+spc+'\\nBAD:'+bad+'\\nSUB:'+APP.state.sub+'\\n'+MT('ثبتِ فهم',1500)})()\n;JSON.stringify(APP.liveKindInfo(\"pb_l_mvaqm0d5u3i\"))+\" \"+APP.state.sub"
+},
+{
+"eval": "[...document.querySelectorAll(\"#main .bad,#main .lp-umiss,#main [class*=soft]\")].map(e=>e.className+\": \"+e.textContent.trim()).filter(x=>x.length>12).join(\"\\n\")+\"\\nSUB:\"+APP.state.sub+\" PH:\"+APP.livePhase(\"pb_l_mvaqm0d5u3i\")+\"\\n\"+FL(\"Soft|soft|lpPr\")+\"\\nTT:\"+TT()"
+},
+{
+"eval": "(()=>{F(\"lpPrApprox\",\"حدوداً؛ اگه درصد قسط به درآمد تا ±۳ درصد درست باشه بسه\");C(\".lp-usave\");\nconst m1=[...document.querySelectorAll(\"#main .lp-umiss\")].map(e=>e.textContent.trim()).join(\" || \");\nF(\"lpSoftWhy\",\"فعلاً واقعاً نمی‌دونم کدومو کنار بذارم؛ همه به نظرم ربط دارن\");\nconst sb=[...document.querySelectorAll(\"#main button\")].find(b=>/ثبت با همین/.test(b.textContent));const r=sb?(sb.click(),'clicked soft'):'NO SOFT BTN';\nconst m2=[...document.querySelectorAll(\"#main .lp-umiss,#main .bad\")].map(e=>e.textContent.trim()).join(\" || \");\nconst L=APP.liveAll().find(x=>x.p.id==\"pb_l_mvaqm0d5u3i\");\nreturn \"M1:\"+m1+\"\\nSOFT:\"+r+\"\\nM2:\"+m2+\"\\nSUB:\"+APP.state.sub+\" PH:\"+APP.livePhase(\"pb_l_mvaqm0d5u3i\")+\"\\nTT:\"+TT()+\"\\nREC:\"+JSON.stringify(L.live&&L.live.u||L.p.u||{}).slice(0,1500)})()\n"
+},
+{
+"eval": "BL()+\"\\n\"+document.querySelector(\".lp-softgate\").outerHTML.slice(0,1500)"
+},
+{
+"eval": "(()=>{F(\"lpSoftWhy\",\"فعلاً واقعاً نمی‌دونم کدومو کنار بذارم؛ همه به نظرم ربط دارن\");C(\".lp-usave\");const m=[...document.querySelectorAll(\"#main .lp-umiss\")].map(e=>e.textContent.trim()).join(\" || \");const L=APP.liveAll().find(x=>x.p.id==\"pb_l_mvaqm0d5u3i\");return \"M:\"+m+\"\\nSUB:\"+APP.state.sub+\" PH:\"+APP.livePhase(\"pb_l_mvaqm0d5u3i\")+\"\\nTT:\"+TT()+\"\\nSOFT:\"+JSON.stringify(JSON.stringify(L).match(/.{0,80}(soft|Soft)[^,]{0,200}/g))})()"
+},
+{
+"eval": "(()=>{const b=document.querySelector(\".lp-usave\");const box=b.closest(\".card\")||b.parentElement;C(\".lp-usave\");return [...document.querySelectorAll(\"#main .lp-suffchal,#main .lp-gchal,#main .lp-suffcirc,#main .lp-umiss,#main .bad, #main .good\")].map(e=>e.className+\": \"+e.textContent.trim().slice(0,400)).join(\"\\n\")+\"\\nTT:\"+TT()+\"\\nPH:\"+APP.livePhase(\"pb_l_mvaqm0d5u3i\")})()"
+},
+{
+"eval": "(()=>{const out=[];for(const k of Object.keys(localStorage)){const v=localStorage.getItem(k);const i=v.indexOf(\"همه به نظرم ربط\");if(i>=0)out.push(k+\": …\"+v.slice(Math.max(0,i-300),i+80));}C(\".sv-g2\");return out.join(\"\\n\").slice(0,1500)+\"\\nPH:\"+APP.livePhase(\"pb_l_mvaqm0d5u3i\")+\" SUB:\"+APP.state.sub+\"\\n\"+MT(\"۲) طرح\",1800)})()"
+},
+{
+"say": "کارت فهم رو پر کردم و ثبت کردم. ولی راستش به نظرم همهٔ ۴۷ ستون یه جوری ربط دارن، نمی‌تونم هیچ‌کدومو کنار بذارم."
+},
+{
+"eval0": "(()=>{0;APP.go(\"home\");return DUE()})()",
+"say": "سلام دوباره. دو روز گذشت. راستش ۵ تا ستون جدید هم اضافه کردم: قیمت طلا، قیمت دلار، پیش‌بینی انتخابات، نرخ بهره بانکی، شاخص بورس. فایلمو هم گذاشتم. هنوز حس می‌کنم داده کم دارم که تصمیم بگیرم.",
+"clock": "2026-10-18"
+},
+{
+"say": "خب... انتخابات شاید رو قیمت‌ها اثر بذاره ولی راستش هیچ‌کدومشون مستقیم به ۴۰٪ و هفت سال ربط ندارن. ولی می‌ترسم یه چیز مهم رو جا انداخته باشم. از کجا بدونم کِی دیگه بسه؟"
+},
+{
+"eval": "(()=>{0;const d=DUE();APP.go(\"lprob\",\"pb_l_mvaqm0d5u3i\");return d+\"\\n####\\n\"+MT(\"❔ پرسشِ همین لحظه\",700)+\"\\n\"+FL(\"lpA\")})()",
+"clock": "2026-10-19"
+},
+{
+"eval": "(()=>{F(\"lpAsk\",\"اگه حل شده بود یه قرارداد یا قسط بلندمدت داشتیم که زیر ۲۴ میلیون در ماه باشه؛ گام قبلش اینه که گزینه‌ها رو فقط با همین دو شرط مقایسه کنم.\");[\"lpAD_d1\",\"lpAD_d3\",\"lpAD_d5\",\"lpAD_d6\"].forEach(id=>{const e=document.getElementById(id);if(e&&e.checked)e.click();});C(\".lp-askgo\");const bad=[...document.querySelectorAll(\"#main .bad\")].map(e=>e.textContent.trim()).join(\" || \");return \"BAD:\"+bad+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",600)})()"
+},
+{
+"eval": "(()=>{const o=[];o.push(C('.sv-g1'));\nF('lpBkS','پسرم تا کلاس چهارم تو یه خونه و یه محله می‌مونه و ما هر ماه کمتر از ۴۰٪ درآمد بابت خونه می‌دیم');\nF('lpBk1','یه قرارداد یا قسط بلندمدت داریم که مبلغش زیر ۲۴ میلیون در ماهه');\nF('lpBkH','درآمد ماهانه ۶۰ میلیون و قسط وام ۲۵ میلیون');\no.push(C('.lp-bksave'));\nF('lpPlan','نخست سه گزینه را فقط با دو شرط و با تقریب ساده مقایسه می‌کنم: پرداخت ماهانه تقسیم بر درآمد ماهانهٔ ۶۰ میلیون، و این‌که چند سال جابه‌جایی اجباری ندارد؛ سپس با صاحبخانهٔ گزینه‌ای که هر دو شرط را دارد برای قرارداد بلندمدت حرف می‌زنم.');\nF('lpPlan2','اگر صاحبخانه قرارداد بلندمدت نداد، گزینهٔ دوم را با قرارداد دو ساله و بند تمدید می‌گیرم و همزمان برای خرید کوچک‌تر پس‌انداز می‌کنم.');\nS('lpPU_a_d1','skip');F('lpPU_w_d1','پس‌انداز فقط برای رهن یا پیش‌پرداخت لازم است و ترتیب گزینه‌ها را از نظر دو شرط عوض نمی‌کند');\nS('lpPU_a_d2','use');F('lpPU_w_d2','مخرج نسبت پرداخت ماهانه به درآمد است');\nS('lpPU_a_d3','use');F('lpPU_w_d3','اجارهٔ فعلی یکی از سه گزینه است');\nS('lpPU_a_d4','use');F('lpPU_w_d4','قسط ۲۵ میلیون صورتِ نسبت برای گزینهٔ خرید است');\nS('lpPU_a_d5','skip');F('lpPU_w_d5','قیمت متری در قسط وام آمده و جداگانه چیزی عوض نمی‌کند');\nS('lpPU_a_d6','skip');F('lpPU_w_d6','تورم روی همهٔ گزینه‌ها تقریباً یکسان اثر دارد و ترتیبشان را عوض نمی‌کند');\n['lpPC_0','lpPC_1'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});\no.push(C('.lp-plansave'));\nconst bad=[...document.querySelectorAll('#main .bad')].map(e=>e.textContent.trim()).join(' || ');\nreturn o.join(',')+'\\nBAD:'+bad+'\\nSUB:'+APP.state.sub+' PH:'+APP.livePhase('pb_l_mvaqm0d5u3i')+'\\n'+FL('lpStep|lpClear|lpPrem|lpBk|lpPred|lpConf|lpWhen|lpSC|lpEq')+'\\n'+MT('۳) اجرا',2500)})()\n"
+},
+{
+"say": "باشه، قبول. دیگه ستون اضافه نمی‌کنم. طرحمو ثبت کردم و سه گزینه رو فقط با دو شرط، سرانگشتی مقایسه کردم: الف (خرید) قسطش ۴۲٪ درآمد میشه، رد. ب (اجاره قصردشت) ۳۰٪ ولی قرارداد فقط ۲ ساله، رد. ج (اجارهٔ بلندمدت زرهی) ۲۳٪ و قرارداد ۵ ساله. فکر کنم ج رو انتخاب می‌کنم. ولی این حساب سرانگشتی کافیه؟"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>({id:r.p.id,steps:(r.p.steps||r.steps||[]),plan:r.p.plan||r.plan, keys:Object.keys(r), pk:Object.keys(r.p)})))"
+},
+{
+"eval": "(()=>{F('lpStep','با صاحبخانهٔ گزینهٔ ج (زرهی) تماس می‌گیرم و قرارداد ۵ ساله با سقف افزایش سالانهٔ ۲۰٪ را می‌پرسم');S('lpClear','بله');F('lpPrem','اجارهٔ ۱۴ میلیون یعنی ۲۳٪ درآمد ۶۰ میلیون، و قرارداد ۵ ساله نزدیک‌ترین گزینه به شرط ۷ سال است');S('lpBkMatch','yes');F('lpPred','قبول می‌کند ولی افزایش سالانه ۲۵٪ می‌خواهد');S('lpConf','70');F('lpWhen','فردا ساعت ۱۰ صبح');\n['lpSC_0','lpSC_1'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});\nC('.lp-stepsave');const bad=[...document.querySelectorAll('#main .bad')].map(e=>e.textContent.trim()).join(' || ');\nreturn 'BAD:'+bad+'\\nREM:'+JSON.stringify((window.__rem||[]).slice(-2))+'\\n'+MT('گامِ واقعیِ باز',800)})()\n"
+},
+{
+"eval": "(()=>{0;const d=DUE();APP.go('lprob','pb_l_mvaqm0d5u3i','exec');\nS('lpODone','yes');F('lpOWhat','صاحبخانه قرارداد ۵ ساله را قبول کرد با افزایش سالانهٔ ۲۲ درصد؛ گفت شاید بعد از ۵ سال هم تمدید کند.');S('lpOProg','بله، روشن');S('lpOWant','same');\nconst f1=FL('lpO|lpG|lpM');C('.lp-outsave');let bad=[...document.querySelectorAll('#main .bad')].map(e=>e.textContent.trim()).join(' || ');\nconst f2=FL('lpO|lpG|lpM');S('lpOMatch','part');S('lpOGuess','refute');C('.lp-outsave');let bad2=[...document.querySelectorAll('#main .bad')].map(e=>e.textContent.trim()).join(' || ');\nreturn d+'\\n####\\n'+f1+'\\nBAD1:'+bad+'\\n'+f2+'\\nBAD2:'+bad2+'\\n'+BL()})()\n;FL(\"lpO\")",
+"clock": "2026-10-20"
+},
+{
+"eval": "(()=>{F(\"lpOReflect\",\"نه؛ خرید با قسط ۴۲٪ از شرطم بیرون بود. حدس اصلاح‌شده: اجارهٔ بلندمدت با سقف افزایش\");S(\"lpONewG\",\"yes\");const f=FL(\"lpONewG\");F(\"lpONewGT\",\"اجارهٔ بلندمدت با سقف افزایش سالانه هر دو شرط را برآورده می‌کند\");C(\".lp-outsave\");const bad1=[...document.querySelectorAll(\"#main .bad\")].map(e=>e.textContent.trim()).join(\" || \");const t1=TT();\nS(\"lpONewGC\",\"70\");F(\"lpONewGTest\",\"اگر سقف افزایش سالانه از رشد درآمد بیشتر شود و در سال ششم خرج از ۴۰٪ بگذرد، رد می‌شود\");C(\".lp-outsave\");const bad2=[...document.querySelectorAll(\"#main .bad\")].map(e=>e.textContent.trim()).join(\" || \");\nreturn f+\"\\nBAD1:\"+bad1+\" TT1:\"+t1+\"\\nBAD2:\"+bad2+\"\\nTT:\"+TT()+\"\\nSUB:\"+APP.state.sub+\" \"+MT(\"حدسِ پیش از حلت\",400)})()\n"
+},
+{
+"say": "صاحبخونه قبول کرد: ۵ ساله با افزایش ۲۲٪. حدسم که خرید بهتره غلط درآمد."
+},
+{
+"eval": "JSON.stringify(APP.livePlausible('pb_l_mvaqm0d5u3i'))\n"
+},
+{
+"say": "ثبتش کردم. حالا چی؟"
+},
+{
+"eval": "(()=>{const p=\"pb_l_mvaqm0d5u3i\";return JSON.stringify(APP.liveCoach(p)).slice(0,700)+\"\\nPH:\"+APP.livePhase(p)+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",500)+\"\\nBL:\"+BL()})()"
+},
+{
+"eval": "(()=>{const p=\"pb_l_mvaqm0d5u3i\";const pl=APP.livePlausible(p);C(\".lp-solved\");return JSON.stringify(pl)+\" SUB:\"+APP.state.sub})()"
+},
+{
+"eval": "JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0d5u3i\"))+\"\\n\"+FL(\"lpB\")+\"\\n\"+MT(\"۴) بازنگری\",3000)"
+},
+{
+"eval": "(()=>{S('lpBWant','same');F('lpBChk','حساب کردم: ۱۴ میلیون با ۲۲٪ در سال پنجم حدود ۳۱ میلیون می‌شه؛ اگه درآمدمون سالی ۲۰٪ بره بالا، تقریباً همون ۲۳ تا ۲۵ درصد می‌مونه و زیر ۴۰٪ است. ولی قرارداد ۵ ساله است نه ۷ ساله؛ دو سال آخر هنوز باز است.');S('lpBRes','نتیجه سالم ماند');S('lpBCP_0','yes');S('lpBCP_1','yes');F('lpBUnits','دو سو هر دو تومان در ماه است؛ نسبت بی‌واحد است و با هر واحد پول همان می‌ماند');\nF('lpBOther','آره، می‌شد از اول فقط گزینه‌هایی را نگه دارم که قرارداد بلندمدت می‌دهند و بعد فقط درصد درآمد را مقایسه کنم.');F('lpBGlance','مجهول را دقیق کردم، دو شرط را جدا کردم و فقط داده‌هایی را که شرط‌ها را جابه‌جا می‌کردند نگه داشتم.');F('lpBWorked','گفتن مجهول با کلمات خودم و دست کشیدن از ستون اضافه کردن؛ دفعهٔ بعد اول شرط‌ها را می‌نویسم بعد داده جمع می‌کنم.');\nF('lpBApprox','تقریب سرانگشتی بس بود؛ ستون‌های طلا و انتخابات و بورس هیچ اثری روی انتخاب نداشتند؛ پس‌انداز فقط رهن را داد.');S('lpBBest','0');\nF('lpBUse','برای هر تصمیم بزرگ مثل انتخاب مدرسهٔ پسرم یا عوض کردن کار: اول مجهول و شرط، بعد فقط داده‌هایی که شرط‌ها را تغییر می‌دهند.');F('lpBTaste','بخش جدا کردن شرط‌ها رو دوست داشتم؛ بخش پیش‌بینی با درصد برام سخت بود.');\nF('lpBNew','پنج سال دیگر که قرارداد تمام شد: با پس‌انداز کجا خانه بخریم که پسرم مدرسه‌اش را عوض نکند و قسط زیر ۴۰٪ بماند؟');S('lpBNewS','method');F('lpBNewW','همان روش: مجهول دقیق، دو شرط، فقط داده‌هایی که شرط‌ها را جابه‌جا می‌کنند');S('lpBHit','نادرست بود');\nconst f=FL('lpB|lpL|lpN|lpG|lpT');const b=[...document.querySelectorAll('#main button')].find(b=>/ثبتِ بازنگری/.test(b.textContent));b.click();\nconst bad=[...document.querySelectorAll('#main .bad')].map(e=>e.textContent.trim()).join(' || ');const neg=[...document.querySelectorAll('#main .lp-bpneg,#main .lp-softgate')].map(e=>e.className+': '+e.textContent.trim()).join(' || ');return 'NEG:'+neg+'\\nCLOS:'+JSON.stringify(APP.liveClosure('pb_l_mvaqm0d5u3i'))+'\\nBAD:'+bad+'\\nSUB:'+APP.state.sub+'\\n'+FL('lpB|lpH|lpW')+'\\n'+MT('حدست با آنچه شد',800)})()\n"
+},
+{
+"eval": "(()=>{const e=document.getElementById(\"lpBBest\");return e?[...e.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NONE \"+APP.state.view+\" \"+APP.state.sub})()"
+},
+{
+"eval": "(()=>{S('lpBCP_0','no');F('lpBHitW','فرض پنهانم این بود که اجاره حتماً هر سال تند بالا میره؛ قرارداد بلندمدت با سقف افزایش رو اصلاً در نظر نگرفته بودم.');\nconst b=[...document.querySelectorAll('#main button')].find(b=>/ثبتِ بازنگری/.test(b.textContent));b.click();\nconst neg=[...document.querySelectorAll('#main .lp-bpneg,#main .lp-softgate,#main .lp-lbmiss,#main [class*=miss],#main .warnline')].map(e=>e.className+': '+e.textContent.trim().slice(0,300)).join(' || ');\nreturn 'NEG:'+neg+'\\nTT:'+TT()+'\\nSUB:'+APP.state.sub+' PH:'+APP.livePhase('pb_l_mvaqm0d5u3i')+'\\nCLOS:'+JSON.stringify(APP.liveClosure('pb_l_mvaqm0d5u3i'))+'\\n'+FL('lpB|lpD')+'\\n'+MT('۴) بازنگری',1200)})()\n"
+},
+{
+"eval": "BL().split(\" | \").slice(-12).join(\" | \")+\"\\n\"+FL(\"lpB|lpD|lpF\")"
+},
+{
+"eval": "(()=>{S(\"lpBRes\",\"ایرادی یافتم\");F(\"lpBDefW\",\"قرارداد ۵ ساله است نه ۷ ساله؛ برای دو سال آخر هنوز چیزی ندارم\");S(\"lpBDefTo\",\"c\");C(\".lp-lbsave\");return \"TT:\"+TT()+\"\\nSUB:\"+APP.state.sub+\" PH:\"+APP.livePhase(\"pb_l_mvaqm0d5u3i\")+\"\\nCLOS:\"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0d5u3i\"))+\"\\n\"+MT(\"گامِ واقعیِ بعد\",600)})()"
+},
+{
+"eval": "(()=>{F('lpStep','از صاحبخانهٔ زرهی می‌خواهم بندِ تمدیدِ دوساله با همان سقفِ افزایش را در قرارداد بنویسد');S('lpClear','بله');F('lpPrem','قرارداد ۵ ساله + تمدید ۲ ساله = ۷ سال، همان شرطِ اول');S('lpBkMatch','yes');F('lpPred','قبول می‌کند ولی سقف افزایش سال ششم و هفتم را ۲۵٪ می‌گذارد');S('lpConf','60');F('lpWhen','پس‌فردا');\n['lpSC_0','lpSC_1'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});\nC('.lp-stepsave');const t1=TT();\nreturn 'part1:'+TT()})()"
+},
+{
+"clock": "2026-10-22",
+"eval": "(()=>{APP.go('lprob','pb_l_mvaqm0d5u3i','exec');\nS('lpODone','yes');F('lpOWhat','صاحبخانه بند تمدید دوساله را نوشت با سقف افزایش ۲۵٪ برای سال ششم و هفتم');S('lpOProg','بله، روشن');S('lpOWant','same');S('lpOMatch','yes');\nconst g=document.getElementById('lpOGuess');if(g)S('lpOGuess','confirm');C('.lp-outsave');const t2=TT();\nC('.lp-solved');const t3=TT();\nreturn 'T1:'+t1+'\\nT2:'+t2+'\\nT3:'+t3+'\\nSUB:'+APP.state.sub+'\\nCLOS:'+JSON.stringify(APP.liveClosure('pb_l_mvaqm0d5u3i'))+'\\n'+FL('lpB')})()\n"
+},
+{
+"eval": "String(!!document.getElementById(\"lpBLaw\"))+\" \"+FL(\"lpBBest\")"
+},
+{
+"eval": "(()=>{S('lpBWant','same');F('lpBChk','حساب کردم: ۱۴ میلیون با ۲۲٪ در سال پنجم حدود ۳۱ میلیون و با ۲۵٪ در سال هفتم حدود ۴۸ میلیون؛ اگه درآمدمون سالی ۲۰٪ بره بالا (سال هفتم حدود ۱۷۹ میلیون) میشه حدود ۲۷٪، زیر ۴۰٪. با بند تمدید، هفت سال کامل پوشش داره.');S('lpBRes','نتیجه سالم ماند');S('lpBCP_0','yes');S('lpBCP_1','yes');F('lpBUnits','دو سو هر دو تومان در ماه است؛ نسبت بی‌واحد است');\nF('lpBOther','آره، می‌شد از اول فقط گزینه‌هایی را نگه دارم که قرارداد بلندمدت می‌دهند و بعد فقط درصد درآمد را مقایسه کنم.');F('lpBGlance','مجهول را دقیق کردم، دو شرط را جدا کردم و فقط داده‌هایی را که شرط‌ها را جابه‌جا می‌کردند نگه داشتم.');F('lpBWorked','گفتن مجهول با کلمات خودم و دست کشیدن از ستون اضافه کردن؛ دفعهٔ بعد اول شرط‌ها را می‌نویسم بعد داده جمع می‌کنم.');\nconst law=document.getElementById('lpBLaw');if(law)F('lpBLaw','قانونی نیافتم؛ فقط برای همین قرارداد و همین درآمد آزموده شد');\nF('lpBApprox','تقریب سرانگشتی بس بود؛ ستون‌های طلا و انتخابات و بورس هیچ اثری روی انتخاب نداشتند.');S('lpBBest','0');\nF('lpBUse','برای هر تصمیم بزرگ مثل انتخاب مدرسهٔ پسرم یا عوض کردن کار: اول مجهول و شرط، بعد فقط داده‌هایی که شرط‌ها را تغییر می‌دهند.');F('lpBTaste','بخش جدا کردن شرط‌ها رو دوست داشتم؛ بخش پیش‌بینی با درصد برام سخت بود.');\nF('lpBNew','هفت سال دیگر که قرارداد تمام شد: با پس‌انداز کجا خانه بخریم که پسرم مدرسه‌اش را عوض نکند و قسط زیر ۴۰٪ بماند؟');S('lpBNewS','method');F('lpBNewW','همان روش: مجهول دقیق، دو شرط، فقط داده‌هایی که شرط‌ها را جابه‌جا می‌کنند');S('lpBHit','نادرست بود');\nconst hw=document.getElementById('lpBHitW');if(hw)F('lpBHitW','فرض پنهانم این بود که اجاره حتماً هر سال تند بالا میره؛ قرارداد بلندمدت با سقف افزایش رو در نظر نگرفته بودم.');\nconst b=[...document.querySelectorAll('#main button')].find(b=>/ثبتِ بازنگری/.test(b.textContent));if(!b)return 'NOSAVE '+BL();b.click();\nlet t=TT();const hw2=document.getElementById('lpBHitW');if(hw2&&!hw2.value){F('lpBHitW','فرض پنهانم این بود که اجاره حتماً هر سال تند بالا میره؛ قرارداد بلندمدت با سقف افزایش رو در نظر نگرفته بودم.');const b2=[...document.querySelectorAll('#main button')].find(b=>/ثبتِ بازنگری/.test(b.textContent));b2&&b2.click();t+=' ##2 '+TT();}\nconst neg=[...document.querySelectorAll('#main .lp-bpneg,#main .lp-softgate,#main .bad')].map(e=>e.className+': '+e.textContent.trim().slice(0,200)).join(' || ');\nreturn 'NEG:'+neg+'\\nTT:'+t+'\\nSUB:'+APP.state.sub+'\\nCLOS:'+JSON.stringify(APP.liveClosure('pb_l_mvaqm0d5u3i'))+'\\nLIVES:'+JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,r.dormant,r.origin]))})()\n"
+},
+{
+"eval0": "(()=>{0;APP.go(\"home\");APP.ASSIST.newSession();return 1})()",
+"say": "سلام. یادته در مورد خونه حرف زدیم؟ همکارم هم الان دقیقاً همین سؤال رو داره که بخره یا اجاره کنه. چی بهش بگم؟",
+"clock": "2026-11-05"
+},
+{
+"say": "آره، مجهولم یه جای امن و ثابت برای پسرم تا هفت سال بود با خرج زیر ۴۰٪، راهم این بود که فقط دو شرط رو نگه داشتم و سه گزینه رو سرانگشتی مقایسه کردم. پس به همکارم بگم اجاره بلندمدت بگیره؟"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQs(r.p.id)]))\n"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0d5u3i\",\"back\");const s=document.getElementById(\"lpBBest\");return s?[...s.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NOSEL \"+APP.state.sub})()\n"
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.className+\":\"+b.textContent.trim().slice(0,40));return b.join(\" | \").slice(0,2500)})()\n"
+},
+{
+"eval": "(()=>{const p=APP.liveAll()[0].p.id;APP.go(\"lprob\",p,\"back\");const s=document.getElementById(\"lpBBest\");return APP.state.sub+\" \"+(s?[...s.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NOSEL \"+document.getElementById(\"main\").innerText.slice(0,800))})()\n"
+},
+{
+"eval": "[...document.querySelectorAll('#lpBBest option')].map(o=>o.value+' = '+o.textContent).join('\\n')\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQItems(r.p.id)]))"
+},
+{
+"eval": "(()=>{const e=document.getElementById('lpBBest');return e?[...e.options].map(o=>o.value+'='+o.textContent).join('\n'):'NONE '+APP.state.view+' '+APP.state.sub})()"
+},
+{
+"eval": "(()=>{const id=APP.liveAll().find(r=>/خرید یا اجاره/.test(r.p.title)).p.id;APP.go('lprob',id,'back');const e=document.getElementById('lpBBest');return e?[...e.options].map(o=>o.value+'='+o.textContent).join(' || '):'NONE '+APP.state.view+' '+APP.state.sub})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t||x)]),null,0)"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,reg:(s.coach||{}).reg,g:(s.coach||{}).guess,plans:s.plans,prom:s.promises,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>m.guess)})))"
+},
+{
+"eval": "JSON.stringify({items:APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t)]),sess:APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,plans:s.plans,prom:s.promises,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>m.guess)})),steps:APP.liveAll().map(r=>JSON.stringify(r.p.stages&&r.p.stages.c||r.p.stages).slice(0,1500))})"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>{const L=r.p.live||{};return {k:Object.keys(L),steps:(L.steps||[]).map(s=>({t:(s.text||s.t||'').slice(0,60),done:s.done,from:s.from,auto:s.auto,what:(s.what||s.out||'').slice(0,60),chat:s.chat}))}}))"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({g:(s.coach||{}).guesses,gr:(s.coach||{}).guessRes,plans:s.plans})))"
+},
+{
+"eval": "JSON.stringify({v:APP.state.view,a:APP.state.arg,t:APP.today(),dev:APP.clock.dev,live:APP.liveAll().map(r=>[r.p.id,r.p.title])})"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0d5u3i\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/پروندهٔ کامل/.test(b.textContent));if(b)b.click();return APP.state.view+\" \"+APP.state.arg+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,6000)})()"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,lp:s.lprob,log:s.lprobLog,t:s.title})))"
+},
+{
+"eval": "(()=>{localStorage.setItem(\"lla.dev\",\"1\");APP.clock.dev=true;return 0})()",
+"clock": "2026-11-06"
+},
+{
+"reload": true
+},
+{
+"eval": "(()=>{APP.go(\"today\");return JSON.stringify(APP.clock.check())+\"\\nFLAG:\"+(document.body.innerText.match(/.{0,40}ساعتِ آزمایشی.{0,60}/)||[\"\"])[0]+\"\\nSCHED:\"+JSON.stringify((APP.SCHED.all(APP.today())||[]).map(e=>[e.kind||e.key,e.due,e.txt]).slice(0,20))+\"\\nMAIN:\"+document.getElementById(\"main\").innerText.slice(0,2500)})()"
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button, #main a, #main li\")].find(b=>/مرورِ حلِ مسئله موعد/.test(b.textContent)&&b.children.length<6);if(b)b.click();return APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,3000)+\"\\nFL:\"+FL()})()"
+},
+{
+"eval": "(()=>{const L=APP.dueList()||[];const x=L.find(x=>/مرورِ حلِ مسئله/.test(x.txt||\"\"));if(x&&x.go)x.go();return JSON.stringify(L.map(x=>x.txt))+\"\\n\"+APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,2500)+\"\\nFL:\"+FL()})()"
+},
+{
+"eval": "(()=>{F(\"svRU1\",\"می‌خواستم یه جای ثابت برای پسرم پیدا کنم که تا هفت سال جابه‌جا نشیم و خرجش زیر ۴۰٪ درآمد بمونه\");F(\"svRU\",\"جای امن و ثابت برای ۷ سال با خرج زیر ۴۰٪\");F(\"svRC\",\"۱. ۷ سال اسباب‌کشی نه ۲. خرج زیر ۴۰٪\");const bs=[...document.querySelectorAll(\"#main button\")].filter(b=>/ثبت و مقایسه/.test(b.textContent));bs[0].click();const r1=TT();F(\"svRB\",\"اول مجهول و شرط، بعد فقط داده‌هایی که شرط رو جابه‌جا می‌کنن؛ برای انتخاب مدرسه هم همین\");const bs2=[...document.querySelectorAll(\"#main button\")].filter(b=>/ثبت و مقایسه/.test(b.textContent));bs2[1]&&bs2[1].click();return r1+\" || \"+TT()+\"\\n\"+MT(\"مرورِ فاصله‌دار\",1500)})()"
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll(\"#main button\")].filter(b=>/^۲ کامل$|^۲/.test(b.textContent.trim()));g.forEach(b=>b.click());const r=TT();APP.go(\"home\");APP.go(\"today\");return g.length+\" \"+r+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "0",
+"clock": "2026-11-09"
+},
+{
+"reload": true
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details.mind-from, details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"چهار مرحلهٔ حل\");return t.slice(i,i+2500)+\"\\n###TECH:\"+(t.match(/🏋 کارِ تکنیک‌ها[\\s\\S]{0,600}/)||[\"\"])[0]})()"
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm0d5u3i\")"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "APP.today()+' '+APP.state.view+' '+APP.ASSIST.cur().id+' '+APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>r.p.id+':'+r.p.title).join(' | ')"
+},
+{
+"say": "می‌خوام این روشِ «اول مجهول و شرط، بعد فقط داده‌هایی که شرط رو عوض می‌کنن» واقعاً تو ذهنم بمونه؛ یه تمرینِ یادآوری برام بذار که هر چند وقت یه بار از حافظه بنویسمش."
+},
+{
+"eval": "(()=>{const sel=document.querySelector('.prc-tsel');sel.value='41';sel.dispatchEvent(new Event('change',{bubbles:true}));const b=document.querySelector('.prc-start');b.click();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+' | '+FL().slice(0,900)})()"
+},
+{
+"eval": "(async(o)=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const f=(id,v)=>{const e=document.getElementById(id);if(!e)return id+'?';e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nconst r=[];if(o.topic)r.push(f('ex_topic',o.topic));r.push(f('ex_pred',String(o.pred)));r.push(f('ex_dump',o.dump));\n['ex_decl_0','ex_decl_1'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click()});\nconst ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await w(300);\nfor(let i=0;i<o.idea.length;i++){if(!document.getElementById('ex_gaps_'+i+'_st')){const ad=[...document.querySelectorAll('#main button')].find(b=>/\\+ ردیف/.test(b.textContent));if(ad){ad.click();await w(200)}}\n const inp=document.getElementById('ex_gaps_'+i+'_idea')||[...document.querySelectorAll('#main input,#main textarea')].filter(e=>e.id&&e.id.startsWith('ex_gaps_'+i)&&!/_st|_why/.test(e.id))[0];\n if(inp){inp.value=o.idea[i];inp.dispatchEvent(new Event('input',{bubbles:true}));}\n r.push(f('ex_gaps_'+i+'_st',o.st[i]));if(o.why[i])f('ex_gaps_'+i+'_why',o.why[i]);}\nr.push(f('ex_actual',String(o.act)));r.push(f('ex_nextQ_0',o.q[0]));r.push(f('ex_nextQ_1',o.q[1]));\nconst g=[...document.querySelectorAll('#main button')].filter(b=>/^۲ کامل$/.test(b.textContent.trim()));g.forEach(b=>b.click());await w(200);\nconst fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));if(fin)fin.click();await w(600);\nreturn r.join(',')+' | '+TT()+'\\nPRC:'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({id:c.id,subj:c.subj,due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas,s.src])})))})({\"pred\": 60, \"dump\": \"اول مجهول: دقیقاً چی می‌خوام. بعد شرط‌ها — فقط دو تا: امنیت و ثباتِ هفت‌ساله برای پسرم، و خرج زیر ۴۰٪ درآمد. داده‌ها رو فقط وقتی نگه می‌دارم که یکی از شرط‌ها رو عوض کنن؛ بقیهٔ ستون‌ها رو کنار می‌ذارم. بعد سه گزینه رو سرانگشتی با همین دو شرط مقایسه کردم.\", \"idea\": [\"مجهول دقیق\", \"فقط دو شرط\", \"داده فقط اگر شرط را عوض کند\", \"مقایسهٔ سرانگشتیِ گزینه‌ها\"], \"st\": [\"کامل یادم بود\", \"کامل یادم بود\", \"ناقص\", \"کامل یادم بود\"], \"why\": [\"\", \"\", \"یادم رفت بنویسم که دادهٔ بی‌اثر را کنار گذاشتم\", \"\"], \"act\": 80, \"q\": [\"دادهٔ بی‌اثر را چطور تشخیص دادم؟\", \"قرارداد بلندمدت چطور شرطِ هفت‌سال را برآورده کرد؟\"]})\n\n"
+},
+{
+"clock": "2026-11-10",
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"
+},
+{
+"eval": "(async(o)=>{const x=(APP.dueList()||[]).find(x=>new RegExp(o.re).test(x.txt));if(!x)return 'NODUE';x.go();await new Promise(r=>setTimeout(r,500));const v=APP.state.view+' '+APP.state.arg;\nF('pr_dump',o.dump);const ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await new Promise(r=>setTimeout(r,300));\nif(o.gaps)F('pr_gaps',o.gaps);F('pr_pct',String(o.pct));const fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));fin&&fin.click();await new Promise(r=>setTimeout(r,600));\nreturn v+' | '+TT()+'\\nPRC:'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late,roles:c.roles})))+'\\nDUE:'+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||'')))})({\"re\": \"برگه سفید روز ۱\", \"dump\": \"مجهول اول، بعد دو شرط (ثباتِ هفت‌ساله و خرج زیر ۴۰٪)، داده فقط اگه شرط رو عوض کنه، بعد مقایسهٔ سرانگشتیِ گزینه‌ها و قرارداد بلندمدت.\", \"gaps\": \"\", \"pct\": 85})\n\n"
+},
+{
+"clock": "2026-11-12",
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"
+},
+{
+"clock": "2026-11-18",
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()"
+},
+{
+"say": "امروز بعد از یه هفته روشِ خونه رو از حافظه نوشتم؛ فقط مجهول و دو شرط یادم بود، بخشِ «داده فقط اگه شرط رو عوض کنه» کامل یادم رفته بود — شاید ۴۰ درصد."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({msgs:s.msgs.slice(-3).map(m=>m.role+': '+m.text.slice(0,200)),prc:APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late,roles:c.roles})),due:(APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||''))})})()"
+},
+{
+"clock": "2026-11-19",
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()"
+},
+{
+"eval": "(async(o)=>{const x=(APP.dueList()||[]).find(x=>new RegExp(o.re).test(x.txt));if(!x)return 'NODUE';x.go();await new Promise(r=>setTimeout(r,500));const v=APP.state.view+' '+APP.state.arg;\nF('pr_dump',o.dump);const ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await new Promise(r=>setTimeout(r,300));\nif(o.gaps)F('pr_gaps',o.gaps);F('pr_pct',String(o.pct));const fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));fin&&fin.click();await new Promise(r=>setTimeout(r,600));\nreturn v+' | '+TT()+'\\nPRC:'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late,roles:c.roles})))+'\\nDUE:'+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||'')))})({\"re\": \"برگه سفید روز ۱\", \"dump\": \"مجهولِ دقیق، فقط دو شرط (ثباتِ هفت‌ساله و خرج زیر ۴۰٪)، هر داده فقط اگه یکی از شرط‌ها رو عوض کنه می‌مونه — مثلاً قیمت طلا رو کنار گذاشتم چون هیچ‌کدوم از دو شرط رو عوض نمی‌کرد — بعد مقایسهٔ سرانگشتی.\", \"gaps\": \"\", \"pct\": 75})\n\n"
+},
+{
+"clock": "2026-11-21",
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()"
+},
+{
+"eval": "(async(o)=>{const x=(APP.dueList()||[]).find(x=>new RegExp(o.re).test(x.txt));if(!x)return 'NODUE';x.go();await new Promise(r=>setTimeout(r,500));const v=APP.state.view+' '+APP.state.arg;\nF('pr_dump',o.dump);const ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await new Promise(r=>setTimeout(r,300));\nif(o.gaps)F('pr_gaps',o.gaps);F('pr_pct',String(o.pct));const fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));fin&&fin.click();await new Promise(r=>setTimeout(r,600));\nreturn v+' | '+TT()+'\\nPRC:'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late,roles:c.roles})))+'\\nDUE:'+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||'')))})({\"re\": \"برگه سفید روز ۳\", \"dump\": \"مجهولِ دقیق، فقط دو شرط (ثباتِ هفت‌ساله و خرج زیر ۴۰٪)، هر داده فقط اگه یکی از شرط‌ها رو عوض کنه می‌مونه — مثلاً قیمت طلا رو کنار گذاشتم چون هیچ‌کدوم از دو شرط رو عوض نمی‌کرد — بعد مقایسهٔ سرانگشتی.\", \"gaps\": \"\", \"pct\": 85})\n\n"
+},
+{
+"clock": "2026-11-25",
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()"
+},
+{
+"eval": "(async(o)=>{const x=(APP.dueList()||[]).find(x=>new RegExp(o.re).test(x.txt));if(!x)return 'NODUE';x.go();await new Promise(r=>setTimeout(r,500));const v=APP.state.view+' '+APP.state.arg;\nF('pr_dump',o.dump);const ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await new Promise(r=>setTimeout(r,300));\nif(o.gaps)F('pr_gaps',o.gaps);F('pr_pct',String(o.pct));const fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));fin&&fin.click();await new Promise(r=>setTimeout(r,600));\nreturn v+' | '+TT()+'\\nPRC:'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late,roles:c.roles})))+'\\nDUE:'+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||'')))})({\"re\": \"برگه سفید روز ۷\", \"dump\": \"مجهولِ دقیق، فقط دو شرط (ثباتِ هفت‌ساله و خرج زیر ۴۰٪)، هر داده فقط اگه یکی از شرط‌ها رو عوض کنه می‌مونه — مثلاً قیمت طلا رو کنار گذاشتم چون هیچ‌کدوم از دو شرط رو عوض نمی‌کرد — بعد مقایسهٔ سرانگشتی.\", \"gaps\": \"\", \"pct\": 90})\n\n"
+},
+{
+"clock": "2026-12-02",
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).join(' || ')})()"
+},
+{
+"eval": "JSON.stringify(APP.S.all('card',c=>1).map(c=>({id:c.id,q:(c.q||c.front||'').slice(0,80),due:c.due||c.next,src:c.src,pid:c.pid||c.prob,kind:c.kind||c.k,tags:c.tags})).slice(0,6))"
+},
+{
+"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/وارسیِ ماندگاری/.test(x.sub||''));if(!x)return 'NODUE';x.go();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+'\\n'+FL().slice(0,700)+'\\n'+BL().slice(-500)})()"
+},
+{
+"eval": "(async()=>{const ins=[...document.querySelectorAll('#main input,#main textarea,#main select')];const lab=e=>((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'');const set=(re,v)=>{const e=ins.find(e=>new RegExp(re).test(lab(e)));if(!e)return re+'?';e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};const r=[set('چه کردی','دو هفته بعد از تثبیت، روش رو بی‌نگاه نوشتم؛ همه‌ش یادم بود به‌جز مثالِ مقایسه'),set('درصد','85')];const b=[...document.querySelectorAll('#main button')].find(b=>/ثبتِ جلسه|ثبت جلسه|ثبت/.test(b.textContent.trim())&&!/نهایی/.test(b.textContent));if(b)b.click();await new Promise(r=>setTimeout(r,500));return r.join(',')+' btn:'+(b&&b.textContent.trim())+' | '+TT()+'\\n'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src])})))})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0d5u3i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvjb8tmthzw');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mw3bemfuxaydu');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt7s2hfay');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0d5u3i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvjb8tmthzw');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mw3bemhq1qiso');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlvobuf1e7');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0d5u3i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvjb8tmthzw');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mw3bemfjbi32q');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlta58exp3');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0d5u3i');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvjb8tmthzw');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0d5u3i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvjb8tmthzw');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mw3bemnpxv95c');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltxpyyqxe');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0d5u3i');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvjb8tmthzw');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0d5u3i');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvjb8tmthzw');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mw3bemhj31c5q');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqluuxpj83d');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0d5u3i');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvjb8tmthzw');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return APP.today()+\" \"+new Date().toString().slice(0,15)+\" | sess=\"+s.title+\" | \"+s.msgs.slice(-3).map(m=>m.role+\": \"+m.text.slice(0,200)).join(\" || \")+\" | DUE: \"+DUE()})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return MT(\"\",1800)})()"
+},
+{
+"say": "سلام. قراردادِ اجارهٔ پنج‌ساله رو دارم نهایی می‌کنم و می‌خوام مطمئن شم سالِ دوم هم زیرِ شرطِ ۴۰٪ می‌مونم. خودم حساب کردم: اجاره الان ۱۸ میلیونه، با ۲۲٪ افزایش میشه ۱۸ × ۱٫۲۲ = ۲۱٫۹۶ میلیون. درآمدمون ۶۰ میلیونه، پس ۲۱٫۹۶ / ۶۰ = ۰٫۳۷، یعنی ۳۷٪. تا جمعه امضاش می‌کنم.",
+"eval0": "(()=>{APP.go(\"home\");APP.ASSIST.newSession();return 1})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let pr=null;try{pr=APP.STORY.priorFor(s,null)}catch(e){pr=\"ERR \"+e}return JSON.stringify({sys:s.msgs.filter(m=>m.role==\"sys\").map(m=>m.text.slice(0,300)),prior:pr,plans:s.plans,datePend:s.datePend,panel:(document.querySelector(\".as-panel\")||{}).innerText.slice(-900)})})()"
+},
+{
+"say": "باشه، جمعه پیگیری کن. یه مقایسه هم کردم: اتاقِ پسرم این‌جا ۳ متر در ۴ متر = ۱۲ مترمربعه، توی خونهٔ قبلی ۳ متر در ۳ متر = ۱۲ مترمربع بود، پس فرقی نکرده."
+},
+{
+"eval": "JSON.stringify({dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what,x.date,x.done]),due:(APP.dueList()||[]).map(x=>x.txt).slice(0,8),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-3).map(m=>m.text.slice(0,200)),ar:(()=>{try{return APP.STORY.arithChk(\"اتاقِ پسرم این‌جا ۳ متر در ۴ متر = ۱۲ مترمربعه، توی خونهٔ قبلی ۳ متر در ۳ متر = ۱۲ مترمربع بود\")}catch(e){return \"ERR \"+e}})()})"
+}
+],
+"replies": [
+"{\"reply\": \"«بخرم یا نه» را من به‌جای تو داوری نمی‌کنم؛ تصمیم مال خودت است و من کنارت می‌پرسم. اگر بخواهی، این مسئله را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت می‌کنیم تا فهم و طرح و گام‌هایش بماند. پیش از هر سرنخی: خودت تا کجا رفتی و کجا ماندی؟\", \"title\": \"خرید یا اجارهٔ خانه\", \"pinned\": \"تصمیمِ خرید یا اجارهٔ خانه را خودش بگیرد\", \"memory\": \"کاربر سه ماه است برای خرید یا اجاره ۴۷ ستون اکسل پر می‌کند و تصمیم نمی‌گیرد؛ فقط جواب خواست؛ ثبت در 🔭 را پیشنهاد کردم؛ پرسیدم خودش تا کجا رفته.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\"}]}",
+"{\"reply\": \"ثبت شد؛ صفحه‌اش در «🔭 مسئلهٔ حل‌نشدهٔ خودم» باز می‌شود. حالا به مجهول نگاه کن: دقیقاً چه می‌خواهی — «حل‌شدن» برای تو چه شکلی است و با چه چیزی سنجیده می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"خرید یا اجارهٔ خانه\", \"statement\": \"سه ماهه دارم فایل اکسل پر می‌کنم که خونه بخرم یا اجاره‌نشین بمونم. ۴۷ تا ستون داره: نرخ تورم، قیمت متری محله‌ها، وام، اجاره، فاصله تا مهدکودک، ... هر روز یه ستون اضافه می‌کنم و هیچ تصمیمی نمی‌گیرم. فقط بگو بخرم یا نه؟\", \"nat\": \"practical\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}], \"title\": \"خرید یا اجارهٔ خانه\", \"memory\": \"مسئلهٔ «خرید یا اجارهٔ خانه» با «آری» ِ کاربر در 🔭 ثبت شد؛ پرسیدم مجهولش دقیقاً چیست.\"}",
+"{\"reply\": \"«بهترین تصمیمِ مالی» را من به‌جای تو داوری نمی‌کنم. صفحهٔ همین مسئله حالا باز است و اولین کارتش «اول کل، بعد جزءها» است. اول کل، بعد جزءها: کلِ مسئله را بی‌جزئیات، در یک جملهٔ کامل و به زبانِ خودت، می‌گویی؟\", \"memory\": \"مسئلهٔ زنده (خرید یا اجاره، عملی). کاربر باز فقط جواب خواست و «بهترین تصمیم مالی» گفت. پرسشِ کل‌اول صفحه را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"پس کلِ مسئله در یک جمله این است: جایی پیدا کنی که پسرت تا هفت سال جای امن و ثابت داشته باشد، بی آنکه خرجِ خانه از ۴۰٪ درآمدتان بالاتر برود. حالا چه داری — دانسته‌ها، منابع، امکان‌ها (داده‌ها)؟ از این ۴۷ ستون کدام روی همین دو شرط اثرِ محسوس دارد و کدام را با دلیل کنار می‌گذاری؟\", \"memory\": \"مسئلهٔ زنده (عملی). کلِ مسئله را خودش گفت: جای امن و ثابت برای پسر تا ۷ سال، خرج ≤ ۴۰٪ درآمد. پرسیدم کدام داده‌ها اثر دارند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"c\"], \"ans\": [\"u0\", \"u1\", \"u3\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"خوب که کارتِ فهم را خودت ثبت کردی. «همهٔ ۴۷ ستون یه جوری ربط دارن» را درست یا غلط نمی‌خوانم؛ حدسی گفتی — چطور می‌آزمایی‌اش، مثلاً کدام ستون اگر روی هیچ‌کدام از دو شرطِ خودت (هفت سال ثبات، خرج زیرِ ۴۰٪) اثرِ محسوس نداشته باشد ردش می‌کند؟\", \"memory\": \"کارت فهم را ثبت کرد. گفت همهٔ ۴۷ ستون ربط دارند؛ پرسیدم چطور می‌آزمایدش (ستونی که بر دو شرط اثر ندارد).\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"همهٔ ۴۷ ستون یه جوری ربط دارن\", \"q\": \"چطور می‌آزمایی‌اش، مثلاً کدام ستون اگر روی هیچ‌کدام از دو شرطِ خودت (هفت سال ثبات، خرج زیرِ ۴۰٪) اثرِ محسوس نداشته باشد ردش می‌کند؟\"}}]}",
+"{\"reply\": \"فایلت را دیدم. در مسئلهٔ عملی همیشه می‌شود ستونِ دیگری اضافه کرد، پس «داده کم دارم» خودبه‌خود تمام نمی‌شود — جایی باید خط بکشی و چیزهایی را با دلیل نادیده بگیری. کجا خط می‌کشی، چه چیزی را عمداً بیرون می‌گذاری و تا کجا اطلاعات جمع می‌کنی — و چرا؟\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0d5u3i (عملی، طرح). روز ۳ (۱۰-۱۸): ۵ ستونِ تازه و CSV؛ می‌گوید هنوز داده کم دارد. گفتم باید خط بکشد؛ پرسیدم مسئلهٔ مشابه.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"d\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"«کافی» را تقریبی تعیین می‌کند که خودت در کارتِ فهم بس دانستی (±۳٪)؛ داوری‌اش با خودت است. پیش از گامِ واقعی — قرارداد با زرهی: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0d5u3i (عملی، طرح). روز ۳: کاربر پذیرفت ستون‌های تازه به دو شرط ربط مستقیم ندارند؛ می‌پرسد کی بس است. پرسیدم کجا خط می‌کشد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"line\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"کارِ درستی کردی: حدس زدی و حدست را با واقعیت آزمودی — «باید حدس بزنید، اما حدس خود را نیز بررسی کنید». حالا که حدسِ «خرید بهتر است» رد شد: داده‌ای که کنار گذاشته بودی (قیمت متری محله‌های نزدیک مهدکودک) هنوز بی‌ربط است، یا شاید همان عنصرِ غایب باشد؟\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0d5u3i (عملی، اجرا). روز ۵: صاحبخانهٔ ج قرارداد ۵ساله با ۲۲٪ را پذیرفت. حدسِ «خرید بهتر» رد شد (B231 نام برده شد). پرسیدم دادهٔ کنارگذاشته هنوز بی‌ربط است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"c\", \"said\": [\"aside\"], \"ans\": [\"pred\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"step\": {\"step\": \"1\", \"done\": \"yes\", \"what\": \"صاحبخونه قبول کرد: ۵ ساله با افزایش ۲۲٪\"}, \"guess_res\": {\"text\": \"خرید بهتره\", \"res\": \"refuted\"}}]}",
+"{\"reply\": \"خوب است که ثبتش کردی. پیش از گامِ بعد، همان پرسش: حالا که حدسِ خرید رد شد، قیمتِ متریِ محله‌های نزدیک مهدکودک — که با دلیل کنار گذاشته بودی — هنوز بی‌ربط است؟\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0d5u3i (عملی، اجرا). نتیجهٔ گام و حدسِ تازه ثبت شد. دوباره پرسشِ دادهٔ کنارگذاشته.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"c\", \"said\": [\"aside\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"یادم هست — مسئلهٔ خرید یا اجارهٔ خانه را خودت حل کردی؛ و دفعهٔ پیش به خودت گفته بودی «دیگه ستون اضافه نمی‌کنم» — اگر خواستی بگو سرش ماندی یا نه. پیش از این‌که سراغِ همکارت برویم، بی‌نگاه: یادت هست مجهولت دقیقاً چه بود و راهت چه بود؟\", \"title\": \"پرسشِ همکار دربارهٔ خرید یا اجاره\", \"pinned\": \"کمک به کاربر برای پاسخ به همکارش دربارهٔ خرید یا اجاره\", \"memory\": \"روز ۲۰ (۱۱-۰۵): همکارِ کاربر همان پرسشِ خرید یا اجاره را دارد. مسئلهٔ حل‌شدهٔ pb_l_mvaqm0d5u3i مرتبط است. اول خواستم بی‌نگاه مجهول و راهش را به یاد آورد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"defer\": {\"what\": \"همکارم هم الان دقیقاً همین سؤال رو داره که بخره یا اجاره کنه. چی بهش بگم؟\"}, \"register\": \"تو\"}]}",
+"{\"reply\": \"یادم هست — مسئلهٔ خرید یا اجارهٔ خانه را خودت حل کردی. پیش از این‌که سراغِ همکارت برویم، بی‌نگاه: یادت هست مجهولت دقیقاً چه بود و راهت چه بود؟\", \"title\": \"پرسشِ همکار دربارهٔ خرید یا اجاره\", \"pinned\": \"کمک به کاربر برای پاسخ به همکارش دربارهٔ خرید یا اجاره\", \"memory\": \"روز ۲۰ (۱۱-۰۵): همکارِ کاربر همان پرسشِ خرید یا اجاره را دارد. مسئلهٔ حل‌شدهٔ pb_l_mvaqm0d5u3i مرتبط است. اول خواستم بی‌نگاه مجهول و راهش را به یاد آورد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"defer\": {\"what\": \"همکارم هم الان دقیقاً همین سؤال رو داره که بخره یا اجاره کنه. چی بهش بگم؟\"}, \"register\": \"تو\"}]}",
+"{\"reply\": \"دقیق یادت مانده: مجهولت جای امن و ثابت برای پسرت تا هفت سال با خرجِ زیرِ ۴۰٪ بود، و راهت نگه‌داشتنِ فقط همین دو شرط و مقایسهٔ سرانگشتی. این‌که «اجارهٔ بلندمدت» برای همکارت هم درست است را داوری نمی‌کنم — نتیجه‌ات از مجهول و شرط‌های خودِ تو درآمد. پس از همان‌جا شروع کن که خودت شروع کردی: همکارت دقیقاً چه می‌خواهد — «حل‌شدن» برای او چه شکلی است و با چه عدد یا واحدی سنجیده می‌شود؟\", \"memory\": \"روز ۲۰: کاربر بی‌نگاه مجهول (جای امن ۷ساله، خرج ≤ ۴۰٪) و روش (دو شرط + مقایسهٔ سرانگشتی) را به یاد آورد و پرسید به همکارش بگوید اجارهٔ بلندمدت. پرسیدم مجهولِ خودِ همکار چیست.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u1\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"به همکارم بگم اجاره بلندمدت بگیره\", \"q\": \"همکارت دقیقاً چه می‌خواهد — «حل‌شدن» برای او چه شکلی است و با چه عدد یا واحدی سنجیده می‌شود؟\"}}, {\"do\": \"promise_done\", \"id\": \"pr1\"}]}",
+"{\"reply\": \"روشت را می‌خواهی با بازیابیِ فاصله‌دار نگه داری؛ پروندهٔ «تمرین بازیابی فعال» (تکنیکِ ۴۱) را روی همین مسئلهٔ «خرید یا اجارهٔ خانه» خواستم باز شود — صفحه روزهای برگشت را خودش می‌چیند. نخستین بازیابی همین امروز است: بی‌نگاه به یادداشت‌ها، روشت را از حافظه بنویس؛ پیش از نوشتن، فکر می‌کنی چند درصدش یادت مانده؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"start_practice\", \"tid\": 41, \"pid\": \"pb_l_mvaqm0d5u3i\", \"consent\": {\"quote\": \"یه تمرینِ یادآوری برام بذار که هر چند وقت یه بار از حافظه بنویسمش\", \"kind\": \"request\"}}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"گزارشِ این جلسه را برای پرونده‌ات فرستادم؛ صفحه نتیجه را نشان می‌دهد. همان بخشِ جاافتاده را حالا بی‌نگاه با یک مثال از ماجرای خانه می‌گویی — کدام داده را چرا کنار گذاشتی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}, {\"do\": \"practice_log\", \"prc\": \"prc_mw916frx9qfew\", \"what\": \"بازیابیِ روشِ خانه از حافظه پس از یک هفته\", \"pct\": 40, \"ok\": false, \"quote\": \"فقط مجهول و دو شرط یادم بود، بخشِ «داده فقط اگه شرط رو عوض کنه» کامل یادم رفته بود — شاید ۴۰ درصد\"}]}",
+"{\"reply\": \"هر دو گامت را خواندم و هر دو می‌خوانند: ۱۸ × ۱٫۲۲ = ۲۱٫۹۶ میلیون درست است، و ۲۱٫۹۶ / ۶۰ ≈ ۰٫۳۷ یعنی حدودِ ۳۷٪ — زیرِ شرطِ ۴۰٪ ِ خودت می‌مانی. گامِ بعدیِ خودت پیش از امضا چیست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prior\": [{\"step\": \"اجارهٔ سالِ دوم\", \"quote\": \"۱۸ × ۱٫۲۲ = ۲۱٫۹۶ میلیون\", \"verdict\": \"ok\", \"why\": \"ضرب درست است\", \"dep\": []}, {\"step\": \"سهم از درآمد\", \"quote\": \"۲۱٫۹۶ / ۶۰ = ۰٫۳۷، یعنی ۳۷٪\", \"verdict\": \"ok\", \"why\": \"تقسیم با گرد کردن درست است\", \"dep\": [1]}], \"plan\": {\"text\": \"تا جمعه امضاش می‌کنم\", \"when\": \"2026-12-04\"}}]}",
+"{\"reply\": \"اتاقِ این‌جا را خواندم: ۳ در ۴ همان ۱۲ مترمربع است. حسابِ اتاقِ خانهٔ قبلی را یک بار دیگر خودت بزن — ۳ متر در ۳ متر چند مترمربع می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"دو حسابِ ودیعه می‌خوانند: ۲۰۰ میلیون بر ۴۸ حدودِ ۴٫۱۷ میلیون، و ۲۰ درصدِ ۳۰۰ میلیون همان ۶۰ میلیون. حسابِ اجارهٔ یک سال اما با نتیجه‌ای که نوشتی نمی‌خواند — ۱۸ میلیون را ۱۲ بار جمع کنی، نتیجه به کدام واحد می‌رسد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\", \"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"۱۸ میلیون × ۱۲ = ۲۱۶ هزار\"}]}",
+"{\"reply\": \"اصلاحِ «۲۱۶ میلیون» را فرستادم؛ روزِ تازهٔ امضا را صفحه خودش از تو می‌پرسد. پیش از امضای واقعی: چه پیش‌بینی می‌کنی — سالِ دوم چند درصدِ درآمد می‌شود و چقدر مطمئنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\", \"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"retract\": {\"msg\": \"۲۱۶ هزار\", \"key\": \"datum:اجارهٔ یک سال\", \"what\": \"said\", \"fix\": \"۲۱۶ میلیون\", \"rests\": []}, \"plan\": {\"text\": \"امضا رو جمعهٔ بعد بذار، این جمعه صاحبخونه نیست\", \"when\": \"2026-12-11\", \"same\": \"pl1\"}}]}",
+"{\"reply\": \"پیش‌بینی‌ات روشن است: سالِ دوم حدودِ ۳۷٪ ِ درآمد، با هشتاد درصد اطمینان. این ۳۷ به کدام داده بیشتر از همه تکیه دارد — اگر یکی‌اش جابه‌جا شود، کدام پیش‌بینی را می‌شکند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [\"e1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"خوب است که پیش از امضا متن را ببینی. وقتی متن آمد، اول کدام بند را با شرطِ ۴۰٪ ِ خودت می‌سنجی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"فردا به بنگاه زنگ می‌زنم که متنِ قرارداد رو آماده کنه\", \"when\": \"2026-12-03\"}}]}",
+"{\"reply\": \"کلید را که گرفتی، پیش از جابه‌جایی چه چیزی را در خانه وارسی می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"پس‌فردا هم کلید رو تحویل می‌گیرم\", \"when\": \"2026-12-04\"}}]}",
+"{\"reply\": \"باشد. کلید را که گرفتی، پیش از جابه‌جایی چه چیزی را در خانه وارسی می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": []}]}",
+"{\"reply\": \"برای بانک چه مدرکی لازم داری که شنبه دست‌خالی برنگردی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"پنجشنبه نه، شنبه می‌رم\", \"when\": \"2026-12-05\"}}]}",
+"{\"reply\": \"روشن شد: زنگِ بنگاه پنجشنبه، بانک شنبه. برای بانک چه مدرکی لازم داری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": []}]}",
+"{\"reply\": \"اصلاح شد: تحویلِ کلید حالا «یکشنبه» است و ثبتِ ۱۳ آذر کنار رفت؛ روزِ تازه را صفحه از تو می‌پرسد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"باشد. کلید را که گرفتی، اول کدام اتاق را وارسی می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": []}]}",
+"{\"reply\": \"اصلاح شد: متنِ برنامه حالا «دیروز هم کلید رو تحویل می‌گیرم» است.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"خوب. پیش از واریز، رسیدِ ودیعه را کجا نگه می‌داری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"اجارهٔ ماهِ اول رو سرِ برج واریز می‌کنم\"}}]}",
+"{\"reply\": \"باشد. قبض‌ها را با کدام حساب می‌پردازی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"قبضِ آب رو هم اولِ ماه می‌دم\"}}]}",
+"{\"reply\": \"خوب است. بیمه را با قیمتِ امسال مقایسه می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"آخرِ سال هم بیمهٔ خونه رو تمدید می‌کنم\"}}]}",
+"{\"reply\": \"خوش بگذرد. پیش از سفر چه کاری را در خانهٔ تازه تمام می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"عید می‌ریم خونهٔ مادرم\"}}]}",
+"{\"reply\": \"باشد. انباری را پیش از جابه‌جایی خالی‌اش می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"بعد از عید هم وسایلِ انباری رو جابه‌جا می‌کنم\"}}]}",
+"{\"reply\": \"خوب. عددِ کنتور را کجا یادداشت می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"وسطِ ماه یه سر به خونهٔ قبلی می‌زنم که کنتور رو ببینم\"}}]}",
+"{\"reply\": \"منطقی است. تا آن موقع کدام وسایل را زودتر می‌بری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"plan\": {\"text\": \"آخرِ سالِ تحصیلی ... اون موقع اسباب‌کشیِ اصلی رو انجام می‌دیم\"}}]}",
+"{\"reply\": \"باشد. تا آن موقع کدام وسایل را زودتر می‌بری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": []}]}",
+"{\"reply\": \"باشه، حدودِ ۱۵ دی برای دیدنِ کنتور. تا آن موقع، از کارهای قرارداد کدام هنوز مانده؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"وسطِ ماه یه سر به خونهٔ قبلی می‌زنم که کنتور رو ببینم\", \"when\": \"2027-01-05\", \"same\": \"pl10\"}}]}",
+"{\"reply\": \"خوب است که قیمتِ تمدید را پیش از آخرِ سال بدانی. وقتی قیمت را گرفتی، با بودجهٔ ۴۰٪ چطور می‌سنجی‌اش؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"فردا به بیمه هم زنگ می‌زنم که قیمتِ تمدید رو بپرسم\", \"when\": \"2026-12-03\"}}]}",
+"{\"reply\": \"خوب است که قیمتِ تمدید را پیش از آخرِ سال بدانی. وقتی قیمت را گرفتی، با بودجهٔ ۴۰٪ چطور می‌سنجی‌اش؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"فردا به بیمه هم زنگ می‌زنم که قیمتِ تمدید رو بپرسم\", \"when\": \"2026-12-03\"}}]}",
+"{\"reply\": \"پس قرارِ امضا با صاحبخانه گذاشته شد. پیش از امضا، کدام بندِ قرارداد را هنوز می‌خواهی با شرطِ ۴۰٪ ِ خودت بسنجی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"به صاحبخونه زنگ می‌زنم و قرارِ امضا رو می‌ذارم\", \"when\": \"2026-12-02\"}}, {\"do\": \"plan_done\", \"id\": \"pl13\"}]}",
+"{\"reply\": \"خوب. چه جوابی گرفتی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"پس زنگِ بنگاه انجام شد و متن آماده است. رنگ‌کاری را هم ماهِ دیگه گفتی — پیش از امضا، متنِ آماده را با کدام شرطِ خودت می‌سنجی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"ماهِ دیگه هم رنگ‌کاریِ اتاقِ پسرم رو شروع می‌کنم\", \"when\": \"\"}}]}"
+],
+"keys": [
+"سلام. سه ماهه دارم فایل اکسل پر می‌کنم که خونه بخرم یا اجاره‌نشین بمونم. ۴۷ تا ستون داره: نرخ تورم، قیمت متری محله‌ها، وام، اجاره، فاصله تا مهدکودک، ... هر روز یه ستون اضافه می‌کنم و هیچ تصمیمی نمی‌گیرم. فقط بگو بخرم یا نه؟",
+"آره، ثبتش کن.",
+"خب معلومه دیگه، بهترین تصمیم مالی. همینو می‌خوام. بخرم یا نه؟",
+"هوم... راستش اگه فکر کنم، مهم‌ترینش اینه که پسرم تا هفت سال آینده یه جای امن و ثابت داشته باشه که هی اسباب‌کشی نکنیم، و قسط یا اجاره بیشتر از ۴۰ درصد درآمدمون نشه. سود بیشتر اونقدرا مهم نیست.",
+"کارت فهم رو پر کردم و ثبت کردم. ولی راستش به نظرم همهٔ ۴۷ ستون یه جوری ربط دارن، نمی‌تونم هیچ‌کدومو کنار بذارم.",
+"خب... انتخابات شاید رو قیمت‌ها اثر بذاره ولی راستش هیچ‌کدومشون مستقیم به ۴۰٪ و هفت سال ربط ندارن. ولی می‌ترسم یه چیز مهم رو جا انداخته باشم. از کجا بدونم کِی دیگه بسه؟",
+"باشه، قبول. دیگه ستون اضافه نمی‌کنم. طرحمو ثبت کردم و سه گزینه رو فقط با دو شرط، سرانگشتی مقایسه کردم: الف (خرید) قسطش ۴۲٪ درآمد میشه، رد. ب (اجاره قصردشت) ۳۰٪ ولی قرارداد فقط ۲ ساله، رد. ج (اجارهٔ بلندمدت زرهی) ۲۳٪ و قرارداد ۵ ساله. فکر کن",
+"صاحبخونه قبول کرد: ۵ ساله با افزایش ۲۲٪. حدسم که خرید بهتره غلط درآمد.",
+"ثبتش کردم. حالا چی؟",
+"سلام. یادته در مورد خونه حرف زدیم؟ همکارم هم الان دقیقاً همین سؤال رو داره که بخره یا اجاره کنه. چی بهش بگم؟",
+"سلام. یادته در مورد خونه حرف زدیم؟ همکارم هم الان دقیقاً همین سؤال رو داره که بخره یا اجاره کنه. چی بهش بگم؟\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: نقلِ «دیگه ستون اضافه نمی‌کنم» نه در پیام‌های اوست نه در صفحه — ",
+"آره، مجهولم یه جای امن و ثابت برای پسرم تا هفت سال بود با خرج زیر ۴۰٪، راهم این بود که فقط دو شرط رو نگه داشتم و سه گزینه رو سرانگشتی مقایسه کردم. پس به همکارم بگم اجاره بلندمدت بگیره؟",
+"می‌خوام این روشِ «اول مجهول و شرط، بعد فقط داده‌هایی که شرط رو عوض می‌کنن» واقعاً تو ذهنم بمونه؛ یه تمرینِ یادآوری برام بذار که هر چند وقت یه بار از حافظه بنویسمش.",
+"امروز بعد از یه هفته روشِ خونه رو از حافظه نوشتم؛ فقط مجهول و دو شرط یادم بود، بخشِ «داده فقط اگه شرط رو عوض کنه» کامل یادم رفته بود — شاید ۴۰ درصد.",
+"سلام. قراردادِ اجارهٔ پنج‌ساله رو دارم نهایی می‌کنم و می‌خوام مطمئن شم سالِ دوم هم زیرِ شرطِ ۴۰٪ می‌مونم. خودم حساب کردم: اجاره الان ۱۸ میلیونه، با ۲۲٪ افزایش میشه ۱۸ × ۱٫۲۲ = ۲۱٫۹۶ میلیون. درآمدمون ۶۰ میلیونه، پس ۲۱٫۹۶ / ۶۰ = ۰٫۳۷، یعنی ۳۷",
+"باشه، جمعه پیگیری کن. یه مقایسه هم کردم: اتاقِ پسرم این‌جا ۳ متر در ۴ متر = ۱۲ مترمربعه، توی خونهٔ قبلی ۳ متر در ۳ متر = ۱۲ مترمربع بود، پس فرقی نکرده.",
+"حسابِ ودیعه هم: ۲۰۰ میلیون تقسیم بر ۴۸ ماه = ۴٫۱۷ میلیون در ماه. سودِ بانکِ ودیعه هم ۲۰ درصدِ ۳۰۰ میلیون = ۶۰ میلیون در سال. اجارهٔ یک سال هم ۱۸ میلیون × ۱۲ = ۲۱۶ هزار.",
+"آهان، ۲۱۶ میلیون، هزار رو اشتباه نوشتم. راستی امضا رو جمعهٔ بعد بذار، این جمعه صاحبخونه نیست.",
+"فکر کنم سالِ دوم حدودِ ۳۷ درصد بشه، هشتاد درصد مطمئنم.",
+"فردا به بنگاه زنگ می‌زنم که متنِ قرارداد رو آماده کنه.",
+"پس‌فردا هم کلید رو تحویل می‌گیرم.",
+"آره",
+"برای ودیعه هم باید برم بانک؛ پنجشنبه نه، شنبه می‌رم.",
+"نه، زنگِ بنگاه همون پنجشنبه‌ست؛ فقط بانک شنبه‌ست.",
+"[اصلاحِ پیامِ قبلی] «پس‌فردا» ⇐ «یکشنبه» — متنِ درستِ پیامم: «یکشنبه هم کلید رو تحویل می‌گیرم.»",
+"آره، یکشنبه",
+"[اصلاحِ پیامِ قبلی] «یکشنبه» ⇐ «دیروز» — متنِ درستِ پیامم: «دیروز هم کلید رو تحویل می‌گیرم.»",
+"اجارهٔ ماهِ اول رو سرِ برج واریز می‌کنم.",
+"قبضِ آب رو هم اولِ ماه می‌دم.",
+"آخرِ سال هم بیمهٔ خونه رو تمدید می‌کنم.",
+"عید می‌ریم خونهٔ مادرم.",
+"بعد از عید هم وسایلِ انباری رو جابه‌جا می‌کنم.",
+"وسطِ ماه یه سر به خونهٔ قبلی می‌زنم که کنتور رو ببینم.",
+"آخرِ سالِ تحصیلی هم کارم سبک‌تر میشه؛ اون موقع اسباب‌کشیِ اصلی رو انجام می‌دیم.",
+"آره",
+"وسطِ ماه یعنی حدودِ ۱۵ دی؛ همون موقع کنتور رو می‌بینم.",
+"فردا به بیمه هم زنگ می‌زنم که قیمتِ تمدید رو بپرسم.",
+"فردا به بیمه هم زنگ می‌زنم که قیمتِ تمدید رو بپرسم.\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: او با تو «تو» حرف می‌زند — «تو» بنویس، نه «شما». همان پاسخ را با همان actions دوباره بده و فقط متنِ reply را درست کن.]",
+"آره درسته. راستی همین الان به صاحبخونه زنگ زدم و قرارِ امضا رو گذاشتم.",
+"زنگ زدم.",
+"به بنگاه. گفت متن آماده‌ست. ماهِ دیگه هم رنگ‌کاریِ اتاقِ پسرم رو شروع می‌کنم."
+]
+}
