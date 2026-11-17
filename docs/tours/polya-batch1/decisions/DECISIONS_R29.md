@@ -192,3 +192,8 @@ after each merge, the full gate once on the whole merge.
   reply (C100/C151 post-check).
 - **C175 (22).** «دفترِ پیش‌بینی کجاست؟» may open the 🎯 view or say where it is; a follow-up telling the model to fill fields and press
   «ثبت» is forbidden.
+
+## C176 (after the fixers; dates «Not done» 2 / bank R29 #174)
+On the 1st of a Jalali month «سرِ برج» is two days (today, or the 1st of next month — R28 #20, C50). «آره، هر دو» confirms both acts are
+wanted; it does not choose a reading, so the page asks «کدام؟» for that act only. Bank #174's «1st of next month» expectation was a guess
+and is withdrawn. Asking is correct; booking either day silently is S2.
