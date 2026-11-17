@@ -186,3 +186,8 @@ prior ⇒ dates ⇒ forecast ⇒ story ⇒ surface; the families' tests re-run a
   reading: #30 is counted as passing when there is no 📌 or date-ask row; the remaining confirm belongs to forecast (`duePend`).
 - **C133 («وسطِ ماه یعنی حدودِ ۱۵ دی»).** She gave the day herself, so the page books it with no extra question and labels it with her
   own words («از حرفِ خودت: حدودِ ۱۵ دی»). «حدود» changes nothing here: unlike C120 (judging an outcome), no value is being judged.
+- **C134 (found by the gate on a Tuesday; current `main` behaves the same).** A bare weekday that replaces a booked weekday («مهلت
+  سه‌شنبه نیست، چهارشنبه است») is the named day IN THE WEEK OF THE REPLACED DATE (Saturday–Friday), or the next one if that day has
+  already passed — never «the first such day after today». A correction that changes only the «what» of a deadline («طرح نه، بودجه»)
+  never moves its date, even when the corrected sentence contains a weekday. Every date test is checked on all seven weekdays (page
+  clock frozen per run), never only on the day the suite happens to run.
