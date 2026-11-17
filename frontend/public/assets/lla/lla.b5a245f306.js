@@ -56241,7 +56241,9 @@ APP.goFromURL = function (q) {
         ws = ws.filter(function (w) { return !FUT28.test(" " + w + " ") && !/^(?:باید|است|هست|نیست|داره|دارم|برای|اینکه|این‌که|کنم|کنه|بشه|میشه|نمیشه|حدودِ?|درصد|مطمئنم)$/.test(w); });
         var Hn = P.map(function (z, i) { return ws.filter(function (w) { return T[i].some(function (v) { return sameW(w, v); }) && !T.some(function (o, j) { return j !== i && o.some(function (v) { return sameW(w, v); }); }); }).length; }), mx = Math.max.apply(null, Hn);
         var H = mx > 0 && Hn.filter(function (n) { return n === mx; }).length === 1 ? [P[Hn.indexOf(mx)]] : [];
-        if (H.length === 1) f = H[0].id; } } catch (e) { }
+        if (H.length === 1) f = H[0].id;
+        /* C121: «مسئلهٔ زنده فقط وقتی هیچ‌کدام نخواند» — پیش‌بینی‌ای که دربارهٔ هیچ مسئلهٔ این گفت‌وگو نیست زیرِ مسئلهٔ زندهٔ بسته‌شده می‌نشیند، نه زیرِ مسئلهٔ گفت‌وگوییِ کانونِ همان نوبت (C28-19 pwC2) */
+        else if (s0 && s0.lprob && P.some(function (z) { return z.id === s0.lprob; })) f = s0.lprob; } } catch (e) { }
     if (!f) { if (s0 && s0.lprob) f = s0.lprob; else return null; } return /^c:/.test(String(f)) ? { sess: s0.id, pk: String(f) } : { sess: s0.id, pid: String(f) }; }
   PR.probOf27 = probOf27;
   /* یک پیش‌بینی، یک 🎯: رکوردِ بی‌موعدی که پیش‌تر ساخته شد (x.fc0) همان است که موعد می‌گیرد — هرگز رکوردِ دوم */
@@ -56634,6 +56636,12 @@ APP.goFromURL = function (q) {
     return "";
   }
   PR.verdict28 = verdict28;
+  /* دورِ ۲۹ (بانکِ R29 #187 «ریاضی ۱۸ شدم، فیزیک ۱۵»): تکهٔ عددیِ بی‌فعل در جمله‌ای که فعلِ سرانجام دارد — فقط عدد با عدد داوری می‌شود
+     (بالای/کمتر از ⇒ مقایسه؛ «حدودِ N» ⇒ برابر شد وگرنه پرسشِ C120؛ یک عددِ ادعا ⇒ برابری)؛ هرگز از واژه‌ای که فعلش را تکهٔ دیگر داشت */
+  function vb29(y, x) { var py = dg(strip28(y.text)).replace(/٫/g, "."), NP = nums27(py), V = nums27(strip28(dg(x)).replace(/٫/g, ".")).filter(function (k) { return true; }); if (V.length !== 1 || !NP.length) return "";
+    var v = +V[0], c = cmp28(py); if (c) return (c.op === ">" ? v > c.n : c.op === ">=" ? v >= c.n : c.op === "<=" ? v <= c.n : v < c.n) ? "شد" : "نشد";
+    if (APPROX28.test(py)) { var am = /(?:حدودِ?|حدوداً|حدودا|تقریباً|تقریبا|نزدیکِ?)\s*(\d+(?:\.\d+)?)/.exec(py); return am && +am[1] === v ? "شد" : ""; }
+    return NP.length === 1 ? (+NP[0] === v ? "شد" : "نشد") : ""; }
   /* «حدودِ N» با مقدارِ دیگری در گزارش ⇒ متنِ پرسشِ C120 (وگرنه «شد یا نشد؟» ِ همیشگی) */
   function approx28(y, x) { var py = dg(strip28(y.text)).replace(/٫/g, "."), v = val28(dg(x)), am = /(?:حدودِ?|حدوداً|حدودا|تقریباً|تقریبا|نزدیکِ?)\s*(\d+(?:\.\d+)?)/.exec(py);
     if (!am) return ""; var un = (/^\s*([آ-ی]{2,10})/.exec(py.slice(am.index + am[0].length)) || [])[1] || ""; if (un && (FUT28.test(" " + un + " ") || new RegExp("^" + RES28 + "$").test(un))) un = "";   /* دورِ ۲۹ (dB2 p13 «حدودِ ۶٫۵ میشه» ⇐ «رایتینگ ۶ شد»): فعل یکا نیست */
@@ -56649,6 +56657,8 @@ APP.goFromURL = function (q) {
   function outcome28(s0, t, open, after) {
     /* دورِ ۲۹ (dB2 p11 ✏️ «[اصلاحِ پیامِ قبلی] … متنِ درستِ پیامم: «…»» ⇒ «شد یا نشد؟»؛ C91/C144): پیامِ ✏️ متنِ کهنه را نقل می‌کند و هرگز سرانجامِ 🎯 نیست */
     if (/^\s*\[اصلاحِ/.test(String(t || ""))) return null;
+    /* دورِ ۲۹ (B29·D4، dB2 p21): سرانجام فقط برای 🎯 — پیش‌بینیِ بی‌عددی که 🎯 نشد (پرسشِ عددش بی‌جواب ماند) نامزدِ داوری نیست */
+    open = open.filter(function (y) { return y && (y.p != null || y.fc || y.fc0); });
     if (!open.length) return null; var hits = [], tie = null;
     var add = function (y, u) { var h = hits.filter(function (z) { return z.y === y; })[0]; if (h) h.u.push(u); else hits.push({ y: y, u: [u] }); };
     /* دورِ ۲۹ (A29-24 pA3 c60 «۷٫۲ متر مربع = ۷۲۰۰۰ سانتی‌متر مربع»؛ بانکِ R29 #216): تبدیلِ واحد (عدد و واحد = عدد و واحد، بی عملگر) گزارشِ سرانجام نیست — از جمله کنار می‌رود */
@@ -56668,7 +56678,7 @@ APP.goFromURL = function (q) {
       var gy = got.map(function (g) { return g[0]; }).filter(function (y, i, X) { return X.indexOf(y) === i; });
       if (gy.length >= 1 && got.length) got.forEach(function (g) { add(g[0], g[1]); if (multi29 && /(?:^|[\s،])ن?(?:شد|شدم|شدیم|شدن|گرفتم|گرفت|اومد|آمد)(?![آ-ی])/.test(dg(s))) hits.filter(function (h) { return h.y === g[0]; })[0].vs = true; }); else if (!tie) tie = { c: cand.filter(function (y) { return sc.filter(function (z) { return z.y === y && z.n === sc[0].n; }).length; }), s: s }; });
     var lastAt = String((userMsgs(s0).slice(-1)[0] || {}).at || ""), done = null, askRes = null;
-    hits.forEach(function (h) { var x = h.u.join(" "), out = verdict28(h.y, x) || (hits.length === 1 && !tie ? verdict28(h.y, t) : "") || (h.vs && /\d/.test(dg(x)) && !/(?:^|[\s،])ن?(?:شد|شدم|شدیم|شدن|گرفتم|گرفت|اومد|آمد)(?![آ-ی])/.test(dg(x)) ? verdict28(h.y, x + " شد") : "");   /* دورِ ۲۹ (بانکِ R29 #187 «ریاضی ۱۸ شدم، فیزیک ۱۵»): فعلِ تکهٔ همسایه برای تکهٔ عددیِ بی‌فعل */   /* «… ۳۰٪. درست درومد.» — داوریِ جملهٔ بعد مالِ همان تنها نامزد */
+    hits.forEach(function (h) { var x = h.u.join(" "), out = verdict28(h.y, x) || (hits.length === 1 && !tie ? verdict28(h.y, t) : "") || (h.vs && /\d/.test(dg(x)) && !/(?:^|[\s،])ن?(?:شد|شدم|شدیم|شدن|گرفتم|گرفت|اومد|آمد)(?![آ-ی])/.test(dg(x)) ? vb29(h.y, x) : "");   /* دورِ ۲۹ (بانکِ R29 #187 «ریاضی ۱۸ شدم، فیزیک ۱۵»): فعلِ تکهٔ همسایه برای تکهٔ عددیِ بی‌فعل */   /* «… ۳۰٪. درست درومد.» — داوریِ جملهٔ بعد مالِ همان تنها نامزد */
       if (out) { predApply26(s0, h.y, out, x); sysLine25(s0, "🎯 " + predLab26(h.y) + " ⇐ " + out + " — به گفتهٔ خودت: «" + clip(x, 80) + "»."); done = h.y; } else if (!askRes) askRes = h; });
     if (askRes && !after) { s0.predAsk = { kind: "res", msg: lastAt, pred: String(askRes.y.at), pkey: String(askRes.y.key || ""), sent: clip(askRes.u.join(" "), 200), state: "open" };
       var ax28 = approx28(askRes.y, askRes.u.join(" ")); if (ax28) s0.predAsk.approx = true;
