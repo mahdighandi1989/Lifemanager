@@ -87,9 +87,10 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
 
   /* ---------- loop B27·D16: گذرِ بی میزبانِ برگه نوبت را نمی‌گیرد ---------- */
   const W = await ev(async () => { let n = 0; const orig = APP.PRE.sysCheck, h0 = APP.HOST; APP.PRE.sysCheck = () => { n++; return Promise.resolve(); };
-    try { APP.HOST = {}; await APP.PRE.sysSweep(true); const a = n; await APP.PRE.sysSweep(); const b = n; APP.HOST = { sheet: async () => null }; await APP.PRE.sysSweep(); const c = n; await APP.PRE.sysSweep(); const d = n; return [a, b, c, d]; }
-    finally { APP.PRE.sysCheck = orig; APP.HOST = h0; } });
-  chk(W.join() === '1,1,2,2', 'B27·D16: the first sweep after the sheet host arrives reads the sheets; the throttle still holds otherwise :: ' + W.join());
+    const ld = APP.S.loaded; APP.S.loaded = true;   /* میزبان‌ها (و هارنسِ دونده‌ها) S.loaded را می‌نشانند */
+    try { APP.HOST = {}; await APP.PRE.sysSweep(true); const a = n; await APP.PRE.sysSweep(); const b = n; APP.HOST = { sheet: async () => null }; await APP.PRE.sysSweep(); const c = n; await APP.PRE.sysSweep(); const d = n; APP.go('today'); await new Promise(r => setTimeout(r, 300)); const e = n; await APP.PRE.sysSweep(); const f = n; return [a, b, c, d, e, f]; }
+    finally { APP.PRE.sysCheck = orig; APP.HOST = h0; APP.S.loaded = ld; } });
+  chk(W.join() === '1,1,2,2,3,3', 'B27·D16: the first sweep after the sheet host arrives reads the sheets; opening a view (her look) reads them at once; the throttle still holds for automatic renders :: ' + W.join());
 
   /* ---------- C175 (C29-23 pwC2 p50) ---------- */
   const V = await ev(() => ['پیش‌بینی‌هام کدوما بازه و کدوما داوری شده؟', 'دفترِ پیش‌بینی کجاست؟ می‌خوام فقط ببینمشون', 'یه پیش‌بینی تازه ثبت کن: فردا بارون میاد، ۷۰ درصد', 'بازش کن و ثبتش کن'].map(t => APP.ASSIST.seeOnly29(t)));

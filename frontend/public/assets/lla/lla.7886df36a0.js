@@ -34614,9 +34614,10 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۳ (Q1): دانسته‌های سامانه دربارهٔ خودش از ثبت‌گاهِ A.SELF_FACTS — اول، تا بریدنِ نقشه (از ته) هرگز آن را نیندازد */
     var SF = A.SELF_FACTS || [], fv = function (x) { try { return typeof x === "function" ? x() : x; } catch (e) { return ""; } };
     var RL = AS.ruleLines();
-    if (SF.length || RL.length) { L.push("## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین؛ و قاعده‌هایی که صفحه خودش اجرا می‌کند — پرسش دربارهٔ رفتارِ صفحه را از همین سطرها با شاهد جواب بده؛ شمارهٔ [..] فقط شاهد است، به او نگو)");
+    /* سرخطِ بخش همان سرخطِ دورِ ۲۳ می‌ماند (بازپخش‌ها و ثبت‌گاهِ کوتاه‌کردن آن را می‌شناسند)؛ قاعده‌ها زیرِ «###» ِ خودشان در همین بخش (هرگز نمی‌افتد) */
+    if (SF.length || RL.length) { L.push("## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)");
       SF.forEach(function (f) { L.push("- " + f.fa + " — کاربرد: " + fv(f.use) + " — جا: " + fv(f.where) + " — آفلاین: " + fv(f.offline) + " — مدل: " + fv(f.model)); });
-      RL.forEach(function (l) { L.push(l); }); }
+      if (RL.length) { L.push("### قاعده‌هایی که صفحه خودش اجرا می‌کند — پرسش دربارهٔ رفتارِ صفحه را از همین سطرها با شاهد جواب بده؛ شمارهٔ [..] فقط شاهد است، به او نگو"); RL.forEach(function (l) { L.push(l); }); } }
     L.push("## نماها (view — نام — کدام کار — چیست — به چه کار می‌آید)");
     AS.views().forEach(function (v) { L.push("- " + v.id + " — " + v.label + (v.job ? " — " + (JOB_FA[v.job] || v.job) : "") + (v.what ? " — " + v.what : "") + (v.why ? " — " + v.why : "")); });
     var F = A.ORIENT_FLOWS || {};
@@ -59674,7 +59675,15 @@ APP.goFromURL = function (q) {
   /* دورِ ۲۹ (R7، B27·D16 tB1 c17–c19 — سه دور «جواب نداد» به‌جای پرسش): گذری که پیش از رسیدنِ میزبانِ برگه‌ها (A.HOST.sheet) رفت هیچ برگه‌ای نخواند ولی نوبتِ دو دقیقه‌ای را
      مصرف کرد ⇒ جوابِ تازهٔ روتین (حوزهٔ «بررسیِ بازار و رقیبان» که فقط در واژه‌های قاب با گام مشترک است) تا دو دقیقه خوانده نمی‌شد و سطرِ «⚠️ … جواب نداد» ِ جوابِ پیشین
      تنها حرفِ صفحه می‌ماند. گذرِ بی میزبان نوبت را نگه نمی‌دارد: نخستین رسمِ پس از رسیدنِ میزبان برگه‌ها را می‌خواند. */
-  PRE.sysSweep = function (force) { var hs = !!(A.HOST && A.HOST.sheet); if (!force && lastSys && A.nowMs() - lastSys < 120000 && (lastHost29 || !hs)) return Promise.resolve(); lastSys = A.nowMs(); lastHost29 = hs; return PRE.sysCheck(); };
+  /* و: هر رفتن (A.go — او خودش «امروز»، پرونده یا مسئله را باز کرد، حتی همان نما را دوباره) نگاهِ اوست ⇒ برگه‌ها همان دم خوانده می‌شوند، نه تا دو دقیقه بعد (دونده
+     در c17 جوابِ تازه را چند ثانیه پس از رسیدنش با بازکردنِ «امروز» دید و صفحه هنوز همان «⚠️ … جواب نداد» ِ پیشین را نشان می‌داد)؛ نوبتِ دو دقیقه فقط رسم‌های خودکار را
+     کم می‌کند. گذرِ هم‌زمانِ دوم راه نمی‌افتد (همان وعدهٔ در جریان). */
+  var look29 = false, busy29 = null;
+  if (typeof A.go === "function" && !A.go._look29) { var rawGo29 = A.go; A.go = function () { var out = rawGo29.apply(this, arguments); look29 = true; try { if (A.S && A.S.loaded) PRE.sysSweep(); } catch (e) { } return out; }; A.go._look29 = true; }
+  PRE.sysSweep = function (force) { var hs = !!(A.HOST && A.HOST.sheet), look = hs && look29; look29 = false;
+    if (!force && !look && lastSys && A.nowMs() - lastSys < 120000 && (lastHost29 || !hs)) return Promise.resolve();
+    if (!force && busy29) return busy29;
+    lastSys = A.nowMs(); lastHost29 = hs; var pr = PRE.sysCheck(); busy29 = Promise.resolve(pr).then(function (r) { busy29 = null; return r; }, function (e) { busy29 = null; throw e; }); return busy29; };
 
   /* ثبتِ برگهٔ کمبود ⇒ مدخلِ «منتظر» در همان مسئله (اگر مسئله‌ای در کانون است) + علتِ «سامانه» برای گیرِ همان پیام (C23-2).
      دورِ ۲۴ (R1، D24-2، A24-6، C24-13؛ بانکِ R23 #167): برگه‌ای دربارهٔ خودِ سامانه (kind=fix، خودشناسیِ سامانه، کتابِ همراه، سنجشِ مدل‌ها) هرگز گامی از

@@ -4,7 +4,7 @@
 //  F13 (پرسش دربارهٔ سامانه مسئله / مقصدِ 🧭 نمی‌شود):  A pwA1 (A29-26)  ·  B oB1 c17 (B27·D14)  ·  C pC2 c41 (C27-6)  ·  D oD1b c1 (D28-10، شکلِ «این سامانه اصلاً … ساخته شده؟»)
 //  F14 (برچسبِ قاعده و شناسهٔ خام در نمای او):         A s09, aA1 (A29-23 «(C57)»)  ·  B s13 c28, s18 c45 («(it1_…)»), nB1, nB2 («(C57)»)
 //  F19 (نقشهٔ «خودِ سامانه» ِ دستیار از ثبت‌گاهِ قاعده‌ها): A oA1 p38 (A29-29؛ بانکِ مالک ۴۲/۶۴/۶۵)
-//  loop (B27·D16): B tB1 c17 — بی «سرکشیِ اجباری»: صفحه خودش جوابِ روتین را می‌خواند و می‌پرسد.
+//  loop (B27·D16): B tB1 c17 — B_tB1n = B_tB1s ِ دورِ ۲۸ بی «سرکشیِ اجباری» ِ c17 (همان کارِ دونده: جابه‌جاییِ صفحه، یادداشتِ روتین، بازکردنِ «امروز») — صفحه خودش می‌خواند و می‌پرسد.
 // LLA_FILE = ساختِ دیگر (برای قرمز بودن روی BASE29)؛ ONLY=pwA1,oB1,...
 const { chromium } = require('playwright');
 const path = require('path');
@@ -70,14 +70,14 @@ const DIR = path.join(__dirname, 'fixtures', 'r29_surface');
     return { ok, miss, selfLen: self.length }; });
 
   /* ---------- loop (B27·D16) ---------- */
-  await run('tB1', 'B_tB1s', 17, async (r) => {
+  await run('tB1', 'B_tB1n', 17, async (r) => {
     /* هیچ «سرکشیِ اجباری» نیست: همان کاری که دونده در c17 کرد (رفتن به «امروز» و رسمِ دوباره) — صفحه خودش برگه را می‌خواند */
     await r.p.evaluate(async () => { const w = ms => new Promise(x => setTimeout(x, ms)); APP.ASSIST.toggle(false); APP.go('today'); await w(800); APP.render(); await w(800); APP.go('today'); await w(400); });
     await r.p.waitForFunction(() => { const x = APP.PRE.sysAll()[0]; return !!(x && x.e && x.e.ask); }, null, { timeout: 30000, polling: 250 }).catch(() => { });
     const e = await r.p.evaluate(() => { const x = APP.PRE.sysAll()[0]; return x ? { st: x.e.state, ask: x.e.ask ? x.e.ask.id : '' } : null; });
     const sy = await sysOf(r.p), last = sy.slice(-1)[0] || '';
     const ok = !!e && e.st === 'wait' && e.ask === 'pr_market_scan' && /^❓/.test(last);
-    chk(ok, 'B27·D16 tB1 c17 (page, no forced sweep): the frame-words-only area is ASKED about, not left unread / rejected :: ' + JSON.stringify({ e, last: last.slice(0, 160) })); return { ok, e }; }, path.join(__dirname, 'fixtures', 'r28_surface'), true);
+    chk(ok, 'B27·D16 tB1 c17 (page, no forced sweep): the frame-words-only area is ASKED about, not left unread / rejected :: ' + JSON.stringify({ e, last: last.slice(0, 160) })); return { ok, e }; }, null, true);
 
   console.log(JSON.stringify(info));
   if (errors.length) { console.log('ERRORS (' + errors.length + '):\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
