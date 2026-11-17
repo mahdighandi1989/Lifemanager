@@ -26,3 +26,10 @@
 2. ✗ on «نصفش» / remainder clauses needs arith's per-clause reader (C141/C157); story shows «؟ نسنجیده» until then.
 3. F11 beyond C29-5: A29-19, B27·D7, B28·D9/B29·D15 (shared with prior).
 4. A moved 🎯's outcome (A29-27) — forecast.
+
+## Integration pass (on merge29, commit 5e3090ee → merged as WORKLOG 161 / PROGRESS 158)
+- 📜 `markOf27` reads `ST.arithClauses`; mixed lines written «بند به بند» under the overall verdict. B226: «✓ «۶ × ۷ = ۴۲ …» · ✗ «از ۵۰ تا ۷ تا می‌مونه» — ۵۰ − ۴۲». `unreadClaims29` kept as fallback; a pattern-only arith «unread» is shown only if story's `claim29` agrees (drops ~27 false «نسنجیده» on «m = 10», «یعنی ۳۷٪», «۱۲٪ گرون میشه»).
+- Prior `tryFix` reads `ST.arithClauses(t).ck` (same data; `kNorm` key unchanged).
+- a46 `otherSpans` → `A.STORY.otherWorks29` (one attribution reader); old body kept as `otherSpansR28` fallback.
+- Tests on merged build: r29 story 51/51, replay 18/18, r29 arith(+replay), r29 prior, r28 story/bank/arith/prior, r26_classify, docs gate 14. C136 sweep 893 turns: only the 3 S1 A29-1 lines became ✗; 4 lines became «؟ بند به بند» for genuinely unread clauses.
+- Not done: F11 📜 side (A29-19, B27·D7, B28·D9/B29·D15); arith `CLAIM29` too wide at the source (narrow it there); A29-27 forecast.

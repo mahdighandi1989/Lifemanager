@@ -346,3 +346,4 @@
 - 2026-11-17: merge29 (23d8eab9) tests: r29 forecast 12/12, bank 46/46, replay 12/12; story replay 18/18; prior pass; r28 forecast 12/12; only story B226 (integration). Story fixer resumed for the integration pass (📜 + tryFix read `ST.arithClauses`; a46 coach reads `A.STORY.otherWorks29`) on top of merge29 → WORKLOG 160+ renumbered at merge.
 - 2026-11-17: surface fixer done (bbfa6775) → merged into merge29 as 160/157 (05fef659). Waiting: correction, dates, story integration pass. Check `test_fixes_1015b` #12 (surface says red on BASE29 too).
 - 2026-11-17: 1015b #12 regression traced to surface merge (green at 23d8eab9) → surface fixer resumed on merge29. Other merge29 tests green (r29 surface+replay, r26_classify, forecast, story replay).
+- 2026-11-17: story integration merged into merge29 (0738105b, 161/158). Waiting: correction, dates (next 162/159, 163/160), surface 1015b #12 fix.
