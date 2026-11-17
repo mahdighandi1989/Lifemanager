@@ -23,7 +23,7 @@ WORKLOG 161 / PROGRESS 158; the handbook gate rejects gaps, so the first free nu
     plan-style «📅 … در «امروز» بیاید؛ درست است؟»), `PR.herDates` (past month-day whose nearest occurrence is past ⇒ C93 item, never next year; per-clause
     labels when a sentence has two dated clauses; «یعنی حدودِ …» drops the idiom row; split before «آخر/اول/وسطِ ماه»), `clauseOk26` (possessive
     third person with copula, «… همکارمه»), `pastDay28` (copula after the month, «۳۰ آبانه»), `nrm26` (tatweel between letters removed),
-    `PR.dlDoneFromHer` (records `doneBy.day` when she named a past day), `PR.herLater` (no deferred request when the request's day is the act's own day).
+    `PR.dlDoneFromHer` (records `doneBy.day` when she named a past day), `PR.herLater` (no deferred request for «ثبتش کن: ⟨dated act⟩» — the date reader asks it; «فردا یادم بنداز …» stays a promise, bank R23 #175); `herDays27` also drops a year-less day whose nearest occurrence is past (bank R22 #73); `PR.datePend` keeps one ask when the model's plan carries the next-year day (R26 U50).
 - `a27_tour.js`: `retractApply`, deadline loop only — on a ✏️ a deadline whose text `sub()` does not change is skipped (C144).
 - `a38_live.js`: `retractSess`, deadline loop only — on a ✏️ (`o.by !== "model"`) a deadline that `fixVal` finds nothing in is skipped (C144).
 
