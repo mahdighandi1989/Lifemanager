@@ -62252,6 +62252,8 @@ APP.goFromURL = function (q) {
 
   /* C45 (دورِ ۲۷؛ D27-7): مقدارِ صفحه در مقیاسِ خودِ او وقتی بخشِ صحیحش در آن مقیاس ۱ تا ۹۹۹ است («۳۵۳٫۱۶ هزار»)؛ وگرنه بزرگ‌ترین واژهٔ مقیاسی که بخشِ صحیح را ≥ ۱ نگه دارد («۶ میلیون»، هرگز «۶۰۰۰ هزار») */
   function fmtSc(v, tk, magW) {
+    /* دورِ ۲۹ (C29-20، D29-1؛ C103/C112): نوشتهٔ او عددِ مرکب است ⇒ مقدارِ صفحه هم به زبانِ خودش — «۱ میلیون و ۴۲۸ هزار و ۵۷۱» (≈ اگر دقیق نیست)، هرگز «۱٫۴» یا «۱۸٫۷» ِ بی‌مقیاس */
+    if (tk && !tk.pct && !tk.mag && tk.cm && MAGW[tk.cm]) { var cmV = fmtCmApx(v, tk.cm); if (cmV) return cmV; }
     if (tk && !tk.pct && !tk.mag && tk.cm && pt(v)) { tk = { raw: "0", mag: tk.cm, pct: false }; magW = MAGW[tk.mag] || ""; }   // «۸ میلیون و ۲۵۰ هزار» (عددِ مرکب) ⇒ «۹ میلیون»
     if (!tk || tk.pct || !tk.mag || !pt(v)) return fmtLike(v, tk, magW);
     var ab = v.lo.n < Z ? sub(F(Z), v.lo) : v.lo, inS = div(ab, F(p10(tk.mag)));
@@ -62267,6 +62269,13 @@ APP.goFromURL = function (q) {
     var o = fa(String(q)) + " " + MAGW[g]; if (r === Z) return o;
     var r1 = r / H, r0 = r % H;
     return o + " و " + (r1 !== Z ? fa(String(r1)) + (g - 3 && MAGW[g - 3] ? " " + MAGW[g - 3] : "") + (r0 !== Z ? " و " : "") : "") + (r0 !== Z ? fa(String(r0)) : "");
+  }
+  /* دورِ ۲۹: مقدارِ صحیح یا تقریبیِ مثبت در قالبِ «N میلیون و M هزار و K» — دقیق ⇒ fmtCm؛ ناصحیح یا بازهٔ تنگ ⇒ «≈» با گرد به واحد (C112: مقدارِ دقیق تا واحد، بی گردِ ساختگی) */
+  function fmtCmApx(v, g) {
+    if (!v || v.lo.n < Z) return null; var ex = pt(v) && v.lo.d === ONE;
+    if (!ex && !pt(v) && !narrow(v)) return null; var a = v.lo, r = ex ? a.n : (a.n * B(2) + a.d) / (B(2) * a.d);
+    while (g > 3 && r < p10(g)) g -= 3; if (r < p10(g)) return null;   // «۷۰۰ هزار»، نه «۰ میلیون …»
+    var o = fmtCm(iv(F(r)), g); return o ? (ex ? "" : "≈ ") + o : null;
   }
   /* ---------- یکدست‌سازیِ متن ---------- */
   var APX = "(?:حدود(?:ِ|اً|ا)?|تقریباً|تقریبا|نزدیک(?:ِ|\\s*به)?)";
@@ -62329,6 +62338,10 @@ APP.goFromURL = function (q) {
   var NUMW_U = { "یک": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "شیش": 6, "هفت": 7, "هشت": 8 }, NUMW_T = { "ده": 10, "یازده": 11, "دوازده": 12, "سیزده": 13, "چهارده": 14, "پانزده": 15, "پونزده": 15, "شانزده": 16, "شونزده": 16, "هفده": 17, "هیفده": 17, "هجده": 18, "هیجده": 18, "نوزده": 19, "بیست": 20, "سی": 30, "چهل": 40, "پنجاه": 50, "شصت": 60, "هفتاد": 70, "هشتاد": 80, "نود": 90, "صد": 100 };
   function nwV(w) { return NUMW_U.hasOwnProperty(w) ? NUMW_U[w] : NUMW_T.hasOwnProperty(w) ? NUMW_T[w] : null; }
   var NUMW_C = { "یک": 1, "یه": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "شیش": 6, "هفت": 7, "هشت": 8, "ده": 10, "یازده": 11, "دوازده": 12 };
+  /* قرنطینه (دورِ ۲۹، C135 — docs/overhaul/REMOVAL_CANDIDATES.md): حکمِ لغوشدهٔ C105 ِ دورِ ۲۸ («تومن» پس از M خوانشِ واحد را می‌بندد). فقط با ST.arithC105R28On = true
+     (هیچ‌جا روشن نمی‌شود) دوباره روی مسیر می‌آید؛ نگه داشته شده تا حذفش با تأییدِ مالک باشد */
+  function lockC105R28(s, n2) { return /^\s*(?:تومن|تومان|ریال)(?![آ-ی])/.test(s.slice(n2.b)); }
+  ST.arithC105R28 = lockC105R28; ST.arithC105R28On = false;
   function tokens(s, sel) {   // sel (دورِ ۲۸، C84): {offsetِ عددِ مرکب: true ⇒ خوانشِ «M هزار»، نبود ⇒ خوانشِ «M واحد»} — بی sel هر دو خوانش (alt) می‌ماند
     var T = [], i = 0, sp = true, n = s.length;
     while (i < n) {
@@ -62360,7 +62373,9 @@ APP.goFromURL = function (q) {
       if (n1.k === "n" && n1.mag && !n1.pct && !n1.cst && w0.k === "w" && w0.t === "و" && n2.k === "n" && !n2.pct && !n2.cst && n2.v.d === ONE && cmp(n2.v, F(p10(n1.mag))) < 0 && !(T[q + 3] && T[q + 3].k === "o" && T[q + 3].t === "/" && !T[q + 3].sp)) {
         var sm = add(n1.v, n2.v); if (sm.d !== ONE) continue;
         var nt = { k: "n", raw: String(sm.n), v: sm, pct: false, mag: 0, cm: n1.cm || n1.mag, int: true, a: n1.a, b: n2.b, sp: n1.sp };
-        if (!n2.mag && !n1.cm && n1.mag >= 6 && n1.mag % 3 === 0 && cmp(n2.v, F(B(1000))) < 0 && !/^\s*(?:تومن|تومان|ریال)(?![آ-ی])/.test(s.slice(n2.b))) { /* C105: «۸۰۰ تومن» خوانشِ واحد را می‌بندد */ nt.alt = add(n1.v, mul(n2.v, F(p10(n1.mag - 3)))); nt.mR = n2.raw; nt.cmT = s.slice(n1.a, n2.b); }
+        /* دورِ ۲۹ (C135؛ S1 D29-1، D29-2، A29-10): «تومن / تومان / ریال» پس از «N میلیون و M» نامِ پولِ همهٔ مبلغ است («۱۸ میلیون و ۷۰۰ تومن» = ۱۸٬۷۰۰٬۰۰۰)، هرگز M را
+           واحد نمی‌کند — شاخهٔ C105 (lockC105R28، پایین) قرنطینه است و دیگر روی این مسیر نیست؛ ترتیبِ C102 (نخست «M هزار») همان است */
+        if (!n2.mag && !n1.cm && n1.mag >= 6 && n1.mag % 3 === 0 && cmp(n2.v, F(B(1000))) < 0 && !(ST.arithC105R28On && lockC105R28(s, n2))) { nt.alt = add(n1.v, mul(n2.v, F(p10(n1.mag - 3)))); nt.mR = n2.raw; nt.cmT = s.slice(n1.a, n2.b); }
         /* C84 (دورِ ۲۸): خوانشِ برگزیده — «M هزار» (rdK) یا «M واحد» (rdU)؛ هم‌طول، همان جایگاه */
         if (sel && nt.alt) { if (sel[nt.a]) { nt.v = nt.alt; nt.raw = String(nt.alt.n); nt.rdK = true; } else nt.rdU = true; nt.alt = null; }
         T.splice(q, 3, nt); q--; } }
@@ -62384,6 +62399,8 @@ APP.goFromURL = function (q) {
       var pre = T[q4 - 1], pre2 = T[q4 - 2], adjN = function (y) { return y && (y.k === "n" || (y.k === "w" && nwV(y.t) != null)); };
       if ((w5 && w5.k === "w" && w5.t === "و" && adjN(w6)) || (pre && pre.k === "w" && pre.t === "و" && adjN(pre2)) || (q4 === 0 && (!w5 || w5.k === "p"))) T[q4] = nwTok(w4, nwV(w4.t));
     }
+    /* دورِ ۲۹ (C29-19): خوانشِ «هزار» ِ عددِ تنهای جملهٔ جمع/تفریق کنارِ عددِ مرکب (sel["b"+جای] = توانِ ده) — هم‌طول، همان جایگاه */
+    if (sel) T.forEach(function (x) { var gb = x.k === "n" ? sel["b" + x.a] : 0; if (gb && !x.mag && !x.pct && !x.cm) { x.v = mul(x.v, F(p10(gb))); x.raw = String(x.v.n); x.rdK = true; x.bareK = gb; x.int = false; } });
     /* پرانتزِ بسته‌ای که جفت ندارد («۲)») نشانهٔ شمارهٔ فهرست است، نه عبارت */
     var st = []; T.forEach(function (x) { if (x.k === "(") st.push(x); else if (x.k === ")") { if (st.length) { st.pop().ok = true; x.ok = true; } } });
     return T;
@@ -62479,7 +62496,7 @@ APP.goFromURL = function (q) {
   var MIXED = /^\s*و\s*(\d+)\/(\d+)(?!\d|\.\d|\/)(?!\s*[+\-*\/÷~^(=≈])/;
   var FLOOR = new RegExp("^\\s*و\\s*(?:خرده\\u200c?\\s?ای|خورده\\u200c?\\s?ای|خرده(?![آ-ی])|خورده(?![آ-ی])|اندی|کمی|یه\\s*چیزی|یک\\s*چیزی|یه\\s*کم(?![آ-ی])|یه\\s*ذره)(?:\\s*[،,]?\\s*(?:یعنی|دقیق\\u200c?تر(?:ش)?)\\s*(" + APX + ")?\\s*(\\d+(?:\\.\\d+)?)(?!\\d|\\.\\d|\\/))?");
   var HALFW = /^\s*و\s*نیم(?![آ-ی])/;
-  var REM = /^\s*(?:[،,]\s*|و\s*|با\s*)?(?:باقی[\u200c\s]?مانده(?:ٔ|ی|\u200cی|ش|\u200cاش)?|باقیش)\s*(\d+)(?![\d.\/])|^\s*(?:[،,]\s*|و\s*)(\d+)\s*(?:تا\s*)?(?:هم\s*)?(?:باقی\s*)?(?:می[\u200c\s]?مونه|می[\u200c\s]?ماند|اضافه\s*میاد)/;
+  var REM = /^\s*(?:[،,]\s*|و\s*|با\s*)?(?:باقی[\u200c\s]?مانده(?:ٔ|ی|\u200cی|ش|\u200cاش)?|باقیش)\s*(\d+)(?![\d.\/])|^\s*(?:(?!و\s)[آ-ی\u200c]{2,}\s+)?(?:[،,]\s*|و\s*)(\d+)\s*(?:تا\s*)?(?:هم\s*)?(?:باقی\s*)?(?:می[\u200c\s]?مونه|می[\u200c\s]?ماند|اضافه\s*میاد)/;   // دورِ ۲۹ (B29·D10): «۵۰ ÷ ۴ = ۱۲ بسته و ۲ تا می‌مونه» — یک واژهٔ شمارش پیش از «و»
   function okNext(T, e) {   // پس از عبارت: عملگر، پرانتز، حرفِ لاتینِ چسبیده یا نمادِ ریاضی ⇒ عبارتِ عددیِ محض نیست
     var nx = T[e]; if (!nx) return true;
     if (nx.k === "w" && !nx.sp && nx.t.length === 1 && nx.t !== "و") return false;      // «۰٫۲۵ح»: ضریبِ یک مجهول
@@ -62648,19 +62665,31 @@ APP.goFromURL = function (q) {
     }
     return ch ? o : null;
   }
+  /* دورِ ۲۹ (R1، D29-8): ۱ تا ۳ واژهٔ نام درست پس از «+ / −» و پیش از عدد ⇒ برچسبِ آن عدد (کنار گذاشته می‌شود؛ جای‌ها همان می‌مانند). واژهٔ ربط، تابع، تقریب، عدد به حروف یا یک حرفِ تنها هرگز */
+  var LBL_NO = new RegExp("^(?:" + APX + "|منفی|مثبت|کل|جمعاً|جمعا|همه)$");
+  function lblStrip(T) {
+    var o = [], ch = false;
+    for (var i = 0; i < T.length; i++) { var a = T[i]; o.push(a);
+      if (a.k !== "o" || "+-~".indexOf(a.t) < 0 || !(o.length > 1 && (o[o.length - 2].k === "n" || (o[o.length - 2].k === ")" && o[o.length - 2].ok)))) continue;
+      var j = i + 1; while (j < T.length && T[j].k === "w" && j - i <= 3) j++;
+      if (j === i + 1 || !T[j] || T[j].k !== "n" || T[j].pct || T[j].cst) continue;
+      if (T.slice(i + 1, j).some(function (w) { return NOSTRIP.test(w.t) || FUNC_FA.test(w.t) || LBL_NO.test(w.t) || w.t.length === 1 || nwV(w.t) != null || CNT.test(w.t); })) continue;
+      i = j - 1; ch = true; }
+    return ch ? o : null;
+  }
   /* C15: واژهٔ مقیاس واحد است. خوانشِ «یک مقیاس»: جمله‌ای که واژهٔ مقیاس ندارد در همان مقیاس است («۳۰۰ + ۲۰ میلیون ÷ ۴۰ = ۸۰۰ هزار»: ۳۰۰ هزار)؛ جمله‌ای با دو واژهٔ مقیاس این خوانش را ندارد */
   /* C24: عددهایی که خوانشِ «یک مقیاس» به مقیاس می‌برد (همان جمله‌هایی که scaledV / scaled ضرب می‌کند) */
   function rdNums(X) {
     if (X.run) return (X.llits || []).concat(X.xlits || []);
     var o = []; if (!X.tl) return o;
-    for (var k = 0; k < X.tl.length; k++) { var ls = X.lits.slice(X.tl[k], k + 1 < X.tl.length ? X.tl[k + 1] : X.lits.length); if (!ls.some(function (l) { return l.mag; })) o = o.concat(ls); }
+    for (var k = 0; k < X.tl.length; k++) { var ls = X.lits.slice(X.tl[k], k + 1 < X.tl.length ? X.tl[k + 1] : X.lits.length); if (!ls.some(function (l) { return l.mag || l.cm; })) o = o.concat(ls); }
     return o;
   }
   function scaledV(X, g) {
     if (!X.tl || !X.terms || X.terms.length !== X.tl.length) return null;
     var f = iv(F(p10(g))), v = null;
     for (var k = 0; k < X.terms.length; k++) {
-      var ls = X.lits.slice(X.tl[k], k + 1 < X.tl.length ? X.tl[k + 1] : X.lits.length), nm = ls.filter(function (l) { return l.mag; }).length;
+      var ls = X.lits.slice(X.tl[k], k + 1 < X.tl.length ? X.tl[k + 1] : X.lits.length), nm = ls.filter(function (l) { return l.mag || l.cm; }).length;   // دورِ ۲۹: عددِ مرکب مقیاسِ خودش را دارد
       if (nm > 1 || (!nm && ls.length && ls.every(function (l) { return l.pct; }))) return null;
       var tv = nm ? X.terms[k] : iMul(X.terms[k], f); v = v ? iAdd(v, tv) : tv;
     }
@@ -62668,11 +62697,27 @@ APP.goFromURL = function (q) {
   }
   function tolSaid(tk, apx) {
     var d = (tk.raw.split(".")[1] || "").length, t;
+    /* دورِ ۲۹ (بانکِ R29 #19، #44، #45؛ C9): «≈ ۳ میلیون و ۸۰۰ هزار» با رقم‌های خودِ او گرد یا بریده است — یکانِ M (هزار)، نه صفرهای پایانیِ «۸۰۰» */
+    if (!d && apx && tk.cm && tk.cm >= 6 && !tk.mag && !tk.pct) return { n: p10(tk.cm - 3), d: ONE, rt: true };
     if (d) t = F(ONE, B(apx ? 1 : 2) * p10(d)); else if (!apx) t = HALF; else { var z = (tk.raw.match(/0+$/) || [""])[0].length; if (z >= tk.raw.length) z = tk.raw.length - 1; t = mul(HALF, F(p10(z))); }
     if (tk.mag) t = mul(t, F(p10(tk.mag))); if (tk.pct) t = div(t, F(B(100)));
     if (d && apx) t = { n: t.n, d: t.d, rt: true };   // C9: یک رقمِ آخر = گرد یا بریده (near)، نه ±۱ رقم
     return t;
   }
+  /* دورِ ۲۹ (D29-2؛ C16): جمع/تفریقِ عددهای صحیح (پس از واژهٔ مقیاس) حاصلِ صحیحِ دقیق دارد — عددِ صحیحِ دیگری که نوشته گرد کردن نیست («۲ میلیون و ۳۰۰ هزار + ۴۰۰ هزار = ۳ میلیون»)،
+     نادرست است (✗ با مقدار)؛ پرسشِ «گرد کرده؟» برای تقسیم و ضرب و اعشار می‌ماند */
+  function intSum(L, s) { return !!s && s.d === ONE && !L.alts && !L.run && L.adds > 0 && !L.muls && !L.divs && !L.par && !L.un && (L.lits || []).length >= 2 && L.lits.every(function (l) { return l && l.v && l.v.d === ONE && !l.pct && !l.cst && l.raw.indexOf(".") < 0; }); }
+  /* عددهای تنهای کمتر از هزار در [a، b) که خودشان یک جملهٔ جمع/تفریق‌اند (پیش از آن «+ / −» یا آغازِ عبارت با «+ / −» پس از آن؛ هرگز کنارِ «× / ÷») */
+  function bareX(T, a, b, g) {
+    var o = [], isAdd = function (z) { return z && z.k === "o" && "+-~".indexOf(z.t) >= 0; }, isMul = function (z) { return z && z.k === "o" && "*/^".indexOf(z.t) >= 0; };
+    for (var j = 0; j < T.length; j++) { var x = T[j]; if (x.k !== "n" || x.a < a || x.b > b || !x.int || x.mag || x.pct || x.cm || x.cst || x.wn || x.v.d !== ONE || cmp(x.v, F(B(1000))) >= 0 || x.v.n === Z) continue;
+      var p = j - 1; while (p >= 0 && T[p].k === "w" && T[p].a >= a) p--; var q = j + 1; while (q < T.length && T[q].k === "w" && T[q].b <= b) q++;
+      if (isMul(T[j - 1]) || isMul(T[j + 1]) || isMul(T[q]) || (T[j + 1] && T[j + 1].k === "w2")) continue;
+      if (!(isAdd(T[p]) && T[p].a >= a) && !(isAdd(T[q]) && T[q].b <= b)) continue;
+      o.push({ a: x.a, b: x.b, cm: g + 3, cmT: x.raw, mR: x.raw, bare: g, k: "n" }); }
+    return o;
+  }
+  function pctOps(L) { return (L.lits || []).concat(L.llits || []).some(function (l) { return l && l.pct; }); }
   function truncF(a) { return a.n < Z ? -floorF({ n: -a.n, d: a.d }) : floorF(a); }
   function floorF(a) { var q = a.n / a.d; if (a.n < Z && a.n % a.d !== Z) q -= ONE; return q; }
   function factB(n) { var r = ONE; for (var i = B(2); i <= n; i += ONE) r *= i; return r; }
@@ -62692,6 +62737,9 @@ APP.goFromURL = function (q) {
       /* خوانش‌ها: نوشتهٔ عینی؛ و (C15) واژهٔ مقیاس به‌عنوانِ واحد */
       var cands = [{ A: Ls, s: sv, t: t }], Lm = L.mags || [], g = tk.mag || (Lm.length && Lm.every(function (x) { return x === Lm[0]; }) ? Lm[0] : 0);
       if (tk.alt) cands.push({ A: Ls, s: tk.alt, t: t });
+      /* C140 (دورِ ۲۹؛ S1 C29-2 «۲ و ۵ دهم × ۴ = ۱۰ درصد»): «درصد» ِ نتیجه وقتی هیچ عملوندی درصد نیست واحدِ نتیجه هم هست — حاصل = N (برچسبِ درصد) یا N/100 (کسرِ درصدنوشته)؛
+         با عملوندِ درصدی نتیجه در واحدِ درصد است (همان N/100). هرگز دو بار ۱۰۰ */
+      if (tk.pct && !pctOps(L)) cands.push({ A: Ls, s: mul(sv, F(B(100))), t: mul(t, F(B(100))), pl: true });
       var GS = !plain || tk.pct ? [] : tk.cm ? [tk.cm, tk.cm - 3].filter(function (x) { return x > 0; }) : g ? [g] : [], SV = tk.alt ? [sv, tk.alt] : [sv];
       GS.forEach(function (g1) { var A2 = L.alts ? (L.scaled ? L.scaled(g1) : null) : scaledV(L, g1), f10 = F(p10(g1)); if (!A2) return;
         SV.forEach(function (s1) { cands.push({ A: A2, s: tk.mag || tk.cm ? s1 : mul(s1, f10), t: tk.mag || tk.cm ? t : mul(t, f10), g: g1 }); }); });
@@ -62700,8 +62748,9 @@ APP.goFromURL = function (q) {
       /* C16: رواداریِ C9 جایی است که خودش رقمِ اعشار یا واژهٔ تقریب نوشته. عددِ صحیح برای مقدارِ ناصحیحِ دقیق: جمعِ کسرها ⇒ نادرست (۱۳/۱۲ یک نیست)؛ وگرنه ⇒ نه ✓ نه ✗، صفحه می‌پرسد */
       var exact = plain && !apx && tk.raw.indexOf(".") < 0 && !R.bang, best = "", fracNo = false;   /* C44 (دورِ ۲۷؛ D27-23): درصدِ صحیح بی واژهٔ تقریب («۴ از ۲۶ میشه ۱۵٪») هم همین پرسش را دارد */
       for (var ci = 0; ci < cands.length; ci++) { var c0 = cands[ci];
+        if (c0.pl && best) continue;   // C159: «درصد» ِ برچسب هرگز جای پرسشِ گرد کردن را نمی‌گیرد («۷ از ۴۵ میشه ۱۶٪»)
         if (!c0.A.some(function (v) { return near(v, c0.s, c0.t, sym); })) continue;
-        if (exact && (c0.A.every(pt) || L.irr) && !c0.A.some(function (v) { return pt(v) && cmp(v.lo, c0.s) === 0; })) { if (L.frac || L.fr1) fracNo = true; else best = best || "ask"; continue; }
+        if (exact && (c0.A.every(pt) || L.irr) && !c0.A.some(function (v) { return pt(v) && cmp(v.lo, c0.s) === 0; })) { if (L.frac || L.fr1 || intSum(L, c0.s)) fracNo = true; else best = best || "ask"; continue; }
         if (c0.g && mixS) { best = best || "reading" + c0.g; continue; }
         return "eq"; }
       if (best) return best; if (fracNo) return "";
@@ -62790,6 +62839,10 @@ APP.goFromURL = function (q) {
         if (r2 && !r.trail && r2.trail) { if (!r.lead && r2.lead) { r.lead = r2.lead; r.leadW = r2.leadW; r.leadN = r2.n; } r.trail = r2.trail; r.n = r2.n; }
         else if (r2 && !r.lead && r2.lead) { r.lead = r2.lead; r.leadW = r2.leadW; r.leadN = r2.n; }
       }
+      /* دورِ ۲۹ (D29-8، B29·D9، A29-9): نامِ قلم میانِ عملگرِ جمع/تفریق و عددِ بعد («کابینتِ پایین ۴ میلیون و ۲۰۰ + بالا ۱ میلیون و ۵۰۰ = …») برچسبِ همان عدد است، نه سدِ حساب —
+         خوانشِ بی‌برچسب وقتی جای‌گزین است که عبارتِ پایانیِ بلندتری بسازد (پیش‌تر فقط عددِ پس از برچسب خوانده می‌شد و «عدد در برابرِ عدد» بی‌سطر می‌ماند) */
+      if (i < segs.length - 1) { var Ts2 = stripUW(T, sg.s), TLs = [lblStrip(T), Ts2 ? lblStrip(Ts2) : null];   // «۳ میلیون و ۷۰۰ تومن + باربر ۹۰۰ هزار تومن» (بانکِ R29 #4): واحد و نام با هم
+        TLs.forEach(function (Tl) { var r3 = Tl ? mk(Tl) : null; if (r3 && r3.trail && (!r.trail || r3.trail.a < r.trail.a)) { r.trail = r3.trail; r.n = r3.n; r.lbl = true; } }); }
       return r;
     }
     var Rd = segs.map(function (_, i) { return read(i, false); }), members = [], MG = null;
@@ -62809,7 +62862,9 @@ APP.goFromURL = function (q) {
       if (hasOp(A)) return endsNum(A) || A[A.length - 1].k === "p";
       return !cutW[i - 1] && hasOp(Bk) && endsNum(A);   // عددِ تنها پیش از «میشه ⟨عبارت⟩» شرط یا شماره است (C18)
     }
-    var uwMix = function (X) { if (!X || !X.adds || !X.lits) return false; var W = {}; X.lits.forEach(function (l) { if (l.uw) W[l.uw.text.replace(/[ِٔ]+$/, "")] = 1; }); return Object.keys(W).length > 1; };
+    /* دورِ ۲۹ (A29-10): «۱ میلیون و ۸۰۰ تومن − ۳۰۰ تومن تخفیف»: واژهٔ پس از نامِ پول نامِ قلم است — واحد همان «تومان» است، ناهم‌سان نیست */
+    var uwKey = function (t) { t = String(t || "").replace(/[ِٔ]+$/, "").trim(); return /^(?:تومن|تومان|ریال)(?![آ-ی])/.test(t) ? (/^ریال/.test(t) ? "ریال" : "تومان") : t; };
+    var uwMix = function (X) { if (!X || !X.adds || !X.lits) return false; var W = {}; X.lits.forEach(function (l) { if (l.uw) W[uwKey(l.uw.text)] = 1; }); return Object.keys(W).length > 1; };
     for (var i = 1; i < segs.length; i++) {
       var L = Rd[i - 1].trail, R = Rd[i].lead;
       if (!L || !R) { members = []; if (numeric(i)) unread(i, ""); continue; }
@@ -62841,22 +62896,30 @@ APP.goFromURL = function (q) {
       var C84 = null;
       if (members.length === 1 && how !== "andmul") {
         var cmX = function (TT, a, b) { return (TT || []).filter(function (x) { return x.k === "n" && x.alt && x.a >= a && x.b <= b; }); };
-        var cL = cmX(Rd[i - 1].T, L.a, L.b), cR = cmX(Rd[i].T, R.a != null ? R.a : 0, R.b), nC = cL.length + cR.length;
-        if (nC && nC <= 5) {
-          var cmb = [];
-          for (var mk2 = 0; mk2 < (1 << nC); mk2++) {
-            var sL = {}, sR = {}; cL.forEach(function (x, k) { if (mk2 & (1 << k)) sL[x.a] = true; }); cR.forEach(function (x, k) { if (mk2 & (1 << (cL.length + k))) sR[x.a] = true; });
-            var rL = read(i - 1, false, sL), rR = read(i, false, sR), Lc = rL && rL.trail, Rc = rR && rR.lead;
+        var cL = cmX(Rd[i - 1].T, L.a, L.b), cR = cmX(Rd[i].T, R.a != null ? R.a : 0, R.b);
+        /* دورِ ۲۹ (C29-19، A29-10؛ C102): عددِ تنهای کمتر از هزار که خودش جملهٔ جمع/تفریق است، کنارِ «N میلیون و M»، همان خوانشِ M را دارد —
+           «۵ میلیون و ۸۰۰ − ۸۰۰ = ۵ میلیون» (هر دو هزار ⇒ درست)، «۱ میلیون و ۸۰۰ تومن − ۳۰۰ تومن تخفیف». همان ترتیبِ C102: نخست «هزار» */
+        if (cL.length + cR.length) { var g29 = (cL.concat(cR)[0].cm || 6) - 3, bL = bareX(Rd[i - 1].T, L.a, L.b, g29); if (bL.length) cL = cL.concat(bL); }
+        var nC = cL.length + cR.length;
+        /* دورِ ۲۹ (S1 C29-3؛ «شش قسط … = ۸ میلیون»): هر تعداد عددِ مرکب. تا ۸ عدد همهٔ ترکیب‌ها؛ بیش از آن فقط خوانش‌های یکدست (همه هزار، همه واحد، و هر سمت جدا) —
+           ترتیبِ C102 (نخست «همه هزار») و ✗ ِ C103 (فقط هزار و واحد) همین‌ها را می‌خواهند؛ ترکیب‌های درهم خوانشِ طبیعیِ هیچ نوشته‌ای نیستند. پیش‌تر بیش از ۵ ⇒ فقط خوانشِ واحد */
+        if (nC) {
+          var cmb = [], full = (1 << Math.min(nC, 30)) - 1, ML = (1 << cL.length) - 1, MS = nC <= 8 ? null : [0, ML, full - ML, full].filter(function (x, k, A0) { return A0.indexOf(x) === k; }).sort(function (x, y) { return x - y; });
+          var sel2 = function (mk2, list, off) { var o = {}; list.forEach(function (x, k) { if (mk2 & (1 << (off + k))) { if (x.bare) o["b" + x.a] = x.bare; else o[x.a] = true; } }); return o; };
+          for (var mi = 0, mN = MS ? MS.length : (1 << nC); mi < mN; mi++) { var mk2 = MS ? MS[mi] : mi;
+            var rL = read(i - 1, false, sel2(mk2, cL, 0)), rR = read(i, false, sel2(mk2, cR, cL.length)), Lc = rL && rL.trail, Rc = rR && rR.lead;
             if (!Lc || !Rc || Lc.a !== L.a || Lc.b !== L.b || Rc.b !== R.b) break;
             cmb.push({ m: mk2, h: agree(Lc, Rc, apx, rR.leadW), L: Lc, R: Rc });
           }
-          if (cmb.length === (1 << nC)) {
+          if (cmb.length === (MS ? MS.length : (1 << nC))) {
             var fits = cmb.filter(function (x) { return x.h === "eq" || x.h === "floor" || x.h === "rem"; }), kAll = cmb[cmb.length - 1], uAll = cmb[0];
             C84 = { cL: cL, cR: cR, all: cL.concat(cR), fits: fits, k: kAll, u: uAll, n: nC };
             /* C102 (جای «دو خوانش ⇒ پرسش» ِ C84): «N میلیون و M» نخست «M هزار» خوانده می‌شود — می‌خواند ⇒ ✓ بی پرسش (حتی اگر خوانشِ واحد هم بخواند)؛
                فقط خوانشِ دیگری می‌خواند ⇒ ✓ با نشان دادنِ همان خوانش («یعنی ۸۰۰ ِ واحد»)؛ هیچ‌کدام ⇒ ✗ (C103) */
             if (fits.indexOf(kAll) >= 0) { C84.pick = kAll; how = kAll.h; }
-            else if (fits.length) { C84.pick = fits.indexOf(uAll) >= 0 ? uAll : fits[0]; C84.other = true; how = C84.pick.h; }
+            else if (fits.indexOf(uAll) >= 0) { C84.pick = uAll; C84.other = true; how = C84.pick.h; }
+            /* C155 (دورِ ۲۹): فقط خوانشِ درهم (یکی هزار، دیگری واحد) می‌خواند ⇒ «؟» با نامِ خوانش‌ها و پرسش؛ هرگز ✓ و هرگز ✗ */
+            else if (fits.length) { C84.pick = fits[0]; C84.mixed = true; how = "mixed"; }
             else if (kAll.h === "ask") { C84.pick = kAll; how = "ask"; }
             else if (kAll.h) { C84.sc = true; C84.pick = kAll; how = ""; }
             else { C84.none = true; C84.pick = cL.length ? uAll : kAll; how = ""; }
@@ -62884,12 +62947,16 @@ APP.goFromURL = function (q) {
       /* C45 (دورِ ۲۷؛ B27·D13): وقتی خوانشِ عینی (واژهٔ مقیاس فقط کنارِ نتیجه) می‌خواند، مقدارِ صفحه همان است — «۳۵۳٫۱۶ هزار»، نه «۳۵۳۱۶۰ هزار» ِ خوانشِ «یک مقیاس» */
       var lgD = function (v) { var x = Math.abs(num(v.lo)), y = Math.abs(num(tkS.v)); return x && y ? Math.abs(Math.log(x / y)) : Infinity; };
       if (sc0 && tkS && tkS.mag && ((!how && lgD(L0.v) < lgD(sc0[0])) || (L0.alts || [L0.v]).some(function (v) { return near(v, tkS.v, tolSaid(tkS, apx), apx); }))) sc0 = null;   // C62: ✗ ⇒ مقدارِ عینی، بی واژهٔ مقیاسی که او ننوشته (۴۵۰ × ۱۲۰۰ ⇒ «۵۴۰ هزار»)
-      var dv0 = sc0 ? sc0[0] : L0.v, dtk = tkS ? (tkS.mag || !sc0 ? tkS : { raw: tkS.raw, mag: g0, pct: false }) : null;
+      var dv0 = sc0 ? sc0[0] : L0.v, dtk = tkS ? (tkS.mag || tkS.cm || !sc0 ? tkS : { raw: tkS.raw, mag: g0, pct: false }) : null;   // دورِ ۲۹ (C29-20): نتیجهٔ مرکبِ او قالبِ مقدارِ صفحه است
       var inForm = function (v) { var f = F(ONE); if (dtk && dtk.pct) f = F(B(100)); else if (dtk && dtk.mag) f = F(ONE, p10(dtk.mag)); return num(mul(v.lo, f)); };
       var c = { expr: L0.t, said: plainR && R.lits[0] ? R.lits[0].raw : said, saidT: said, val: tkS ? inForm(dv0) : num(L0.v.lo),
         valT: (/\//.test(said) || ((L0.frac || L0.fr1) && tkS && tkS.int)) && pt(L0.v) && L0.v.lo.d !== ONE && String(L0.v.lo.d).length <= 9 ? fa(String(L0.v.lo.n) + "/" + String(L0.v.lo.d)) : tkS ? fmtSc(dv0, dtk, magW) : fmtV(L0.v),
-        ok: !!how, kind: L0.run ? "run" : R.floor ? "floor" : "chain", pos: segs[i - 1].at + L0.a, pe: segs[i].at + R.b, sx: !R.single || !!R.floor || R.rem != null || !!R.mixed || !!R.comp };
+        ok: !!how, apx: !!apx, kind: L0.run ? "run" : R.floor ? "floor" : "chain", pos: segs[i - 1].at + L0.a, pe: segs[i].at + R.b, sx: !R.single || !!R.floor || R.rem != null || !!R.mixed || !!R.comp };
       if (how === "ask" || how === "scale") { c.ask = true; c.kind = how === "scale" ? "scale" : "round"; }
+      if (how === "mixed") { c.ok = true; c.ask = true; c.kind = "mixed"; }
+      /* C140: ✗ ِ «… = N درصد» بی عملوندِ درصدی هر دو خوانش را نشان می‌دهد — حاصل به درصد (برچسب) و کسر به درصد — یک بار ضربِ ۱۰۰، نه دو بار (C29-2 «۱۰۰۰٪») */
+      if (!how && tkS && tkS.pct && !pctOps(L0) && !L0.alts) c.valT = fmtLike(L0.v, { raw: tkS.raw, mag: 0, pct: false }, "") + "٪ (اگر حاصل را به درصد نوشته) یا " + fmtLike(L0.v, tkS, "") + " (اگر کسر را به درصد نوشته)";
+      else if (!how && tkS && tkS.pct && !pctOps(L0) && L0.alts && pt(L0.alts[0])) c.valT = fmtLike(L0.alts[0], { raw: tkS.raw, mag: 0, pct: false }, "") + "٪ (اگر حاصل را به درصد نوشته) یا " + fmtLike(L0.alts[0], tkS, "") + " (اگر کسر را به درصد نوشته)";
       if (how === "andmul") { c.ask = true; c.kind = "andmul"; c.mulT = tkS ? fmtLike(L0.mulAlt, tkS, magW) : fmtV(L0.mulAlt); }   // C40: نه ✓ نه ✗ — «ضرب کردی؟»
       if (how === "reading") {   // C24: خوانشِ معمول (هر مقیاس روی عددِ کنارش) نمی‌خواند و خوانشِ «همه در یک مقیاس» می‌خواند ⇒ همان خوانش نشان داده و پرسیده می‌شود
         c.ask = true; c.kind = "reading"; c.rdW = MAGW[rdG] || ""; c.rdN = rdNums(L0).map(function (l) { return l.raw; });
@@ -62922,7 +62989,7 @@ APP.goFromURL = function (q) {
           c.m2U = C84.fits.indexOf(C84.u) >= 0 ? "ok" : "wrong"; c.m2K = C84.sc || C84.fits.indexOf(C84.k) >= 0 ? "ok" : "wrong"; }
       }
       if (plainR && !L0.run && !c.ask) {
-        var us = unitAt(segs[i].s.slice(R.b)), ou = L0.lits.map(function (l) { return l.mag || l.pct || l.cst ? null : l.uw ? l.uw.u : (CU && CU[l.raw]) || null; }), unk = L0.lits.some(function (l) { return l.uw && !l.uw.u && !l.mag && !l.cm; }), dimDone = false;   // دورِ ۲۸ (A28-9): واژهٔ پس از «۲۰۰ هزار» («انعام») برچسبِ پول است، نه واحدِ اندازه
+        var us = unitAt(segs[i].s.slice(R.b)), ou = L0.lits.map(function (l) { return l.mag || l.pct || l.cst ? null : l.uw ? l.uw.u : (CU && CU[l.raw]) || null; }), unk = L0.lits.some(function (l) { return l.uw && !l.uw.u && !l.mag && !l.cm && !/^\s*(?:تومن|تومان|ریال)(?![آ-ی])/.test(String(l.uw.text || "")); }), dimDone = false;   // دورِ ۲۸ (A28-9): واژهٔ پس از «۲۰۰ هزار» («انعام») برچسبِ پول است، نه واحدِ اندازه
         if (us && L0.prod && ou.some(Boolean)) {
           var all = ou.every(Boolean), dm = {}, si = F(ONE);
           if (all) { ou.forEach(function (u, k2) { var inv = k2 > 0 && L0.mops[k2 - 1] === "/"; EXK.forEach(function (x) { dm[x] = (dm[x] || 0) + (inv ? -1 : 1) * (u.ex[x] || 0); }); var q = mul(L0.lits[k2].v, u.si); si = inv ? div(si, q) : mul(si, q); });
@@ -62948,7 +63015,9 @@ APP.goFromURL = function (q) {
       out.push(c);
       /* C108 (دورِ ۲۸): جملهٔ «M تا می‌مونه» جدا سنجیده می‌شود فقط وقتی کلّ را خودش در همین پیام پیش از حساب گفته («۲۰ تا مداد … ۶ و ۶ و ۶ میشه ۱۸، ۲ تا می‌مونه»):
          واپسین «N تا» ِ پیش از حساب که از نتیجه بزرگ‌تر است. وگرنه سطری نمی‌گیرد */
-      if (remCl && R.single && pt(R.v) && R.v.lo.d === ONE) { var T84 = tokens(t), p84 = segs[i - 1].at + L0.a, tot = null;
+      /* دورِ ۲۹ (C141): این شاخه جای خود را به remains29 (پایین، همهٔ عمل‌ها و شکلِ روایی) داد — قرنطینه پشتِ ST.arithC108R28On (هیچ‌جا روشن نمی‌شود) */
+      c.v29 = L0.alts ? L0.alts[0] : L0.v; c.sub29 = !L0.alts && !L0.run && L0.adds >= 1 && !L0.muls && !L0.divs && !L0.par && /−/.test(L0.t) && !/\+/.test(L0.t) || !!(L0.wop && /−/.test(L0.t));
+      if (ST.arithC108R28On && remCl && R.single && pt(R.v) && R.v.lo.d === ONE) { var T84 = tokens(t), p84 = segs[i - 1].at + L0.a, tot = null;
         for (var q84 = 0; q84 + 1 < T84.length && T84[q84].b <= p84; q84++) { var x84t = T84[q84]; if (x84t.k === "n" && x84t.int && !x84t.mag && T84[q84 + 1].k === "w" && T84[q84 + 1].t === "تا" && cmp(x84t.v, R.v.lo) > 0) tot = x84t; }
         if (tot) { var rv84 = sub(tot.v, R.v.lo); out.push({ expr: tot.raw + " − " + R.lits[0].raw, said: String(remCl.n), saidT: String(remCl.n), val: num(rv84), valT: fmtF(rv84), ok: cmp(rv84, F(remCl.n)) === 0, kind: "remc", pos: remCl.a, pe: remCl.e, sx: false }); } }
       /* عددی که خودش گرد کرد، در حسابِ بعدی همان بازه است */
@@ -63025,11 +63094,112 @@ APP.goFromURL = function (q) {
     }
   }
 
+  /* ---------- دورِ ۲۹ (C141؛ S1 C29-1، A29-1/A29-18، D29-9، B29·D10): جملهٔ «N تا می‌مونه / کم میاد / اضافه میاد» ----------
+     هر جملهٔ باقی/کم/اضافه جملهٔ خودش است (C85)، هرگز عملوند یا نتیجهٔ تساویِ پیش از آن نیست، و هرگز بی‌سطر نمی‌ماند:
+       • پس از تقسیم: باقی‌ماندهٔ همان تقسیم (leadOf / REM، پیشین)؛
+       • پس از تفریق («۱۸ − ۱۵ = ۳، ۳ تا می‌مونه»): همان حاصلِ تفریق — دو گزاره، هر دو سنجیده؛
+       • پس از هر حسابِ دیگر (جمع، ضرب، زنجیره): کلِ لازم/موجود از خودِ متنِ او — واپسین عددِ پیش از حساب (بیرون از هر حساب، نه نرخِ «روزی/هر …»، با همان واژهٔ واحدِ جمله
+         اگر واژه دارد) که با جهتِ جمله جور است (باقی/کم ⇒ بزرگ‌تر از حاصل، اضافه ⇒ کوچک‌تر)؛ «برای ۱۵ لیتر … ۱۱ + ۱۱ = ۲۲، پس ۸ لیتر اضافه میاد» ⇒ ✗ ۷؛
+       • بی حساب (روایی): در همان جمله دقیقاً دو عدد — «۳۰ تا لازمه، ۲۵ تا داریم، ۶ تا کم میاد» ⇒ ✗ ۵؛ «۱۸ تا داشتیم، ۱۲ تا رو باز کردیم، ۶ تا می‌مونه» ⇒ ✓؛
+       • هیچ‌کدام روشن نیست، یا حسابِ پیش از آن خودش نمی‌خواند ⇒ «نسنجیده» با دلیل — صفحه حدس نمی‌زند. */
+  var REMST = /(\d+(?:\.\d+)?)\s*(?:(تا|[^\s\d،,.؛:!?؟]+)\s*)?(?:هم\s*)?(?:از\s*(\d+)\s*(?:تا\s*)?)?(باقی[‌\s]?می[‌\s]?مونه|باقی[‌\s]?می[‌\s]?ماند|می[‌\s]?مونه|می[‌\s]?ماند|کم\s*میاد|کم\s*می[‌\s]?آید|کم\s*میاره|اضافه\s*میاد|اضافه\s*می[‌\s]?آید|زیاد\s*میاد)(?![آ-ی])/g;
+  var RATE29 = /^(?:روزی|ماهی|هفته[‌]?ای|ساعتی|سالی|نفری|دونه[‌]?ای|هر|تایی|متری|کیلویی|گام|مرحله|قدم|سطر|بند|شماره|ساعت|پارچِ|پارچ)$/;
+  var HAVE29 = /داشت|داری|دارم|داره|داریم|موجود|بود(?![آ-ی])|مونده|کل(?![آ-ی])/, NEED29 = /لازم|نیاز|می[‌\s]?خوا|باید|برای(?![آ-ی])/;
+  /* C156: عددهای سادهٔ صورتِ ثبت‌شدهٔ مسئلهٔ همین گفت‌وگو (نه نرخ، نه عددِ مرکب) — فقط وقتی صورت متنی جز همین پیام است */
+  function stmt29(t) {
+    var st = ""; try { var s0 = AS && AS.cur ? AS.cur() : null; st = String((((s0 || {}).coach || {}).stmt) || ""); } catch (e) { st = ""; }
+    if (!st.trim()) return []; var tt = normM(st).t; if (t.indexOf(tt) >= 0) return []; var T = tokens(tt), o = [];
+    T.forEach(function (x, k) { if (x.k !== "n" || !x.int || x.mag || x.pct || x.cm || x.cst || x.v.d !== ONE) return; var pw = T[k - 1] && T[k - 1].k === "w" ? T[k - 1].t : "";
+      if (RATE29.test(pw) || (T[k + 1] && T[k + 1].k === "o") || (T[k - 1] && T[k - 1].k === "o")) return;
+      var nx = T[k + 1] && T[k + 1].k === "w" ? (T[k + 1].t === "تا" && T[k + 2] && T[k + 2].k === "w" ? T[k + 2].t : T[k + 1].t !== "تا" ? T[k + 1].t : "") : "";
+      o.push({ v: x.v, raw: x.raw, a: -1e9 + k, w: nx.replace(/[ِٔ]+$/, "") }); });
+    return o;
+  }
+  function rs29(a) { return a.d === ONE ? String(a.n) : num(a).toString(); }
+  function remains29(t, all, out, U) {
+    var T = tokens(t), sts = [], m; REMST.lastIndex = 0;
+    /* «۳۵ می‌مونه» پس از «همون/هنوز»، «ماه ۲۴ می‌مونه …» (شمارهٔ ماه)، «… از ۱۸ می‌مونه» (۱۸ کل است، نه باقی) جملهٔ باقی نیستند (C136: round28 aB4 p4، aD3 p4، pwA2 p11) */
+    while ((m = REMST.exec(t))) { var pw0 = (/([^\s\d]+)\s*$/.exec(t.slice(Math.max(0, m.index - 20), m.index)) || [])[1] || "";
+      if (/^(?:همون|همان|هنوز|از|ماه|روز|سال|هفته|ساعت|گام|مرحله|سطر|شماره|ردیف)$/.test(pw0) || (m[2] && /^(?:می|نمی)/.test(m[2]))) continue;
+      var w = m[2] && !/^(?:تا|هم|هم‌|و|از)$/.test(m[2]) ? m[2].replace(/[ِٔ]+$/, "") : "", kd = /^کم/.test(m[4]) ? "short" : /^(?:اضافه|زیاد)/.test(m[4]) ? "sur" : "rem";
+      sts.push({ a: m.index, nb: m.index + m[1].length, e: m.index + m[0].length, raw: m[1], w: w, kd: kd, verb: m[4].replace(/\s+/g, " "), of: m[3] ? dec(m[3]) : null }); }
+    if (!sts.length) return;
+    var inChk = function (p) { return all.some(function (c) { return c.pos <= p && p < c.pe; }) || U.some(function (u) { return u.pos <= p && p < u.pe; }); };
+    var tokAt = function (p) { for (var k = 0; k < T.length; k++) if (T[k].k === "n" && T[k].a <= p && p < T[k].b) return k; return -1; };
+    var isSt = function (p) { return sts.some(function (x) { return x.a <= p && p < x.nb; }); };
+    var cands = function (from, to) {   // عددهای صحیحِ ساده (بیرون از هر حساب و جمله‌های باقی، نه نرخ) میانِ from و to
+      var o = []; for (var k = 0; k < T.length; k++) { var x = T[k]; if (x.k !== "n" || x.a < from || x.b > to || !x.int || x.mag || x.pct || x.cm || x.cst || x.v.d !== ONE || inChk(x.a) || isSt(x.a)) continue;
+        var pw = T[k - 1] && T[k - 1].k === "w" ? T[k - 1].t : "", pw2 = T[k - 2] && T[k - 2].k === "w" ? T[k - 2].t : "";
+        if (RATE29.test(pw) || (RATE29.test(pw2) && pw === "")) continue;
+        if (T[k + 1] && T[k + 1].k === "w" && T[k + 1].t === "تا" && T[k + 2] && T[k + 2].k === "n" && pw !== "از") continue;   // «۴ تا ۴ تا»، «۳ تا ۵» (نه «از ۵۰ تا ۸ تا»)
+        if (T[k + 1] && T[k + 1].k === "o") continue;
+        var nx = T.slice(k + 1, k + 4).filter(function (z) { return z.k === "w" && z.t !== "تا"; })[0], tail = t.slice(x.b, (T.slice(k + 1).filter(function (z) { return z.k === "n" || (z.k === "p" && /[،,.؛!?؟\n]/.test(z.t)); })[0] || { a: t.length }).a);
+        o.push({ v: x.v, raw: x.raw, a: x.a, w: nx && T[k + 1] && (T[k + 1] === nx || (T[k + 1].t === "تا" && T[k + 2] === nx)) ? nx.t.replace(/[ِٔ]+$/, "") : "", tail: tail }); }
+      return o; };
+    var sentA = function (p) { var q = p; while (q > 0 && !/[.!?؟\n؛]/.test(t[q - 1])) q--; return q; };
+    sts.forEach(function (st) {
+      if (inChk(st.a)) return; var k0 = tokAt(st.a); if (k0 < 0) return; var tk = T[k0];
+      if (tk.a < st.a || tk.mag || tk.cm || tk.pct) { if (!tk.cm && !tk.mag) return; U.push({ text: pretty(t.slice(tk.a, st.e)), why: "مبلغِ باقی/کم را صفحه با کلِ متنش نسنجیده", pos: tk.a, pe: st.e, cut: st.a, rem29: st.kd }); return; }
+      var N = tk.v, s0 = sentA(st.a), lbl = st.raw + (st.w ? " " + st.w : "") + " " + st.verb, put = function (expr, val, why) {
+        if (val == null) { U.push({ text: pretty(t.slice(st.a, st.e)), why: why, pos: st.a, pe: st.e, cut: st.a, rem29: st.kd }); return; }
+        out.push({ expr: expr, said: st.raw, saidT: pretty(t.slice(st.a, st.e)), val: num(val), valT: fmtF(val), ok: cmp(val, N) === 0, kind: "remc", rem29: st.kd, pos: st.a, pe: st.e, sx: false }); };
+      /* حسابِ درست پیش از آن، در همین جمله و بی عددِ دیگری میانشان */
+      /* دورِ ۲۹ (بانکِ R29 #23، #27): عددِ میانِ حساب و جمله کلِ همان جمله است («۶ × ۷ = ۴۲ تا تخم‌مرغ، از ۵۰ تا ۸ تا می‌مونه»، «… = ۲۷ تا شیرینی، ۲۵ نفریم، پس ۳ تا اضافه میاد») */
+      var E = null; all.forEach(function (c) { if (c.pe <= st.a && (c.pos >= s0 || st.of) && (!E || c.pe > E.pe)) E = c; });   // «۳ تا هم از ۱۸ می‌مونه»: کل در خودِ جمله، حاصل همان حسابِ پیشین
+      if (E) {
+        if (E.kind === "remc" || E.conv || E.rem29) return;
+        if (!E.ok || E.ask || !E.v29 || !pt(E.v29)) { put("", null, "حسابِ پیش از آن خودش " + (E.ask ? "هنوز روشن نیست" : "نمی‌خواند") + " — باقی/کم را صفحه نسنجید"); return; }
+        var hv = E.v29.lo;
+        if (E.sub29 && st.kd === "rem") { put(E.expr, hv); return; }
+        if (/\//.test(E.expr) && E.sx) return;   // باقی‌ماندهٔ تقسیم که در خودِ حساب خوانده شد
+        /* کل: عددهای سادهٔ پیش از حساب و نتیجهٔ حساب‌های درستِ پیشینِ خودش («مونده ۴۸ − ۳۰ = ۱۸. … ۵ و ۵ و ۵ میشه ۱۵، ۳ تا می‌مونه»)؛ عملوندهای همین حساب کل نیستند
+           («۳۵ تا صندلی، ۴ ردیف ۸تایی: ۴ × ۸ = ۳۲، ۳ تا اضافه میاد» ⇒ ۳۵). باقی ⇒ کل بزرگ‌تر از حاصل؛ کم/اضافه ⇒ فاصلهٔ دو عدد (لازم و موجود هر کدام می‌توانند حاصل باشند) */
+        var opV = (String(E.expr).match(/\d+(?:\.\d+)?/g) || []).map(function (x) { return dec(x); }).filter(Boolean);
+        var mid = st.of ? [{ v: st.of, a: st.a, w: "" }] : cands(E.pe, st.a), C0 = (mid.length ? mid : cands(0, E.pos)).concat(mid.length ? [] : st.w ? [] : all.filter(function (c) { return c !== E && c.ok && !c.ask && c.kind !== "remc" && !c.conv && c.pe <= E.pos && /^\d+$/.test(String(c.said)); }).map(function (c) { return { v: F(B(String(c.said))), a: c.pos, w: "" }; }))
+          .filter(function (x) { return (!st.w || x.w === st.w) && cmp(x.v, hv) !== 0 && !opV.some(function (o) { return cmp(o, x.v) === 0; }) && (st.kd !== "rem" || cmp(x.v, hv) > 0); })
+          .sort(function (x, y) { return x.a - y.a; });
+        /* C156: کلِ لازم/موجود از صورتِ ثبت‌شدهٔ مسئله هم می‌آید («۲۰ صفحه باید بخونم» در صورت، «۶ و ۶ و ۶ میشه ۱۸، ۲ تا می‌مونه» در پیام) */
+        if (!C0.length) C0 = stmt29(t).filter(function (x) { return (!st.w || x.w === st.w) && cmp(x.v, hv) !== 0 && !opV.some(function (o) { return cmp(o, x.v) === 0; }) && (st.kd !== "rem" || cmp(x.v, hv) > 0); });
+        if (!C0.length) { put("", null, "کلِ لازم یا موجود در متنش نیست"); return; }
+        var Q = C0[C0.length - 1].v, gt = cmp(Q, hv) > 0, dv = gt ? sub(Q, hv) : sub(hv, Q);
+        put(gt ? rs29(Q) + " − " + rs29(hv) : rs29(hv) + " − " + rs29(Q), dv); return;
+      }
+      /* روایی: دقیقاً دو عدد در همان جمله */
+      var C1 = cands(s0, st.a); if (C1.length !== 2) { put("", null, "کلِ لازم یا موجود در جمله‌اش روشن نیست"); return; }
+      var nd = C1.map(function (x) { return NEED29.test(x.tail); }), hvM = C1.map(function (x) { return HAVE29.test(x.tail) && !NEED29.test(x.tail); }), big, small;
+      if (st.kd === "rem") { var hi = hvM[0] && !hvM[1] ? 0 : hvM[1] && !hvM[0] ? 1 : -1; if (hi < 0) { put("", null, "کدام عدد کل است روشن نیست"); return; } big = C1[hi]; small = C1[1 - hi]; }
+      else { var ni = nd[0] && !nd[1] ? 0 : nd[1] && !nd[0] ? 1 : -1; if (ni < 0) { put("", null, "کدام عدد لازم است روشن نیست"); return; }
+        if (st.kd === "short") { big = C1[ni]; small = C1[1 - ni]; } else { big = C1[1 - ni]; small = C1[ni]; } }
+      put(rs29(big.v) + " − " + rs29(small.v), sub(big.v, small.v));
+    });
+  }
+  /* دورِ ۲۹ (A29-3، s06 p9؛ C138): «نصفش (هم) میشه N»، «دو برابرش میشه N» — عملی روی نتیجهٔ حسابِ درستِ پیش از آن در همان جمله. عدد به ترتیبِ C102 خوانده می‌شود
+     (نخست «M هزار»). حسابِ پیشینِ نادرست/نامعلوم یا بی حسابِ پیشین ⇒ «نسنجیده»، هرگز حدس */
+  var OFW29 = [[/^(?:نصفش|نصفِ?\s*(?:اون|این)|نیمش)$/, 1, 2, "نصفِ"], [/^(?:ثلثش|یه\s*سومش|یک\s*سومش)$/, 1, 3, "یک‌سومِ"], [/^(?:ربعش|یه\s*چهارمش|یک\s*چهارمش)$/, 1, 4, "یک‌چهارمِ"],
+    [/^(?:دو\s*برابرش|دوبرابرش)$/, 2, 1, "دو برابرِ"], [/^(?:سه\s*برابرش|سه‌برابرش)$/, 3, 1, "سه برابرِ"]];
+  var OFRE29 = /(نصفش|نصفِ?\s*(?:اون|این)|نیمش|ثلثش|یه\s*سومش|یک\s*سومش|ربعش|یه\s*چهارمش|یک\s*چهارمش|دو\s*برابرش|دوبرابرش|سه\s*برابرش|سه‌برابرش)\s*(?:هم\s*)?(?:میشه|می[‌\s]?شه|می[‌\s]?شود|میشود|＝|=)\s*(\d)/g;
+  function ofPrev29(t, all, out, U) {
+    var m, T = null; OFRE29.lastIndex = 0;
+    while ((m = OFRE29.exec(t))) {
+      var w = m[1].replace(/\s+/g, " "), f = null; OFW29.forEach(function (x) { if (!f && x[0].test(w)) f = x; }); if (!f) continue;
+      var pn = m.index + m[0].length - 1; if (all.some(function (c) { return c.pos <= pn && pn < c.pe; })) continue;
+      T = T || tokens(t); var tk = T.filter(function (x) { return x.k === "n" && x.a === pn; })[0]; if (!tk || tk.pct) continue;
+      var s0 = m.index; while (s0 > 0 && !/[.!?؟\n؛]/.test(t[s0 - 1])) s0--;
+      var E = null; all.forEach(function (c) { if (c.pe <= m.index && c.pos >= s0 && !/\d/.test(t.slice(c.pe, m.index)) && (!E || c.pe > E.pe)) E = c; });
+      if (!E || !E.ok || E.ask || !E.v29 || !pt(E.v29) || E.kind === "remc") { U.push({ text: pretty(t.slice(m.index, tk.b)), why: "حسابی که «" + w + "» به آن برمی‌گردد " + (E ? "خودش روشن نیست" : "در همین جمله نیست"), pos: m.index, pe: tk.b, cut: m.index }); continue; }
+      var tg = mul(E.v29.lo, F(B(f[1]), B(f[2]))), rd = [tk.alt, tk.v].filter(Boolean), hit = rd.filter(function (v) { return cmp(v, tg) === 0; })[0];
+      if (!hit && tg.d !== ONE) { var tl = tolSaid(tk, false); hit = rd.filter(function (v) { return near(iv(tg), v, tl, false); })[0]; }
+      out.push({ expr: f[3] + " " + (E.saidT || E.said), said: tk.raw, saidT: pretty(t.slice(tk.a, tk.b)), val: num(tg), valT: (tk.cm ? fmtCmApx(iv(tg), tk.cm) : null) || fmtLike(iv(tg), tk, ""),
+        ok: !!hit, kind: "of29", pos: m.index, pe: tk.b, sx: true, rdShow: !!(hit && tk.alt && hit === tk.v && cmp(tk.v, tk.alt) !== 0), rdC: hit && tk.alt ? "«" + fa(pretty(tk.cmT)) + (hit === tk.alt ? " هزار»" : "» ِ واحد") : "" });
+    }
+  }
   /* ---------- درگاه ---------- */
   function run(t, reg, note, CU) {
     var out = [], un = [], U = [];
     try { chains(t, reg, out, note, CU, U); } catch (e) { console.warn(e); }
     try { units(t.replace(/＝/g, "="), un, note); } catch (e2) { console.warn(e2); }
+    try { remains29(t, out.concat(un), out, U); } catch (e4) { console.warn(e4); }
+    try { ofPrev29(t, out.concat(un), out, U); } catch (e5) { console.warn(e5); }
     /* خواننده‌ٔ واحد (تبدیل، جمعِ ناهم‌واحد) بر خوانشِ «فقط عدد» ِ همان سطر مقدم است */
     out = out.filter(function (c) { return !(c.uw && un.some(function (u) { return u.pos < c.pe && c.pos < u.pe; })); }).concat(un).sort(function (a, b) { return a.pos - b.pos; });
     out.unread = U.filter(function (u) { return !out.some(function (c) { return c.pos <= u.cut && u.cut < c.pe; }); });
@@ -63080,13 +63250,15 @@ APP.goFromURL = function (q) {
       (coach ? " — حساب در هر دو خوانش درست است، ولی عددش به خوانش بسته است: نه ✓ و نه ✗ تا خودش بگوید؛ یک بار بپرس «" + fa(c.m2M[0]) + " " + c.m2W + " یا خودِ " + fa(c.m2M[0]) + "؟»" : " — «" + fa(c.m2M[0]) + " " + c.m2W + "» یا خودِ «" + fa(c.m2M[0]) + "»؟");   // C84 (دورِ ۲۸؛ C28-11)
     if (c.kind === "m2") return "«" + fa(c.m2T) + "» دو خوانش دارد (اولی «" + fa(c.m2T) + " " + c.m2W + "»، دومی «" + fa(c.m2T) + "» ِ واحد) — «" + fa(c.expr) + "» به ترتیب " + c.m2A[1] + " یا " + c.m2A[0] + " می‌شود؛ با خوانشِ «" + c.m2W + "» «" + fa(c.saidT || c.said) + "» فقط تا مقیاس/گرد کردن می‌خواند" +
       (coach ? " — نه ✓ و نه ✗ (حکم به خوانش بسته است)؛ از خودش بپرس کدام را نوشت" : " — کدام را نوشتی؟");   // دورِ ۲۸ (C106): ترتیبِ ثابت — «اولی» = هزار، «دومی» = واحد
+    if (c.kind === "mixed") return "«" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» نه با خوانشِ «هزار» ِ همه می‌خواند نه با خوانشِ «واحد» ِ همه؛ فقط با خوانشِ درهمِ " + (c.rdC || "") + " می‌خواند" +
+      (coach ? " — نه ✓ و نه ✗؛ خوانش‌ها را نام ببر و یک بار بپرس کدام را نوشت" : " — کدام را نوشتی؟");
     if (c.kind === "scale") return "عددهای «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» می‌خوانند، ولی مقیاسش (هزار/میلیون/میلیارد) را صفحه نسنجیده" + (coach ? " — نه ✓ و نه ✗؛ از خودش بپرس کدام مقیاس را می‌خواست" : "");
     return "«" + fa(c.expr) + "» " + (/^≈/.test(c.valT) ? "" : "دقیقاً ") + c.valT + " می‌شود" + (c.remT ? " (خارج‌قسمتِ صحیح " + c.remT + ")" : "") + " و «" + fa(c.saidT || c.said) + "» نوشته شده" + (coach ? " — نه ✓ و نه ✗؛ مقدارِ دقیق را بگو و بپرس گرد کرده یا همین را می‌خواست" : " — گرد شده؟");
   }
   var MAGW = { 3: "هزار", 6: "میلیون", 9: "میلیارد" };
   function unreadT(u) { return "حسابِ «" + fa(u.text) + "» را صفحه نسنجیده" + (u.why ? " (" + u.why + ")" : ""); }
   /* سطرِ کنارِ حکمِ هر گام: chk برای خودش (عددِ درست لو نمی‌رود)، chkM برای مربی. کنارِ «✗» هرگز «درست» نمی‌آید (DECISIONS_R25 P2). */
-  function sideT(c) { return c.unit ? "" : "«" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "»"; }
+  function sideT(c) { return c.unit ? "" : "«" + fa(c.expr) + (c.apx ? " ≈ " : " = ") + fa(c.saidT || c.said) + "»"; }   // دورِ ۲۹ (C29-18): «≈» ِ خودش «≈» می‌ماند
   ST.arithNote = function (ck, verdict) {
     ck = ck || []; var bad = ck.filter(function (c) { return !c.ok; }), asks = ck.filter(function (c) { return c.ask; }), UR = ck.unread || [], sure = ck.filter(function (c) { return c.ok && !c.ask; });
     var extra = asks.map(function (c) { return askT(c, false); }).concat(UR.map(unreadT)).join("؛ "), extraM = asks.map(function (c) { return askT(c, true); }).concat(UR.map(unreadT)).join("؛ ");
@@ -63108,7 +63280,7 @@ APP.goFromURL = function (q) {
     var L = (ck || []).map(function (c) { var l = lineOf(c); return c.other ? l.replace(/^(\S+ )/, function (m) { return m + whoT(c); }) : l; });
     function lineOf(c) {
       if (c.ask) return "؟ " + askT(c, true);
-      if (c.ok) return "✓ «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» می‌خواند" + (c.rdC ? (c.rdShow ? " — یعنی " + c.rdC + " (فقط با این خوانش می‌خواند؛ همین را به خودش هم بگو)" : " (با خوانشِ " + c.rdC + ")") : "") + (c.unitUnread ? " (فقط عدد؛ واحدش نسنجیده)" : c.unitRead ? " (با واحدِ " + c.unitRead + ")" : "") +
+      if (c.ok) return "✓ «" + fa(c.expr) + (c.apx ? " ≈ " : " = ") + fa(c.saidT || c.said) + "» می‌خواند" + (c.rdC ? (c.rdShow ? " — یعنی " + c.rdC + " (فقط با این خوانش می‌خواند؛ همین را به خودش هم بگو)" : " (با خوانشِ " + c.rdC + ")") : "") + (c.unitUnread ? " (فقط عدد؛ واحدش نسنجیده)" : c.unitRead ? " (با واحدِ " + c.unitRead + ")" : "") +
         (c.unitQ ? " — فقط برای تو (مربی): حساب جمع است و می‌خواند، ولی واحدِ نتیجه «" + c.unitQ + "» است؛ اگر به کار می‌آید یک بار بپرس منظورش ضربِ دو اندازه بود؟ (این ✗ نیست)" : "");
       return "✗ " + (c.unit ? "واحد (" + c.unit + "): «" + fa(c.expr) + "» را «" + fa(c.saidT || c.said) + "» نوشته — با تبدیل " + c.valT + " می‌شود" : "«" + fa(c.expr) + "» را «" + fa(c.saidT || c.said) + "» نوشته — حسابِ صفحه: " + c.valT);
     }
@@ -63116,6 +63288,48 @@ APP.goFromURL = function (q) {
     return L;
   };
   ST.arithUnread = function (ck) { return ((ck && ck.unread) || []).slice(); };
+  /* ---------- دورِ ۲۹ (C138، C139؛ S1 A29-1): حکمِ هر بند — صادره برای story (📜)، prior (دفترِ کارِ پیشین)، correction ----------
+     ریشهٔ A29-1: نشانِ 📜 از ST.arithNote روی کلِ جمله ساخته می‌شد — «موتور چیزی نادرست نخواند» ⇒ «✓ درست» برای همهٔ جمله، حتی برای بندی که موتور اصلاً نخوانده
+     و غلط است («…، نصفش هم میشه ۱ میلیون و ۳۰۰»، «پس ۸ لیتر اضافه میاد»، «۳ تا کم میاد»). حالا موتور خودش جمله را بند به بند برمی‌گرداند: هر بندی که ادعای عددی دارد
+     (عدد + «= / ≈ / میشه / شد / می‌مونه / کم میاد / اضافه میاد / یعنی / درمیاد») یا حکمِ موتور را دارد یا «نسنجیده» است؛ جمله هرگز «✓» ِ یکپارچه نمی‌گیرد وقتی چنین بندی هست.
+     ST.arithClauses(q، ctx؟) ⇒ { mark: "ok"|"bad"|"ask"|"part"|"unread"|""، clauses: [{ a, b, t, claim, mark: "ok"|"bad"|"ask"|"unread"|""، checks: [c…]، unread: [u…]، line }]،
+       line: یک سطر برای نمای او (عددِ درستِ ✗ لو نمی‌رود)، lineM: همان برای مربی (با مقدارِ صفحه) }
+     جای‌ها (a، b) در متنِ q اند. «part» = بندهای سنجیده همه ✓ ولی بندی نسنجیده هست — هرگز «✓ درست» برای کلِ جمله. داور همین موتور است (C139): هر خوانندهٔ دیگر فقط
+     «نسنجیده» می‌افزاید، هرگز حکمِ این‌ها را برنمی‌گرداند. */
+  /* C161 (دورِ ۲۹): مقدارِ دقیقِ یک کسرِ ناپایان (برای پیشنهادهای correction و هر جای دیگر): «۲۷۰۶ و ۲ سوم ≈ ۲۷۰۶٫۶۷» — کسرِ دقیق و «≈» با دو رقم؛ هرگز عددِ صحیحِ ساختگی.
+     ST.arithExactT(صورت، مخرج) یا ST.arithExactT("8120/3") ⇒ رشته؛ اعشارِ پایان‌پذیر همان عدد است */
+  var ORD29 = { 2: "دوم", 3: "سوم", 4: "چهارم", 5: "پنجم", 6: "ششم", 7: "هفتم", 8: "هشتم", 9: "نهم", 10: "دهم", 11: "یازدهم", 12: "دوازدهم" };
+  ST.arithExactT = function (n, d) {
+    var a; try { if (d == null) { var m = /^\s*(-?\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)\s*$/.exec(digs(n)); if (!m) { var x = dec(digs(n).trim()); return x ? fmtF(x) : String(n); } a = div(dec(m[1].replace("-", "")), dec(m[2])); if (/^-/.test(m[1])) a = sub(F(Z), a); } else a = div(dec(digs(n)), dec(digs(d))); } catch (e) { return String(n); }
+    if (!a) return String(n); if (term10(a)) return fmtF(a);
+    var neg = a.n < Z, an = neg ? -a.n : a.n, q = an / a.d, r = an % a.d, fr = ORD29[Number(a.d)] ? fa(String(r)) + " " + ORD29[Number(a.d)] : fa(String(r) + "/" + String(a.d));
+    return (neg ? "−" : "") + (q ? fa(String(q)) + " و " : "") + fr + " ≈ " + fmtD(a, 2);
+  };
+  var CLAIM29 = /(?:=|≈|＝|(?:^|[\s،,.؛:])(?:میشه|می[‌\s]?شه|می[‌\s]?شود|میشود|می[‌\s]?شد|میشد|شد|شده|درمیاد|در\s*میاد|درمی[‌\s]?آید|می[‌\s]?مونه|میمونه|می[‌\s]?ماند|کم\s*میاد|اضافه\s*میاد|یعنی|جمعاً|جمعا)(?![آ-ی‌]))/;
+  var DIG29 = /[0-9۰-۹٠-٩]/;
+  ST.arithClauses = function (q, ctx) {
+    q = String(q == null ? "" : q); var base = ctx && String(ctx).indexOf(q) >= 0 ? String(ctx) : q, off = base === q ? 0 : base.indexOf(q);
+    var ck = []; try { ck = arithChk(q, base === q ? undefined : base) || []; } catch (e) { ck = []; }
+    var UR = ck.unread || [], cuts = [0], re = /[.!?؟؛\n،,]/g, m;
+    while ((m = re.exec(q))) { var pc = q[m.index - 1] || "", nc = q[m.index + 1] || ""; if (/[,،.]/.test(m[0]) && DIG29.test(pc) && DIG29.test(nc)) continue; cuts.push(m.index + 1); }
+    cuts.push(q.length); var C = [];
+    for (var k = 0; k + 1 < cuts.length; k++) if (cuts[k + 1] > cuts[k]) C.push({ a: cuts[k], b: cuts[k + 1] });
+    /* سنجشی که از مرزِ بند می‌گذرد بندها را یکی می‌کند («۲۵ ÷ ۴ = ۶، ۱ تا می‌مونه») */
+    ck.concat(UR).forEach(function (c) { var a = c.pos - off, b = c.pe - off; if (!(b > 0 && a < q.length)) return;
+      var i0 = -1, i1 = -1; C.forEach(function (x, j) { if (x.b > a && x.a < b) { if (i0 < 0) i0 = j; i1 = j; } }); if (i0 >= 0 && i1 > i0) C.splice(i0, i1 - i0 + 1, { a: C[i0].a, b: C[i1].b }); });
+    var ofIt = function (x, c) { var a = c.pos - off, b = c.pe - off; return b > x.a && a < x.b; };
+    var out = C.map(function (x) {
+      var t = q.slice(x.a, x.b), tt = t.replace(/^[\s.!?؟؛\n،,]+|[\s.!?؟؛\n،,]+$/g, ""), cs = ck.filter(function (c) { return ofIt(x, c); }), us = UR.filter(function (u) { return ofIt(x, u); });
+      var claim = !!(cs.length || us.length || (DIG29.test(t) && CLAIM29.test(t)));
+      var mk = cs.some(function (c) { return !c.ok; }) ? "bad" : cs.some(function (c) { return c.ask; }) ? "ask" : cs.length && !us.length ? "ok" : claim ? "unread" : "";
+      var o = { a: x.a, b: x.b, t: tt, claim: claim, mark: mk, checks: cs, unread: us };
+      o.line = mk === "ok" ? "✓ «" + tt + "»" : mk === "bad" ? "✗ «" + tt + "» — " + ST.arithNote(Object.assign(cs.slice(), { unread: [] }), "").chk : mk === "ask" ? "؟ «" + tt + "» — " + cs.filter(function (c) { return c.ask; }).map(function (c) { return askT(c, false); }).join("؛ ") : mk === "unread" ? "؟ نسنجیده: «" + tt + "»" + (us[0] && us[0].why ? " (" + us[0].why + ")" : "") : "";
+      o.lineM = mk === "bad" ? "✗ «" + tt + "» — " + cs.filter(function (c) { return !c.ok; }).map(function (c) { return "حسابِ صفحه: " + fa(c.expr) + " = " + c.valT + "، نه " + fa(c.saidT || c.said); }).join("؛ ") : o.line;
+      return o; });
+    var cl = out.filter(function (x) { return x.claim; }), has = function (k) { return cl.some(function (x) { return x.mark === k; }); };
+    var mark = has("bad") ? "bad" : has("ask") ? "ask" : has("unread") ? (has("ok") ? "part" : "unread") : has("ok") ? "ok" : "";
+    return { mark: mark, clauses: out, line: cl.map(function (x) { return x.line; }).join(" · "), lineM: cl.map(function (x) { return x.lineM; }).join(" · "), ck: ck };
+  };
   /* ---------- اعتراض به «✗» ِ صفحه (پرسشِ ۳۶ ِ مالک؛ A26-2، A26-3؛ بانکِ R26 #25، #41، #42) ----------
      وقتی «✗» ِ حسابِ صفحه روی میز است (گامِ دفترِ «کارِ پیشین» با pageBad، یا «✗» ِ پیامِ پیشینِ همین گفت‌وگو) و او می‌گوید حسابش درست است، صفحه همان نوشته را **یک بار** دوباره می‌سنجد و هر دو حساب را
      نشان می‌دهد. خواند ⇒ «✗» همه‌جا برداشته می‌شود (دفتر از راهِ خودِ ادغامِ a45 — ST.priorOf + ST.priorMerge —، کارنامه، 📜) با تاریخچه؛ نخواند ⇒ حکم می‌ماند، با حسابِ صفحه به‌عنوانِ شاهد، و دوباره پرسیده نمی‌شود.

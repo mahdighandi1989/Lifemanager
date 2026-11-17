@@ -80,9 +80,13 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
     chk(JSON.stringify(sts(r)) === '["OK","OK","FLAG"]' && /^۶۵ میلیون/.test(r.c[2].valT) && /۶۰ میلیون و ۵ هزار/.test(r.c[2].valT) && !/گرد کرده/.test(r.lines[2]),
       'C28-12 + C28-11 aC3 p29: «× ۱۰ = ۶۰ میلیون» ✗ with both values, thousands first (C103; never a rounding «؟»); «÷ ۲ = ۱ میلیون و ۴۰۰» ✓ with no question (C102 replaces RUNNER28 T15 / C84 «ask») :: ' + J(r));
     await want('۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰۰', 'FLAG', 'neg C102: a result that fits no reading is still ✗');
-    r = await AC('۱ میلیون و ۵۰۰ − ۵۰۰ = ۱ میلیون'); chk(JSON.stringify(sts(r)) === '["OK"]' && /یعنی «۱ میلیون و ۵۰۰» ِ واحد/.test(r.lines[0]), 'C102: right only under the units reading ⇒ ✓ and the page shows that reading :: ' + J(r));
+    /* دورِ ۲۹ (DECISIONS_R29 F1، C29-19): عددِ تنهای «۵۰۰» ِ جملهٔ تفریق کنارِ «۱ میلیون و ۵۰۰» همان خوانشِ «هزار» را دارد ⇒ ✓ با خوانشِ هزار (پیش‌تر «یعنی ِ واحد»).
+       مسیرِ «فقط خوانشِ واحد می‌خواند ⇒ ✓ و نشان دادنِ همان خوانش» (C102) با جمله‌ای که فقط واحد در آن می‌خواند سنجیده می‌شود */
+    r = await AC('۱ میلیون و ۵۰۰ − ۵۰۰ = ۱ میلیون'); chk(JSON.stringify(sts(r)) === '["OK"]' && /با خوانشِ «۱ میلیون و ۵۰۰ هزار»، «۵۰۰ هزار»/.test(r.lines[0]), 'C102 + C29-19: the bare «۵۰۰» of the subtraction takes the thousands reading too ⇒ ✓ :: ' + J(r));
+    r = await AC('۱ میلیون و ۵۰۰ × ۲ = ۲ میلیون و ۱۰۰۰'); chk(JSON.stringify(sts(r)) === '["OK"]' && /یعنی «۱ میلیون و ۵۰۰» ِ واحد/.test(r.lines[0]), 'C102: right only under the units reading ⇒ ✓ and the page shows that reading :: ' + J(r));
     await want('۲ میلیون و ۸۰۰ تومن + ۲۰۰ = ۲ میلیون و ۱۰۰۰', 'OK', 'C105: «۸۰۰ تومن» fixes the units reading (no thousand alternative)');
-    await want('۲ میلیون و ۸۰۰ تومن + ۲۰۰ هزار = ۳ میلیون', 'FLAG', 'neg C105: with «تومن» the thousand reading is not tried');
+    /* دورِ ۲۹ (C135 — C105 لغو شد؛ S1 D29-1/D29-2): «تومن» نامِ پولِ همهٔ مبلغ است و خوانشِ «هزار» نخست است ⇒ ۲٫۸ + ۰٫۲ = ۳ میلیون ✓ (پیش‌تر ✗) */
+    await want('۲ میلیون و ۸۰۰ تومن + ۲۰۰ هزار = ۳ میلیون', 'OK', 'C135 (C105 revoked): «تومن» names the currency of the whole amount; the thousands reading fits');
     await want('۶ میلیون و ۵۰۰ × ۱۰ = ۶۵ میلیون', 'OK', 'neg C28-12: the right product is ✓ (no rounding question)');
     // ---- A (s02 p17/p18): A28-9 ✓ (نه «واحدِ ناشناخته»)، A28-10 ✗ با هر دو مقدار در مقیاسِ خودش، A28-8 «۲√۳ ≈ …» نسنجیده ----
     r = await AC('دقیق‌ترش: ۲√۳ ≈ ۳٫۴۶ دسی‌متر. کرایه: ۲ میلیون و ۸۰۰ + ۲۰۰ هزار انعام = ۳ میلیون. سهمِ من: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰. سهمِ برادرم با کارگر: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۵۰۰.');
@@ -96,7 +100,8 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
     await want('۱۸ × ۱۵۰ هزار = ۲ میلیون و ۷۰۰', 'OK', 'neg D28-15: the right result (thousand reading) is ✓');
     // ---- S1 A28-40 (A pwA2 p10) — C85 ----
     r = await AC('مونده ۴۸ − ۳۰ = ۱۸. روزی ۵ تا: ۵ و ۵ و ۵ میشه ۱۵، ۳ تا می‌مونه، پس ۴ روز.');
-    chk(JSON.stringify(sts(r)) === '["OK","OK"]' && noX(r) && !/باقی‌ماندهٔ/.test(r.lines.join(' ')), 'S1 A28-40 pwA2 p10 (C85): «۳ تا می‌مونه» is its own statement; the sum is ✓ :: ' + J(r));
+    /* دورِ ۲۹ (C141): جملهٔ «۳ تا می‌مونه» جملهٔ خودش است و حالا با کلِ خودِ او (۱۸، نتیجهٔ «۴۸ − ۳۰») سنجیده می‌شود ⇒ سطرِ سوم ✓ (remc)؛ هرگز ✗ و هرگز چسبیده به جمع */
+    chk(JSON.stringify(sts(r)) === '["OK","OK","OK"]' && r.c[2].kind === 'remc' && noX(r) && !/باقی‌ماندهٔ/.test(r.lines.join(' ')), 'S1 A28-40 pwA2 p10 (C85/C141): «۳ تا می‌مونه» is its own statement (✓ against her 18); the sum is ✓ :: ' + J(r));
     await want('۵ و ۵ و ۵ میشه ۱۶، ۳ تا می‌مونه', 'FLAG', 'neg C85: a wrong sum stays ✗, quoting only the sum', r => r.c[0].said === '16');
     await want('۱۸ ÷ ۵ = ۳، ۳ تا می‌مونه', 'OK', 'neg C85: after a division the clause IS the remainder (and right)');
     await want('۱۸ ÷ ۵ = ۳، ۲ تا می‌مونه', 'FLAG', 'neg C85: a wrong remainder of a division is still ✗');
@@ -199,7 +204,9 @@ const BANK = JSON.parse(fs.readFileSync(process.env.LLA_VARIANTS || path.join(__
       }
       const t = e.text.replace(/^U:\s*/, ''), r = await AC(t), v = verdict(r), S = sts(r);
       let ok;
-      if (t0 === 'OK') ok = S.length > 0 && S.every(x => x === 'OK') && !r.u.length;
+      /* دورِ ۲۹ (C141 جای «otherwise it gets no line» ِ C108): جملهٔ «N تا می‌مونه / کم میاد / اضافه میاد» که کلش در متن نیست «نسنجیده» می‌گیرد، نه سکوت — پس «OK» یعنی همهٔ سنجش‌ها ✓
+         و هر سطرِ نسنجیده فقط همان جملهٔ باقی/کم/اضافه است (هرگز ✗، هرگز چسبیده به حساب) */
+      if (t0 === 'OK') ok = S.length > 0 && S.every(x => x === 'OK') && r.u.every(u => /(?:تا|^\S+)\s*(?:می‌مونه|میمونه|می مونه|کم میاد|اضافه میاد)$/.test(u) || /^\d+ تا (?:می‌مونه|میمونه|کم میاد|اضافه میاد)$/.test(u));
       else if (t0 === 'FLAG') ok = S.includes('FLAG');
       else if (t0 === 'ASK-SCALE') { ok = S.length === 1 && S[0] === 'OK' && /با خوانشِ .*هزار/.test(r.lines[0]); if (ok) info.nc[i + 1] = 'C102 replaces C84 «two fit ⇒ ask»: the line fits under the thousands reading ⇒ ✓ with no question (asserted)'; }
       else if (t0 === 'NOT-FLAG') ok = (v === 'OK' || v === 'UNCHECKED');

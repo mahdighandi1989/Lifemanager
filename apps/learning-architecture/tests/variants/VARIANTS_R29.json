@@ -1,0 +1,2402 @@
+[
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲۴ تا کارتن، هر کدوم ۶۵۰ هزار: ۲۴ × ۶۵۰ هزار = ۱۵ میلیون و ۶۰۰ تومن",
+  "expect": "OK — 24 × 650 000 = 15 600 000 = «۱۵ میلیون و ۶۰۰ تومن» under the thousand reading (C102); «تومن» is the currency of the whole amount, never a units marker on «۶۰۰» (C135); the units reading 15 000 600 is never used; never ✗, never a bare «۱۵٫۶» in the prompt, the 🧭 map or 📜; PAGE-LEVEL: the 📜 mark beside the line is ✓ and the route map step is not «نادرست»",
+  "context": "adult, flooring; S1 family D29-1 (the C105 branch made this ✗ «۱۸٫۷»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲۴ × ۶۵۰ هزار = ۱۵ میلیون و ۶۰۰ تومن ‖ [page ✓] ‖ U: این رو دوباره بسنج، مطمئنم درسته",
+  "expect": "OK stays OK — the re-check (C29) recomputes 15 600 000 and says it re-checked once with the same ✓; no «حکم ماند» over a ✗; chat and page say the same thing",
+  "context": "adult; S1 family D29-1 (after her objection the false ✗ was kept)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: کرایهٔ وانت ۱ میلیون و ۴۰۰ تومن، باربر ۶۰۰ هزار تومن: ۱ میلیون و ۴۰۰ تومن + ۶۰۰ هزار تومن = ۲ میلیون تومن",
+  "expect": "OK — 1 400 000 + 600 000 = 2 000 000 under the thousand reading; the units reading gives 1 600 400 and is never shown; never «؟ دقیقاً ۱٫۶۰۰۴ میلیون … گرد کرده؟»; the coach is never told to ask her about rounding",
+  "context": "adult, moving house; S1 family D29-2"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: کرایهٔ ون ۳ میلیون و ۷۰۰ تومن + باربر ۹۰۰ هزار تومن = ۴ میلیون و ۶۰۰ تومن",
+  "expect": "OK — 3 700 000 + 900 000 = 4 600 000 (thousand reading, carry in the M part); units reading 3 900 700 against 4 000 600 does not fit; labels between the amounts do not stop the reader",
+  "context": "adult; S1 family D29-2 with item labels (D29-8 shape)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: 12 × 1 میلیون و 250 تومن = 15 میلیون تومن",
+  "expect": "OK — 12 × 1 250 000 = 15 000 000; Latin digits read like Persian; the units reading 12 003 000 is not the reading; never ✗",
+  "context": "adult, twelve monthly instalments; Latin digits; S1 family D29-1"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲ میلیون و ۵۰۰ تومن + ۳۰۰ هزار تومن = ۳ میلیون تومن",
+  "expect": "FLAG — thousand reading 2 800 000, units reading 2 300 500, her 3 000 000 fits neither; the ✗ names both in her words («۲ میلیون و ۸۰۰ هزار» and «۲ میلیون و ۳۰۰ هزار و ۵۰۰»), never a raw «۲٫۵۰۰۳ میلیون» or «۲٫۸۰۰۳» (C103, C45)",
+  "context": "adult; S1 family D29-2 second line (verdict was right, the value raw)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲ میلیون و ۹۰۰ تومن − ۹۰۰ تومن = ۲ میلیون تومن",
+  "expect": "OK (units reading named) — the thousand reading 2 900 000 − 900 = 2 899 100 does not fit; only the units reading 2 000 900 − 900 = 2 000 000 does, so it is ✓ and the page names it («یعنی ۹۰۰ تومان») per C102/C135; never «نسنجیده», never ✗",
+  "context": "adult, bank fee; C136 look-alike of a sentence runner C judged ✓ (it must keep ✓ after C105 is quarantined); A29-10 shape"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پول خرد قلک: ۳ میلیون و ۴۰۰ تومن منهای ۴۰۰ تومن میشه ۳ میلیون تومن",
+  "expect": "OK (units reading named) — only 3 000 400 − 400 = 3 000 000 fits; thousand reading 3 399 600 does not; the page says which reading it used; never «نسنجیده» (A29-10 was «نسنجیده»)",
+  "context": "adult; A29-10 shape with the word operator «منهای … میشه»"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: قسط‌های شش ماه: ۲ میلیون و ۱۰۰ + ۲ میلیون و ۴۰۰ + ۱ میلیون و ۹۰۰ + ۲ میلیون و ۳۰۰ + ۱ میلیون و ۸۰۰ + ۲ میلیون و ۵۰۰ = ۱۳ میلیون",
+  "expect": "OK — six compound terms, thousand reading 13 000 000 exactly; the units reading 10 003 000 is never the verdict; never «✗ ۱۰٫۰۰۳ میلیون»; no limit on the number of terms",
+  "context": "adult, six instalments; S1 family C29-3 (beyond five compounds only the units reading was used)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: خرجِ هفت روزِ سفر: ۸۰۰ هزار + ۱ میلیون و ۲۰۰ + ۱ میلیون و ۳۵۰ + ۹۰۰ هزار + ۱ میلیون و ۱۵۰ + ۱ میلیون و ۶۰۰ + ۱ میلیون = ۸ میلیون",
+  "expect": "OK — seven terms, four of them compound: 0.8 + 1.2 + 1.35 + 0.9 + 1.15 + 1.6 + 1.0 = 8.0 million; the units reading 6 701 300 does not fit; ✓ with no question",
+  "context": "adult, travel diary; S1 family C29-3 (mixed compound and «هزار» terms, seven in all)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱ میلیون و ۶۰۰ + ۱ میلیون و ۲۰۰ + ۱ میلیون و ۸۰۰ + ۱ میلیون و ۴۰۰ + ۱ میلیون و ۷۰۰ + ۱ میلیون و ۳۰۰ = ۸ میلیون و ۵۰۰",
+  "expect": "FLAG — thousand reading 9 000 000, units reading 6 003 000, her 8 500 000 (or 8 000 500) fits neither; the ✗ names «۹ میلیون» and «۶ میلیون و ۳ هزار» in her words; the right sum is not given to her",
+  "context": "adult; S1 family C29-3, a genuinely wrong six-term sum"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲ میلیون و ۷۵۰ + ۱ میلیون و ۲۵۰ + ۳ میلیون و ۴۰۰ + ۲ میلیون و ۶۰۰ + ۱ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ = ۱۴ میلیون",
+  "expect": "OK — 2.75 + 1.25 + 3.4 + 2.6 + 1.5 + 2.5 = 14.0 million under the thousand reading; units 11 003 000 does not fit; never ✗",
+  "context": "adult, car repairs; S1 family C29-3"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یخچال ۲۸ میلیون و ۴۰۰ + لباسشویی ۱۹ میلیون و ۸۰۰ = ۴۸ میلیون و ۲۰۰",
+  "expect": "OK — 28.4 M + 19.8 M = 48.2 M (thousand reading); the item names between the amounts are skipped, the sum is read; never silent",
+  "context": "adult, buying appliances; D29-8 / B29·D9 shape"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سینک ۳ میلیون و ۴۰۰ + شیرآلات ۱ میلیون و ۸۰۰ = ۴ میلیون و ۲۰۰",
+  "expect": "FLAG — thousand reading 5 200 000, units reading 4 001 200, her 4 200 000 fits neither; ✗ with both values in her words; never silent because of the labels (D29-8 let a wrong labelled sum pass)",
+  "context": "adult, kitchen; D29-8 (the wrong labelled sum was silent)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: بلیت ۲ میلیون و ۶۵۰ + هتل ۵ میلیون و ۴۰۰ + غذا ۱ میلیون و ۹۵۰ = ۱۰ میلیون",
+  "expect": "OK — 2.65 + 5.4 + 1.95 = 10.0 million; three labelled compound terms; units reading 8 002 000 does not fit",
+  "context": "adult, trip budget; B29·D9 shape with three labels"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پیش‌پرداخت ۳ میلیون و ۲۰۰ هزار دادم، با ۲ میلیونِ دیگه میشه ۵ میلیون و ۲۰۰",
+  "expect": "NOT-FLAG — «با ۲ میلیونِ دیگه میشه» is a sum word; 3 200 000 + 2 000 000 = 5 200 000; ✓ if the reader takes the word operator, otherwise «نسنجیده» — never silent, never ✗",
+  "context": "adult; D29-17 shape (no line at all in round 29)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲۰ میلیون ÷ ۷ ≈ ۲ میلیون و ۵۰۰ هزار",
+  "expect": "FLAG — 20 000 000 ÷ 7 = 2 857 142.86…; her 2 500 000 is neither its rounding nor its truncation at the thousand she wrote; the ✗ states the value in her scale («≈ ۲ میلیون و ۸۵۷ هزار»), never a bare «≈ ۲٫۹» or «۲٫۸۶»",
+  "context": "adult, splitting an inheritance; C29-20 shape"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۹ هزار و ۵۰۰ × ۳ = ۲۷ هزار و ۵۰۰",
+  "expect": "FLAG — «N هزار و M» has M in units (C104): 9 500 × 3 = 28 500; the ✗ says «۲۸ هزار و ۵۰۰», never «۲۸٫۵ هزار» (C103 in her words)",
+  "context": "adult, bus tickets; B28·D15 shape seen again in round 29"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: سهم هر کدوم از ۱۵ میلیون ÷ ۴ ≈ ۳ میلیون و ۸۰۰ هزار",
+  "expect": "FLAG in the prompt line too — 15 000 000 ÷ 4 = 3 750 000 exactly; «≈ ۳ میلیون و ۸۰۰ هزار» is not its rounding at her thousand digits (3 750 000); the coach line quotes her «≈» as «≈» (never «=») and writes the exact value «۳ میلیون و ۷۵۰ هزار»",
+  "context": "adult; C29-20 with C29-18 (coach line wrote her «≈» as «=»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲۲ تا مداد داشتیم، ۱۷ تا رو دادیم به کلاس: ۲۲ − ۱۷ = ۵، ۵ تا می‌مونه.",
+  "expect": "OK and OK — two statements: «۲۲ − ۱۷ = ۵» ✓ and the remainder clause «۵ تا می‌مونه» ✓ (22 − 17 = 5); the clause is never glued into «۱۷ − ۵» or «۵ − ۵»; the coach is never told «✗ … ۱۲»",
+  "context": "child, 9; S1 family C29-1 (after a subtraction the clause was glued)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: 23 - 16 = 7, 7 تا میمونه",
+  "expect": "OK and OK — 23 − 16 = 7, the clause «۷ تا میمونه» repeats the remainder; Latin digits and missing ZWNJ read the same; no «۱۶ − ۷ = ۹» anywhere",
+  "context": "child, 8; S1 family C29-1, Latin digits"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۳۵ − ۱۲ − ۹ = ۱۴، ۱۴ تا می‌مونه",
+  "expect": "OK and OK — the chain 35 − 12 − 9 = 14; the remainder clause is its own statement (C141 «a chain»)",
+  "context": "teen, 13, stickers; S1 family C29-1 (chain)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۶ × ۷ = ۴۲ تا تخم‌مرغ، از ۵۰ تا ۸ تا می‌مونه",
+  "expect": "OK and OK — 6 × 7 = 42 and 50 − 42 = 8; the remainder after a multiplication is its own statement with its operands in her text",
+  "context": "adult, bakery; C141 after a multiplication"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۶ × ۷ = ۴۲ تا تخم‌مرغ، از ۵۰ تا ۷ تا می‌مونه",
+  "expect": "OK then FLAG — the product is ✓; the clause «۷ تا می‌مونه» is ✗ on its own line (50 − 42 = 8); the product line keeps its ✓ (one mark per clause, C138)",
+  "context": "adult; C141 after a multiplication, wrong remainder"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۴۰ تا صندلی لازمه، ۳۲ تا داریم، ۹ تا کم میاد",
+  "expect": "FLAG — need 40, have 32, short by 8; «۹ تا کم میاد» is ✗ against the problem's own numbers (C141), shown as its own line; never silent",
+  "context": "adult, a wedding hall; D29-9 shape («۳۰ لازمه، ۲۵ داریم، ۶ تا کم میاد» was silent)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۴۰ تا صندلی لازمه، ۳۲ تا داریم، ۸ تا کم میاد",
+  "expect": "OK — 40 − 32 = 8; judged against her own need/have numbers (C141)",
+  "context": "adult; C141 positive with the right shortfall"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۳ × ۹ = ۲۷ تا شیرینی گرفتیم، ۲۵ نفریم، پس ۳ تا اضافه میاد",
+  "expect": "OK then FLAG — 3 × 9 = 27 ✓; «۳ تا اضافه میاد» is ✗ (27 − 25 = 2) on its own line; the sentence is never ✓ as a whole (C138 with story)",
+  "context": "adult; A29-1 s08 shape («پس ۸ لیتر اضافه میاد» was under a sentence-wide ✓)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: روزی ۴ صفحه: ۴ و ۴ و ۴ و ۴ میشه ۱۶، ۲ تا کم میاد",
+  "expect": "OK then UNCHECKED — the sum 16 ✓; her text gives no total to compare «۲ تا کم میاد» with, so it is «نسنجیده» on its own line (C141 «otherwise نسنجیده»); never silent and never glued to the sum",
+  "context": "child, 8, reading pages; A29-1 pwA2 shape without a stated total"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۸ صفحه مونده. روزی ۴ تا: ۴ و ۴ و ۴ و ۴ میشه ۱۶، ۳ تا کم میاد",
+  "expect": "OK then FLAG — the sum 16 ✓; with her stated total 18, 18 − 16 = 2, so «۳ تا کم میاد» is ✗ on its own line; the line is never ✓ as a whole (C138, C141)",
+  "context": "child, 8; S1 A29-1 pwA2 shape with the total in her text"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۵۰ ÷ ۶ = ۸ و ۲ تا می‌مونه",
+  "expect": "OK — quotient 8, remainder 2; never «؟ گرد شده؟» (B29·D10)",
+  "context": "adult, packing; B29·D10 shape (a right remainder was asked as rounding)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۴۷ ÷ ۵ = ۹ و ۳ تا می‌مونه",
+  "expect": "FLAG — 47 = 5 × 9 + 2, so the remainder is 2, not 3; ✗ names the remainder, never «؟» (B29·D10 gave «؟» for a wrong remainder)",
+  "context": "adult; B29·D10 shape"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سودِ ماهانه ۱ و ۵ دهم درصده؛ ۶ ماه میشه ۱ و ۵ دهم × ۶ = ۹ درصد",
+  "expect": "OK — 1.5 × 6 = 9, percent context, the result is labelled in percent (C140); never «✗ … ۹۰۰٪» and never scaled twice",
+  "context": "adult, a deposit; S1 family C29-2"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۳ و ۲ دهم × ۵ = ۱۶ درصد",
+  "expect": "OK — no operand is a percentage; the computed value 16 equals N (she labels the result in percent), so ✓ (C140)",
+  "context": "adult; S1 family C29-2 without a percent context"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۴۸ تقسیم بر ۶۰۰ = ۸٪",
+  "expect": "OK — 48 / 600 = 0.08 = 8/100, a fraction written as a percent (C140)",
+  "context": "adult, defect rate; C140 look-alike («۱۷۵ تقسیم بر ۱۲۵۰ = ۱۴٪»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۳ × ۵ = ۱۲ درصد",
+  "expect": "FLAG — computed 15; neither 12 nor 0.12; ✗ showing both readings («۱۵» and «۱۵۰۰٪»), never silent (C140 negative)",
+  "context": "adult; C140 negative shape"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۷ از ۴۵ میشه ۱۶٪",
+  "expect": "ASK — 7/45 = 15.55…%; 16 is its rounding with no approximation word, so the C44/C25 question («دقیقاً ۱۵٫۵۵…٪ — گرد کردی؟»); never ✗, never ✓ before her answer (C140 keeps C9/C44)",
+  "context": "adult; C140 look-alike «۴ از ۲۶ میشه ۱۵٪»"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۱۵٪ِ ۴۰۰ = ۵۰",
+  "expect": "FLAG — 15% of 400 = 60; ✗ (the result is not in percent, so no percent unit applies)",
+  "context": "adult; a percent-of shape, wrong"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: ۵ میلیون و ۲۰۰ − ۲ میلیون و ۷۰۰ = ۲ میلیون و ۵۰۰، نصفش هم میشه ۱ میلیون و ۳۰۰",
+  "expect": "the arith export for this sentence has TWO clause entries: «۵ میلیون و ۲۰۰ − ۲ میلیون و ۷۰۰ = ۲ میلیون و ۵۰۰» OK (5.2 M − 2.7 M = 2.5 M) and «نصفش هم میشه ۱ میلیون و ۳۰۰» NOT-OK (half of 2 500 000 is 1 250 000: ✗ if read, «نسنجیده» if not) — never a single sentence-level OK",
+  "context": "adult; S1 A29-1 s06 shape, arith side (C138 export)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: ۱۱ + ۱۱ = ۲۲ لیتر، پس ۹ لیتر اضافه میاد",
+  "expect": "the export has two entries: «۱۱ + ۱۱ = ۲۲» OK and «۹ لیتر اضافه میاد» UNCHECKED (no need/have in her text) — or FLAG if the problem statement in the same record gives the target (for a 15-litre target, 22 − 15 = 7); never folded into the sum entry",
+  "context": "adult, jug puzzle; S1 A29-1 s08 shape, arith side"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: حقوقم ۲۱ میلیون و ۳۰۰ تومنه",
+  "expect": "SILENT — an amount with no operation; no line, no reading question (C17)",
+  "context": "elder, 66, «شما» register; look-alike of the D29-1 shape"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲ میلیون و ۵۰۰ تومن نقد دارم و ۸۰۰ تومن پول خرد",
+  "expect": "SILENT — no operation word, no «=»/«میشه»; «و» between two amounts is not a sum without «میشه» (C28)",
+  "context": "adult; look-alike of D29-2 with no result"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: یخچال ۲۸ میلیون و ۴۰۰، لباسشویی ۱۹ میلیون و ۸۰۰",
+  "expect": "SILENT — a price list with labels and no operation; nothing to judge",
+  "context": "adult; look-alike of the labelled-sum shape"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: قسط‌ها: ۱ میلیون و ۲۰۰، ۱ میلیون و ۳۰۰، ۱ میلیون و ۱۰۰، ۱ میلیون و ۴۰۰، ۱ میلیون و ۵۰۰، ۱ میلیون و ۵۰۰",
+  "expect": "SILENT — six compound amounts with no «+», «=» or «میشه»; no line",
+  "context": "adult; look-alike of the C29-3 shape with no claim"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۰ میلیون ÷ ۳ ≈ ۳ میلیون و ۳۳۳ هزار",
+  "expect": "OK — 3 333 333.3…, «۳ میلیون و ۳۳۳ هزار» is its truncation at the thousand she wrote (C9); stays ✓; the coach line keeps her «≈» (C29-18)",
+  "context": "adult; C136 look-alike a runner judged ✓ (aC3 p35)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۸ میلیون ÷ ۷ ≈ ۱ میلیون و ۱۴۳ هزار",
+  "expect": "OK — 1 142 857.1…; «۱ میلیون و ۱۴۳ هزار» is its rounding at her thousand digits (C9); stays ✓",
+  "context": "adult; C136 look-alike (nB2, judged ✓)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۷ میلیون و ۶۰۰ − ۶۰۰ = ۷ میلیون",
+  "expect": "NOT-FLAG — the units reading (7 000 600 − 600) fits, and a bare «۶۰۰» read as 600 thousand beside it fits too; never ✗; which reading the page names is open (see ambiguities)",
+  "context": "adult; C29-19 shape (runner C rated the units-only wording S3); C136: no ✗ either way"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۸ + ۱۲ = ۳۰ تا کارتن، ۴ تا هم برای فردا می‌مونه",
+  "expect": "OK for the sum; the clause «۴ تا هم برای فردا می‌مونه» has no operands in her text, so it gets no ✗ and is never glued into «۳۰ − ۴» or «۳۰ + ۴» (C85/C108)",
+  "context": "adult; look-alike of C29-1 with a narrative remainder"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۸ + ۷ = ۱۵ و ۳ تا می‌مونه برای داداشم",
+  "expect": "OK — the sum ends at «۱۵» (C109); «و ۳ تا می‌مونه» starts its own statement; the sum is never read as «۸ + ۷ = ۱۵۳» or «۱۵ − ۳»",
+  "context": "child, 9; C109 look-alike (a runner judged «۸ + ۶ = ۱۴ و ۲ تا می‌مونه» ✓)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۳۴ ÷ ۴ = ۸، ۲ تا می‌مونه",
+  "expect": "OK — 34 = 4 × 8 + 2; stays ✓ (runner C judged the same shape right after a division)",
+  "context": "child, 9, marbles; C136 look-alike"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: امروز ۲ × ۳ = ۶ تا نون خریدم، یکی هم از دیروز مونده",
+  "expect": "OK for «۲ × ۳ = ۶»; «یکی هم … مونده» is narrative with no operands: no line, no ✗, nothing glued",
+  "context": "elder, 70; small-talk look-alike"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲۰ درصدِ ۳۵۰ = ۷۰",
+  "expect": "OK — 20% of 350 = 70; the result has no percent unit; never scaled by 100 (C140 «never scale twice»)",
+  "context": "adult; C136 look-alike («۲۰ درصدِ ۳۰۰ = ۶۰», judged ✓)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۵ درصد × ۴ = ۶۰ درصد",
+  "expect": "OK — a percent operand, so the result is in percent units: 15% × 4 = 60% (C140); never «۶۰۰۰٪» or «۰٫۶٪»",
+  "context": "adult; C140 percent-operand look-alike"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ماهی ۲ و ۵ دهم درصد × ۴ ماه = ۱۰ درصد",
+  "expect": "OK — 2.5% × 4 = 10%, percent on both sides; never ✗ «۱۰۰۰٪»",
+  "context": "adult; runner C's owner-like question shape (C140)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲۷۰ تقسیم بر ۶۰۰ میشه ۰٫۴۵، یعنی ۴۵ درصد",
+  "expect": "OK and OK — 270 / 600 = 0.45 and «یعنی ۴۵ درصد» restates it (0.45 = 45/100); no ✗ on the «یعنی» clause",
+  "context": "adult, electricity bill share; C136 look-alike («۳۶۰ تقسیم بر ۵۰۰ میشه ۰٫۷۲، یعنی ۷۲ درصد»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۱۲ ÷ ۱۳۰٫۵ ≈ ۹٫۲٪",
+  "expect": "OK — 12 / 130.5 = 0.0919…, i.e. 9.195…%; «≈ ۹٫۲٪» is its rounding at her one decimal (C9); never scaled on one side only",
+  "context": "adult, a screening test; C136 look-alike («۹ ÷ ۹۸٫۱ ≈ ۹٫۲٪»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲/۶ × ۳/۵ = ۶/۳۰ = ۱/۵، یعنی ۲۰٪",
+  "expect": "OK — 6/30 = 1/5 = 20%; the percent restatement is not ✗",
+  "context": "teen, 16, probability; C136 look-alike («… = ۳/۱۰، یعنی ۳۰٪»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۴۰۰ میلیون ضربدر ۱۸ درصد میشه ۷۲ میلیون",
+  "expect": "OK — 400 M × 18% = 72 M; a percent operand with a scaled result is not double-scaled",
+  "context": "elder, 67, savings; C136 look-alike («۲۵۰ میلیون ضربدر ۲۳ درصد میشه ۵۷.۵ میلیون»)"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: جلسه ساعت ۱۰:۳۰ تا ۱۲ بود، ۱۸ از ۲۰ گرفتم",
+  "expect": "SILENT — a clock time and a score are not arithmetic",
+  "context": "teen, 15; look-alike"
+ },
+ {
+  "rc": "R1.arith_reader",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: ۴ میلیون و ۲۰۰ + ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰",
+  "expect": "the export has ONE clause entry, OK (5.7 M, thousand reading, no question); a sentence with only read clauses may be ✓ as a whole",
+  "context": "adult; C138 look-alike: nothing unread, so the sentence ✓ is right"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵",
+  "expect": "the datum reads «اتاق ۶ متر در ۵ متر»; only that «۴» changes; exact proposals along recorded dependency: گام ۱ ۲۴ ⇒ ۳۰، گام ۲ ۶۰۰۰ ⇒ ۷۵۰۰، گام ۳ ۹۶۰ ⇒ ۱۲۰۰، گام ۴ ۶۹۶۰ ⇒ ۸۷۰۰، گام ۵ ۲۳۲۰ ⇒ ۲۹۰۰ (هزار); «۴ تا پنجره» and «ساعتِ ۴» untouched; PAGE-LEVEL: the ledger marks steps 1–5 stale with these values",
+  "context": "adult; base correction (C29-12 shape: a datum change must reach every dependent ledger step)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵ ‖ [page proposals] ‖ U: متری ۲۵۰ نیست، ۲۸۰",
+  "expect": "proposals recomputed from BOTH current values (width 5, price 280): گام ۲ ⇒ ۸۴۰۰، گام ۴ ⇒ ۹۶۰۰، گام ۵ ⇒ ۳۲۰۰ (هزار); گام ۳ stays ۱۲۰۰; never the ratio values ۹۷۴۴ / ۳۲۴۸ and never ۶۷۲۰ (the stale area 24 × 280); the earlier proposals built on 250 are re-marked, not left as current",
+  "context": "adult; B29·D13, C29-14, D29-10 shape (proposals by ratio or on a stale value)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵ ‖ U: عرض ۵ هم نیست، ۵٫۵",
+  "expect": "the second correction of the same datum is accepted (C142): the datum reads «۶ متر در ۵٫۵ متر», history keeps both («۴ ⇒ ۵ ⇒ ۵٫۵»); proposals: ۳۳، ۸۲۵۰، ۱۳۲۰، ۹۵۷۰، ۳۱۹۰ (هزار); the step label «گام ۵» never becomes «گام ۵٫۵» (D29-5); never «از آن بخش چیزی ثبت نشده بود»",
+  "context": "adult; A29-14 (a second correction of the same datum was refused) + D29-5 label"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ما ۴ نفریم نه ۳ ‖ U: نه ببخشید، ۵ نفریم نه ۴",
+  "expect": "both corrections land; the datum shows 5 with history «۳ ⇒ ۴ ⇒ ۵»; every share is recomputed with 5; never refused as «already corrected»",
+  "context": "adult, sharing a rent; A29-14 shape with «نه ببخشید»"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ارثیه ۹ میلیارد، ۴ نفریم: ۹ ÷ ۴ = ۲٫۲۵ میلیارد ‖ U: ۶ نفریم نه ۴ ‖ U: ۹ نیست، ۱۰٫۸ میلیارد",
+  "expect": "after the second correction the proposal is ۱٫۸ میلیارد (10.8 ÷ 6, both current values); never ۲٫۷ (10.8 ÷ 4 on the stale heirs, or 2.25 × 1.2 by ratio); the first proposal 1.5 is shown as superseded in history",
+  "context": "adult, inheritance; A29-15 (proposals after «۱۲ میلیارد» used the stale 4 heirs)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۴۰ ÷ ۱۶ = ۲٫۵ ‖ U: ۴۰ نیست، ۳۶ ‖ U: ۱۶ هم نیست، ۱۸",
+  "expect": "the last proposal is ۲ (36 ÷ 18, exact); never ≈ ۲٫۲۲ (40 ÷ 18 with the stale 40)",
+  "context": "teen, 16, a recipe ratio; C29-14 shape"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲۰ تا کارتن، هر کدوم ۱۸ هزار: ۲۰ × ۱۸ = ۳۶۰ هزار؛ با ۵۰ هزار نوارچسب: ۳۶۰ + ۵۰ = ۴۱۰ هزار ‖ U: ۱۸ نیست، ۲۰",
+  "expect": "exact proposals: ۳۶۰ ⇒ ۴۰۰، ۴۱۰ ⇒ ۴۵۰ (هزار); never ۴۱۰ ⇒ ≈ ۴۵۵٫۵۶ (ratio 20/18); her own count «۲۰ تا کارتن» is a datum and is never marked stale by the price",
+  "context": "adult, moving; B29·D13 shape (her carton count was marked stale; ratio proposals)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۲۰ تا کارتن، هر کدوم ۱۵ هزار … ‖ U: ۱۵ نیست، ۱۸ ‖ U: ۱۸ هم نیست، ۲۰",
+  "expect": "the second correction of the price replaces the first (history «۱۵ ⇒ ۱۸ ⇒ ۲۰»); the current proposal for the product is ۴۰۰ هزار (20 × 20); the accept-stale line never says «پیشنهادِ دقیقِ جاری» about a value built on 18",
+  "context": "adult; B29·D13 (two corrections of one datum)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: نصبِ متری ۴۰ نبود، ۴۵ بود",
+  "expect": "«X نبود، Y بود» is a correction (C142): گام ۳ ۹۶۰ ⇒ ۱۰۸۰، گام ۴ ۶۹۶۰ ⇒ ۷۰۸۰، گام ۵ ۲۳۲۰ ⇒ ۲۳۶۰ (هزار); گام ۱ and گام ۲ untouched",
+  "context": "adult; C142 shape"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه اصلاحِ دیگه: هر قوطی ۴ لیتر نمیشه، ۵ لیتر میشه",
+  "expect": "«X نمیشه، Y میشه» after «یه اصلاحِ دیگه:» is a correction (C142): the can size becomes 5 with history; never «این اصلاح انجام نشد: … نشانهٔ اصلاح … نبود»",
+  "context": "adult, painting; C29-13 shape"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: هر سبد ۱۲ تا سیب نمیشه، ۱۰ تا میشه",
+  "expect": "a correction (C142) without a lead phrase: the count 12 ⇒ 10 in the datum it names; dependent steps get exact proposals",
+  "context": "child, 10, «نمیشه، … میشه» with no «اصلاح» word"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: ۴ نیست، ۵",
+  "expect": "the page asks which «۴» (C143/C88): the width, the windows («۴ تا پنجره») or the hour («ساعتِ ۴»); nothing changes until she answers; no proposal shown yet",
+  "context": "adult; C143 (her sentence names no quantity)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۸ تا پنل، هر کدوم ۵ میلیون: ۸ × ۵ = ۴۰ میلیون. شیشه‌ش ۵ میلی‌متره ‖ U: ضخامتِ شیشه ۵ نیست، ۶ میلی‌متره",
+  "expect": "the correction binds to the thickness her sentence names; the panel price «۵ میلیون» and «۴۰ میلیون» are untouched and not stale; no proposal on 40",
+  "context": "adult, solar panels; C29-10 shape (the price «۵» was confused with «۵ میلی‌متر»)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۸ تا پنل، هر کدوم ۴٫۵ میلیون: ۸ × ۴٫۵ = ۳۶ میلیون. شیشه ۵ میلی‌متره ‖ U: پنل ۴٫۵ نیست، ۵ میلیون ‖ [page: ۳۶ ⇒ ۴۰] ‖ U: ضخامت ۵ نیست، ۶ ‖ U: آره، همون ۴۰ میلیون درسته",
+  "expect": "the acceptance acts: the step is rewritten to «۸ × ۵ = ۴۰ میلیون» (its base, the price 5, is current; the thickness change is not a base of it); never «پیشنهادِ «۳۶ ⇒ ۴۰» بر «۵» بنا بود که بعداً «۶ میلی‌متر» شد»",
+  "context": "adult; C29-10 p31 (a correct acceptance was refused)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: مجموعِ ۱/(n(n+1)) برای n از ۱ تا ۱۵ چند میشه؟ ‖ U: منظورم n از ۱ تا ۳۰ بود، نه از ۱ تا ۱۵",
+  "expect": "the range is replaced as one unit: the statement reads «… برای n از ۱ تا ۳۰ چند میشه؟» (or the page asks which part to change); never a garbled «n از ۱ تا ۳۰ n = ۱ تا ۱۵»; the old statement stays in history",
+  "context": "teen, 17, a telescoping sum; C29-15 shape"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: عرضِ باغچه ۶ نیست، ۵ متره",
+  "expect": "the statement «باغچه‌ای به طولِ ۹ متر و عرضِ ۶ متر …» becomes «… عرضِ ۵ متر …»; «متره» is never pasted into it; the rest of her statement stays byte-exact (D29-26 regression)",
+  "context": "adult, a garden plot; D29-26 shape («عرض ۵ نیست، ۴» no longer changed the statement)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵ ‖ [page: گام ۴ ۶۹۶۰ ⇒ ۸۷۰۰] ‖ U: متری ۲۵۰ نیست، ۲۸۰ ‖ U: آره، همون ۸۷۰۰ درسته",
+  "expect": "NOT rewritten: the page names the stale base and its current value («این پیشنهاد روی ۲۵۰ ِ کهنه ساخته شده — الان ۲۸۰ است») and shows the current exact value ۹۶۰۰; never «✓ پیشنهادِ صفحه را پذیرفتی — «۶۹۶۰ ⇒ ۸۷۰۰»»",
+  "context": "adult; C29-11 shape (a proposal built on a value corrected later was accepted)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵ ‖ U: آره، همون ۸۷۰۰ درسته",
+  "expect": "accepted (all bases current): گام ۴ reads ۸۷۰۰ with history «اصلاح شد ⇐ ۶۹۶۰»; its dependant گام ۵ gets its own exact proposal ۲۳۲۰ ⇒ ۲۹۰۰ (C68); nothing else changes silently",
+  "context": "adult; C87/C68 positive"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: قرنیز: دورِ اتاق ۲ × (۶ + ۴) = ۲۰ متر، متری ۱۵۰ هزار: ۲۰ × ۱۵۰ = ۳۰۰۰ هزار. شاخه‌ها ۳ متری‌ان: ۸ × ۳ = ۲۴، ۴ متر می‌مونه ‖ U: متری ۱۵۰ نیست، ۱۸۰",
+  "expect": "one proposal ۳۰۰۰ ⇒ ۳۶۰۰ هزار (20 × 180); the perimeter 20, «۸ × ۳ = ۲۴» and «۴ متر می‌مونه» are not dependants of the price and are never stale; never «۲۰ ⇒ ۲۴» or «۸ ⇒ ۹٫۶» by scaling",
+  "context": "adult; D29-11 shape (a remainder clause and counts were scaled by 180/150)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: کفِ هال ۵٫۵ در ۴ = ۲۲ متر، متری ۱۵۰ هزار: ۲۲ × ۱۵۰ = ۳۳۰۰ هزار ‖ U: ۱۵۰ نیست، ۱۶۰ ‖ U: ۱۶۰ هم نیست، ۱۸۰",
+  "expect": "the current proposal is ۳۹۶۰ هزار (22 × 180); never ۳۶۰۰ (built on the stale 20 m² or by a ratio of the last step only); the 📜 line text agrees with the ledger",
+  "context": "adult, flooring; D29-10/D29-11 (three values of one price; exact 3960)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: ۵ × ۵ = ۲۵ تا کاشی لازمه ‖ U: … با ۴ تا ردیف کافیه. پس جوابم غلط بود",
+  "expect": "her earlier result is marked as rejected by her («ردشده به حرفِ خودت») and stays as written in history; the record is never rewritten into another of her lines (C74); the coach is told she withdrew it",
+  "context": "adult; D29-23 shape (the rejected record was rewritten)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "page",
+  "text": "[مسئلهٔ موکت in the prior ledger] U: اتاق ۶ در ۴ نبود، ۶ در ۴٫۵ بود",
+  "expect": "PAGE-LEVEL: the ledger view shows steps 1–5 re-marked stale with exact proposals (۲۷، ۶۷۵۰، ۱۰۸۰، ۷۸۳۰، ۲۶۱۰ هزار) and the earlier open proposals re-marked; not only «داده به حرفِ خودت» changed",
+  "context": "adult; C29-12 (a datum change did not re-mark the ledger)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "page",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵ ‖ U: متری ۲۵۰ نیست، ۲۸۰",
+  "expect": "PAGE-LEVEL: the 📜 history of گام ۴ shows the two corrections in order and the current proposal ۹۶۰۰; one history line per change, each with only «اصلاح شد ⇐» (never «⇐» and «→» in one line)",
+  "context": "adult; B24·D16 seen with two corrections"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: اگه عرض ۵ بود چی؟",
+  "expect": "a hypothetical (C46): nothing changes, no proposal is booked; the coach answers",
+  "context": "adult; C46 look-alike of a correction"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: اتاق ۵ تا پنجره داره نه ۴",
+  "expect": "only the window count changes; no ledger step is stale (no recorded dependency on windows); no proposal; the width 4 untouched",
+  "context": "adult; C143 named quantity"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۲۳ تا سیب رو با ۱۲ تا سبد نمیشه مساوی تقسیم کرد",
+  "expect": "not a correction («نمیشه» without a replacement value): nothing changes; the coach answers",
+  "context": "child, 10; C142 look-alike"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: پارسال قیمتش ۲۵۰ نبود، خیلی ارزون‌تر بود",
+  "expect": "not a correction: past narrative, «X نبود» without Y; the price 250 stays; nothing re-marked",
+  "context": "adult; C142 look-alike («X نبود، Y بود» needs Y)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵ ‖ U: آره، همون ۸۸۰۰ درسته",
+  "expect": "nothing rewritten: 8800 is not the page's proposal (8700); the page says so and keeps the step",
+  "context": "adult; a wrong value accepted (C87)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵ ‖ U: نه، ۸۷۰۰ رو قبول ندارم، خودم دستی حساب می‌کنم",
+  "expect": "not an acceptance: the proposal stays open; nothing rewritten",
+  "context": "adult; negation look-alike"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: جمع ۶۹۶۰ نیست، ۶۹۰۰",
+  "expect": "a result fix the page's own check rejects (6000 + 960 = 6960, C8): not applied; the page shows its computation and asks; no datum changes",
+  "context": "adult; C88 «fixing a result never changes a datum» with a wrong fix"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: فکر کنم جوابم غلط باشه؟",
+  "expect": "a question: nothing is marked rejected, nothing rewritten; the coach answers (C46)",
+  "context": "adult; look-alike of «پس جوابم غلط بود»"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: طول ۶ نیست، ۷",
+  "expect": "the length becomes 7; «۶ سال پیش موکت کرده بودیم» is untouched and not stale (equal digits are not dependency, C66); proposals ۲۸، ۷۰۰۰، ۱۱۲۰، ۸۱۲۰ and the exact third ۸۱۲۰/۳ (≈ ۲۷۰۶٫۶۷) — no invented rounding",
+  "context": "adult; C66/C112"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: یه اصلاحِ دیگه هم بکنم؟",
+  "expect": "a question: no correction, no refusal line; the coach answers",
+  "context": "adult; C142 look-alike (lead phrase without content)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۸ × ۳ = ۲۴، ۴ متر می‌مونه ‖ U: شاخه‌ها ۳ متری نیست، ۴ متری‌ان",
+  "expect": "the product gets the exact proposal ۸ × ۴ = ۳۲ and the remainder clause its own recomputation (if 20 m was stated, 32 − 20 = 12 left over — shown as a proposal, not silently rewritten); the remainder is never treated as a factor of the product",
+  "context": "adult; C141 with a correction (the clause has its own recorded operands)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: عرضِ اتاقِ دوم ۴ نیست، ۳",
+  "expect": "only the second room's width changes; the first room («۶ متر در ۴ متر») and its ledger are untouched; never «both changed» (C110 needs the same meaning)",
+  "context": "adult; C110 look-alike (same digits, another quantity)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: منظورم n از ۱ تا ۲۰ بود",
+  "expect": "with no old range named and one range in the statement, the range «از ۱ تا ۱۵» is replaced as one unit (or the page asks); no other «۱» in the statement changes",
+  "context": "teen; C88 range with a bare restatement"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: آهان، اصلاً ۵ متر بود، نه ۴ — اگه ۶ بود چی می‌شد؟",
+  "expect": "the fact is a correction (4 ⇒ 5, C74); the hypothetical «اگه ۶ بود» changes nothing and goes to the coach",
+  "context": "adult; C74 mixed message"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: نصاب ساعتِ ۴ نمیاد، ساعتِ ۵ میاد",
+  "expect": "only the hour changes («X نمیشه/نمیاد، Y» about the visit time); the width «۴» and every ledger step are untouched; no proposal",
+  "context": "adult; C143 equal digits with a named quantity"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: عرض ۴ نیست، ۵ ‖ U: نه ببخشید، همون ۴ درست بود",
+  "expect": "a take-back: the width returns to 4 with both changes in history; the proposals built on 5 are withdrawn (marked superseded), nothing stays stale",
+  "context": "adult; C5/C142 look-alike (a correction undone)"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: ۵ × ۵ = ۲۵ تا کاشی لازمه ‖ U: پس جوابم غلط نبود، درسته",
+  "expect": "not a rejection: nothing is marked «ردشده»; the line keeps its ✓",
+  "context": "adult; D29-23 look-alike"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت] U: متری ۲۵۰ نیست، ۲۸۰ ‖ U: عرض ۴ نیست، ۵",
+  "expect": "the same end state in the other order: current proposals ۳۰، ۸۴۰۰، ۱۲۰۰، ۹۶۰۰، ۳۲۰۰ (هزار); never ۶۷۲۰ × 30/24 = ۸۴۰۰ reached by scaling the first proposal, never ۹۷۴۴ — the function recomputes from the data, so order does not matter",
+  "context": "adult; C89 order-independence"
+ },
+ {
+  "rc": "R2.correction_engine",
+  "kind": "pos",
+  "role": "chat",
+  "text": "[مسئلهٔ موکت, where the datum «اتاق ۶ متر در ۴ متر» and گام ۱ «۶ × ۴ = ۲۴» both carry the width] U: عرض ۴ نیست، ۵",
+  "expect": "the width changes in BOTH places (same quantity, same meaning) with ONE history line naming both (C110); «۴ تا پنجره» untouched; گام ۱ proposal ۳۰",
+  "context": "adult; C110 one quantity written twice"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: آهان، ۹ میلیون منهای ۵ میلیون و ۷۵۰ میشه ۳ میلیون و ۲۵۰",
+  "expect": "her fix of گام ۴ is applied: the engine reads 9 000 000 − 5 750 000 = 3 250 000 ✓ (thousand reading), and the ledger uses the SAME verdict (C139): گام ۴ ✓ «اصلاح‌شده به حرفِ خودت», the resume point moves past it; never «گامِ ۴ متنِ تازه هنوز نمی‌خواند»; the coach is told گام ۴ ✓",
+  "context": "adult; S1 family B29·D11 (the ledger re-read «۵ میلیون و ۷۵۰» as 5 and 750 and contradicted the engine)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[مسئلهٔ اسباب‌کشی] U: آهان، ۹ میلیون منهای ۵ میلیون و ۷۵۰ میشه ۳ میلیون و ۲۵۰",
+  "expect": "PAGE-LEVEL: in her 📜 the line carries ✓ and the ledger step 4 shows ✓ with its old ✗ in history; no line «… هنوز نمی‌خواند» anywhere in 📜; the turn question no longer asks her to re-check گام ۴",
+  "context": "adult; S1 family B29·D11, the view the runner saw"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: کامیون ۳ میلیون و ۶۰۰ نیست، ۴ میلیون ‖ U: پس ۹ میلیون منهای ۶ میلیون و ۱۵۰ = ۲ میلیون و ۸۵۰",
+  "expect": "after the correction (گام ۱ ⇒ ۵ میلیون و ۴۰۰، گام ۳ ⇒ ۶ میلیون و ۱۵۰) her redo of گام ۴ is ✓ (9 − 6.15 = 2.85 million) in the engine AND in the ledger; one judge, no second verdict",
+  "context": "adult; S1 family B29·D11, second fix after a datum change («… منهای ۶ میلیون و ۶۰۰ = ۱ میلیون و ۴۰۰» shape)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: ۹ میلیون منهای ۵ میلیون و ۷۵۰ میشه ۳ میلیون و ۳۵۰",
+  "expect": "a wrong fix is not applied (C8): the ledger says what the ENGINE says — ✗ with «۳ میلیون و ۲۵۰ هزار» and «۳ میلیون و ۹۹۹ هزار و ۲۵۰» in her words (C103); no separate «نمی‌خواند» wording from a second reader",
+  "context": "adult; S1 family B29·D11, the negative side (one judge also when she is wrong)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: گامِ ۴: ۹ میلیون منهای ۵ میلیون و ۷۵۰ هزار تومن = ۳ میلیون و ۲۵۰ هزار تومن",
+  "expect": "applied ✓ — explicit «هزار» and «تومن» are read by the same engine; the ledger never reads «هزار تومن» as an extra factor",
+  "context": "adult; S1 family B29·D11 with explicit scale words (C135)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[مسئلهٔ اسباب‌کشی, گام ۴ ✗ «۴ میلیون و ۲۵۰»] U: اون گامِ ۴ رو یه لحظه کنار بذار؛ کارتن‌ها رو چطور ببندم؟",
+  "expect": "a second reader that cannot parse a ledger step may only add «نسنجیده» (C139); the prompt never carries two contradicting verdicts for one step (engine ✗ and ledger «✓» or vice versa)",
+  "context": "adult; C139 rule stated in the prompt view"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: راستی کارتن‌ها رو مامانم آورد، ۳۰ تا بود",
+  "expect": "not a redo of گام ۱ or گام ۲: no «متنِ تازه‌ات» is recorded for any step; گام ۲ stays as she wrote it (the count agrees)",
+  "context": "adult; D29-7 (each later message became a fake redo of step 1)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[opening: «گام ۱: پذیرایی ۵ متر در ۴ متر = ۲۰ … گام ۲: …»] U: نه، ۲۰ نیست؛ منظورم طول بود: ۵٫۵ متر",
+  "expect": "PAGE-LEVEL: the ledger shows گام ۱ as «پذیرایی ۵٫۵ متر در ۴ متر = ۲۰» stale with the exact proposal ۲۲, or the page asks; never a fabricated sentence «پذیرایی ۵٫۵ متر در ۴ متر = ۲۰» presented as «متنِ تازه‌ات», and no «گامِ ۱ متنِ تازه هنوز نمی‌خواند» lines in 📜 for her later messages",
+  "context": "adult, parquet; D29-7 shape"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: کارگر رو هم داداشم پیدا کرد. ساعت ۸ صبح میان.",
+  "expect": "no ledger step is touched: no redo, no new «متنِ تازه», no stale mark",
+  "context": "adult; D29-7 negative-shape sentence that must stay inert (asserted as the pos of «no fabrication»)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[مسئلهٔ اسباب‌کشی] U: آهان، ۹ میلیون منهای ۵ میلیون و ۷۵۰ میشه ۳ میلیون و ۲۵۰",
+  "expect": "PAGE-LEVEL: گام ۲ (unchanged) keeps its whole reason «۳۰ تا کارتن، چون سه اتاق و یه آشپزخونه داریم» — never cut at «و», never stamped «دلیلِ پیشینی که دیگر برقرار نیست کنار رفت»; only گام ۴ gets a history line",
+  "context": "adult; B29·D25 (whyLine misfire on unchanged steps, seen in four B runs)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[opening: «گام ۱: ۳۶ ÷ ۲ = ۱۸ و نصفِ محیط همینه … گام ۲: …»] U: گامِ ۲ رو درست کردم: …",
+  "expect": "PAGE-LEVEL: گام ۱'s reason stays «۳۶ ÷ ۲ = ۱۸ و نصفِ محیط همینه» byte-exact; no «کنار رفت» line on it; only گام ۲ changes",
+  "context": "adult, a picture frame; B29·D25 shape"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[مسئلهٔ اسباب‌کشی] U: گامِ ۲ رو عوض کنم: ۳۲ تا کارتن، چون انباری هم هست: ۳۲ × ۲۵ هزار = ۸۰۰ هزار",
+  "expect": "PAGE-LEVEL: گام ۲ IS fixed (32 × 25 000 = 800 000 ✓), so its OLD reason goes to history with «کنار رفت» — correct here; dependants گام ۳ and گام ۴ get exact proposals (۵ میلیون و ۸۰۰؛ ۳ میلیون و ۲۰۰)",
+  "context": "adult; the C27-21 rule where it SHOULD fire (look-alike of B29·D25)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی open] U: یه مسئلهٔ دیگه هم دارم: میزِ آشپزخونه. خودم حساب کردم: گام ۱: دیوار ۲۴۰ سانته؛ گام ۲: ۹۰ + ۷۰ + ۷۰ = ۲۳۰، پس جا میشه.",
+  "expect": "the second problem gets its own record AND its own prior block (C7/C56 at its opening): two steps with verdicts (۹۰ + ۷۰ + ۷۰ = ۲۳۰ ✓); nothing is merged into the moving ledger",
+  "context": "adult; s28 p4 / C25-7′ (no prior block at a second problem's opening)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[two problems as above]",
+  "expect": "PAGE-LEVEL: the kitchen-table dossier shows «کارِ پیشینِ تو» with its 2 steps; the moving dossier still shows its own 4 steps only; each 🧭 strip is its own (B29·D15 shape)",
+  "context": "adult; C97 + C25-7′, page view"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: سلام، یه مسئله دارم: می‌خوام قفسه بسازم. خودم حساب کردم: سه تا طبقهٔ ۸۰ سانتی میشه ۳ × ۸۰ = ۲۴۰، اندازهٔ دیوار.",
+  "expect": "one relation with a computed value at the opening fires the prior block, even as the only step (C7/C56): گام ۱ ✓ (240)",
+  "context": "adult; C56 one-step opening"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی closed] U: یه چیزی یادم اومد: انعامِ کارگرها هم ۲۰۰ هزار شد، پس ۵ میلیون و ۹۵۰",
+  "expect": "a later report about the SAME problem merges into its ledger after closure (C56): a new step 5.75 M + 0.2 M = 5.95 M ✓ (thousand reading); the closed problem is offered on «امروز», not silently reopened (C36)",
+  "context": "adult; C56 after closure"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: گامِ ۴ رو قبول ندارم، ۹ منهای ۵ و ۷۵۰ همون ۴ و ۲۵۰ میشه",
+  "expect": "a dispute: the page re-checks by recomputation once and keeps ✗ (C6/C29), pointing at the part that does not read («۹ − ۵٫۷۵ = ۳٫۲۵») without overriding the engine; at most one dispute question",
+  "context": "adult; C29/C139"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: ۹ منهای ۵ و ۷۵۰ صدم میشه ۳ و ۲۵ صدم دیگه، نه؟",
+  "expect": "a bare question about a calculation (C98): no prior block, at an opening or mid-chat; the coach answers",
+  "context": "adult; C98 look-alike"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: سلام، ماهِ دیگه اسباب‌کشی داریم؛ بودجه‌ام ۹ میلیونه. از کجا شروع کنم؟",
+  "expect": "a bare problem statement with no worked step: no prior block (C7)",
+  "context": "adult; C7 look-alike"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: اگه کامیون ۴ میلیون بود چی؟",
+  "expect": "a hypothetical (C46): not a dispute, not a correction; the ledger and its verdicts do not change; no retract block",
+  "context": "adult; C46"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: راستی بچه‌ها امروز ۲ × ۵ = ۱۰ تا شیرینی خوردن",
+  "expect": "small talk mid-session: ✓ for the arithmetic, but no ledger step, no prior block, no redo of any step",
+  "context": "adult; C136 look-alike (runner B judged it right: «not prior work»)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: ۹ میلیون منهای ۵ میلیون و ۷۵۰ میشه ۴ میلیون و ۲۵۰",
+  "expect": "re-typing her ✗ line without objection is not a dispute and not a fix: گام ۴ stays ✗, no «re-checked» message, no second ✗ line in 📜",
+  "context": "adult; re-typed wrong line"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: یه سؤالِ دیگه: کارتن‌ها رو چطور ببندم که نشکنن؟",
+  "expect": "not a new problem with its own unknown that needs a ledger (no statement, no numbers): no second prior block; the coach answers inside the same session",
+  "context": "adult; C97 look-alike"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[opening as in the base] U: باشه، از گامِ ۴ شروع کنیم",
+  "expect": "the resume question never asks again for steps 1–3 (they are ✓); nothing is re-judged",
+  "context": "adult; resume-point look-alike"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: ۹ میلیون منهای ۵ میلیون و ۷۵۰ میشه ۳ میلیون و ۲۵۰، درسته؟",
+  "expect": "a fix with a question tag still lands (✓ by the engine) and the coach answers «درسته»; not treated as a bare question about someone else's number (C98 is for a question with no worked claim of hers in the ledger context)",
+  "context": "adult; C98/C139 boundary — ambiguity noted"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "page",
+  "text": "[مسئلهٔ اسباب‌کشی] (no message changes گام ۲)",
+  "expect": "PAGE-LEVEL: at the end of the session گام ۲ has no history line at all (no «کنار رفت», no «اصلاح شد»)",
+  "context": "adult; B29·D25 control"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: یه مسئلهٔ دیگه: دخترم می‌پرسه ۷ × ۸ چند میشه",
+  "expect": "a separate question with its own unknown gets its own record if she calls it «مسئله» (C97), but no prior block (no worked step); the moving ledger is untouched",
+  "context": "adult; C97 vs C7 boundary"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: همون ۵ میلیون و ۷۵۰ که خودت گفتی رو قبول دارم",
+  "expect": "repeating the coach's or page's number as hers keeps it hers (C79); no «کارِ دیگری»; no new step",
+  "context": "adult; C79"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: ۱۸ + ۱۲ = ۳۰ تا کارتن؛ مامانم کمکم کرد بشمارم",
+  "expect": "her own sentence that mentions a helper stays hers (C96): a step of her ledger with ✓, never «کارِ دیگری»; no redo of گام ۲ text since the count is the same",
+  "context": "adult; C136 look-alike (runner C judged «مامانم کمکم کرد» right)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: داداشم حساب کرد ۳ × ۲۵۰ هزار = ۷۵۰ هزار برای کارتن",
+  "expect": "another person's calculation: «کارِ دیگری» (C57/C125), checked ✓ but never booked as her step or a redo of گام ۲",
+  "context": "adult; C57 look-alike"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[opening: «گام ۱: کامیون ۲ میلیون و ۸۰۰ + کارگر ۱ میلیون و ۷۰۰ = ۴ میلیون و ۵۰۰ · گام ۲: ۷ میلیون منهای ۴ میلیون و ۵۰۰ = ۳ میلیون و ۵۰۰»]",
+  "expect": "the prior block judges with the engine: گام ۱ ✓ (2.8 + 1.7 = 4.5 million), گام ۲ ✗ (7 − 4.5 = 2.5 million; ✗ names «۲ میلیون و ۵۰۰ هزار» and the units reading «۲ میلیون و ۹۹۹ هزار و ۵۰۰»); resume point گام ۲",
+  "context": "adult; C139 at the opening (the ledger and the engine agree from the first message)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[opening as above] U: آره، ۷ میلیون منهای ۴ میلیون و ۵۰۰ میشه ۲ میلیون و ۵۰۰",
+  "expect": "her fix lands ✓ in the ledger (one judge); the resume point moves on; the turn question asks the next piece, not گام ۲ again",
+  "context": "adult; S1 family B29·D11, second shape"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی closed] U: یه مسئله‌ی دیگه: خونه‌ی جدید ۳ تا اتاق داره؛ خودم حساب کردم ۳ × ۴ = ۱۲ لیتر رنگ لازمه",
+  "expect": "a new problem after closure gets its own record and its own prior block (one step, 3 × 4 = 12 ✓); the closed moving ledger is never extended (C97, D28-6)",
+  "context": "adult; C97 after closure"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "pos",
+  "role": "page",
+  "text": "[مسئلهٔ اسباب‌کشی, after her fix of گام ۴]",
+  "expect": "PAGE-LEVEL: 🧭 and the dossier show «کارِ پیشینِ تو» with گام ۱–۳ ✓ and گام ۴ ✓ (fixed), the counts agree with 📜; the mind card credits the fixed step to her",
+  "context": "adult; S1 family B29·D11, view check (roadmap §21 «کارنامه»)"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: گامِ ۲ درسته دیگه؟",
+  "expect": "a bare question about her own ✓ step: no dispute, no re-check message, no change; the coach answers",
+  "context": "adult; C98 look-alike"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: کامیون ۳ میلیون و ۶۰۰ بود؛ همون رو گفتم",
+  "expect": "restating a datum unchanged: no correction, no history line, no redo of گام ۱",
+  "context": "adult; D29-7 look-alike"
+ },
+ {
+  "rc": "R3.prior_work",
+  "kind": "neg",
+  "role": "events",
+  "text": "[مسئلهٔ اسباب‌کشی] U: ۵ میلیون و ۷۵۰ هزار تومن = ۵ میلیون و ۷۵۰",
+  "expect": "an identity she writes about her own scale (thousand reading, ✓); it changes no step and the ledger does not re-read it with a second reader",
+  "context": "adult; C139 look-alike"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[booked: 📌 «فردا به بانک زنگ می‌زنم» (D0+1) and 📌 «پس‌فردا به صاحب‌خونه زنگ می‌زنم» (D0+2)] [clock → D0+1] U: زنگ زدم",
+  "expect": "the page asks «کدام؟» naming both («به بانک» / «به صاحب‌خونه»); NOTHING closes until she answers; PAGE-LEVEL: both stay in the open-plans list",
+  "context": "adult; B29·D19 shape (the call she had not made was closed)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[same two calls] [clock → D0+1] U: زنگ زدم ‖ [page: «کدام؟»] ‖ U: به بانک",
+  "expect": "the bank call closes «انجام شد» on D0+1; the landlord call stays open on D0+2; PAGE-LEVEL: «امروز» and the plan list show the bank done and the landlord open (A29-6: the answer had no visible effect)",
+  "context": "adult; A29-6 + C117"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[same two calls] [clock → D0+1] U: به بانک زنگ زدم. صاحب‌خونه بمونه برای فردا",
+  "expect": "bank closed on D0+1 (named object, no «کدام؟»); «صاحب‌خونه بمونه برای فردا» is read as the landlord call's day counted from D0+1, i.e. D0+2 — its own booked day, so it stays booked there with no new ask; it is never closed",
+  "context": "adult; B29·D19 (her reopening sentence was not read)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[one ask row for two acts: «گاز ⟨D0+2⟩ · مدرسه ⟨D0+3⟩ — درست است؟»] U: زنگ زدم",
+  "expect": "the page asks «کدام؟» (C117); the pending date ask is neither booked nor silently dropped — it stays open or is closed with «بی‌جواب ماند» shown; the school call is never lost from every list",
+  "context": "adult; D29-18 shape (one plan «انجام شد», the ask vanished, the school call nowhere)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[same row] U: ⟨D0+2, written as day + month name⟩ و ⟨D0+3, written as day + month name⟩ درسته",
+  "expect": "both acts are booked: gas on D0+2, school on D0+3; never «هیچ» (D29-18: «۲ آذر و ۳ آذر درسته» booked nothing)",
+  "context": "adult; D29-18 + C145 «X درسته» with two days"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[two pending asks: «فردا بانک — ⟨D0+1⟩ — درست است؟», «پس‌فردا صاحب‌خونه — ⟨D0+2⟩ — درست است؟»] U: آره، فردا و پس‌فردا",
+  "expect": "both are booked in order: bank D0+1, landlord D0+2; [clock → D0+1] the bank call is never re-asked as «D0+2 (به‌جای D0+1)» — «فردا» stays anchored to the day she said it (C49)",
+  "context": "adult; B29·D18 (only the landlord was booked, «فردا» re-anchored)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "edit",
+  "text": "[📌 «پنجشنبه جلسه با مدیر» booked; ✏️ → «سه‌شنبه جلسه با مدیر», and that Tuesday has passed] [page: «این روز گذشته — کدام روز؟»] U: سه‌شنبه‌ی هفته‌ی بعد، ⟨D0+8, written as day + month name⟩",
+  "expect": "clock on a Monday: «سه‌شنبه‌ی هفته‌ی بعد» = D0+8 and matches the written day, so it is booked on D0+8; the meeting stays in the open-plans list; never «پرسشِ تاریخ بی‌جواب ماند» and never «هنوز تأیید نشده» after this answer",
+  "context": "adult; B29·D20"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[page: «پس‌فردا — ⟨D0+2⟩ — درست است؟»] U: باشه، پس‌فردا صبح انجامش میدم",
+  "expect": "booked on D0+2 (a yes plus her restating the asked day, C49); never «بی‌جواب ماند و چیزی ثبت نشد»",
+  "context": "adult; D29-25 regression"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[page: «پس‌فردا — ⟨D0+2⟩ — درست است؟»] U: یادداشتش کردم. پس‌فردا صبح انجامش میدم",
+  "expect": "booked on D0+2 — restating the asked day books it even without «بله» (C49/C145); the past-tense «یادداشتش کردم» refers to her own note and closes nothing",
+  "context": "adult; D29-25 shape («ثبتش کردم. …», round 28 booked it)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "edit",
+  "text": "U (original): پنجشنبه با مدیرم جلسه دارم و تا ⟨D0+30, written as day + month name⟩ باید امتحانِ آیلتس بدم ‖ ✏️ → سه‌شنبه با مدیرم جلسه دارم و تا ⟨D0+30, …⟩ باید امتحانِ آیلتس بدم",
+  "expect": "only the meeting is re-dated (one confirm for the new Tuesday); the exam deadline D0+30 is untouched: never «جایگزین شد؛ روزِ تازه پرسیده شد» on it; PAGE-LEVEL: the exam stays in «امروز» / the plan list",
+  "context": "adult; B29·D21 (the ✏️ closed the other act's deadline)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "edit",
+  "text": "U (original): فردا بانک، پس‌فردا داروخونه ‖ ✏️ → فردا بانک، سه روز دیگه داروخونه",
+  "expect": "only the pharmacy act changes: D0+2 ⇒ D0+3 counted from the day the sentence was SAID (C93), one confirm; the bank plan keeps its booking and history has no line for it",
+  "context": "adult; C144 with two plans in one sentence"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[open 📌 «⟨D0−5⟩ برم بانک فرم رو بدم» still open] U: ⟨D0−3, written as day + month name⟩ رفتم بانک و فرم رو دادم",
+  "expect": "the bank act is recorded done on D0−3 (C94/C146); no «کدام روز؟», no plan date, no «این روز گذشته» question",
+  "context": "adult; C146 (runner C's question to the coordinator)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "edit",
+  "text": "[📌 «فردا می‌رم بانک»] ✏️ → ⟨D0−2, written as day + month name⟩ رفتم بانک",
+  "expect": "a past-tense act with a past day: recorded done on D0−2; C93's «این روز گذشته — کدام روز؟» is NOT asked (C146: it applies only to a plan whose day lands in the past)",
+  "context": "adult; C146 vs C93 in the ✏️ path"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[pending «⟨D0−1⟩ می‌رم داروخونه … گذشته — کدام روز؟»] U: پسفردا می‌رم بیمه رو تمدید کنم",
+  "expect": "a NEW plan «بیمه» on D0+2 with its own confirm; the pharmacy ask stays open and untouched — never «📌 «… داروخونه» — D0+2»; PAGE-LEVEL: the plan list contains the insurance plan",
+  "context": "adult; C29-6 (the insurance day booked the pharmacy ask; ZWNJ missing in «پسفردا»)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "U: اندازه‌گیریِ بعدی ⟨D0−20, written as day + month name⟩ ـه",
+  "expect": "a plan whose stated day is already past ⇒ «این روز گذشته — کدام روز؟» (C93/C147); never the same day of next year offered or booked",
+  "context": "adult; A29-17 (30 Aban said on 3 Dey became next year)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "U: بنگاه پنجشنبه، بانک هم پنجشنبه ‖ [two asks] ‖ U: بانک پنجشنبه نه، شنبه",
+  "expect": "only the bank moves to the first Saturday after D0 (with its confirm); the agency stays on Thursday; the negated Thursday is never booked for the bank (C51/C92)",
+  "context": "adult, clock on a Tuesday (Thursday = D0+2, Saturday = D0+4); A28-1 p24 STILL in round 29"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "U: وسطِ ماهِ دیگه، یعنی حدودِ ⟨day 15 of the next Jalali month, written as day + month name⟩، کولر رو سرویس می‌کنم",
+  "expect": "booked on that day with her own words as label («از حرفِ خودت: حدودِ …»); no «وسطِ ماه — کدام روز؟» row and no «… درست است؟» (C133)",
+  "context": "adult; C29-21, D29-20, A29-5 (two contradictory asks)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[pending «وسطِ ماه — کدام روز؟» for «وسطِ ماه بیمه رو تمدید می‌کنم»] U: وسطِ ماه یعنی حدودِ ⟨day 15 of D0's Jalali month or the next, as she writes it⟩",
+  "expect": "her reply answers the pending row: booked with her words, one row in all (no second row, no extra confirm)",
+  "context": "adult; A29-5 (a second row remained)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "page",
+  "text": "[after the two entries above]",
+  "expect": "PAGE-LEVEL: «امروز» shows exactly one row per act with the day she gave; no row reads «کدام روز؟» for an act already booked",
+  "context": "adult; C133 view check"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[two pending asks as in C145] U: آره",
+  "expect": "a bare yes binds only the newest ask (C49): the landlord call on D0+2 is booked; the bank ask stays open",
+  "context": "adult; C145 «a single yes binds the newest»"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[pending «پنجشنبه برهانِ دوم رو می‌نویسم — ⟨first Thursday after D0⟩ — درست است؟»] U: امروز خیلی خسته‌ام، دیشب بد خوابیدم",
+  "expect": "a mood sentence never moves a plan (C147): the Thursday ask stays as it is; never re-dated to today",
+  "context": "adult; A29-12"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "U: ۶۰ درصد مطمئنم جمعه بارون میاد و کوه کنسل میشه",
+  "expect": "no 📌, no 📅 plan ask «در «امروز» بیاید؛ درست است؟» from the date reader (C152); the only question is the 🎯 due confirm, owned by forecast",
+  "context": "adult; B29·D8 / C29-7 shape, date side"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[one open 📌 «فردا به بانک زنگ می‌زنم»] [clock → D0+1] U: زنگ زدم",
+  "expect": "one call plan: it closes «انجام شد» on D0+1 with no «کدام؟» (C94)",
+  "context": "adult; C117 look-alike with one candidate"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[open 📌 «فردا به بانک زنگ می‌زنم»] U: هفتهٔ پیش به مامانم زنگ زدم، حالش خوب بود",
+  "expect": "another object and a past week: the bank call does not close; no ask",
+  "context": "adult; C94 look-alike"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[open 📌 «فردا می‌رم بانک»] U: داداشم دیروز رفت بانک",
+  "expect": "another person's past act (C19): nothing closes, no ask",
+  "context": "adult; C146 look-alike"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "U: دیروز رفتم کتابخونه، کتابِ آمار رو گرفتم",
+  "expect": "a past narrative with no open plan: no plan, no «کدام روز؟», no «انجام شد» row invented",
+  "context": "teen, 16; C146 look-alike"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[pending pharmacy «کدام روز؟»] U: پسفردا مامانم می‌ره داروخونه",
+  "expect": "another person's act: no plan of hers, and the pending pharmacy ask is NOT answered by this day (C147/C19)",
+  "context": "adult; C29-6 look-alike"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "U: اگه شنبه برم بانک، فرم رو هم می‌برم",
+  "expect": "a conditional (C35): nothing booked, nothing asked",
+  "context": "adult; C35"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "U: وسطِ ماه کارگر میاد کولر رو ببینه",
+  "expect": "a fact about another person (C19/C34): no plan of hers, no «کدام روز؟»",
+  "context": "adult; runner C judged this right (aC3 p45)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[page: «پس‌فردا — ⟨D0+2⟩ — درست است؟»] U: نه، پس‌فردا نمی‌تونم",
+  "expect": "a negated day is never booked (C51); the page asks which day",
+  "context": "adult; D29-25 look-alike (restating a day inside a negation)"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "edit",
+  "text": "U (original): پنجشنبه با مدیرم جلسه دارم و تا ⟨D0+30, …⟩ باید امتحان بدم ‖ ✏️ → پنجشنبه با مدیرِ بخش جلسه دارم و تا ⟨D0+30, …⟩ باید امتحان بدم",
+  "expect": "an edit that changes neither day: no re-dating, no new ask for either act; history notes the text change only",
+  "context": "adult; C144 look-alike"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[page: «📌 … — ⟨D0+1⟩ — درست است؟»] U: آره، راستی کتابی که گفتی رو خریدم",
+  "expect": "the yes books the pending ask (C49); «خریدم» about a book closes no plan unless a plan «کتاب رو بخرم» is open",
+  "context": "adult; C94 look-alike"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "edit",
+  "text": "[📌 «فردا می‌رم بانک»] ✏️ → ⟨D0−2, written as day + month name⟩ می‌رم بانک",
+  "expect": "a plan (not past tense) whose day is now past: C93 asks «این روز گذشته — کدام روز؟» and keeps the booking until she answers — the C146 path is not taken",
+  "context": "adult; C146/C93 boundary"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "U: ⟨D0+5, written yyyy/m/d⟩ تحویلِ پروژه‌ی همکارمه",
+  "expect": "a date that is a fact about someone else (C34/C19): no ask",
+  "context": "adult; written date look-alike"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[booked 📌 «فردا ساعت ۱۰ کلاس» (D0+1) via «اینو ثبتش کن: فردا ساعت ۱۰ کلاس …»] [clock → D0+2]",
+  "expect": "PAGE-LEVEL: «امروز» shows no stray «↩ خواسته‌ای که گذاشتی برای بعد» for this plan; one commitment, one record (C52)",
+  "context": "adult; B29·D22"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "[pending two asks: «فردا بانک», «پس‌فردا صاحب‌خونه»] U: فردا آره، پس‌فردا نه، شنبه",
+  "expect": "bank booked on D0+1; the landlord moves to the first Saturday after D0 with one confirm; the negated «پس‌فردا» is never booked (C51, C145)",
+  "context": "adult, clock on a Wednesday (Saturday = D0+3); C145 with a mixed answer"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "pos",
+  "role": "time",
+  "text": "U: سرِ برج قسطِ بیمه رو می‌دم و آخرِ ماه هم اجاره رو",
+  "expect": "two acts, two asks: day 1 of the next Jalali month (C50) and the last day of D0's Jalali month (C37), each «… درست است؟»; a later «آره، هر دو» books both (C145)",
+  "context": "adult; C145 with idioms"
+ },
+ {
+  "rc": "R4.date_ask_engine",
+  "kind": "neg",
+  "role": "time",
+  "text": "[booked 📌 «فردا بانک» (D0+1)] U: آره، فردا می‌رم",
+  "expect": "restating the booked day books nothing new: no second row, no new ask (C52)",
+  "context": "adult; C49 look-alike"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: یه پیش‌بینی: اجاره‌ی سالِ بعد با ۱۸٪ افزایش میشه ۱۵ × ۱٫۱۸ = ۱۷٫۷ میلیون؛ ۷۵ درصد مطمئنم",
+  "expect": "exactly ONE 🎯 with confidence 75% (the «۱۸٪ افزایش» is a datum, C148); its text is the outcome («اجاره‌ی سالِ بعد … ۱۷٫۷ میلیون میشه»), without «یه پیش‌بینی:» and the counter; the arithmetic 15 × 1.18 = 17.7 is ✓",
+  "context": "adult, renting; C148 (a data percent and a confidence in one sentence)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[open 🎯 «۵ تا قفسه تا جمعه سوار می‌کنم» 70%] U: گفته بودم ۵ تا با ۷۰ درصد، شد ۴ تا",
+  "expect": "a report on the existing 🎯: it settles «نشد» by the numbers (4 < 5, C91); NO new 🎯 from «با ۷۰ درصد»",
+  "context": "adult; C148 positive look-alike («گفته بودم ۴ تا با ۷۰ درصد، شد ۳ تا»)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[open 🎯 «نمره‌ی پایانی بالای ۱۸ میشه» 80%] U: ۱۹ گرفتم، همون‌طور که با ۸۰ درصد گفته بودم",
+  "expect": "settles «شد» (19 > 18); no new 🎯 and no confidence update from the past «با ۸۰ درصد گفته بودم»",
+  "context": "teen, 17; C148 look-alike («همون‌طور که با ۹۰ درصد گفته بودم»)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: یه پیش‌بینیِ تازه: «برای ۴۰ بهترین تعداد ۱۵ است» با ۶۵٪ اطمینان",
+  "expect": "one 🎯, 65%, text «برای ۴۰ بهترین تعداد ۱۵ است»; «با ۶۵٪ اطمینان» after a quoted claim is its confidence (C148)",
+  "context": "adult; C148 look-alike («… ۱۱ است» با ۷۰٪ اطمینان»)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: تمرین‌های فصلِ ۶ رو تا چهارشنبه تموم می‌کنم. ۸۰ درصد.",
+  "expect": "one 🎯 at 80% (a percentage ending its phrase right after a predicted outcome, C148); its due date is the first Wednesday after D0 through the single «موعدِ این پیش‌بینی … است؟» confirm (C152); no 📅 plan ask",
+  "context": "adult, clock on a Saturday (Wednesday = D0+4); C29-7 p45 shape"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: احتمالش ۳۰ درصده که پنجشنبه کلاسِ جبرانی تشکیل بشه",
+  "expect": "one 🎯 at 30%; the forecast reader runs first (C152): its due date is the first Thursday after D0 through ONE confirm; never «📅 … در «امروز» بیاید؛ درست است؟», never «بی موعد»",
+  "context": "adult, clock on a Monday (Thursday = D0+3); C29-7, B29·D8"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: احتمالش ۳۰ درصده که پنجشنبه کلاسِ جبرانی تشکیل بشه ‖ [page: «موعدِ این پیش‌بینی ⟨D0+3⟩ است؟»] ‖ U: آره",
+  "expect": "PAGE-LEVEL: the 🎯 book lists it under «باز» with due D0+3; «امروز» has no plan row for it and no «بی‌جواب ماند … به‌شکلِ پرسش می‌ماند» line later",
+  "context": "adult, clock on a Monday; C132/C152 at page level (B and C shapes)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: ۸۰ درصد مطمئنم کابینت تا آخرِ ماه نصب میشه",
+  "expect": "one 🎯 at 80% with due date the last day of D0's Jalali month (C37) through one confirm; never «موعدی نگفتی»",
+  "context": "adult; D29-14 («تا آخرِ آذر» shown as no due date)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: فکر کنم ۷۰ درصد کارتن‌ها تا جمعه بسته میشن",
+  "expect": "one 🎯 at 70% due the first Friday after D0 — the belief word «فکر کنم» makes it a confidence (C90/C148), as runner D judged; no 📌",
+  "context": "adult; C136: a sentence a runner judged a 🎯 must stay one (see ambiguities on «N درصد Y»)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: ۷۵ درصد مطمئنم ریاضی ۱۸ میشم و ۵۵ درصد که فیزیک ۱۶ بشم",
+  "expect": "TWO 🎯: «ریاضی ۱۸ میشم» 75% and «فیزیک ۱۶ بشم» 55%, each with its own text; never one 🎯 «ریاضی ۱۸ میشم و ۵۵ درصد که فیزیک …»",
+  "context": "teen, 17; B29·D17"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[two 🎯 as above] U: ریاضی ۱۸ شدم، فیزیک ۱۵",
+  "expect": "math settles «شد» (18 ≥ 18), physics «نشد» (15 < 16); the calibration counts one hit and one miss",
+  "context": "teen, 17; B29·D17 (one 🎯 settled «شد» although listening failed)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: ۸۰ درصد مطمئنم مهمونا قبل از ۸ می‌رسن و ۶۰ درصد مطمئنم غذا کم نمیاد",
+  "expect": "two 🎯 (80%, 60%), each with its own text; «قبل از ۸» is part of the first outcome, not a date ask",
+  "context": "adult; C90 positive (worked in round 29 D, must keep)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: مطمئنم آزمونِ آزمایشیِ شنبه حدودِ ۶٫۵ میشه",
+  "expect": "plain «مطمئنم» without a number: the page asks the number once (C119); the due date (first Saturday after D0) waits for the 🎯; no 📅 plan ask",
+  "context": "adult, IELTS; B29·D23 (no 🎯 and no ask)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: مطمئنم آزمونِ آزمایشیِ شنبه حدودِ ۶٫۵ میشه ‖ [page: «چند درصد؟»] ‖ U: ۶۰",
+  "expect": "a bare «۶۰» answers the page's question: one 🎯 at 60% (C122)",
+  "context": "adult; B29·D23 / C122 reachable once C119 asks"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: تقریباً مطمئنم بچه‌ها از آزمونِ کوتاه استقبال می‌کنن",
+  "expect": "the page asks the number once (C90); nothing else",
+  "context": "adult, teacher; C90"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[🎯 «گزارش رو تا آخرِ هفته‌ی بعد تحویل میدم» 70%] U: الان دیگه ۸۵ درصد مطمئنم، نه ۷۰",
+  "expect": "the same 🎯 is updated to 85% with history «اصلاح شد ⇐ ۷۰» (C77); no second 🎯",
+  "context": "adult; C77"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[🎯 «تو کوییز فقط ۱ سؤال غلط می‌زنم» 60%] U: پیش‌بینیم ۱ بود، شد ۲",
+  "expect": "settled «نشد» from the numbers (C91); never «شد یا نشد؟»",
+  "context": "adult; C29-22 (owner bank 68)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[🎯 «کارتن‌ها روی هم حدودِ ۵۰ تا میشن» 70%] U: ۵۳ تا شد",
+  "expect": "the page asks «این حدودِ ۵۰ حساب می‌شود؟» (C120); never silent, never settled by an invented tolerance",
+  "context": "adult; D29-21 («۴۲ تا شد» against «حدودِ ۴۰» got no reaction)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[🎯 «کارتن‌ها روی هم حدودِ ۵۰ تا میشن» 70%] U: دقیقاً ۵۰ تا شد",
+  "expect": "settled «شد» (equal to N, C120)",
+  "context": "adult; C120"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[🎯 «جلسه‌ی اولِ باشگاه خسته می‌شم ولی می‌رم» 70%] U: دیروز رفتم باشگاه! خسته شدم ولی رفتم، همون که پیش‌بینی کرده بودم",
+  "expect": "that 🎯 settles «شد»; the page never offers «کدام؟» with a non-forecast sentence as a candidate; PAGE-LEVEL: the mind card counts 1 of 1 for it",
+  "context": "adult; B29·D4"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[two 🎯: «مدیرم تا جمعه تأیید می‌کنه» 70%, «همکارم تا جمعه ثبت‌نام می‌کنه» 40%] U: یکی از پیش‌بینی‌های ۷۰ درصدیم درست شد",
+  "expect": "one candidate by confidence: the manager 🎯 settles «شد»; no «کدام؟»",
+  "context": "adult; C91 (a confidence that names one candidate)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[the marbles forecast said once: «احتمالِ دو قرمز حدودِ ۲۵٪ درمیاد، ۶۰ درصد مطمئنم»] U: حساب کردم، همون ۲۵٪ درست درومد",
+  "expect": "exactly one 🎯 exists (60%; the 25% is the predicted value), and it settles «شد» with no «کدام؟»",
+  "context": "teen; C29-8 regression"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[problems: «اسباب‌کشی» and «میزِ آشپزخونه» (focused)] U: ۷۰ درصد مطمئنم بودجه‌ی اسباب‌کشی برای رنگ کافی میشه",
+  "expect": "the 🎯 is filed under «اسباب‌کشی», the problem it is about (C121), not under the focused table problem",
+  "context": "adult; B29·D7"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "[focused: a probability puzzle; a course dossier «دورهٔ آمار» open] U: ۶۰ درصد مطمئنم کوییزِ فصلِ ۳ رو کامل جواب میدم",
+  "expect": "filed under the course dossier it is about, not the puzzle (C121)",
+  "context": "adult; C28-19 / C29 pwC2 p37"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: باشه، قبل از این‌که حساب کنم، حدسم اینه که جواب حدودِ ۴۰٪ باشه. ۷۰ درصد مطمئنم.",
+  "expect": "one 🎯 at 70% whose text is «جواب حدودِ ۴۰٪ باشه» — lead words «باشه، قبل از این‌که حساب کنم، حدسم اینه که» stripped (C90); the 40% is the predicted value",
+  "context": "adult; C29-26"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: اجاره با ۱۸٪ افزایش میشه ۱۵ × ۱٫۱۸ = ۱۷٫۷ میلیون",
+  "expect": "NO 🎯 (a data percent: «با N٪ افزایش»), no «شد یا نشد؟» later, nothing in «امروز»; the arithmetic is ✓ (15 × 1.18 = 17.7)",
+  "context": "adult; A29-4 s01 (a false 🎯 at 22%)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: با ۱۲ درصد برای درز و دوخت میشه ۴٫۵ × ۱٫۱۲ = ۵٫۰۴ متر پارچه",
+  "expect": "NO 🎯; arithmetic ✓ (4.5 × 1.12 = 5.04)",
+  "context": "adult, sewing; A29-4 pA3"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: ۱۰۰ × ۰٫۴ = ۴۰ وات هیدرولیکی؛ با ۱۵٪ اصطکاک ۳۴ وات مفید",
+  "expect": "NO 🎯 (B29·D6: «اطمینان: ۲۰٪» was the friction); no «شد یا نشد؟» on later prior-work reports; 40 × 0.85 = 34 ✓ if read",
+  "context": "adult, engineer; B29·D6"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: پمپ‌ها حدودِ ۴۰ تا ۵۰ درصدن. با راندمانِ ۴۵٪ میشه ۹۰۰ ÷ ۰٫۴۵ = ۲۰۰۰ وات",
+  "expect": "NO 🎯 (efficiency, C148); no «شد یا نشد؟» next turn; 900 / 0.45 = 2000 ✓",
+  "context": "adult; C29-9"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: با ۸ درصد پرت، ۲۵ × ۱٫۰۸ = ۲۷ متر",
+  "expect": "NO 🎯; no «⇐ نشد» from a later unrelated sentence; 25 × 1.08 = 27 ✓",
+  "context": "adult; D29-3 tD1"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: ۳۰ لیتر شربت با ۱۲٪ یعنی ۳٫۶ لیتر شکر",
+  "expect": "NO 🎯 («یعنی N لیتر» marks a datum, C148); 30 × 0.12 = 3.6",
+  "context": "adult; D29-3 s36 («۲۰ لیتر یعنی ۲ لیتر نمک»)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: خرج‌مون هر سال حدود ۲۵ درصد زیاد میشه، ولی حقوقم فقط حدود ۱۵ درصد",
+  "expect": "NO 🎯 — the percents are rates of change (a quantity word after N درصد), even with the future verb «زیاد میشه»",
+  "context": "elder, 67; C136 look-alike from the round-29 B transcripts"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: اگه بفروشیم، خریدار ۳ درصد کمیسیون میده",
+  "expect": "NO 🎯 — «میده» (he gives) is not the belief word «می‌دم» (I give, C90); a fee rate",
+  "context": "adult; C136 look-alike («… ۵ درصد کمیسیون میده»)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: فروشنده گفت از ماهِ بعد ۱۲٪ گرون میشه",
+  "expect": "NO 🎯 and not someone else's confidence: a datum with a source label (C96/C125)",
+  "context": "adult; C136 look-alike"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: الان ۶ هزار کاربر داریم و ماهی حدودِ ۵٪ رشد می‌کنیم",
+  "expect": "NO 🎯 (a growth rate)",
+  "context": "adult; C136 look-alike"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: صاحبخونه قبول کرد: ۵ ساله با افزایشِ ۲۰٪",
+  "expect": "NO 🎯, and it settles nothing (no open 🎯 is about this)",
+  "context": "adult; C136 look-alike (past datum)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: مشاور گفت ۸۰ درصد مطمئنه صاحبخونه اجاره رو بالا نمی‌بره",
+  "expect": "another person's confidence: no 🎯 of hers (C75), filed as «کارِ دیگری»",
+  "context": "adult; C75"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: پارسال ۹۰ درصد مطمئن بودم ترفیع می‌گیرم و نشد",
+  "expect": "a past confidence: no 🎯, no settle, no «شد یا نشد؟»",
+  "context": "adult; C91"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: می‌خوام ببینم پیش‌بینی‌هام چقدر درست درمیان — مثل همون «۷۰ درصد مطمئنم» برای جلسه",
+  "expect": "a wish about forecasting, quoting a counter: NO 🎯 (B29·D5); the quote is shown byte-exact, never stripped to «« »»",
+  "context": "adult; B29·D5"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "[open 🎯 «کفِ حیاط حدودِ ۶ مترمربع میشه» 70%] U: ۶٫۴ متر مربع = ۶۴۰۰۰ سانتی‌متر مربع",
+  "expect": "no «این ۶٫۴ حدودِ ۶ حساب می‌شود؟» — a unit conversion is not a report of the outcome (A29-24); 6.4 m² = 64 000 cm² ✓",
+  "context": "adult; A29-24"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "[open 🎯 «پارکت تا آخرِ ماه نصب میشه» 80%] U: برگردیم به کارتن‌های پارکت",
+  "expect": "no «شد یا نشد؟» (D29-4)",
+  "context": "adult; D29-4"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "[open 🎯 «پارکت تا آخرِ ماه نصب میشه» 80%] U: دستمزدِ نصب ۱۵۰ نیست، ۱۸۰",
+  "expect": "a correction never settles and never asks «شد یا نشد؟» (C91)",
+  "context": "adult; D29-4 / dB1 shape"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "[🎯 «تا آخرِ همین هفته ۴ تا قفسه رو سوار می‌کنم» 70%] U: یعنی: ۷۰ درصد مطمئنم تا آخرِ همین هفته ۴ تا قفسه رو سوار می‌کنم",
+  "expect": "a restatement: no second 🎯 (A29-16); a later «شد ۳ تا» settles the one 🎯 «نشد» with no «کدام؟»",
+  "context": "adult; A29-16"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: ۶۰ درصد مطمئنم درصدِ خطام حدودِ ۸ درصد درمیاد",
+  "expect": "ONE 🎯 (60%); «حدودِ ۸ درصد» is the predicted value, not a second confidence (C90 needs two outcomes)",
+  "context": "adult, Anki statistics; C90 look-alike"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: ۲۰ درصدِ ۳۰۰ میلیون رو می‌ذارم طلا، میشه ۶۰ میلیون",
+  "expect": "NO 🎯 («N درصدِ Y» is a datum, C148); 20% × 300 M = 60 M",
+  "context": "elder, 67; C136 look-alike (aB3)"
+ },
+ {
+  "rc": "R5.forecast",
+  "kind": "neg",
+  "role": "events",
+  "text": "[🎯 «مدیرم تا جمعه تأیید می‌کنه» 70%] U: امروز خیلی کار داشتم، فردا بیشتر می‌نویسم",
+  "expect": "an unrelated sentence: no settle, no «شد یا نشد؟»",
+  "context": "adult; C91"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: از ۵ میلیون و ۲۰۰ پس‌انداز، ۲ میلیون و ۷۰۰ رفت: ۵ میلیون و ۲۰۰ − ۲ میلیون و ۷۰۰ = ۲ میلیون و ۵۰۰، نصفش هم میشه ۱ میلیون و ۳۰۰",
+  "expect": "PAGE-LEVEL: in 📜 the subtraction clause carries ✓ and the clause «نصفش هم میشه ۱ میلیون و ۳۰۰» carries ✗ (half of 2 500 000 = 1 250 000) or «؟ نسنجیده» beside THAT clause; the line never shows «✓ حسابِ عددی‌اش را صفحه سنجید: درست» for the whole sentence",
+  "context": "adult; S1 A29-1 s06 shape"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[problem: «با یه پارچِ ۷ و یه پارچِ ۱۱ لیتری، ۱۵ لیتر آب بردار»] U: با پارچِ ۱۱: ۱۱ + ۱۱ = ۲۲، پس ۸ لیتر اضافه میاد",
+  "expect": "PAGE-LEVEL: ✓ beside «۱۱ + ۱۱ = ۲۲» and ✗ beside «۸ لیتر اضافه میاد» (22 − 15 = 7) — or «؟ نسنجیده» if the engine does not take the target from the statement — never a sentence-wide ✓",
+  "context": "adult; S1 A29-1 s08 shape"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[child, 8; problem: «۱۸ صفحه مونده، روزی ۴ تا بخونم چند روز طول می‌کشه؟»] U: ۴ و ۴ و ۴ و ۴ میشه ۱۶، ۳ تا کم میاد",
+  "expect": "PAGE-LEVEL in the child's view: ✓ beside the sum and ✗ (18 − 16 = 2) or «؟ نسنجیده» beside «۳ تا کم میاد»; never «درست» for the whole line",
+  "context": "child, 8; S1 A29-1 pwA2 shape"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: … = ۲ میلیون و ۵۰۰، نصفش هم میشه ۱ میلیون و ۳۰۰",
+  "expect": "chat ⇄ page agree: the coach is told the half clause is wrong (or unchecked); 📜 never says ✓ where the coach flags the clause (A29-1 «disagree» rows)",
+  "context": "adult; S1 A29-1, one voice"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: ۶ × ۷ = ۴۲ تا تخم‌مرغ، از ۵۰ تا ۷ تا می‌مونه",
+  "expect": "PAGE-LEVEL: two marks on the line — ✓ for the product, ✗ for the remainder clause (8) — taken from arith's per-clause export (C138); the dossier counts one right and one wrong",
+  "context": "adult; F15 with a remainder after a product"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[🎯 and 📜 after her fix] U: نصفش ۱ میلیون و ۲۵۰ میشه، ببخشید",
+  "expect": "PAGE-LEVEL: the clause's mark moves to ✓ with the old ✗/؟ in its history (C86); the subtraction clause keeps its ✓",
+  "context": "adult; S1 A29-1, after the fix"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: اجاره ماهی ۱۵ میلیونه و ۴ نفریم: ۱۵ ÷ ۴ = ۳٫۷۵ میلیون",
+  "expect": "PAGE-LEVEL: 📜 has one «داده» line for «اجاره ماهی ۱۵ میلیونه», one for «۴ نفریم» (or one for the data clause as she wrote it) and ONE «حسابِ تو» line with ✓ for «۱۵ ÷ ۴ = ۳٫۷۵»; never four «داده» lines and never the sentence again as «حسابِ تو»",
+  "context": "adult; A29-2 (s02, s06, s09, pA2)"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: پیش‌بینیم: این هفته ۵ روز از ۷ صبح زود بیدار میشم؛ ۶۵ درصد مطمئنم.",
+  "expect": "PAGE-LEVEL: 📜 files it as a 🎯 line (with 65%), never as «داده (از گفت‌وگو)»; the draft form never shows it as «داده: …»",
+  "context": "adult; B29·D2"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[🎯 «۵ روز از ۷ صبح زود بیدار میشم» 65%] U: یه هفته گذشت؛ پیش‌بینیم ۵ از ۷ با ۶۵ درصد بود، شد ۴",
+  "expect": "PAGE-LEVEL: filed as the outcome of that 🎯 («نشد»), under the problem the 🎯 belongs to; never «داده»",
+  "context": "adult; B29·D2 past report + B27·D7 filing"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: ۳ × ۴ = ۱۲ صندلی داریم",
+  "expect": "PAGE-LEVEL: exactly one 📜 line, kind «حسابِ تو», with ✓; not also a «داده» line",
+  "context": "adult; C149"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: داداشم یه حسابِ دیگه هم کرد: ۱۶ × ۲۵ = ۳۸۰",
+  "expect": "«کارِ دیگری» with the label for her brother (shown as «[نامِ شخص]» / «داداشت» per C38), checked ✗ (16 × 25 = 400); never her «داده» and never her step; the coach line carries the label",
+  "context": "adult; B29·D12, D29-12, A29-21, C28-8"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: داداشم حساب کرد ۴ × ۲۵۰ = ۱۰۰۰ هزار برای حمل",
+  "expect": "filed ONCE as «کارِ دیگری» ✓; never also as her «داده» (A29-21 filed it both ways)",
+  "context": "adult; A29-21"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: بابام گفت هر جعبه ۱۵ تا مداد داره، پس ۳ تا جعبه میشه ۳ × ۱۵ = ۴۵ تا",
+  "expect": "the datum «هر جعبه ۱۵ تا مداد» is hers with source «بابام»; the inference after «پس» is HER calculation (✓ 45) — never «کارِ دیگری — بابام» (C125: X is not the doer of the calculation)",
+  "context": "child, 10; C29-4"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: همسایه‌مون گفت جابه‌جایی ۳ ساعت طول می‌کشه، پس ۳ × ۵۰۰ هزار = ۱ میلیون و ۵۰۰",
+  "expect": "the coach line treats the product as hers (✓ 1 500 000) with «۳ ساعت» as a datum from the neighbour; never «کارِ دیگری — همسایه‌مون»",
+  "context": "adult; B29·D12 first half"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: فروشنده گفت اگه نقد بدم ۱۵٪ تخفیف میده",
+  "expect": "PAGE-LEVEL: a «داده» line of her problem with a source label («به گفتهٔ فروشنده»); not «کارِ دیگری», not a 🎯",
+  "context": "adult; A29-22"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "events",
+  "text": "U: داداشم یه حسابِ دیگه هم کرد: ۲ میلیون و ۴۰۰ + ۱۲ درصد = ۲ میلیون و ۶۸۸",
+  "expect": "«کارِ دیگری» (labelled); the «+ ۱۲ درصد» is read as 12% of the amount: 2 400 000 × 1.12 = 2 688 000 ✓ — or «نسنجیده»; never a silent «درصدِ چه؟»",
+  "context": "adult; B29·D12 second half"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[ledger (proof): گام ۱ «هر نفر با ۷ نفرِ دیگه دست میده» · گام ۲ «۸ × ۷ = ۵۶» (depends on 1) · گام ۳ «۵۶ ÷ ۲ = ۲۸» (depends on 2)] [click «↪» on گام ۱ → another problem]",
+  "expect": "PAGE-LEVEL: before moving, the page lists گام ۲ and گام ۳ (the transitive dependant included) and asks «همه / فقط همین / هیچ»; nothing moves until she answers",
+  "context": "adult; A shape (oA1 handshakes, A29-28)"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[ledger (cost): گام ۲ «۲۰ × ۱۸ = ۳۶۰ هزار» · گام ۳ «۳۶۰ + ۵۰ = ۴۱۰ هزار» (depends on 2)] [click «↪» on گام ۲]",
+  "expect": "PAGE-LEVEL: the all / only this / none ask names گام ۳; the step never moves alone silently",
+  "context": "adult; B shape (nB2 s18, B29·D16)"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[chat-only ledger: گام ۱ «۱۲ × ۲ = ۲۴ برش» · گام ۲ «۲۴ ÷ ۸ = ۳ کیک» (depends on 1)] [click «↪» on گام ۱]",
+  "expect": "PAGE-LEVEL: the ask appears for a chat-only ledger too; «فقط همین» moves گام ۱ and leaves گام ۲ with a history line that its base moved; undo restores both places",
+  "context": "adult; C shape (s23 / pwC1, C29-16)"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[ledger: گام ۴ «۲ × (۵ + ۴) = ۱۸» · گام ۵ «۱۸ × ۱۶۰ = ۲۸۸۰» (on 4) · گام ۶ «۲۸۸۰ + ۶۰۰ = ۳۴۸۰» (on 5)] [click «↪» on گام ۴] ‖ U: همه",
+  "expect": "PAGE-LEVEL: the ask names گام ۵ AND گام ۶; «همه» moves all three with «جابه‌جا شد» on the page clock; «↩» brings all three back",
+  "context": "adult; D shape (tD1 T23, D29-15 transitive dependant)"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[🎯 «گزارشِ مالیشون باثباته» 70%, settled «نشد», under the wrong problem] [click «↪» → the right problem]",
+  "expect": "PAGE-LEVEL: the moved 🎯 shows «سرانجام: نشد» AND the «جابه‌جا شد» history; it appears in the destination problem's 🎯 list, not the source's",
+  "context": "adult; A29-27, D29-16"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "events",
+  "text": "[live: «سه تا دفتر …»] U: یه مسئله: هر جعبه ۸ تا ماژیک داره. ۶ تا جعبه چند تا میشه؟",
+  "expect": "a statement with its own unknown gets its own record (C97); the next lines about the boxes go there, not under «سه تا دفتر …»",
+  "context": "child, 10; C29-5"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[problems «۷ و ۱۱» (15-litre target) and «۵ و ۹» (focused)] U: برای ۱۵ لیتر یه راهِ دیگه هم امتحان کردم: ۷ × ۲ = ۱۴، پس ۱ لیتر کم میاد",
+  "expect": "PAGE-LEVEL: the line is filed under the 15-litre problem (it names it), with ✓ for 7 × 2 = 14 and ✓ for «۱ لیتر کم میاد» (15 − 14 = 1); never under «۵ و ۹»",
+  "context": "adult; A29-19"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "pos",
+  "role": "page",
+  "text": "[problems «قفسه‌ها» (2-step prior ledger) and «کفِ سالن» (own 4-step ledger)]",
+  "expect": "PAGE-LEVEL: the floor dossier's 📜 shows its own 4 steps (with stale marks and accepted values), never the shelves' 2 steps; each dossier's 🧭 strip is its own",
+  "context": "adult; B28·D9, B29·D15"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: ۴ میلیون و ۲۰۰ + ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰",
+  "expect": "PAGE-LEVEL: one clause, read ✓ ⇒ the sentence-level ✓ is right here (C138 forbids it only when an unread numeric clause exists)",
+  "context": "adult; C138 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: ۵ میلیون و ۲۰۰ − ۲ میلیون و ۶۰۰ = ۲ میلیون و ۶۰۰، نصفش میشه ۱ میلیون و ۳۰۰",
+  "expect": "PAGE-LEVEL: both clauses are right (half of 2 600 000 = 1 300 000): ✓ and ✓, or ✓ and «؟ نسنجیده»; never ✗ beside «نصفش»",
+  "context": "adult; A29-1 look-alike with a right half"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: ۱۸ + ۱۲ = ۳۰ تا کارتن؛ مامانم کمکم کرد بشمارم",
+  "expect": "PAGE-LEVEL: hers («حسابِ تو» ✓), never «کارِ دیگری» — a helper mentioned in her own sentence (C96)",
+  "context": "adult; C136 look-alike (judged right in A and C)"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: همون ۳ میلیون و ۲۵۰ که خودت گفتی رو قبول دارم",
+  "expect": "a number of the coach repeated as hers stays hers (C79)",
+  "context": "adult; C79"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: فروشنده گفت هر متر ۱۶۰ هزاره",
+  "expect": "a bare value from a source: a datum with source label, not «کارِ دیگری» (C125)",
+  "context": "adult; C125 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: استادم گفت دامنه‌ی واژه‌هام کمه",
+  "expect": "no numbers, no calculation: not «کارِ دیگری» with arithmetic, not a 🎯; at most a note in her record",
+  "context": "adult; C96 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "[ledger: گام ۳ «۵۶ ÷ ۲ = ۲۸» is the last step, nothing depends on it] [click «↪» on گام ۳]",
+  "expect": "PAGE-LEVEL: moves at once with its undo; no all / only / none question (no dependants)",
+  "context": "adult; C124 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "[🎯 with no dependants] [click «↪»]",
+  "expect": "PAGE-LEVEL: moves at once; no dependants ask",
+  "context": "adult; C124 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "events",
+  "text": "[live: «میزِ آشپزخونه»] U: اگه ۶ نفر باشیم چی؟",
+  "expect": "a hypothetical inside the same problem (C126): no new record",
+  "context": "adult; C126"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "events",
+  "text": "[problems P and Q] U: برگردیم به مسئله‌ی اسباب‌کشی",
+  "expect": "a return by naming (C30): no new record; later unnamed lines go to P until she names another",
+  "context": "adult; C97 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: اجاره ماهی ۱۵ میلیونه. ۱۵ × ۱۲ = ۱۸۰ میلیون در سال",
+  "expect": "PAGE-LEVEL: two clauses ⇒ two lines (one «داده», one «حسابِ تو» ✓) — splitting distinct clauses is right; what C149 forbids is the SAME clause twice",
+  "context": "adult; C149 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: یه مسئلهٔ تازه نیست، همون میزه؛ فقط عرضش رو دوباره گفتم: ۹۰ سانت",
+  "expect": "a restated datum of Q: no new record (C97 needs a separate problem or its own unknown)",
+  "context": "adult; C97 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: پیش‌بینیم این بود که دیر میرسم، ولی به موقع رسیدم",
+  "expect": "PAGE-LEVEL: an outcome report with no confidence and no open 🎯 about it: not a 🎯 line, not «داده» of a forecast; at most an ordinary line",
+  "context": "adult; C149/C91 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "events",
+  "text": "U: مامانم گفت هر کیسه برنج ۱۰ کیلوئه؛ ۳ تا کیسه گرفتیم",
+  "expect": "a datum with source label (C125); no calculation by anyone, so no «کارِ دیگری»; no arithmetic line",
+  "context": "adult; C125 look-alike"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "[problems P and Q; a line already filed under the right problem] (no move)",
+  "expect": "PAGE-LEVEL: the «↪» button is present on the line but nothing moves without her click; no automatic re-filing",
+  "context": "adult; C95 control"
+ },
+ {
+  "rc": "R6.filing_story",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: ۱۵ ÷ ۴ = ۳٫۷۵",
+  "expect": "PAGE-LEVEL: one «حسابِ تو» line with ✓; repeating the same sentence later as «یعنی ۱۵ ÷ ۴ = ۳٫۷۵» adds no duplicate line (it is the same clause restated)",
+  "context": "adult; A29-2 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "route",
+  "text": "[one open problem «جلسه‌ی ۴۵ دقیقه‌ای»] U: یه نقشه از همه‌ی پرونده‌هام نشونم میدی؟",
+  "expect": "a question about the system: never «مسئلهٔ ۲ از ۲», never a chat problem; PAGE-LEVEL: it is not offered as a «↪» destination and 🧭 shows only the real problem",
+  "context": "adult; A29-26"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: این برنامه اصلاً برای این‌جور حساب‌کتابا ساخته شده؟",
+  "expect": "a question about the system (D28-10 shape): no problem record, no 🧭 destination; the assistant answers",
+  "context": "adult; D28-10 shape (oD1b and ten branches)"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: سه تا سؤال دربارهٔ خودِ سامانه: اون گامی که جابه‌جا کردم، گام‌هایی که بهش تکیه داشتن چی شدن؟",
+  "expect": "not a problem; answered by the assistant from the system map (C150) — the dependants ask, «↩» undo — never filed under a problem",
+  "context": "adult; oA1 p38 shape (bank 42)"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: این برگه‌ای که الان ثبت کردی کِی جواب می‌گیره؟ از کجا بفهمم؟",
+  "expect": "a question about the page's sheets: not a chat problem, not a «↪» destination (B27·D14)",
+  "context": "adult; B27·D14"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "route",
+  "text": "[a problem closed] U: آها یه چیزی یادم رفت بگم: دیشب مادرم دو تا قرص رو با هم برداشت",
+  "expect": "a piece after closure: offered on «امروز» (C36) for her to decide; never a new chat problem by itself (C27-6, C half)",
+  "context": "adult; C27-6"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: داداشم حساب کرد ۲۲ × ۵۰ = ۱۱۰۰ هزار برای حمل",
+  "expect": "PAGE-LEVEL: the «کارِ دیگری» line in her 📜 never contains «(C57)» or any «C<number>» label",
+  "context": "adult; B29·D1 (nB1, nB2), A29-23 (s09, aA1)"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "page",
+  "text": "U: اینا رو به فهرستِ خریدم اضافه کن: قرصِ ویتامین، باتری",
+  "expect": "PAGE-LEVEL: the page line after the add names the items in her words; never raw ids such as «(it1_…)»",
+  "context": "adult; B29·D1 (s13, s18)"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: داداشم حساب کرد ۲۲ × ۵۰ = ۱۱۰۰ هزار",
+  "expect": "the coach's quoted lines carry no «C57», no «it1_…» id and no English words; the label is «کارِ دیگری — [نامِ شخص]» (C151, C128)",
+  "context": "adult; C151 in the prompt view"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "page",
+  "text": "[🎯 with no due date]",
+  "expect": "PAGE-LEVEL: no internal text such as «… در موعدهای باز نیست» or a raw ISO date in the 🎯 book or the step card",
+  "context": "adult; C100 (A28-36 held; C28-22 «2026-…» in a step card)"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[any session; prompt inspected]",
+  "expect": "the page-built user-prompt block «خودِ سامانه» (not the static system text) carries one line each for: accepting a proposal with a stale base (C87/C111), a source of a datum vs another person's work (C96/C125), moving a step with dependants (C124), one mark per clause (C138); each line is generated from the same registry the page enforces",
+  "context": "adult; A29-29"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: اگه یه گام رو جابه‌جا کنم، گام‌هایی که روش بنا شدن چی میشن؟",
+  "expect": "the assistant answers from the map's evidence: the page lists the dependants and asks «همه / فقط همین / هیچ», nothing moves silently, «↩» undoes; it names where that rule is written",
+  "context": "adult; owner bank 42"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پیشنهادی که از عددِ کهنه ساخته شده بود رو قبول کردم — گامم با همون بازنویسی شد؟",
+  "expect": "the assistant answers with the rule: no — the page names the stale base and its current value and does not rewrite; it shows the current exact value",
+  "context": "adult; owner bank 64"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: «فروشنده گفت ۱۲٪» دادهٔ منه یا کارِ یکی دیگه؟",
+  "expect": "the assistant answers with the rule: a datum of her problem with a source label; «کارِ دیگری» only when another person does the calculation",
+  "context": "adult; owner bank 65"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[after a fixer adds a new rule to the registry]",
+  "expect": "the «خودِ سامانه» block shows the new rule the next time it is built, with no hand edit (C150 test: a registry entry added in a test appears in the block)",
+  "context": "adult; C150 registry check"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "events",
+  "text": "[sheet for her step «سنجشِ تعدادِ قرص‌های برداشته‌شده»] [routine reply naming only frame words: «برگه»، «ابزار»، «ثبت»]",
+  "expect": "the page asks her whether the reply fits her step (C2/C20); never «جواب نداد» rejection, never «answered»",
+  "context": "adult; B27·D16 (identical r27–r29)"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "events",
+  "text": "[sheet #N open] U: نه، لازم نیست دیگه، خودم یه راه پیدا کردم",
+  "expect": "a take-back closes the sheet; PAGE-LEVEL: the sheet list shows it closed, not «open»",
+  "context": "adult; U59"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "[register «تو»] model reply written fully in «تو»",
+  "expect": "no «please rewrite» demand from the register guard (A29-7); the reply is shown as written",
+  "context": "adult; A29-7"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "page",
+  "text": "[«شما» user, 67]",
+  "expect": "PAGE-LEVEL: the strip and static labels use the «شما» forms consistently («برگردید»، «خودتان»); never «خودت … برگرد» beside «حسابِ شما» on the same page",
+  "context": "elder, 67; B29·D3 (C130)"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "events",
+  "text": "[tie ❓ between two identical candidate names]",
+  "expect": "the page says they look like duplicates and asks whether to merge (C129); never two identical names offered as a choice",
+  "context": "adult; A28-32 / C129"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: نقشه‌ی آپارتمان ۸۰ متره؛ اگه ۶۵ درصدش کاشی بشه چند متر کاشی لازمه؟",
+  "expect": "a real problem that contains «نقشه»: a problem record and a 🧭 destination (C99 last clause); 0.65 × 80 = 52",
+  "context": "adult; C99 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: سامانه‌ی آبیاریِ قطره‌ای ۲۰ تا نازل داره، هر کدوم ساعتی ۴ لیتر؛ ۳ ساعت چند لیتر میشه؟",
+  "expect": "a real problem that contains «سامانه»: a problem record (20 × 4 × 3 = 240)",
+  "context": "adult; C99 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: فردا ساعت ۹ یادم بنداز به بانک زنگ بزنم",
+  "expect": "a reminder request (C127): a plan with its date ask, not a question about the system",
+  "context": "adult; C127"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: کدِ کلاسم C57 ـه، اینو یادداشت کن",
+  "expect": "PAGE-LEVEL: her own words stay byte-exact in her bubble and data line (C55); the label rule removes only page-authored labels",
+  "context": "teen, 15; C100 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: مدلِ دستگاه it1_x200 ـه",
+  "expect": "PAGE-LEVEL: her own text is shown as she typed it; only page-made ids are hidden",
+  "context": "adult; C151 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "U: 2x + 3 = 11، پس x = 4",
+  "expect": "a variable she wrote may be quoted («x»), per C128; not counted as an English word in the page text",
+  "context": "teen, 14; C128"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "events",
+  "text": "[sheet open] [routine reply that names no area at all: «فعلاً چیزی نداریم»]",
+  "expect": "rejected and the step reopened (C20) — this is the right result here, not an ask",
+  "context": "adult; C20 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: چرا کارت‌های Anki رو زود فراموش می‌کنم؟",
+  "expect": "a question about her learning, not about the page: the coach answers; no «خودِ سامانه» rule is cited for it and no problem record unless she makes one",
+  "context": "adult; C150 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[register «تو»] model reply with one «شما» verb among «تو» forms",
+  "expect": "the guard may ask for a rewrite here (a real mix) — the right result for this look-alike",
+  "context": "adult; A29-7 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: می‌خوام یه برنامه‌ی پس‌انداز بچینم؛ ماهی ۳ میلیون کنار بذارم، ۱۰ ماه میشه ۳۰ میلیون",
+  "expect": "a real problem with «برنامه» in it: a record, not a system question (3 × 10 = 30)",
+  "context": "adult; C99 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "events",
+  "text": "[tie ❓ between «شارژرِ بلوتوثی» and «شارژرِ سیمی»] U: سیمی",
+  "expect": "a distinct part of a name is her choice (C54); no merge question",
+  "context": "adult; C54/C129 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: دفترِ پیش‌بینی کجاست؟ می‌خوام فقط ببینمشون",
+  "expect": "a question about the page: it opens/points to the 🎯 book; no problem record; the follow-up never asks the model to fill fields and press «ثبت» (C29-23)",
+  "context": "adult; C29-23 / C99"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "route",
+  "text": "U: الان که گفتم «بله»، دقیقاً به کدوم پرسش بله گفتم؟",
+  "expect": "a question about the system: answered (the ask it bound to, by name); no problem record",
+  "context": "adult; owner bank 54 shape"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "pos",
+  "role": "page",
+  "text": "[after any correction]",
+  "expect": "PAGE-LEVEL: the correction header in 📜 states the change exactly as made, with one arrow convention (never «⇐» and «→» in one history line)",
+  "context": "adult; B24·D16, B27·D11 (surface labels)"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: یه نقشه‌ی راه برای یادگیریِ آمار می‌خوام بچینم",
+  "expect": "a learning plan of hers (a real topic), not a question about the page: the coach takes it; not rejected as «system»",
+  "context": "adult; C99 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "page",
+  "text": "U: نسخه‌ی C۲ و C۳ گزارش رو مقایسه کردم",
+  "expect": "PAGE-LEVEL: her words with «C۲»/«C۳» stay byte-exact (C55)",
+  "context": "adult; C100 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "route",
+  "text": "U: این مسئله‌ی جدول رو کجای پرونده‌م ببینم؟",
+  "expect": "a question about where a record is: answered with the place; no new problem; the existing table problem is not duplicated",
+  "context": "adult; C99 look-alike"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "[the «خودِ سامانه» block]",
+  "expect": "the block carries no secrets, no raw ids and no rule numbers in her view; rule numbers may appear only in the model-facing evidence, never quoted to her (C100)",
+  "context": "adult; C150/C100 boundary — see ambiguities"
+ },
+ {
+  "rc": "R7.surface",
+  "kind": "neg",
+  "role": "events",
+  "text": "[sheet reply that names her step's specific tool «شمارندهٔ قرص»]",
+  "expect": "a clear single fit: marked as arrived with no tie ❓ and no ask (C54/C3)",
+  "context": "adult; C20 look-alike"
+ }
+]
