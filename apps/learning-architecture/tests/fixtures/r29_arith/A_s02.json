@@ -1,0 +1,609 @@
+{
+"from": "round29A/s02",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "یه لوله‌ی صاف ۴ متری دارم، بار وانتم ۳.۲ متر طول، ۱.۸ عرض، ۱.۶ ارتفاع داره. جا میشه یا نه؟ زود بگو مشتری منتظره."
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='1998-06-03';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()"
+},
+{
+"say": "آره ثبتش کن."
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,r.p.nat]))\n"
+},
+{
+"say": "خب ۳.۲ از ۴ کمتره دیگه، پس جا نمیشه. درسته؟"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveCoach(\"pb_l_mvaqm0ik9l6\")).slice(0,600)\n"
+},
+{
+"eval": "(()=>{F(\"lpOne\",\"می‌خوام بدونم لولهٔ چهار متری به‌نحوی توی بار وانت جا میشه یا نه.\");F(\"lpWhy\",\"مشتری منتظره و نمی‌خوام دو سفر برم.\");C(\".lp-onesave\");document.getElementById(\"lpSpatial\").click();return MT(\"شاید فضایی\",100)})()"
+},
+{
+"eval": "(()=>{const D=['طول بار ۳.۲ متر (a)','عرض بار ۱.۸ متر (b)','ارتفاع بار ۱.۶ متر (c)','طول لوله ۴ متر'];\nfor(let i=2;i<D.length;i++)C('.lp-dadd');const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>{F(id,D[i]||'');S(id.replace('lpD_','lpDE_'),'big')});\nF('lpUnk','بلندترین پاره‌خطی که داخل جعبهٔ بار جا می‌شه (x)');F('lpCond','طول لوله باید کمتر یا مساوی بلندترین پاره‌خط داخل بار باشه\\nلوله صافه و خم نمی‌شه');\nS('lpSat','unknown');S('lpSuff','کافی است');F('lpSuffW','سه بعد جعبه و طول لوله همه هست');\nF('lpPrVague','«جا میشه» یعنی لوله کامل داخل بار باشه و در بسته بشه');F('lpPrLine','ضخامت لوله و بستن بار رو فعلاً کنار می‌ذارم چون اول باید بدونم اصلاً طولش جا میشه');F('lpPrApprox','تا یک سانتی‌متر دقت کافیه');F('lpPrPrior','قبلاً میله‌های بلند رو کج می‌ذاشتیم');F('lpPrMeasure','x متر ≥ ۴ متر');\nF('lpFigDone','یه جعبه می‌بینم و لوله از یه گوشهٔ پایین تا گوشهٔ بالای روبه‌رو کشیده شده');S('lpFigGen','general');F('lpFigLab','a طول، b عرض، c ارتفاع، x بلندترین پاره‌خط');\nF('lpNS_0','x');F('lpNM_0','بلندترین پاره‌خط داخل بار');\nF('lpGuess','جا نمی‌شه چون ۳.۲ از ۴ کمتره');S('lpConf','80');F('lpTest','اگه یه راه کج پیدا کنم که بلندتر از ۴ باشه');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','no');\nC('.lp-usave');const bad=[...document.querySelectorAll('#main .bad')].map(e=>e.textContent.trim()).join(' || ');\nreturn 'BAD:'+bad+'\\n'+BL().slice(-300)+'\\n'+MT('فهمت با صورتی',300)})()\n;C(\".sv-g2\");APP.state.sub"
+},
+{
+"eval": "JSON.stringify(APP.liveKindInfo(\"pb_l_mvaqm0ik9l6\"))+\" PH:\"+APP.livePhase(\"pb_l_mvaqm0ik9l6\")+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",500)"
+},
+{
+"say": "خب مجهول بلندترین پاره‌خط داخل بارِ. کف رو حساب کردم: sqrt(3.2^2 + 1.8^2) ≈ 3.67. باز هم از ۴ کمتره! گیر کردم."
+},
+{
+"say": "آره قطر مستطیل رو دیدم، همینو حساب کردم دیگه. باز ۳.۶۷ میشه. نمی‌دونم."
+},
+{
+"eval": "(()=>{const c=APP.liveCoach(\"pb_l_mvaqm0ik9l6\");return JSON.stringify({src:c.src,stuckN:c.stuckN,unused:c.unused,rung:c.rung})})()"
+},
+{
+"eval": "(()=>{const c=APP.liveCoach(\"pb_l_mvaqm0ik9l6\");return JSON.stringify({src:c.src,stuckN:c.stuckN,unused:c.unused,rung:c.rung})})()"
+},
+{
+"say": "خب ۳.۲ رو که تو همون قطر کف به کار بردم، ۱.۸ رو هم. دیگه نمی‌دونم چی کار کنم."
+},
+{
+"eval": "JSON.stringify([...document.querySelectorAll(\".as-panel .mx, .mx\")].map(e=>[e.closest(\"[class*=msg]\")?e.closest(\"[class*=msg]\").className:\"?\",e.getAttribute(\"data-src\"),e.textContent]))"
+},
+{
+"say": "اگه جا شده باشه، یه سرش کف بار تو یه گوشه‌ست و سر دیگه‌ش بالا، گوشهٔ روبه‌رو! پس ارتفاع رو استفاده نکردم. قطر کف با ارتفاع یه مثلث قائم دیگه می‌سازه: sqrt(3.67^2 + 1.6^2) ≈ 4.005. جا میشه! حلش کردم دیگه، حل شد!"
+},
+{
+"eval": "(()=>{const o=[];F('lpAsk','آره، قطر مستطیل کف رو قبلاً با فیثاغورس حساب کرده بودم');o.push(C('.lp-askgo'));o.push(C('.sv-g2'));\nF('lpPlan','نخست قطر کف را از طول و عرض با فیثاغورس حساب می‌کنم، سپس با قطر کف و ارتفاع مثلث قائم دوم را می‌سازم و قطر فضایی را با ۴ متر مقایسه می‌کنم.');\nF('lpPlan2','اگر جا نشد، لوله را از درِ عقب بیرون می‌گذارم و پرچم قرمز می‌زنم.');\n['a','b','c'].forEach((x,i)=>{});\nfor(let i=1;i<=4;i++){S('lpPU_a_d'+i,'use');F('lpPU_w_d'+i,['طول در مثلث کف','عرض در مثلث کف','ارتفاع در مثلث دوم','برای مقایسهٔ نهایی'][i-1]);}\n['lpPC_0','lpPC_1'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});\no.push(C('.lp-plansave'));const bad1=[...document.querySelectorAll('#main .bad')].map(e=>e.textContent.trim()).join(' || ');\nF('lpStep','با متر قطر فضایی بار رو از گوشهٔ پایین جلو تا گوشهٔ بالای عقب اندازه می‌گیرم');S('lpClear','بله');F('lpPrem','قطر کف ۳.۶۷ و ارتفاع ۱.۶، دو مثلث قائم');S('lpBkMatch','yes');F('lpPred','حدود ۴ متر و نیم سانت می‌شه');S('lpConf','80');F('lpWhen','امروز');\n['lpSC_0','lpSC_1'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});\no.push(C('.lp-stepsave'));const bad2=[...document.querySelectorAll('#main .bad')].map(e=>e.textContent.trim()).join(' || ');\nreturn o.join(',')+'\\nBAD1:'+bad1+'\\nBAD2:'+bad2+'\\nSUB:'+APP.state.sub+'\\n'+FL('lpO|lpStep|lpG')})()\n"
+},
+{
+"eval": "(()=>{const o=[];S('lpMv','mv_auxiliary');F('lpMvWhy','قطر کف رو به‌عنوان پاره‌خط کمکی می‌کشم که دو مثلث قائم بسازه');o.push(C('.lp-mvadd'));\no.push(C('.lp-plansave'));const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).join(' || ');const s1=st();\nF('lpStep','با متر قطر فضایی بار رو از گوشهٔ پایین جلو تا گوشهٔ بالای عقب اندازه می‌گیرم؛ انتظار: sqrt(3.2^2 + 1.8^2 + 1.6^2) ≈ 4.005');const PV=[...document.querySelectorAll('#main .mx-prev')].map(e=>(e.hidden||e.style.display=='none'?'HIDDEN ':'')+e.textContent.trim()+' | math='+e.querySelectorAll('math').length).join(' || ');S('lpClear','بله');F('lpPrem','قطر کف ۳.۶۷ و ارتفاع ۱.۶، دو مثلث قائم');S('lpBkMatch','yes');F('lpPred','حدود ۴ متر و نیم سانت می‌شه');S('lpConf','80');F('lpWhen','امروز');\n['lpSC_0','lpSC_1'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});\no.push(C('.lp-stepsave'));\nreturn 'PV:'+PV+'\\n'+o.join(',')+'\\nS1:'+s1+'\\nS2:'+st()+'\\nSUB:'+APP.state.sub+'\\n'+MT('گام‌های واقعی',600)})()\n"
+},
+{
+"eval": "(()=>{const r=[];r.push(FL('lpStep|lpNewS'));r.push(F('lpStep','قطر فضایی رو با متر اندازه می‌گیرم؛ انتظار: sqrt(3.2^2 + 1.8^2 + 1.6^2) ≈ 4.005 و ۴۰ درصد خطا نه'));const e=document.getElementById('lpStep');if(e)e.scrollIntoView({block:'center'});r.push([...document.querySelectorAll('#main .mx-prev')].map(e=>(e.hidden||getComputedStyle(e).display=='none'?'HIDDEN ':'')+e.textContent.trim()+' | math='+e.querySelectorAll('math').length+' src='+[...e.querySelectorAll('[data-src]')].map(x=>x.getAttribute('data-src')).join(';')).join(' || '));return r.join('\n')})()"
+},
+{
+"eval": "(()=>{const r=[];r.push(FL('lpStep|lpNewS'));r.push(F('lpStep','قطر فضایی رو با متر اندازه می‌گیرم؛ انتظار: sqrt(3.2^2 + 1.8^2 + 1.6^2) ≈ 4.005 و ۴۰ درصد خطا نه'));const e=document.getElementById('lpStep');if(e)e.scrollIntoView({block:'center'});r.push([...document.querySelectorAll('#main .mx-prev')].map(e=>(e.hidden||getComputedStyle(e).display=='none'?'HIDDEN ':'')+e.textContent.trim()+' | math='+e.querySelectorAll('math').length+' src='+[...e.querySelectorAll('[data-src]')].map(x=>x.getAttribute('data-src')).join(';')).join(' || '));return r.join(' ### ')})()"
+},
+{
+"eval": "(()=>{S('lpODone','yes');F('lpOWhat','اندازه گرفتم: قطر فضایی حدود ۴ متر و نیم سانت شد؛ لوله رو کج گذاشتم و جا شد، در بسته شد.');S('lpOMatch','yes');S('lpOProg','بله، روشن');S('lpOWant','same');S('lpOGuess','refute');C('.lp-outsave');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).join(' || ');const s1=st()+'\\n'+FL('lpRe|lpO|lpG');\nreturn s1+'\\n'+MT('غافلگیر',700)})()\n"
+},
+{
+"eval": "(()=>{const r=[];r.push(FL('lpStep|lpNewS'));r.push(F('lpStep','قطر فضایی رو با متر اندازه می‌گیرم؛ انتظار: sqrt(3.2^2 + 1.8^2 + 1.6^2) ≈ 4.005 و ۴۰ درصد خطا نه'));const e=document.getElementById('lpStep');if(e)e.scrollIntoView({block:'center'});r.push([...document.querySelectorAll('#main .mx-prev')].map(e=>(e.hidden||getComputedStyle(e).display=='none'?'HIDDEN ':'')+e.textContent.trim()+' | math='+e.querySelectorAll('math').length+' src='+[...e.querySelectorAll('[data-src]')].map(x=>x.getAttribute('data-src')).join(';')).join(' || '));return r.join(' ### ')})()"
+},
+{
+"eval": "(()=>{F('lpOReflect','نه؛ اشتباهم این بود که فقط طول رو با ۴ مقایسه کردم. حدس اصلاح‌شده: بلندترین جای بار قطر فضاییه.');C('.lp-outsave');C('.lp-solved');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).join(' || ');\nreturn st()+'\\nSUB:'+APP.state.sub+'\\n'+FL('lpB')+'\\n'+MT('وارسیِ شکل',1500)})()\n"
+},
+{
+"eval": "(()=>{S('lpBWant','same');F('lpBChk','با متر اندازه گرفتم و با حساب خوند: حدود ۴.۰۰۵ متر');S('lpBRes','نتیجه سالم ماند');S('lpBCP_0','yes');S('lpBCP_1','yes');F('lpBOther','آره، یه مستطیل مورب از دو یال روبه‌رو تصور کنم که قطرش همون قطر فضاییه');F('lpBGlance','قطر فضایی = رادیکال a²+b²+c²');F('lpBWorked','پرسیدن «از همهٔ داده‌ها استفاده کردم؟»');\nF('lpBSym','آره؛ a و b و c توی فرمول یکسان‌اند، جابه‌جا کنم فرق نمی‌کنه');F('lpBUnits','اگه سانتی‌متر بگیرم ۴۰۰.۵ سانت میشه، همون؛ دو طرف طول‌اند');F('lpBLimit','اگه ارتفاع صفر بشه به قطر کف ۳.۶۷ می‌رسم، درسته');\nF('lpBApprox','نیم سانت از یک سانت دقتم کمتر بود؛ شانس آوردم که در بسته شد');S('lpBBest','chat:2');F('lpBLetter','قطر = رادیکال a² + b² + c²');F('lpBUse','هر جا جسم بلندی رو توی جعبه جا بدم، قطر فضایی رو حساب می‌کنم');F('lpBTaste','بخش دیدن مثلث دوم رو دوست داشتم؛ حساب رادیکال رو نه');\nF('lpBNew','طناب مهار از گوشهٔ بالای بار تا وسط کف روبه‌رو چقدر باید باشه؟');S('lpBNewS','method');F('lpBNewW','همون روش: پاره‌خط مورب رو توی دو مثلث قائم پیدا کنم');S('lpBHit','نادرست بود');F('lpBHitW','فقط طول رو دیدم و فکر کردم لوله باید صاف کف بخوابه؛ فرض پنهانم «موازی دیواره» بود');\nwindow.__opts=[...document.getElementById('lpBBest').options].map(o=>o.value+'='+o.text.slice(0,70)).join(' | ');window.__apx=MT('تقریبت بس',300);const b=[...document.querySelectorAll('#main button')].find(b=>/ثبتِ بازنگری/.test(b.textContent));b.click();\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).join(' || ');\nreturn window.__opts+'\\nAPX:'+window.__apx+'\\nTT:'+TT()+'\\nCLOS:'+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0ik9l6\"))+'\\n'+st()+'\\nPH:'+APP.livePhase('pb_l_mvaqm0ik9l6')+'\\n'+JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.dormant,APP.liveKindInfo(r.p.id)]))})()\n"
+},
+{
+"eval": "[...document.querySelectorAll(\"#main .lp-bapproxm,#main .lp-softgate,#main .bad\")].map(e=>e.className+\": \"+e.textContent.trim().slice(0,300)).join(\"\\n\")+\"\\nCLOS:\"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0ik9l6\"))"
+},
+{
+"eval": "(()=>{F(\"lpBApprox\",\"نه، بس نبود: نیم سانت از یک سانت دقتم کمتر بود؛ اندازه‌گیری واقعی نشون داد جا میشه ولی دفعهٔ بعد دقت باید میلی‌متری باشه\");const sw=document.getElementById(\"lpBSoftWhy\")||document.getElementById(\"lpSoftWhy\");if(sw)F(sw.id,\"اندازه‌گیری واقعی با متر جا شدن رو نشون داد؛ تقریب حساب کافی نبود و اینو پذیرفتم\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/ثبتِ بازنگری/.test(b.textContent));b.click();return \"SW:\"+(sw&&sw.id)+\" TT:\"+TT()+\"\\nCLOS:\"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0ik9l6\"))+\"\\n\"+JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,r.dormant]))})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title.slice(0,40),r.dormant]))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{0;APP.go('home');const d=DUE();APP.go('lprob','pb_l_mvaqnh8dtn2');const t1=MT('',2500);\nconst b=[...document.querySelectorAll('#main button')].find(b=>/شروع می‌کنم/.test(b.textContent));if(b)b.click();\nF('lpOne','می‌خوام بدونم طناب مهار از گوشهٔ بالا تا وسط کف روبه‌رو چقدر باید باشه.');F('lpWhy','که طناب کم نیارم');C('.lp-onesave');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).join(' || ');\nreturn d+'\\n####\\n'+t1.slice(-1500)+'\\n####\\n'+st()+'\\n'+FL('lpNat|lpSpatial|lpUnk')+' sp='+(document.getElementById('lpSpatial')||{}).checked})()\n",
+"clock": "2026-10-21"
+},
+{
+"eval": "(()=>{F('lpOne','دنبال طول یه پاره‌خط موربم توی همون جعبه.');C('.lp-onesave');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).slice(-2).join(' || ');\nconst D=['طول بار ۳.۲','عرض بار ۱.۸','ارتفاع بار ۱.۶'];C('.lp-dadd');const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>{F(id,D[i]||'');S(id.replace('lpD_','lpDE_'),'big')});\nF('lpUnk','طول طناب از گوشهٔ بالا تا وسط کف روبه‌رو');F('lpCond','طناب صاف کشیده بشه');S('lpSat','yes');S('lpSuff','کافی است');F('lpSuffW','سه بعد هست');\nF('lpPrVague','وسط کف یعنی مرکز مستطیل کف');F('lpPrLine','گره‌ها رو حساب نمی‌کنم');F('lpPrApprox','ده سانت');F('lpPrPrior','همون مسئلهٔ لوله');F('lpPrMeasure','طول طناب به متر');\nF('lpFigDone','جعبه، طناب از یه گوشهٔ بالا به مرکز کف');S('lpFigGen','general');F('lpFigLab','a،b،c، L طول طناب');F('lpGuess','حدود ۳ متر');S('lpConf','60');F('lpTest','حساب با مثلث قائم');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','neutral');\nC('.lp-usave');C('.sv-g2');\nreturn st()+'\\nSUB:'+APP.state.sub+'\\n'+MT('مسئلهٔ مرتبط از کارهای خودت',900)+'\\n'+BL().slice(0,900)})()\n"
+},
+{
+"eval": "(()=>{C('.lp-rellink');const t=document.getElementById('main').innerText;const i=t.indexOf('مسئلهٔ مرتبط از کارهای خودت');const a=t.slice(i,i+1200);const f=FL('lpRel|lpSh|lpMap');\nreturn a+'\\n'+f})()\n"
+},
+{
+"eval": "(()=>{F('lpPrMeasure','L متر = طول طناب، L ≤ ۴ متر طنابی که داریم');C('.lp-usave');C('.sv-g2');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).slice(-2).join(' || ');\nconst r=st()+'\\nSUB:'+APP.state.sub;const t=document.getElementById('main').innerText;const i=t.indexOf('مسئلهٔ مرتبط از کارهای خودت');\nreturn r+'\\n'+t.slice(i,i+900)})()\n"
+},
+{
+"eval": "(()=>{C('.lp-rellink');const t=document.getElementById('main').innerText;const i=t.indexOf('مسئلهٔ مرتبط از کارهای خودت');const a=t.slice(i,i+1200);const f=FL('lpRel|lpSh|lpMap');\nreturn a+'\\n'+f})()\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQs(r.p.id)]))"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.cur().msgs.filter(m=>m.role==\"ai\").map(m=>m.text))"
+},
+{
+"eval": "(()=>{APP.go('lprob');let r=[];r.push('has:'+!!document.getElementById('lpNewS'));r.push(F('lpNewS','طناب مهار از گوشهٔ بالای بار تا وسط کف روبه‌رو: L = sqrt((3.2/2)^2 + (1.8/2)^2 + 1.6^2) — بار ۳.۲ در ۱.۸ در ۱.۶ متره و طنابم ۴ متر؛ قرارداد ۱۴۰۵/۰۷/۲۵'));const e=document.getElementById('lpNewS');if(e)e.scrollIntoView({block:'center'});r.push([...document.querySelectorAll('#main .mx-prev')].map(e=>(e.hidden||getComputedStyle(e).display=='none'?'HIDDEN ':'')+e.textContent.trim()+' | math='+e.querySelectorAll('math').length+' src='+[...e.querySelectorAll('[data-src]')].map(x=>x.getAttribute('data-src')).join(';')).join(' || '));return r.join(' ### ')})()"
+},
+{
+"eval": "(()=>{APP.go('e_prob',null,'live');let r=[];r.push('has:'+!!document.getElementById('lpNewS'));r.push(F('lpNewS','طناب مهار از گوشهٔ بالای بار تا وسط کف روبه‌رو: L = sqrt((3.2/2)^2 + (1.8/2)^2 + 1.6^2) — بار ۳.۲ در ۱.۸ در ۱.۶ متره و طنابم ۴ متر؛ قرارداد ۱۴۰۵/۰۷/۲۵'));const e=document.getElementById('lpNewS');if(e)e.scrollIntoView({block:'center'});r.push([...document.querySelectorAll('#main .mx-prev')].map(e=>(e.hidden||getComputedStyle(e).display=='none'?'HIDDEN ':'')+e.textContent.trim()+' | math='+e.querySelectorAll('math').length+' src='+[...e.querySelectorAll('[data-src]')].map(x=>x.getAttribute('data-src')).join(';')).join(' || '));return r.join(' ### ')})()"
+},
+{
+"eval": "(()=>{APP.go(\"home\");return JSON.stringify(APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t||x)]))})()"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,g:(s.coach||{}).guess&&s.coach.guess.text,plans:s.plans,prom:s.promises,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>m.guess)})))"
+},
+{
+"eval": "JSON.stringify({live:APP.liveAll().map(r=>[r.p.id,r.p.title,(APP.liveClosure(r.p.id)||{}).state])})"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqm0ik9l6\");return document.getElementById(\"main\").innerText.slice(900,7000)})()"
+},
+{
+"eval": "JSON.stringify(APP.dossier(\"pb_l_mvaqm0ik9l6\").events.map(e=>[e.at,e.k,e.title]))"
+},
+{
+"eval": "(()=>{const r=APP.liveAll().find(r=>r.p.id==\"pb_l_mvaqm0ik9l6\");const L=r.live||(r.solve||{}).live||{};return JSON.stringify({planKeys:Object.keys(L).filter(k=>/plan/i.test(k)),plan:L.plan,pa:L.planAt,st:(L.steps||[]).map(s=>[s.at,s.created])}).slice(0,1500)})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\");return document.getElementById(\"main\").innerText.slice(700,2500)})()"
+},
+{
+"eval": "(()=>{localStorage.setItem(\"lla.dev\",\"1\");APP.clock.dev=true;return 0})()",
+"clock": "2026-10-24"
+},
+{
+"reload": true
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "APP.today()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt69iy9gl');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "JSON.stringify({t:APP.today(),v:APP.state.view,a:APP.state.arg,cur:APP.ASSIST.cur().id,sess:APP.ASSIST.sessions().map(s=>({id:s.id,t:s.title,n:(s.msgs||[]).length,first:((s.msgs||[])[0]||{}).text})),live:APP.liveAll().map(r=>[r.p.id,r.p.title,JSON.stringify(APP.liveClosure(r.p.id))])})"
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0ik9l6\");return MT(\"داده‌ها\",900)})()"
+},
+{
+"say": "یه اصلاح دربارهٔ همون لوله: اولش گفتم ارتفاعِ بار ۱.۶ـه؛ امروز دوباره با متر اندازه گرفتم — ۱۶۰ سانت نبود، ۱۵۰ سانته."
+},
+{
+"eval": "[...document.querySelectorAll(\"button\")].filter(b=>/بله|عوض شود|نه، همان/.test(b.textContent)).map(b=>b.className+\":\"+b.textContent.trim().slice(0,60)+\" @\"+(b.closest(\".as-root\")?\"panel\":\"main\")).join(\" | \")"
+},
+{
+"eval": "(()=>{document.querySelector(\".as-askyes\").click();return \"ok\"})()"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0ik9l6\");return JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0ik9l6\"))+\"\\n\"+MT(\"داده‌ها\",10)+\"\\n\"+FL(\"lpD_\")})()"
+},
+{
+"eval": "JSON.stringify((APP.S.get(\"eprog_pb_l_mvaqm0ik9l6\").solve.u||{}).data||(APP.S.get(\"eprog_pb_l_mvaqm0ik9l6\").solve.u||{}).d||Object.keys(APP.S.get(\"eprog_pb_l_mvaqm0ik9l6\").solve.u||{}))"
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"say": "دوباره حساب کردم: sqrt(3.2^2 + 1.8^2 + 1.5^2) ≈ 3.97 — از ۴ کمتره، پس با ارتفاع ۱۵۰ سانت لوله جا نمیشه."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlxzz8u81p');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltl2ehgit');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const r=APP.liveRec(\"pb_l_mvaqm0ik9l6\");const L=APP.S.get(\"eprog_pb_l_mvaqm0ik9l6\");const u=L&&L.solve&&L.solve.live;return JSON.stringify({stmt:r&&r.p&&(r.p.statement||r.p.stmt||r.p.text),dl:u&&u.uDraft&&u.uDraft.dl,u:u&&u.u&&u.u.dl})})()"
+},
+{
+"eval": "(()=>{const L=APP.S.get(\"eprog_pb_l_mvaqm0ik9l6\");const t=JSON.stringify(L);const out=[];let i=-1;while((i=t.indexOf(\"ارتفاع بار\",i+1))>=0&&out.length<8)out.push(t.slice(Math.max(0,i-60),i+80));return out.join(\"\\n\")})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt6ue0gwc');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlu62v8c2c');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "یه لولهٔ کوتاه‌تر هم دارم، ۳٫۹۵ متری. خودم حساب کردم: ۳٫۲² = ۱۰٫۲۴، با ۱٫۸² میشه ۱۳٫۴۸، با ۱٫۵² میشه ۱۵٫۷۳. ۱۵۰ سانت = ۱٫۵ متر. قطر = sqrt(15.73) ≈ ۳٫۹۷ و ۳٫۹۷ − ۳٫۹۵ = ۰٫۰۲ متر = ۲ سانت جا دارم."
+},
+{
+"say": "لولهٔ سومم ۳٫۹ متریه: ۳٫۹۷ − ۳٫۹ = ۰٫۷ متر = ۷ سانت جا داره. بارگیری هم ۱۴۰۵/۹/۱۲ ـه و نمرهٔ آزمونِ گواهینامه‌م ۱۸ از ۲۰ شد."
+},
+{
+"say": "آهان ممیز رو جا انداختم: ۳٫۹۷ − ۳٫۹ = ۰٫۰۷ متر = ۷ سانت."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({dp:s.datePend,sys:s.msgs.filter(m=>m.role==\"sys\").slice(-3).map(m=>m.text.slice(0,200)),due:DUE()})})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlthiifts1');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "JSON.stringify({dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what,x.date]),due:(APP.dueList()||[]).map(x=>x.txt).slice(0,6),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-3).map(m=>m.text.slice(0,200)),today:APP.today()})"
+},
+{
+"say": "اگه بار رو سه قسمت کنم: ۴ تقسیم بر ۳ = ۱٫۳۳ متر هر تکه، ۸ ÷ ۳ = ۳ تا میله برای هر تکه. نسبتِ طول به عرضِ بار هم ۱۳/۱۲ = ۱ میشه."
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll(\".as-panel .as-msg, .as-panel [class*=msg]\")].slice(-4).map(e=>e.innerText.slice(0,400));return JSON.stringify(b)})()"
+},
+{
+"say": "آره گرد کردم، دو و خرده‌ای، یعنی ۲٫۶۷ میشه که سه تا میله لازمه. اون نسبت هم ۱۳/۱۲ = ۱٫۰۸ ـه."
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,250)))"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltp2vy7v5');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "یه وانتِ دیگه هم هست: کفش ۱۵ دسی‌متر در ۸ دسی‌متره، پس قطرش √(۱۵² + ۸²) ≈ ۱۷ دسی‌متر. برای وانتِ کوچیک‌تر هم حساب کردم √(۱۵² + ۸²) ≈ ۱۶ که فکر کنم همون عدده."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"say": "آره ۱۶ رو اشتباه زدم. ارتفاعِ مثلثِ نگه‌دارنده هم ۲√۳ دسی‌متر میشه. آخرش هم: کلِ بار ۲ میلیون و ۸۰۰ تومن کرایه داره و نصفش با منه، یعنی ۱ میلیون و ۴۰۰."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"say": "دقیق‌ترش: ۲√۳ ≈ ۳٫۴۶ دسی‌متر. کرایه: ۲ میلیون و ۸۰۰ + ۲۰۰ هزار انعام = ۳ میلیون. سهمِ من: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰. سهمِ برادرم با کارگر: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۵۰۰."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"say": "آهان برادرم هم ۱ میلیون و ۴۰۰. رفت‌وبرگشت: ۲ میلیون و ۸۰۰ × ۲ = ۵ میلیون و ۶۰۰. توی دفترم نوشتم ۲ میلیون و ۸۰۰ ÷ ۲ = ۱۴۰۰."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"say": "منظورم ۲ میلیون و ۸۰۰ هزار بود، پس ۱۴۰۰ هزار تومن."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltm9y4ezy');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0ik9l6');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqnh8dtn2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "حسابِ سفر رو هم بستم: بنزین ۴ میلیون و ۲۰۰ + عوارض ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰. از ۳ میلیون و ۴۰۰ پیش‌پرداخت، ۱ میلیون و ۱۰۰ رو پس گرفتم، پس ۳ میلیون و ۴۰۰ − ۱ میلیون و ۱۰۰ = ۲ میلیون و ۲۰۰. پارکینگ ۱ میلیون و ۸۰۰ تومن − ۳۰۰ تومن تخفیف = ۱ میلیون و ۵۰۰ تومن. ناهار ۱۲ هزار و ۵۰۰ × ۲ = ۲۵ هزار. اجارهٔ بالابر هم ۲ میلیون و ۸۰۰ ÷ ۴ نفر = ۷۰۰."
+}
+],
+"replies": [
+"{\"reply\": \"«جا می‌شود یا نه» را من جای تو نمی‌گویم؛ با هم سریع پیش می‌رویم. اگر بخواهی، این را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت می‌کنی تا فهم و گام‌هایش بماند. پیش از هر سرنخی: خودت تا کجا رفتی و کجا ماندی؟\", \"title\": \"لوله در بارِ وانت\", \"pinned\": \"آیا لولهٔ ۴ متری در بارِ وانت جا می‌شود\", \"memory\": \"لولهٔ صافِ ۴ متری؛ بار ۳.۲×۱.۸×۱.۶؛ «زود بگو»؛ پیشنهاد کردم در 🔭 ثبت کند. پرسیدم خودش تا کجا رفته.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\"}]}",
+"{\"reply\": \"ثبت شد. پیش از هر سرنخی: خودت تا کجا رفتی و کجا ماندی؟\", \"title\": \"لوله در بارِ وانت\", \"pinned\": \"آیا لولهٔ ۴ متری در بارِ وانت جا می‌شود\", \"memory\": \"لولهٔ صافِ ۴ متری؛ بار ۳.۲×۱.۸×۱.۶؛ «زود بگو»؛ با آریِ خودش مسئلهٔ زنده ثبت شد. پرسیدم خودش تا کجا رفته.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"لوله در بارِ وانت\", \"statement\": \"یه لوله‌ی صاف ۴ متری دارم، بار وانتم ۳.۲ متر طول، ۱.۸ عرض، ۱.۶ ارتفاع داره. جا میشه یا نه؟\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"درست است یا نه را نمی‌گویم — این حدسِ توست. حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0ik9l6 (لوله، عملی). کاربر حدس زد ۳.۲<۴ پس جا نمی‌شود؛ داوری نکردم؛ پرسیدم چطور می‌آزماید.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"۳.۲ از ۴ کمتره دیگه، پس جا نمیشه\", \"q\": \"حدسی گفتی — چطور می‌آزمایی‌اش؟\"}}]}",
+"{\"reply\": \"قطرِ کف را درست حساب کردی — $\\\\sqrt{3.2^2+1.8^2}\\\\approx 3.67$ — این یک گامِ واقعی است. حالا: داده‌هایی که اثرِ محسوس دارند همه در طرح آمده‌اند؟ کلِ قیدها را؟\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0ik9l6 (عملی، فضایی، طرح). مجهول: بلندترین پاره‌خط داخل بار. قطر کف ≈۳.۶۷، گیر است. پرسیدم همهٔ داده‌ها در طرح آمده‌اند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"u\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"قطرِ کف را دیده‌ای. حالا خاص‌تر: دادهٔ «ارتفاع بار ۱.۶ متر (c)» را کجا به کار برده‌ای؟ اگر هنوز نه، در کدام گام جا دارد — یا با دلیل کنارش می‌گذاری؟\", \"memory\": \"لوله در بار؛ مجهول بلندترین پاره‌خط داخل بار؛ قطر کف ≈۳.۶۷؛ دومین گیر. پرسیدم ارتفاع (c) را کجا به کار برده.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"درست است، ۳.۲ و ۱.۸ را در قطرِ کف به کار بردی. از سوی دیگر نگاه کن — از خواسته به عقب: فرض کن لوله جا شده؛ یک گام مانده به آخر چه وضعی بود که از آن به این بلندترین پاره‌خط می‌رسیدی؟\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0ik9l6. سومین گیرِ پیاپی؛ پرسشِ «از خواسته به عقب» را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"back\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"ارتفاع را به کار بردی. ولی «حل شد» را صفحه هنوز ندیده. نتیجه‌ای گفتی — با واقعیت سنجیدی‌اش؟ بعد در صفحه «✅ حل شد» و بازنگری.\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0ik9l6: کاربر ارتفاع را به کار برد، قطر فضایی ≈۴.۰۰۵، گفت حل شد؛ به طرح/اجرا/بازنگریِ صفحه بردم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\", \"result\"], \"ans\": [\"p8\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"err_stage\": {\"ph\": \"p\", \"quote\": \"پس ارتفاع رو استفاده نکردم\"}}]}",
+"{\"reply\": \"اصلاحِ ارتفاعِ بار (۱۵۰ سانت به‌جای ۱.۶ متر) را فرستادم؛ صفحه در نوبتِ بعد می‌گوید کجاها عوض شد. با ارتفاعِ ۱۵۰ سانت، نتیجهٔ «جا می‌شود» را دوباره وارسی می‌کنی — هنوز همان درمی‌آید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"retract\": {\"msg\": \"۱.۶ ارتفاع داره\", \"key\": \"datum:ارتفاع بار\", \"what\": \"fact\", \"fix\": \"۱۵۰ سانت\", \"old\": \"۱.۶\"}}]}",
+"{\"reply\": \"وارسی‌ات را با مقدارِ تازه خودت انجام دادی: با ارتفاعِ ۱۵۰ سانت قطرِ فضایی حدودِ $\\\\sqrt{3.2^2+1.8^2+1.5^2}\\\\approx 3.97$ می‌شود و لوله جا نمی‌شود. میانهٔ راه: دربارهٔ مسئله چه آموختی که روزِ اول نمی‌دانستی، و دربارهٔ خودت چه دیدی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"c\", \"said\": [\"result\"], \"result\": \"از ۴ کمتره، پس با ارتفاع ۱۵۰ سانت لوله جا نمیشه\", \"ans\": [], \"stuck\": false, \"fail\": true, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"حساب‌هایت را خواندم: جمعِ سه مربع تا ۱۵٫۷۳، تبدیلِ ۱۵۰ سانت به ۱٫۵ متر و ۳٫۹۷ − ۳٫۹۵ = ۰٫۰۲ متر = ۲ سانت می‌خوانند (ریشهٔ ۱۵٫۷۳ را صفحه نسنجید؛ حدودِ ۳٫۹۷ است). پیش از این‌که لولهٔ ۳٫۹۵ را واقعاً در وانت بگذاری: فکر می‌کنی چه می‌شود، و چقدر مطمئنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\", \"result\"], \"result\": \"۳٫۹۷ − ۳٫۹۵ = ۰٫۰۲ متر = ۲ سانت جا دارم\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"دو جای این حساب با حسابِ صفحه نمی‌خواند: تفاضلِ «۳٫۹۷ − ۳٫۹» و تبدیلِ همان عدد از متر به سانت. عدد را نمی‌گویم — خودت دوباره حساب می‌کنی و می‌گویی لغزش کجا بود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"۳٫۹۷ − ۳٫۹ = ۰٫۷ متر = ۷ سانت جا داره\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"حالا می‌خواند: ۳٫۹۷ − ۳٫۹ = ۰٫۰۷ متر، یعنی ۷ سانت — لغزش را خودت پیدا کردی (جای ممیز). این گام به کدام داده تکیه دارد — و واحدها در دو سوی حساب یکی است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"۳٫۹۷ − ۳٫۹ = ۰٫۰۷ متر = ۷ سانت\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"«۴ تقسیم بر ۳ = ۱٫۳۳» می‌خواند. نسبتِ «۱۳/۱۲ = ۱» اما با حسابِ صفحه نمی‌خواند — خودت دوباره نگاهش کن. و «۸ ÷ ۳» دقیقاً حدودِ ۲٫۶۷ می‌شود: «۳ تا میله» را گرد کردی، یا واقعاً همین را می‌خواستی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"حالا ۱۳/۱۲ ≈ ۱٫۰۸ می‌خواند، و ۲٫۶۷ ⇒ سه میله با گرد کردنِ رو به بالا منطقی است. واحدها: اگر همه را با سانت بسنجی، رابطه‌ها درست می‌مانند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"۱۳/۱۲ = ۱٫۰۸\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"قطرِ اول با حسابِ صفحه می‌خواند. حسابِ دوم را — که همان عبارت است — یک بار دیگر خودت بزن: چرا دو عددِ متفاوت از یک عبارت درآمد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"خودت درستش کردی. این رابطه‌ها در کدام دامنه آزموده شدند — برای وانتِ خیلی کوچک هم همین‌طور است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"جمعِ کرایه و انعام می‌خواند. سهمِ برادرت را یک بار دیگر خودت حساب کن — با سهمِ خودت جور است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"رفت‌وبرگشت می‌خواند. آن «۱۴۰۰» ِ دفترت به چه واحدی است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"روشن شد. نتیجه را از راهِ دیگری هم می‌توانی به دست آوری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"بیشترِ حساب‌های سفر می‌خوانند، ولی تفریقِ پیش‌پرداخت (۳ میلیون و ۴۰۰ − ۱ میلیون و ۱۰۰) را یک بار دیگر خودت بزن. برای سهمِ بالابر: «۷۰۰» یعنی ۷۰۰ هزار تومان، یا عددِ دیگری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"l\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"یه لوله‌ی صاف ۴ متری دارم، بار وانتم ۳.۲ متر طول، ۱.۸ عرض، ۱.۶ ارتفاع داره. جا میشه یا نه؟ زود بگو مشتری منتظره.",
+"آره ثبتش کن.",
+"خب ۳.۲ از ۴ کمتره دیگه، پس جا نمیشه. درسته؟",
+"خب مجهول بلندترین پاره‌خط داخل بارِ. کف رو حساب کردم: sqrt(3.2^2 + 1.8^2) ≈ 3.67. باز هم از ۴ کمتره! گیر کردم.",
+"آره قطر مستطیل رو دیدم، همینو حساب کردم دیگه. باز ۳.۶۷ میشه. نمی‌دونم.",
+"خب ۳.۲ رو که تو همون قطر کف به کار بردم، ۱.۸ رو هم. دیگه نمی‌دونم چی کار کنم.",
+"اگه جا شده باشه، یه سرش کف بار تو یه گوشه‌ست و سر دیگه‌ش بالا، گوشهٔ روبه‌رو! پس ارتفاع رو استفاده نکردم. قطر کف با ارتفاع یه مثلث قائم دیگه می‌سازه: sqrt(3.67^2 + 1.6^2) ≈ 4.005. جا میشه! حلش کردم دیگه، حل شد!",
+"یه اصلاح دربارهٔ همون لوله: اولش گفتم ارتفاعِ بار ۱.۶ـه؛ امروز دوباره با متر اندازه گرفتم — ۱۶۰ سانت نبود، ۱۵۰ سانته.",
+"دوباره حساب کردم: sqrt(3.2^2 + 1.8^2 + 1.5^2) ≈ 3.97 — از ۴ کمتره، پس با ارتفاع ۱۵۰ سانت لوله جا نمیشه.",
+"یه لولهٔ کوتاه‌تر هم دارم، ۳٫۹۵ متری. خودم حساب کردم: ۳٫۲² = ۱۰٫۲۴، با ۱٫۸² میشه ۱۳٫۴۸، با ۱٫۵² میشه ۱۵٫۷۳. ۱۵۰ سانت = ۱٫۵ متر. قطر = sqrt(15.73) ≈ ۳٫۹۷ و ۳٫۹۷ − ۳٫۹۵ = ۰٫۰۲ متر = ۲ سانت جا دارم.",
+"لولهٔ سومم ۳٫۹ متریه: ۳٫۹۷ − ۳٫۹ = ۰٫۷ متر = ۷ سانت جا داره. بارگیری هم ۱۴۰۵/۹/۱۲ ـه و نمرهٔ آزمونِ گواهینامه‌م ۱۸ از ۲۰ شد.",
+"آهان ممیز رو جا انداختم: ۳٫۹۷ − ۳٫۹ = ۰٫۰۷ متر = ۷ سانت.",
+"اگه بار رو سه قسمت کنم: ۴ تقسیم بر ۳ = ۱٫۳۳ متر هر تکه، ۸ ÷ ۳ = ۳ تا میله برای هر تکه. نسبتِ طول به عرضِ بار هم ۱۳/۱۲ = ۱ میشه.",
+"آره گرد کردم، دو و خرده‌ای، یعنی ۲٫۶۷ میشه که سه تا میله لازمه. اون نسبت هم ۱۳/۱۲ = ۱٫۰۸ ـه.",
+"یه وانتِ دیگه هم هست: کفش ۱۵ دسی‌متر در ۸ دسی‌متره، پس قطرش √(۱۵² + ۸²) ≈ ۱۷ دسی‌متر. برای وانتِ کوچیک‌تر هم حساب کردم √(۱۵² + ۸²) ≈ ۱۶ که فکر کنم همون عدده.",
+"آره ۱۶ رو اشتباه زدم. ارتفاعِ مثلثِ نگه‌دارنده هم ۲√۳ دسی‌متر میشه. آخرش هم: کلِ بار ۲ میلیون و ۸۰۰ تومن کرایه داره و نصفش با منه، یعنی ۱ میلیون و ۴۰۰.",
+"دقیق‌ترش: ۲√۳ ≈ ۳٫۴۶ دسی‌متر. کرایه: ۲ میلیون و ۸۰۰ + ۲۰۰ هزار انعام = ۳ میلیون. سهمِ من: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰. سهمِ برادرم با کارگر: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۵۰۰.",
+"آهان برادرم هم ۱ میلیون و ۴۰۰. رفت‌وبرگشت: ۲ میلیون و ۸۰۰ × ۲ = ۵ میلیون و ۶۰۰. توی دفترم نوشتم ۲ میلیون و ۸۰۰ ÷ ۲ = ۱۴۰۰.",
+"منظورم ۲ میلیون و ۸۰۰ هزار بود، پس ۱۴۰۰ هزار تومن.",
+"حسابِ سفر رو هم بستم: بنزین ۴ میلیون و ۲۰۰ + عوارض ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰. از ۳ میلیون و ۴۰۰ پیش‌پرداخت، ۱ میلیون و ۱۰۰ رو پس گرفتم، پس ۳ میلیون و ۴۰۰ − ۱ میلیون و ۱۰۰ = ۲ میلیون و ۲۰۰. پارکینگ ۱ میلیون و ۸۰۰ تومن − ۳۰۰ تومن تخفیف "
+]
+}

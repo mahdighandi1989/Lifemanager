@@ -499,3 +499,11 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R28 C134 — «مهلت سه‌شنبه نیست، چهارشنبه است» on a Tuesday moved next week's Tuesday deadline to tomorrow; the
   replacing weekday belongs to the week of the replaced date, and a what-only correction never moves the date.
 - **Status:** reachable, not called. Delete only with the owner's approval.
+
+## 2026-11-17 — Tour 1 round 29, fixer «arith»: C105 branch and the C108 inline remainder kept as quarantine in `a46_arith.js`
+- **What:** `lockC105R28(s, n2)` (exported as `ST.arithC105R28`, switch `ST.arithC105R28On = false`): «تومن / تومان / ریال» after M fixed the units reading
+  of «N میلیون و M». The inline C108 remainder (`remc` from «the last N تا before the calc larger than the result») inside `chains`, behind
+  `ST.arithC108R28On` (never set).
+- **Why replaced:** C135 revokes C105 (S1 D29-1, D29-2: «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰ تومن» was ✗ «۱۸٫۷»). C141 replaces the C108 inline rule by
+  `remains29` (S1 C29-1: after a subtraction the inline rule picked «۱۵» as the total and told the coach «✗ ۱۵ − ۳ … ۱۲»).
+- **Status:** reachable only by flipping the switches; not called. Delete only with the owner's approval.

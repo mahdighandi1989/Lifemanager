@@ -1,0 +1,470 @@
+{
+"from": "round29A/s06",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "یه باگ دارم که هفته‌ای یه بار پرداخت دوبار ثبت میشه. سه روزه لاگ اضافه می‌کنم، کد رو عوض می‌کنم، deploy می‌کنم، منتظر می‌مونم. هیچی. دیگه نمی‌دونم چی رو امتحان کنم. ۹ تا تغییر دادم: timeout، retry، قفل دیتابیس، ... تغییر دهم چی باشه؟"
+},
+{
+"fill": [
+".age-in",
+"1997-04-22"
+]
+},
+{
+"click": ".age-ask .btn.sm:not(.ghost)"
+},
+{
+"eval": "(()=>{return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()"
+},
+{
+"say": "آره ثبتش کن."
+},
+{
+"eval": "(()=>{const c=document.querySelectorAll(\".age-ask\");return c.length+\" | \"+[...c].map(x=>x.innerText.slice(0,300)+\" val=\"+x.querySelector(\".age-in\").value).join(\" || \")})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,APP.liveKindInfo(r.p.id).kind,APP.liveKindInfo(r.p.id).type]))\n"
+},
+{
+"say": "داده: دو رکورد پرداخت با یک order_id، با فاصلهٔ حدود ۳۰ ثانیه، و idempotency-key هاشون متفاوته. نمی‌دونم چی‌کار کنم."
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.value='1997-04-22';document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()})()"
+},
+{
+"eval": "(()=>{const p=APP.liveSessionPid(APP.ASSIST.cur());F('lpOne','می‌خوام بفهمم چرا گاهی یه پرداخت دو بار ثبت میشه.');F('lpWhy','مشتری‌ها شاکی‌اند و سه روزه بی‌نتیجه‌ام');C('.lp-onesave');\nconst D=['دو رکورد با یک order_id','فاصلهٔ دو ثبت حدود ۳۰ ثانیه','idempotency-key دو رکورد متفاوت است','هفته‌ای یک بار رخ می‌دهد'];for(let i=2;i<D.length;i++)C('.lp-dadd');const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>F(id,D[i]||''));\nF('lpUnk','علتی که باعث می‌شود یک پرداخت دو رکورد با کلیدِ متفاوت بسازد');F('lpCond','دو رکورد با یک order_id\\nکلیدهای متفاوت\\nفاصلهٔ ~۳۰ ثانیه');S('lpSuff','کافی است');F('lpSuffW','لاگ‌ها هست');S('lpSat','yes');\nF('lpGuess','یه race condition در worker است');S('lpConf','70');F('lpTest','اگر دو worker هم‌زمان پیام را برنداشته باشند');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','neutral');\nC('.lp-usave');C('.sv-g2');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-1).join(' || ');return p+' '+st()+' '+APP.state.sub})()\n"
+},
+{
+"eval": "(()=>{F('lpBkS','دو رکورد با یک order_id و کلیدِ متفاوت در دیتابیس نشسته‌اند');F('lpBk1','دو درخواستِ ثبت با کلیدهای متفاوت به سرویسِ پرداخت رسیده‌اند');\nC('.lp-bkbranch');const f=FL('lpBk');return f})()\n"
+},
+{
+"eval": "(()=>{F('lpBk2','کلاینت پس از timeout درخواست را با کلیدِ تازه دوباره فرستاده (retry)');F('lpBk_1_0','دو worker یک پیامِ صف را هم‌زمان برداشته‌اند');F('lpBk_1_1','قفلِ پیام در صف پیش از پایانِ کار آزاد شده');\ndocument.getElementById('lpBkPick_1').click();F('lpBkH','لاگِ worker و لاگِ کلاینت');C('.lp-bksave');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-1).join(' || ');return st()})()\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{0;APP.go('lprob','pb_l_mvaqm5inxdt','plan');document.getElementById('lpBkDead_1').click();const f=FL('lpBk');const t=MT('بن‌بست',1200);return f+'\\n####\\n'+t})()\n",
+"clock": "2026-10-17"
+},
+{
+"eval0": "(()=>{F('lpBkDeadW_1','صف قفلِ دوباره ندارد ولی لاگ نشان داد هر پیام فقط یک بار برداشته شده');document.getElementById('lpBkPick_0').click();C('.lp-bkdeeper');const f=FL('lpBk');return f})()\n",
+"say": "شاخهٔ worker رو دو روز دنبال کردم، کلی نشونه داشت ولی آخرش بن‌بست بود. می‌خوام کل این نظریه‌ی تحلیل رو بندازم دور و برگردم سراغ تغییر دادن کد."
+},
+{
+"eval": "APP.liveCoach('pb_l_mvaqm5inxdt',{turn:{text:'می‌خوام کل این نظریه‌ی تحلیل رو بندازم دور و برگردم سراغ تغییر دادن کد.'}}).src\n"
+},
+{
+"eval": "(()=>{const c=APP.liveCoach('pb_l_mvaqm5inxdt',{turn:{text:'می‌خوام کل این نظریه‌ی تحلیل رو بندازم دور و برگردم سراغ تغییر دادن کد.'}});return c.src+' | '+c.q})()\n"
+},
+{
+"eval": "(()=>{0;APP.go('lprob','pb_l_mvaqm5inxdt','plan');const f=FL('lpBk');\nconst e=[...document.querySelectorAll('#main input,#main textarea')].filter(x=>/^lpBk/.test(x.id)&&!x.value&&x.type!=='checkbox'&&x.type!=='radio');\nif(e[0])F(e[0].id,'gateway پس از ۳۰ ثانیه timeout می‌دهد و کلاینت درخواست را با کلیدِ تازه می‌سازد');C('.lp-bksave');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-1).join(' || ');return f+'\\nFILLED:'+(e[0]&&e[0].id)+'\\n'+st()})()\n",
+"clock": "2026-10-18"
+},
+{
+"eval": "(()=>{F('lpPlan','نخست timeoutِ gateway را بالاتر از زمانِ پردازش می‌برم، سپس کلید را در retry ثابت نگه می‌دارم، سپس با آزمونِ بار تأیید می‌کنم که ثبتِ دوباره رخ نمی‌دهد.');\n[...document.querySelectorAll('[id^=lpPU_a_]')].forEach(e=>S(e.id,'use'));[...document.querySelectorAll('[id^=lpPU_w_]')].forEach((e,i)=>F(e.id,['همان دو رکورد','۳۰ ثانیه همان timeoutِ gateway است','کلیدِ متفاوت از retry','هفتگی چون بار در اوجِ هفته بالاست'][i]||'در طرح'));\n[...document.querySelectorAll('[id^=lpPC_]')].forEach(e=>{if(!e.checked)e.click()});C('.lp-plansave');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-1).join(' || ');const a=st();\n// step 1: last link of chosen branch\nF('lpStep','timeoutِ gateway را از ۳۰ به ۹۰ ثانیه می‌برم');S('lpClear','بله');F('lpProof','لاگ نشان می‌دهد پردازش گاهی ۴۰ ثانیه طول می‌کشد و gateway در ۳۰ ثانیه قطع می‌کند');F('lpPrem','فاصلهٔ ۳۰ ثانیه');const bm=document.getElementById('lpBkMatch');if(bm)S('lpBkMatch','yes');\n[...document.querySelectorAll('[id^=lpSD_]')].slice(1,2).forEach(e=>{if(!e.checked)e.click()});C('.lp-stepsave');const b=st();\n// step 2: no proof\nF('lpStep','کلید را در retryِ کلاینت ثابت نگه می‌دارم');S('lpClear','بله');F('lpProof','');F('lpPrem','کلیدِ متفاوت');C('.lp-stepsave');const c=st();\nreturn a+'\\n'+b+'\\n'+c+'\\n'+FL('lpClear|lpProof|lpIntu')})()\n"
+},
+{
+"eval": "(()=>{C(\".lp-stepsave\");const a=[...document.querySelectorAll(\"[aria-live]\")].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join(\"\");return a+\"\\n\"+BL().slice(-600)})()"
+},
+{
+"eval": "(()=>{S('lpClear','مطمئن نیستم');C('.lp-stepsave');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join('');const a=st();\nconst ck=document.getElementById('lpReal');if(ck&&!ck.checked)ck.click();\nF('lpStep','آزمونِ بار با ۱۰۰۰ پرداختِ کند در محیطِ آزمایشی');S('lpClear','بله');F('lpProof','اگر دو اصلاحِ قبلی کافی باشند، هیچ رکوردِ دوباره‌ای نباید ساخته شود');F('lpPrem','دو گامِ پیشین');F('lpPred','صفر رکوردِ دوباره');S('lpConf','80');F('lpWhen','۴ آبان');C('.lp-stepsave');\nreturn 'part1:'+TT()})()"
+},
+{
+"clock": "2026-10-26",
+"eval": "(()=>{APP.go('lprob','pb_l_mvaqm5inxdt','exec');S('lpODone','yes');F('lpOWhat','آزمون: صفر رکوردِ دوباره در ۱۰۰۰ پرداخت؛ یک هفته در production هم تکرار نشد');S('lpOMatch','yes');S('lpOProg','بله، روشن');S('lpOWant','same');S('lpOGuess','refute');C('.lp-outsave');F('lpOReflect','حدسِ race در worker غلط بود؛ علت timeoutِ gateway و retry بود');C('.lp-outsave');\nC('.lp-solved');const t=MT('پیش از «حل شد»',900);return a+'\\n'+st()+'\\nSUB:'+APP.state.sub+'\\n'+JSON.stringify(APP.liveClosure('pb_l_mvaqm5inxdt'))+'\\n'+t+'\\n'+FL('lpGate|lpG_|lpCg|lpIn')})()\n"
+},
+{
+"eval": "(()=>{const sel=[...document.querySelectorAll('#main select')].find(e=>[...e.options].some(o=>/حالا ثابتش می‌کنم/.test(o.textContent)));const opt=[...sel.options].find(o=>/حالا ثابتش/.test(o.textContent));S(sel.id,opt.value);\nconst f=FL();const tx=[...document.querySelectorAll('#main textarea,#main input')].filter(e=>!e.value&&/lpG|Gate|lpIn|lpCg/.test(e.id)).map(e=>e.id);\ntx.forEach(id=>F(id,'سرور idempotency-key را یکتا می‌گیرد؛ اگر کلاینت در retry همان کلید را بفرستد، درخواستِ دوم رد می‌شود — ولی این را در سرور نیازموده بودم؛ آزمونِ واحدش را افزودم و گذشت'));\nconst b=[...document.querySelectorAll('#main button')].find(b=>/تأیید — حل شد/.test(b.textContent));if(b)b.click();\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join('');\nreturn sel.id+' '+tx.join(',')+'\\n'+st()+'\\nSUB:'+APP.state.sub+'\\n'+JSON.stringify(APP.liveClosure('pb_l_mvaqm5inxdt')).slice(0,300)})()\n"
+},
+{
+"eval": "(()=>{const ids=[...document.querySelectorAll(\"#main textarea,#main input\")].filter(e=>/lpIS|lpIP/.test(e.id)).map(e=>e.id+\"=\"+e.value);return ids.join(\" | \")+\"\\n\"+FL(\"lpI\")})()"
+},
+{
+"eval": "(()=>{F('lpISP_ls2','سرور idempotency-key را یکتا می‌گیرد؛ اگر retry همان کلید را بفرستد درخواستِ دوم رد می‌شود — این را سمتِ سرور نیازموده بودم؛ آزمونِ واحدش را افزودم و گذشت');\nconst b=[...document.querySelectorAll('#main button')].find(b=>/تأیید — حل شد/.test(b.textContent));if(b)b.click();\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join('');\nreturn st()+'\\nSUB:'+APP.state.sub+'\\n'+FL('lpB').split('\\n').filter(x=>/lpB(Chk|Use|New|Hyp|Concl|Crit|Sens)/.test(x)).join('\\n')+'\\n'+MT('وارسیِ',500)})()\n"
+},
+{
+"say": "تموم شد، یک هفته تکرار نشده. بازنگری چی کار کنم؟"
+},
+{
+"eval": "(()=>{window.__T=[];const o=APP.toast;if(!o.__w){APP.toast=function(m,k){window.__T.push((k||\"\")+\":\"+m);return o.apply(this,arguments)};APP.toast.__w=1}window.TT=()=>{const t=window.__T.slice(-3).join(\" || \");window.__T=[];return t};return FL(\"lpB\")})()"
+},
+{
+"eval": "window.__T=[];(()=>{S('lpBWant','same');F('lpBChk','جای‌گذاری در شرط: با کلیدِ ثابت دو رکورد با کلیدِ متفاوت دیگر ساخته نمی‌شود؛ آزمونِ بار صفر تکرار داد');S('lpBRes','نتیجه سالم ماند');[...document.querySelectorAll('[id^=lpBCP_]')].forEach(x=>S(x.id,'yes'));F('lpBOther','می‌شد از لاگِ gateway شروع کنم و فاصلهٔ ۳۰ ثانیه را مستقیم با timeout مقایسه کنم');F('lpBGlance','از وضعِ نهایی به عقب رفتم تا timeoutِ gateway و retry با کلیدِ تازه');F('lpBWorked','کارِ به عقب و جدا کردنِ دو شاخه');F('lpBLimit','اگر timeout بی‌نهایت بزرگ باشد retry هرگز رخ نمی‌دهد و تکرار صفر است؛ اگر صفر باشد هر پرداخت دوبار ثبت می‌شود — همان که باید');S('lpBMulti','one');S('lpBBest','chat:0');F('lpBUse','هر باگِ دوباره‌کاری: اول به عقب از وضعِ نهایی تا علت');F('lpBTaste','کارِ به عقب را دوست داشتم؛ صبر برای deploy را نه');F('lpBNew','چرا گاهی ایمیلِ تأیید دو بار فرستاده می‌شود؟');S('lpBNewS','method');F('lpBNewW','همان روش: از وضعِ نهایی به عقب تا retry');S('lpBHit','نادرست بود');F('lpBHitW','فرض کردم دوبار ثبت یعنی هم‌زمانی، در حالی که فاصلهٔ ۳۰ ثانیه نشانهٔ timeout بود');C('.lp-lbsave');const p='pb_l_mvaqm5inxdt';return TT()+'\\n'+JSON.stringify(APP.liveClosure(p))+'\\n'+MT('۴) بازنگری',500)})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQs(r.p.id)]))\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQItems(r.p.id)]))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t||x)]),null,0)"
+},
+{
+"eval": "JSON.stringify([...document.querySelectorAll(\".as-msg .mx\")].map(e=>e.getAttribute(\"data-src\")))"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,g:(s.coach||{}).guess&&s.coach.guess.text})))"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "APP.liveAll().map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"
+},
+{
+"eval": "\"clock->2026-10-30\"",
+"clock": "2026-10-30"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");const j=t.indexOf(\"⚫ نقطه\");return t.slice(i,j+400)})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltftthu6w');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltj4vwqe8');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt5t1y3nw');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlttuaxypy');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltz1uliwm');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "یه گزارشِ کوتاه برای تیم نوشتم: تو هفتهٔ پیش ۳ پرداختِ دوباره از ۱۲۰۰ تراکنش داشتیم، یعنی ۳ / ۱۲۰۰ = ۰٫۲۵٪. کلیدِ یکتا رو این‌جوری می‌سازم: key = hash(user_id + ts) و برای شاردها ۱۷ ≡ ۲ (mod ۵). تایم‌اوت هم باید x + ۳ = ۱۰ ثانیه باشه. نسخهٔ ۲.۳.۱ روز ۱۴۰۵/۸/۲۰ رفت بالا."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltifmpd5a');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"home\");APP.ASSIST.newSession();return APP.ASSIST.cur().id})()"
+},
+{
+"say": "یه سؤالِ تازه: سرورِ صف‌مون شب‌ها کند میشه. خودم یه گام رفتم: ۲۰۰ پیام در ثانیه × ۳۶۰۰ = ۷۲۰۰۰۰ پیام در ساعت. حالا نمی‌دونم گلوگاه کجاست."
+},
+{
+"eval": "JSON.stringify(APP.STORY.arithChk(\"۲۰۰ پیام در ثانیه × ۳۶۰۰ = ۷۲۰۰۰۰ پیام در ساعت\"))"
+},
+{
+"eval": "JSON.stringify([APP.STORY.arithChk(\"۲۰۰ پیام در ثانیه × ۳۶۰۰ = ۷۲۰۰۰۰ پیام در ساعت\"),APP.STORY.arithChk(\"۲۰۰ × ۳۶۰۰ = ۷۲۰۰۰۰\")])"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvuqyc8nojliu');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltnousb6k');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const m=APP.ASSIST.cur().msgs;return m.slice(-3).map(x=>x.role+\": \"+x.text.slice(0,300)).join(\"\\n\")})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvuqv6m1vyy26');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt2mmf4mt');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm5inxdt');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvp10jkwcwf');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "یه حساب دیگه هم کردم: شب‌ها تا ۸۰۰ پیام در ثانیه میاد، پس ۸۰۰ × ۳۶۰۰ = ۲۸۸۰۰۰۰ پیام در ساعت. ظرفیتِ صف ۵ میلیون و ۴۰۰ پیامه، پس ۵ میلیون و ۴۰۰ − ۲ میلیون و ۸۸۰ = ۲ میلیون و ۵۲۰ جا می‌مونه، نصفش هم میشه ۱ میلیون و ۳۰۰. جلسه‌مون ساعت ۲:۳۰ بود و تا شب ۲ × ۳ = ۶ تا قهوه خوردم!"
+}
+],
+"replies": [
+"{\"reply\": \"تغییرِ دهم را من پیشنهاد نمی‌دهم. اگر بخواهی، این را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت می‌کنیم تا قدم‌به‌قدم جلو برویم. پیش از هر لاگ و تغییرِ تازه: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"پرداختِ دوباره\", \"pinned\": \"علتِ ثبتِ دوبارهٔ پرداخت\", \"memory\": \"باگ: هفته‌ای یک بار پرداخت دوبار ثبت می‌شود؛ ۹ تغییرِ بی‌نتیجه. مسئلهٔ زنده ثبت شد؛ خواستم کل را در یک جمله بگوید.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"ثبت شد و صفحه‌اش باز است. پیش از هر لاگ و تغییرِ تازه: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"پرداختِ دوباره\", \"statement\": \"یه باگ دارم که هفته‌ای یه بار پرداخت دوبار ثبت میشه. سه روزه لاگ اضافه می‌کنم، کد رو عوض می‌کنم، deploy می‌کنم، منتظر می‌مونم. هیچی. تغییر دهم چی باشه؟\", \"nat\": \"objective\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}], \"title\": \"پرداختِ دوباره\", \"memory\": \"باگِ پرداختِ دوباره با «آری» ِ کاربر در 🔭 ثبت شد؛ پرسشِ کل‌اول را پرسیدم.\"}",
+"{\"reply\": \"داده‌ها را روشن گفتی. پیش از این‌که سراغِ جزءها برویم — اول کل، بعد جزءها: کلِ مسئله را بی‌جزئیات، در یک جملهٔ کامل و به زبانِ خودت، می‌گویی؟\", \"memory\": \"پرداختِ دوباره: دو رکورد با یک order_id، ~۳۰ ثانیه فاصله، کلیدِ متفاوت؛ گفت نمی‌داند چه کند. پرسشِ کل‌اولِ صفحه را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [\"u2\"], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"در صفحه‌ات فقط یک شاخه بن‌بست شد، نه کلِ تحلیل — نشانه‌ها گاهی در یک مورد فریب می‌دهند ولی بیشترِ وقت‌ها درست راه می‌برند. پیش از رها کردنِ کلِ راه: کدام حلقه دقیقاً شکست؟ شاید فقط همان یکی باید عوض شود و بقیهٔ زنجیره درست است.\", \"memory\": \"pb_l_mvaqm5inxdt: شاخهٔ worker بن‌بست شد؛ کاربر می‌خواهد تحلیل را رها کند. پرسیدم کدام حلقه شکست.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"«تمام شد» را نه تأیید می‌کنم نه رد — بازنگری مهم‌ترین بخشِ کار است. شاخهٔ worker را آزمودی و کنارش گذاشتی؛ این همان «حدس بزن، ولی حدست را بیازما» است. یک پرسش: جوابت را در شرط جای‌گذاری کن — با timeoutِ بالاتر و کلیدِ ثابت در retry، هنوز می‌شود دو رکورد با یک order_id و کلیدِ متفاوت با فاصلهٔ ~۳۰ ثانیه ساخته شود؟ همهٔ شرط برقرار است؟\", \"memory\": \"pb_l_mvaqm5inxdt در بازنگری (روز ۱۰). پرسیدم جواب را در شرط جای‌گذاری کند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"«تمام شد» را نه تأیید می‌کنم نه رد — بازنگری مهم‌ترین بخشِ کار است. شاخهٔ worker را آزمودی و کنارش گذاشتی؛ این همان «حدس بزن، ولی حدست را بیازما» است. جوابت را در شرط جای‌گذاری کن: با timeoutِ بالاتر و کلیدِ ثابت در retry، همهٔ شرط برقرار است — دیگر دو رکورد با یک order_id و کلیدِ متفاوت با فاصلهٔ ~۳۰ ثانیه ساخته نمی‌شود؟\", \"memory\": \"pb_l_mvaqm5inxdt در بازنگری (روز ۱۰). پرسیدم جواب را در شرط جای‌گذاری کند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"گزارشت را خواندم: نرخِ «۳ / ۱۲۰۰ = ۰٫۲۵٪» می‌خواند؛ ساختِ کلید، شاردبندی، تایم‌اوت و نسخه را صفحه نمی‌سنجد و داوری‌شان با خودِ توست. این گزارش پس از بستنِ باگ است — در بازنگری، چه چیزی از این باگ را جای دیگر به کار می‌بری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"۳ / ۱۲۰۰ = ۰٫۲۵٪\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"گامت را خواندم: ۲۰۰ پیام در ثانیه × ۳۶۰۰ = ۷۲۰۰۰۰ پیام در ساعت درست است (صفحه هم همین را سنجید). همه‌چیزِ کارِ پیشینت درست است — گامِ بعدیِ خودت برای یافتنِ گلوگاه چیست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prior\": [{\"step\": \"ظرفیتِ ساعتی\", \"quote\": \"۲۰۰ پیام در ثانیه × ۳۶۰۰ = ۷۲۰۰۰۰ پیام در ساعت\", \"verdict\": \"ok\", \"why\": \"ضرب درست است\", \"dep\": []}]}]}",
+"{\"reply\": \"سه حسابت درست است (صفحه هم سنجید): ۸۰۰ × ۳۶۰۰ = ۲۸۸۰۰۰۰ و ۵ میلیون و ۴۰۰ − ۲ میلیون و ۸۸۰ = ۲ میلیون و ۵۲۰. فقط «نصفش» را دوباره ببین: نصفِ ۲ میلیون و ۵۲۰ هزار، ۱ میلیون و ۲۶۰ هزار است، نه ۱ میلیون و ۳۰۰. با این عددها، در یک ساعتِ اوج صف پر نمی‌شود — پس گلوگاه را کجا می‌بینی: ورودیِ صف یا سرعتِ مصرف‌کننده‌ها؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"یه باگ دارم که هفته‌ای یه بار پرداخت دوبار ثبت میشه. سه روزه لاگ اضافه می‌کنم، کد رو عوض می‌کنم، deploy می‌کنم، منتظر می‌مونم. هیچی. دیگه نمی‌دونم چی رو امتحان کنم. ۹ تا تغییر دادم: timeout، retry، قفل دیتابیس، ... تغییر دهم چی باشه؟",
+"آره ثبتش کن.",
+"داده: دو رکورد پرداخت با یک order_id، با فاصلهٔ حدود ۳۰ ثانیه، و idempotency-key هاشون متفاوته. نمی‌دونم چی‌کار کنم.",
+"شاخهٔ worker رو دو روز دنبال کردم، کلی نشونه داشت ولی آخرش بن‌بست بود. می‌خوام کل این نظریه‌ی تحلیل رو بندازم دور و برگردم سراغ تغییر دادن کد.",
+"تموم شد، یک هفته تکرار نشده. بازنگری چی کار کنم؟",
+"تموم شد، یک هفته تکرار نشده. بازنگری چی کار کنم؟\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: دو پرسش پرسیدی — در هر نوبت فقط یک پرسش (همان پرسشِ نوبت). همان پاسخ را با همان actions دوباره بده و فقط متنِ reply را درست ",
+"یه گزارشِ کوتاه برای تیم نوشتم: تو هفتهٔ پیش ۳ پرداختِ دوباره از ۱۲۰۰ تراکنش داشتیم، یعنی ۳ / ۱۲۰۰ = ۰٫۲۵٪. کلیدِ یکتا رو این‌جوری می‌سازم: key = hash(user_id + ts) و برای شاردها ۱۷ ≡ ۲ (mod ۵). تایم‌اوت هم باید x + ۳ = ۱۰ ثانیه باشه. نسخهٔ",
+"یه سؤالِ تازه: سرورِ صف‌مون شب‌ها کند میشه. خودم یه گام رفتم: ۲۰۰ پیام در ثانیه × ۳۶۰۰ = ۷۲۰۰۰۰ پیام در ساعت. حالا نمی‌دونم گلوگاه کجاست.",
+"یه حساب دیگه هم کردم: شب‌ها تا ۸۰۰ پیام در ثانیه میاد، پس ۸۰۰ × ۳۶۰۰ = ۲۸۸۰۰۰۰ پیام در ساعت. ظرفیتِ صف ۵ میلیون و ۴۰۰ پیامه، پس ۵ میلیون و ۴۰۰ − ۲ میلیون و ۸۸۰ = ۲ میلیون و ۵۲۰ جا می‌مونه، نصفش هم میشه ۱ میلیون و ۳۰۰. جلسه‌مون ساعت ۲:۳۰ بود"
+]
+}
