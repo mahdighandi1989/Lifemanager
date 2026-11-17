@@ -1,6 +1,6 @@
 # Tour batch 1 (Pólya) — ROUND 29 (read RUNNER.md … RUNNER28.md incl. all ADDENDA, then this; this overrides)
 
-Page: main <MAIN29> (the seven round-28 fixers; `build.py --check` in sync, dist newer — else STOP). What changed: DECISIONS_R28.md
+Page: main e0e26045 (the seven round-28 fixers; `build.py --check` in sync, dist newer — else STOP). What changed: DECISIONS_R28.md
 (the 14 families F1–F14, R1–R7, Clarifications C84–C133 — C102 REPLACES the «two readings ⇒ ask» part of C84), the fixers' hand-backs
 reports/fix28/*.md (each item is marked «proven (a+b+c)» or «unit-only»: every unit-only item is a claim YOU test), the handoff notes
 docs/overhaul/handoff-notes/_pending_tour1_R28_*_2026-11-16.md, and WORKLOG 148–154.
