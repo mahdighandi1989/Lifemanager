@@ -547,7 +547,8 @@
       [/^## نماها/, cols(2)],
       /* دورِ ۲۳ (Q1، ageclass): «خودِ سامانه» و سطرهای ثبت‌گاه هم پیش از فهرستِ فیلدهای صفحه کوتاه می‌شوند — هر فیلد و دکمهٔ صفحه بر توضیحِ نقشه مقدم است
          (test_fixes_1015b #12)؛ «خودِ سامانه» فقط فشرده می‌شود (کاربرد/جا/آفلاین/مدل هر سطر می‌ماند، هر بخش کوتاه‌تر)، هرگز نمی‌افتد */
-      [/(?:^|\n)## خودِ سامانه/, function (sec) { return sec.split("\n").map(function (l) { return !/^- /.test(l) ? l : l.split(" — ").map(function (c, j) { return j === 0 ? c : clip(c, 70); }).join(" — "); }).join("\n"); }],
+      /* دورِ ۲۹ (F19): سطرِ قاعده فشرده می‌شود (شماره + آغازِ کارش)، هرگز نمی‌افتد */
+      [/(?:^|\n)## خودِ سامانه/, function (sec) { return sec.split("\n").map(function (l) { return /^- قاعدهٔ صفحه /.test(l) ? clip(l.split(" — ")[0], 110) : !/^- /.test(l) ? l : l.split(" — ").map(function (c, j) { return j === 0 ? c : clip(c, 70); }).join(" — "); }).join("\n"); }],
       [/^## ثبت‌گاه‌ها/, function (sec) { return sec.split("\n").map(function (l, i) { return i === 0 ? l : clip(l, 120); }).join("\n"); }]];
     for (var i = 0; i < steps.length && L0 - P.join("\n").length < need; i++) P = P.map(function (sec) { return !MAN_KEEP.test(sec) && steps[i][0].test(sec) ? steps[i][1](sec) : sec; });
     var out = P.join("\n");
