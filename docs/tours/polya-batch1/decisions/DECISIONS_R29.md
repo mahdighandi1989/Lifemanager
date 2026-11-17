@@ -151,3 +151,44 @@ lists of A, B, C go to the bank as 82+.
 arith (R1) · correction (R2) · prior (R3) · dates (R4) · forecast (R5) · story (R6) · surface (R7). Merge order: arith ⇒ prior ⇒
 correction ⇒ story ⇒ forecast ⇒ dates ⇒ surface (arith first: story and prior consume its per-clause export); the families' tests re-run
 after each merge, the full gate once on the whole merge.
+
+### Clarifications after the independent bank (C154–C175; answers to the bank writer's 22 ambiguities, same order; C136 applied)
+- **C154 (1).** A bare amount beside «N میلیون و M» amounts is read in both scales like them (C84/C102, thousands first): «۵ میلیون و ۸۰۰
+  − ۸۰۰ = ۵ میلیون» is ✓ under the thousands reading, with no question.
+- **C155 (2).** Mixed readings (one amount in thousands, another in units) are not tried for ✓: a line right only under a mixed
+  reading gets «؟» naming the readings and asks which she meant; it is never ✓ and never ✗.
+- **C156 (3).** C141's need/have may come from the problem's recorded statement as well as her message. If the page holds both numbers,
+  it judges; otherwise «نسنجیده». Never ✓ unread, never silent.
+- **C157 (4).** «نصفش / دو برابرش / با N دیگه میشه» whose antecedent is the immediately preceding result in the same message are read
+  by the engine; any other antecedent ⇒ «؟ نسنجیده» beside that clause (C138). Either way, never a sentence-wide ✓ (A29-1).
+- **C158 (5).** «تومن» on a bare operand changes nothing (C135): the units reading is named only when it alone fits (C103).
+- **C159 (6).** C140 never overrides the rounding rule: «۷ از ۴۵ میشه ۱۶٪» (15.56 %) asks the rounding question (C9/C44).
+- **C160 (7).** Taking back a correction follows C5: the earlier value returns with history; proposals built on the withdrawn value are
+  marked superseded.
+- **C161 (8).** A repeating-decimal proposal shows the exact fraction and «≈» to two decimals («۸۱۲۰ ÷ ۳ = ۲۷۰۶ و ۲ سوم ≈ ۲۷۰۶٫۶۷»); never an
+  invented whole number.
+- **C162 (9).** A remainder clause computed from a corrected factor is a C89 dependant of it and gets an exact proposal.
+- **C163 (10).** Inside an existing ledger, her fix with a confirmation tag («… میشه ۳ میلیون و ۲۵۰، درسته؟») is applied like a fix and
+  the tag is answered with the verdict. C98 stays for a bare question that brings no new value and opens no prior work.
+- **C164 (11).** A ledger step that quotes a corrected datum is marked stale with an exact C89 proposal; it is never rewritten with a
+  text she did not write (D29-7).
+- **C165 (12).** «آره، هر دو» books every open ask it answers, in order (C145).
+- **C166 (13).** A past act with a past day and no open plan gets a 📜 line of her report and no plan row; nothing is invented.
+- **C167 (14).** «بمونه برای فردا» when the call is already booked for tomorrow changes nothing and asks nothing; for any other booked
+  day it moves the call to tomorrow with history (C49 restating = consent).
+- **C168 (15) — C148 amended.** Checked in the transcripts (C136): «فکر کنم ۷۰ درصد مدیرم منو … انتخاب می‌کنه», «فکر کنم ۷۰ درصد که
+  تمرین‌ها … تا جمعه …», «فکر کنم ۷۰ درصد نصب تا عصرِ شنبه تموم میشه» are all confidences. So **a belief word in the clause wins**:
+  «فکر کنم ۷۰ درصد کارتن‌ها تا جمعه بسته میشن» is a 70 % 🎯. C148's datum reading applies when there is no belief word, or when the
+  percent carries an explicit ezafe to a quantity («۷۰ درصدِ کارتن‌ها») or is followed by a quantity word of C148's list.
+- **C169 (16).** A rate followed by a change verb («۲۵ درصد زیاد میشه», «۱۰ درصد گرون میشه», «۲۰ درصد رشد می‌کنیم») is a datum unless a
+  belief word is in the clause (C168).
+- **C170 (17).** A 🎯 needs a future, checkable outcome. A probability for a hypothesis about a present or past fact makes no 🎯 (it may
+  be recorded as her estimate). «شاید ۴۰٪ یادم بمونه» about a future recall is a 🎯 (شاید + N٪ = belief).
+- **C171 (18).** «تا آخرِ ⟨ماه⟩» as a forecast's due date is the last day of that month, with C132's single confirm.
+- **C172 (19).** After «فقط همین» (C124), each dependant left behind shows a history line «پایه‌اش به ⟨مسئله⟩ رفت» and the undo restores
+  all.
+- **C173 (20).** The same clause restated later makes no new 📜 line; at most a history mark on the existing line.
+- **C174 (21).** Rule numbers may appear in the model-facing «خودِ سامانه» block as evidence; they never reach her view or a quoted
+  reply (C100/C151 post-check).
+- **C175 (22).** «دفترِ پیش‌بینی کجاست؟» may open the 🎯 view or say where it is; a follow-up telling the model to fill fields and press
+  «ثبت» is forbidden.
