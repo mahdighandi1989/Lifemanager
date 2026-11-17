@@ -501,9 +501,11 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Status:** reachable, not called. Delete only with the owner's approval.
 
 ## Pólya R29 «correction» — tiers (ج)/(د) of the guessed one-op relation in `staleCore25` (quarantined 2026-11-17)
-- **What:** `a38` `staleCore25` → `implicit(c, 3)` / `implicit(c, 4)` as a proposal source (any two numbers whose one operation gives this
-  number). Behind `A.LIVE_R29_QUARANTINE_C89.on` (default `false`); the function itself is kept (the «unknown operand» guard still uses it in
-  plain mode, and the anchored tier (ج) — the number follows «پس/میشه/یعنی» with co-operands written in the same sentence — still uses it).
+- **What:** the two ratio shapes of `a38` `staleCore25` tiers (ج)/(د) (`implicit(c, 3)` / `implicit(c, 4)`): (a) the number is itself a
+  factor of her written expression (`c.opnd` / `c.run`) and the guessed relation solves the product for it; (b) a remainder clause
+  «N تا می‌مونه / کم میاد / اضافه میاد». Plus two guards: a lone result record built by dividing by the corrected datum, and an equal digit in
+  another magnitude. Behind `A.LIVE_R29_QUARANTINE_C89.on` (default `false`, listed in `.shapes`); the tiers themselves stay for every
+  other number (nine R24–R26 bank verdicts rely on relations she wrote in words).
 - **Why quarantined:** DECISIONS_R29 C89 «Scaling a number by the ratio of a correction is never a proposal»; R2 «the ratio path is
   quarantined, not kept as a fallback». A guessed product solved for one factor is exactly that (D29-11 «۱۸ ⇒ ۱۵ = ۲۷۰۰ ÷ ۱۸۰», B29·D13
   «۶ ⇒ ۶٫۴»).

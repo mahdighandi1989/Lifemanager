@@ -50632,7 +50632,7 @@ APP.goFromURL = function (q) {
     var f = function (t) { return ftoks(t).filter(function (w) { return w.length >= 2 && !/^[\d#]/.test(w) && !UCAN[w] && FUNC_W.indexOf(w) < 0 && !numOccs(w).length && !CLSSTOP25.test(w); }); };
     return f(a).slice(-(n || 4)).concat(f(b).slice(0, n || 4)); }
   /* دورِ ۲۹ (R2، C89): رده‌های (ج)/(د) ِ staleCore25 قرنطینه‌اند — on فقط برای بازبینیِ مالک (A.LIVE_R29_QUARANTINE_C89.on = true)، هرگز در راهِ صفحه */
-  var Q29C89 = { on: false, why: "C89: رابطهٔ یک‌عملیِ حدسی (رده‌های ج/د) بازحسابِ دقیق در امتدادِ وابستگیِ ثبت‌شده نیست — ضربِ عدد در نسبتِ اصلاح است" };
+  var Q29C89 = { on: false, shapes: ["a factor of her own written expression solved for (c.opnd / c.run)", "a remainder clause «N تا می‌مونه / کم میاد / اضافه میاد»"], why: "C89: رابطهٔ یک‌عملیِ حدسی (رده‌های ج/د) بازحسابِ دقیق در امتدادِ وابستگیِ ثبت‌شده نیست — ضربِ عدد در نسبتِ اصلاح است" };
   A.LIVE_R29_QUARANTINE_C89 = Q29C89;
   function staleCore25(RC0, D, dbg, opt) {
     opt = opt || {};
@@ -50752,7 +50752,7 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۶ (Q2، pwC1 «باغ ۲ هکتاره» ⇒ «۲۰۰۰۰ متر مربع»): ریشه‌ای که در یکای دیگری نوشته شد مقدارش را در یکای خودش دارد (همان ضریبِ rootOf) */
     var rk26 = function (o) { var q = o.root.q; return q.u && o.u && UFAC[q.u] && UFAC[o.u] ? ufac(o.u) / ufac(q.u) : 1; };
     /* دورِ ۲۹ (#65 بانکِ R29 «۲۰ تا کارتن … ۱۸ نیست، ۲۰»): عددی که با مقدارِ تازه برابر است (ریشهٔ «new») پیش از اصلاح هم همان بود — مقدارِ پیشینش خودِ اوست، نه مقدارِ پیشینِ داده */
-    var curV = function (o) { return o.root && o.root.st !== "new" ? o.root.q.a / rk26(o) : o.v; };          // مقدارِ «پیش از اصلاح» ِ هر عدد
+    var curV = function (o) { return o.root && (o.root.st !== "new" || o.zone === "given") ? o.root.q.a / rk26(o) : o.v; };   // نوشتهٔ بازنویسی‌شدهٔ صفحه (صورت/داده) همان داده است          // مقدارِ «پیش از اصلاح» ِ هر عدد
     /* دورِ ۲۷ (R2، B27·D8 s17 «۱۶٫۸ ⇒ ۱۸» = ۲۴ × ۰٫۷۵ در حالی که خودِ ۲۴ از اصلاحِ پیشین کهنه بود ⇒ ۲۱٫۶): عملوندی که اصلاحِ پیشینِ بازمانده کهنه‌اش کرده با مقدارِ تازهٔ همان
        اصلاح در بازحساب می‌آید (۲۱٫۶ × ۰٫۷۵ = ۱۶٫۲)، و اگر آن یکی پرسیده شده بود (بی عدد) بازحسابِ این هم پرسیده می‌شود */
     var PREV27 = opt.prev27 || [], prevOf = function (o) { var k = RC[o.ri].k; return PREV27.filter(function (x) { return x.k === k && veq(x.v, o.v); })[0] || null; };
@@ -50818,12 +50818,16 @@ APP.goFromURL = function (q) {
         X.concat(Y).forEach(function (y, j) { if (j <= i) return;
           /* دورِ ۲۷ (R2، C66؛ بانکِ R27 #67/#99 «پس با ۲ میلیون بودجه کافیه» ⇒ ۲ = ۱۲ ÷ ۶): بزرگیِ حاصل («میلیون») از یکی از عملوندها می‌آید — در رده‌های (ج) و (د) رابطه‌ای که هیچ
              عملوندش بزرگی ندارد برای عددِ «… میلیون» هم‌رقمی است، نه وابستگی */
-          if (!plain && cMag27 && !(x.mag27 || y.mag27) && (tier === 4 || !cSent27)) return;   // ردهٔ (ج): فقط وقتی جملهٔ خودش داده/حاصلِ کهنه ندارد
+          if (!plain && cMag27 && !(x.mag27 || y.mag27) && (tier === 4 || !cSent27 || RC[c.ri].zone === "role")) return;   // دورِ ۲۹ (C89؛ D29-11 «۲ میلیون تومن» = ۳۰۰ ÷ ۱۵۰): رکوردِ تک‌عددیِ نتیجه هم   // ردهٔ (ج): فقط وقتی جملهٔ خودش داده/حاصلِ کهنه ندارد
           OPS.forEach(function (op) { if (!dimOk(op[0], x.f, y.f, fam25(c), x.kind, y.kind)) return;
             if (tier === 4 && !plain && /[*\/]/.test(op[0]) && x.f && fam25(c) && x.f !== fam25(c) && x.f !== "pct" && fam25(c) !== "pct" && y.f && y.f !== "pct" && y.f !== x.f && y.f !== fam25(c)) return;   // سه جنسِ گوناگون با یک ضرب/تقسیم از هر جای مسئله: حدس است، نه رابطه
             if (tier === 4 && !plain && /[*\/]/.test(op[0]) && !fam25(c) && x.f && y.f && x.f !== y.f && x.f !== "pct" && y.f !== "pct" && (PHYS25[x.f] || PHYS25[y.f])) return;
             if (tier === 3 && !plain && /[*\/]/.test(op[0]) && !fam25(c) && x.f && y.f && x.f !== y.f && PHYS25[x.f] && PHYS25[y.f]) return;   // دورِ ۲۶ (Q2، pwC1 پس از یکای «هکتار»: «۴ تا پنل» = «۸ ساعت» ÷ «۲ هکتار»): در ردهٔ (ج) هم ضرب/تقسیمِ دو جنسِ فیزیکیِ گوناگون شمارِ تنها نمی‌دهد   // C25-4 pwC1   // C25-4 pwC1 «۴ تا پنل» = «۸ ساعت» ÷ «۲ هکتار»: حاصلِ دو جنسِ گوناگون شمارِ تنها نیست
+            if (!plain && x.q && op[0] === "r/" && RC[c.ri].zone === "role") return;   // دورِ ۲۹ (C89؛ D29-11 «۲ میلیون تومن» = ۳۰۰ ÷ «۱۵۰»): نتیجهٔ تنها با تقسیم بر دادهٔ اصلاح‌شده حدسِ نسبت است
             var mul = /[*\/^]/.test(op[0]), xv = mul && x.pct ? x.v / 100 : x.v, yv = mul && y.pct ? y.v / 100 : y.v, v = op[1](xv, yv), tv = mul ? cv : c.v; if (!isFinite(v) || !veq(v, tv)) return;
+            /* دورِ ۲۹ (C89؛ D29-11 «پس‌اندازم ۱۸ میلیونه» = «۱۵۰ هزار» × ۱۲): بزرگیِ هر دو سو شمرده می‌شود — هم‌رقمی در مقیاسِ دیگر رابطه نیست */
+            if (!plain && mul && op[0] !== "^") { var cm29 = mag27(c) || 1, xm29 = x.q ? (function () { var z = numOccs(dTxt27).filter(function (o) { return veq(o.v, x.q.a); })[0]; var m = z && /^[\s‌]*(هزار|میلیون|میلیارد)/.exec(dTxt27.slice(z.e, z.e + 14)); return m ? (m[1] === "هزار" ? 1e3 : m[1] === "میلیون" ? 1e6 : 1e9) : 1; })() : (x.d && x.d.mag) || 1, ym29 = y.ri != null && y.mag27 ? (function () { var yo = occ.filter(function (o) { return o.ri === y.ri && veq(o.v, y.v); })[0]; return yo ? mag27(yo) || 1 : 1; })() : 1;
+              if ((cm29 > 1 || xm29 > 1 || ym29 > 1) && !(cm29 === 1 && (xm29 === 1 || ym29 === 1) && !(xm29 > 1 && ym29 > 1))) { var vs29 = op[1](xv * xm29, yv * ym29); if (!isFinite(vs29) || !veq(vs29, tv * cm29)) return; } }
             if (dbg && !plain) dbg.push({ imp: c.raw, k: RC[c.ri].k, x: x.v, op: op[0], y: y.v, tier: tier });
             if (x.re == null || y.re == null) { res.push(null); return; } var nv = op[1](mul && x.pct ? x.re / 100 : x.re, mul && y.pct ? y.re / 100 : y.re); res.push(isFinite(nv) ? outV25(mul ? nv : (c.pct ? nv / 100 : nv), c, false) : null); }); }); });
       return res; };
@@ -50907,10 +50911,11 @@ APP.goFromURL = function (q) {
         /* دورِ ۲۶ (Q2): عددِ پیامِ زمینه فقط با رابطهٔ نوشته‌شدهٔ خودش (عبارت، تبدیلِ واحد، بازگفت) کهنه می‌شود — رابطهٔ حدسیِ یک‌عملی (رده‌های ج و د) در متنِ آزادِ گفت‌وگو تصادف می‌سازد */
         if (c.zone === "ctx") { /* دورِ ۲۶ (Q2، بانکِ R26 #52 «هر دور ۲۵ دقیقه‌ست، ۴ دور یعنی ۱۰۰ دقیقه»): در پیامِ خودش فقط جمله‌ای که خودِ مقدارِ اصلاح‌شده در آن است — یک عمل با همان مقدار و عددی از همان جمله */
           var rs26 = RC[c.ri].O.filter(function (q) { return q !== c && q.sent === c.sent && q.pos < c.pos && q.root && q.root.st === "old"; }); if (!rs26.length) return;
-          var cc = implicit(c, 3).filter(function () { return true; }).map(function (z) { return { re: z }; });
+          var ratC29 = !!(c.opnd || c.run) || /^[\s‌]*(?:تا[\s‌]+)?(?:می[\s‌]*مونه|کم[\s‌]*میاد|اضافه[\s‌]*میاد)/.test(RC[c.ri].t.slice(c.ue != null ? c.ue : c.e, (c.ue != null ? c.ue : c.e) + 20));
+          var cc = ratC29 || /^[\s‌]*(?:تا[\s‌]+)?(?:می[\s‌]*مونه|کم[\s‌]*میاد|اضافه[\s‌]*میاد)/.test(RC[c.ri].t.slice(c.ue != null ? c.ue : c.e, (c.ue != null ? c.ue : c.e) + 20)) ? [] : implicit(c, 3).filter(function () { return true; }).map(function (z) { return { re: z }; });   // دورِ ۲۹ (C89): نه عاملِ عبارتِ خودش، نه بندِ باقی‌مانده
           /* دورِ ۲۶ (Q2، A26-34 tA1 «… یعنی ۲۶٫۵ لیتر. … دبیش دقیقه‌ای ۲ لیتره، پس روزی حدودِ ۱۳ دقیقه»): یک عمل میانِ همان مقدارِ کهنهٔ این جمله و حاصلی که خودش پیش‌تر در همین پیام
              گفت (پس از «=»/«یعنی»)؛ با واژهٔ تقریب پیش از عدد («حدودِ»، «تقریباً»، «≈») گردکردنِ ضرب/تقسیمِ خودش پذیرفته است (C16) و مقدارِ تازه هم گرد می‌شود (۲۶٫۵ ÷ ۱٫۶ ≈ ۱۷) */
-          if (!cc.length) { var ap26 = /(?:حدود[ِ]?|تقریباً|تقریبا|≈|~)[\s‌]*$/.test(RC[c.ri].t.slice(Math.max(0, c.s - 14), c.s)), WR26 = RC[c.ri].O.filter(function (q) { return q !== c && q.pos < c.pos && q.sent <= c.sent && (q.rel && q.rel.res === q || q.mark && !q.opnd && !q.word) && !q.root && !isStaleOp(q); });
+          if (!cc.length && !ratC29) { var ap26 = /(?:حدود[ِ]?|تقریباً|تقریبا|≈|~)[\s‌]*$/.test(RC[c.ri].t.slice(Math.max(0, c.s - 14), c.s)), WR26 = RC[c.ri].O.filter(function (q) { return q !== c && q.pos < c.pos && q.sent <= c.sent && (q.rel && q.rel.res === q || q.mark && !q.opnd && !q.word) && !q.root && !isStaleOp(q); });
             rs26.forEach(function (a) { WR26.forEach(function (b2) { [[function (x, y) { return y / x; }, "÷", "r/"], [function (x, y) { return x * y; }, "×", "*"], [function (x, y) { return y - x; }, "−", "r-"], [function (x, y) { return x + y; }, "+", "+"]].forEach(function (op) {
               if (!dimOk(op[2], fam25(a) || ufam(a.root.q.u), fam25(b2), fam25(c))) return;   // دورِ ۲۷ (R2، D27-11 pwD1 «۱۷ دقیقه = ۱۷۰ ÷ ۱۰ ثانیه»): همان سنجهٔ بُعد
               var v0 = op[0](a.v, b2.v); if (!isFinite(v0) || !(veq(v0, c.v) || ap26 && /[÷×]/.test(op[1]) && Number.isInteger(c.v) && !veq(v0, c.v) && veq(Math.round(v0), c.v))) return; var na = newV(a), nb = newV(b2), v1 = na == null || nb == null ? null : op[0](na, nb);
@@ -50933,8 +50938,12 @@ APP.goFromURL = function (q) {
         /* … ولی رابطه‌ای که خودش با واژه نوشت می‌ماند (بانکِ R26 «صدی ۸ لیتر می‌سوزونه، پس ۳۳٫۶ لیتر»): عددی که خودش عملوندِ عبارتی نیست و پس از «پس/میشه/یعنی» ِ همان جمله آمده،
            با عملوندهایی که پیش از آن در همان جمله نوشت — بازحسابِ دقیقِ نوشتهٔ خودش، نه حلِ یک حاصل برای یکی از عامل‌هایش («۱۸ = ۲۷۰۰ ÷ ۱۵۰») */
         var anch29 = !c.opnd && !c.run && (function () { var T29 = RC[c.ri].t, pv = RC[c.ri].O.filter(function (q) { return q !== c && q.sent === c.sent && q.pos < c.pos && !q.struct; }).pop(); return !!pv && /(?:^|[\s‌،,])(?:پس|میشه|می[\s‌]*شه|می[\s‌]*شود|یعنی)(?=[\s‌]|$)/.test(T29.slice(pv.ue != null ? pv.ue : pv.e, c.s)); })();
-        var imp27 = false; if ((Q29C89.on || anch29) && !cand.length && !wr27) { cand = implicit(c, 3, false, !Q29C89.on).map(function (z) { return { re: z }; }); }
-        if (Q29C89.on && !cand.length && t4 && !wr27) { cand = implicit(c, 4).map(function (z) { return { re: z }; }); }
+        /* راهِ نسبت (C89) دقیقاً دو شکل دارد و همان دو قرنطینه‌اند (A.LIVE_R29_QUARANTINE_C89.shapes): (الف) عددی که خودش عاملِ عبارتِ نوشتهٔ اوست («۱۸ × ۱۵۰ هزار = …») —
+           حلِ حاصل برای یکی از عامل‌ها («۱۸ ⇒ ۱۵ = ۲۷۰۰ ÷ ۱۸۰»، «۲ ⇒ ≈ ۱٫۶۷») ضربِ آن عامل در نسبتِ اصلاح است؛ (ب) بندِ باقی‌مانده («۶ تا می‌مونه») که رابطه‌اش را C141/C162 می‌خوانند،
+           نه رابطهٔ حدسی («۶ ⇒ ۵ = ۹۰۰ ÷ ۱۸۰»). رده‌های (ج)/(د) برای بقیه می‌مانند (بانک‌های R24–R26: «صدی ۸ … پس ۳۳٫۶»، «۸٪ آن رب ⇒ ۲٫۴»، «محیط ۲۶») */
+        var rat29 = !!(c.opnd || c.run) || /^[\s‌]*(?:تا[\s‌]+)?(?:می[\s‌]*مونه|می[\s‌]*ماند|کم[\s‌]*میاد|اضافه[\s‌]*میاد)/.test(RC[c.ri].t.slice(c.ue != null ? c.ue : c.e, (c.ue != null ? c.ue : c.e) + 20));
+        var imp27 = false; if ((Q29C89.on || !rat29 || anch29) && !cand.length && !wr27) { cand = implicit(c, 3, false, rat29 && !Q29C89.on).map(function (z) { return { re: z }; }); }
+        if ((Q29C89.on || !rat29) && !cand.length && t4 && !wr27) { cand = implicit(c, 4).map(function (z) { return { re: z }; }); }
         if (dbg) dbg.push({ v: c.v, k: RC[c.ri].k, cand: cand });
         /* دورِ ۲۶ (Q2، D25-19 s36 «۰٫۱×۲۰ + ۰٫۲۵×ح = ۰٫۱۵(۲۰+ح) ⇒ ۰٫۱ح = ۱ ⇒ ح = ۱۰»): نتیجهٔ یک زنجیرهٔ «⇒» که معادلهٔ نمادینِ آغازش مقدارِ کهنه را دارد به آن وابسته است؛ صفحه جبر را حساب نمی‌کند ⇒ می‌پرسد */
         /* دورِ ۲۶ (Q2، s17 «۲۴ × ۰.۷ = ۱۶.۸ مترمکعب، پس یه مخزن بتنی ۱۷ مترمکعبی»): عددِ صحیحی که گردِ بالا/پایینِ یک حاصلِ کهنهٔ هم‌جنس در همان پیام است از آن برداشته شده — انتخابِ خودِ اوست، صفحه عدد پیشنهاد نمی‌کند، می‌پرسد */

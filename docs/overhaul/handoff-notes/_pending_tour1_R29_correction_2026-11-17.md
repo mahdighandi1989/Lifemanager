@@ -6,7 +6,7 @@ PROGRESS row **153** cites it; the coordinator renumbers at merge.
 ## Functions changed (exactly)
 - `a38_live.js`
   - New: `reg29`, `pair29`, `uok29`, `chain29`, `props29`, `A.liveChain29`, `A.liveCorrReg29`, `Q29C89` / `A.LIVE_R29_QUARANTINE_C89`, `LABEL29L`.
-  - `staleCore25`: tiers (ج)/(د) of the guessed one-op relation are quarantined (`Q29C89.on`, default false); tier (ج) survives only
+  - `staleCore25`: the two ratio shapes of tiers (ج)/(د) are quarantined (`Q29C89.shapes`: factor of her own expression, remainder clause), plus guards (lone result divided by the datum; equal digit in another magnitude); the anchored tier (ج) also serves those numbers only
     «anchored» — the number is not itself an operand, follows «پس/میشه/یعنی» in its sentence, and its fresh co-operands are written in that
     sentence (`implicit(c, 3, false, true)`, new 4th parameter `same29`). New passes: per-pair freshness `q.at29` / `q.since29`; C143
     (`CNT29`, `UQ29`, `o.c143`: counted datum, «ساعتِ N», own-word unit, physical datum vs money/magnitude or another dimension);
