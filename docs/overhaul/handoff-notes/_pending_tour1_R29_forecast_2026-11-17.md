@@ -13,7 +13,8 @@ WORKLOG (156) / PROGRESS (153) on this branch (assigned 160 / 157 — the coordi
 - `outcome28`: returns null for «[اصلاحِ …» (✏️) messages; unit conversions «N u = M u» removed from the sentence; when ≥2 candidates have a unique word in one sentence, each takes its own chunk (`multi29`), and a numeric chunk without a verb borrows the sibling's result verb.
 - `isRep28`: «پیش‌بینی کردم/کرده بودم» and «برگردیم/بریم» are not reports. `EXC28`: «X نیست/نبود/نمیشه، Y» corrections.
 - `verdict28`: a number she names with «پیش‌بینیم N» is the target. `approx28`: a verb after «حدودِ N» is not a unit (C120 question now appears for «حدودِ ۶٫۵ میشه» ⇐ «۶ شد»).
-- `probOf27`: verbs/function words are not problem words; the problem with the most unique words wins (C121).
+- `probOf27`: verbs/function words are not problem words; the problem with the most unique words wins; with no match the conversation's bound live problem (or its one open live problem) is used, not the turn's focused chat problem (C121).
+- `outcome28` also drops open preds that are not a 🎯 (no p, no fc/fc0) from the candidates (B29·D4); new helper `vb29(y, chunk)` judges a verbless numeric chunk by numbers only.
 - `PR.datePend` — ONLY the forecast part (dates owns the rest): `fcW29`/`inFc29` — own date items and model-reported plans of this message that belong to a forecast clause are not asked (plan loses whenPend/whenAsk, gets `q.fcast29`); pred items of a vague 🎯 wait for its number (`y.dueAskAt`); pred items get their own line «🎯 موعدِ این پیش‌بینی «…» — <day> (از حرفِ خودت) است؟ …», ambiguous ones are prefixed «🎯 موعدِ این پیش‌بینی:». The answer path (`dateAnswer`/`bookItem26`) is unchanged.
 - New export `PR.predPendDue29(fcId)`; `a31_tools.js` `A.V.fcast` shows «موعدِ پیشنهادی … — منتظرِ «آره»ی تو» instead of «بی موعد» while the confirm is open.
 
