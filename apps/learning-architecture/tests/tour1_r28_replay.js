@@ -59,7 +59,8 @@ async function replay(browser, name, opt) {
         if (cmd.clock > cur) { await p.clock.setSystemTime(new Date(cmd.clock + 'T09:00:00')); if (cmd.reloadAfterClock !== false) { const st = await p.evaluate(() => ({ v: APP.state.view, a: APP.state.arg, s: APP.state.sub })).catch(() => null); await boot(); await settle(); if (st) await p.evaluate((st) => { APP.go(st.v, st.a, st.s); }, st).catch(() => { }); } } }
       if (cmd.eval0) await p.evaluate(sub(cmd.eval0));   // تعریفِ ابزارهای خودِ دونده (__setf، __btn …)
       if (cmd.say != null) { await p.evaluate(async (t) => { const pn = document.querySelector('.as-panel'); if (!pn || pn.hidden) APP.ASSIST.toggle(true); await APP.ASSIST.send(t || ''); }, cmd.say); await settle(); }
-      if (cmd.eval && (ACT.test(cmd.eval) || /__[a-z]\w*\(/.test(cmd.eval))) { r = await p.evaluate(sub(cmd.eval)); await settle(); }
+      if (cmd.eval && (opt.allEval || ACT.test(cmd.eval) || /__[a-z]\w*\(/.test(cmd.eval))) {   // دورِ ۲۹ (surface): opt.allEval — کنترل‌هایی که با ابزارهای خودِ دونده (F/P/B ِ eval0) فرم پر می‌کنند هم اجرا شوند
+       r = await p.evaluate(sub(cmd.eval)); await settle(); }
       if (cmd.click) { await p.click(cmd.click, { timeout: 8000 }); await wait(300); await settle(); }
       if (cmd.fill) { await p.fill(cmd.fill[0], cmd.fill[1], { timeout: 8000 }); await wait(300); await settle(); }
       if (cmd.reload) { await boot(); await settle(); }

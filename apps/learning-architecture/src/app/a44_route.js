@@ -1429,8 +1429,11 @@
     if (A.HOST && A.HOST.sheet) chain = chain.then(function () { return AS.openSheets ? AS.openSheets() : null; }).then(function () { var c2 = Promise.resolve(); try { looseSheets().forEach(function (x) { c2 = c2.then(function () { return sheetNews(x); }); }); } catch (e) { } return c2; }, function () { });
     return chain;
   };
-  var lastSys = 0;
-  PRE.sysSweep = function (force) { if (!force && lastSys && A.nowMs() - lastSys < 120000) return Promise.resolve(); lastSys = A.nowMs(); return PRE.sysCheck(); };
+  var lastSys = 0, lastHost29 = false;
+  /* دورِ ۲۹ (R7، B27·D16 tB1 c17–c19 — سه دور «جواب نداد» به‌جای پرسش): گذری که پیش از رسیدنِ میزبانِ برگه‌ها (A.HOST.sheet) رفت هیچ برگه‌ای نخواند ولی نوبتِ دو دقیقه‌ای را
+     مصرف کرد ⇒ جوابِ تازهٔ روتین (حوزهٔ «بررسیِ بازار و رقیبان» که فقط در واژه‌های قاب با گام مشترک است) تا دو دقیقه خوانده نمی‌شد و سطرِ «⚠️ … جواب نداد» ِ جوابِ پیشین
+     تنها حرفِ صفحه می‌ماند. گذرِ بی میزبان نوبت را نگه نمی‌دارد: نخستین رسمِ پس از رسیدنِ میزبان برگه‌ها را می‌خواند. */
+  PRE.sysSweep = function (force) { var hs = !!(A.HOST && A.HOST.sheet); if (!force && lastSys && A.nowMs() - lastSys < 120000 && (lastHost29 || !hs)) return Promise.resolve(); lastSys = A.nowMs(); lastHost29 = hs; return PRE.sysCheck(); };
 
   /* ثبتِ برگهٔ کمبود ⇒ مدخلِ «منتظر» در همان مسئله (اگر مسئله‌ای در کانون است) + علتِ «سامانه» برای گیرِ همان پیام (C23-2).
      دورِ ۲۴ (R1، D24-2، A24-6، C24-13؛ بانکِ R23 #167): برگه‌ای دربارهٔ خودِ سامانه (kind=fix، خودشناسیِ سامانه، کتابِ همراه، سنجشِ مدل‌ها) هرگز گامی از

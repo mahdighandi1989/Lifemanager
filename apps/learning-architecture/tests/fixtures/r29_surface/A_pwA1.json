@@ -1,0 +1,589 @@
+{
+"from": "round29A/pwA1",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام. یه مسئلهٔ المپیادی دارم که خودم تا یه جایی جلو بردمش؛ می‌خوام ببینی کجاش درسته کجاش نه، و کمکم کنی تمومش کنم.\nمسئله: ثابت کنید برای هر عددِ طبیعیِ n، عددِ 2^n عددِ n! را نمی‌شمارد.\nایده‌ام: توانِ ۲ در n! را بشمارم و نشان بدهم از n کمتر است.\nگام ۱: طبقِ فرمولِ لژاندر، توانِ ۲ در n! برابر است با [n/2] + [n/4] + [n/8] + … (تا جایی که 2^k ≤ n؛ [x] یعنی جزءِ صحیح).\nگام ۲: هر جملهٔ [n/2^k] از n/2^k بزرگ‌تر نیست.\nگام ۳: پس توانِ ۲ در n! حداکثر n/2 + n/4 + n/8 + … = n است، یعنی ≤ n.\nگام ۴: ولی چون 2^n عددِ n! را نمی‌شمارد، این توان نمی‌تواند دقیقاً n باشد؛ پس اکیداً کمتر از n است.\nگام ۵: پس 2^n عددِ n! را نمی‌شمارد. ∎\nبرای n = 1 تا 6 هم امتحان کردم، درست بود.",
+"c": 1
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const p=APP.STORY.priorFor(s,null);return JSON.stringify({msgs:s.msgs.map(m=>m.role+\": \"+(m.text||\"\").slice(0,300)),prior:p},null,0).slice(0,5000)})()",
+"c": 2
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll(\".as-panel .as-msg, .as-panel [class*=msg]\")];const u=b.find(x=>/لژاندر/.test(x.textContent));if(!u)return \"none\";u.scrollIntoView({block:\"start\"});return u.innerHTML.slice(0,3000)})()",
+"c": 3
+},
+{
+"say": "آره ثبتش کن. کلش اینه: باید نشون بدم توانِ ۲ تو n! همیشه از n کمتره.",
+"c": 4
+},
+{
+"eval": "JSON.stringify({v:APP.state.view,a:APP.state.arg,s:APP.state.sub,live:APP.liveAll().map(r=>[r.p.id,r.p.title])})",
+"c": 5
+},
+{
+"eval": "JSON.stringify({v:APP.state.view,a:APP.state.arg,s:APP.state.sub,live:APP.liveAll().map(r=>[r.p.id,r.p.title])})",
+"c": 6
+},
+{
+"eval": "document.getElementById(\"main\").innerText.slice(0,5000)",
+"c": 7
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 8
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 9
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 10
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 11
+},
+{
+"eval": "APP.go(\"route\",\"pb_l_mvaqm22hqls\")",
+"c": 12
+},
+{
+"eval": "document.getElementById(\"main\").innerText.slice(0,3000)",
+"c": 13
+},
+{
+"eval": "(()=>{document.querySelectorAll(\"#main details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"همهٔ نقطه‌ها\");return t.slice(i,i+2500)+\" || TITLES: \"+[...document.querySelectorAll(\"#main svg title, #main [data-tip]\")].map(x=>x.textContent||x.getAttribute(\"data-tip\")).join(\" ## \").slice(0,2500)})()",
+"c": 14
+},
+{
+"eval": "(()=>{const els=[...document.querySelectorAll(\"#main svg [tabindex], #main svg g\")].filter(e=>/کارِ پیشین/.test(e.textContent||\"\"));const e=els[els.length-1];if(!e)return \"none\";e.dispatchEvent(new MouseEvent(\"mouseover\",{bubbles:true}));e.dispatchEvent(new FocusEvent(\"focus\"));e.focus&&e.focus();const tip=[...document.querySelectorAll(\"#main .rt-tip, #main [class*=tip]\")].map(x=>x.innerText).join(\" | \");return tip.slice(0,2000)||(\"no tip; \"+e.outerHTML.slice(0,600))})()",
+"c": 15
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[1];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');t&&t.scrollIntoView({block:'center'});return g.length+' pts | '+x.getAttribute('aria-label')+' || TIP: '+(t?t.innerText:'')})()",
+"c": 16
+},
+{
+"eval": "APP.go(\"dossier\",\"pb_l_mvaqm22hqls\")",
+"c": 17
+},
+{
+"eval": "document.getElementById(\"main\").innerText.slice(document.getElementById(\"main\").innerText.indexOf(\"📜\"),4000)",
+"c": 18
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm22hqls\")",
+"c": 19
+},
+{
+"eval": "BL()",
+"c": 20
+},
+{
+"eval": "(()=>{document.querySelectorAll(\".lp-prior-ok\")[0].click();return TT()})()",
+"c": 21
+},
+{
+"eval": "(()=>{document.querySelectorAll(\".lp-prior-ok\")[1].click();return TT()})()",
+"c": 22
+},
+{
+"eval": "(()=>{document.querySelectorAll(\".lp-prior-no\")[3].click();return TT()+\" || \"+MT(\"کارِ پیشینِ تو —\",2200)})()",
+"c": 23
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll('.lp-prior-ok')].find(x=>{let p=x.parentElement;while(p&&!/گامِ/.test(p.textContent))p=p.parentElement;return p&&p.textContent.trim().startsWith('گامِ '+'2'.replace(/\\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])+' ')});if(!b)return 'NOBTN';b.click();return 'clicked '+TT()})()",
+"c": 24
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll('.lp-prior-no')].find(x=>{let p=x.parentElement;while(p&&!/گامِ/.test(p.textContent))p=p.parentElement;return p&&p.textContent.trim().startsWith('گامِ '+'4'.replace(/\\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])+' ')});if(!b)return 'NOBTN';b.click();return 'clicked '+TT()})()",
+"c": 25
+},
+{
+"eval": "MT(\"کارِ پیشینِ تو —\",1500)",
+"c": 26
+},
+{
+"say": "حکمِ گامِ ۳ رو قبول دارم — راست میگی، فقط ≤ n میده. ولی چرا گامِ ۴ رو غلط زدی؟ خب واقعاً 2^n عددِ n! رو نمی‌شمارد دیگه، با n=1 تا 6 هم دیدم. به نظرم گامم درسته.",
+"c": 27
+},
+{
+"eval": "MT(\"گامِ ۴ ·\",400)",
+"c": 28
+},
+{
+"say": "آها راست میگی، گامِ ۴ دور بود. پس باید خودِ گامِ ۳ رو اکید کنم: چون جمع فقط تا 2^K ≤ n میره، n/2 + n/4 + … + n/2^K = n(1 − 1/2^K) که اکیداً از n کمتره. پس توانِ ۲ در n! از n کمتره و 2^n عددِ n! را نمی‌شمارد. ثابت شد؟",
+"c": 29
+},
+{
+"eval": "MT(\"کارِ پیشینِ تو —\",900)",
+"c": 30
+},
+{
+"eval": "JSON.stringify(APP.STORY.priorFor(APP.ASSIST.cur(),\"pb_l_mvaqm22hqls\")).slice(0,1500)",
+"c": 31
+},
+{
+"eval": "MT(\"کارِ پیشینِ تو —\",1200)",
+"c": 32
+},
+{
+"say": "برای n=1 هیچ جمله‌ای نیست، پس توانِ ۲ در 1! صفره و ۰ < ۱. برای n ≥ 2 هم K ≥ 1 و n(1 − 1/2^K) < n. پس برای همه‌ی n درسته.",
+"c": 33
+},
+{
+"say": "وارسی کردم: فرضِ «n طبیعی» در لژاندر و در تعریفِ K به کار رفت، و نتیجه «توان کمتر از n» دقیقاً یعنی 2^n عددِ n! را نمی‌شمارد — همون حکمه. فقط یه چیزی: وقتی گامِ ۴ رو نوشتم حس کردم یه جاش می‌لنگه ولی نفهمیدم کجا. این یعنی من استعدادِ اثبات ندارم، یا یه چیزی رو بلد نیستم؟",
+"c": 34
+},
+{
+"eval": "BL()",
+"c": 35
+},
+{
+"eval": "MT(\"کارِ پیشینِ تو —\",700)",
+"c": 36
+},
+{
+"eval": "[...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|طرح|بازنگری|✅/.test(x)).join(\"\\n\")",
+"c": 37
+},
+{
+"eval": "[...document.querySelectorAll(\"#main summary, #main h3, #main h4\")].map(x=>x.textContent.trim().slice(0,50)).join(\" | \")",
+"c": 38
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm22hqls\",\"exec\");return [...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.className.split(\" \")[0]+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|گام|بازنگری|✅|ثبت/.test(x)).join(\"\\n\")+\"\\n---\\n\"+MT(\"۳)\",2500)})()",
+"c": 39
+},
+{
+"eval": "[...document.querySelectorAll(\"#main [class*=lp-ph], #main [class*=chip], #main [role=tab], #main a\")].slice(0,30).map(x=>x.tagName+\".\"+x.className+\":\"+x.textContent.trim().slice(0,40)).join(\"\\n\")",
+"c": 40
+},
+{
+"eval": "(()=>{const b=document.querySelector(\".lp-fc-ok\");if(!b)return \"none\";b.click();return \"ok \"+TT()})()",
+"c": 41
+},
+{
+"eval": "(()=>{const b=document.querySelector(\".lp-fc-ok\");if(!b)return \"none\";b.click();return \"ok \"+TT()})()",
+"c": 42
+},
+{
+"eval": "(()=>{const b=document.querySelector(\".lp-fc-ok\");if(!b)return \"none\";b.click();return \"ok \"+TT()})()",
+"c": 43
+},
+{
+"eval": "FL()",
+"c": 44
+},
+{
+"eval": "(()=>{const r=[F(\"lpOne\",\"باید نشون بدم توانِ ۲ تو n! همیشه از n کمتره\"),F(\"lpUnk\",\"2^n عددِ n! را نمی‌شمارد، یعنی توانِ ۲ در n! کمتر از n است\"),F(\"lpD_d1\",\"n عددِ طبیعی است\")];return r.join(\",\")+\" spatial=\"+document.getElementById(\"lpSpatial\").checked})()",
+"c": 45
+},
+{
+"eval": "(()=>{const r=CT(\"ثبتِ فهم\");return r+\" | \"+TT()+\" | \"+MT(\"✓ فهمِ مسئله\",300)})()",
+"c": 46
+},
+{
+"eval": "(()=>{F(\"lpWhy\",\"برای مرحلهٔ دومِ المپیاد تمرین می‌کنم و می‌خوام اثبات‌نویسی‌ام دقیق بشه\");const r=CT(\"ثبتِ فهم\");return r+\" | \"+TT()})()",
+"c": 47
+},
+{
+"eval": "(()=>{return FL().split(\"\\n\").slice(0,25).join(\"\\n\")+\"\\n---\\n\"+[...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|گام|بازنگری|✅|ثبت|طرح/.test(x)).join(\"\\n\")})()",
+"c": 48
+},
+{
+"eval": "(()=>{const r=CT(\"ثبتِ کل\");return r+\" | \"+TT()})()",
+"c": 49
+},
+{
+"eval": "(()=>{return FL().split(\"\\n\").slice(0,12).join(\"\\n\")+\"\\n---\\n\"+[...document.querySelectorAll(\"#main button\")].map((b,i)=>i+\":\"+b.textContent.trim().slice(0,40)).filter(x=>/حل|اجرا|گام|بازنگری|✅|ثبت|طرح/.test(x)).join(\"\\n\")})()",
+"c": 50
+},
+{
+"eval": "MT(\"۱) کلِ مسئله\",1800)",
+"c": 51
+},
+{
+"say": "از خودم می‌پرسم: «این جمله از کدوم مقدمه اومده؟» — اگه جوابش خودِ حکم بود، یعنی دوره. پس حل شد دیگه؟",
+"c": 52
+},
+{
+"say": "قبل از این‌که راهِ دیگه رو بگم، کلِ اثباتمو یه بار مرتب و از نو نوشتم که ببینی: گام ۱: لژاندر، توانِ ۲ در n! = [n/2] + [n/4] + … تا 2^K ≤ n. گام ۲: هر [n/2^k] ≤ n/2^k. گام ۳: جمعِ n/2 + … + n/2^K = n(1 − 1/2^K) < n. گام ۴: پس توان < n و 2^n عددِ n! را نمی‌شمارد.",
+"c": 53
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.S.all(\"eprob\",r=>r&&r.live&&r.p)[0].p.id;const pr=APP.STORY.priorFor(s,pid)||{};return JSON.stringify({sum:pr.sum,steps:(pr.steps||[]).map(x=>[x.n,x.verdict,(x.fixed?x.fixed.t:x.quote).slice(0,60),x.her||\"\",x.re?1:0])})})()",
+"c": 54
+},
+{
+"say": "راستش حکمِ گامِ ۲ رو قبول ندارم.",
+"c": 55
+},
+{
+"say": "ببخشید، اشتباهی گفتم؛ منظورم گامِ ۲ نبود. همون حکمت درست بود.",
+"c": 56
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.S.all(\"eprob\",r=>r&&r.live&&r.p)[0].p.id;const pr=APP.STORY.priorFor(s,pid)||{};const x=pr.steps[1];return JSON.stringify({sum:pr.sum,s2:{v:x.verdict,her:x.her,hist:x.herHist,re:x.re}})})()",
+"c": 57
+},
+{
+"say": "از راهِ دیگه: حدس می‌زنم توانِ ۲ در n! دقیقاً برابرِ n منهای تعدادِ یک‌های n در مبنای ۲ باشه. برای n=6: ۶ = 110 دو تا یک، ۶ − ۲ = ۴، و 6! = 720 = 16 × 45، پس توان ۴ ✓. برای n=5: 101 دو تا یک، ۳؛ و 5! = 120 = 8 × 15 ✓. اگه درست باشه، چون n دست‌کم یه یک داره، توان ≤ n − 1 < n.",
+"c": 58
+},
+{
+"clock": "2026-10-26",
+"c": 59
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+DUE()})()",
+"c": 60
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm22hqls\")",
+"c": 61
+},
+{
+"say": "سلام، برگشتم. n=8 رو امتحان کردم: 8 = 1000 یه یک داره، پس حدسم میگه ۷. 8! = 40320 = 128 × 315 و 128 = 2^7، پس توان ۷ ✓. فکر کنم اثباتشم پیدا کردم: اگه n = a_0 + 2a_1 + 4a_2 + … (رقم‌های دودویی)، اون‌وقت [n/2^k] = a_k + 2a_{k+1} + …؛ جمعِ همه‌ی k ها میشه Σ a_i(2^i − 1) = n − (تعدادِ یک‌ها). پس حدسم درسته.",
+"c": 62
+},
+{
+"say": "آره: a_i توی [n/2^k] فقط برای k = 1 تا i میاد، با ضریبِ 2^(i−k)؛ جمعشون 2^(i−1) + … + 2 + 1 = 2^i − 1 میشه. پس کل توان n − (تعدادِ یک‌ها) هست و چون n دست‌کم یه یک داره، از n کمتره. حل شد.",
+"c": 63
+},
+{
+"say": "برای ۳ هم همین کار رو می‌کنم: هر [n/3^k] رقم‌های مبنای ۳ رو جابه‌جا می‌کنه و آخرش میشه (n − جمعِ رقم‌های n در مبنای ۳) / 2. مثلاً n=6: در مبنای ۳ میشه 20، جمعِ رقم‌ها ۲، (6−2)/2 = 2، و 720 = 9 × 80 ✓. درسم: هر جمله‌ی اثبات رو بپرسم از کدوم مقدمه اومده. بیشتر از همه همین پرسش کمک کرد که «۲ و ۳ رو اکید کن، از خودِ جمع». از این نوع مسئله‌ها خوشم میاد، مخصوصاً وقتی یه فرمولِ دقیق پشتش پیدا میشه.",
+"c": 64
+},
+{
+"say": "یه نقشه از این که از کجا شروع کردم، کجاها اشتباه داشتم و الان کجام نشونم میدی؟",
+"c": 65
+},
+{
+"eval": "(()=>{document.querySelectorAll(\"#main details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+3000)})()",
+"c": 66
+},
+{
+"eval": "(()=>{document.querySelectorAll(\"#main details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+2500)})()",
+"c": 67
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 68
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 69
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 70
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvnlkwr423ljm');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 71
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 72
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 73
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 74
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t})()",
+"c": 75
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 76
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 77
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 78
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 79
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltftxov4e');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 80
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 81
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 82
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 83
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t})()",
+"c": 84
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 85
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;return (t.match(/[+−] [^\\n]*کارِ پیشین[^\\n]*/g)||[]).join(\"\\n\")})()",
+"c": 86
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;return (t.match(/[^\\n]*(گامِ کارِ پیشین|گامِ درست)[^\\n]*/g)||[]).join(\"\\n\")})()",
+"c": 87
+},
+{
+"say": "یه بارِ دیگه، گزارشِ سوم، کلِ اثبات رو تمیز نوشتم: گام ۱: لژاندر، توانِ ۲ در n! = [n/2] + [n/4] + … + [n/2^K]. گام ۲: هر [n/2^k] ≤ n/2^k. گام ۳: جمع ≤ n(1 − 1/2^K) < n. گام ۵: پس 2^n عددِ n! را نمی‌شمارد. یه گامِ تازه هم اضافه کردم، گام ۶: برای ۳ هم همین‌جوری توانِ ۳ کمتر از n/2 ـه.",
+"c": 88
+},
+{
+"eval": "JSON.stringify((()=>{const s=APP.ASSIST.cur();const pr=APP.STORY.priorFor(s,null);return {sum:pr&&pr.sum,steps:pr&&pr.steps.map(x=>[x.n||\"\",(x.v||x.verdict),(x.quote||x.q||\"\").slice(0,40),x.hist?x.hist.length:0])}})())",
+"c": 89
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 90
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 91
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 92
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsvjpdznl');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 93
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 94
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 95
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 96
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t})()",
+"c": 97
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 98
+},
+{
+"eval": "(()=>{const m=APP.ASSIST.cur().msgs;let i=m.length-1;while(i>0&&m[i].role!=\"user\")i--;return m.slice(i-1).filter(x=>x.role==\"sys\").map(x=>x.text.slice(0,400)).join(\"\\n\")})()",
+"c": 99
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let pr=null;try{pr=APP.STORY.priorFor(s,null)}catch(e){return \"ERR \"+e}return JSON.stringify({sum:pr&&pr.sum,steps:(pr&&pr.steps||[]).map(x=>[x.n,x.v||x.verdict,(x.quote||\"\").slice(0,50),(x.hist||[]).length])})})()",
+"c": 100
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 101
+},
+{
+"eval": "DOSS('pb_l_mvaqm22hqls')",
+"c": 102
+},
+{
+"say": "اگه گامِ ۲ غلط باشه چی؟ کلِ اثبات خراب میشه؟ آهان یه چیز: تو گامِ ۶ منظورم n/2 نبود، درستش (n−1)/2 ـه.",
+"c": 103
+},
+{
+"eval": "(()=>{const m=APP.ASSIST.cur().msgs;return m.slice(-2).map(x=>x.role+\": \"+x.text.slice(0,400)).join(\"\\n\")})()",
+"c": 104
+},
+{
+"eval": "DOSS('pb_l_mvaqm22hqls')",
+"c": 105
+},
+{
+"eval": "APP.ASSIST.newSession()",
+"c": 106
+},
+{
+"say": "۷ × ۸ = ۵۶ بود دیگه؟",
+"c": 107
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 108
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 109
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 110
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvp14dk14ypz7');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 111
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsxpj138u');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 112
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 113
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 114
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 115
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t})()",
+"c": 116
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 117
+},
+{
+"say": "چند تا نمونهٔ دیگه برای فرمولِ n منهای یک‌ها: n=10 در مبنای ۲ میشه 1010، دو تا یک؛ 10! = 3628800 = 256 × 14175 و ۱۰ − ۲ = ۸ ✓. n=7 هم 111، پس ۷ − ۳ = ۴، و 7! = 5040 = 32 × 157.",
+"c": 118
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 119
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 120
+},
+{
+"c": 121
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 122
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvp13jkdosuqw');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 123
+},
+{
+"c": 124
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltjbswnc4');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 125
+},
+{
+"c": 126
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 127
+},
+{
+"c": 128
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 129
+},
+{
+"c": 130
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 131
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm22hqls');const t=document.getElementById('main').innerText;return t})()",
+"c": 132
+},
+{
+"c": 133
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 134
+},
+{
+"c": 135
+},
+{
+"c": 136,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"کارت را کامل خواندم. گامِ ۱ (لژاندر) و گامِ ۲ (هر $[n/2^k]$ از $n/2^k$ بزرگ‌تر نیست) درست‌اند. گامِ ۳ ناقص است: فقط «≤ n» می‌دهد، و حکم «کمتر از n» می‌خواهد. گامِ ۴ نادرست است: «چون $2^n$ عددِ $n!$ را نمی‌شمارد» همان حکمی است که باید ثابت شود — استدلال دور می‌زند. گامِ ۵ به گامِ ۴ تکیه دارد. آزمودنِ n = ۱ تا ۶ آزمون است، نه گام. از نخستین گامِ نادرست‌نشده ادامه می‌دهیم: در گامِ ۳، چه چیزی کم است تا «≤ n» به «< n» برسد؟\", \"title\": \"2^n عددِ n! را نمی‌شمارد\", \"memory\": \"اثباتِ نیمه‌تمام: گام ۱ و ۲ درست، گام ۳ ناقص (فقط ≤ n)، گام ۴ دوری، گام ۵ وابسته؛ ازسرگیری از گامِ ۳.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"proof\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prior\": [{\"step\": \"فرمولِ لژاندر\", \"quote\": \"طبقِ فرمولِ لژاندر، توانِ ۲ در n! برابر است با [n/2] + [n/4] + [n/8] + …\", \"verdict\": \"ok\", \"why\": \"فرمولِ لژاندر برای p = 2\"}, {\"step\": \"کرانِ هر جمله\", \"quote\": \"هر جملهٔ [n/2^k] از n/2^k بزرگ‌تر نیست\", \"verdict\": \"ok\", \"why\": \"جزءِ صحیح از خودِ عدد بزرگ‌تر نیست\", \"dep\": [1]}, {\"step\": \"کرانِ جمع\", \"quote\": \"پس توانِ ۲ در n! حداکثر n/2 + n/4 + n/8 + … = n است، یعنی ≤ n\", \"verdict\": \"incomplete\", \"why\": \"فقط ≤ n می‌دهد؛ حکم نابرابریِ اکید می‌خواهد\", \"dep\": [2]}, {\"step\": \"اکید کردن\", \"quote\": \"ولی چون 2^n عددِ n! را نمی‌شمارد، این توان نمی‌تواند دقیقاً n باشد؛ پس اکیداً کمتر از n است\", \"verdict\": \"wrong\", \"why\": \"همان حکم را فرض گرفته است (دور)\", \"dep\": [3]}, {\"step\": \"نتیجه\", \"quote\": \"پس 2^n عددِ n! را نمی‌شمارد\", \"verdict\": \"incomplete\", \"why\": \"بر گامِ ۴ تکیه دارد\", \"dep\": [4]}]}]}",
+"{\"reply\": \"مسئله را برای ثبت در «🔭 مسئله‌های من» فرستادم؛ کارِ پیشینت هم با حکمِ هر گام همان‌جا می‌آید. کل را هم روشن گفتی. همان گامِ ۳: چه چیزی کم دارد تا «≤ n» به «< n» برسد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"2^n عددِ n! را نمی‌شمارد\", \"statement\": \"ثابت کنید برای هر عددِ طبیعیِ n، عددِ 2^n عددِ n! را نمی‌شمارد.\", \"nat\": \"objective\", \"kind\": \"prove\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u0\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"گامِ ۴ را دوباره سنجیدم و حکمش همان می‌ماند، با این شاهد: جمله‌ات با «چون $2^n$ عددِ $n!$ را نمی‌شمارد» شروع می‌شود — و این دقیقاً همان چیزی است که مسئله می‌خواهد ثابت کنی؛ دیدنِ n = ۱ تا ۶ هم فقط شش حالت است. دلیلت برای گامِ ۴ — همین دلیل گام را کامل ثابت می‌کند، هر حالتی را می‌پوشاند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prior\": [{\"n\": 4, \"quote\": \"ولی چون 2^n عددِ n! را نمی‌شمارد، این توان نمی‌تواند دقیقاً n باشد؛ پس اکیداً کمتر از n است\", \"verdict\": \"wrong\", \"why\": \"دوباره سنجیده شد: مقدمهٔ این گام خودِ حکم است، و n = ۱ تا ۶ فقط شش حالت را می‌پوشاند\"}]}]}",
+"{\"reply\": \"گامِ ۳ را خودت اکید کردی: جمع فقط تا $2^K \\\\le n$ می‌رود و $n(1-\\\\frac{1}{2^K})$ از n کمتر است — این دیگر به گامِ ۴ نیاز ندارد. «ثابت شد» را من نمی‌گویم؛ هر گام را وارسی کن: این گامِ تازه برای هر n برقرار است — کوچک‌ترین n را هم می‌پوشاند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"proof\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prior\": [{\"n\": 3, \"quote\": \"چون جمع فقط تا 2^K ≤ n میره، n/2 + n/4 + … + n/2^K = n(1 − 1/2^K) که اکیداً از n کمتره\", \"verdict\": \"ok\", \"why\": \"جمعِ متناهیِ هندسی اکیداً کمتر از n است\"}, {\"n\": 5, \"quote\": \"پس توانِ ۲ در n! از n کمتره و 2^n عددِ n! را نمی‌شمارد\", \"verdict\": \"ok\", \"why\": \"حالا از گامِ ۳ ِ اکید نتیجه می‌شود، نه از گامِ ۴\", \"dep\": [3]}]}]}",
+"{\"reply\": \"کوچک‌ترین حالت را هم پوشاندی: برای n = ۱ جمله‌ای نیست و ۰ < ۱، و برای n ≥ ۲ همان $n(1-\\\\frac{1}{2^K}) < n$. کارِ گامِ ۴ ِ قدیمی (اکید کردن) را حالا همین استدلال انجام می‌دهد، بی دور. «ثابت شد» را صفحه پس از وارسیِ خودت می‌گوید: هر بخشِ فرض کجای برهان به کار رفت، و نتیجه دقیقاً همان حکم است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"check\"], \"ans\": [\"e1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prior\": [{\"n\": 4, \"quote\": \"برای n=1 هیچ جمله‌ای نیست، پس توانِ ۲ در 1! صفره و ۰ < ۱. برای n ≥ 2 هم K ≥ 1 و n(1 − 1/2^K) < n\", \"verdict\": \"ok\", \"why\": \"اکید بودن حالا از خودِ جمع برای هر n نشان داده شد، نه از حکم\", \"dep\": [3]}], \"check\": {\"msgs\": [\"برای n=1 هیچ جمله‌ای نیست، پس توانِ ۲ در 1! صفره و ۰ < ۱\"]}}]}",
+"{\"reply\": \"وارسی‌ات کامل بود: فرضِ «n طبیعی» دو جا به کار رفت و نتیجه همان حکم است. دربارهٔ آن حسِ «یه جاش می‌لنگه»: چیزی از مفهوم‌ها کم نداشتی — لژاندر، جزءِ صحیح و جمعِ هندسی را درست به کار بردی. گیر در یک مهارتِ وارسی بود: این‌که هر جمله را بپرسی از کدام مقدمه آمده. خودت همان را حس کرده بودی، فقط نامش را نداشتی. از این به بعد، وقتی جمله‌ای در اثبات می‌نویسی، از خودت چه می‌پرسی تا دور را زود ببینی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"check\"], \"ans\": [\"e2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"cause\": {\"kind\": \"skill\", \"quote\": \"وقتی گامِ ۴ رو نوشتم حس کردم یه جاش می‌لنگه ولی نفهمیدم کجا\"}, \"check\": {\"msgs\": [\"فرضِ «n طبیعی» در لژاندر و در تعریفِ K به کار رفت، و نتیجه «توان کمتر از n» دقیقاً یعنی 2^n عددِ n! را نمی‌شمارد\"]}}]}",
+"{\"reply\": \"پرسشِ خودت را پیدا کردی: «این جمله از کدام مقدمه آمده؟» — و نشانهٔ دور را هم گفتی. «حل شد» را من نمی‌گویم؛ وارسی‌ات را کرده‌ای، پس خودت در صفحه «✅ حل شد» را بزن تا بازنگریِ صفحه جلو برود. و یک پرسشِ بازنگری: می‌توانی همین حکم را از راهِ دیگری هم به دست بیاوری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"نسخهٔ مرتبت را خواندم؛ با دفتری که داریم می‌خواند: لژاندر، کرانِ هر جمله، جمعِ متناهی $n(1-\\\\frac{1}{2^K}) < n$ و نتیجه. همه سرِ جایش است. حالا همان راهِ دیگر: چه حدسی داری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"proof\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prior\": [{\"n\": 1, \"quote\": \"گام ۱: لژاندر، توانِ ۲ در n! = [n/2] + [n/4] + … تا 2^K ≤ n\", \"verdict\": \"ok\", \"why\": \"همان گامِ ۱\"}, {\"n\": 2, \"quote\": \"گام ۲: هر [n/2^k] ≤ n/2^k\", \"verdict\": \"ok\", \"why\": \"همان گامِ ۲\"}, {\"n\": 3, \"quote\": \"گام ۳: جمعِ n/2 + … + n/2^K = n(1 − 1/2^K) < n\", \"verdict\": \"ok\", \"why\": \"همان گامِ ۳ ِ اکید\"}, {\"n\": 4, \"quote\": \"گام ۴: پس توان < n و 2^n عددِ n! را نمی‌شمارد\", \"verdict\": \"ok\", \"why\": \"نتیجه از گامِ ۳\"}]}]}",
+"{\"reply\": \"گامِ ۲ را «درست» خوانده بودم (جزءِ صحیح از خودِ عدد بزرگ‌تر نیست). اگر آن حکم را قبول نداری، دوباره می‌سنجمش — کجای گامِ ۲ به نظرت نمی‌خواند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"باشه — پس حکمِ گامِ ۲ همان «درست» می‌ماند و چیزی عوض نشد. برگردیم به راهِ دیگر: چه حدسی داری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"راهِ دیگرِ خودت است و قوی‌تر از حکمِ اول: «توانِ ۲ در $n!$ برابرِ n منهای تعدادِ یک‌های دودوییِ n». دو حالت را خودت آزمودی (n = ۶ و n = ۵) و حساب‌هایش با حسابِ صفحه می‌خواند. نمونه‌ها حدس را محتمل‌تر می‌کنند، ثابتش نمی‌کنند — چرا برای هر n برقرار است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [\"b6\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"guess\": {\"text\": \"توانِ ۲ در n! دقیقاً برابرِ n منهای تعدادِ یک‌های n در مبنای ۲ باشه\", \"q\": \"چرا برای هر n برقرار است؟\"}}]}",
+"{\"reply\": \"n = ۸ را هم خودت آزمودی و حسابش با حسابِ صفحه می‌خواند ($128 \\\\times 315 = 40320$ و $128 = 2^7$). برهانی هم آوردی؛ «درست است» را من نمی‌گویم — نقطهٔ حساسش را وارسی کن: چرا ضریبِ هر $a_i$ در جمعِ همهٔ $[n/2^k]$ها دقیقاً $2^i - 1$ می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"proof\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"guess_res\": {\"id\": \"g1\", \"res\": \"confirmed\"}}]}",
+"{\"reply\": \"نقطهٔ حساس را خودت باز کردی: $a_i$ فقط برای k = ۱ تا i می‌آید و ضریب‌هایش $2^{i-1} + \\\\dots + 2 + 1 = 2^i - 1$ می‌شود؛ پس توان $n$ منهای تعدادِ یک‌هاست و از n کمتر. «حل شد» را خودت در صفحه بزن. یک پرسشِ بازنگری: همین روش را در مسئلهٔ دیگری هم می‌توانی به کار ببری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"proof\", \"check\"], \"ans\": [\"b5\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"check\": {\"msgs\": [\"a_i توی [n/2^k] فقط برای k = 1 تا i میاد، با ضریبِ 2^(i−k)؛ جمعشون 2^(i−1) + … + 2 + 1 = 2^i − 1 میشه\"]}}]}",
+"{\"reply\": \"روشت را به مبنای ۳ هم بردی و با n = ۶ آزمودی. درسِ خودت روشن است: هر جملهٔ اثبات را بپرسی از کدام مقدمه آمده. مسئله، وارسی، این درس، پرسشی که بیشتر کمکت کرد و سلیقه‌ات را ثبت می‌کنم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"2^n عددِ n! را نمی‌شمارد\", \"statement\": \"ثابت کنید برای هر عددِ طبیعیِ n، عددِ 2^n عددِ n! را نمی‌شمارد.\", \"kind\": \"prove\", \"lesson\": \"هر جمله‌ی اثبات رو بپرسم از کدوم مقدمه اومده\", \"check\": \"a_i توی [n/2^k] فقط برای k = 1 تا i میاد، با ضریبِ 2^(i−k)؛ جمعشون 2^(i−1) + … + 2 + 1 = 2^i − 1 میشه\", \"bestQ\": \"«۲ و ۳ رو اکید کن، از خودِ جمع»\", \"taste\": \"از این نوع مسئله‌ها خوشم میاد، مخصوصاً وقتی یه فرمولِ دقیق پشتش پیدا میشه\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"(n − جمعِ رقم‌های n در مبنای ۳) / 2\", \"ans\": [\"b7\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"taste\": {\"text\": \"از این نوع مسئله‌ها خوشم میاد، مخصوصاً وقتی یه فرمولِ دقیق پشتش پیدا میشه\"}}]}",
+"{\"reply\": \"«🧭 نقشهٔ مسیرِ مسئله» را برای همین مسئله باز می‌کنم: از صورت (مبدأ) تا «حل شد» (مقصد)، پنج گامِ کارِ پیشینت با حکمِ هر کدام، جایی که گامِ ۴ را رد کردی و دوباره سنجیده شد، و اصلاح‌هایی که خودت کردی. موس را روی هر نقطه ببر تا ببینی چه بود و چه شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"go\", \"view\": \"route\", \"arg\": \"pb_l_mvaqm22hqls\"}]}",
+"{\"reply\": \"همین‌جا خطِ مسیرت را می‌بینی: مبدأ، گام‌های کارِ پیشینت با حکمشان، ردِ گامِ ۴ و دوباره‌سنجی، اصلاح‌های خودت و مقصدِ «حل شد» — جوابِ «از کجا شروع کردم، کجا اشتباه داشتم و الان کجام».\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"گزارشِ سومت را خواندم: گام‌های ۱ تا ۵ همان‌اند که پیش‌تر درست درآمد. گامِ تازهٔ ۶ («برای ۳ هم همین‌جوری توانِ ۳ کمتر از n/2 ـه») هنوز ناقص است — «همین‌جوری» را بنویس: جمعِ n/3 + n/9 + … کمتر از چه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prior\": [{\"n\": 6, \"step\": \"توانِ ۳\", \"quote\": \"گام ۶: برای ۳ هم همین‌جوری توانِ ۳ کمتر از n/2 ـه\", \"verdict\": \"incomplete\", \"why\": \"«همین‌جوری» نوشته نشده؛ کرانِ جمعِ n/3 + n/9 + … باید نوشته شود\", \"dep\": []}]}]}",
+"{\"reply\": \"گامِ ۲ درست است و درست می‌ماند — هر جزءِ صحیحِ [n/2^k] از خودِ n/2^k بزرگ‌تر نیست؛ اگر نادرست بود، گام ۳ که از آن می‌آید هم می‌افتاد. اصلاحِ گامِ ۶ را فرستادم: «(n−1)/2». حالا جمعِ n/3 + n/9 + … را بنویس — کمتر از چه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"prior\": [{\"n\": 6, \"quote\": \"تو گامِ ۶ منظورم n/2 نبود، درستش (n−1)/2 ـه\", \"verdict\": \"incomplete\", \"why\": \"کرانِ جمعِ n/3 + n/9 + … هنوز نوشته نشده\"}]}]}",
+"{\"reply\": \"بله، ۷ × ۸ = ۵۶ است. برای چه کاری لازمش داری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"نمونهٔ n=10 درست می‌خواند. در n=7 ضربِ ۳۲ × ۱۵۷ را یک بار دیگر خودت بزن — به ۵۰۴۰ می‌رسد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"l\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"سلام. یه مسئلهٔ المپیادی دارم که خودم تا یه جایی جلو بردمش؛ می‌خوام ببینی کجاش درسته کجاش نه، و کمکم کنی تمومش کنم.\nمسئله: ثابت کنید برای هر عددِ طبیعیِ n، عددِ 2^n عددِ n! را نمی‌شمارد.\nایده‌ام: توانِ ۲ در n! را بشمارم و نشان بدهم از n کمت",
+"آره ثبتش کن. کلش اینه: باید نشون بدم توانِ ۲ تو n! همیشه از n کمتره.",
+"حکمِ گامِ ۳ رو قبول دارم — راست میگی، فقط ≤ n میده. ولی چرا گامِ ۴ رو غلط زدی؟ خب واقعاً 2^n عددِ n! رو نمی‌شمارد دیگه، با n=1 تا 6 هم دیدم. به نظرم گامم درسته.",
+"آها راست میگی، گامِ ۴ دور بود. پس باید خودِ گامِ ۳ رو اکید کنم: چون جمع فقط تا 2^K ≤ n میره، n/2 + n/4 + … + n/2^K = n(1 − 1/2^K) که اکیداً از n کمتره. پس توانِ ۲ در n! از n کمتره و 2^n عددِ n! را نمی‌شمارد. ثابت شد؟",
+"برای n=1 هیچ جمله‌ای نیست، پس توانِ ۲ در 1! صفره و ۰ < ۱. برای n ≥ 2 هم K ≥ 1 و n(1 − 1/2^K) < n. پس برای همه‌ی n درسته.",
+"وارسی کردم: فرضِ «n طبیعی» در لژاندر و در تعریفِ K به کار رفت، و نتیجه «توان کمتر از n» دقیقاً یعنی 2^n عددِ n! را نمی‌شمارد — همون حکمه. فقط یه چیزی: وقتی گامِ ۴ رو نوشتم حس کردم یه جاش می‌لنگه ولی نفهمیدم کجا. این یعنی من استعدادِ اثبات ن",
+"از خودم می‌پرسم: «این جمله از کدوم مقدمه اومده؟» — اگه جوابش خودِ حکم بود، یعنی دوره. پس حل شد دیگه؟",
+"قبل از این‌که راهِ دیگه رو بگم، کلِ اثباتمو یه بار مرتب و از نو نوشتم که ببینی: گام ۱: لژاندر، توانِ ۲ در n! = [n/2] + [n/4] + … تا 2^K ≤ n. گام ۲: هر [n/2^k] ≤ n/2^k. گام ۳: جمعِ n/2 + … + n/2^K = n(1 − 1/2^K) < n. گام ۴: پس توان < n و 2^n",
+"راستش حکمِ گامِ ۲ رو قبول ندارم.",
+"ببخشید، اشتباهی گفتم؛ منظورم گامِ ۲ نبود. همون حکمت درست بود.",
+"از راهِ دیگه: حدس می‌زنم توانِ ۲ در n! دقیقاً برابرِ n منهای تعدادِ یک‌های n در مبنای ۲ باشه. برای n=6: ۶ = 110 دو تا یک، ۶ − ۲ = ۴، و 6! = 720 = 16 × 45، پس توان ۴ ✓. برای n=5: 101 دو تا یک، ۳؛ و 5! = 120 = 8 × 15 ✓. اگه درست باشه، چون n د",
+"سلام، برگشتم. n=8 رو امتحان کردم: 8 = 1000 یه یک داره، پس حدسم میگه ۷. 8! = 40320 = 128 × 315 و 128 = 2^7، پس توان ۷ ✓. فکر کنم اثباتشم پیدا کردم: اگه n = a_0 + 2a_1 + 4a_2 + … (رقم‌های دودویی)، اون‌وقت [n/2^k] = a_k + 2a_{k+1} + …؛ جمعِ هم",
+"آره: a_i توی [n/2^k] فقط برای k = 1 تا i میاد، با ضریبِ 2^(i−k)؛ جمعشون 2^(i−1) + … + 2 + 1 = 2^i − 1 میشه. پس کل توان n − (تعدادِ یک‌ها) هست و چون n دست‌کم یه یک داره، از n کمتره. حل شد.",
+"برای ۳ هم همین کار رو می‌کنم: هر [n/3^k] رقم‌های مبنای ۳ رو جابه‌جا می‌کنه و آخرش میشه (n − جمعِ رقم‌های n در مبنای ۳) / 2. مثلاً n=6: در مبنای ۳ میشه 20، جمعِ رقم‌ها ۲، (6−2)/2 = 2، و 720 = 9 × 80 ✓. درسم: هر جمله‌ی اثبات رو بپرسم از کدوم ",
+"یه نقشه از این که از کجا شروع کردم، کجاها اشتباه داشتم و الان کجام نشونم میدی؟",
+"[سامانه: « نقشهٔ مسیرِ مسئله» باز شد. این نما فیلدی برای پر کردن ندارد — چیزی پر نکن و دکمه‌ای نزن؛ در یک جمله بگو همین‌جا چه می‌بیند و به کدام پرسشش جواب می‌دهد؛ reply خیلی کوتاه.]",
+"یه بارِ دیگه، گزارشِ سوم، کلِ اثبات رو تمیز نوشتم: گام ۱: لژاندر، توانِ ۲ در n! = [n/2] + [n/4] + … + [n/2^K]. گام ۲: هر [n/2^k] ≤ n/2^k. گام ۳: جمع ≤ n(1 − 1/2^K) < n. گام ۵: پس 2^n عددِ n! را نمی‌شمارد. یه گامِ تازه هم اضافه کردم، گام ۶: ",
+"اگه گامِ ۲ غلط باشه چی؟ کلِ اثبات خراب میشه؟ آهان یه چیز: تو گامِ ۶ منظورم n/2 نبود، درستش (n−1)/2 ـه.",
+"۷ × ۸ = ۵۶ بود دیگه؟",
+"چند تا نمونهٔ دیگه برای فرمولِ n منهای یک‌ها: n=10 در مبنای ۲ میشه 1010، دو تا یک؛ 10! = 3628800 = 256 × 14175 و ۱۰ − ۲ = ۸ ✓. n=7 هم 111، پس ۷ − ۳ = ۴، و 7! = 5040 = 32 × 157."
+]
+}

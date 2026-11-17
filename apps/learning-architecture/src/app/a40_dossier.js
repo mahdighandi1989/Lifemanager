@@ -52,7 +52,8 @@
   /* A.EVLOG.add({pid|sess, k, at, title, lines, out, src, sign:[{row, sign}], by, id}) — at = زمانِ کنش (ISO)؛ id ⇒ دوباره‌نویسی همان رویداد را عوض می‌کند (نه رویدادِ دوم) */
   EVL.add = function (ev) {
     if (!ev || !ev.title || !ev.at) return null; var o = evOwner(ev); if (!o) return null; var L = o.arr(), id = ev.id || ("ev" + L.length + "_" + String(ev.at).replace(/\D/g, "").slice(-9));
-    var e = { id: id, k: String(ev.k || "act"), at: String(ev.at), title: String(ev.title), lines: (ev.lines || []).map(String), out: ev.out ? String(ev.out) : "", src: ev.src || null, mind: ev.sign || ev.mind || [], by: ev.by || "", pid: ev.pid || "", sess: ev.sess || "" };
+    var e = { id: id, k: String(ev.k || "act"), at: String(ev.at), title: String(ev.title), lines: (ev.lines || []).map(function (x) { x = String(x); return A.noLabels29 ? A.noLabels29(x) : x; }),   /* دورِ ۲۹ (F14، C151): بی برچسبِ قاعده و شناسهٔ خام */
+      out: ev.out ? String(ev.out) : "", src: ev.src || null, mind: ev.sign || ev.mind || [], by: ev.by || "", pid: ev.pid || "", sess: ev.sess || "" };
     var i = L.map(function (x) { return x.id; }).indexOf(id); if (i >= 0) { if (JSON.stringify(L[i]) === JSON.stringify(e)) return L[i]; L[i] = e; } else L.push(e);
     if (L.length > 500) L.splice(0, L.length - 500); o.put(); return e;
   };
@@ -340,7 +341,7 @@
       sessions: sessionsOf(pid, r).map(function (x) { return { id: x.id, title: x.title || clip(((x.msgs || [])[0] || {}).text, 50) || "گفت‌وگو", last: x.updated || "" }; }), events: ev };
   };
   /* دورِ ۲۰ (RO6): بی شناسهٔ خام (pl1، g2، lpNewS) و بی تاریخِ لاتینِ ISO در آنچه او می‌بیند */
-  function clean(t) { if (typeof t !== "string") return val(t); return t.replace(/\b(\d{4}-\d{2}-\d{2})(?:T[\d:.]+Z?)?\b/g, function (m0, d0) { try { return A.fdate(d0); } catch (e) { return m0; } }).replace(/\b(?:برنامهٔ|حدسِ|درخواستِ)?\s*\b(?:pl|g|pr)\d+\b:?/g, function (m0) { return /^(برنامهٔ|حدسِ|درخواستِ)/.test(m0) ? m0.replace(/\s*\b(?:pl|g|pr)\d+\b/, "") : ""; }).replace(/«?\blpNew\w*\b»?/g, "فرمِ «ساختنِ مسئله»").replace(/\s{2,}/g, " ").trim(); }
+  function clean(t) { if (typeof t !== "string") return val(t); if (A.noLabels29) t = A.noLabels29(t); return t.replace(/\b(\d{4}-\d{2}-\d{2})(?:T[\d:.]+Z?)?\b/g, function (m0, d0) { try { return A.fdate(d0); } catch (e) { return m0; } }).replace(/\b(?:برنامهٔ|حدسِ|درخواستِ)?\s*\b(?:pl|g|pr)\d+\b:?/g, function (m0) { return /^(برنامهٔ|حدسِ|درخواستِ)/.test(m0) ? m0.replace(/\s*\b(?:pl|g|pr)\d+\b/, "") : ""; }).replace(/«?\blpNew\w*\b»?/g, "فرمِ «ساختنِ مسئله»").replace(/\s{2,}/g, " ").trim(); }
   function cleanEv(e) { if (e.from && String(e.title || "").indexOf(e.from) >= 0) e.from = "";   // دورِ ۲۱ (A21-14): «از گفت‌وگو — از گفت‌وگو» نه
     e.lines = (e.lines || []).map(clean); if (e.out) e.out = clean(e.out); e.hist = (e.hist || []).map(function (x) { return Object.assign({}, x, { old: typeof x.old === "string" ? clean(x.old) : x.old, new: typeof x.new === "string" ? clean(x.new) : x.new }); }); }
   A.dossierClean = clean;

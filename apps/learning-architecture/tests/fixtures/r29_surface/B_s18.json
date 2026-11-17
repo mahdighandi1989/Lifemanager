@@ -1,0 +1,269 @@
+{
+"from": "round29B/s18",
+"t0": "2026-10-25T09:00:00",
+"base": 0,
+"inject": "(()=>{if(window.__RD)return;const RD=Date;window.__RD=RD;window.__off=0;function D(...a){if(!new.target)return new RD(RD.now()+window.__off).toString();return a.length?new RD(...a):new RD(RD.now()+window.__off)}D.prototype=RD.prototype;D.now=()=>RD.now()+window.__off;D.UTC=RD.UTC;D.parse=RD.parse;window.Date=D;window.__adv=(d)=>{window.__off+=d*864e5;try{APP.render()}catch(e){};return new D().toISOString()};})();\nwindow.__fx={set(sel,v){const e=typeof sel==='string'?document.querySelector(sel):sel;if(!e)return 'NOEL '+sel;const pr=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(pr,'value').set.call(e,v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'},\nbtn(re,root){const b=[...(root?document.querySelector(root):document).querySelectorAll('button')].filter(b=>b.getClientRects().length).find(b=>re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,60)},\nfields(){return [...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>e.getClientRects().length).map(e=>(e.id||e.name||'?')+'|'+e.type+'|'+(e.getAttribute('aria-label')||e.placeholder||'').slice(0,70)+'|'+String(e.value).slice(0,40))},\nbtns(){return [...document.querySelectorAll('#main button')].filter(b=>b.getClientRects().length).map(b=>b.textContent.trim().slice(0,50))},\nmain(n){return document.getElementById('main').innerText.slice(0,n||3000)}};'fx'\n",
+"steps": [
+{
+"say": "یه قیف مخروطی (نوک پایین) با شعاع دهانه ۱۰ سانت و ارتفاع ۳۰ سانت داریم. آب با نرخ ثابت ۵ سانتی‌متر مکعب در ثانیه از ته خارج می‌شه. وقتی عمق آب ۱۲ سانته، سطح آب با چه سرعتی پایین میاد؟ فرمولش یادم نیست. حجم مخروط ⅓πr²h = ⅓·π·۱۰۰·۱۲ تقسیم بر ۵ ثانیه؟",
+"c": 1
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await w(700);const i=document.querySelector('.age-ask .age-in');if(!i)return 'NOCARD age='+APP.AGE.age();i.scrollIntoView({block:'center'});const st=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;st.call(i,\"2008-02-27\");i.dispatchEvent(new Event('input',{bubbles:true}));await w(300);[...document.querySelectorAll('.age-ask button')].find(b=>b.textContent.trim()==='ثبت').click();await w(700);const m=document.querySelector('.age-ask .bad');return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' err='+(m?m.textContent:'')+' card='+!!document.querySelector('.age-ask')})()",
+"c": 2
+},
+{
+"say": "مجهول؟ «سرعت پایین اومدن سطح آب». به زبون دیگه... «چقدر سطح آب در یک ثانیه پایین میاد». یعنی... «تغییر عمق در واحد زمان»، اون لحظه که عمق ۱۲ه. پس نرخ تغییر عمق، dy/dt.",
+"c": 3
+},
+{
+"say": "نرخ حجم داده شده: V با سرعت ۵ کم می‌شه. حجم آب V = ⅓πr²y. ولی r رو نمی‌دونم! شعاع سطح آب که ۱۰ نیست، فقط شعاع دهانه‌ست. داده کمه.",
+"c": 4
+},
+{
+"say": "آهان ۱۰ و ۳۰ رو استفاده نکردم! مثلث‌های متشابه: r/y = 10/30، پس r = y/3. پس V = (1/3)π(y/3)^2 y = πy^3/27. حالا دیگه فقط y داره.",
+"c": 5
+},
+{
+"say": "جلسه‌ی دوم. از V = πy^3/27 نسبت به زمان مشتق گرفتم: dV/dt = (πy^2/9)·dy/dt. با dV/dt = −5 و y = 12: dy/dt = −5·9/(144π) = −45/(144π) ≈ −0.1 سانت بر ثانیه. جواب اینه.",
+"eval0": "__adv(1);1",
+"c": 6
+},
+{
+"say": "ابعاد: cm³/s ÷ cm² = cm/s، درسته. وقتی y→0، dy/dt به بی‌نهایت میل می‌کنه! عجیبه... آهان، نزدیک نوک سطح آب خیلی کوچیکه، پس همون ۵ سانت مکعب ارتفاع زیادی رو خالی می‌کنه. درسم: اول مجهول رو با کلمه‌های دیگه بگم، و هر کمیت نامعلوم رو اسم بذارم و با داده‌ها بهش رابطه پیدا کنم.",
+"c": 7
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);return JSON.stringify(V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,prom:s.promises,coach:s.coach&&{lbAsk:s.coach.lbAsk},n:(s.msgs||[]).length})))+'\\n'+JSON.stringify(V.filter(r=>r&&r.type==='eprob').map(r=>({t:r.title,b:r.solve&&r.solve.b,g:r.solve&&r.solve.g,origin:r.origin}))).slice(0,3000)})()",
+"c": 8
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const P=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live);const out=[];\nfor(const r of P){const pid=r.p.id;APP.go('lprob',pid);await w(1200);out.push('## '+r.title+' closure='+JSON.stringify(APP.liveClosure(pid)));APP.go('lprob',pid,'back');await w(1500);const sel=document.querySelector('#lpBBest');out.push('sub='+APP.state.sub+' lpBBest='+(sel?[...sel.options].map(o=>o.textContent.slice(0,140)).join(' || '):'NONE'));out.push(document.getElementById('main').innerText.slice(0,1500));}\nreturn out.join('\\n')})()\n",
+"c": 9
+},
+{
+"eval": "[...document.querySelectorAll('#main select')].filter(s=>s.getClientRects().length).map(s=>(s.id||'?')+' ['+(s.getAttribute('aria-label')||'')+']: '+[...s.options].map(o=>o.textContent).join(' || ')).join('\\n')+'\\nTEXTAREAS '+[...document.querySelectorAll('#main textarea')].filter(s=>s.getClientRects().length).map(s=>s.id+'|'+(s.getAttribute('aria-label')||s.placeholder||'')).join(' ; ')",
+"c": 10
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const ids=new Set();for(let i=0;i<localStorage.length;i++){const v=localStorage.getItem(localStorage.key(i))||'';(v.match(/pb_l_[a-z0-9]+/g)||[]).forEach(x=>ids.add(x))}const o=[];ids.forEach(p=>{let it=[];try{it=APP.liveChatQItems(p)}catch(e){it=['ERR '+e]}o.push(p+' => '+JSON.stringify(it))});\nconst R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const cnt={};Object.values(R).forEach(r=>{if(r&&r.type)cnt[r.type]=(cnt[r.type]||0)+1});o.push('TYPES '+JSON.stringify(cnt));o.push('EPROB '+Object.values(R).filter(r=>r&&r.type==='eprob').map(r=>r.title+(r.live?' [live '+(r.live.state||'')+']':'')).join(' | '));o.push('CARDS '+Object.values(R).filter(r=>r&&/card/.test(r.type)).map(r=>(r.q||r.front||r.title||'').slice(0,80)+' @'+(r.due||'')).join(' | '));try{o.push('IDEA '+JSON.stringify(APP.S.all('idea')).slice(0,2500))}catch(e){};o.push('DL '+JSON.stringify(Object.values(R).filter(r=>r&&/dead|dl/.test(r.type))).slice(0,600));__adv(3);APP.go('home');await w(1500);const t=document.getElementById('main').innerText;return o.join('\\n')+'\\n### HOME '+APP.today()+'\\n'+t.slice(0,6000)})()",
+"c": 11
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const s=r.solve||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}return {pid:r.p.id,t:r.title,stmt:(r.p.statement||'').slice(0,200),fixHist:r.fixHist||r.p.fixHist||null,g:s.g&&s.g[1]&&{g:s.g[1].guess||s.g[1].g,fixHist:s.g[1].fixHist},u1:s.u&&s.u[1]&&{one:s.u[1].one,fixHist:s.u[1].fixHist},L:r.L&&{chat:r.L.chat&&{sol:(r.L.chat.solution||'').slice(0,200),verdict:r.L.chat.verdict,verdictHist:r.L.chat.verdictHist,fixHist:r.L.chat.fixHist},lesson:r.L.lesson,plan:r.L.plan,retracts:r.L.retracts,fixHist:r.L.fixHist},b:s.b&&s.b[1]&&{lesson:s.b[1].lesson,fixHist:s.b[1].fixHist},closure:cl&&{label:cl.label,verdict:cl.verdict,state:cl.state},steps:(s.e&&s.e[1]&&s.e[1].steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),out:x.out,fixHist:x.fixHist}))}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,retracts:s.retracts,coachRetr:s.coach&&s.coach.retracts,plans:s.coach&&s.coach.plans,guess:s.coach&&s.coach.guess,last:(s.msgs||[]).slice(-3).map(m=>m.role+': '+(m.text||'').slice(0,160)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,200)+']':''))}));\ntry{o.mind=APP.MIND.phases().rows.map(r=>r.id+':'+r.k+'/'+r.n)}catch(e){o.mind=String(e)}\ntry{o.acts=APP.MIND.phases().rows.map(r=>r.id+'=> '+(r.acts||[]).map(a=>(a.ok?'+':'-')+(a.wd?'WD':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){}\nreturn JSON.stringify(o,null,0)})()\n",
+"c": 12
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const out=[];for(const k in R){const r=R[k];if(r&&(r.type==='eprob'||r.type==='lprog'||/pb_l_/.test(k)))out.push(k+' type='+r.type+' keys='+Object.keys(r).join(',')+' :: '+JSON.stringify(r).slice(0,1500))}return out.join('\\n')})()\n",
+"c": 13
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}\nreturn {pid:r.p.id,stmt:c(r.p.statement,220),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1]&&{one:s.u[1].one,u:s.u[1].u,dl:s.u[1].dl,fixHist:s.u[1].fixHist},400),g1:c(s.g&&s.g[1],300),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded},600),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd})),400),chat:c(L.chat,500),plan:c(L.plan,300),steps:c((L.steps||[]).map(x=>({t:(x.t||'').slice(0,60),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist})),900),retracts:c(L.retracts,600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,retracts:c(s.retracts,500),coachRetr:c(s.coach&&s.coach.retracts,600),plans:c(s.coach&&s.coach.plans,600),guess:c(s.coach&&s.coach.guess,200),corrLog:c(s.corr||s.corrLog,300),last:(s.msgs||[]).slice(-4).map(m=>m.role+': '+(m.text||'').slice(0,220)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,60)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\no.rem=(window.__rem||[]).slice(-4).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,60));\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 14
+},
+{
+"eval": "(async()=>{APP.ASSIST.toggle(false);APP.go('lprob','pb_l_mvoz13ymq96');await new Promise(r=>setTimeout(r,900));return 1})()",
+"c": 15
+},
+{
+"eval": "(async()=>{APP.go('dossier','pb_l_mvoz13ymq96');await new Promise(r=>setTimeout(r,900));return 1})()",
+"c": 16
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 17
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"lprob\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 18
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 19
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"mind\",null,null);await w(1000);document.querySelectorAll('#main details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});await w(400);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 20
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 21
+},
+{
+"say": "یه چیزی: تو پیام اولم اشتباه نوشتم — نرخ خروج ۶ سانتی‌متر مکعب در ثانیه‌ست نه ۵. امروز برگه‌ی سؤال رو دوباره نگاه کردم.",
+"eval0": "__adv(1);1",
+"c": 22
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 23
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"lprob\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 24
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 25
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 26
+},
+{
+"say": "کل مسئله: آب با ۶ سانتی‌متر مکعب در ثانیه از قیف خالی می‌شه؛ می‌خوام بدونم وقتی عمق ۱۲ه، عمق با چه سرعتی کم می‌شه. با همون فرمول: dy/dt = −6·9/(144π) = −54/(144π) ≈ −0.37 سانت بر ثانیه.",
+"c": 27
+},
+{
+"click": ".as-editb >> nth=-1",
+"c": 28
+},
+{
+"eval": "(()=>{const t=document.querySelector('.as-edtx');return t?t.value:'NO EDITOR'})()\n",
+"c": 29
+},
+{
+"fill": [
+".as-edtx",
+"کل مسئله: آب با ۶ سانتی‌متر مکعب در ثانیه از قیف خالی می‌شه؛ می‌خوام بدونم وقتی عمق ۱۲ه، عمق با چه سرعتی کم می‌شه. با همون فرمول: dy/dt = −6·9/(144π) = −54/(144π) ≈ −0.12 سانت بر ثانیه."
+],
+"c": 30
+},
+{
+"click": ".as-edsave",
+"c": 31
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 32
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 33
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 34
+},
+{
+"say": "وارسی: ۶ به ۵ یعنی ۱.۲ برابر، و ۰.۱۲ هم تقریباً ۱.۲ برابر ۰.۱ه، می‌خونه. یه اصلاح دیگه: درسی که اون روز نوشتم رو اشتباه گفتم — منظورم «قبل از جایگذاری، مجهول رو به زبون نرخ بگم» بود نه «اول مجهول رو با کلمه‌های دیگه بگم».",
+"c": 35
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 36
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"lprob\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),\"back\");await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 37
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);return L[L.length-1]})(),null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 38
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"mind\",null,null);await w(1000);document.querySelectorAll('#main details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});await w(400);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 39
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 40
+},
+{
+"say": "راستی دیروز اشتباه کردم و قیف پر از آب رو گذاشتم لب میز، همه‌جا خیس شد 😅. سلیقه؟ این که با یه اسم گذاشتن (r) همه‌چی باز شد رو دوست داشتم؛ حساب‌های عددی آخرش رو نه.",
+"c": 41
+},
+{
+"say": "معلم فیزیکمون همیشه می‌گه «اشتباه نوشتی، اول واحد رو بنویس». فکر کنم منظورش همین وارسی ابعاد بود.",
+"c": 42
+},
+{
+"say": "یه سؤال: اگه نرخ خروج ۷ بود، جواب چند می‌شد؟ فقط می‌خوام ببینم چقدر حساسه.",
+"c": 43
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 44
+},
+{
+"say": "یه چیز دیگه: اشتباهِ روزِ اولم — که حجم رو تقسیم بر زمان کردم، بی‌اینکه بفهمم مجهول چیه — رو می‌خوام یه جا نگه دارم که دیگه تکرار نکنم. اون ترفندِ «اسم گذاشتن روی کمیتِ نامعلوم» رو هم می‌خوام جای دیگه به کار ببرم.",
+"c": 45
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go('practice');await w(900);const t=__fx.main(30000);const i=t.indexOf('فهرست‌های جاری');const el=[...document.querySelectorAll('#main h2')].find(h=>/فهرست‌های جاری/.test(h.textContent));if(el)el.scrollIntoView({block:'start'});await w(300);return t.slice(i,i+900)})()",
+"c": 46
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const L=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live).map(r=>r.p.id);const pid=L[L.length-1];APP.go('lprob',pid);await w(1200);const inp=document.querySelector('#main input[aria-label=\"مدلِ ذهنی که در این مسئله به کار بردی\"]');if(!inp)return 'NO MODEL INPUT; sub='+APP.state.sub+' '+__fx.main(600);inp.scrollIntoView({block:'center'});__fx.set(inp,'نام‌گذاریِ کمیتِ نامعلوم و ربط دادنش به داده‌ها (مثلث‌های متشابه)');await w(200);const b=[...document.querySelectorAll('#main button')].find(b=>/کاربستِ مدل/.test(b.textContent));b.click();await w(900);return 'clicked; '+JSON.stringify(APP.PR.list('models').items)})()",
+"c": 47
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go('practice');await w(900);const t=__fx.main(30000);const i=t.indexOf('فهرست‌های جاری');const el=[...document.querySelectorAll('#main h2')].find(h=>/فهرست‌های جاری/.test(h.textContent));if(el)el.scrollIntoView({block:'start'});await w(300);return t.slice(i,i+900)})()",
+"c": 48
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 49
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);__adv(7);APP.go('today');await w(1200);window.scrollTo(0,0);return APP.today()+' :: '+__fx.main(30000).split('\\n').filter(l=>/اشتباه|مدل|🧪|قیف|پوشه/.test(l)).join(' ¦ ')})()",
+"c": 50
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);__adv(23);APP.go('today');await w(1200);window.scrollTo(0,0);return APP.today()+' :: '+__fx.main(30000).split('\\n').filter(l=>/اشتباه|مدل|🧪|قیف|پوشه/.test(l)).join(' ¦ ')})()",
+"c": 51
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"mind\",null,null);await w(1000);document.querySelectorAll('#main details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});await w(400);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 52
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 53
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 54
+},
+{
+"c": 55,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"پیش از جایگذاری: مجهول دقیقاً چیست؟ می‌توانی آن را به عبارتِ دیگری بگویی؟\", \"title\": \"قیفِ مخروطی\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی (شعاع ۱۰، ارتفاع ۳۰، خروج ۵ cm³/s) وقتی عمق ۱۲ است\", \"memory\": \"قیفِ مخروطی؛ فوراً عددها را در حجمِ مخروط گذاشت و بر ۵ تقسیم کرد. پرسیدم مجهول چیست و به عبارتِ دیگر.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"فهمِ مسئله: مجهول\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"⅓·π·۱۰۰·۱۲ تقسیم بر ۵ ثانیه\"}}]}",
+"{\"reply\": \"پیش از جایگذاری: مجهول دقیقاً چیست — با کلمه‌های خودت؟\", \"title\": \"قیفِ مخروطی\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی (شعاع ۱۰، ارتفاع ۳۰، خروج ۵ cm³/s) وقتی عمق ۱۲ است\", \"memory\": \"قیفِ مخروطی؛ فوراً عددها را در حجمِ مخروط گذاشت و بر ۵ تقسیم کرد. پرسیدم مجهول چیست و به عبارتِ دیگر.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"فهمِ مسئله: مجهول\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"⅓·π·۱۰۰·۱۲ تقسیم بر ۵ ثانیه\"}}]}",
+"{\"reply\": \"عالی — از «سرعت» به «نرخِ تغییرِ عمق»، یعنی $\\\\frac{dy}{dt}$، رسیدی. حالا داده‌ها: چه چیزهایی در دست داری و هر کدام به چه کمیتی مربوط است؟\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است\", \"memory\": \"مجهول را سه بار بازبیان کرد تا dy/dt در y=12. پرسیدم داده‌ها چیست.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"فهمِ مسئله: داده‌ها\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u1\", \"u5\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"اسم گذاشتنِ $r$ کارِ خوبی بود، حتی اگر هنوز نمی‌دانی‌اش — و هدف هنوز همان $\\\\frac{dy}{dt}$ است. پیش از این‌که بگویی داده کم است: همهٔ داده‌ها را به کار برده‌ای؟ کلِ شرط را؟\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است\", \"memory\": \"مجهول را سه بار بازبیان کرد تا dy/dt در y=12. V = ⅓πr²y نوشت؛ r (شعاعِ سطحِ آب) را نمی‌داند؛ می‌گوید داده کم است. پرسیدم همهٔ داده‌ها را به کار برده؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"اجرا: رابطهٔ V و y\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": []}",
+"{\"reply\": \"داده‌های ۱۰ و ۳۰ را خودت به کار بردی و حجم را فقط برحسبِ عمق نوشتی: $V=\\\\frac{\\\\pi y^3}{27}$. مجهول هنوز «نرخ تغییر عمق»، $\\\\frac{dy}{dt}$، است — این گام تو را به آن نزدیک‌تر کرد؟\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است\", \"memory\": \"مجهول را سه بار بازبیان کرد تا dy/dt. r را نامید؛ با تشابه r = y/3 و V = πy³/27. یادآوریِ هدف: مجهول dy/dt؛ پرسیدم این گام چطور به آن نزدیکش کرد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"اجرا: از V(y) به dy/dt\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\", \"plan\"], \"ans\": [\"u2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prior\": [{\"step\": \"تشابه\", \"quote\": \"r/y = 10/30، پس r = y/3\", \"verdict\": \"ok\", \"why\": \"درست\"}, {\"step\": \"حجم بر حسبِ y\", \"quote\": \"V = (1/3)π(y/3)^2 y = πy^3/27\", \"verdict\": \"ok\", \"why\": \"درست\", \"dep\": [1]}]}]}",
+"{\"reply\": \"پیش از «جواب اینه»، وارسی: بُعدِ جوابت با «سانتی‌متر بر ثانیه» می‌خواند؟ و در حالتِ حدی — وقتی عمق به صفر نزدیک می‌شود، $y \\\\to 0$ — فرمولت چه می‌گوید و معقول است؟\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است\", \"memory\": \"جلسهٔ ۲: dV/dt=(πy²/9)dy/dt، dy/dt=−45/(144π)≈−0.1 cm/s. پرسیدم وارسیِ ابعاد و حالتِ حدیِ y→0.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری: ابعاد و حالتِ حدی\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"پیش از «جواب اینه»، وارسی: می‌توانی جوابت را بسنجی — با بُعدش (سانتی‌متر بر ثانیه درمی‌آید) یا در حالتِ حدی، وقتی عمق به صفر نزدیک می‌شود ($y \\\\to 0$)؟\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است\", \"memory\": \"جلسهٔ ۲: dV/dt=(πy²/9)dy/dt، dy/dt=−45/(144π)≈−0.1 cm/s. پرسیدم وارسیِ ابعاد و حالتِ حدیِ y→0.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری: ابعاد و حالتِ حدی\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"وارسیِ ابعاد و حالتِ حدی را خودت کردی و تفسیرش هم درست به قلمِ خودت آمد؛ درست را ثبت کردم تا برگردد. از پرسش‌هایی که در این گفت‌وگو پرسیدم، کدام بیشتر کمکت کرد؟\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است\", \"memory\": \"وارسی: cm³/s ÷ cm² = cm/s؛ y→0 ⇒ dy/dt→∞ (نزدیکِ نوک سطح کوچک است). درسش: مجهول را با کلماتِ دیگر بگوید و کمیتِ نامعلوم را نام بگذارد. chat_solved.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری\", \"s\": \"done\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"قیفِ مخروطی: سرعتِ پایین‌آمدنِ سطحِ آب\", \"statement\": \"یه قیف مخروطی (نوک پایین) با شعاع دهانه ۱۰ سانت و ارتفاع ۳۰ سانت داریم. آب با نرخ ثابت ۵ سانتی‌متر مکعب در ثانیه از ته خارج می‌شه. وقتی عمق آب ۱۲ سانته، سطح آب با چه سرعتی پایین میاد؟\", \"kind\": \"find\", \"lesson\": \"اول مجهول رو با کلمه‌های دیگه بگم، و هر کمیت نامعلوم رو اسم بذارم و با داده‌ها بهش رابطه پیدا کنم.\", \"check\": \"ابعاد: cm³/s ÷ cm² = cm/s، درسته. وقتی y→0، dy/dt به بی‌نهایت میل می‌کنه؛ نزدیک نوک سطح آب خیلی کوچیکه.\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [\"b1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"check\": {\"msgs\": [\"ابعاد: cm³/s ÷ cm² = cm/s، درسته\", \"وقتی y→0، dy/dt به بی‌نهایت میل می‌کنه\"]}, \"prior\": [{\"step\": \"وارسیِ ابعاد\", \"quote\": \"ابعاد: cm³/s ÷ cm² = cm/s، درسته\", \"verdict\": \"ok\", \"why\": \"درست\"}, {\"step\": \"حالتِ حدی\", \"quote\": \"وقتی y→0، dy/dt به بی‌نهایت میل می‌کنه\", \"verdict\": \"ok\", \"why\": \"درست\"}]}]}",
+"{\"reply\":\"اصلاحِ نرخِ خروج (۶ به‌جای ۵ سانتی‌متر مکعب در ثانیه) را برای صفحه فرستادم؛ صفحه نتیجه‌اش را می‌گوید. پیش از رفتن سراغِ حسابِ تازه: این نوع مسئله برایت چطور بود — کدام بخشش را دوست داشتی و کدامش را نه؟\",\"pinned\":\"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است (خروج ۶ cm³/s)\",\"memory\":\"اصلاحِ داده: نرخِ خروج ۶ cm³/s است نه ۵ (پیامِ اولش). اصلاح را فرستادم؛ جوابِ پیشین بر ۵ تکیه داشت.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"بازنگری با دادهٔ اصلاح‌شده\",\"s\":\"now\",\"view\":\"whole\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"b\",\"said\":[\"d\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"objective\",\"retract\":{\"msg\":\"آب با نرخ ثابت ۵ سانتی‌متر مکعب در ثانیه از ته خارج می‌شه\",\"key\":\"datum:نرخِ خروج\",\"what\":\"fact\",\"fix\":\"۶ سانتی‌متر مکعب در ثانیه\",\"old\":\"۵ سانتی‌متر مکعب در ثانیه\"}}]}",
+"{\"reply\":\"صفحه صورتِ مسئله و فرمِ فهم را به ۶ سانتی‌متر مکعب در ثانیه اصلاح کرد و حکمِ «وارسی شد» را کنار گذاشت تا با مقدارِ درست دوباره وارسی شود. حالا با همین ۶: نتیجهٔ تازه‌ات را وارسی کن — عددِ $-\\\\frac{54}{144\\\\pi}$ واقعاً همان ≈ −0.37 درمی‌آید؟\",\"pinned\":\"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است (خروج ۶ cm³/s)\",\"memory\":\"با ۶: dy/dt = −54/(144π) ≈ −0.37 نوشت (عددِ آخر را وارسی نکرده). پرسیدم نتیجه را با ۶ دوباره وارسی کند.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"وارسیِ نتیجهٔ تازه\",\"s\":\"now\",\"view\":\"whole\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"b\",\"said\":[\"result\"],\"result\":\"dy/dt = −6·9/(144π) = −54/(144π) ≈ −0.37 سانت بر ثانیه\",\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"objective\"}]}",
+"{\"reply\":\"اصلاحت در صفحه نشست: در پیامت ≈ −0.37 به ≈ −0.12 تغییر کرد. با این عدد، نتیجهٔ تازه با جوابِ قبلی (برای ۵) می‌خواند؟\",\"memory\":\"با ۶: dy/dt = −54/(144π) ≈ −0.12 (اول −0.37 نوشته بود، با ✏️ اصلاح کرد). پرسیدم وارسی با جوابِ ۵.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"وارسیِ نتیجهٔ تازه\",\"s\":\"now\",\"view\":\"whole\"}],\"actions\":[]}",
+"{\"reply\":\"وارسیِ نسبتِ ۶ به ۵ با نسبتِ دو جواب خوب بود. اصلاحِ درست («قبل از جایگذاری، مجهول رو به زبون نرخ بگم» به‌جای «اول مجهول رو با کلمه‌های دیگه بگم») را برای صفحه فرستادم؛ نتیجه‌اش را صفحه می‌گوید. این نوع مسئله — نرخ‌های وابسته — برایت چطور بود؛ کدام بخشش را دوست داشتی و کدام را نه؟\",\"memory\":\"وارسی: نسبتِ ۶/۵ با نسبتِ جواب‌ها می‌خواند. اصلاحِ درس را فرستادم (فقط بخشِ اول).\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"بازنگری: سلیقه\",\"s\":\"now\",\"view\":\"whole\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"b\",\"said\":[],\"ans\":[\"b1\"],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"objective\",\"retract\":{\"msg\":\"درسم: اول مجهول رو با کلمه‌های دیگه بگم\",\"key\":\"lesson\",\"what\":\"lesson\",\"fix\":\"قبل از جایگذاری، مجهول رو به زبون نرخ بگم\",\"old\":\"اول مجهول رو با کلمه‌های دیگه بگم\"}}]}",
+"{\"reply\":\"سلیقه‌ات را نگه داشتم: لحظهٔ نام‌گذاریِ r را دوست داشتی، حساب‌های عددیِ آخر را نه — این خودش نشان می‌دهد کجا را بیشتر دنبال کنی.\",\"memory\":\"سلیقه: نام‌گذاری (r) را دوست داشت؛ حسابِ عددیِ آخر را نه. (قیف را لبِ میز گذاشته بود — کارِ بیرونی، نه اصلاح.)\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"chat_lookback\",\"pid\":\"pb_l_mvoz13ymq96\",\"taste\":\"این که با یه اسم گذاشتن (r) همه‌چی باز شد رو دوست داشتم؛ حساب‌های عددی آخرش رو نه\"},{\"do\":\"coach_state\",\"ph\":\"b\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"objective\",\"taste\":{\"text\":\"این که با یه اسم گذاشتن (r) همه‌چی باز شد رو دوست داشتم؛ حساب‌های عددی آخرش رو نه\"}}]}",
+"{\"reply\":\"شاید؛ ولی این حدس است — چطور می‌آزمایی‌اش؟ مثلاً اگر در همین مسئله از اول واحدها را کنارِ عددها می‌نوشتی، کجا خطای −0.37 زودتر پیدا می‌شد؟\",\"memory\":\"نقلِ معلم: «اشتباه نوشتی، اول واحد رو بنویس» — حدس زد منظور وارسیِ ابعاد است؛ پرسیدم چطور می‌آزمایدش.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"b\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"objective\"}]}",
+"{\"reply\":\"پرسشِ خوبی است — همین «اگر داده عوض شود چه؟» یعنی نتیجه را در مسئلهٔ دیگری به کار ببری. فرمولت را با حرف داری: $\\\\frac{dy}{dt} = -\\\\frac{9r}{144\\\\pi}$ که r نرخِ خروج است. خودت با ۷ حسابش کن: جواب چند می‌شود و نسبتش با جوابِ ۶ چطور است؟\",\"memory\":\"پرسید اگر نرخ ۷ بود؛ پرسیدم خودش با فرمولِ حرفی حساب کند و نسبت را ببیند. (پرسش است، نه اصلاح.)\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"به‌کار بردنِ نتیجه با دادهٔ دیگر\",\"s\":\"now\",\"view\":\"whole\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"b\",\"said\":[],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"objective\"}]}",
+"{\"reply\": \"هر دو را برای نگه‌داشتن فرستادم: اشتباه به «پوشهٔ اشتباهاتِ فکری من» (بازخوانیِ ماهانه) و ترفندِ نام‌گذاری به «قفسهٔ مدل‌های ذهنی» با همین مسئله به‌عنوانِ نخستین کاربست — صفحه می‌گوید ثبت شد یا نه. پیش‌تر مسئله‌ای دیده‌ای — شاید به شکلی کمی متفاوت — که در آن هم کمیتی نامعلوم بود که با نام‌گذاری باز می‌شد؟\", \"pinned\": \"سرعتِ پایین‌آمدنِ سطحِ آب در قیفِ مخروطی وقتی عمق ۱۲ است\", \"memory\": \"اشتباهِ روزِ اول و ترفندِ نام‌گذاری را با list_add فرستادم (mistakes؛ models با use).\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"list_add\", \"list\": \"mistakes\", \"text\": \"اشتباهِ روزِ اولم — که حجم رو تقسیم بر زمان کردم، بی‌اینکه بفهمم مجهول چیه\", \"quote\": \"اشتباهِ روزِ اولم — که حجم رو تقسیم بر زمان کردم، بی‌اینکه بفهمم مجهول چیه\", \"consent\": {\"quote\": \"رو می‌خوام یه جا نگه دارم که دیگه تکرار نکنم\", \"kind\": \"request\"}}, {\"do\": \"list_add\", \"list\": \"models\", \"text\": \"اسم گذاشتن روی کمیتِ نامعلوم\", \"quote\": \"اون ترفندِ «اسم گذاشتن روی کمیتِ نامعلوم» رو هم می‌خوام جای دیگه به کار ببرم\", \"consent\": {\"quote\": \"می‌خوام جای دیگه به کار ببرم\", \"kind\": \"request\"}, \"use\": true}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"یه قیف مخروطی (نوک پایین) با شعاع دهانه ۱۰ سانت و ارتفاع ۳۰ سانت داریم. آب با نرخ ثابت ۵ سانتی‌متر مکعب در ثانیه از ته خارج می‌شه. وقتی عمق آب ۱۲ سانته، سطح آب با چه سرعتی پایین میاد؟ فرمولش یادم نیست. حجم مخروط ⅓πr²h = ⅓·π·۱۰۰·۱۲ تقسیم بر ",
+"یه قیف مخروطی (نوک پایین) با شعاع دهانه ۱۰ سانت و ارتفاع ۳۰ سانت داریم. آب با نرخ ثابت ۵ سانتی‌متر مکعب در ثانیه از ته خارج می‌شه. وقتی عمق آب ۱۲ سانته، سطح آب با چه سرعتی پایین میاد؟ فرمولش یادم نیست. حجم مخروط ⅓πr²h = ⅓·π·۱۰۰·۱۲ تقسیم بر ",
+"مجهول؟ «سرعت پایین اومدن سطح آب». به زبون دیگه... «چقدر سطح آب در یک ثانیه پایین میاد». یعنی... «تغییر عمق در واحد زمان»، اون لحظه که عمق ۱۲ه. پس نرخ تغییر عمق، dy/dt.",
+"نرخ حجم داده شده: V با سرعت ۵ کم می‌شه. حجم آب V = ⅓πr²y. ولی r رو نمی‌دونم! شعاع سطح آب که ۱۰ نیست، فقط شعاع دهانه‌ست. داده کمه.",
+"آهان ۱۰ و ۳۰ رو استفاده نکردم! مثلث‌های متشابه: r/y = 10/30، پس r = y/3. پس V = (1/3)π(y/3)^2 y = πy^3/27. حالا دیگه فقط y داره.",
+"جلسه‌ی دوم. از V = πy^3/27 نسبت به زمان مشتق گرفتم: dV/dt = (πy^2/9)·dy/dt. با dV/dt = −5 و y = 12: dy/dt = −5·9/(144π) = −45/(144π) ≈ −0.1 سانت بر ثانیه. جواب اینه.",
+"جلسه‌ی دوم. از V = πy^3/27 نسبت به زمان مشتق گرفتم: dV/dt = (πy^2/9)·dy/dt. با dV/dt = −5 و y = 12: dy/dt = −5·9/(144π) = −45/(144π) ≈ −0.1 سانت بر ثانیه. جواب اینه.\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: دو پرسش",
+"ابعاد: cm³/s ÷ cm² = cm/s، درسته. وقتی y→0، dy/dt به بی‌نهایت میل می‌کنه! عجیبه... آهان، نزدیک نوک سطح آب خیلی کوچیکه، پس همون ۵ سانت مکعب ارتفاع زیادی رو خالی می‌کنه. درسم: اول مجهول رو با کلمه‌های دیگه بگم، و هر کمیت نامعلوم رو اسم بذارم ",
+"یه چیزی: تو پیام اولم اشتباه نوشتم — نرخ خروج ۶ سانتی‌متر مکعب در ثانیه‌ست نه ۵. امروز برگه‌ی سؤال رو دوباره نگاه کردم.",
+"کل مسئله: آب با ۶ سانتی‌متر مکعب در ثانیه از قیف خالی می‌شه؛ می‌خوام بدونم وقتی عمق ۱۲ه، عمق با چه سرعتی کم می‌شه. با همون فرمول: dy/dt = −6·9/(144π) = −54/(144π) ≈ −0.37 سانت بر ثانیه.",
+"[اصلاحِ پیامِ قبلی] «−0.37» ⇐ «−0.12» — متنِ درستِ پیامم: «کل مسئله: آب با ۶ سانتی‌متر مکعب در ثانیه از قیف خالی می‌شه؛ می‌خوام بدونم وقتی عمق ۱۲ه، عمق با چه سرعتی کم می‌شه. با همون فرمول: dy/dt = −6·9/(144π) = −54/(144π) ≈ −0.12 سانت بر ثا",
+"وارسی: ۶ به ۵ یعنی ۱.۲ برابر، و ۰.۱۲ هم تقریباً ۱.۲ برابر ۰.۱ه، می‌خونه. یه اصلاح دیگه: درسی که اون روز نوشتم رو اشتباه گفتم — منظورم «قبل از جایگذاری، مجهول رو به زبون نرخ بگم» بود نه «اول مجهول رو با کلمه‌های دیگه بگم».",
+"راستی دیروز اشتباه کردم و قیف پر از آب رو گذاشتم لب میز، همه‌جا خیس شد . سلیقه؟ این که با یه اسم گذاشتن (r) همه‌چی باز شد رو دوست داشتم؛ حساب‌های عددی آخرش رو نه.",
+"معلم فیزیکمون همیشه می‌گه «اشتباه نوشتی، اول واحد رو بنویس». فکر کنم منظورش همین وارسی ابعاد بود.",
+"یه سؤال: اگه نرخ خروج ۷ بود، جواب چند می‌شد؟ فقط می‌خوام ببینم چقدر حساسه.",
+"یه چیز دیگه: اشتباهِ روزِ اولم — که حجم رو تقسیم بر زمان کردم، بی‌اینکه بفهمم مجهول چیه — رو می‌خوام یه جا نگه دارم که دیگه تکرار نکنم. اون ترفندِ «اسم گذاشتن روی کمیتِ نامعلوم» رو هم می‌خوام جای دیگه به کار ببرم."
+]
+}
