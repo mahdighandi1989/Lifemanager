@@ -53,7 +53,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     return { pid, D, mine: D.filter(e => MINEK.test(e.k)), o: D.filter(e => e.k === 'cother'), fc: D.filter(e => /🎯/.test(e.t || '') || e.k === 'fcast') }; };
   const has = (e, re) => e.l.some(l => re.test(l));
   /* C138: هیچ سطری که بندِ ادعای عددیِ نخوانده دارد ✓ ِ کل نمی‌گیرد؛ بندِ نخوانده «نسنجیده» کنارِ خودش دارد */
-  const c138 = (R, re) => { const L = R.mine.concat(R.o).filter(e => re.test(e.l[0])); return L.length >= 1 && L.every(e => !/^حسابِ صفحه: ✓/.test(mark(e)) && /نسنجیده|✗/.test(mark(e))); };
+  const c138 = (R, re) => { const L = R.mine.concat(R.o).filter(e => re.test(e.l[0])); return L.length >= 1 && L.every(e => !/^حسابِ صفحه: ✓ حسابِ عددی‌اش/.test(mark(e)) && /؟ «[^»]*» نسنجیده|نسنجیده|✗/.test(mark(e))); };
   /* C149: هیچ بندی دو بار (همان متن در دو سطر) */
   const dup = (R) => { const T = R.mine.concat(R.o).map(e => e.l[0]); const C = []; T.forEach(t => String(t).split(/[،,.؛]\s*/).map(x => x.trim()).filter(x => /[0-9۰-۹]/.test(x) && x.length >= 6).forEach(x => C.push(x)));
     return C.filter((x, i) => C.indexOf(x) !== i); };
@@ -110,7 +110,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   bankE[225] = async () => ({ nc: 'coach side (prompt «# حسابِ صفحه» line for «نصفش …») is the arith engine\'s reader (a46, C157, arith R1); story only guarantees 📜 never ✓ there — checked by bank #222' });
   bankE[226] = async () => { const R = await one('۶ × ۷ = ۴۲ تا تخم‌مرغ، از ۵۰ تا ۷ تا می‌مونه', []); const L = R.mine.filter(e => /می‌مونه/.test(e.l[0]));
     /* C138 floor: the remainder clause is never under a sentence-wide ✓; its ✗ (8) needs arith's per-clause reader (C141) — «نسنجیده» is allowed by C138 */
-    return [L.length >= 1 && L.every(e => !/^حسابِ صفحه: ✓/.test(mark(e))) && R.mine.some(e => /۶ × ۷ = ۴۲/.test(e.l[0]) && /✓|سنجید و می‌خواند/.test(mark(e))), J(R.mine.map(e => [e.l[0], mark(e)]))]; };
+    return [L.length >= 1 && L.every(e => !/^حسابِ صفحه: ✓ حسابِ عددی‌اش/.test(mark(e))) && R.mine.some(e => /۶ × ۷ = ۴۲/.test(e.l[0]) && /✓|سنجید و می‌خواند/.test(mark(e))), J(R.mine.map(e => [e.l[0], mark(e)]))]; };
   bankE[227] = async () => ({ nc: 'the fixed «نصفش» clause re-mark with history is C86 (relines28, round 28) — needs arith reading «نصفش» (C157) to give ✓; unchanged by story' });
   bankE[228] = async () => { const R = await one('اجاره ماهی ۱۵ میلیونه و ۴ نفریم: ۱۵ ÷ ۴ = ۳٫۷۵ میلیون', ['d']); const calc = R.mine.filter(e => /۱۵ ÷ ۴/.test(e.l[0]));
     return [calc.length === 1 && calc[0].k === 'ccalc' && R.mine.filter(e => e.k === 'cdata').length <= 2 && !dup(R).length, J(R.mine.map(e => [e.k, e.l[0], mark(e)]))]; };

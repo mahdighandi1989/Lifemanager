@@ -60368,6 +60368,10 @@ APP.goFromURL = function (q) {
       if (U29.length) { var ck2 = ck.slice(); ck2.unread = (ck.unread || []).concat(U29); ck = ck2; }
       var N = ST.arithNote(ck, ""); if (!N || !N.chk) return ""; var sure = ck.some(function (c) { return c.ok && !c.ask; }), chk = N.chk;
       if (N.bad && U29.length) chk += "؛ " + U29.map(function (u) { return "حسابِ «" + fa(u.text) + "» را صفحه نسنجیده (؟ نسنجیده)"; }).join("؛ ");
+      /* بندهای خوانده و نخوانده کنارِ هم، به ترتیبِ متن: «✓ «…» می‌خواند؛ ؟ «…» نسنجیده» — نشانِ هر بند کنارِ خودش، نه یک ✓ برای کلِ جمله (بانکِ R29 #222) */
+      if (!N.bad && !N.ask && N.unread && sure) { var P29 = ck.filter(function (c) { return c.ok && !c.ask && !c.unit && c.expr; }).map(function (c) { return { at: c.pos == null ? 0 : c.pos, t: "✓ «" + fa(c.expr) + " = " + fa(c.saidT || c.said) + "» می‌خواند" }; })
+          .concat((ck.unread || []).map(function (u) { return { at: u.pos == null ? 1e9 : u.pos, t: "؟ «" + fa(u.text) + "» نسنجیده" + (u.why ? " (" + u.why + ")" : "") }; })).sort(function (a, b) { return a.at - b.at; });
+        if (P29.length) return "حسابِ صفحه: " + P29.map(function (x) { return x.t; }).join("؛ "); }
       return "حسابِ صفحه: " + (N.bad ? "✗ " : N.ask ? "؟ " : N.unread ? (sure ? "؟ " : "— ") : "✓ ") + chk; } catch (e) { return ""; }
   }
   ST.markOf27 = markOf27;
