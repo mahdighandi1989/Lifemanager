@@ -1,0 +1,27 @@
+{
+"from": "round29B/pwB3",
+"t0": "2026-11-17T09:00:00",
+"base": -23,
+"inject": "(()=>{if(window.__RD)return;const RD=Date;window.__RD=RD;window.__off=0;function D(...a){if(!new.target)return new RD(RD.now()+window.__off).toString();return a.length?new RD(...a):new RD(RD.now()+window.__off)}D.prototype=RD.prototype;D.now=()=>RD.now()+window.__off;D.UTC=RD.UTC;D.parse=RD.parse;window.Date=D;window.__adv=(d)=>{window.__off+=d*864e5;try{APP.render()}catch(e){};return new D().toISOString()};})();\nwindow.__fx={set(sel,v){const e=typeof sel==='string'?document.querySelector(sel):sel;if(!e)return 'NOEL '+sel;const pr=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(pr,'value').set.call(e,v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'},\nbtn(re,root){const b=[...(root?document.querySelector(root):document).querySelectorAll('button')].filter(b=>b.getClientRects().length).find(b=>re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,60)},\nfields(){return [...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>e.getClientRects().length).map(e=>(e.id||e.name||'?')+'|'+e.type+'|'+(e.getAttribute('aria-label')||e.placeholder||'').slice(0,70)+'|'+String(e.value).slice(0,40))},\nbtns(){return [...document.querySelectorAll('#main button')].filter(b=>b.getClientRects().length).map(b=>b.textContent.trim().slice(0,50))},\nmain(n){return document.getElementById('main').innerText.slice(0,n||3000)}};'fx'\n",
+"steps": [
+{
+"say": "سلام. یه قاب عکسِ مستطیلی می‌خوام برای اتاقِ دخترم بسازم و فقط ۳۶ سانت چوب دارم؛ طولش باید دو برابرِ عرضش باشه. ابعادش چند میشه؟ گامِ اول رو خودم رفتم: نصفِ محیط میشه طول + عرض = ۱۸ سانت."
+},
+{
+"say": "خب، طول دو برابرِ عرضه، پس ۳ × عرض = ۱۸، یعنی عرض = ۶ سانت و طول = ۱۲ سانت."
+},
+{
+"say": "وارسی کردم: ۲ × (۱۲ + ۶) = ۳۶. با چوبی که دارم جور درمیاد."
+}
+],
+"replies": [
+"{\"reply\":\"گامِ اولت درست است: نصفِ ۳۶ سانت ۱۸ است، پس طول + عرض = ۱۸ سانت ✓. گامِ بعدیِ خودت چیست — قیدِ «طول دو برابرِ عرض» را چطور در همین رابطه می‌گذاری؟\",\"title\":\"قابِ عکسِ اتاقِ دخترم\",\"pinned\":\"ابعادِ قابِ مستطیلی با ۳۶ سانت چوب، طول دو برابرِ عرض\",\"memory\":\"قاب با ۳۶ سانت چوب؛ طول = ۲ × عرض. گامِ ۱ خودش: طول + عرض = ۱۸ (درست). پرسیدم گامِ بعدی را بگوید.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"فهمِ مسئله\",\"s\":\"done\"},{\"t\":\"طرح‌ریزی\",\"s\":\"now\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"p\",\"said\":[\"u\",\"p\"],\"ans\":[\"u1\",\"u2\",\"u3\"],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\",\"prior\":[{\"step\":\"نصفِ محیط\",\"quote\":\"نصفِ محیط میشه طول + عرض = ۱۸ سانت\",\"verdict\":\"ok\",\"why\":\"۳۶ ÷ ۲ = ۱۸ و نصفِ محیطِ مستطیل همان طول + عرض است\",\"dep\":[]}]}]}",
+"{\"reply\":\"از «طول + عرض = ۱۸» و «طول = ۲ × عرض» خودت به عرض ۶ و طول ۱۲ رسیدی. پیش از بریدنِ چوب: می‌توانی نتیجه را وارسی کنی — با این دو عدد همهٔ شرط‌ها برقرار است؟\",\"title\":\"قابِ عکسِ اتاقِ دخترم\",\"pinned\":\"ابعادِ قابِ مستطیلی با ۳۶ سانت چوب، طول دو برابرِ عرض\",\"memory\":\"به عرض ۶ و طول ۱۲ رسید. پرسیدم وارسی کند.\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"وارسیِ نتیجه\",\"s\":\"now\",\"view\":\"whole\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"e\",\"said\":[\"result\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\",\"result\":\"عرض ۶ سانت و طول ۱۲ سانت\"}]}",
+"{\"reply\":\"وارسی‌ات می‌خواند: ۲ × (۱۲ + ۶) = ۳۶، و ۱۲ هم دو برابرِ ۶ است — هر دو شرط برقرار است. یک نگاهِ آخر: همین راه (نصفِ محیط، بعد نسبتِ طول به عرض) را برای قابِ دیگری هم به کار می‌بری؟\",\"title\":\"قابِ عکسِ اتاقِ دخترم\",\"pinned\":\"ابعادِ قابِ مستطیلی با ۳۶ سانت چوب، طول دو برابرِ عرض\",\"memory\":\"عرض ۶، طول ۱۲؛ خودش وارسی کرد. پرسیدم راه را جای دیگر به کار می‌برد؟\",\"status\":\"related\",\"next\":false,\"outside\":\"\",\"know\":[],\"steps\":[{\"t\":\"بازنگری\",\"s\":\"now\",\"view\":\"whole\"}],\"actions\":[{\"do\":\"coach_state\",\"ph\":\"r\",\"said\":[\"check\"],\"ans\":[],\"stuck\":false,\"fail\":false,\"role\":\"self\",\"nat\":\"practical\",\"check\":{\"msgs\":[\"وارسی کردم: ۲ × (۱۲ + ۶) = ۳۶. با چوبی که دارم جور درمیاد.\"]}}]}"
+],
+"keys": [
+"سلام. یه قاب عکسِ مستطیلی می‌خوام برای اتاقِ دخترم بسازم و فقط ۳۶ سانت چوب دارم؛ طولش باید دو برابرِ عرضش باشه. ابعادش چند میشه؟ گامِ اول رو خودم رفتم: نصفِ محیط میشه طول + عرض = ۱۸ سانت.",
+"خب، طول دو برابرِ عرضه، پس ۳ × عرض = ۱۸، یعنی عرض = ۶ سانت و طول = ۱۲ سانت.",
+"وارسی کردم: ۲ × (۱۲ + ۶) = ۳۶. با چوبی که دارم جور درمیاد."
+]
+}
