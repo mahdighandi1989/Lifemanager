@@ -93,7 +93,9 @@ const HELPERS = () => {
   /* #144: ✏️ به سه‌شنبه‌ای که گذشته، سپس «سه‌شنبه‌ی هفته‌ی بعد، ⟨D0+8⟩» — دوشنبهٔ بانک (k=0) و شکلِ هم‌ارز در روزهای دیگر (نامِ روزِ D0+1 و پاسخِ «… هفته‌ی بعد، ⟨D0+8⟩» از روزِ D0+3) */
   for (const wp of [true, false]) await run(7, async (k) => { await fresh(0); await E(async (wp) => { const t = __wn(__D(3)) + ' جلسه با مدیر دارم'; await __say(t, 'خب.', wp ? __plan(t) : undefined); await __say('آره'); }, wp); await day(3);
     const r = await E(async () => { const o = { d8: __D(5) }; const n0 = __sys().length; o.ok = await __edit(__um(0), __wn(__D(-2)) + ' جلسه با مدیر دارم'); o.l1 = __sys().slice(n0); o.p1 = __pend();
-      const n1 = __sys().length; await __say(__wn(__D(5)) + '‌ی هفته‌ی بعد، ' + __dm(__D(5))); Object.assign(o, __st(n1)); o.wm = __when(/مدیر/); o.om = __open(/مدیر/); return o; });
+      /* بانک در دوشنبه: «سه‌شنبه‌ی هفته‌ی بعد» = ⟨D0+8⟩. در روزهای دیگر نامِ روز + «هفته‌ی بعد» فقط وقتی همان روزِ نوشته‌شده است (هفتهٔ شنبه–جمعه)؛ وگرنه فقط روزِ نوشته‌شده
+         (دو روزِ ناهمسان در یک پاسخ را صفحه حدس نمی‌زند — جدا آزموده نمی‌شود) */
+      const nw = APP.PR.whenInfo(__wn(__D(5)) + '‌ی هفته‌ی بعد'); const n1 = __sys().length; await __say((nw && nw.date === __D(5) ? __wn(__D(5)) + '‌ی هفته‌ی بعد، ' : '') + __dm(__D(5))); Object.assign(o, __st(n1)); o.wm = __when(/مدیر/); o.om = __open(/مدیر/); return o; });
     B(7, r.ok && r.l1.some(x => /گذشته — کدام روز؟/.test(x)) && r.wm === r.d8 && !r.l.some(x => /بی‌جواب ماند/.test(x)) && !r.rows.some(x => /مدیر/.test(x) && /هنوز تأیید نشده/.test(x)) && r.om, Object.assign({ wp }, r)); });
   /* #145–#146: بازگفتنِ روزِ پرسیده */
   for (const [n, t] of [[8, 'باشه، پس‌فردا صبح انجامش میدم'], [9, 'یادداشتش کردم. پس‌فردا صبح انجامش میدم']]) await run(n, async () => { await fresh(0);
@@ -102,8 +104,8 @@ const HELPERS = () => {
   /* #147: ✏️ ِ روزِ جلسه موعدِ آزمونِ همان پیام را دست نمی‌زند */
   await run(10, async () => { await fresh(0);
     const r = await E(async () => { const o = { d30: __D(30), wa: __wn(__D(3)), wb: __wn(__D(5)) }; await __say(o.wa + ' با مدیرم جلسه دارم و تا ' + __dm(o.d30) + ' باید امتحانِ آیلتس بدم'); await __say('آره'); o.dl0 = __dlAll();
-      const n0 = __sys().length; o.ok = await __edit(__um(0), o.wb + ' با مدیرم جلسه دارم و تا ' + __dm(o.d30) + ' باید امتحانِ آیلتس بدم'); Object.assign(o, __st(n0)); o.ex = __when(/آیلتس/); return o; });
-    B(10, r.ok && r.dl0.some(x => /آیلتس/.test(x.what) && x.date === r.d30) && r.ex === r.d30 && !r.dl.some(x => /آیلتس/.test(x.what) && x.by === 'replaced') && r.l.some(x => /مدیر/.test(x) && /^📅/.test(x)) && !r.l.some(x => /آیلتس/.test(x) && /^📅/.test(x)) && r.rows.some(x => /آیلتس/.test(x)), r); });
+      const n0 = __sys().length; o.ok = await __edit(__um(0), o.wb + ' با مدیرم جلسه دارم و تا ' + __dm(o.d30) + ' باید امتحانِ آیلتس بدم'); Object.assign(o, __st(n0)); o.ex = __when(/آیلتس/); o.oex = __open(/آیلتس/); return o; });
+    B(10, r.ok && r.dl0.some(x => /آیلتس/.test(x.what) && x.date === r.d30) && r.ex === r.d30 && !r.dl.some(x => /آیلتس/.test(x.what) && x.by === 'replaced') && r.l.some(x => /مدیر/.test(x) && /^📅/.test(x)) && !r.l.some(x => /آیلتس/.test(x) && /^📅/.test(x)) && r.oex, r); });
   /* #148: دو برنامه در یک جمله؛ ✏️ فقط داروخانه */
   for (const [t0, t1] of [['فردا بانک، پس‌فردا داروخونه', 'فردا بانک، سه روز دیگه داروخونه'], ['فردا می‌رم بانک، پس‌فردا می‌رم داروخونه', 'فردا می‌رم بانک، سه روز دیگه می‌رم داروخونه']]) await run(11, async () => { await fresh(0);
     const r = await E(async (a) => { const o = { t0: a[0], d1: __D(1), d3: __D(3), fd3: APP.fdate(__D(3)) }; await __say(a[0]); o.p0 = __pend(); await __say('آره'); o.dl0 = __dlAll();
@@ -198,8 +200,9 @@ const HELPERS = () => {
     B(36, r.wb === r.d1 && r.pend.some(x => /صاحب/.test(x.what) && x.date === r.s) && !r.dl.some(x => /صاحب/.test(x.what) && x.date === r.d2) && !r.pend.some(x => /صاحب/.test(x.what) && x.date === r.d2), r); });
   /* #174 (C145/C165) */
   await run(37, async () => { await fresh(0);
-    const r = await E(async () => { const o = { f: __firstDay(), e: __lastDay() }; await __say('سرِ برج قسطِ بیمه رو می‌دم و آخرِ ماه هم اجاره رو'); o.p0 = __pend(); const n0 = __sys().length; await __say('آره، هر دو'); Object.assign(o, __st(n0)); o.wq = __when(/بیمه|قسط/); o.wa = __when(/اجاره/); return o; });
-    B(37, r.p0.length === 2 && r.wq === r.f && r.wa === r.e && !r.pend.length, r); });
+    const r = await E(async () => { const o = { f: __firstDay(), e: __lastDay(), first1: /^۱ /.test(APP.fdate(APP.today())) }; await __say('سرِ برج قسطِ بیمه رو می‌دم و آخرِ ماه هم اجاره رو'); o.p0 = __pend(); const n0 = __sys().length; await __say('آره، هر دو'); Object.assign(o, __st(n0)); o.wq = __when(/بیمه|قسط/); o.wa = __when(/اجاره/); return o; });
+    /* در روزِ ۱ ِ ماه «سرِ برج» امروز یا ماهِ بعد است و صفحه می‌پرسد کدام (بانکِ R28 #20، C50) — «آره، هر دو» آن یکی را بی حدس می‌گذارد */
+    B(37, r.p0.length === 2 && r.wa === r.e && (r.first1 ? (r.pend.some(x => /بیمه|قسط/.test(x.what)) && r.l.some(x => /یکی را بنویس/.test(x))) : (r.wq === r.f && !r.pend.length)), r); });
   /* #175 */
   await run(38, async () => { await fresh(0);
     const r = await E(async () => { await __say('فردا بانک می‌رم'); await __say('آره'); const o = { dl0: __dlAll() }; const n0 = __sys().length; await __say('آره، فردا می‌رم'); Object.assign(o, __st(n0)); return o; });

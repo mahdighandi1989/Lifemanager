@@ -499,3 +499,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R28 C134 — «مهلت سه‌شنبه نیست، چهارشنبه است» on a Tuesday moved next week's Tuesday deadline to tomorrow; the
   replacing weekday belongs to the week of the replaced date, and a what-only correction never moves the date.
 - **Status:** reachable, not called. Delete only with the owner's approval.
+
+## 2026-11-17 — Tour 1 round 29, fixer «dates»: `doneFromHer28` kept as `PR.R29_QUARANTINE.doneFromHer28`
+- **What:** in `apps/learning-architecture/src/app/a41_practice.js` the round-28 body of `PR.doneFromHer28` (counted only booked 📌/⏰ as «زنگ زدم»
+  candidates) is no longer called; `PR.doneFromHer28` now gathers booked records AND the page's open date-ask items in one judge (`cands29`, `close29`,
+  `which29`, `stay29`), and `lapse27` no longer closes ask items itself through `didIt28`. The old body stays as `PR.R29_QUARANTINE.doneFromHer28`.
+- **Why replaced:** DECISIONS_R29 C117 (B29·D19, D29-18; group C's «held» was only the line — the asks were silently closed by `lapse27`), C165–C167.
+- **Status:** reachable, not called. Delete only with the owner's approval.
