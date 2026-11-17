@@ -347,3 +347,4 @@
 - 2026-11-17: surface fixer done (bbfa6775) → merged into merge29 as 160/157 (05fef659). Waiting: correction, dates, story integration pass. Check `test_fixes_1015b` #12 (surface says red on BASE29 too).
 - 2026-11-17: 1015b #12 regression traced to surface merge (green at 23d8eab9) → surface fixer resumed on merge29. Other merge29 tests green (r29 surface+replay, r26_classify, forecast, story replay).
 - 2026-11-17: story integration merged into merge29 (0738105b, 161/158). Waiting: correction, dates (next 162/159, 163/160), surface 1015b #12 fix.
+- 2026-11-17: surface 1015b #12 fix merged (d7a29d38); tests running. Waiting: correction, dates.

@@ -32,3 +32,4 @@
 
 ## Coordinator check (2026-11-17)
 - `test_fixes_1015b` #12 is NOT pre-existing: NO ERRORS on BASE29 and on merge29 before surface (23d8eab9); fails after the surface merge (05fef659) — `lastField:false, textDropped:false` (rule/map block eats the budget). Counted as a merge-introduced defect (§22). Surface fixer resumed to fix on top of merge29.
+- Fix 990efc9d (`a26 AS.cutManifest`: rule lines collapse to one id-only line before any field/button is cut; new «fix29» check in r29 surface) merged into merge29 (d7a29d38). Fixer's «fails on BASE29» claim came from `test_fixes_1015b.js` always loading `dist/learning-architecture.html` (ignores `LLA_FILE`), so its "base" run tested its own build.
