@@ -507,3 +507,13 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** C135 revokes C105 (S1 D29-1, D29-2: «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰ تومن» was ✗ «۱۸٫۷»). C141 replaces the C108 inline rule by
   `remains29` (S1 C29-1: after a subtraction the inline rule picked «۱۵» as the total and told the coach «✗ ۱۵ − ۳ … ۱۲»).
 - **Status:** reachable only by flipping the switches; not called. Delete only with the owner's approval.
+## Pólya R29 «correction» — tiers (ج)/(د) of the guessed one-op relation in `staleCore25` (quarantined 2026-11-17)
+- **What:** the two ratio shapes of `a38` `staleCore25` tiers (ج)/(د) (`implicit(c, 3)` / `implicit(c, 4)`): (a) the number is itself a
+  factor of her written expression (`c.opnd` / `c.run`) and the guessed relation solves the product for it; (b) a remainder clause
+  «N تا می‌مونه / کم میاد / اضافه میاد». Plus two guards: a lone result record built by dividing by the corrected datum, and an equal digit in
+  another magnitude. Behind `A.LIVE_R29_QUARANTINE_C89.on` (default `false`, listed in `.shapes`); the tiers themselves stay for every
+  other number (nine R24–R26 bank verdicts rely on relations she wrote in words).
+- **Why quarantined:** DECISIONS_R29 C89 «Scaling a number by the ratio of a correction is never a proposal»; R2 «the ratio path is
+  quarantined, not kept as a fallback». A guessed product solved for one factor is exactly that (D29-11 «۱۸ ⇒ ۱۵ = ۲۷۰۰ ÷ ۱۸۰», B29·D13
+  «۶ ⇒ ۶٫۴»).
+- **Status:** reachable (flag), not called on the page path. Delete only with the owner's approval.
