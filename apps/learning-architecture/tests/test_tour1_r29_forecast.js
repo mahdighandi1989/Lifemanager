@@ -104,6 +104,20 @@ const wd = (n) => { const d = new Date(D0); do { d.setDate(d.getDate() + 1); } w
     A = await run(['۷۰ درصد مطمئنم مدیرم عمداً جلوی ترفیع منو گرفته.']); if (A[0].fc.length) bad.push('past hypothesis ' + J(A[0].fc));
     return [!bad.length, bad.join(' | ')]; };
 
+  /* ---------- بازپخشِ dB2 (B): ارجاع «… پیش‌بینی کردم» و ✏️ هرگز «شد یا نشد؟» نمی‌سازند؛ «حدودِ ۶٫۵ میشه» ⇐ «۶ شد» ⇒ پرسشِ C120؛ «شنبه‌ی بعد» 🎯 ِ تازه است ---------- */
+  K.dB2_shape = async () => { const bad = [];
+    let A = await run(['تو آزمونِ آزمایشیِ شنبه رایتینگم حدودِ ۶٫۵ میشه، ۷۰ درصد مطمئنم.', 'نه، اون تاریخ رو نمی‌خوام؛ شنبه آزمونِ آزمایشیه و فقط نمره‌ش رو پیش‌بینی کردم.', '[اصلاحِ پیامِ قبلی] «پنجشنبه» ⇐ «سه‌شنبه» — متنِ درستِ پیامم: «نمره‌ی رایتینگم باید از ۶ به ۷ برسه. سه‌شنبه هم با استادم جلسه دارم.»', 'آزمونِ آزمایشی رو دادم: رایتینگ ۶ شد.']);
+    if (newSys(A, 1).some(x => /شد یا نشد/.test(x)) || newSys(A, 2).some(x => /شد یا نشد|حساب می‌شود/.test(x))) bad.push('ref/edit ' + J([newSys(A, 1), newSys(A, 2)]));
+    if (!newSys(A, 3).some(x => /این ۶ «حدودِ/.test(x))) bad.push('C120 ' + J(newSys(A, 3)));
+    A = await run(['تو آزمونِ آزمایشیِ شنبه رایتینگم حدودِ ۶٫۵ میشه، ۷۰ درصد مطمئنم.', 'آره']);
+    await p.clock.runFor(6 * 864e5);
+    await p.evaluate(() => __turn('یه پیش‌بینیِ تازه: ۶۰ درصد مطمئنم آزمایشیِ شنبه‌ی بعد حدودِ ۶٫۵ میشه.')); const S = await p.evaluate(() => __st());
+    if (S.fc.filter(f => /آزمایشی/.test(f.q)).length !== 2) bad.push('next Saturday ' + J(S.fc));
+    /* C91: «پیش‌بینیم ۱ بود، شد ۳» با عددِ دیگری در همان جمله (pwC2) */
+    A = await run(['تو کوییزِ فصلِ ۵ فقط ۱ سؤال رو غلط می‌زنم، ۶۰ درصد مطمئنم.', 'کوییزِ فصلِ ۵ رو دادم: پیش‌بینیم ۱ بود، شد ۳.']);
+    if (!(A[1].fc[0].out === 'نشد')) bad.push('quiz ' + J(A[1].fc));
+    return [!bad.length, bad.join(' | ')]; };
+
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').includes(k)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 900)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   console.log(JSON.stringify(info));
