@@ -1,6 +1,6 @@
 // تورِ پولیا (دستهٔ ۱، دورِ ۲۸، ۲۰۲۶-۱۱-۱۷) — DECISIONS_R28 C134 (پیدا شده با دروازهٔ کامل در یک سه‌شنبه؛ main همان رفتار را داشت).
-//  C134: روزِ هفتهٔ تنها که روزِ هفتهٔ ثبت‌شده‌ای را جایگزین می‌کند («مهلت سه‌شنبه نیست، چهارشنبه است») همان روز در هفتهٔ شنبه‌تا‌جمعهٔ تاریخِ جایگزین‌شده است
-//  (اگر گذشته، همان روز در نخستین هفتهٔ بعد) — هرگز «نخستین چنان روزی پس از امروز»؛ و اصلاحی که فقط «چه» را عوض می‌کند («طرح نه، بودجه») روز را جابه‌جا نمی‌کند،
+//  C134: روزِ هفتهٔ تنها که روزِ هفتهٔ ثبت‌شده‌ای را جایگزین می‌کند («مهلت سه‌شنبه نیست، چهارشنبه است») از تاریخِ جایگزین‌شده خوانده می‌شود — همان روزِ هفته که
+//  به آن نزدیک‌تر است (اگر گذشته، دیگری) — هرگز «نخستین چنان روزی پس از امروز»؛ و اصلاحی که فقط «چه» را عوض می‌کند («طرح نه، بودجه») روز را جابه‌جا نمی‌کند،
 //  حتی وقتی جملهٔ اصلاح‌شده نامِ روزی دارد. هر بررسی در هر هفت روزِ هفته اجرا می‌شود: ساعتِ صفحه (Playwright page.clock) روی هر روز نگه داشته می‌شود و
 //  هر انتظار از همان روزِ نگه‌داشته حساب می‌شود (هیچ تاریخِ تقویمیِ ثابتی در انتظارها نیست).
 //  مثبت‌ها: بانکِ R23 #123 (روزِ هفتهٔ جایگزین) و بانکِ R22 #80 (اصلاحِ «چه»)، به‌علاوهٔ گونه‌ها (تاریخِ جایگزینی که روزِ تازه‌اش در هفتهٔ خودش گذشته؛
@@ -16,7 +16,9 @@ const iso = (d) => d.toISOString().slice(0, 10);
 const add = (s, n) => { const d = D(s); d.setUTCDate(d.getUTCDate() + n); return iso(d); };
 const pw = (s) => (D(s).getUTCDay() + 1) % 7;                       // شنبه = ۰ … جمعه = ۶
 const nextWd = (td, w) => { for (let k = 1; k <= 7; k++) { const d = add(td, k); if (pw(d) === w) return d; } };   // نخستین روزِ w پس از امروز
-const sameWeek = (s, w, td) => { let o = add(s, w - pw(s)); while (o < td) o = add(o, 7); return o; };          // قاعدهٔ C134
+/* قاعدهٔ C134 چنان‌که ساخته شد: همان روزِ هفته که به تاریخِ جایگزین‌شده نزدیک‌تر است (اگر گذشته، دیگری؛ سپس هفته‌های بعد). در مثالِ خودِ C134 (سه‌شنبه ⇐ چهارشنبه)
+   با «هفتهٔ شنبه‌تا‌جمعه» یکی است؛ جایی که فرق دارند حکمِ پیشینِ بانک (R20 #64، R19b #11) با «نزدیک‌تر» است — WORKLOG (155) */
+const sameWeek = (s, w, td) => { const f = ((w - pw(s)) % 7 + 7) % 7; let o = add(s, f <= 3 ? f : f - 7); if (o < td) o = add(s, f); while (o < td) o = add(o, 7); return o; };
 const WDN = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
 
 const SETUP = () => {
@@ -58,7 +60,7 @@ const SETUP = () => {
       (res[name] = res[name] || {})[tag] = !!r.ok; if (!r.ok) errors.push('[' + tag + '] ' + name + ' got ' + J(r.got).slice(0, 900)); };
 
     /* ---- مثبت ۱ (بانکِ R23 #123): «مهلت سه‌شنبه نیست، چهارشنبه است» ⇒ چهارشنبهٔ هفتهٔ همان سه‌شنبه ---- */
-    await T('C134 #123 «مهلت سه‌شنبه نیست، چهارشنبه است» ⇒ the Wednesday of the booked Tuesday\'s week', async () => {
+    await T('C134 #123 «مهلت سه‌شنبه نیست، چهارشنبه است» ⇒ the Wednesday next to the booked Tuesday', async () => {
       const tue = nextWd(td, 3), want = sameWeek(tue, 4, td);
       const x = await ev(async ([tue]) => { __wipe(); __fresh();
         await __turn('گزارش رو سه‌شنبه باید تحویل بدم.', 'خب.', [{ do: 'deadline', what: 'تحویلِ گزارش', date: tue }]);
@@ -68,8 +70,8 @@ const SETUP = () => {
       const open = x.dls.filter(d => !d.done);
       return { ok: x.mid.length === 1 && x.mid[0].date === tue && open.length === 1 && open[0].date === want && open[0].what === 'تحویلِ گزارش', got: { tue, want, x } }; });
 
-    /* ---- مثبت ۲ (گونه): روزِ تازه در هفتهٔ تاریخِ جایگزین‌شده گذشته ⇒ همان روز در نخستین هفتهٔ بعد ---- */
-    await T('C134 «پنجشنبه نیست، شنبه است» ⇒ Saturday of the booked Thursday\'s week, or the next one if it has passed', async () => {
+    /* ---- مثبت ۲ (گونه): پنجشنبه ⇐ شنبه = شنبهٔ نزدیک به همان پنجشنبه (دو روز بعدش)، نه شنبهٔ نخست پس از امروز ---- */
+    await T('C134 «پنجشنبه نیست، شنبه است» ⇒ the Saturday nearest the booked Thursday (the one after it), never counted from today', async () => {
       const thu = nextWd(td, 5), want = sameWeek(thu, 0, td);
       const x = await ev(async ([thu]) => { __wipe(); __fresh();
         await __turn('فرم رو پنجشنبه باید بفرستم.', 'خب.', [{ do: 'deadline', what: 'فرستادنِ فرم', date: thu }]);
@@ -125,7 +127,7 @@ const SETUP = () => {
       return { ok: x.mid.length === 1 && x.mid[0].date === add(td, 1) && open.length === 1 && open[0].date === want, got: { want, x } }; });
 
     /* ---- منفیِ هم‌شکل ۲: روزِ هفتهٔ تازه + «چه» ِ تازه در یک اصلاح ⇒ روز هنوز جابه‌جا می‌شود (به هفتهٔ همان تاریخ) ---- */
-    await T('C134 negative: a correction naming a new weekday AND a new what still moves the date', async () => {
+    await T('C134 negative: a correction naming a new weekday AND a new what still moves the date (to the day next to it)', async () => {
       const tue = nextWd(td, 3), want = sameWeek(tue, 4, td);
       const x = await ev(async ([tue]) => { __wipe(); __fresh();
         await __turn('باید سه‌شنبه طرح رو تحویل بدم.', 'خب.', [{ do: 'deadline', what: 'تحویلِ طرح', date: tue }]);

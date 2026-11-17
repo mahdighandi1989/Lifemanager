@@ -3904,15 +3904,19 @@
   function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
   function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
   var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
-  /* دورِ ۲۸ (C134؛ پیدا شده با دروازه در یک سه‌شنبه): روزِ هفتهٔ تنها که روزِ هفتهٔ ثبت‌شده‌ای را جایگزین می‌کند («مهلت سه‌شنبه نیست، چهارشنبه است») همان روز در
-     هفتهٔ شنبه‌تا‌جمعهٔ تاریخِ جایگزین‌شده است (اگر گذشته، همان روز در نخستین هفتهٔ بعد) — نه «نخستین چنان روزی پس از امروز» (planDate18، که در خودِ سه‌شنبه
-     «چهارشنبه» را فردا می‌خواند). و اصلاحی که فقط «چه» را عوض می‌کند (همان واژهٔ روز در متنِ پیشین و تازه) هرگز روز را جابه‌جا نمی‌کند. */
+  /* دورِ ۲۸ (C134؛ پیدا شده با دروازه در یک سه‌شنبه): روزِ هفتهٔ تنها که روزِ هفتهٔ ثبت‌شده‌ای را جایگزین می‌کند («مهلت سه‌شنبه نیست، چهارشنبه است») از
+     تاریخِ جایگزین‌شده خوانده می‌شود، نه از امروز (planDate18 = «نخستین چنان روزی پس از امروز»، که در خودِ سه‌شنبه «چهارشنبه» را فردا می‌خواند): همان روزِ هفته
+     که به تاریخِ جایگزین‌شده نزدیک‌تر است (اگر گذشته، دیگری؛ و همچنان گذشته ⇒ هفته‌های بعد). «هفتهٔ شنبه‌تا‌جمعهٔ همان تاریخ» ِ متنِ C134 در مثالِ خودِ C134 همین را
+     می‌دهد (سه‌شنبه ⇐ چهارشنبهٔ فردایش) ولی دو حکمِ پیشینِ بانک را می‌شکست که این قاعده هر دو را نگه می‌دارد: R20 #64 (یکشنبه: «شنبه ⇐ پنجشنبه» = پنجشنبهٔ پیش از آن شنبه،
+     نه ۵ روز بعدش) و R19b #11 («جمعه ⇐ شنبه‌ی بعد» = شنبهٔ فردای آن جمعه، نه شنبهٔ شش روز پیشش). هفت فرد است، پس «نزدیک‌تر» همیشه یکی است.
+     و اصلاحی که فقط «چه» را عوض می‌کند (همان واژهٔ روز در متنِ پیشین و تازه) هرگز روز را جابه‌جا نمی‌کند. */
   var WDI134 = { "شنبه": 0, "یکشنبه": 1, "دوشنبه": 2, "سهشنبه": 3, "چهارشنبه": 4, "پنجشنبه": 5, "جمعه": 6 };
   function wdKey134(tok) { return String(tok || "").replace(/[‌\s]+/g, ""); }
   function wdIdx134(tok) { var k = wdKey134(tok); return Object.prototype.hasOwnProperty.call(WDI134, k) ? WDI134[k] : -1; }   // فقط روزِ هفتهٔ تنها؛ «… ی بعد»، «فردا» ⇒ -1
-  function sameWeek134(iso, w) { if (!/^\d{4}-\d\d-\d\d$/.test(String(iso || "")) || w < 0) return "";
-    var d0 = new Date(String(iso) + "T12:00:00Z"), pw = (d0.getUTCDay() + 1) % 7, o = A.addDays(String(iso), w - pw), td = A.today(); while (o < td) o = A.addDays(o, 7); return o; }
-  AS.sameWeek134 = sameWeek134;
+  function nearDay134(iso, w) { if (!/^\d{4}-\d\d-\d\d$/.test(String(iso || "")) || w < 0) return "";
+    var d0 = new Date(String(iso) + "T12:00:00Z"), pw = (d0.getUTCDay() + 1) % 7, f = ((w - pw) % 7 + 7) % 7, td = A.today(), near = f <= 3 ? f : f - 7, o = A.addDays(String(iso), near);
+    if (o < td) o = A.addDays(String(iso), f); while (o < td) o = A.addDays(o, 7); return o; }
+  AS.nearDay134 = nearDay134;
   AS.R28_QUARANTINE = AS.R28_QUARANTINE || {};
   /* قرنطینه (صدا زده نمی‌شوند؛ docs/overhaul/REMOVAL_CANDIDATES.md): خوانشِ پیشینِ روزِ تازهٔ اصلاح در retractApply — «نخستین چنان روزی پس از امروز» */
   AS.R28_QUARANTINE.dlDay19b = function (fix) { var wdx = WD19b.exec(String(fix || "")); if (!wdx) return ""; var d2 = planDate18(wdx[0]); return d2 && d2 >= A.today() ? d2 : ""; };
@@ -3921,7 +3925,7 @@
   function newDay134(nT, oT, cur) { var G = new RegExp(WD19b.source, "g"), all = String(nT || "").match(G) || []; if (!all.length) return "";
     var olds = (String(oT || "").match(G) || []).map(wdKey134), left = all.filter(function (t) { return olds.indexOf(wdKey134(t)) < 0; });
     if (!left.length) return "";   // همان واژهٔ روز («… سه‌شنبه … بودجه») ⇒ اصلاحِ «چه»، نه روز
-    var tk = left[left.length - 1], w = wdIdx134(tk); if (w >= 0 && /^\d{4}-\d\d-\d\d$/.test(String(cur || ""))) return sameWeek134(cur, w);
+    var tk = left[left.length - 1], w = wdIdx134(tk); if (w >= 0 && /^\d{4}-\d\d-\d\d$/.test(String(cur || ""))) return nearDay134(cur, w);
     var d = planDate18(tk); return d && d >= A.today() ? d : ""; }
   AS.newDay134 = newDay134;
   /* مقدارِ درست را در متنِ رکورد بنشان: (الف) «old» ِ مدل یا «نه Y»/«به‌جای Y» ِ پیامِ کنونی، (ب) تنها عددِ عوض‌شده، (پ) روزِ هفته، (ت) پنجره‌ای از تکه که

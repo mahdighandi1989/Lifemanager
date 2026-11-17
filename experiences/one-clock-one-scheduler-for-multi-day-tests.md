@@ -113,5 +113,5 @@ same act; keep the owner line (the one with the person's answer buttons) and fol
 - **Rule:** any test whose expectation involves a weekday or a relative day runs on all seven weekdays: freeze the page clock per run
   (Playwright `page.clock.install({time})` before `goto`, or `setSystemTime` between runs in one page), and compute every expectation from the
   frozen day in the test, never from the machine's clock. Installing the clock at «now» first keeps the rest of an old suite unchanged.
-- **Replacement rule for weekdays:** a weekday that replaces a booked weekday is that day in the week of the replaced date (next week if passed);
+- **Replacement rule for weekdays:** a weekday that replaces a booked weekday is read from the replaced date — the same weekday nearest to it (the other one if passed); a «calendar week» rule looked right on the motivating example but broke two older verdicts at the week boundary;
   a correction that keeps the same day word is a «what» correction and never moves the date.
