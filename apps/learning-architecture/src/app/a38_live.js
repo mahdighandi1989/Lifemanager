@@ -5409,6 +5409,9 @@
       var nd27 = x.date && wdOf(D.o) && wdOf(D.n) ? shiftDate(x.date, D.o, D.n) : "", fdn = faDateOf(D.n); if (!nd27 && x.date && fdn && !wdOf(D.n)) nd27 = isoOfFa(fdn, x.date) || "";
       if (nd27 && nd27 !== x.date && A.PR && typeof A.PR.rebook27 === "function") { var um27 = (se.msgs || []).filter(function (q) { return q && q.role === "user"; }).slice(-1)[0] || {}, wn27 = fixVal(x.quote || x.what, D), rb = null, ed27 = o.by !== "model";
         var tm27 = x.time !== time27 ? x.time : ""; x.time = time27;   // ساعتِ تازه (اگر بود) با همان یک راه می‌رود
+        /* دورِ ۲۹ (dates، C144؛ B29·D21، بانکِ R29 #147): در ✏️ موعدی که متنش با همین ✏️ عوض نمی‌شود (fixVal چیزی در آن نیافت) کارِ دیگری از همان پیام است —
+           روزش با «پنجشنبه ⇐ شنبه» ِ کارِ دیگر جابه‌جا یا «جایگزین» نمی‌شود (پیش‌تر shiftDate هر موعدِ آن پیام را می‌برد) */
+        if (ed27 && wn27 == null) return;   /* ed27 = ✏️ ِ خودش (o.by !== "model") */
         try { rb = A.PR.rebook27(se, x, { kind: "deadline", date: nd27, time: tm27, src: wn27 != null ? wn27 : (x.quote || x.what), at: String(um27.at || ""), why: ed27 ? "✏️ ِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد" : o.corr ? "به گفتهٔ خودش: «" + o.corr + "»" : "اصلاحِ خودش", by: ed27 ? "edit" : "corr", move: !ed27, queue: ed27, src20: mid, d: dk, oldT: before, what: !ed27 && wn27 != null ? wn27 : undefined }); } catch (e) { rb = null; }
         if (!rb && tm27) x.time = tm27;
         if (rb && rb.moved) { ch.push({ kind: "deadline", label: "یادآورِ «" + clip(x.what, 40) + "»", old: before, new: dlFa(x) }); return; }

@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T12:00:00Z"
 created_at: "2026-10-17T12:00:00Z"
-updated_at: "2026-11-17T12:00:00Z"
+updated_at: "2026-11-17T18:00:00Z"
 merged_from: []
 ---
 
@@ -115,3 +115,14 @@ same act; keep the owner line (the one with the person's answer buttons) and fol
   frozen day in the test, never from the machine's clock. Installing the clock at «now» first keeps the rest of an old suite unchanged.
 - **Replacement rule for weekdays:** a weekday that replaces a booked weekday is read from the replaced date — the same weekday nearest to it (the other one if passed); a «calendar week» rule looked right on the motivating example but broke two older verdicts at the week boundary;
   a correction that keeps the same day word is a «what» correction and never moves the date.
+
+## Update 2026-11-17 (round 29, «dates»)
+- **One judge must see every store before it calls something ambiguous.** «I called» was checked for ambiguity only among *booked* records, while the
+  same acts still waiting in the page's own date question were closed by a second path. Each path saw one candidate, so neither asked «which?». Rule:
+  gather candidates from every store that can hold the act (booked plans, booked deadlines, open questions — deduplicated by act), decide once, and
+  let no other path close the same thing.
+- **Seven-weekday runs catch test sentences, not only code.** A fixed sentence («Tuesday of next week, ⟨written day⟩») is consistent on the bank's own
+  weekday only; on others the two readings differ and the right behaviour is to not guess. Build the sentence from the frozen clock and assert the
+  no-guess path where the readings disagree.
+- **A year-less date that has passed is not «next year» by default.** Use the nearest occurrence (past this year vs. coming next year) — it follows from
+  the data, needs no tolerance constant, and keeps «1 Farvardin said in Esfand» in the future.

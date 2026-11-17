@@ -1,0 +1,594 @@
+{
+"from": "round29A/s07",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "۵ تا گلدون لوبیا با ۲، ۴، ۶، ۸ و ۱۰ ساعت نور گذاشتم. قدشون بعد از ۳ هفته: ۴، ۹، ۱۳، ۱۶، ۱۷ سانت. استادم گفت «یه قانون پیدا کن». قانونش چیه؟ فکر کنم خطیه، هر ۲ ساعت ۴ سانت."
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='2004-02-27';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()"
+},
+{
+"eval": "(()=>{APP.go('e_prob',null,'live');const t=[...document.querySelectorAll('#main input,#main textarea')];F('lpNewTitle','نور و رشدِ لوبیا');\nconst ids=FL('lpNew');return ids})()\n"
+},
+{
+"eval": "(()=>{F('lpNewT','نور و رشدِ لوبیا');F('lpNewS','۵ گلدان لوبیا با ۲، ۴، ۶، ۸ و ۱۰ ساعت نور؛ قد پس از ۳ هفته ۴، ۹، ۱۳، ۱۶، ۱۷ سانت. قانونِ رابطهٔ نور و قد چیست؟');\nconst nat0=document.getElementById('lpNewNat').value;const hint=MT('پیش‌انتخابِ کد',120);S('lpNewNat','objective');\nconst b=[...document.querySelectorAll('#main button')].find(b=>/ساختنِ مسئلهٔ حل‌نشده/.test(b.textContent));b.click();const p=APP.state.arg;\nF('lpOne','دنبال رابطه‌ای‌ام که قدِ لوبیا را از ساعتِ نور بدهد.');F('lpWhy','استادم خواسته و کنجکاوم');C('.lp-onesave');\nreturn 'nat0='+nat0+' '+hint+'\\n'+p+' bound='+APP.liveSessionPid(APP.ASSIST.cur())+'\\n'+FL('lpGK')})()\n"
+},
+{
+"eval": "APP.state.arg"
+},
+{
+"eval": "(()=>{window.__T=[];const o=APP.toast;if(!o.__w){APP.toast=function(m,k){window.__T.push((k||\"\")+\":\"+m);return o.apply(this,arguments)};APP.toast.__w=1}window.TT=()=>{const t=window.__T.slice(-3).join(\" || \");window.__T=[];return t};S(\"lpNat\",\"practical\");return 1})()"
+},
+{
+"eval": "(()=>{const D=['۲ ساعت ⇒ ۴ سانت','۴ ساعت ⇒ ۹ سانت','۶ ساعت ⇒ ۱۳ سانت','۸ ساعت ⇒ ۱۶ سانت','۱۰ ساعت ⇒ ۱۷ سانت'];for(let i=2;i<D.length;i++)C('.lp-dadd');const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>{F(id,D[i]||'');S(id.replace('lpD_','lpDE_'),'big')});\nF('lpUnk','رابطهٔ قدِ لوبیا پس از ۳ هفته با ساعتِ نورِ روزانه');F('lpCond','همهٔ گلدان‌ها ۳ هفته\\nفقط ساعتِ نور فرق دارد');S('lpSat','yes');S('lpSuff','کافی است');F('lpSuffW','پنج حالت داریم');\n[...document.querySelectorAll('#main [id^=lpPr]')].forEach(e=>{if(!e.value)F(e.id,e.id==='lpPrMeasure'?'قد (سانت) = f(ساعتِ نور)، و f باید هر پنج حالت را با خطای کمتر از ۱ سانت بدهد':'دقتِ ۱ سانت')});\nF('lpGuess','خطی است: هر ۲ ساعت ۴ سانت');S('lpConf','80');F('lpTest','اگر تفاضل‌ها ثابت نباشند');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','yes');F('lpGContra','تفاضل‌ها: ۵، ۴، ۳، ۱');\nC('.lp-usave');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join('');const a=st();C('.sv-g2');return a+' | '+st()+' SUB:'+APP.state.sub})()\n"
+},
+{
+"eval": "(()=>{F('lpPrVague','«قد» یعنی ارتفاعِ ساقه از خاک');F('lpPrLine','نوعِ خاک و آب را یکسان فرض می‌کنم و اندازه نمی‌گیرم');F('lpPrApprox','دقتِ یک سانتی‌متر');F('lpPrPrior','می‌دانم گیاه بدون نور رشد نمی‌کند');\nC('.lp-usave');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<500).slice(-1).join('');const a=st();C('.sv-g2');return a+' SUB:'+APP.state.sub+'\\n'+MT('حالتِ حدی',300)})()\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "APP.livePhase(\"pb_l_mvaqm0wl4n3\")"
+},
+{
+"say": "تفاضل‌ها ۵، ۴، ۳، ۱ شدن، پس خطی نیست، کند میشه. حدسم اشباعه. یه مقاله هم پیدا کردم دربارهٔ اشباع فتوسنتز. پس ثابت شد دیگه، قانونش اشباعه!",
+"eval0": "(()=>{0;return 1})()",
+"clock": "2026-10-17"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0wl4n3\",\"plan\");S(\"lpMv\",\"mv_special\");F(\"lpMvWhy\",\"حالتِ حدیِ ۲۴ ساعت نور را می‌آزمایم که اشباع را جدا می‌کند\");C(\".lp-mvadd\");F(\"lpPlan\",\"نخست یک گلدانِ تازه را ۲۴ ساعت زیرِ نور می‌گذارم، سپس پس از ۳ هفته قدش را با پیش‌بینیِ اشباع (حدود ۱۸ سانت) مقایسه می‌کنم.\");F(\"lpPlan2\",\"اگر نشد، ۱۲ و ۱۴ ساعت را هم می‌آزمایم\");[...document.querySelectorAll(\"[id^=lpPU_a_]\")].forEach(e=>S(e.id,\"use\"));[...document.querySelectorAll(\"[id^=lpPU_w_]\")].forEach(e=>F(e.id,\"نقطه‌ای از منحنیِ اشباع\"));[...document.querySelectorAll(\"[id^=lpPC_]\")].forEach(e=>{if(!e.checked)e.click()});C(\".lp-plansave\");return TT()+\" SUB:\"+APP.state.sub+\"\\n\"+MT(\"پیش از آزمایش\",400)})()"
+},
+{
+"eval": "(()=>{F(\"lpStep\",\"گلدانِ ششم را ۲۴ ساعت زیرِ نور می‌گذارم و پس از ۳ هفته قد را می‌سنجم\");S(\"lpClear\",\"بله\");F(\"lpPrem\",\"منحنیِ تفاضل‌ها\");F(\"lpPred\",\"حدود ۱۸ سانت\");S(\"lpConf\",\"70\");F(\"lpWhen\",\"۱۶ آبان\");[...document.querySelectorAll(\"[id^=lpSD_],[id^=lpSC_]\")].slice(0,2).forEach(e=>{if(!e.checked)e.click()});C(\".lp-stepsave\");return TT()})()"
+},
+{
+"eval": "MT(\"۳) اجرا\",900)"
+},
+{
+"say": "هفتهٔ چهارم. ۲۴ ساعت نور فقط ۱۱ سانت شد و گیاه آسیب دید. ناامیدم، کل قانونم خراب شد.",
+"eval0": "(()=>{0;APP.go('home');const d=DUE().split('\\n').filter(x=>/لوبیا/.test(x)).join('\\n');APP.go('lprob','pb_l_mvaqm0wl4n3','exec');\nS('lpODone','yes');F('lpOWhat','۱۱ سانت شد و برگ‌ها زرد و آسیب‌دیده‌اند');S('lpOMatch','no');S('lpOProg','کمی');S('lpOWant','same');S('lpOGuess','refute');C('.lp-outsave');F('lpOReflect','اشباع در ۲۴ ساعت نگه نمی‌دارد؛ گیاه آسیب می‌بیند. شاید قانون فقط تا ۱۲ ساعت درست است.');C('.lp-outsave');\nreturn d})()\n",
+"clock": "2026-11-07"
+},
+{
+"eval": "MT(\"غافلگیر\",900)+\"\\n###\\n\"+MT(\"مثالِ نقض\",400)+\"\\n###\"+MT(\"دامنه\",400)"
+},
+{
+"eval": "(()=>{C(\".lp-solved\");return APP.state.sub+\"\\n\"+FL(\"lpB(Dom|Lim|Law|Rng)\")+\"\\n\"+MT(\"دامنه\",500)})()"
+},
+{
+"eval": "FL('lpB').split('\\n').map(x=>x.slice(0,110)).join('\\n')+'\\n'+JSON.stringify(APP.liveClosure('pb_l_mvaqm0wl4n3'))\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQs(r.p.id)]))\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,r.p.created||r.created,r.sess,APP.liveChatQs(r.p.id)]))"
+},
+{
+"eval": "JSON.stringify(APP.S.all(\"achat\",x=>1).map(se=>({id:se.id,lprob:se.lprob,lprobAt:se.lprobAt,log:se.lprobLog,msgs:(se.msgs||[]).map(m=>m.role+\"@\"+(m.at||\"\")+\": \"+String(m.text).slice(0,160))})))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQItems(r.p.id)]))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t||x)]),null,0)"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,g:(s.coach||{}).guess&&s.coach.guess.text,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>m.guess)})))"
+},
+{
+"eval": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll('.as-msg')];const out=ms.map((m,i)=>i+':'+m.className+' svg='+m.querySelectorAll('svg').length+' plot='+(m.querySelector('[class*=plot]')?m.querySelector('[class*=plot]').className+' '+(m.querySelector('[class*=plot]').textContent||'').slice(0,200):''));const t=ms.find(m=>m.querySelector('svg'));if(t)t.scrollIntoView({block:'start'});return out.join('\n')})()"
+},
+{
+"eval": "(()=>{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll('.as-msg')];const out=ms.map((m,i)=>i+':'+m.className+' svg='+m.querySelectorAll('svg').length+' plot='+(m.querySelector('[class*=plot]')?m.querySelector('[class*=plot]').className+' '+(m.querySelector('[class*=plot]').textContent||'').slice(0,200):''));const t=ms.find(m=>m.querySelector('svg'));if(t)t.scrollIntoView({block:'start'});return out.join(' ## ')})()"
+},
+{
+"eval": "(()=>{const ms=[...document.querySelectorAll('.as-msg')];ms[2].scrollIntoView({block:'start'});return ms[3].querySelector('.mx-plot').outerHTML.slice(0,1500)})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll(\".as-msg\")];return ms.map((m,i)=>{const p=m.querySelectorAll(\"svg\");return p.length?i+\":\"+m.className.split(\" \").join(\".\")+\" svgs=\"+p.length+\" ticks=\"+[...m.querySelectorAll(\"svg text\")].map(t=>t.textContent).slice(0,14).join(\",\")+\" | \"+m.innerText.slice(0,80):null}).filter(Boolean).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{const ms=[...document.querySelectorAll(\".as-msg, .as-bubble, [class*=as-m]\")];const s=[...document.querySelectorAll(\".as-panel svg\")];return ms.length+\" msgs; svgs \"+s.length+\"\\n\"+s.map(x=>{const m=x.closest(\"[class*=as-]\");return (m?m.className:\"?\")+\" :: \"+[...x.querySelectorAll(\"text\")].map(t=>t.textContent).join(\",\").slice(0,200)}).join(\"\\n\")})()"
+},
+{
+"eval": "(async()=>{const s=[...document.querySelectorAll(\".as-panel svg\")];const m=s[0].closest(\".as-msg\");m.scrollIntoView({block:\"center\"});const b=[...m.querySelectorAll(\"button\")].find(b=>/افزودن/.test(b.textContent));if(!b)return \"NOADD \"+m.innerText.slice(0,300);b.click();await new Promise(r=>setTimeout(r,300));const ins=[...m.querySelectorAll(\"input\")];return ins.map(i=>(i.getAttribute(\"aria-label\")||i.placeholder)).join(\" | \")+\" || \"+m.innerText.slice(0,400)})()"
+},
+{
+"eval": "(async()=>{const s=[...document.querySelectorAll(\".as-panel svg\")];const m=s[0].closest(\".as-msg\");const ins=[...m.querySelectorAll(\"input\")];const set=(e,v)=>{e.value=v;e.dispatchEvent(new Event(\"input\",{bubbles:true}))};set(ins[0],\"۱۲\");set(ins[1],\"۱۸\");[...m.querySelectorAll(\"button\")].find(b=>/^افزودن$/.test(b.textContent.trim())).click();await new Promise(r=>setTimeout(r,500));const m2=[...document.querySelectorAll(\".as-panel svg\")][0].closest(\".as-msg\");m2.scrollIntoView({block:\"center\"});return [...m2.querySelectorAll(\"svg text\")].map(t=>t.textContent).join(\",\")+\" || \"+m2.innerText.slice(-200)})()"
+},
+{
+"eval": "[...document.querySelectorAll(\".as-panel svg\")].map(x=>{const m=x.closest(\".as-msg\");return m.innerText.slice(0,50)+\" | inputs=\"+m.querySelectorAll(\"input\").length+\" | ticks=\"+[...x.querySelectorAll(\"text\")].map(t=>t.textContent).join(\",\")}).join(\"\\n\")"
+},
+{
+"eval": "APP.today()"
+},
+{
+"eval": "APP.liveAll().map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()"
+},
+{
+"eval": "\"clock->2026-10-30\"",
+"clock": "2026-10-30"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");const j=t.indexOf(\"⚫ نقطه\");return t.slice(i,j+400)})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "APP.today()+' '+APP.state.view+' '+APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>r.p.id+':'+r.p.title+':'+(APP.liveClosure(r.p.id)||{}).state).join(' | ')+' sess:'+APP.ASSIST.cur().id+' lp:'+(APP.ASSIST.cur().lprob||'')"
+},
+{
+"say": "می‌خوام عادت کنم قبل از هر اندازه‌گیری پیش‌بینیِ عددی با درصدِ اطمینان بنویسم و بعد ببینم چقدر درست بوده — برای آزمایش‌های بعدیِ لوبیا یه تمرین برام راه بنداز."
+},
+{
+"eval": "(()=>{APP.go('lprob','pb_l_mvaqm0wl4n3');const sel=document.querySelector('.prc-tsel');if(sel){sel.value='24';sel.dispatchEvent(new Event('change',{bubbles:true}));}const b=document.querySelector('.prc-start');if(b)b.click();return APP.state.view+' '+APP.state.arg+' '+APP.state.sub+' | '+FL().slice(0,300)})()"
+},
+{
+"eval": "(()=>{const st0=document.getElementById('ex_preds_0_st')?'ex_preds_0_st':'ex_preds';const r=[F(st0,'گلدانِ ۱۲ ساعت تا ۲۵ آبان قدش بین ۱۸ تا ۲۲ سانت می‌شود'),F('ex_preds_0_conf','70'),F('ex_preds_0_why','داده؛ تفاضل‌های قبلی'),F('ex_preds_0_due','۲۵ آبان'),F('ex_preds_1_st','گلدانِ ۲۴ ساعت تا یک هفتهٔ دیگر برگ‌هایش زرد می‌شود'),F('ex_preds_1_conf','60'),F('ex_preds_1_why','آشنایی با گیاهِ زیرِ نورِ زیاد'),F('ex_preds_1_due','۷ روز دیگر'),F('ex_preds_2_st','قدِ گلدانِ ۸ ساعت تا دو هفتهٔ دیگر از ۲۵ سانت می‌گذرد'),F('ex_preds_2_conf','80'),F('ex_preds_2_why','روندِ هفته‌های قبل'),F('ex_preds_2_due','۱۴ روز دیگر')];return r.join(',')})()"
+},
+{
+"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({id:c.id,tid:c.tid,subj:c.subj,due:c.due,state:c.state})),fc:APP.S.all('fcast',x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,40),x.p,x.due])})"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()",
+"clock": "2026-11-14"
+},
+{
+"say": "امروز برگ‌های گلدانِ ۲۴ ساعت زرد شد — اون پیش‌بینیِ ۶۰ درصدیم درست درومد."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({m:s.msgs.slice(-1).map(m=>m.role+': '+m.text.slice(0,300)),prc:APP.PR.all().map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas,s.src])})),fc:APP.S.all('fcast',x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,30),x.p,x.due,x.out,x.res]),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/🎯|🧪/.test(t))})})()"
+},
+{
+"eval": "(()=>{return JSON.stringify({prc:APP.PR.all().map(c=>({id:c.id,tid:c.tid,due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.p,s.src])})),fc:APP.S.all('fcast',x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,40),x.p,x.due,x.outcome||'',x.judgedBy?x.judgedBy.kind:''])})})()"
+},
+{
+"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas,s.src])})),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/🎯|🧪/.test(t))})"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()",
+"clock": "2026-11-24"
+},
+{
+"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/🎯/.test(x.txt));if(x&&x.go)x.go();const s=[...document.querySelectorAll('#main select')].find(e=>/گلدانِ ۸ ساعت/.test((e.closest('label,li,div')||{}).textContent||''));if(!s)return 'NOSEL '+APP.state.view;s.value='نشد';s.dispatchEvent(new Event('change',{bubbles:true}));return 'set '+TT()})()"
+},
+{
+"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas,s.src])})),due:(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).filter(t=>/🎯|🧪/.test(t))})"
+},
+{
+"say": "اون پیش‌بینی همون گلدانِ ۲۴ ساعت بود؛ برگ‌هاش ۱۰ روز پیش، ۲۳ آبان، زرد شد — درست درومد."
+},
+{
+"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.p])})),fc:APP.S.all(\"fcast\",x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,25),x.p,x.outcome||\"\",x.outcomeAt||\"\"])})"
+},
+{
+"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/🎯/.test(x.txt));if(x&&x.go)x.go();const out=[];for(const [re,v] of [[/گلدانِ ۲۴ ساعت/,\"شد\"],[/گلدانِ ۱۲ ساعت/,\"شد\"]]){const s=[...document.querySelectorAll(\"#main select\")].find(e=>re.test((e.closest(\"label,li,div\")||{}).textContent||\"\"));if(!s){out.push(\"NOSEL\");continue}s.value=v;s.dispatchEvent(new Event(\"change\",{bubbles:true}));out.push(\"set \"+TT());}return out.join(\" | \")})()"
+},
+{
+"eval": "JSON.stringify({prc:APP.PR.all().map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.p])})),fc:APP.S.all(\"fcast\",x=>x.src&&x.src.ex).map(x=>[x.q.slice(0,25),x.p,x.outcome||\"\"])})"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.sessions().map(s=>({id:s.id,n:s.msgs.length,m:s.msgs.slice(0,3).map(m=>[APP.ASSIST.msgId(m),m.role,m.text.slice(0,60),!!m.pts])})))"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let ml=null;try{ml=APP.liveMeasLog?APP.liveMeasLog(s.id):\"nofn\"}catch(e){ml=\"ERR \"+e}const m=s.msgs[0];return JSON.stringify({ml,keys:Object.keys(m),pts:m.pts||null,mlog:s.mlog||null})})()"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll(\".as-msg\")];return ms.slice(0,4).map((m,i)=>i+\":\"+m.querySelectorAll(\"svg\").length+\" \"+m.innerText.slice(0,50)).join(\" | \")})()"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return document.querySelectorAll(\".as-panel svg\").length+\" svgs; mx-plot=\"+document.querySelectorAll(\".as-panel .mx-plot\").length+\"; ptsAt=\"+APP.ASSIST.cur().msgs[0].ptsAt+\"; plotAdd=\"+JSON.stringify(APP.ASSIST.cur().msgs[0].plotAdd)})()"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);const ms=[...document.querySelectorAll(\".as-msg\")];return ms.length+\" msgs; mxv=\"+ms.filter(m=>m.getAttribute(\"data-mxv\")).length+\"; firstcls=\"+(ms[0]&&ms[0].className)+\"; tx=\"+(ms[0]&&ms[0].querySelector(\".as-tx\")?\"y\":\"n\")+\"; svgs=\"+document.querySelectorAll(\".as-panel svg\").length})()"
+},
+{
+"eval": "(async()=>{const d=document.createElement(\"div\");document.body.appendChild(d);await new Promise(r=>setTimeout(r,300));const ms=[...document.querySelectorAll(\".as-msg\")];return \"mxv=\"+ms.filter(m=>m.getAttribute(\"data-mxv\")).length+\" svgs=\"+document.querySelectorAll(\".as-panel svg\").length+\" mxScan=\"+(typeof (window.APP&&APP.MATH))})()"
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0wl4n3\");return MT(\"داده\",50)+\"\\n\"+FL(\"lpD_|lpOne|lpUnk\").slice(0,800)})()"
+},
+{
+"eval": "JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0wl4n3\"))"
+},
+{
+"eval": "(async()=>{const MID='u1',FROM='۴، ۹، ۱۳، ۱۶، ۱۷',TO='۴، ۸، ۱۳، ۱۵، ۱۷';const s=APP.ASSIST.cur();const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await new Promise(r=>setTimeout(r,300));const m=s.msgs.find(m=>APP.ASSIST.msgId(m)==MID);if(!m)return 'NOMSG';const b=document.querySelector('.as-mtools[data-mid=\"'+MID+'\"] .as-editb');if(!b)return 'NOEDIT';b.click();await new Promise(r=>setTimeout(r,400));const ta=document.querySelector('.as-edtx');ta.scrollIntoView({block:'center'});const nt=m.text.replace(FROM,TO);ta.value=nt;ta.dispatchEvent(new Event('input',{bubbles:true}));const cs=getComputedStyle(ta);return 'OPEN '+nt+' | color='+cs.color+' bg='+cs.backgroundColor})()"
+},
+{
+"eval": "(()=>{document.querySelector(\".as-edsave\").click();return \"saved\"})()"
+},
+{
+"eval": "[...document.querySelectorAll(\"button\")].filter(b=>/بله، این‌جا هم/.test(b.textContent)).length"
+},
+{
+"eval": "(()=>{const b=document.querySelector(\".as-askyes\");if(b)b.click();return \"clicked \"+!!b})()"
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"eval": "(async()=>{APP.ASSIST.toggle(true);document.body.appendChild(document.createElement(\"div\"));await new Promise(r=>setTimeout(r,400));const m=document.querySelectorAll(\".as-msg\")[0];m.scrollIntoView({block:\"start\"});const sv=m.querySelector(\"svg\");return (m.innerText.slice(0,120))+\" || ticks=\"+(sv?[...sv.querySelectorAll(\"text\")].map(t=>t.textContent).join(\",\"):\"nosvg\")+\" | marked=\"+(m.className)})()"
+},
+{
+"say": "یه چیزی رو می‌خوام یه جا نگه دارم که دیگه تکرار نکنم: اشتباهم این بود که با یه مقاله و چهار تا عدد گفتم «ثابت شد قانونش اشباعه». کجا بنویسمش که بعداً برگرده جلوم؟"
+},
+{
+"eval": "(()=>{APP.go('practice');return APP.state.view+'\\n'+MT('فهرست‌های جاری',700)})()"
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll('#main button')].find(b=>/اشتباهات/.test(b.textContent));if(b)b.click();return MT('پوشهٔ',1500)})()"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0wl4n3\");const i=document.querySelector(\"#main input[aria-label=\\\"مدلِ ذهنی که در این مسئله به کار بردی\\\"]\");if(!i)return \"NOINPUT\";i.value=\"منحنیِ اشباع (بازدهِ کاهنده)\";i.dispatchEvent(new Event(\"input\",{bubbles:true}));const b=i.parentElement.querySelector(\"button\");b.click();return \"ok \"+TT()+\" | \"+(b.textContent)})()"
+},
+{
+"eval": "(()=>{APP.go(\"practice\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/سیگنال و نویز/.test(b.textContent));b.click();const i=document.querySelector(\"#main input[type=text]\");i.value=\"مقاله: رشدِ لوبیا در نورِ زیاد به اشباعِ فتوسنتز می‌رسد\";i.dispatchEvent(new Event(\"input\",{bubbles:true}));const d=document.querySelector(\"#main input[type=date]\");if(d){d.value=\"2026-12-08\";d.dispatchEvent(new Event(\"input\",{bubbles:true}));d.dispatchEvent(new Event(\"change\",{bubbles:true}));}const ad=[...document.querySelectorAll(\"#main button\")].find(b=>b.textContent.trim()==\"افزودن\");ad.click();return MT(\"باز (\",500)})()"
+},
+{
+"eval": "(()=>{APP.go(\"practice\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/قفسهٔ مدل/.test(b.textContent));b.click();return MT(\"باز (\",500)})()"
+},
+{
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).filter(t=>/🧪|فهرست|قفسه|پوشه|سیگنال|ادعا|مدل/.test(t)).join(' || ')})()",
+"clock": "2026-12-01"
+},
+{
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).filter(t=>/🧪|فهرست|قفسه|پوشه|سیگنال|ادعا|مدل/.test(t)).join(' || ')})()",
+"clock": "2026-12-08"
+},
+{
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).filter(t=>/🧪|فهرست|قفسه|پوشه|سیگنال|ادعا|مدل/.test(t)).join(' || ')})()",
+"clock": "2026-12-24"
+},
+{
+"eval": "(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\").slice(0,80)).join(\"\\n\")"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltyqjqe25');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{const r=APP.liveAll()[0];const p=r.p;return JSON.stringify({stmt:(p.statement||p.text||\"\").slice(0,200),dl:(r.solve&&r.solve.u1&&r.solve.u1.dl||[]).map(x=>x.t||x).slice(0,8)})})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt6uansrx');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltg6juy3a');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlts1ckb49');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltjpv656x');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "راستی دمای اتاق هم ثابت ۱۷ درجه بود و به هر گلدون ۱۷۰ میلی‌لیتر آب دادم."
+},
+{
+"say": "یه اشتباهِ دیگه: قدِ گلدونِ ۱۰ ساعته ۱۷ نبود، ۱۶ بود. حالا آخرین تفاضل چی میشه؟"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-1).map(m=>m.text.slice(0,900)))"
+},
+{
+"eval": "JSON.stringify(REC().match(/۱۷ درجه[^\"]{0,60}|۱۷۰[^\"]{0,40}|کهنه[^\"]{0,80}/g))"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltnldx8e1');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt42u9g4h');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "با عددهای درست: میانگینِ قدها (۴ + ۸ + ۱۳ + ۱۵ + ۱۶) / ۵ = ۱۱٫۲ سانت، گلدونِ آخر ۱۶ / ۴ = ۴ برابرِ اولیه، و ۱۳ − ۸ = ۴. اندازه‌گیریِ بعدی ۳۰ آبانه."
+},
+{
+"eval": "APP.today()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltljezvhl');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0wl4n3');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"«خطی است، هر ۲ ساعت ۴ سانت» یک حدسِ تازه است — درست یا غلط نمی‌گویم؛ راهش این است که ثابتش کنی یا با مثالِ نقض ردش کنی. چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟\", \"title\": \"نور و رشدِ لوبیا\", \"pinned\": \"یافتنِ قانونِ رابطهٔ ساعتِ نور و قدِ لوبیا\", \"memory\": \"۵ گلدان لوبیا (۲..۱۰ ساعت نور ⇒ ۴،۹،۱۳،۱۶،۱۷ سانت). کاربر حدس می‌زند خطی است (هر ۲ ساعت ۴ سانت). پرسیدم چطور می‌آزمایدش.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"guess\"], \"ans\": [\"u2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"فکر کنم خطیه، هر ۲ ساعت ۴ سانت\", \"q\": \"چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟\"}}]}",
+"{\"reply\": \"دیدنِ تفاضل‌های کاهشیِ ۵، ۴، ۳، ۱ کارِ خوبی بود و «اشباع» حدسِ شایسته‌ای است. ولی تفاضل‌ها و یک مقاله استدلالِ اکتشافی‌اند، نه برهان — «اشباع» فعلاً «ناتمام — اکتشافی» است، نه «ثابت شد». حدست را چطور می‌آزمایی — کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟\", \"memory\": \"pb_l_mvaqm0wl4n3: تفاضل‌ها ۵،۴،۳،۱؛ حدسِ اشباع + مقاله؛ گفتم اکتشافی است نه برهان؛ پرسیدم چطور می‌آزماید.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"test\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"حدسم اشباعه\", \"q\": \"حدست را چطور می‌آزمایی — کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟\"}}]}",
+"{\"reply\": \"وقتت هدر نرفت: حدس زدی و آزمودی — همان «حدس بزن، ولی حدست را بیازما». یک استثنا برای ردِ گزارهٔ کلی بس است، پس قانون به شکلِ «برای هر ساعتِ نور» رد شد؛ ولی دورش نینداز — می‌شود دامنه‌اش را تنگ کرد. میانهٔ راه: دربارهٔ مسئله چه آموختی که روزِ اول نمی‌دانستی، و دربارهٔ خودت چه دیدی؟\", \"memory\": \"pb_l_mvaqm0wl4n3: ۲۴ ساعت نور ⇒ ۱۱ سانت و آسیب (پیش‌بینی ۱۸). کاربر ناامید. گفتم مثال نقض گزارهٔ کلی را رد می‌کند؛ پیشنهاد تنگ کردن دامنه؛ پرسیدم میانهٔ راه چه آموخت.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"برای همین عادت، تکنیکِ ۲۴ «کالیبراسیون اعتماد» هست: پیش از هر اندازه‌گیری پیش‌بینیِ عددی با درصدِ اطمینان، و روزِ موعد سنجش. پرونده‌اش را روی همین آزمایشِ لوبیا خواستم باز شود؛ پیش‌بینی‌ها را خودت در کاربرگش می‌نویسی. نخستین پیش‌بینی‌ات برای اندازه‌گیریِ بعدی چیست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}, {\"do\": \"start_practice\", \"tid\": 24, \"pid\": \"pb_l_mvaqm0wl4n3\", \"consent\": {\"quote\": \"برای آزمایش‌های بعدیِ لوبیا یه تمرین برام راه بنداز\", \"kind\": \"request\"}}]}",
+"{\"reply\": \"این نتیجه را برای پروندهٔ کالیبراسیونت فرستادم؛ صفحه نتیجه را نشان می‌دهد. و دربارهٔ خودِ آزمایش: واحدها و ابعاد درست‌اند — اگر همه را با واحدِ دیگری بسنجی، رابطه درست می‌ماند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}, {\"do\": \"practice_log\", \"prc\": \"prc_mw66byv5we7jp\", \"what\": \"داوریِ پیش‌بینیِ «گلدانِ ۲۴ ساعت تا یک هفتهٔ دیگر برگ‌هایش زرد می‌شود» (۶۰٪): درست\", \"pct\": 60, \"ok\": true, \"quote\": \"امروز برگ‌های گلدانِ ۲۴ ساعت زرد شد — اون پیش‌بینیِ ۶۰ درصدیم درست درومد\"}]}",
+"{\"reply\": \"داوریِ پیش‌بینیِ گلدانِ ۲۴ ساعت (۶۰٪، روزِ ۲۳ آبان) را برای پروندهٔ کالیبراسیونت فرستادم؛ صفحه نتیجه را نشان می‌دهد. پیش‌بینیِ بعدی‌ات برای کدام گلدان است و چقدر مطمئنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mw66byv5we7jp\", \"what\": \"داوریِ پیش‌بینیِ «گلدانِ ۲۴ ساعت تا یک هفتهٔ دیگر برگ‌هایش زرد می‌شود» (۶۰٪): درست\", \"pct\": 60, \"ok\": true, \"quote\": \"اون پیش‌بینی همون گلدانِ ۲۴ ساعت بود؛ برگ‌هاش ۱۰ روز پیش، ۲۳ آبان، زرد شد — درست درومد\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"صفحه در صورتِ مسئلهٔ گفت‌وگو «۹» را به «۸» و «۱۶» را به «۱۵» برد؛ برای صورتِ مسئلهٔ صفحه از خودت می‌پرسد «این‌جا هم عوض شود؟».\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"جای همین «پوشهٔ اشتباهاتِ فکری من» در فهرست‌های جاری است که به آهنگِ خودش دوباره جلوت می‌آید؛ جمله‌ات را با همین مسئله برایش فرستادم و صفحه نتیجه را می‌گوید.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}, {\"do\": \"list_add\", \"list\": \"mistakes\", \"text\": \"اشتباهم این بود که با یه مقاله و چهار تا عدد گفتم «ثابت شد قانونش اشباعه»\", \"quote\": \"اشتباهم این بود که با یه مقاله و چهار تا عدد گفتم «ثابت شد قانونش اشباعه»\", \"consent\": {\"quote\": \"یه چیزی رو می‌خوام یه جا نگه دارم که دیگه تکرار نکنم\", \"kind\": \"request\"}}]}",
+"{\"reply\": \"دما و آبِ ثابت یعنی دو عاملِ مزاحم را کنار گذاشته‌ای — خوب است. با تفاضل‌های تازه (۴، ۵، ۲، ۲)، حدسِ «اشباع» هنوز می‌خواند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"اصلاحِ «۱۷ ⇐ ۱۶» برای گلدانِ ۱۰ ساعته را فرستادم؛ صفحه نتیجه را می‌گوید. آخرین تفاضل را خودت از ۱۵ و ۱۶ حساب کن — با آن، حدسِ اشباع هنوز می‌خواند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"retract\": {\"msg\": \"قدشون بعد از ۳ هفته: ۴، ۸، ۱۳، ۱۵، ۱۷ سانت\", \"key\": \"datum:قدِ گلدانِ ۱۰ ساعته\", \"what\": \"fact\", \"fix\": \"۱۶\", \"old\": \"۱۷\", \"rests\": []}}]}",
+"{\"reply\": \"میانگین و نسبت می‌خوانند؛ تفریقِ ۱۳ − ۸ را یک بار دیگر خودت بزن. با عددهای درست، الگوی تفاضل‌ها هنوز حدسِ اشباع را نگه می‌دارد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"۵ تا گلدون لوبیا با ۲، ۴، ۶، ۸ و ۱۰ ساعت نور گذاشتم. قدشون بعد از ۳ هفته: ۴، ۹، ۱۳، ۱۶، ۱۷ سانت. استادم گفت «یه قانون پیدا کن». قانونش چیه؟ فکر کنم خطیه، هر ۲ ساعت ۴ سانت.",
+"تفاضل‌ها ۵، ۴، ۳، ۱ شدن، پس خطی نیست، کند میشه. حدسم اشباعه. یه مقاله هم پیدا کردم دربارهٔ اشباع فتوسنتز. پس ثابت شد دیگه، قانونش اشباعه!",
+"هفتهٔ چهارم. ۲۴ ساعت نور فقط ۱۱ سانت شد و گیاه آسیب دید. ناامیدم، کل قانونم خراب شد.",
+"می‌خوام عادت کنم قبل از هر اندازه‌گیری پیش‌بینیِ عددی با درصدِ اطمینان بنویسم و بعد ببینم چقدر درست بوده — برای آزمایش‌های بعدیِ لوبیا یه تمرین برام راه بنداز.",
+"امروز برگ‌های گلدانِ ۲۴ ساعت زرد شد — اون پیش‌بینیِ ۶۰ درصدیم درست درومد.",
+"اون پیش‌بینی همون گلدانِ ۲۴ ساعت بود؛ برگ‌هاش ۱۰ روز پیش، ۲۳ آبان، زرد شد — درست درومد.",
+"[اصلاحِ پیامِ قبلی] «۹» ⇐ «۸»، «۱۶» ⇐ «۱۵» — متنِ درستِ پیامم: «۵ تا گلدون لوبیا با ۲، ۴، ۶، ۸ و ۱۰ ساعت نور گذاشتم. قدشون بعد از ۳ هفته: ۴، ۸، ۱۳، ۱۵، ۱۷ سانت. استادم گفت «یه قانون پیدا کن». قانونش چیه؟ فکر کنم خطیه، هر ۲ ساعت ۴ سانت.»",
+"یه چیزی رو می‌خوام یه جا نگه دارم که دیگه تکرار نکنم: اشتباهم این بود که با یه مقاله و چهار تا عدد گفتم «ثابت شد قانونش اشباعه». کجا بنویسمش که بعداً برگرده جلوم؟",
+"راستی دمای اتاق هم ثابت ۱۷ درجه بود و به هر گلدون ۱۷۰ میلی‌لیتر آب دادم.",
+"یه اشتباهِ دیگه: قدِ گلدونِ ۱۰ ساعته ۱۷ نبود، ۱۶ بود. حالا آخرین تفاضل چی میشه؟",
+"با عددهای درست: میانگینِ قدها (۴ + ۸ + ۱۳ + ۱۵ + ۱۶) / ۵ = ۱۱٫۲ سانت، گلدونِ آخر ۱۶ / ۴ = ۴ برابرِ اولیه، و ۱۳ − ۸ = ۴. اندازه‌گیریِ بعدی ۳۰ آبانه."
+]
+}
