@@ -16,6 +16,9 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
   p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
   p.on('dialog', d => { errors.push('dialog ' + d.message()); d.dismiss(); });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
+  /* دورِ ۲۸ (C134): ساعتِ صفحه نصب می‌شود (همان اکنون، زمان جلو می‌رود — بررسی‌های دیگر دست نمی‌خورند) تا بررسی‌های تاریخیِ بانک در هر هفت روزِ هفته با ساعتِ
+     نگه‌داشته اجرا شوند، نه فقط در روزی که مجموعه اجرا می‌شود (atDay پایین) */
+  await p.clock.install({ time: new Date() });
   const J = (x) => JSON.stringify(x);
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(250);
   await p.evaluate(() => {
@@ -266,7 +269,8 @@ const BANKF = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VAR
     const Q4 = bank.filter((e) => /^Q4\b/.test(String(e.rc || e.mech || '')));
     info.bank.n = bank.length; info.bank.q4 = Q4.length;
     const BH = require('./tour1_r23_correction_bank.js');
-    const out = await BH.run({ p, ev, turn, blockOf, head, bank, Q4 });
+    const out = await BH.run({ p, ev, turn, blockOf, head, bank, Q4, atDay: async (d) => { await p.clock.setSystemTime(d ? new Date(d + 'T10:00:00') : new Date()); },
+      days: [0, 1, 2, 3, 4, 5, 6].map(k => { const t = new Date(); t.setDate(t.getDate() + k); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); }) });   // C134: هفت روزِ پیاپی = هر هفت روزِ هفته
     Object.assign(info.bank, out.summary); Object.assign(info.nc, out.nc);
     out.fail.forEach(f => errors.push('bank ' + f));
   }

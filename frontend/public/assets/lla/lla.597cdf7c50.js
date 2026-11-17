@@ -39636,6 +39636,26 @@ APP.goFromURL = function (q) {
   function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
   function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
   var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
+  /* دورِ ۲۸ (C134؛ پیدا شده با دروازه در یک سه‌شنبه): روزِ هفتهٔ تنها که روزِ هفتهٔ ثبت‌شده‌ای را جایگزین می‌کند («مهلت سه‌شنبه نیست، چهارشنبه است») همان روز در
+     هفتهٔ شنبه‌تا‌جمعهٔ تاریخِ جایگزین‌شده است (اگر گذشته، همان روز در نخستین هفتهٔ بعد) — نه «نخستین چنان روزی پس از امروز» (planDate18، که در خودِ سه‌شنبه
+     «چهارشنبه» را فردا می‌خواند). و اصلاحی که فقط «چه» را عوض می‌کند (همان واژهٔ روز در متنِ پیشین و تازه) هرگز روز را جابه‌جا نمی‌کند. */
+  var WDI134 = { "شنبه": 0, "یکشنبه": 1, "دوشنبه": 2, "سهشنبه": 3, "چهارشنبه": 4, "پنجشنبه": 5, "جمعه": 6 };
+  function wdKey134(tok) { return String(tok || "").replace(/[‌\s]+/g, ""); }
+  function wdIdx134(tok) { var k = wdKey134(tok); return Object.prototype.hasOwnProperty.call(WDI134, k) ? WDI134[k] : -1; }   // فقط روزِ هفتهٔ تنها؛ «… ی بعد»، «فردا» ⇒ -1
+  function sameWeek134(iso, w) { if (!/^\d{4}-\d\d-\d\d$/.test(String(iso || "")) || w < 0) return "";
+    var d0 = new Date(String(iso) + "T12:00:00Z"), pw = (d0.getUTCDay() + 1) % 7, o = A.addDays(String(iso), w - pw), td = A.today(); while (o < td) o = A.addDays(o, 7); return o; }
+  AS.sameWeek134 = sameWeek134;
+  AS.R28_QUARANTINE = AS.R28_QUARANTINE || {};
+  /* قرنطینه (صدا زده نمی‌شوند؛ docs/overhaul/REMOVAL_CANDIDATES.md): خوانشِ پیشینِ روزِ تازهٔ اصلاح در retractApply — «نخستین چنان روزی پس از امروز» */
+  AS.R28_QUARANTINE.dlDay19b = function (fix) { var wdx = WD19b.exec(String(fix || "")); if (!wdx) return ""; var d2 = planDate18(wdx[0]); return d2 && d2 >= A.today() ? d2 : ""; };
+  AS.R28_QUARANTINE.planDay19b = function (v, oldText) { var d = planDate18(v); return d && d >= A.today() && d !== planDate18(oldText) ? d : ""; };
+  /* روزِ تازهٔ اصلاح: «» ⇒ روز عوض نمی‌شود. nT = متنِ تازه (یا مقدارِ درست)، oT = متنِ پیشین، cur = تاریخِ ثبت‌شده */
+  function newDay134(nT, oT, cur) { var G = new RegExp(WD19b.source, "g"), all = String(nT || "").match(G) || []; if (!all.length) return "";
+    var olds = (String(oT || "").match(G) || []).map(wdKey134), left = all.filter(function (t) { return olds.indexOf(wdKey134(t)) < 0; });
+    if (!left.length) return "";   // همان واژهٔ روز («… سه‌شنبه … بودجه») ⇒ اصلاحِ «چه»، نه روز
+    var tk = left[left.length - 1], w = wdIdx134(tk); if (w >= 0 && /^\d{4}-\d\d-\d\d$/.test(String(cur || ""))) return sameWeek134(cur, w);
+    var d = planDate18(tk); return d && d >= A.today() ? d : ""; }
+  AS.newDay134 = newDay134;
   /* مقدارِ درست را در متنِ رکورد بنشان: (الف) «old» ِ مدل یا «نه Y»/«به‌جای Y» ِ پیامِ کنونی، (ب) تنها عددِ عوض‌شده، (پ) روزِ هفته، (ت) پنجره‌ای از تکه که
      با واژهٔ مشترکِ درست هم‌تراز است، (ث) خودِ تکه درونِ متن؛ متنی که درونِ تکه است ⇒ خودِ درست. هیچ‌کدام ⇒ null (رکورد دست نمی‌خورد، مگر نوعش همان what باشد). */
   /* ================= دورِ ۲۰ ِ تورِ پولیا (RO4، سهمِ «coach»، DECISIONS_R20) — هم‌سنجیِ واژه‌به‌واژه، نه زیررشتهٔ خام =================
@@ -40104,7 +40124,8 @@ APP.goFromURL = function (q) {
     /* برنامه‌ها (+ موعد و یادآورِ پیگیری‌اش) */
     var pS = (s.plans || []).filter(function (q) { return fromMsg(q, R); }).map(function (q) { return { k: "plan:" + q.id, span: q.text }; });
     (s.plans || []).forEach(function (q) { if (!fromMsg(q, R) || !aff("plan:" + q.id, q.text, pS)) return; var v = sub(q.text, R.what === "plan"); if (v == null || v === q.text) return;
-      var ow = q.when, nw = ow; if (ow && ow !== "next-session" && WD19b.test(String(v))) { var d = planDate18(v); if (d && d >= A.today() && d !== planDate18(q.text)) nw = d; }
+      /* دورِ ۲۸ (C134): روزِ هفتهٔ تازه در هفتهٔ همان روزِ ثبت‌شده؛ همان واژهٔ روز ⇒ روز دست نمی‌خورد (خوانشِ پیشین: AS.R28_QUARANTINE.planDay19b) */
+      var ow = q.when, nw = ow; if (ow && ow !== "next-session" && WD19b.test(String(v))) { var d = newDay134(v, q.text, ow); if (d && d >= A.today() && d !== ow) nw = d; }
       /* دورِ ۲۷ب (C58 «یک راه»): روزِ برنامهٔ ثبت‌شده را همان یک تابعِ a41 (PR.rebook27) عوض می‌کند — ✏️: ثبتِ پیشین «جایگزین شد» و روزِ تازه یک بار پرسیده می‌شود؛
          اصلاحِ گفت‌وگو: همان برنامه به روزِ تازه می‌رود. یک سطرِ تاریخچه: corr ِ همین‌جا (با oldWhen، که 📜 می‌خواند) — نه سطرِ دوم. جابه‌جاییِ پیشینِ موعدهای پیوسته
          (corr ِ جدا برای هر موعد) قرنطینه است: AS.R27B_QUARANTINE.planMove27 */
@@ -40123,7 +40144,9 @@ APP.goFromURL = function (q) {
       if (!(R.what === "plan" || aff("deadline:" + dl.id, dl.src20.span || dl.what, []) || over(dl.what))) return;
       var hm = /(?:ساعت[\s‌]*)?([0-9۰-۹]{1,2})(?:[:٫.]([0-9۰-۹]{2}))?[\s‌]*(صبح|ظهر|عصر|بعد[\s‌]*از[\s‌]*ظهر|شب)?/.exec(faDigits(R.fix)), tm = "", dd = dl.date;
       if (hm && (/ساعت|صبح|ظهر|عصر|شب|:/.test(R.fix) || dl.time)) { var hh = +hm[1], mm = hm[2] ? +hm[2] : 0; if (hm[3] && /عصر|بعد|شب/.test(hm[3]) && hh < 12) hh += 12; if (hh <= 23 && mm <= 59) tm = (hh < 10 ? "0" : "") + hh + ":" + (mm < 10 ? "0" : "") + mm; }
-      var wdx = WD19b.exec(R.fix); if (wdx) { var d2 = planDate18(wdx[0]); if (d2 && d2 >= A.today()) dd = d2; }
+      /* دورِ ۲۸ (C134): روزِ تازه از هفتهٔ همان تاریخِ ثبت‌شده (نه از امروز)، و اصلاحِ «چه» با همان واژهٔ روز روز را عوض نمی‌کند. خوانشِ پیشین (planDate18 از امروز)
+         قرنطینه است: AS.R28_QUARANTINE.dlDay19b */
+      var wdx = WD19b.exec(R.fix); if (wdx) { var d2 = newDay134(R.fix, (R.old && WD19b.test(R.old) ? R.old : "") || R.frag || dl.quote || (dl.src20 && dl.src20.span) || dl.what, dl.date); if (d2) dd = d2; }
       if ((!tm || tm === dl.time) && dd === dl.date) return;
       /* دورِ ۲۷ب (C58 «یک راه»): روزِ موعدِ ثبت‌شده عوض شد ⇒ همان یک تابع (PR.rebook27) — ✏️: بسته «جایگزین شد» و روزِ تازه یک بار پرسیده می‌شود؛ اصلاحِ گفت‌وگو: همان موعد
          به روزِ تازه می‌رود با یک سطرِ تاریخچه (fixHist؛ پیش‌تر corr ِ این‌جا + fixHist ِ a38 = دو سطر) */
@@ -50019,7 +50042,8 @@ APP.goFromURL = function (q) {
     var wo = wdOf(oldT), wn = wdOf(newT); if (!iso || !wo || !wn || wo.w === wn.w) return iso;
     var d0 = new Date(String(iso).slice(0, 10) + "T12:00:00Z"); if (isNaN(d0)) return iso;
     var pw = (d0.getUTCDay() + 1) % 7, delta = wn.w - pw; if (delta < 0 && /بعد/.test(nz(newT))) delta += 7;
-    var d1 = new Date(d0.getTime() + delta * 864e5), o = d1.toISOString().slice(0, 10); if (o < A.today()) o = new Date(d1.getTime() + 7 * 864e5).toISOString().slice(0, 10);
+    /* دورِ ۲۸ (C134): «اگر گذشته، همان روز در نخستین هفتهٔ بعد» — تاریخِ جایگزین‌شده‌ای که چند هفته پیش بود با یک +۷ هنوز گذشته می‌ماند */
+    var d1 = new Date(d0.getTime() + delta * 864e5), o = d1.toISOString().slice(0, 10); while (o < A.today()) { d1 = new Date(d1.getTime() + 7 * 864e5); o = d1.toISOString().slice(0, 10); }
     return o;
   }
   A.retractShiftDate = shiftDate;
@@ -57069,6 +57093,9 @@ APP.goFromURL = function (q) {
           /* دورِ ۲۷ (C49): نامِ روز («جمعهٔ بعد»، «همین امروز») فقط تازه‌ترین پرسش را جواب می‌دهد — پرسشِ باز، یا اگر پرسشِ بازی نیست تنها/تازه‌ترینِ مانده‌ها */
           if (!first && !(isNew && !open)) { var mw = it.opts ? mine.filter(function (o) { return it.opts.indexOf(o.date) >= 0 && ovD27(o.what, it.what) >= 1; })[0] : null;
             if (mw) { it.date = mw.date; it.amb = false; delete it.opts; var lw = bookItem26(s0, P0, it); if (lw) done.push(lw); said = true; } else left.push(it); return; }
+          /* دورِ ۲۸ (C134 ← C92/C49؛ بانکِ R22 #80 در یک سه‌شنبه): پرسشِ دوپهلویی که دیگر زیرِ آخرین پاسخِ صفحه باز نیست («بی‌جواب ماند») فقط با پیامی جواب می‌گیرد
+             که جز روز چیزی نمی‌گوید یا همان کار را نام می‌برد — «امروز وقت ندارم» سه پیام بعد، «نه امروز» ِ آن موعد نیست و «سه‌شنبهٔ بعد» را ثبت نمی‌کند */
+          if (!first && !bare27 && !(ovD27(t, it.what) >= 1 && sameAct28(t, it.what))) { left.push(it); return; }
           var k26 = ambPick26(it, P0.d0, xA, same, next, R.pos), od = k26 >= 0 ? ambO26(it, P0.d0)[k26] : "";
           if (od && od < td) { left.push(it); return; }   /* دورِ ۲۸ (F6، B28·D7 dB1 p11): گزینهٔ «همان روز» ِ پرسشی که روزش گذشته ثبت نمی‌شود (۲ آذر در ۶ آذر) */
           if (od && R.neg.indexOf(od) < 0) { it.date = od; it.amb = false; delete it.opts; var l1 = bookItem26(s0, P0, it); if (l1) done.push(l1); said = true; }
@@ -57287,7 +57314,9 @@ APP.goFromURL = function (q) {
     var mm = /متنِ درستِ پیامم: «([\s\S]*)»\s*$/.exec(String(t)); if (!mm) return null; var nt = mm[1], pairs = [], re = /«([^«»]*)» ⇐ «([^«»]*)»/g, g;
     while ((g = re.exec(String(t).slice(0, mm.index)))) pairs.push([g[1], g[2]]);
     var em = userMsgs(s0).filter(function (u) { return !/^\s*\[/.test(String(u.text || "")) && nrm26(u.text) === nrm26(nt); }).slice(-1)[0] || null;
-    return { text: nt, at: em ? String(em.at || "") : "", apply: function (x) { var y = String(x || ""); pairs.forEach(function (p) { if (p[0] && y.indexOf(p[0]) >= 0) y = y.split(p[0]).join(p[1]); }); return y; } };
+    return { text: nt, at: em ? String(em.at || "") : "", apply: function (x) { var y = String(x || ""); pairs.forEach(function (p) { if (p[0] && y.indexOf(p[0]) >= 0) y = y.split(p[0]).join(p[1]); }); return y; },
+      /* دورِ ۲۸ (C134): متنِ پیشین از متنی که راهِ دیگری (a27) پیش‌تر بازنوشته بود — تا «فقط چه عوض شد» دیده شود */
+      unapply: function (x) { var y = String(x || ""); pairs.slice().reverse().forEach(function (p) { if (p[1] && y.indexOf(p[1]) >= 0) y = y.split(p[1]).join(p[0]); }); return y; } };
   }
   PR.editOf27 = editOf27;
   /* برنامهٔ ثبت‌شدهٔ همین گفت‌وگو که روزش را حالا نفی کرد ⇒ ثبت کنار (q.whenHist)، روزِ تازه (اگر یکی است) یک بار پرسیده می‌شود؛ بی روزِ تازه ⇒ «کدام روز؟» (C71) */
@@ -57330,10 +57359,21 @@ APP.goFromURL = function (q) {
       var d0 = A.epiRevDate(J.y + "-" + (JM26.split("|").indexOf(m[2]) + 1) + "-" + (+m[1])); return d0 && d0 < base ? d0 : ""; } catch (e) { return ""; }
   }
   PR.pastDay28 = pastDay28;
+  /* دورِ ۲۸ (C134): دو متن روزِ یکسانی می‌گویند؟ (هر دو با یک پایه؛ هیچ‌کدام روزی نگوید هم «یکسان» است) */
+  function sameDay134(a, b, base) { var r = function (t) { var I = null; try { I = PR.whenInfo(String(t || ""), base); } catch (e) { } return I && I.date ? [I.date, !!I.amb, !!I.free, (I.opts || []).join(",")].join("|") : ""; };
+    var x = nrm26(String(a || "")), y = nrm26(String(b || "")), pa = /(?:^| )(دیروز|پریروز)(?![آ-ی])/.exec(x), pb = /(?:^| )(دیروز|پریروز)(?![آ-ی])/.exec(y);
+    if ((pa ? pa[1] : "") !== (pb ? pb[1] : "")) return false; return r(a) === r(b); }
+  PR.sameDay134 = sameDay134;
   function rebook27(s0, x, o) {
     if (!s0 || !x || !o) return null; var td = today(), isPl = o.kind === "plan";
     if (isPl ? (!/^\d{4}-\d\d-\d\d$/.test(String(x.when || "")) || x.done || (x.state && x.state !== "open")) : (x.done || !x.date)) return null;
     var cur = isPl ? x.when : x.date, I = null;
+    /* دورِ ۲۸ (C134): اصلاحی که فقط «چه» را عوض می‌کند هرگز روز را جابه‌جا نمی‌کند — حتی وقتی جملهٔ اصلاح‌شده نامِ روزی دارد («باید سه‌شنبه طرحش ⇐ بودجه‌ش …»).
+       وقتی فراخوان روزِ تازه را نداده و روز فقط از بازخوانیِ متنِ تازه درمی‌آید، متنِ پیشین و تازه با یک پایه خوانده می‌شوند؛ خوانشِ یکسان ⇒ روز دست نمی‌خورد
+       (پیش‌تر متنِ تازه از نو خوانده می‌شد و در خودِ روزِ نام‌برده دوپهلو یا «گذشته» درمی‌آمد ⇒ ثبت کنار می‌رفت و دوباره پرسیده می‌شد) */
+    if (!(o.date && /^\d{4}-\d\d-\d\d$/.test(String(o.date))) && o.src != null) {
+      var oS134 = o.old != null ? String(o.old) : String((isPl ? x.text : (x.quote || x.what)) || ""), b134 = o.base && o.base <= td ? o.base : td;
+      if (oS134 && nrm26(oS134) !== nrm26(String(o.src)) && sameDay134(oS134, String(o.src), b134)) return null; }
     if (o.date && /^\d{4}-\d\d-\d\d$/.test(String(o.date))) I = { date: o.date };
     else { try { I = PR.whenInfo(String(o.src || ""), o.base && o.base <= td ? o.base : td); } catch (e) { I = null; } }
     /* دورِ ۲۸ (dates، C93؛ D28-27 tD2 p20، B28·D14 dB1 p15، D28-28 tD2 p21، A28-2 s01 p27، C28-10 aC3 p28): نوبتِ ✏️ ِ خودش — روزِ نسبیِ جملهٔ اصلاح‌شده از روزی
@@ -57378,9 +57418,9 @@ APP.goFromURL = function (q) {
   function editBooked27(s0, ed, at) {
     var out = []; if (!ed || !ed.at) return out; var td = today(), b0 = (A.localDay ? A.localDay(ed.at) : "") || td, base = b0 <= td ? b0 : td, why = "✏️ ِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد";
     (s0.plans || []).forEach(function (q) { if (!q || String(q.at || "") !== String(ed.at)) return;
-      var r = rebook27(s0, q, { kind: "plan", src: ed.apply(q.text), base: q.d && q.d <= td ? q.d : base, at: at, why: why, by: "edit" }); if (r && r.it) out.push(r.it); });
+      var r = rebook27(s0, q, { kind: "plan", src: ed.apply(q.text), old: ed.unapply ? ed.unapply(q.text) : undefined, base: q.d && q.d <= td ? q.d : base, at: at, why: why, by: "edit" }); if (r && r.it) out.push(r.it); });
     S.all("deadline", function (r) { return r && !r.done && /^her/.test(String(r.by || "")) && r.src && String(r.src.at || "") === String(ed.at); }).forEach(function (r) {
-      var z = rebook27(s0, r, { kind: "deadline", src: ed.apply(r.quote || r.what), base: base, at: at, why: why, by: "edit" }); if (z && z.it) out.push(z.it); });
+      var z = rebook27(s0, r, { kind: "deadline", src: ed.apply(r.quote || r.what), old: ed.unapply ? ed.unapply(r.quote || r.what) : undefined, base: base, at: at, why: why, by: "edit" }); if (z && z.it) out.push(z.it); });
     return out;
   }
   PR.editBooked27 = editBooked27;
