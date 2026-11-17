@@ -46,7 +46,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     ['bank #283', 'فردا ساعت ۹ یادم بنداز به بانک زنگ بزنم', null],
     ['bank #288', 'چرا کارت‌های Anki رو زود فراموش می‌کنم؟', null],
     ['no-ezafe', 'سامانه آبیاری قطره‌ای بهتره یا بارانی؟', null],
-    ['trip map', 'نقشهٔ مسیرِ سفر به شیراز رو نشونم میدی؟', null]];
+    ['trip map', 'نقشهٔ مسیرِ سفر به شیراز رو نشونم میدی؟', null],
+    ['bank R26 #245', 'چطور از همین صفحه برای کنکورم برنامه بریزم؟', null]];
   const RN = await ev((L) => L.map(([k, t, st]) => ({ k, sq: APP.ASSIST.sysQ28(t.split(/(?<=[؟?])/).pop().trim() || t), only: APP.ASSIST.onlySysQ28(t), st: APP.ASSIST.statesProblem(t), want: st })), NEG);
   RN.forEach(x => chk(!x.only && !x.sq && (x.want !== true || x.st), 'F13 negative look-alike stays hers :: ' + JSON.stringify(x)));
   /* C27-6: بازگشت با وصف به مسئلهٔ بسته (بانک #266 بی پرسش؛ pC2 p13 با وصف) */
