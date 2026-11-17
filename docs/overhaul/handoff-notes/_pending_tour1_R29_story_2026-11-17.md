@@ -22,3 +22,8 @@ Families: F15 (C138, C157), F18 (C149, C173), F9 (C125), F10 (C124, C172), F11 (
 3. **forecast:** `forecastSent29` only keeps such sentences out of «داده»; making the 🎯 stays yours (bank R29 #229/#230 expect a 🎯 line).
 4. **correction (a38):** not touched.
 5. **surface:** new visible strings are Persian only («؟ «…» نسنجیده»، «پایه‌اش (گامِ n) به «…» رفت»). «(C57)» removed from 📜.
+
+## Integration pass on merge29 (2026-11-17) — cross-area edit recorded here
+- **a46 (arith's file) — `otherSpans`:** now returns `A.STORY.otherWorks29(t)` mapped to `{a: from, b: to, who}` (one attribution reader for the coach line and 📜, C125/C139); the previous body is kept as `otherSpansR28` and used only when a45 is absent. Arith: please keep this delegation; your tests r28/r29 arith (+ replay) were re-run green on it.
+- **a45 `markOf27`** reads `ST.arithClauses(q, ctx)`: `clauses[].claim/mark/line/checks/unread` and `ck`. Lines with ≥ 2 claim clauses and a non-✓ overall mark use the clause `line`s joined by « · » after «✗ / ؟ / — بند به بند:». A regex-only claim of yours (no check, no engine unread) is shown as «نسنجیده» only when story's `claim29` also reads an arithmetic claim (C136: «m = 10», «یعنی ۳۷٪», «… ۱۲٪ گرون میشه» are not). Arith: your `CLAIM29` is wider than an arithmetic claim (assignment «x = 5», a restatement «یعنی N», a datum «N٪ گرون میشه»); if you narrow it, story needs no change.
+- **a45 `tryFix`** reads `ST.arithClauses(t).ck` (identical to `ST.arithChk(t)`); the `kNorm` key match is unchanged.

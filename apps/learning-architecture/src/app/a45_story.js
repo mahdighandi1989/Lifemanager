@@ -317,7 +317,20 @@
   var MARK27 = { d: 1, res: 1, step: 1, other: 1, whole: 1, tried: 1, calc: 1 };
   function markOf27(it, um) {
     if (!it || !MARK27[it.k] || !ST.arithChk || !ST.arithNote || !/[0-9۰-۹]/.test(String(it.t || ""))) return "";
-    try { var ut = String((um && um.text) || it.t), q = String(it.t || "").replace(/…$/, ""), inU = ut.indexOf(q) >= 0, ck = ST.arithChk(q, inU ? ut : q);
+    try { var ut = String((um && um.text) || it.t), q = String(it.t || "").replace(/…$/, ""), inU = ut.indexOf(q) >= 0, ck;
+      /* دورِ ۲۹، گذرِ یکپارچه (C138/C139 — یک خواننده): بندها و حکمِ هر بند از خروجیِ بند‌به‌بندِ موتور (a46 ST.arithClauses)؛ unreadClaims29 فقط برای بندی که موتور
+         ادعا نخواندش «نسنجیده» می‌افزاید. سطری با دو بندِ ادعا یا بیشتر که همه ✓ نیستند بند به بند نوشته می‌شود («✗ بند به بند: ✓ «…» · ✗ «…» — …»)؛ سرِ سطر همان حکمِ کل است. */
+      if (ST.arithClauses) { var AC = ST.arithClauses(q, inU ? ut : undefined) || {}, CL = (AC.clauses || []).map(function (x) { return Object.assign({}, x); });
+        CL.forEach(function (x) { if (!x.claim && !(x.checks || []).length && !(x.unread || []).length && claim29(x.t)) { x.claim = true; x.mark = "unread"; x.line = "؟ نسنجیده: «" + x.t + "»"; }
+          /* C136 (نگاهِ هم‌شکل در دورهای ۲۸/۲۹): «ادعا» ای که فقط از الگوی واژه آمده (نه سنجش و نه نسنجیدهٔ موتور) و ادعای حساب نیست — «m = 10»، «d = 5»، «یعنی ۳۷٪»،
+             «فروشنده گفت ۱۲٪ گرون میشه» — سطرِ ✓ ِ دونده را «؟» نمی‌کند؛ فقط بندی که claim29 هم ادعای حساب می‌خواند «نسنجیده» می‌ماند */
+          else if (x.claim && x.mark === "unread" && !(x.checks || []).length && !(x.unread || []).length && !claim29(x.t)) x.claim = false; });
+        var cl = CL.filter(function (x) { return x.claim; }), hasM = function (k) { return cl.some(function (x) { return x.mark === k; }); };
+        var mk29 = hasM("bad") ? "bad" : hasM("ask") ? "ask" : hasM("unread") ? (hasM("ok") ? "part" : "unread") : cl.length ? "ok" : "";
+        if (cl.length >= 2 && mk29 !== "ok") return "حسابِ صفحه: " + (mk29 === "bad" ? "✗ " : mk29 === "unread" ? "— " : "؟ ") + "بند به بند: " + cl.map(function (x) { return x.line; }).join(" · ");
+        ck = AC.ck || ST.arithChk(q, inU ? ut : q);
+        if (cl.length === 1 && mk29 === "unread" && !ck.length && !(ck.unread || []).length) return "حسابِ صفحه: — حسابِ «" + fa(cl[0].t) + "» را صفحه نسنجیده"; }
+      else ck = ST.arithChk(q, inU ? ut : q);
       /* دورِ ۲۹ (story R6، C138؛ S1 A29-1): نشان فقط بندهایی را می‌پوشاند که موتور خواند — بندی با ادعای عددی که موتور نخواند «؟ نسنجیده» می‌گیرد و سطر هرگز ✓ ِ کل نمی‌شود */
       var U29 = unreadClaims29(q, inU ? ut.indexOf(q) : 0, ck);
       if (!ck.length && !(ck.unread || []).length && !U29.length) return "";
@@ -890,7 +903,9 @@
   /* دورِ ۲۹ (C163): برچسبِ تأییدِ پایانِ اصلاحِ خودش («… میشه ۳ میلیون و ۲۵۰، درسته؟») پرسشِ تازه نیست — اصلاح مثلِ هر اصلاح سنجیده می‌شود و حکمش جوابِ همان برچسب است */
   var TAG163 = /[0-9۰-۹][^.!؟?\n]{0,40}[،,]?\s*(?:درسته|درست\s*(?:است|ه)|درسته\s*دیگه|دیگه|نه|آره|مگه\s*نه)\s*[؟?]+$/;
   function tryFix(x, t, at, by, v, soft) {
-    var E0 = ST.arithChk(t), bad = E0.filter(function (c) { return c.ok === false; }), sure = E0.filter(function (c) { return c.ok === true; }), nc = false, ok;
+    /* گذرِ یکپارچهٔ دورِ ۲۹ (C139، یک خواننده): حکمِ متنِ تازه از همان خروجیِ بند‌به‌بندِ موتور (a46 ST.arithClauses().ck — همان ST.arithChk(t))؛ کلیدِ kNorm همان می‌ماند */
+    var AC29 = null; try { AC29 = ST.arithClauses ? ST.arithClauses(t) : null; } catch (e) { AC29 = null; }
+    var E0 = (AC29 && AC29.ck) || ST.arithChk(t), bad = E0.filter(function (c) { return c.ok === false; }), sure = E0.filter(function (c) { return c.ok === true; }), nc = false, ok;
     if (bad.length) ok = false;
     else if (sure.length) ok = true;
     else { ok = true; if (calcs(t).some(function (c) { return !c.ok; })) nc = true; }   // موتور چیزی نخواند: خوانشِ سبک رد نمی‌کند، فقط «نسنجیده»
