@@ -349,3 +349,4 @@
 - 2026-11-17: story integration merged into merge29 (0738105b, 161/158). Waiting: correction, dates (next 162/159, 163/160), surface 1015b #12 fix.
 - 2026-11-17: surface 1015b #12 fix merged (d7a29d38); tests running. Waiting: correction, dates.
 - 2026-11-17: correction merged into merge29 (60968ff7, 162/159); tests running. Waiting: dates only (→ 163/160). Then two-part gate on merge29.
+- 2026-11-17: container restarted. Dates fixer's commits safe (e594dc31, clean worktree); its suite was cut → resumed it to finish the suite and hand back. Pre-gate (node suite, 2 halves via `gate_node_part.sh`) running on merge29 60968ff7 in `gatewt` to catch cross-fixer breaks early; real gate re-runs after dates merges.
