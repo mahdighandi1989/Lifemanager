@@ -340,3 +340,4 @@
 - **پوششِ کاملِ سامانه در دستهٔ ۲ (نقشهٔ راه §۸):** دستهٔ ۱ تقریباً فقط از «مسئلهٔ حل‌نشدهٔ خودم» و دستیار گذشت (۵۱ رفتن به صفحهٔ مسئله، ۰ به گره/کارنامه/معرفت‌شناسی). دستهٔ ۲: ماتریسِ پوشش از `VIEW_META` و گراف؛ کارخانهٔ معرفت‌شناسی؛ شبیه‌ساز و مسئلهٔ هم‌ریخت با تمرینِ چندروزه؛ تصویرِ پیش/پس ِ نقشه‌ها و کارنامهٔ ذهن برای هر سناریو در تصویرنامه.
 
 - 2026-11-17: story fixer done (head 9c493c51, 51/51 + replay 18/18; docs renumber at merge). Report `reports/fix29/story.md`. Waiting: arith, prior, correction, forecast, dates, surface. Merge order unchanged (arith first).
+- 2026-11-17: arith fixer done (head 4476d561, bank 59/59, replay A–D, suite 178/178). Report `reports/fix29/arith.md`. merge29 (in scratch merge27) = BASE29 + arith (fast-forward). Trial merge of story on top: no source conflicts; tests running. Waiting: prior, correction, forecast, dates, surface.
