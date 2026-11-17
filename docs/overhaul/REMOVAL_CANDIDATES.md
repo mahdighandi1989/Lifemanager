@@ -492,3 +492,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   می‌گیرم» (B28·D14 dB1 p2), and «زنگ زدم» did not close a booked plan (A27-19).
 - **Status:** reachable, not called. Delete only with the owner's approval.
 
+## 2026-11-17 — Tour 1 round 28, fixer «C134»: old weekday readers in `retractApply` kept as `AS.R28_QUARANTINE.dlDay19b` / `.planDay19b`
+- **What:** in `apps/learning-architecture/src/app/a27_tour.js` the deadline and plan branches of `retractApply` read the corrected day with
+  `planDate18(<weekday word>)` (the first such day after today). They now call `newDay134`; the old readers stay as `AS.R28_QUARANTINE.dlDay19b`
+  and `AS.R28_QUARANTINE.planDay19b`.
+- **Why replaced:** DECISIONS_R28 C134 — «مهلت سه‌شنبه نیست، چهارشنبه است» on a Tuesday moved next week's Tuesday deadline to tomorrow; the
+  replacing weekday belongs to the week of the replaced date, and a what-only correction never moves the date.
+- **Status:** reachable, not called. Delete only with the owner's approval.
