@@ -1,0 +1,302 @@
+{
+"from": "round29A/pA2",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام. کفش‌فروشی دارم. قیمتِ خریدِ هر جفت از تولیدی ۲۵٪ رفته بالا — قبلاً ۷۰۰ هزار می‌خریدم و یک میلیون می‌فروختم. منم قیمتِ فروش رو ۲۵٪ بردم بالا. حالا برای حراجِ آخرِ پاییز می‌خوام ۲۵٪ تخفیف بدم که قیمت برگرده همون یک میلیون. می‌خوام سودِ هر جفت حداقل ۲۰۰ هزار بمونه. این تخفیف خوبه دیگه، نه؟"
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.value='1981-03-05';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()})()"
+},
+{
+"say": "خب ۲۵٪ اضافه کردم، ۲۵٪ هم کم می‌کنم، پس برمی‌گرده همون یک میلیون دیگه. خرید هم شده ۷۰۰ به‌علاوهٔ ۲۵٪ … یعنی ۷۲۵؟ نه… راستش وقتی دو تا درصد پشتِ سرِ هم میاد گیج میشم، کلاً با درصد خنگم. سودم چقدر میشه؟"
+},
+{
+"say": "اول ۱۱۰ میشه. بعد ۱۰٪ ارزون… میشه ۱۰۰ دیگه؟ نه صبر کن، گفتی از مقدارِ تازه: ۱۰٪ِ ۱۱۰ میشه ۱۱، پس ۹۹! برنمی‌گرده به ۱۰۰."
+},
+{
+"say": "اول فروش: یک میلیون و ۲۵۰، ۲۵٪ِ همین میشه ۳۱۲ و نیم، پس با تخفیف ۹۳۷ و نیم — به یک میلیون برنمی‌گرده. خریدِ تازه: ۲۵٪ِ ۷۰۰ میشه ۱۷۵، پس ۸۷۵ هزار. سود فقط ۶۲ و نیم هزاره! برای اینکه سود ۲۰۰ بمونه قیمت باید حداقل ۸۷۵ + ۲۰۰ = یک میلیون و ۷۵ باشه. از یک میلیون و ۲۵۰ یعنی ۱۷۵ هزار تخفیف، که میشه ۱۷۵ تقسیم بر ۱۲۵۰ = ۱۴٪. پس حداکثر ۱۴٪ تخفیف می‌دم."
+},
+{
+"say": "وارسی کردم: ۱۲۵۰ × ۰٫۸۶ = ۱۰۷۵؛ منهای ۸۷۵ میشه ۲۰۰. درست درمیاد. درسم اینه که وقتی دو تا درصد پشتِ سرِ هم میاد، دومی از مقدارِ جدید حساب میشه و همدیگه رو خنثی نمی‌کنن — برای قیمت‌گذاری‌های بعدی یادم می‌مونه. اون سؤالِ «۱۰۰ تومن، ۱۰٪ گرون بعد ۱۰٪ ارزون» از همه بیشتر کمک کرد. این جور حساب‌های مغازه رو دوست دارم."
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+700)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlup4p6tj7');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"prereq\").map(x=>x.title||x.t||x.fa).join(\" | \")"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt4dhek37');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlwge1tso8');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "برای حراجِ بعدی هم نشستم حساب کردم: سه مدل کفش دارم با سودهای ۲۰۰، ۱۵۰ و ۲۵۰ هزار؛ میانگین = (۲۰۰ + ۱۵۰ + ۲۵۰) / ۳ = ۶۰۰ / ۳ = ۲۰۰. سهمِ سه مدل از فروش: ۱ = ۱/۲ + ۱/۳ + ۱/۶. نرخِ سود ۲۰۰ / ۱۰۷۵ = ۰٫۱۹. اگه ۱۵٪ تخفیف بدم: ۱۲۵۰ × ۰٫۸۵ = ۱۰۶۲٫۵ و سود ۱۰۶۲٫۵ − ۸۷۵ = ۱۷۸٫۵."
+},
+{
+"say": "آخ، جابه‌جا نوشته بودم: ۱۰۶۲٫۵ − ۸۷۵ = ۱۸۷٫۵."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pr=APP.STORY.priorFor(s,null)||{};return JSON.stringify({sum:pr.sum,resume:pr.resume,s5:pr.steps&&pr.steps[4]&&{v:pr.steps[4].verdict,q:pr.steps[4].quote,fixed:pr.steps[4].fixed},sys:s.msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,200))})})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltj6d8jhi');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"home\");APP.ASSIST.newSession();return APP.ASSIST.cur().id})()"
+},
+{
+"say": "سلام، یه مسئلهٔ تازه دارم: اجارهٔ مغازه ۲۰٪ رفته بالا و می‌خوام بدونم قیمتِ کفش رو چقدر ببرم بالا. خودم یه گامش رو رفتم: ۴۰ میلیون × ۱٫۲ = ۴۸ میلیون اجارهٔ جدید. از این‌جا به بعدش رو نمی‌دونم."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqqxm8hmly3');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltjr35vag');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqp50jpv9uc');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt2qdw7es');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"fcast\");const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"ثبتِ پیش‌بینی\"))})()"
+},
+{
+"say": "تولیدی گفت اگه ۱۰۰ جفت بخرم ۱۵٪ تخفیف میده. ۱۵٪ِ ۷۰۰ میشه ۱۰۰، پس ۷۰۰ × ۰٫۸۵ = ۵۹۵ هزار هر جفت. امروز ساعت ۱۰:۱۵ هم ۲ + ۲ = ۴ تا مشتری با هم اومدن."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqozfv2qbrf');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltho6td6x');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9ycqde');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"«این تخفیف خوبه» را من درست یا غلط نمی‌خوانم؛ فعلاً حدسِ توست. اگر بخواهی، می‌شود این را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت کرد تا قدم‌به‌قدم جلو برویم. چطور می‌آزمایی‌اش — با کدام حساب یا حالتِ خاص می‌فهمی که با ۲۵٪ تخفیف هم قیمت به یک میلیون برمی‌گردد و هم سودِ ۲۰۰ هزار می‌ماند؟\", \"title\": \"تخفیفِ حراجِ کفش\", \"pinned\": \"قیمتِ حراج با سودِ دست‌کم ۲۰۰ هزار در هر جفت\", \"memory\": \"کفش‌فروش: خرید ۷۰۰ هزار (۲۵٪ گران‌تر شده)، فروش یک میلیون (۲۵٪ بالا برده). می‌خواهد در حراج ۲۵٪ تخفیف بدهد تا به یک میلیون برگردد؛ سودِ دست‌کم ۲۰۰ هزار. حدسش: «این تخفیف خوبه». پرسیدم چطور می‌آزمایدش.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"آزمودنِ حدسِ تخفیف\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"d\", \"c\", \"guess\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"این تخفیف خوبه دیگه\", \"q\": \"چطور می‌آزمایی‌اش — با کدام حساب یا حالتِ خاص می‌فهمی که با ۲۵٪ تخفیف هم قیمت به یک میلیون برمی‌گردد و هم سودِ ۲۰۰ هزار می‌ماند؟\"}}]}",
+"{\"reply\": \"«خنگم» نیست؛ گیرت یک چیزِ مشخص است: «درصدهای پشتِ سرِ هم» — این‌که درصدِ دوم از مقدارِ تازه حساب می‌شود، نه از مقدارِ اول؛ و همین گام لازمش دارد: حسابِ قیمتِ حراج پس از ۲۵٪ بالا رفتن و ۲۵٪ تخفیف. یک وارسیِ کوتاه: چیزی ۱۰۰ تومان است؛ اول ۱۰٪ گران و بعد ۱۰٪ ارزان شود، آخرش چند تومان می‌شود؟\", \"title\": \"تخفیفِ حراجِ کفش\", \"pinned\": \"قیمتِ حراج با سودِ دست‌کم ۲۰۰ هزار در هر جفت\", \"memory\": \"کفش‌فروش (۴۵): خرید ۷۰۰ هزار (۲۵٪ گران‌تر شده)، فروش یک میلیون (۲۵٪ بالا برده)؛ می‌خواهد ۲۵٪ تخفیف بدهد تا به یک میلیون برگردد؛ سودِ دست‌کم ۲۰۰ هزار. گفت «با درصد خنگم» و «دو درصدِ پشتِ سرِ هم گیجم می‌کند» ⇒ پیش‌نیازِ «درصدهای پشتِ سرِ هم» در گامِ حسابِ قیمتِ حراج؛ پرسشِ تشخیصی ۱۰۰ تومان +۱۰٪ −۱۰٪.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"پیش‌نیاز: درصدهای پشتِ سرِ هم\", \"s\": \"now\", \"view\": \"whole\"}, {\"t\": \"قیمتِ حراج با سودِ ۲۰۰ هزار\", \"s\": \"todo\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq\": {\"concept\": \"درصدهای پشتِ سرِ هم (درصدِ دوم از مقدارِ تازه)\", \"step\": \"حسابِ قیمتِ حراج پس از ۲۵٪ افزایش و ۲۵٪ تخفیف\", \"quote\": \"وقتی دو تا درصد پشتِ سرِ هم میاد گیج میشم\", \"q\": \"چیزی ۱۰۰ تومان است؛ اول ۱۰٪ گران و بعد ۱۰٪ ارزان شود، آخرش چند تومان می‌شود؟\", \"topic\": \"درصد\"}}]}",
+"{\"reply\": \"دقیقاً: اول «۱۰۰ دیگه؟» گفتی، بعد خودت دیدی درصدِ دوم از ۱۱۰ است و به ۹۹ رسیدی — همین «درصدهای پشتِ سرِ هم» است. برگردیم به مسئلهٔ اصلی، گامِ «حسابِ قیمتِ حراج پس از ۲۵٪ افزایش و ۲۵٪ تخفیف»؛ تا این‌جا داری: خریدِ ۷۰۰ و فروشِ یک میلیون، هر دو ۲۵٪ بالا رفته. حالا که درصدهای پشتِ سرِ هم را داری، همان گام را چطور برمی‌داری؟\", \"memory\": \"کفش‌فروش (۴۵): خرید ۷۰۰ هزار (۲۵٪ گران‌تر)، فروش یک میلیون (۲۵٪ بالا)، حراج ۲۵٪ تخفیف، سودِ دست‌کم ۲۰۰ هزار. پیش‌نیازِ «درصدهای پشتِ سرِ هم»: تشخیص (۱۰۰ +۱۰٪ −۱۰٪) ⇒ اول «۱۰۰» بعد خودش «۹۹» ⇒ نبود ولی خودش ساخت. برگشت به گامِ حسابِ قیمتِ حراج.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"پیش‌نیاز: درصدهای پشتِ سرِ هم\", \"s\": \"done\", \"view\": \"whole\"}, {\"t\": \"قیمتِ حراج با سودِ ۲۰۰ هزار\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"missing\", \"mastery\": \"yes\", \"quote\": \"نه صبر کن، گفتی از مقدارِ تازه: ۱۰٪ِ ۱۱۰ میشه ۱۱، پس ۹۹!\"}}]}",
+"{\"reply\": \"گام را خودت برداشتی: با درصدِ دوم از مقدارِ تازه، ۲۵٪ تخفیف قیمت را ۹۳۷ و نیم می‌کند و سود ۶۲ و نیم می‌شود؛ و برای سودِ ۲۰۰ به سقفِ ۱۴٪ رسیدی. حالا نتیجه را وارسی کن: با ۱۴٪ تخفیف از یک میلیون و ۲۵۰، سود واقعاً ۲۰۰ هزار می‌ماند؟\", \"memory\": \"کفش‌فروش (۴۵): پس از آموختنِ «درصدهای پشتِ سرِ هم»، خودش حساب کرد: ۲۵٪ تخفیف ⇒ ۹۳۷.۵ و سود ۶۲.۵؛ خریدِ تازه ۸۷۵؛ برای سودِ ۲۰۰ قیمتِ حراج ≥ ۱۰۷۵ ⇒ حداکثر ۱۴٪ تخفیف. پرسیدم وارسی کند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"قیمتِ حراج با سودِ ۲۰۰ هزار\", \"s\": \"done\", \"view\": \"whole\"}, {\"t\": \"وارسی\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"result\"], \"result\": \"پس حداکثر ۱۴٪ تخفیف می‌دم\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"وارسی‌ات درست جا افتاد: $1250\\times0.86=1075$ و سود دقیقاً ۲۰۰ هزار. درسی که گرفتی همان کلیدِ کار بود — درصدِ دوم از مقدارِ تازه — و حراج، درس، وارسی، پرسشِ سودمند و سلیقه‌ات را ثبت می‌کنم.\", \"memory\": \"کفش‌فروش (۴۵): حل شد — حداکثر ۱۴٪ تخفیف (۱۰۷۵ هزار، سود ۲۰۰). پیش‌نیازِ «درصدهای پشتِ سرِ هم» آموخته شد؛ وارسی ۱۲۵۰×۰.۸۶=۱۰۷۵؛ درس، bestQ، سلیقه ثبت.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"وارسی\", \"s\": \"done\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"تخفیفِ حراجِ کفش\", \"statement\": \"قیمتِ خریدِ هر جفت از تولیدی ۲۵٪ رفته بالا — قبلاً ۷۰۰ هزار می‌خریدم و یک میلیون می‌فروختم. منم قیمتِ فروش رو ۲۵٪ بردم بالا. حالا برای حراجِ آخرِ پاییز می‌خوام ۲۵٪ تخفیف بدم که قیمت برگرده همون یک میلیون. می‌خوام سودِ هر جفت حداقل ۲۰۰ هزار بمونه.\", \"kind\": \"find\", \"lesson\": \"وقتی دو تا درصد پشتِ سرِ هم میاد، دومی از مقدارِ جدید حساب میشه و همدیگه رو خنثی نمی‌کنن\", \"check\": \"۱۲۵۰ × ۰٫۸۶ = ۱۰۷۵؛ منهای ۸۷۵ میشه ۲۰۰\", \"bestQ\": \"اون سؤالِ «۱۰۰ تومن، ۱۰٪ گرون بعد ۱۰٪ ارزون»\", \"taste\": \"این جور حساب‌های مغازه رو دوست دارم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"check\"], \"ans\": [\"b1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"learned\": {\"concept\": \"درصدهای پشتِ سرِ هم (درصدِ دوم از مقدارِ تازه)\", \"quote\": \"دومی از مقدارِ جدید حساب میشه\"}, \"taste\": {\"text\": \"این جور حساب‌های مغازه رو دوست دارم\"}}]}",
+"{\"reply\": \"میانگینِ سود (۲۰۰)، سهم‌ها (۱/۲ + ۱/۳ + ۱/۶ = ۱)، نرخِ سود (۰٫۱۹) و قیمت با ۱۵٪ تخفیف (۱۰۶۲٫۵) می‌خوانند. تفریقِ آخر — «۱۰۶۲٫۵ − ۸۷۵ = ۱۷۸٫۵» — نمی‌خواند؛ عدد را نمی‌گویم. خودت دوباره بزنش — کجایش می‌لنگد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"حالا می‌خواند: ۱۰۶۲٫۵ − ۸۷۵ = ۱۸۷٫۵ — لغزش را خودت پیدا کردی (جابه‌جاییِ دو رقم). همهٔ گام‌هایت درست درآمد — گامِ بعدیِ تو چیست، و پیش از برداشتنش فکر می‌کنی چه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"۱۰۶۲٫۵ − ۸۷۵ = ۱۸۷٫۵\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"گامت را خواندم: ۴۰ میلیون × ۱٫۲ = ۴۸ میلیون درست است (صفحه هم سنجید). همهٔ کارِ پیشینت درست است — گامِ بعدیِ خودت چیست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prior\": [{\"step\": \"اجارهٔ تازه\", \"quote\": \"۴۰ میلیون × ۱٫۲ = ۴۸ میلیون\", \"verdict\": \"ok\", \"why\": \"ضرب درست است\", \"dep\": []}]}]}",
+"{\"reply\": \"۷۰۰ × ۰٫۸۵ = ۵۹۵ درست است؛ «۱۵٪ِ ۷۰۰» را یک بار دیگر خودت حساب کن. با این قیمتِ خرید، گامِ بعدیِ خودت برای قیمتِ فروش چیست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}"
+],
+"keys": [
+"سلام. کفش‌فروشی دارم. قیمتِ خریدِ هر جفت از تولیدی ۲۵٪ رفته بالا — قبلاً ۷۰۰ هزار می‌خریدم و یک میلیون می‌فروختم. منم قیمتِ فروش رو ۲۵٪ بردم بالا. حالا برای حراجِ آخرِ پاییز می‌خوام ۲۵٪ تخفیف بدم که قیمت برگرده همون یک میلیون. می‌خوام سودِ ",
+"خب ۲۵٪ اضافه کردم، ۲۵٪ هم کم می‌کنم، پس برمی‌گرده همون یک میلیون دیگه. خرید هم شده ۷۰۰ به‌علاوهٔ ۲۵٪ … یعنی ۷۲۵؟ نه… راستش وقتی دو تا درصد پشتِ سرِ هم میاد گیج میشم، کلاً با درصد خنگم. سودم چقدر میشه؟",
+"اول ۱۱۰ میشه. بعد ۱۰٪ ارزون… میشه ۱۰۰ دیگه؟ نه صبر کن، گفتی از مقدارِ تازه: ۱۰٪ِ ۱۱۰ میشه ۱۱، پس ۹۹! برنمی‌گرده به ۱۰۰.",
+"اول فروش: یک میلیون و ۲۵۰، ۲۵٪ِ همین میشه ۳۱۲ و نیم، پس با تخفیف ۹۳۷ و نیم — به یک میلیون برنمی‌گرده. خریدِ تازه: ۲۵٪ِ ۷۰۰ میشه ۱۷۵، پس ۸۷۵ هزار. سود فقط ۶۲ و نیم هزاره! برای اینکه سود ۲۰۰ بمونه قیمت باید حداقل ۸۷۵ + ۲۰۰ = یک میلیون و ۷۵ با",
+"وارسی کردم: ۱۲۵۰ × ۰٫۸۶ = ۱۰۷۵؛ منهای ۸۷۵ میشه ۲۰۰. درست درمیاد. درسم اینه که وقتی دو تا درصد پشتِ سرِ هم میاد، دومی از مقدارِ جدید حساب میشه و همدیگه رو خنثی نمی‌کنن — برای قیمت‌گذاری‌های بعدی یادم می‌مونه. اون سؤالِ «۱۰۰ تومن، ۱۰٪ گرون بع",
+"برای حراجِ بعدی هم نشستم حساب کردم: سه مدل کفش دارم با سودهای ۲۰۰، ۱۵۰ و ۲۵۰ هزار؛ میانگین = (۲۰۰ + ۱۵۰ + ۲۵۰) / ۳ = ۶۰۰ / ۳ = ۲۰۰. سهمِ سه مدل از فروش: ۱ = ۱/۲ + ۱/۳ + ۱/۶. نرخِ سود ۲۰۰ / ۱۰۷۵ = ۰٫۱۹. اگه ۱۵٪ تخفیف بدم: ۱۲۵۰ × ۰٫۸۵ = ۱۰۶۲٫",
+"آخ، جابه‌جا نوشته بودم: ۱۰۶۲٫۵ − ۸۷۵ = ۱۸۷٫۵.",
+"سلام، یه مسئلهٔ تازه دارم: اجارهٔ مغازه ۲۰٪ رفته بالا و می‌خوام بدونم قیمتِ کفش رو چقدر ببرم بالا. خودم یه گامش رو رفتم: ۴۰ میلیون × ۱٫۲ = ۴۸ میلیون اجارهٔ جدید. از این‌جا به بعدش رو نمی‌دونم.",
+"تولیدی گفت اگه ۱۰۰ جفت بخرم ۱۵٪ تخفیف میده. ۱۵٪ِ ۷۰۰ میشه ۱۰۰، پس ۷۰۰ × ۰٫۸۵ = ۵۹۵ هزار هر جفت. امروز ساعت ۱۰:۱۵ هم ۲ + ۲ = ۴ تا مشتری با هم اومدن."
+]
+}

@@ -1,0 +1,533 @@
+{
+"from": "round29A/oA1",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام. یه مسئله‌ست که از دیشب ذهنمو درگیر کرده: تو یه مهمونیِ ۱۰ نفره هر کس با هر کس دقیقاً یه بار دست داده. چند تا دست‌دادن شده؟ و اگه n نفر باشن چی؟ حدسِ اولم ۱۰۰ بود ولی حس می‌کنم غلطه."
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.value='1982-03-21';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()})()"
+},
+{
+"say": "یعنی می‌خوایم بشمریم چند تا «جفت آدم» هست، چون هر جفت یه بار دست می‌دن. راستی من ۴۴ سالمه، اون کارتِ تاریخِ تولد رو هم پر کردم — این سن به چه دردِ این صفحه می‌خوره؟"
+},
+{
+"say": "با ۳ نفر: الف‌ب، الف‌ج، ب‌ج — ۳ تا. راهِ من (۱۰ × ۱۰) برای ۳ نفر می‌شه ۹. پس دو جا اشتباه کردم: هر کس با خودش دست نمی‌ده، پس ۳ × ۲ = ۶؛ و هر دست‌دادن رو دو بار شمردم، پس ۶ ÷ ۲ = ۳. برای ۱۰ نفر: ۱۰ × ۹ ÷ ۲ = ۴۵."
+},
+{
+"say": "برای n نفر: n(n−1)/2. ولی بذار یه لحظه یه چیزِ دیگه بپرسم که الان مهم‌تره: یه پیشنهادِ کار از یه شرکتِ دیگه دارم، حقوقش ۳۰٪ بیشتره ولی باید از تیمی که خودم ساختم جدا شم. تا پنج‌شنبه باید جواب بدم. اینو هم می‌شه همین‌جا با همین روش فکر کرد؟"
+},
+{
+"say": "ثبتش کن. در یک جمله: بین «بمونم و تیمی که ساختم رو به جایی برسونم» و «برم با حقوقِ ۳۰٪ بیشتر و یه محیطِ تازه» انتخاب می‌کنم."
+},
+{
+"say": "یعنی محصولی که ساختیم به ۱۰ هزار کاربرِ فعال برسه و یکی از بچه‌ها بتونه جای من رو بگیره. راستی یه چیزی: اون مهمونی ۱۲ نفره بود، نه ۱۰. هر جا ۱۰ نوشتی درستش کن."
+},
+{
+"say": "مهم‌ترین داده: الان ۶ هزار کاربرِ فعال داریم و ماهی حدودِ ۵٪ رشد می‌کنیم. قبلش بگو: اون اصلاحِ ۱۲ نفر واقعاً همه جا نشست؟ اون ۴۵ چی شد، و خواستهٔ سنجاق‌شدهٔ سشن که هنوز ۱۰ نوشته؟"
+},
+{
+"say": "از ۸ ماهِ گذشته، تقریباً ثابت. یه سؤال: کجا می‌تونم همهٔ قدم‌هایی که تو این دو تا مسئله برداشتم — حدسا، اصلاحا، تصمیما — رو یه جا ببینم؟"
+},
+{
+"eval": "document.getElementById('main').innerText.slice(0,2500)"
+},
+{
+"eval": "(()=>{APP.go('dossier',APP.S.all('achat',x=>x&&x.msgs&&x.msgs.length)[0].id);const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'),t.indexOf('📜')+3500)})()"
+},
+{
+"say": "موعد واقعیه، تمدید نمی‌شه. حالا نقشهٔ مسیرم رو نشون بده — می‌خوام ببینم تو این تصمیم کجام و چقدر مونده."
+},
+{
+"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return APP.state.view+\" \"+APP.state.arg+\"\\n\"+t.slice(i,i+1100)})()"
+},
+{
+"eval": "(()=>{const t=document.getElementById('main').innerText;const i=t.indexOf('🧭 نقشهٔ مسیرِ مسئله');return t.slice(i,i+1500)})()"
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[0];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');t&&t.scrollIntoView({block:'center'});return g.length+' pts | '+x.getAttribute('aria-label')+' || TIP: '+(t?t.innerText:'')})()"
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[1];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');t&&t.scrollIntoView({block:'center'});return g.length+' pts | '+x.getAttribute('aria-label')+' || TIP: '+(t?t.innerText:'')})()"
+},
+{
+"eval": "(()=>{const v=APP.state.view;return v+\" \"+APP.state.arg})()"
+},
+{
+"say": "یه نکته: تو نقشهٔ این تصمیم، حدسِ ۱۰۰ و اصلاحِ ۱۲ نفرِ مهمونی هم اومده — اونا که مالِ این نیستن! دربارهٔ کافی بودن: نه، نمی‌دونم شرکتِ جدید چقدر ثبات داره. یه چیزِ دیگه: کارنامهٔ ذهنم تا الان دربارهٔ من چی می‌گه و هر عددش از کجا اومده؟"
+},
+{
+"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"چهار مرحله\");const j=t.indexOf(\"سن:\");return APP.state.view+\"\\n\"+t.slice(Math.max(0,i),i+900)+\"\\n---\\n\"+t.slice(j,j+200)})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{document.querySelectorAll('details').forEach(d=>{d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('📐');return t.slice(i,i+1500)+'\\n=====\\n'+t.slice(t.indexOf('در یک نگاه'),t.indexOf('در یک نگاه')+1800)+'\\n====\\n'+t.slice(t.indexOf('🧩 چهار مرحلهٔ حل'),t.indexOf('🧩 چهار مرحلهٔ حل')+1200)})()"
+},
+{
+"say": "دربارهٔ ثبات: می‌تونم با دو نفر که اون‌جا کار می‌کنن حرف بزنم و گزارشِ مالیِ سالانه‌شون هم عمومیه. دو تا سؤالِ فنی هم دارم: اگه مدلِ هوشِ مصنوعیِ پشتِ تو عوض بشه یا یه مدلِ ضعیف‌تر بیاد، این روش و این کارنامه هنوز درست کار می‌کنه؟ و اگه اینترنتم قطع بشه، چیزی از دستم می‌ره؟ یه چیزِ دیگه هم: اگه یه جا جوابِ بدی ازت گرفتم، از کجا بفهمم تقصیرِ مدلِ ضعیفِ پشتِ توئه یا خودِ روش؟ اصلاً اینو اندازه گرفتین؟"
+},
+{
+"say": "پیش‌بینیم: گزارشِ مالیشون باثباته، حدودِ ۷۰٪ مطمئنم. تا یکشنبه با اون دو نفر حرف می‌زنم و گزارش رو می‌خونم، بعد برمی‌گردم."
+},
+{
+"clock": "2026-10-18T19:00:00"
+},
+{
+"eval": "APP.today()"
+},
+{
+"eval": "(()=>{APP.go('today');return document.getElementById('main').innerText.slice(0,2500)})()"
+},
+{
+"clock": "2026-10-18"
+},
+{
+"eval": "APP.today()"
+},
+{
+"eval": "(()=>{APP.go('today');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('کارهای موعددار'),t.indexOf('کارهای موعددار')+900)})()"
+},
+{
+"say": "برگشتم. با هر دو نفر حرف زدم و گزارش رو خوندم: دو فصلِ آخر زیان دادن و یکیشون گفت تیمش نصف شده. پس پیش‌بینیم غلط بود."
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.step||\"\"]),pend:(APP.S.get(\"pre22\")||{}).sysPend||null})"
+},
+{
+"eval": "JSON.stringify(APP.S.all('eprob',r=>r&&r.live).map(r=>({id:r.p&&r.p.id,g:(r.guesses||r.p&&r.p.guesses||[]).map(x=>[x.id,x.text,x.res||x.status])})))"
+},
+{
+"eval": "JSON.stringify(Object.keys(APP.S.all('eprob',r=>r&&r.live)[0]||{}))"
+},
+{
+"say": "گزینهٔ رفتن ضعیف شد: ۳۰٪ حقوقِ بیشتر تو شرکتی که داره کوچیک می‌شه ارزشِ ریسک نداره. فعلاً می‌مونم، ولی پنج‌شنبه رسماً جواب می‌دم. حالا برگردیم به دست‌دادن‌ها: برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶."
+},
+{
+"say": "آره: نفرِ دوم ۱ دست، سومی ۲، ... دوازدهمی ۱۱ — جمعش ۱ + ۲ + … + ۱۱ = ۶۶. همون شد. درسِ من: وقتی حدسِ بزرگ می‌زنم، اول با یه حالتِ کوچیک مثلِ ۳ نفر امتحانش کنم. بیشتر از همه همون سؤالِ «اگه فقط ۳ نفر بودن؟» کمک کرد. این جور مسئله‌های شمردنی رو دوست دارم."
+},
+{
+"eval": "JSON.stringify({last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-2).map(m=>(m.text||\"\").slice(0,330)),pr:APP.S.all(\"eprob\",r=>r&&r.p).map(r=>[r.p.id,(r.p.title||\"\").slice(0,30),r.status,r.live?1:0]),due:(APP.dueList()||[]).map(x=>x.txt.slice(0,110))})"
+},
+{
+"say": "یه مسئلهٔ سومِ کوتاه هم دارم: برای تیم یه جلسهٔ هفتگیِ ۴۵ دقیقه‌ای می‌خوام که ۶ نفر هر کدوم ۵ دقیقه گزارش بدن و بقیه‌ش بحث باشه. حساب کردم: ۶ × ۵ = ۳۰، پس ۴۵ − ۳۰ = ۲۵ دقیقه بحث می‌مونه."
+},
+{
+"eval": "JSON.stringify([\"برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶.\",\"جمعش ۱ + ۲ + … + ۱۱ = ۶۶. همون شد.\",\"۱۲ × ۱۱ ÷ ۲ = ۶۶\"].map(t=>{try{return APP.STORY.arithChk(t)}catch(e){return \"ERR \"+e}}))"
+},
+{
+"eval": "JSON.stringify([\"برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶.\",\"جمعش ۱ + ۲ + … + ۱۱ = ۶۶. همون شد.\",\"حالا برگردیم به دست‌دادن‌ها: برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶.\"].map(t=>{try{const r=APP.STORY.arithChk(t);return (r||[]).map(x=>[x.ok,x.expr||x.raw||\"\",x.val||\"\"])}catch(e){return \"ERR \"+e}}))"
+},
+{
+"say": "آخ، ۴۵ − ۳۰ = ۱۵. پس فقط ۱۵ دقیقه بحث می‌مونه؛ همین کافیه، این یکی حل شد. حالا برگردیم به همون تصمیمِ موندن یا رفتن: الان کجاش بودیم؟"
+},
+{
+"say": "یه چیزِ دیگه که برام مهمه: می‌خوام این عادت رو که «قبل از هر تصمیم پیش‌بینی با درصد بنویسم و بعد بسنجم» واقعاً جا بندازم. اگه چند هفته طول بکشه، این‌جا یه پرونده براش باز می‌مونه تا وقتی واقعاً تثبیت بشه؟ با زمانِ واقعی جلو می‌ره یا فقط یه یادداشته؟ اگه هست، برام بازش کن."
+},
+{
+"eval": "(()=>{const c=(APP.PR&&APP.PR.all?APP.PR.all():[]);return JSON.stringify(c.map(x=>({id:x.id,tid:x.tid,topic:x.topic||x.title,st:x.state||x.st,next:x.next||x.due})))})()"
+},
+{
+"eval": "(()=>{const c=(APP.PR&&APP.PR.all?APP.PR.all():[]);return JSON.stringify(c.map(x=>({id:x.id,tid:x.tid,t:(x.topic||x.title||\"\").slice(0,60),st:x.state||x.st||x.status})))})()"
+},
+{
+"say": "پیش‌بینیم: تا جمعه مدیرم برای موندنم یه پیشنهادِ ترفیع می‌ده — ۴۰٪ مطمئنم."
+},
+{
+"clock": "2026-10-23"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+DUE()})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return JSON.stringify({d:APP.today(),due:(APP.dueList()||[]).map(x=>(x.txt+\" | \"+(x.sub||\"\")).slice(0,200)),last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-3).map(m=>(m.text||\"\").slice(0,300))})})()"
+},
+{
+"say": "جمعه شد: دیروز مدیرم پیشنهادِ ترفیع داد. پس اون پیش‌بینیِ ۴۰ درصدیم درست درومد — هرچند فکر می‌کردم بعیده."
+},
+{
+"eval": "(()=>{return JSON.stringify({due:(APP.dueList()||[]).map(x=>(x.txt+\" | \"+(x.sub||\"\")).slice(0,170)),pr:APP.PR.all().map(x=>[x.tid,x.st,x.next,(x.log||x.sessions||[]).length])})})()"
+},
+{
+"say": "فاصله‌ش این بود که مدیرم رو دستِ کم گرفته بودم. پنج‌شنبه هم رسماً جواب دادم که می‌مونم. تا جمعه با اون همکارم که قراره جانشینم بشه حرف می‌زنم."
+},
+{
+"say": "باشه"
+},
+{
+"eval": "(()=>{const all=(APP.dueAll?APP.dueAll():[]);return JSON.stringify({due:(APP.dueList()||[]).map(x=>(x.txt+\" | \"+(x.sub||\"\")).slice(0,170)),dl:APP.S.all(\"dl\",x=>x).concat(APP.S.all(\"deadline\",x=>x)).map(x=>[x.what||x.title,x.date,x.done]).slice(0,8)})})()"
+},
+{
+"eval": "(APP.ASSIST.cur().msgs.slice(-1).map(m=>m.text).join(\"\"))+\"\\n---\\n\"+DUE()"
+},
+{
+"say": "یه سؤالِ دیگه: پسرم ۱۲ سالشه و گاهی با همین مرورگر از این برنامه استفاده می‌کنه. تاریخِ تولد و کارنامهٔ ذهنِ اون با مالِ من قاطی نمی‌شه؟ تو با اون هم همین‌طوری حرف می‌زنی که با من؟"
+},
+{
+"say": "یه چیزی دربارهٔ همین برگه‌ها: دو تا کمبود ثبت کردی. از کجا بفهمم ساخته شدن؟ خودم باید هی بیام چک کنم یا این‌جا خودش خبر می‌ده و برمی‌گردیم سرش؟"
+},
+{
+"reload": true
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return JSON.stringify({due:(APP.dueList()||[]).map(x=>x.txt.slice(0,120)),last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-2).map(m=>(m.text||\"\").slice(0,260)),sys:APP.PRE.sysAll().length})})()"
+},
+{
+"say": "برگردیم به مسئلهٔ «دست‌دادن‌های مهمانی»: حالا می‌خوام بدونم تو همون مهمونیِ ۱۲ نفره چند تا گروهِ سه‌نفره می‌شه ساخت. شنیدم با «ترکیب» حساب می‌شه ولی ترکیب رو اصلاً بلد نیستم. این یعنی ریاضیم ضعیفه؟"
+},
+{
+"say": "الف‌ب، الف‌ج، الف‌د، ب‌ج، ب‌د، ج‌د — ۶ تا. آها، همون کارِ دست‌دادن‌هاست: ۴ × ۳ ÷ ۲ = ۶. پس برای سه‌نفره‌ها: ۱۲ × ۱۱ × ۱۰ ÷ ۶ = ۲۲۰، چون هر گروهِ سه‌نفره ۶ بار شمرده می‌شه. فکر کنم ترکیب رو فهمیدم."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlht2ld72');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9v9n0l');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltjb9tn32');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlht2ld72');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9v9n0l');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"reload": true
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);const o=[];APP.PRE.sysAll().forEach(x=>o.push(\"SHEET \"+x.e.number+\" \"+x.e.state+\" \"+((x.e.checks||[]).slice(-1).map(c=>c.reason).join(\"\")).slice(0,200)));APP.S.all(\"achat\",x=>x&&x.msgs).forEach(s=>s.msgs.slice(-40).forEach(m=>{if(m.role==\"sys\"&&/برگه|#۱۰۱/.test(m.text))o.push(\"  \"+m.text.slice(0,200))}));(APP.dueList()||[]).forEach(x=>{if(/برگه|ابزار|سنجش/.test(x.txt))o.push(\"DUE \"+x.txt.slice(0,150))});return o.join(\" ¶ \")})()"
+},
+{
+"eval": "JSON.stringify({dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,50),x.date]),pl:APP.S.all(\"achat\",x=>x&&x.plans).flatMap(s=>s.plans.map(p=>[(p.text||\"\").slice(0,40),p.when,p.state])),fc:APP.S.all(\"fcast\",x=>1).map(x=>[(x.q||\"\").slice(0,40),x.p,x.due,x.outcome||null])})"
+},
+{
+"eval": "(()=>{APP.go(\"today\");const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.textContent.trim().slice(0,30));return JSON.stringify([...new Set(b)].slice(0,60))})()"
+},
+{
+"eval": "JSON.stringify({t:APP.today(),due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\").slice(0,90)).filter(t=>/📅/.test(t))})"
+},
+{
+"say": "یه چیزی: تو «امروز» هنوز از من می‌پرسه «پنج‌شنبه رسماً جواب می‌دم — پنجشنبه ۷ آبان — درست است؟» در حالی که من پنجشنبه جواب دادم. اگه صفحه چیزی رو اشتباه ثبت کرده، خودم از کجا برش گردونم؟"
+},
+{
+"eval": "(()=>{APP.go(\"today\");const rows=[...document.querySelectorAll(\"#main *\")].filter(e=>/پنج‌شنبه رسماً جواب می‌دم/.test(e.textContent)&&e.querySelector&&e.querySelector(\"button\"));const r=rows[rows.length-1];if(!r)return \"NOROW\";const b=[...r.querySelectorAll(\"button\")].find(b=>b.textContent.trim()==\"نه\");if(!b)return \"NOBTN \"+r.innerText.slice(0,200);b.click();return \"clicked\"})()"
+},
+{
+"eval": "JSON.stringify((APP.dueList()||[]).map(x=>x.txt.slice(0,80)).filter(t=>/📅/.test(t)))"
+},
+{
+"say": "دو تا سؤال دیگه: کدوم عددِ کارنامه‌م از کدوم جمله‌م اومده؟ و وقتی دو تا پیش‌بینیِ باز دارم، از کجا بفهمم نتیجه‌ای که گفتم روی کدومشون نشست؟"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"از کجا؟\");return t.slice(i,i+500)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlht2ld72');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9v9n0l');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltlhps8kw');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlht2ld72');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9v9n0l');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.today()+\"\\n\"+DUE()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id+\" \"+r.p.title).join(\"\\n\")"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "DOSS('pb_l_mvdlht2ld72')"
+},
+{
+"eval": "DOSS('pb_l_mvaqm9v9n0l')"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvdlht2ld72\");const b=[...document.querySelectorAll(\"#main .lp-dmv\")];return b.length+\" | \"+b.slice(0,40).map((x,i)=>i+\":\"+x.textContent.trim().slice(0,20)+\"@\"+(x.closest(\"li,div,section\")||{}).innerText.replace(/\\n/g,\" \").slice(0,90)).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvdlht2ld72\");const d=APP.dossier(\"pb_l_mvdlht2ld72\");const ev=(d&&(d.ev||d.events||d.items))||[];return \"keys=\"+Object.keys(d||{}).join(\",\")+\" n=\"+ev.length+\" btns=\"+ev.filter(e=>e.btns&&e.btns.length).length+\" dmvDOM=\"+document.querySelectorAll(\".lp-dmv\").length+\" | \"+ev.filter(e=>e.btns&&e.btns.length).slice(0,3).map(e=>e.title+\":\"+e.btns.map(b=>b.label).join(\"/\")).join(\" || \")})()"
+},
+{
+"eval": "(()=>{const out=[];for(const p of [\"pb_l_mvdlht2ld72\",\"pb_l_mvaqm9v9n0l\"]){const d=APP.dossier(p);out.push(p+\" sessions=\"+JSON.stringify((d.sessions||[]).map(s=>s.id||s.sid||s).slice(0,4))+\" kinds=\"+[...new Set(d.events.map(e=>e.k))].join(\",\"))};const ss=APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(s=>s.id+\" lprob=\"+s.lprob+\" log=\"+JSON.stringify((s.lprobLog||[]).map(x=>x.p)));return out.join(\"\\n\")+\"\\n\"+ss.join(\"\\n\")})()"
+},
+{
+"eval": "APP.go(\"dossier\",\"pb_l_mvdlht2ld72\")"
+},
+{
+"say": "بله"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const m=s.msgs;let i=m.length-1;while(i>0&&m[i].role!=\"user\")i--;return m.slice(i+1).filter(x=>x.role==\"sys\").map(x=>\"SYS: \"+x.text).join(\"\\n\")||\"(no sys)\"})()"
+},
+{
+"eval": "DUE()"
+},
+{
+"say": "الان که گفتم «بله»، دقیقاً به کدوم پرسش بله گفتم؟ و پیش‌بینی‌هایی که هنوز بازن کدوما‌ن؟"
+},
+{
+"eval": "APP.go(\"fcast\")"
+},
+{
+"eval": "(()=>{APP.go(\"fcast\");return document.getElementById(\"main\").innerText.slice(0,1500)})()"
+},
+{
+"eval": "(()=>{APP.go(\"fcast\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"باز\");return t.split(\"\\n\").filter(l=>/٪|موعد|شد|نشد|باز/.test(l)).slice(-15).join(\"\\n\")})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvdlht2ld72');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm9v9n0l');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt7me28ud');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvdlht2ld72');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm9v9n0l');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,(r.p.title||r.p.text||\"\").slice(0,50)]))"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvdlht2ld72\");const bs=[...document.querySelectorAll(\".lp-dmv, [class*=mv]\")].filter(b=>/↪/.test(b.textContent));return bs.length+\" | \"+bs.slice(0,40).map((b,i)=>{let p=b.closest(\"div,li,section\");return i+\": \"+(p?p.innerText.replace(/\\s+/g,\" \").slice(0,140):\"\")}).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{const bs=[...document.querySelectorAll(\".lp-dmv, [class*=mv]\")].filter(b=>/↪/.test(b.textContent));const b=bs[22];b.scrollIntoView();b.click();const p=b.closest(\"div,li,section\").parentElement;return b.className+\" | \"+b.textContent+\" || \"+p.innerText.slice(0,900)})()"
+},
+{},
+{
+"eval": "(()=>{const a=[...document.querySelectorAll(\"[aria-live]\")].map(e=>e.textContent.trim()).filter(x=>x).slice(-2).join(\" || \");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جابه‌جا\");return a+\"\\n##\"+(i>=0?t.slice(Math.max(0,i-300),i+300):\"no جابه‌جا\")})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqm9v9n0l\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"۶ هزار کاربرِ فعال\");const u=[...document.querySelectorAll(\"button\")].filter(b=>/↩/.test(b.textContent)&&!/برگرد/.test(b.textContent));return (i>=0?t.slice(Math.max(0,i-200),i+400):\"NOT FOUND\")+\"\\n## undo buttons: \"+u.length+\" \"+u.map(b=>b.textContent).join(\" | \").slice(0,300)})()"
+},
+{},
+{
+"eval": "(()=>{const t=document.getElementById(\"main\").innerText;let out=[];let i=-1;while((i=t.indexOf(\"جابه‌جا\",i+1))>=0&&out.length<4)out.push(t.slice(Math.max(0,i-250),i+250));const u=[...document.querySelectorAll(\"button,a\")].filter(b=>/↩|برگردان/.test(b.textContent)).map(b=>b.textContent.trim().slice(0,60));return out.join(\"\\n----\\n\")+\"\\n## \"+u.join(\" | \")})()"
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll(\"button,a\")].find(b=>/برگرداندنِ این سطر/.test(b.textContent));b.click();return \"clicked\"})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvdlht2ld72\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"۶ هزار کاربرِ فعال\");return t.slice(Math.max(0,i-100),i+600)})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqm9v9n0l\");const t=document.getElementById(\"main\").innerText;let out=[];let i=-1;while((i=t.indexOf(\"🎯\",i+1))>=0&&out.length<3)out.push(t.slice(i,i+330).replace(/\\n+/g,\" ¦ \"));return out.join(\"\\n----\\n\")})()"
+},
+{
+"eval": "(()=>{const bs=[...document.querySelectorAll(\".lp-dmv\")];const b=bs.find(x=>{const p=x.closest(\"div,li,section\");return p&&/اطمینان: ۷۰٪/.test(p.parentElement.innerText.slice(0,0)+(p.previousElementSibling?\"\":\"\"))});let t=null;for(const x of bs){let el=x;for(let k=0;k<4&&el;k++){el=el.parentElement;if(el&&/🎯 پیش‌بینی/.test(el.innerText)&&el.innerText.length<1200){t=x;break}}if(t)break}if(!t)return \"no 🎯 btn\";t.click();return \"clicked: \"+t.textContent})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvdlht2ld72\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"گزارشِ مالیشون باثباته\");return i>=0?t.slice(Math.max(0,i-150),i+500):\"not in handshakes\"})()"
+},
+{
+"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"۰۹:۰۱ · 🎯 پیش‌بینی\");return t.slice(i,i+600)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"fcast\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"گزارشِ مالیشون\");return t.slice(i,i+250)})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvdlht2ld72\");const b=[...document.querySelectorAll(\"button,a\")].find(b=>/برگرداندنِ این سطر/.test(b.textContent));if(!b)return \"none\";b.click();return \"undone\"})()"
+},
+{
+"say": "یه مسئلهٔ جدا: می‌خوام جلسهٔ هفتگیِ ۴۵ دقیقه‌ای تیم رو کوتاه کنم. خودم سه گام رفتم: گام ۱: ۴ نفر هر کدوم ۱۰ دقیقه گزارش، ۴ × ۱۰ = ۴۰ دقیقه. گام ۲: پس ۴۵ − ۴۰ = ۵ دقیقه برای بحث می‌مونه. گام ۳: اگه هر گزارش ۷ دقیقه بشه، ۴ × ۷ = ۲۸ و ۴۵ − ۲۸ = ۱۸ دقیقه بحث."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"dossier\",s);const t=document.getElementById(\"main\").innerText;const i=t.lastIndexOf(\"کارِ پیشینِ تو\");const bs=[...document.querySelectorAll(\".lp-dmv\")].filter(b=>{let e=b;for(let k=0;k<4&&e;k++){e=e.parentElement;if(e&&/گامِ ۱ ·/.test(e.innerText)&&/جلسهٔ هفتگی|۴ × ۱۰/.test(e.innerText)&&e.innerText.length<3000)return true}return false});return s+\" | btns=\"+bs.length+\" \"+bs.slice(0,6).map(b=>b.textContent).join(\" ¦ \")+\"\\n\"+t.slice(i,i+900)})()"
+},
+{
+"eval": "(()=>{const ids=APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id);const s=ids[ids.length-1];APP.go(\"dossier\",s);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جلسهٔ هفتگیِ ۴۵\");return ids.join(\",\")+\"\\n\"+t.slice(Math.max(0,i-200),i+1800)})()"
+},
+{
+"eval": "(()=>{const bs=[...document.querySelectorAll(\"button\")].filter(b=>/↪/.test(b.textContent));const out=bs.map((b,i)=>{let e=b.parentElement;let ctx=\"\";for(let k=0;k<3&&e;k++){ctx=e.innerText;if(ctx.length>40)break;e=e.parentElement}return i+\": \"+b.textContent.slice(0,60)+\" ⟸ \"+ctx.replace(/\\s+/g,\" \").slice(0,110)});return bs.length+\"\\n\"+out.join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{const bs=[...document.querySelectorAll(\"button\")].filter(b=>/↪/.test(b.textContent));bs[9].click();const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"وابسته\");const btn=[...document.querySelectorAll(\"button\")].filter(b=>/همه|فقط همین|هیچ/.test(b.textContent)).map(b=>b.textContent.trim());return (i>=0?t.slice(Math.max(0,i-300),i+400):\"no وابسته text\")+\"\\n## \"+btn.join(\" | \").slice(0,300)})()"
+},
+{},
+{
+"eval": "(()=>{const a=[...document.querySelectorAll(\"[aria-live]\")].map(e=>e.textContent.trim()).filter(x=>x).slice(-2).join(\" || \");const d=document.querySelector(\"dialog[open], .modal, .lp-dmvask, [role=dialog]\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"گامِ ۱ ·\");return \"LIVE: \"+a.slice(0,400)+\"\\nDLG: \"+(d?d.innerText.slice(0,500):\"none\")+\"\\nSTEP: \"+(i>=0?t.slice(i,i+500):\"\")})()"
+},
+{
+"say": "سه تا سؤال دربارهٔ خودِ سامانه: اون گامِ ۱ که جابه‌جا کردم، گام‌های ۲ و ۳ که بهش تکیه داشتن چی شدن؟ اگه به پیشنهادی که روی یه عددِ غلط ساخته شده «آره» بگم، گامم با همون غلط بازنویسی میشه؟ و وقتی میگم «فروشنده گفت ۱۲٪ گرون میشه»، این دادهٔ منه یا کارِ یه نفر دیگه؟"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"حدسِ ۱۰۰ را خودت زیرِ سؤال برده‌ای — خوب است که نگهش داشته‌ای تا بیازماییم. کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"guess\": {\"text\": \"حدسِ اولم ۱۰۰ بود\", \"q\": \"کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\"}}]}",
+"{\"reply\": \"مجهول را خودت گفتی: شمارِ «جفت‌های آدم». دربارهٔ سن: صفحه فقط تاریخِ تولد را نگه می‌دارد (نه عددِ سن) و فقط دو جا به کارش می‌آید — شیوهٔ گفتن (برای کودک، نوجوان یا سالمند؛ منطقِ حل همان می‌ماند) و مقایسه با هم‌سن‌ها در «📐 سنجشِ استاندارد»، که اگر هنجارِ معتبری نباشد همین را می‌گوید. اگر فقط ۳ نفر بودند، می‌توانی همین را حل کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"با حالتِ ۳ نفر خودت حدسِ ۱۰۰ را رد کردی و دو خطایش را هم پیدا کردی (با خودش دست نمی‌دهد؛ هر دست‌دادن دو بار شمرده شد). سه حسابی که نوشتی می‌خواند. همین راه برای n نفر چه می‌دهد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}, \"result\": \"برای ۱۰ نفر: ۱۰ × ۹ ÷ ۲ = ۴۵\"}]}",
+"{\"reply\": \"فرمولت را نگه می‌دارم: n(n−1)/2 — وارسی‌اش می‌ماند تا برگردیم. و بله، همین روش برای تصمیم هم هست؛ فقط داورش واقعیت و داوریِ خودِ توست، نه من. می‌خواهی این تصمیم را جدا در «🔭 مسئله‌های من» ثبت کنم تا مسیرش بماند — و اگر آره، کلش را در یک جمله می‌گویی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"result\": \"برای n نفر: n(n−1)/2\"}, {\"do\": \"deadline\", \"what\": \"جواب به پیشنهادِ کار\", \"date\": \"2026-10-22\"}]}",
+"{\"reply\": \"ثبتش می‌کنم، با جملهٔ خودت. به مجهول نگاه کن: «تیم را به جایی برسانم» دقیقاً چه شکلی است — با چه عدد یا نشانه‌ای می‌فهمی رسیده؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}, {\"do\": \"live_new\", \"title\": \"بمانم یا بروم: پیشنهادِ کار با حقوقِ ۳۰٪ بیشتر\", \"statement\": \"بین «بمونم و تیمی که ساختم رو به جایی برسونم» و «برم با حقوقِ ۳۰٪ بیشتر و یه محیطِ تازه» انتخاب می‌کنم.\", \"nat\": \"life\", \"kind\": \"find\"}]}",
+"{\"reply\": \"خواسته‌ات حالا سنجیدنی شد: ۱۰ هزار کاربرِ فعال و جانشینی از میانِ خودِ تیم. اصلاحِ مهمانی را هم به صفحه می‌دهم: ۱۲ نفر، نه ۱۰ — پس «۱۰ × ۹ ÷ ۲ = ۴۵» که روی ۱۰ بنا شده بود باید دوباره حساب شود؛ این را خودت وقتی برگشتیم حساب کن. پیش‌تر مسئله‌ای شبیه این — در زندگیِ خودت یا دیگران — دیده‌ای، از آن چه به کار می‌آید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\", \"retract\": {\"msg\": \"تو یه مهمونیِ ۱۰ نفره هر کس با هر کس دقیقاً یه بار دست داده\", \"key\": \"datum:تعدادِ مهمان‌ها\", \"what\": \"fact\", \"fix\": \"۱۲ نفر\", \"old\": \"۱۰ نفر\", \"rests\": [\"برای ۱۰ نفر: ۱۰ × ۹ ÷ ۲ = ۴۵\"]}}]}",
+"{\"reply\": \"آنچه صفحه همین حالا نشانم داد: صورتِ مسئله «مهمونیِ ۱۲ نفره» شد، و نتیجهٔ «۱۰ × ۹ ÷ ۲ = ۴۵» کنار رفت با این یادداشت که بر «۱۰ نفر» بنا بود و باید با ۱۲ دوباره حساب شود — عددِ تازه را صفحه جای تو ننوشت. خواستهٔ سنجاق‌شده هنوز در این سشن ثبت نشده، پس «۱۰»ی آن‌جا نمانده. دادهٔ تصمیم را هم گرفتم: ۶ هزار کاربر و ماهی حدودِ ۵٪. این ۵٪ از کجاست — چند ماه دیده‌ای‌اش؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}]}",
+"{\"reply\": \"همه‌اش یک‌جا در «📜 پروندهٔ کامل» است: هر حدس، اصلاح، نتیجه و فرمی که پر شده، به ترتیبِ زمان و با پیوند به همان پیام — همین حالا بازش می‌کنم؛ پروندهٔ هر مسئله هم جدا از صفحهٔ خودش باز می‌شود. و دربارهٔ تصمیم: قیدِ «تا پنج‌شنبه» واقعی است یا می‌شود تمدیدش را خواست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}, {\"do\": \"go\", \"view\": \"dossier\"}]}",
+"{\"reply\": \"این‌جا «📜 پروندهٔ کامل» است: همهٔ قدم‌هایت در هر دو مسئله — حدس‌ها، اصلاح‌ها، نتیجه‌ها — به ترتیبِ زمان؛ به پرسشِ «کجا همه را یک‌جا ببینم؟» جواب می‌دهد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}]}",
+"{\"reply\": \"پس «تا پنج‌شنبه» قیدِ سفت است. نقشهٔ مسیرِ همین تصمیم را باز می‌کنم: از صورت تا خواسته، جایی که الان هستی و آنچه مانده.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"c\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}, {\"do\": \"go\", \"view\": \"route\", \"arg\": \"pb_l_mvaqm9v9n0l\"}]}",
+"{\"reply\": \"این نقشهٔ مسیرِ همین تصمیم است: مبدأ (صورت)، جایی که الان هستی، و مقصد (خواسته‌ات)؛ «مانده» تا وقتی طرحی نگفته‌ای نامعلوم می‌ماند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}]}",
+"{\"reply\": \"حق با توست که چیزهای مهمانی جای‌شان این‌جا نیست: در نقشهٔ این تصمیم سه سطرِ «داده» از پرسش‌هایت دربارهٔ اصلاحِ ۱۲ نفر نشسته؛ آن‌ها دادهٔ این تصمیم نیستند و در فرمِ فهمِ همین مسئله با ✏️ می‌توانی برشان داری. «ثباتِ شرکتِ جدید را نمی‌دانم» را هم به‌عنوانِ دادهٔ گم‌شده نگه می‌دارم. کارنامهٔ ذهن را باز می‌کنم: هر سطرش «از کجا؟» دارد که نشان می‌دهد آن عدد از کدام کارِ خودت آمده.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}, {\"do\": \"go\", \"view\": \"mind\"}]}",
+"{\"reply\": \"این کارنامهٔ ذهنِ توست: برای هر مرحلهٔ حل یک سطر با «موفق از کل» و زیرش «از کجا؟» که هر عدد را به همان پیام یا کارِ خودت برمی‌گرداند. چیزی را جای تو پر نمی‌کنم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}]}",
+"{\"reply\": \"سه پرسشِ فنی‌ات، از روی نقشهٔ خودِ سامانه: روش، رکوردها و کارنامه مالِ صفحه‌اند — با عوض شدنِ مدل عوض نمی‌شوند؛ فقط خودِ گفت‌وگو مدل می‌خواهد. همه چیز در همین مرورگر نگه‌داری می‌شود و بی اینترنت هم می‌ماند و کار می‌کند؛ فقط گفت‌وگو با من شبکه می‌خواهد. اما برای این‌که بفهمی یک جوابِ بد از مدل بوده یا از روش، در این صفحه ابزاری ندیدم و عددِ اندازه‌گیری‌شده‌ای هم جلوی من نیست؛ برای ثبتِ این کمبود بررسی می‌کنم. طرحت را هم شنیدم: حرف با دو نفر و خواندنِ گزارشِ مالی. کی انجامش می‌دهی؟ روزش را بگو.\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\", \"plan\": {\"text\": \"می‌تونم با دو نفر که اون‌جا کار می‌کنن حرف بزنم و گزارشِ مالیِ سالانه‌شون هم عمومیه\", \"when\": \"next-session\"}}], \"gap\": {\"title\": \"جوابِ بد از مدل است یا از روش؟ — سنجشِ مدلِ پشتِ دستیار برای کاربر\", \"area\": \"lla-page\", \"kind\": \"build\", \"abstract\": \"کاربری که جوابِ بدی از دستیار می‌گیرد باید بتواند بفهمد ضعف از مدلِ پشتِ دستیار است یا از خودِ روش، و بداند کیفیتِ مدل‌ها اندازه گرفته شده یا نه.\", \"missing\": \"جایی در صفحه که بگوید کدام مدل پاسخِ هر نوبت را داده، کیفیتِ مدل‌ها روی همین روش چطور سنجیده شده و نتیجه‌اش چه بوده.\", \"where\": \"«خودِ سامانه» در نقشهٔ سامانه و نمای دستیار\", \"how\": \"سطری در نقشهٔ خودِ سامانه با نتیجهٔ سنجشِ مدل‌ها و نشانِ مدلِ هر پاسخ.\", \"relations\": \"پرسشِ کاربر در گفت‌وگو\", \"docs\": \"apps/learning-architecture/docs/HANDBOOK.md\", \"why_area\": \"دربارهٔ دستیار و نماهای صفحه است که در lla-page نگه‌داری می‌شود.\", \"why_not\": \"sys-territory نقشهٔ حوزه‌های دانشی است، نه رفتارِ دستیار؛ psy-norms دادهٔ جمعیتیِ سنجشِ ذهنِ کاربر است، نه سنجشِ مدل.\", \"evidence\": \"در «خودِ سامانه» فقط آمده «عوض کردنِ مدل چیزی را عوض نمی‌کند»؛ دربارهٔ سنجشِ کیفیتِ مدل‌ها چیزی نیست؛ حرفِ خودش: «اصلاً اینو اندازه گرفتین؟».\", \"confidence\": 0.8}}",
+"{\"agree\": true, \"area\": \"lla-page\", \"kind\": \"build\", \"dup_of\": null, \"reason\": \"در نقشهٔ خودِ سامانه دربارهٔ سنجشِ کیفیتِ مدل‌ها و نشانِ مدلِ هر پاسخ چیزی نیست و برگهٔ بازی هم همین را نمی‌گوید؛ قلمروِ lla-page درست است.\", \"fix\": {}, \"actions\": []}",
+"{\"reply\": \"پیش‌بینی‌ات را پیش از دیدنِ شاهد ثبت کردی: «گزارشِ مالیشون باثباته»، ۷۰٪. برنامه‌ات هم روشن است: تا یکشنبه با آن دو نفر حرف می‌زنی و گزارش را می‌خوانی. وقتی برگشتی همین پیش‌بینی را با آنچه دیدی می‌سنجیم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [\"e1\", \"e3\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\", \"guess\": {\"text\": \"گزارشِ مالیشون باثباته، حدودِ ۷۰٪ مطمئنم\"}, \"plan\": {\"text\": \"تا یکشنبه با اون دو نفر حرف می‌زنم و گزارش رو می‌خونم\", \"when\": \"2026-10-18\", \"on_guess\": true}}]}",
+"{\"reply\": \"کاری که گفته بودی کردی و با شاهد برگشتی: دو فصلِ آخر زیان، و تیمی که نصف شده. پیش‌بینیِ ۷۰ درصدی‌ات «باثبات است» بود و واقعیت خلافش درآمد — این را خودت گفتی، نه من. آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت — و این فاصله دربارهٔ فهمت از مسئله چه می‌گوید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}, \"plan_done\": {\"id\": \"pl1\", \"done\": true}, \"result\": \"دو فصلِ آخر زیان دادن و یکیشون گفت تیمش نصف شده\"}]}",
+"{\"reply\": \"فاصله را خودت خواندی: شاهدِ تازه گزینهٔ رفتن را ضعیف کرد؛ تصمیمِ «فعلاً می‌مانم» مالِ خودت است و جوابِ رسمی‌ات برای پنج‌شنبه می‌ماند. برگشتیم به دست‌دادن‌ها: با ۱۲ نفر به ۶۶ رسیدی. می‌توانی نتیجه را از راهِ دیگری وارسی کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [\"e4\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"result\": \"برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶\", \"plan\": {\"text\": \"پنج‌شنبه رسماً جواب می‌دم\", \"when\": \"2026-10-22\"}}]}",
+"{\"reply\": \"از راهِ دوم (۱ + ۲ + … + ۱۱) هم به همان ۶۶ رسیدی — وارسی از خودت بود. درس، پرسشی که بیشتر کمکت کرد و سلیقه‌ات را به قلمِ خودت ثبت می‌کنم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [\"b1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"taste\": {\"text\": \"این جور مسئله‌های شمردنی رو دوست دارم\"}, \"check\": {\"msgs\": [\"نفرِ دوم ۱ دست، سومی ۲، ... دوازدهمی ۱۱ — جمعش ۱ + ۲ + … + ۱۱ = ۶۶\"]}}, {\"do\": \"chat_solved\", \"title\": \"دست‌دادن‌های مهمانی\", \"statement\": \"تو یه مهمونیِ ۱۲ نفره هر کس با هر کس دقیقاً یه بار دست داده. چند تا دست‌دادن شده؟ و اگه n نفر باشن چی؟\", \"kind\": \"find\", \"lesson\": \"وقتی حدسِ بزرگ می‌زنم، اول با یه حالتِ کوچیک مثلِ ۳ نفر امتحانش کنم\", \"check\": \"نفرِ دوم ۱ دست، سومی ۲، ... دوازدهمی ۱۱ — جمعش ۱ + ۲ + … + ۱۱ = ۶۶. همون شد\", \"bestQ\": \"اگه فقط ۳ نفر بودن؟\", \"taste\": \"این جور مسئله‌های شمردنی رو دوست دارم\"}]}",
+"{\"reply\": \"مسئلهٔ سوم را هم شنیدم: جلسهٔ ۴۵ دقیقه‌ای، ۶ نفر و هر کدام ۵ دقیقه. حسابِ «۶ × ۵ = ۳۰» می‌خواند، ولی «۴۵ − ۳۰ = ۲۵» با حسابِ صفحه نمی‌خواند. همان تفریق را یک بار دیگر خودت حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\"}]}",
+"{\"reply\": \"تفریق را خودت درست کردی: ۱۵ دقیقه. در تصمیمِ ماندن یا رفتن این‌جا بودیم: پیش‌بینیِ «باثبات است» با شاهدِ خودت رد شد، گفتی «فعلاً می‌مانم»، و قرارت این است که پنج‌شنبه رسماً جواب بدهی — همین برنامه باز است. روشن می‌بینی که این گام به خواسته‌ات (۱۰ هزار کاربر و جانشینی از تیم) نزدیکت می‌کند — به کدام داده تکیه دارد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}]}",
+"{\"reply\": \"هست: «پروندهٔ تمرین» برای یک تکنیک روی یک موضوع باز می‌ماند و با زمانِ واقعی جلو می‌رود — کاربست‌هایت را با تاریخ ثبت می‌کند و تا وقتی تثبیت نشده بسته نمی‌شود؛ یادداشتِ خشک نیست. به خواستِ خودت برای تکنیکِ ۲۴ «کالیبراسیون اعتماد» روی همین عادت بازش می‌کنم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}, {\"do\": \"start_practice\", \"tid\": 24, \"topic\": \"قبل از هر تصمیم پیش‌بینی با درصد بنویسم و بعد بسنجم\", \"consent\": {\"quote\": \"اگه هست، برام بازش کن\", \"kind\": \"request\"}}]}",
+"{\"reply\": \"این همان عادتی است که می‌خواهی جا بیندازی: پیش‌بینی را پیش از دیدنِ نتیجه و با درصد نوشتی — «تا جمعه پیشنهادِ ترفیع»، ۴۰٪. جمعه با آنچه شد می‌سنجیمش. کدام نشانهٔ روشن تا جمعه می‌گوید شد یا نشد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [\"e1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\", \"guess\": {\"text\": \"تا جمعه مدیرم برای موندنم یه پیشنهادِ ترفیع می‌ده — ۴۰٪ مطمئنم\"}}]}",
+"{\"reply\": \"پس آنچه ۴۰٪ داده بودی رخ داد — این را خودت با واقعیت سنجیدی، و همین یک جلسه از عادتِ تازه‌ات است. تا نتیجهٔ صفحه نیاید نمی‌گویم ثبت شد. آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت — و این فاصله دربارهٔ فهمت از مسئله چه می‌گوید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\", \"guess_res\": {\"id\": \"g2\", \"res\": \"confirmed\"}, \"result\": \"دیروز مدیرم پیشنهادِ ترفیع داد\"}, {\"do\": \"practice_log\", \"prc\": \"prc_mvdli8t6vfdyw\", \"what\": \"پیش‌بینیِ «تا جمعه پیشنهادِ ترفیع» را با نتیجه سنجید\", \"pct\": 40, \"ok\": true, \"quote\": \"دیروز مدیرم پیشنهادِ ترفیع داد. پس اون پیش‌بینیِ ۴۰ درصدیم درست درومد\"}]}",
+"{\"reply\": \"پس آنچه ۴۰٪ داده بودی رخ داد — این را خودت با واقعیت سنجیدی، و همین یک جلسه از عادتِ تازه‌ات است؛ جلسه را به صفحه فرستادم و نتیجه‌اش را صفحه می‌گوید. آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت — و این فاصله دربارهٔ فهمت از مسئله چه می‌گوید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\", \"guess_res\": {\"id\": \"g2\", \"res\": \"confirmed\"}, \"result\": \"دیروز مدیرم پیشنهادِ ترفیع داد\"}, {\"do\": \"practice_log\", \"prc\": \"prc_mvdli8t6vfdyw\", \"what\": \"پیش‌بینیِ «تا جمعه پیشنهادِ ترفیع» را با نتیجه سنجید\", \"pct\": 40, \"ok\": true, \"quote\": \"دیروز مدیرم پیشنهادِ ترفیع داد. پس اون پیش‌بینیِ ۴۰ درصدیم درست درومد\"}]}",
+"{\"reply\": \"فاصله را خودت خواندی: مدیرت را دستِ کم گرفته بودی. جوابِ رسمی‌ات را هم دادی: می‌مانی. برنامهٔ تازه‌ات را هم شنیدم — حرف با همکاری که قرار است جانشینت شود؛ همان روز می‌پرسم چه شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\", \"plan\"], \"ans\": [\"e4\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\", \"result\": \"پنج‌شنبه هم رسماً جواب دادم که می‌مونم\", \"plan_done\": {\"id\": \"pl3\", \"done\": true}, \"plan\": {\"text\": \"تا جمعه با اون همکارم که قراره جانشینم بشه حرف می‌زنم\", \"when\": \"2026-10-23\"}}]}",
+"{\"reply\": \"باشه. تاریخ‌ها را خودِ صفحه از تو پرسیده و جوابت را خودش می‌خواند. تصمیمت را گرفته‌ای و جوابش را هم داده‌ای؛ مانده حرف با جانشینت.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}]}",
+"{\"reply\": \"راستش را از روی نقشهٔ خودِ سامانه می‌گویم: همهٔ رکوردها در همین مرورگر نگه‌داری می‌شود و صفحه یک تاریخِ تولد و یک کارنامه دارد؛ جایی برای جدا کردنِ دو نفر در یک مرورگر ندیدم. پس اگر پسرت با همین مرورگر کار کند، کارهایش در کارنامهٔ تو می‌نشیند و من هم با همان شیوه‌ای حرف می‌زنم که برای تاریخِ تولدِ ثبت‌شده (تو) است، نه شیوهٔ یک دوازده‌ساله. تا وقتی این ساخته نشده، راهِ بی‌خطر مرورگر یا پروفایلِ مرورگرِ جدا برای اوست. برای ثبتِ این کمبود بررسی می‌کنم.\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}, {\"do\": \"deadline_done\", \"what\": \"جواب به پیشنهادِ کار\"}], \"gap\": {\"title\": \"چند نفر در یک مرورگر: جدا ماندنِ تاریخِ تولد و کارنامهٔ هر کاربر\", \"area\": \"lla-page\", \"kind\": \"build\", \"abstract\": \"وقتی چند نفر (مثلاً پدر و فرزند) با یک مرورگر از صفحه استفاده می‌کنند، تاریخِ تولد، کارنامهٔ ذهن و رکوردهای هر کدام باید جدا بماند و دستیار با هر کدام به شیوهٔ سنِ خودش حرف بزند.\", \"missing\": \"انتخابِ کاربر (پروفایل) در صفحه، با تاریخِ تولد، رکوردها و کارنامهٔ جدا برای هر نفر.\", \"where\": \"تنظیماتِ صفحه و «خودِ سامانه»\", \"how\": \"پروفایل‌های جدا در همان مرورگر با کلیدِ ذخیرهٔ جدا و نشانِ کاربرِ جاری بالای صفحه.\", \"relations\": \"سن و تاریخِ تولد؛ کارنامهٔ ذهن؛ ذخیرهٔ داده‌ها\", \"docs\": \"apps/learning-architecture/docs/HANDBOOK.md\", \"why_area\": \"دربارهٔ ذخیره و تنظیماتِ خودِ صفحه است که در lla-page نگه‌داری می‌شود.\", \"why_not\": \"psy-norms فقط دادهٔ جمعیتیِ سنجش است، نه جداسازیِ کاربران؛ sys-territory نقشهٔ حوزه‌های دانشی است.\", \"evidence\": \"«خودِ سامانه»: ذخیره «فقط در همین مرورگر» و سن «فقط تاریخ — تنظیماتِ صفحه»؛ از چند کاربر چیزی نیست؛ حرفِ خودش: «با مالِ من قاطی نمی‌شه؟».\", \"confidence\": 0.8}}",
+"{\"agree\": true, \"area\": \"lla-page\", \"kind\": \"build\", \"dup_of\": null, \"reason\": \"در نقشهٔ خودِ سامانه ذخیره «فقط در همین مرورگر» و یک تاریخِ تولد است و از پروفایلِ چند کاربر چیزی نیست؛ برگهٔ #۱۰۱ دربارهٔ سنجشِ مدل است و همین را نمی‌گوید.\", \"fix\": {}, \"actions\": []}",
+"{\"reply\": \"آنچه جلوی من است: هر دو برگه (#۱۰۱ سنجشِ مدل، #۱۰۲ چند نفر در یک مرورگر) در «نظارت و سرکشی» بازند و صفحه وضعِ هر برگه را در هر نوبت نشانم می‌دهد؛ پس اگر جوابی بیاید همین‌جا می‌بینم و می‌گویم. این دو به گامی از مسئله‌هایت بسته نیستند، برای همین چیزی از کارت منتظرشان نمانده. ولی این‌که صفحه خودش در «امروز» خبرت کند یا نه، در آنچه جلوی من است نیامده — قولش را نمی‌دهم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}]}",
+"{\"reply\": \"نه — این ضعفِ ریاضی نیست؛ یک پیش‌نیازِ مشخص است که هنوز نداری: «ترکیب» (شمارِ راه‌های برداشتنِ چند نفر وقتی ترتیب مهم نیست)، و همین گامِ «شمردنِ گروه‌های سه‌نفره» به آن نیاز دارد. جالب این‌که دست‌دادن‌ها را بی این نام شمردی. اگر از ۴ نفر بخواهی ۲ نفر را برداری و ترتیب مهم نباشد، چند جور می‌شود — می‌توانی بشماری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"u\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prereq\": {\"concept\": \"ترکیب (شمارِ انتخابِ چند تا از n تا، بی ترتیب)\", \"step\": \"شمردنِ گروه‌های سه‌نفره در مهمانیِ ۱۲ نفره\", \"quote\": \"ترکیب رو اصلاً بلد نیستم\", \"q\": \"اگر از ۴ نفر بخواهی ۲ نفر را برداری و ترتیب مهم نباشد، چند جور می‌شود — می‌توانی بشماری؟\", \"topic\": \"شمارش\"}}, {\"do\": \"chat_invent\", \"statement\": \"تو همون مهمونیِ ۱۲ نفره چند تا گروهِ سه‌نفره می‌شه ساخت\", \"title\": \"گروه‌های سه‌نفرهٔ مهمانی\", \"nat\": \"objective\", \"kind\": \"find\"}]}",
+"{\"reply\": \"پیش‌نیاز را خودت ساختی: شش جفت را شمردی، به دست‌دادن‌ها وصلش کردی و دیدی چرا باید بر تعدادِ تکرارها تقسیم کرد. هر دو حسابت می‌خواند. حالا برگشتیم به همان گام: برای گروه‌های سه‌نفره به ۲۲۰ رسیدی. می‌توانی این نتیجه را در یک حالتِ کوچک (مثلاً ۴ نفر) وارسی کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"missing\", \"mastery\": \"yes\", \"quote\": \"الف‌ب، الف‌ج، الف‌د، ب‌ج، ب‌د، ج‌د — ۶ تا. آها، همون کارِ دست‌دادن‌هاست: ۴ × ۳ ÷ ۲ = ۶\"}, \"learned\": {\"concept\": \"ترکیب (شمارِ انتخابِ چند تا از n تا، بی ترتیب)\", \"quote\": \"فکر کنم ترکیب رو فهمیدم\"}, \"result\": \"برای سه‌نفره‌ها: ۱۲ × ۱۱ × ۱۰ ÷ ۶ = ۲۲۰\"}]}",
+"{\"reply\": \"حق داری — آن کار را پنج‌شنبه انجام دادی و پرسش دیگر جا ندارد. برای برگرداندنِ ثبتِ نادرست دو راه در خودِ صفحه هست: در «امروز» کنارِ همان سطرِ 📅 دکمهٔ «نه» هست که آن تاریخ را کنار می‌گذارد؛ و اگر حرفِ خودت را می‌خواهی عوض کنی، ✏️ ِ زیرِ همان پیام. اگر ثبتی از صفحه جای دیگری اشتباه است و دکمه‌ای ندارد، همین‌جا بگو کدام است تا بفرستمش.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"برای اولی: در «🧠 کارنامهٔ ذهن» کنارِ هر بخش «از کجا؟» را باز کن — هر + یا − با تاریخ و جملهٔ خودت آمده و 📜 کنارش تو را به همان پیام می‌برد. برای دومی: هر 🎯 در پروندهٔ گفت‌وگو جدا با سرانجامش («شد/نشد — به گفتهٔ خودت») ثبت می‌شود، و اگر حرفت روشن نباشد کدام است، صفحه خودش می‌پرسد «کدام پیش‌بینی؟». می‌خواهی همین حالا کارنامه را با «از کجا؟» باز کنم؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"باشد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": []}]}",
+"{\"reply\": \"آن «بله» به هیچ پرسشِ تاریخیِ تازه‌ای زیرِ پیامِ پیشینم نخورد؛ صفحه هم چیزی ثبت نکرد (اگر ثبت می‌کرد، زیرش «✓ به گفتهٔ خودت ثبت شد: …» با نامِ همان کار می‌آمد). پرسشِ باز ِ «امروز» هنوز «تا جمعه با همکارم حرف می‌زنم — همان روز یا جمعهٔ بعد؟» است. پیش‌بینی‌های باز را در «🎯 دفترِ پیش‌بینی» می‌بینی؛ می‌خواهی بازش کنم؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": []}]}",
+"{\"reply\": \"سه گامت را خواندم: گامِ ۱ (۴ × ۱۰ = ۴۰) و گامِ ۲ (۴۵ − ۴۰ = ۵) درست‌اند. گامِ ۳ نیمه‌درست است: ۴ × ۷ = ۲۸ درست است، ولی تفریقِ ۴۵ − ۲۸ را یک بار دیگر خودت بزن — چند دقیقه برای بحث می‌ماند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prior\": [{\"step\": \"زمانِ گزارش\", \"quote\": \"گام ۱: ۴ نفر هر کدوم ۱۰ دقیقه گزارش، ۴ × ۱۰ = ۴۰ دقیقه\", \"verdict\": \"ok\", \"why\": \"ضرب درست است\", \"dep\": []}, {\"step\": \"زمانِ بحث\", \"quote\": \"گام ۲: پس ۴۵ − ۴۰ = ۵ دقیقه برای بحث می‌مونه\", \"verdict\": \"ok\", \"why\": \"تفریق درست است\", \"dep\": [1]}, {\"step\": \"گزارشِ ۷ دقیقه‌ای\", \"quote\": \"گام ۳: اگه هر گزارش ۷ دقیقه بشه، ۴ × ۷ = ۲۸ و ۴۵ − ۲۸ = ۱۸ دقیقه بحث\", \"verdict\": \"wrong\", \"why\": \"۴۵ − ۲۸ با ۱۸ نمی‌خواند\", \"dep\": [1]}]}]}",
+"{\"reply\": \"آنچه صفحه نشان می‌دهد: در پروندهٔ این گفت‌وگو کنارِ گامِ ۱ نوشته «جابه‌جا شد ⇒ «برای تیم یه جلسهٔ هفتگیِ ۴۵ دقیقه‌ای…»» و گام‌های ۲ و ۳ همان‌جا مانده‌اند — صفحه دربارهٔ وابسته‌ها از تو نپرسید. دربارهٔ دو پرسشِ دیگر، نقشهٔ سامانه که من می‌بینم قاعدهٔ «آره» به پیشنهادِ ساخته از عددِ غلط و جدا کردنِ «دادهٔ با منبع» از «کارِ دیگری» را نمی‌گوید؛ پس با اطمینان جواب نمی‌دهم. می‌خواهی این سه را برای سازنده در «نظارت و سرکشی» بنویسم؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+""
+],
+"keys": [
+"سلام. یه مسئله‌ست که از دیشب ذهنمو درگیر کرده: تو یه مهمونیِ ۱۰ نفره هر کس با هر کس دقیقاً یه بار دست داده. چند تا دست‌دادن شده؟ و اگه n نفر باشن چی؟ حدسِ اولم ۱۰۰ بود ولی حس می‌کنم غلطه.",
+"یعنی می‌خوایم بشمریم چند تا «جفت آدم» هست، چون هر جفت یه بار دست می‌دن. راستی من ۴۴ سالمه، اون کارتِ تاریخِ تولد رو هم پر کردم — این سن به چه دردِ این صفحه می‌خوره؟",
+"با ۳ نفر: الف‌ب، الف‌ج، ب‌ج — ۳ تا. راهِ من (۱۰ × ۱۰) برای ۳ نفر می‌شه ۹. پس دو جا اشتباه کردم: هر کس با خودش دست نمی‌ده، پس ۳ × ۲ = ۶؛ و هر دست‌دادن رو دو بار شمردم، پس ۶ ÷ ۲ = ۳. برای ۱۰ نفر: ۱۰ × ۹ ÷ ۲ = ۴۵.",
+"برای n نفر: n(n−1)/2. ولی بذار یه لحظه یه چیزِ دیگه بپرسم که الان مهم‌تره: یه پیشنهادِ کار از یه شرکتِ دیگه دارم، حقوقش ۳۰٪ بیشتره ولی باید از تیمی که خودم ساختم جدا شم. تا پنج‌شنبه باید جواب بدم. اینو هم می‌شه همین‌جا با همین روش فکر کرد؟",
+"ثبتش کن. در یک جمله: بین «بمونم و تیمی که ساختم رو به جایی برسونم» و «برم با حقوقِ ۳۰٪ بیشتر و یه محیطِ تازه» انتخاب می‌کنم.",
+"یعنی محصولی که ساختیم به ۱۰ هزار کاربرِ فعال برسه و یکی از بچه‌ها بتونه جای من رو بگیره. راستی یه چیزی: اون مهمونی ۱۲ نفره بود، نه ۱۰. هر جا ۱۰ نوشتی درستش کن.",
+"مهم‌ترین داده: الان ۶ هزار کاربرِ فعال داریم و ماهی حدودِ ۵٪ رشد می‌کنیم. قبلش بگو: اون اصلاحِ ۱۲ نفر واقعاً همه جا نشست؟ اون ۴۵ چی شد، و خواستهٔ سنجاق‌شدهٔ سشن که هنوز ۱۰ نوشته؟",
+"از ۸ ماهِ گذشته، تقریباً ثابت. یه سؤال: کجا می‌تونم همهٔ قدم‌هایی که تو این دو تا مسئله برداشتم — حدسا، اصلاحا، تصمیما — رو یه جا ببینم؟",
+"[سامانه: « مسئله‌های بزرگ ›» باز شد. این نما فیلدی برای پر کردن ندارد — چیزی پر نکن و دکمه‌ای نزن؛ در یک جمله بگو همین‌جا چه می‌بیند و به کدام پرسشش جواب می‌دهد؛ reply خیلی کوتاه.]",
+"موعد واقعیه، تمدید نمی‌شه. حالا نقشهٔ مسیرم رو نشون بده — می‌خوام ببینم تو این تصمیم کجام و چقدر مونده.",
+"[سامانه: « نقشهٔ مسیرِ مسئله» باز شد. این نما فیلدی برای پر کردن ندارد — چیزی پر نکن و دکمه‌ای نزن؛ در یک جمله بگو همین‌جا چه می‌بیند و به کدام پرسشش جواب می‌دهد؛ reply خیلی کوتاه.]",
+"یه نکته: تو نقشهٔ این تصمیم، حدسِ ۱۰۰ و اصلاحِ ۱۲ نفرِ مهمونی هم اومده — اونا که مالِ این نیستن! دربارهٔ کافی بودن: نه، نمی‌دونم شرکتِ جدید چقدر ثبات داره. یه چیزِ دیگه: کارنامهٔ ذهنم تا الان دربارهٔ من چی می‌گه و هر عددش از کجا اومده؟",
+"[سامانه: « کارنامهٔ ذهن» باز شد. حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]",
+"دربارهٔ ثبات: می‌تونم با دو نفر که اون‌جا کار می‌کنن حرف بزنم و گزارشِ مالیِ سالانه‌شون هم عمومیه. دو تا سؤالِ فنی هم دارم: اگه مدلِ هوشِ مصنوعیِ پشتِ تو عوض بشه یا یه مدلِ ضعیف‌تر بیاد، این روش و این کارنامه هنوز درست کار می‌کنه؟ و اگه این",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"پیش‌بینیم: گزارشِ مالیشون باثباته، حدودِ ۷۰٪ مطمئنم. تا یکشنبه با اون دو نفر حرف می‌زنم و گزارش رو می‌خونم، بعد برمی‌گردم.",
+"برگشتم. با هر دو نفر حرف زدم و گزارش رو خوندم: دو فصلِ آخر زیان دادن و یکیشون گفت تیمش نصف شده. پس پیش‌بینیم غلط بود.",
+"گزینهٔ رفتن ضعیف شد: ۳۰٪ حقوقِ بیشتر تو شرکتی که داره کوچیک می‌شه ارزشِ ریسک نداره. فعلاً می‌مونم، ولی پنج‌شنبه رسماً جواب می‌دم. حالا برگردیم به دست‌دادن‌ها: برای ۱۲ نفر با فرمولم می‌شه ۱۲ × ۱۱ ÷ ۲ = ۶۶.",
+"آره: نفرِ دوم ۱ دست، سومی ۲، ... دوازدهمی ۱۱ — جمعش ۱ + ۲ + … + ۱۱ = ۶۶. همون شد. درسِ من: وقتی حدسِ بزرگ می‌زنم، اول با یه حالتِ کوچیک مثلِ ۳ نفر امتحانش کنم. بیشتر از همه همون سؤالِ «اگه فقط ۳ نفر بودن؟» کمک کرد. این جور مسئله‌های شمردنی ",
+"یه مسئلهٔ سومِ کوتاه هم دارم: برای تیم یه جلسهٔ هفتگیِ ۴۵ دقیقه‌ای می‌خوام که ۶ نفر هر کدوم ۵ دقیقه گزارش بدن و بقیه‌ش بحث باشه. حساب کردم: ۶ × ۵ = ۳۰، پس ۴۵ − ۳۰ = ۲۵ دقیقه بحث می‌مونه.",
+"آخ، ۴۵ − ۳۰ = ۱۵. پس فقط ۱۵ دقیقه بحث می‌مونه؛ همین کافیه، این یکی حل شد. حالا برگردیم به همون تصمیمِ موندن یا رفتن: الان کجاش بودیم؟",
+"یه چیزِ دیگه که برام مهمه: می‌خوام این عادت رو که «قبل از هر تصمیم پیش‌بینی با درصد بنویسم و بعد بسنجم» واقعاً جا بندازم. اگه چند هفته طول بکشه، این‌جا یه پرونده براش باز می‌مونه تا وقتی واقعاً تثبیت بشه؟ با زمانِ واقعی جلو می‌ره یا فقط یه ",
+"پیش‌بینیم: تا جمعه مدیرم برای موندنم یه پیشنهادِ ترفیع می‌ده — ۴۰٪ مطمئنم.",
+"جمعه شد: دیروز مدیرم پیشنهادِ ترفیع داد. پس اون پیش‌بینیِ ۴۰ درصدیم درست درومد — هرچند فکر می‌کردم بعیده.",
+"جمعه شد: دیروز مدیرم پیشنهادِ ترفیع داد. پس اون پیش‌بینیِ ۴۰ درصدیم درست درومد — هرچند فکر می‌کردم بعیده.\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: صفحه هنوز اصلاح را انجام نداده — نگو «عوض شد/درست شد»؛ بگو اصلاح را",
+"فاصله‌ش این بود که مدیرم رو دستِ کم گرفته بودم. پنج‌شنبه هم رسماً جواب دادم که می‌مونم. تا جمعه با اون همکارم که قراره جانشینم بشه حرف می‌زنم.",
+"باشه",
+"یه سؤالِ دیگه: پسرم ۱۲ سالشه و گاهی با همین مرورگر از این برنامه استفاده می‌کنه. تاریخِ تولد و کارنامهٔ ذهنِ اون با مالِ من قاطی نمی‌شه؟ تو با اون هم همین‌طوری حرف می‌زنی که با من؟",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"یه چیزی دربارهٔ همین برگه‌ها: دو تا کمبود ثبت کردی. از کجا بفهمم ساخته شدن؟ خودم باید هی بیام چک کنم یا این‌جا خودش خبر می‌ده و برمی‌گردیم سرش؟",
+"برگردیم به مسئلهٔ «دست‌دادن‌های مهمانی»: حالا می‌خوام بدونم تو همون مهمونیِ ۱۲ نفره چند تا گروهِ سه‌نفره می‌شه ساخت. شنیدم با «ترکیب» حساب می‌شه ولی ترکیب رو اصلاً بلد نیستم. این یعنی ریاضیم ضعیفه؟",
+"الف‌ب، الف‌ج، الف‌د، ب‌ج، ب‌د، ج‌د — ۶ تا. آها، همون کارِ دست‌دادن‌هاست: ۴ × ۳ ÷ ۲ = ۶. پس برای سه‌نفره‌ها: ۱۲ × ۱۱ × ۱۰ ÷ ۶ = ۲۲۰، چون هر گروهِ سه‌نفره ۶ بار شمرده می‌شه. فکر کنم ترکیب رو فهمیدم.",
+"یه چیزی: تو «امروز» هنوز از من می‌پرسه «پنج‌شنبه رسماً جواب می‌دم — پنجشنبه ۷ آبان — درست است؟» در حالی که من پنجشنبه جواب دادم. اگه صفحه چیزی رو اشتباه ثبت کرده، خودم از کجا برش گردونم؟",
+"دو تا سؤال دیگه: کدوم عددِ کارنامه‌م از کدوم جمله‌م اومده؟ و وقتی دو تا پیش‌بینیِ باز دارم، از کجا بفهمم نتیجه‌ای که گفتم روی کدومشون نشست؟",
+"بله",
+"الان که گفتم «بله»، دقیقاً به کدوم پرسش بله گفتم؟ و پیش‌بینی‌هایی که هنوز بازن کدوما‌ن؟",
+"یه مسئلهٔ جدا: می‌خوام جلسهٔ هفتگیِ ۴۵ دقیقه‌ای تیم رو کوتاه کنم. خودم سه گام رفتم: گام ۱: ۴ نفر هر کدوم ۱۰ دقیقه گزارش، ۴ × ۱۰ = ۴۰ دقیقه. گام ۲: پس ۴۵ − ۴۰ = ۵ دقیقه برای بحث می‌مونه. گام ۳: اگه هر گزارش ۷ دقیقه بشه، ۴ × ۷ = ۲۸ و ۴۵ − ۲۸ ",
+"سه تا سؤال دربارهٔ خودِ سامانه: اون گامِ ۱ که جابه‌جا کردم، گام‌های ۲ و ۳ که بهش تکیه داشتن چی شدن؟ اگه به پیشنهادی که روی یه عددِ غلط ساخته شده «آره» بگم، گامم با همون غلط بازنویسی میشه؟ و وقتی میگم «فروشنده گفت ۱۲٪ گرون میشه»، این دادهٔ م",
+"سه تا سؤال دربارهٔ خودِ سامانه: اون گامِ ۱ که جابه‌جا کردم، گام‌های ۲ و ۳ که بهش تکیه داشتن چی شدن؟ اگه به پیشنهادی که روی یه عددِ غلط ساخته شده «آره» بگم، گامم با همون غلط بازنویسی میشه؟ و وقتی میگم «فروشنده گفت ۱۲٪ گرون میشه»، این دادهٔ م"
+]
+}
