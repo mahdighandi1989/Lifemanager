@@ -2675,7 +2675,7 @@
   function sents28(t) { return String(t || "").split(/(?<=[.!؟?])\s+|\n+/).map(function (x) { return x.trim(); }).filter(Boolean); }
   function qc28(x) { return /[؟?]\s*$/.test(x) || /(?:^|[\s،])(?:اگه|اگر|کاش)(?![آ-ی])/.test(x); }
   /* بندِ ادعا: اطمینان، شمارنده، پیش‌واژه و نشانهٔ تازه‌کردن از متن می‌روند — اطمینان کنارِ 🎯 جدا نشان داده می‌شود */
-  function strip28(s) { var w = wpct(s); CONF28.forEach(function (re) { w = w.replace(new RegExp(re.source, "g"), " "); });
+  function strip28(s) { var w = wpct(s); CONF28.forEach(function (re) { w = w.replace(new RegExp(re.source, "g"), " "); }); w = w.replace(/(?:^|\s)شاید\s*\d{1,3}\s*(?:٪|%|درصد)(?=\s)/g, " ");   /* C170 */
     return w.replace(/احتمال(?:ش|ِ?\s*این(?:\s*که|که)?)\s*(?:ه\s*)?(?:که)?/g, " ").replace(/(?:^|\s)ه\s*که(?=\s)/g, " ").replace(/\(\s*\)/g, " ").replace(/[،,]\s*نه\s*\d{1,3}\s*(?:٪|%|درصد)?\s*[.!]?\s*$/, " ").replace(/[؛،—–]\s*(?:حدودِ?\s*)?\d{1,3}\s*(?:٪|%|درصد)\s*[.!]?\s*$/, " ").replace(/(?:^|\s)ه(?=\s|$|[.!،؛])/g, " ").replace(/\s+/g, " ").trim(); }
   function clean28(s) { var x = strip28(s).replace(LEAD28, ""), k = 0, prev = null;
     while (prev !== x && k++ < 8) { prev = x; x = x.replace(/^[\s:،,؛.\-–—]+/, "").replace(ENUM27, "").replace(/^(?:و|ولی|اما|پس|یعنی|راستش|خب|حالا\s*که\s*فکر\s*می[‌\s]?کنم|حالا|الان(?:\s*دیگه)?|دیگه|هم)(?:[\s:،,]+|$)/, "")
@@ -2687,7 +2687,9 @@
   function read28(t, msgPred) {
     var out = [], S = sents28(t);
     var claimOk = function (x) { return x && !qc28(x) && cnt28(strip28(x).replace(LEAD28, "")) >= 2 && !confAll28(wpct(x)).length; };
-    var item = function (raw, c, sIdx) { var cl = clean28(raw), k = past27(raw) || /مطمئن\s*بودم|بودم(?![آ-ی])/.test(raw) ? "past" : OTH28.test(dg(raw)) ? "other" : "own";
+    /* دورِ ۲۹ (C170): 🎯 پیامدِ آینده و سنجیدنی است — احتمال برای فرضی دربارهٔ اکنون/گذشته («۷۰ درصد مطمئنم مدیرم … جلوی ترفیع منو گرفته»: فعلِ ماضیِ نقلی در پایانِ ادعا) 🎯 نمی‌سازد */
+    var perf29 = function (raw) { var d = dg(strip28(raw)).replace(/[\s.!،؛]+$/, ""); return !FUT28.test(d) && /(?:^|\s)ن?[آ-ی]{1,8}(?:فته|شته|خته|سته|رده|یده|اده|وده|ته|ده)(?:\s*(?:است|ه|ان|اند))?$/.test(d) && !/(?:^|\s)(?:ن?می|ب)[آ-ی]*ده$/.test(d); };
+    var item = function (raw, c, sIdx) { var cl = clean28(raw), k = past27(raw) || /مطمئن\s*بودم|بودم(?![آ-ی])/.test(raw) || perf29(raw) ? "past" : OTH28.test(dg(raw)) ? "other" : "own";
       var w = wpct(raw), np = /[،,]\s*نه\s*(\d{1,3})\s*(?:٪|%|درصد)?\s*[.!]?\s*$/.exec(w);
       out.push({ raw: raw, claim: cl, p: c.p, kind: k, pure: cnt28(cl) < 2, si: sIdx, notP: np ? +np[1] : null, upd: /(?:^|[\s،])(?:الان|حالا|دیگه|راستش|دیگر)(?![آ-ی])|[،,]\s*نه\s*\d/.test(dg(raw)) }); };
     S.forEach(function (s0, si) { var s = s0.replace(LEAD28, ""); if (/[؟?]\s*$/.test(s)) return;
@@ -2699,6 +2701,8 @@
       var QS29 = [], qm29, qre29 = /«[^«»]*»|"[^"]*"/g; while ((qm29 = qre29.exec(w))) QS29.push([qm29.index, qm29.index + qm29[0].length]);
       if (QS29.length) C = C.filter(function (c) { return !QS29.some(function (q) { return c.i > q[0] && c.j < q[1]; }); });
       var AND29 = /^(\d{1,3})\s*(?:٪|%|درصد)\s*(?:هم\s*)?که\s+/, and29 = false;
+      /* دورِ ۲۹ (C170): «شاید N٪ <پیامدِ آینده>» (شاید + N٪ = باور) اطمینانِ خودش است — «شاید ۴۰٪ یادم بمونه»؛ «… یادم رفته بود — شاید ۴۰ درصد» (گذشته) نه */
+      if (!C.length) { var sh29 = /(?:^|\s)شاید\s*(\d{1,3})\s*(?:٪|%|درصد)/.exec(w); if (sh29 && +sh29[1] <= 100 && FUT28.test(w.slice(sh29.index + sh29[0].length).split(/[.!؛،]/)[0]) && !past27(s)) C.push({ i: sh29.index, j: sh29.index + sh29[0].length, p: +sh29[1] }); }
       if (C.length) { var re29 = /\sو\s+(\d{1,3})\s*(?:٪|%|درصد)\s*(?:هم\s*)?که\s+/g, m29; while ((m29 = re29.exec(w))) { var i29 = m29.index, j29 = i29 + m29[0].length;
         if (+m29[1] <= 100 && C.some(function (c) { return c.j <= i29; }) && !C.some(function (c) { return i29 < c.j && j29 > c.i; }) && FUT28.test(w.slice(j29).split(/[.!؛،]/)[0])) { C.push({ i: i29, j: j29, p: +m29[1] }); and29 = true; } } }
       if (!C.length && qc28(s)) return;   /* شرط («اگه تاس رو ۶۰ بار بندازم … ۷۰ درصد مطمئنم») با اطمینانِ خودش پیش‌بینی است؛ بی اطمینان نه */

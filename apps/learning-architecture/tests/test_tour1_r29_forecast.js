@@ -97,6 +97,13 @@ const wd = (n) => { const d = new Date(D0); do { d.setDate(d.getDate() + 1); } w
   K.A29_24 = async () => { const A = await run(['۷۰ درصد مطمئنم حدودِ ۸ متر پارچه بس باشه.', 'برای خرید یادداشت کردم: ۷٫۲ متر مربع = ۷۲۰۰۰ سانتی‌متر مربع. پارچه عرضش ۱٫۵ متره، پس ۸ / ۱٫۵ = ۵٫۳۳ متر طول می‌خوام.']);
     return [A[1].fc.length === 1 && !A[1].fc[0].out && !newSys(A, 1).some(x => /حساب می‌شود|شد یا نشد/.test(x)), J([A[1].fc, newSys(A, 1)])]; };
 
+  /* ---------- C170: پیامدِ آینده (s01 p14 «… یادم رفته بود — شاید ۴۰ درصد» گذشته است؛ «شاید ۴۰٪ یادم بمونه» 🎯) ---------- */
+  K.C170 = async () => { const bad = [];
+    let A = await run(['شاید ۴۰٪ یادم بمونه.']); if (!(A[0].fc.length === 1 && A[0].fc[0].p === 40 && nz(A[0].fc[0].q) === 'یادم بمونه')) bad.push('شاید ' + J(A[0].fc));
+    A = await run(['امروز بعد از یه هفته روشِ خونه رو از حافظه نوشتم؛ فقط مجهول و دو شرط یادم بود، بخشِ «داده فقط اگه شرط رو عوض کنه» کامل یادم رفته بود — شاید ۴۰ درصد.']); if (A[0].fc.length) bad.push('s01 p14 ' + J(A[0].fc));
+    A = await run(['۷۰ درصد مطمئنم مدیرم عمداً جلوی ترفیع منو گرفته.']); if (A[0].fc.length) bad.push('past hypothesis ' + J(A[0].fc));
+    return [!bad.length, bad.join(' | ')]; };
+
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').includes(k)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 900)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   console.log(JSON.stringify(info));
