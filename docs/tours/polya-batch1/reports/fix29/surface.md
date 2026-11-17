@@ -29,3 +29,6 @@
 6. C175 no page replay (pwC2 p50–p51).
 7. #272–#274 model's actual answer untested.
 8. `test_fixes_1015b` #12 long page loses its last field from the prompt.
+
+## Coordinator check (2026-11-17)
+- `test_fixes_1015b` #12 is NOT pre-existing: NO ERRORS on BASE29 and on merge29 before surface (23d8eab9); fails after the surface merge (05fef659) — `lastField:false, textDropped:false` (rule/map block eats the budget). Counted as a merge-introduced defect (§22). Surface fixer resumed to fix on top of merge29.
