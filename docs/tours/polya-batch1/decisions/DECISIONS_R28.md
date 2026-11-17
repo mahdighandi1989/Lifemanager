@@ -195,3 +195,7 @@ prior ⇒ dates ⇒ forecast ⇒ story ⇒ surface; the families' tests re-run a
   replaced date** (if that day has passed, the other one, then later weeks). The literal Saturday–Friday week broke two older verdicts
   (R20 #64: said on a Sunday, «شنبه ⇒ پنجشنبه» is the Thursday before that Saturday; R19b #11: «جمعه ⇒ شنبه» is the next day); the
   nearest-day rule satisfies those and C134's own example, and is never counted from today.
+- **C135 (2026-11-17, from round 29 D: D29-1 and D29-2 are S1 caused by C105).** **C105 is revoked.** «تومن / تومان / ریال» after
+  «N میلیون و M» names the currency of the whole amount («۱۸ میلیون و ۷۰۰ تومن» = 18,700,000); it never fixes M to units. The C102
+  order stands: thousands first; the units reading only when it alone makes her line right, and then the page names it. The
+  coordinator's ruling was wrong; the fixer built it faithfully. Arith in round 29 removes the C105 branch (quarantined).
