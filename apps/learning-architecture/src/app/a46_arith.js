@@ -619,7 +619,13 @@
   var RECLAIM = /^\s*(?:(?:ولی|اما|و)\s+)?(?:من|خودم)(?![آ-ی])/;
   /* دامنه: همان جمله؛ اگر جمله فهرست را پیش می‌کشد («…: »، «اینا/این حساب‌ها/نسخه») تا پایانِ پیام یا تا جمله‌ای که با «من/خودم» برمی‌گردد. «گفت/زد» (فعلِ سست) فقط وقتی عدد پس از آن در همان جمله آمده —
      «مادرم اولش نه گفت … پس نمره میشه ۷» نسبتِ حساب نیست (pwB2 p9) */
+  /* گذرِ یکپارچهٔ دورِ ۲۹ (story، با ثبت در یادداشتِ تحویلِ story؛ C125/C139 — یک خواننده): نسبتِ «کارِ دیگری» همان خوانندهٔ 📜 است (a45 A.STORY.otherWorks29):
+     «X یه حسابِ دیگه (هم) کرد: …» کارِ X، و «X گفت …، پس <حسابِ خودش>» از «پس» به بعد مالِ خودِ او (بانکِ R29 #232/#235؛ B29·D12، C29-4). بی a45 ⇒ همان خوانشِ پیشین (otherSpansR28). */
   function otherSpans(t) {
+    try { var SW = A.STORY && A.STORY.otherWorks29; if (SW) return SW(t).map(function (w) { return { a: w.from, b: w.to, who: w.who }; }); } catch (e) { }
+    return otherSpansR28(t);
+  }
+  function otherSpansR28(t) {
     var S = [], re = /[.!؟?\n](?!\d)/g, m, last = 0, cut = [];
     while ((m = re.exec(t))) { cut.push([last, m.index + 1]); last = m.index + 1; } cut.push([last, t.length]);
     var open = null;
