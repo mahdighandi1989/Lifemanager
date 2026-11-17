@@ -191,3 +191,7 @@ prior ⇒ dates ⇒ forecast ⇒ story ⇒ surface; the families' tests re-run a
   already passed — never «the first such day after today». A correction that changes only the «what» of a deadline («طرح نه، بودجه»)
   never moves its date, even when the corrected sentence contains a weekday. Every date test is checked on all seven weekdays (page
   clock frozen per run), never only on the day the suite happens to run.
+- **C134 amended (2026-11-17, after the full suite).** «The week of the replaced date» is read as **the same weekday nearest to the
+  replaced date** (if that day has passed, the other one, then later weeks). The literal Saturday–Friday week broke two older verdicts
+  (R20 #64: said on a Sunday, «شنبه ⇒ پنجشنبه» is the Thursday before that Saturday; R19b #11: «جمعه ⇒ شنبه» is the next day); the
+  nearest-day rule satisfies those and C134's own example, and is never counted from today.
