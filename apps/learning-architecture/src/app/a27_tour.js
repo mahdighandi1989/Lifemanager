@@ -4146,6 +4146,13 @@
       var occ28 = typeof A.liveOccOf28 === "function" ? A.liveOccOf28(src.text, named28.o) : [];
       var bare28 = !String(own).replace(/«[^»]*»/g, " ").split(/[\s،,.!؟?:؛]+/).some(function (w) { w = w.replace(/^ـ/, ""); return w.length >= 2 && !/^[0-9۰-۹٠-٩.٫]+$/.test(w) && !/^(?:نیست|نیستن|نیستند|نیسته|نبود|نبوده|نه|است|ست|هست|بود|بوده|ه|ـه|درست|درسته|اشتباه|گفتم|ببخشید)$/.test(w); });
       if (bare28 && occ28.length > 1) return { err: "«" + clip(named28.o, 20) + "» در آن پیام چند بار آمده («" + occ28.slice(0, 4).join("»، «") + "») — کدام عدد را اصلاح می‌کنی؟", ask28: true };
+      /* دورِ ۲۹ (R2 correction، C143؛ بانکِ R29 #70 «۴ نیست، ۵» کنارِ «۶ متر در ۴ متر»، «۴ تا پنجره»، «ساعتِ ۴»): جمله‌اش کمیتی نام نبرد و همان رقم در پیام‌های پیشینش چند کمیتِ
+         گوناگون است (همسایهٔ دیگر) ⇒ صفحه می‌پرسد کدام — حتی اگر پیامِ منبع یک بار آن را دارد؛ هیچ چیز عوض نمی‌شود تا او بگوید */
+      if (bare28 && /^[0-9۰-۹٠-٩.٫]+$/.test(String(named28.o).trim()) && typeof A.liveOccOf28 === "function") { var all29 = [];
+        for (var j29 = 0; j29 < ui; j29++) if (isUser(M[j29]) && !EDIT20.test(String(M[j29].text || ""))) (A.liveOccOf28(M[j29].text, named28.o) || []).forEach(function (t0) { t0 = String(t0).trim(); var w = t0.split(/[\s‌]+/), ix = w.findIndex(function (z) { return /[0-9۰-۹٠-٩]/.test(z); }); if (ix < 0 || (ix > 0 && LABEL29.test(w[ix - 1] + " "))) return;
+          var key = (w[ix + 1] || w[ix - 1] || "").replace(/[،,:؛.]+$/, ""); if (all29.every(function (x) { return x.k !== key; })) all29.push({ k: key, t: t0 }); });
+        all29 = all29.map(function (x) { return x.t; });
+        if (all29.length > 1) return { err: "«" + clip(named28.o, 20) + "» در پیام‌هایت چند کمیت است («" + all29.slice(0, 4).join("»، «") + "») — کدام عدد را اصلاح می‌کنی؟", ask28: true }; }
       /* فقط وقتی مقدارِ نام‌برده اصلاً در آن پیام نیست می‌پرسد؛ اگر هست ولی جایش را این خواننده نیافت، راهِ پیشین (old ِ مدل، numParts …) می‌ماند */
       var nv28 = String(named28.o).replace(/[^0-9۰-۹٠-٩.٫]+.*$/, ""), hasV28 = !!nv28 && new RegExp("(?:^|[^0-9۰-۹٠-٩.٫])" + nv28.replace(/[.٫]/g, "[.٫]") + "(?![0-9۰-۹٠-٩]|[.٫][0-9۰-۹٠-٩])").test(String(src.text) + " " + frag);
       var bareX28 = /^[0-9۰-۹٠-٩.٫]+$/.test(String(named28.o).trim());   // با یکا («۱۶۰ سانت» برای «۱.۶» ِ متر) شاید همان مقدار در یکای دیگر است ⇒ راهِ پیشین
@@ -4154,6 +4161,10 @@
     var frag48 = typeof A.liveNegStrip48 === "function" ? A.liveNegStrip48(frag) || frag : frag;
     /* … و وقتی مقدارِ پیشین را مدل نام برده و در تکه هست («۵» در «ما ۵ نفریم و ۴ میلیون پول داریم»)، سنجه همان مقدار است، نه هر عددِ دیگرِ تکه («۴ میلیون») */
     var old48 = txtOf(x.old).trim(), byOld = (!!old48 && hasTok20(frag, old48) && !hasTok20(old48, fix)) || !!(cd28 && cd28.c88 === "named" && !cd28.absent28);   // دورِ ۲۸ (C88): X ِ نام‌برده‌اش در تکه پیدا شد («۴» ِ «√(۳² + ۴²)»)
+    /* دورِ ۲۹ (R2 correction، C160/C142؛ بانکِ R29 #97 «نه ببخشید، همون ۴ درست بود»): پس‌گرفتنِ اصلاح — منبع پیامِ اصلاحِ پیشین است و مقدارِ «درست» همان مقدارِ نخستِ داده؛
+       تکه همان مقدارِ جاری (مقدارِ اصلاح) است، نه X ِ نفی‌شدهٔ آن پیام ⇒ داده با تاریخچه برمی‌گردد (ثبتِ اصلاح‌ها back) */
+    try { if (!edit && A.liveCorrReg29) { var fxn29 = nums19b(fix), bk29 = fxn29.length === 1 ? A.liveCorrReg29(s.id).filter(function (e) { return e && !e.sup && e.cm === msgId19b(src) && Math.abs(+e.a0 - +fxn29[0]) < 1e-9; }).pop() : null;
+        if (bk29) { frag = fa(String(+bk29.b)).replace(/\./g, "٫"); frag48 = frag; byOld = false; } } } catch (e29) { }
     if ((!byOld && hasTok20(frag48, fix)) || (typeof A.liveSameVal === "function" && A.liveSameVal(x.old ? txtOf(x.old) : frag48, fix))) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };   // دورِ ۲۲: «۷۴ کیلو» = «۷۴ کیلوئه» به معنا
     /* دورِ ۲۳ (Q4، D23-7 aD3 «اولش که گفتم ۶۷ ماه اشتباه بود؛ درستش ۶۱ و نیمه»): «اشتباه گفتم» (لغزشِ گفتن) با «نتیجه‌ام رد شد» فرق دارد — حدس/نتیجه‌ای که خودش
        آزمود و رد شد بازنویسی نمی‌شود؛ «رد شد» شاهدِ کارِ اوست و مقدارِ تازه نتیجهٔ تازهٔ اوست (✏️ ِ خودِ پیام جداست) */
@@ -4366,17 +4377,23 @@
         while (fo.length > 1 && fn.length > 1 && nzT(fo[0]) === nzT(fn[0])) { fo.shift(); fn.shift(); }
         while (fo.length > 1 && fn.length > 1 && nzT(fo[fo.length - 1]) === nzT(fn[fn.length - 1])) { fo.pop(); fn.pop(); }
         var De = { o: fo.join(" "), n: fn.join(" ") }; if (A.liveFixVal(srcT, De) != null) D21 = De; } } catch (e) { D21 = null; }
+    /* دورِ ۲۹ (R2 correction، C142؛ بانکِ R29 #61 «عرض ۵ هم نیست، ۵٫۵» با تکهٔ گزارش‌شدهٔ «اتاق ۶ متر در ۴ متر» ⇒ «گام ۴» ⇒ «گام ۵٫۵»): X ِ جملهٔ خودش مقدارِ جاریِ داده‌ای است که پیش‌تر
+       اصلاح شد (ثبتِ اصلاح‌های سشن) و در تکهٔ گزارش‌شده نیست ⇒ اصلاحِ دومِ همان داده: جفت «X ⇒ مقدارِ تازه» روی متن‌هایی که X ِ جاری را دارند */
+    try { if (!R.edit && A.liveCorrReg29) { var xm29 = /([0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?)[^،,.؛\n]{0,20}?(?:نیست|نبود|نمیشه|نمی‌شه|نه)(?![آ-ی])/.exec(ownText(cu)), fx29 = rawNums(R.fix);
+        if (xm29 && fx29.length === 1) { var xv29 = faDigits(xm29[1]).replace(/٫/g, "."), fr29 = nums19b(R.frag);
+          if (fr29.indexOf(xv29) < 0 && A.liveCorrReg29(s.id).some(function (e) { return e && !e.sup && Math.abs(+e.b - +xv29) < 1e-9; })) D21 = { o: xm29[1], n: fx29[0], c88: "chain29" }; } } } catch (e29) { }
     var fullNew21 = R.edit ? ((/متنِ درستِ پیامم:\s*«([\s\S]*)»\s*$/.exec(cu) || [])[1] || "") : "";
     var sub = function (T, typed) { var v = null;
       try { if (D21 && A.liveFixVal && (D21.n || "").trim()) v = A.liveFixVal(T, D21); } catch (e) { v = null; }
       /* دورِ ۲۸ (R2، C88): جفتِ کمینه از حرفِ خودش (D21.c88) که جایگزینیِ درجایش برابریِ نوشته‌شده‌ای را دروغ می‌کرد رد شد — جایگزینیِ زمخت‌تر («۵ متر²)») جایش نمی‌نشیند؛ عددهای کهنه را موتورِ کهنگی می‌گوید */
       if (v == null && D21 && D21.c88 && typeof T === "string" && String(D21.o).trim()) { var esc28 = String(D21.o).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/[.٫]/g, "[.٫]"), re28 = new RegExp("(^|[^0-9۰-۹٠-٩.٫])(" + esc28 + ")(?![0-9۰-۹٠-٩]|[.٫][0-9۰-۹٠-٩])", "g"), m28 = T.match(re28) || [];
         /* همان یک جای X در این رکورد (جایگزینیِ کمینه؛ برابریِ نوشته‌شده‌ای که دیگر برقرار نیست را موتورِ کهنگی «کهنه» می‌گوید) — چند جا ⇒ هیچ (نه حدس) */
+        m28 = (function () { var g = new RegExp(re28.source, "g"), x, k = []; while ((x = g.exec(T))) { var at = x.index + x[1].length; if (!LABEL29.test(T.slice(Math.max(0, at - 12), at))) k.push(x[0]); } return k; })();   // دورِ ۲۹ (D29-5): برچسبِ گام شمرده نمی‌شود
         /* دورِ ۲۹ (R2 correction، C88/C143؛ D29-26 arD2 «عرضِ حیاط ۵ نیست، ۴» — «۵» سه جا در صورت بود و صورت دست نخورد): چند جا ⇒ همان جایی که تکهٔ نام‌بردهٔ او («حیاط ۵ متر در ۸ متره») در همین متن است؛ وگرنه هیچ (نه حدس) */
         if (m28.length > 1 && R.frag) { var fz29 = String(T).indexOf(String(R.frag).trim()), fl29 = String(R.frag).trim().length; if (fz29 < 0) { var fr29 = fragRe(String(R.frag).trim()), mm29 = fr29 && fr29.exec(String(T)); if (mm29) { fz29 = mm29.index; fl29 = mm29[0].length; } }
           if (fz29 >= 0) { var g29 = new RegExp(re28.source, "g"), x29, hit29 = []; while ((x29 = g29.exec(T))) { var at29 = x29.index + x29[1].length; if (at29 >= fz29 && at29 < fz29 + fl29) hit29.push({ s: at29, e: at29 + x29[2].length }); }
             if (hit29.length === 1) return T.slice(0, hit29[0].s) + numOnly29(T.slice(hit29[0].s, hit29[0].e), String(D21.n)) + T.slice(hit29[0].e); } }
-        return m28.length === 1 ? T.replace(re28, function (all, pre, x0) { return pre + numOnly29(x0, String(D21.n)); }) : null; }
+        if (m28.length !== 1) return null; var g1 = new RegExp(re28.source, "g"), y1; while ((y1 = g1.exec(T))) { var a1 = y1.index + y1[1].length; if (LABEL29.test(T.slice(Math.max(0, a1 - 12), a1))) continue; return T.slice(0, a1) + numOnly29(y1[2], String(D21.n)) + T.slice(a1 + y1[2].length); } return null; }
       if (v == null) v = subst20(T, R.frag, R.fix, cu, R.old); if (v == null) v = subst19b(T, R.frag, R.fix, cu, R.old);
       if (v == null && fullNew21 && String(T || "").trim() && (String(T).trim() === srcT.trim() || (String(T).length >= 40 && srcT.indexOf(String(T).replace(/…$/, "")) === 0))) v = clip(fullNew21, 400);
       /* دورِ ۲۴ (R3، C24-12 s23 «۱.۵.۷۵ برابر» ⇒ «۱۲۰»): رکوردِ همان نوع که تکه را ندارد فقط وقتی کلاً با مقدارِ درست جایگزین می‌شود که نه ✏️ باشد (در ✏️ تکه و

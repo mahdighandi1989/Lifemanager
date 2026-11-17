@@ -4460,7 +4460,9 @@
     try { var CT = out.filter(function (x) { return x.zone === "ctx"; }).map(function (x) { return nz(x.t); }); ctxIds.forEach(function (id) { var se = S.get(id); ((se && se.plans) || []).forEach(function (q) { if (!q || q.done || !txt(q.text) || !CT.some(function (t) { return t.indexOf(nz(q.text)) >= 0; })) return; add("splan:" + id + ":" + q.id, "برنامه", q.text, "role"); }); }); } catch (e) { console.warn(e); }
     if (g) { add("g.guess", "حدس", g.guess, "t1"); add("g.test", "آزمونِ حدس", g.test); }
     if (L.prior && Array.isArray(L.prior.steps)) L.prior.steps.forEach(function (x, i) { var n = x.n || i + 1; if (x.fixed && txt(x.fixed.t) && txt(x.quote) && nz(x.quote) !== nz(x.fixed.t)) add("priorq:" + n, "گامِ " + fa(n) + " ِ کارِ پیشین (متنِ نخست)", x.quote, "ctx");
-      add("prior:" + n, "گامِ " + fa(n) + " ِ کارِ پیشین", x.fixed && txt(x.fixed.t) ? x.fixed.t : x.quote); });
+      add("prior:" + n, "گامِ " + fa(n) + " ِ کارِ پیشین", x.fixed && txt(x.fixed.t) ? x.fixed.t : x.quote);
+      /* دورِ ۲۹ (R2، C143/C47؛ بانکِ R29 #93 «عرضِ اتاقِ دوم ۴ نیست، ۳» گامِ ۱ ِ اتاقِ اول را کهنه می‌کرد): گامِ دفتر نقلِ پیامی از اوست — زمانِ همان پیام زمانِ نوشتنِ گام است (ترتیبِ نوشتن، C47) */
+      var l29 = out[out.length - 1], q29 = nz(x.quote || ""); if (l29 && l29.k === "prior:" + n && q29.length >= 6) { var m29 = out.filter(function (y) { return y.zone === "ctx" && /^msg:/.test(y.k) && y.at && nz(y.t).indexOf(q29) >= 0; }).sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); })[0]; if (m29) l29.at = m29.at; } });
     if (L.plan) { add("plan", "طرح", L.plan.t); add("plan2", "طرحِ دوم", L.plan.t2); }
     (L.steps || []).forEach(function (st, i) { add("step:" + st.id, "گامِ " + fa(i + 1), st.text); add("pred:" + st.id, "پیش‌بینیِ گامِ " + fa(i + 1), st.pred, "t1"); if (st.out) add("out:" + st.id, "نتیجهٔ گامِ " + fa(i + 1), st.out.what, "role"); });
     try { var seen = {}; [sid, L.chat && L.chat.sess, r && r.sess].filter(function (x, i, X) { return x && X.indexOf(x) === i; }).forEach(function (id) { var se = S.get(id); if (!se || !Array.isArray(se.coachEv)) return;
@@ -4734,6 +4736,14 @@
        (۳) در ✏️، هم‌رقمی که او در همان پیام دست نزد همان داده نیست — ویرایشِ خودش داور است (D27-24 s37: «۴+۵+۷+۲»، «بر ۴» کنارِ «رقمِ اول ۴ ⇐ ۵»). */
     /* دورِ ۲۹ (R2، C89): داده‌ای که پیش‌تر اصلاح شد (جفتِ «جاری» ِ ثبتِ اصلاح‌ها، q.at29) فقط در نوشته‌ای ریشه است که پیش از آن اصلاح نوشته شد — پس از آن با مقدارِ تازه نوشته شده */
     occ.forEach(function (o) { var q = o.root && o.root.q, at = RC[o.ri].at; if (q && q.at29 && at && String(at) >= String(q.at29)) { o.fresh29 = true; o.root = null; } });
+    /* دورِ ۲۹ (R2، C143 «the correction binds to the quantity her sentence names»؛ بانکِ R29 #83 «۵ تا پنجره نه ۴» کنارِ «۶ متر در ۴ متر»، #71 «ضخامت ۵ نیست، ۶ میلی‌متره» کنارِ «۸ × ۵ = ۴۰ میلیون»؛ C29-10 pwC1):
+       (۱) داده‌ای که شمرده می‌شود («N تا پنجره») کمیتِ یکادار («۴ متر») نیست؛ (۲) داده‌ای با یکای فیزیکی («میلی‌متر») عملوندِ بی‌یکای حسابی نیست که حاصلش پول/بزرگی («… = ۴۰ میلیون») است،
+       و عددِ با بزرگیِ «میلیون/هزار» هم نیست */
+    var CNT29 = function (q) { return numParts0(D).some(function (p) { var pr = numPair(p.o, p.n); if (!pr || !veq(pr.a.v, q.a)) return false; return /^[\s‌]*تا(?:[\s‌]|$)/.test(String(p.o).slice(pr.a.e)) || /ساعتِ?[\s‌]*$/.test(String(p.o).slice(0, pr.a.s)); }); };   // «N تا X» یا «ساعتِ N» (#96)
+    occ.forEach(function (o) { var q = o.root && o.root.q; if (!q || o.root.st !== "old") return; var T29 = RC[o.ri].t;
+      if (CNT29(q) && o.u && UFAC[o.u]) { o.c143 = true; o.root = null; return; }
+      if (q.u && UFAC[q.u] && PHYS25[ufam(q.u)] && ufam(q.u) !== "money" && !o.u) { if (MAGRE27.test(T29.slice(o.e, o.e + 14))) { o.c143 = true; o.root = null; return; }
+        var r29 = o.run || o.rel; if (r29 && r29.res && r29.res !== o && (MAGRE27.test(T29.slice(r29.res.e, r29.res.e + 14)) || /^[\s‌]*(?:تومن|تومان|ریال)/.test(T29.slice(r29.res.e, r29.res.e + 10)))) { o.c143 = true; o.root = null; } } });
     var ord27 = opt.ord27 || null, inSp27 = function (sp, a, b) { return (sp || []).some(function (z) { return a < z[1] && b > z[0]; }); };
     if (ord27) occ.forEach(function (o) { var rc = RC[o.ri], mid = rc.mid || rc.hmid || "", at = rc.at || "";
       if (mid && (ord27.fresh || []).indexOf(mid) >= 0 || ord27.freshAt && at && at >= ord27.freshAt) { o.fresh27 = true; o.root = null; return; }
@@ -5018,7 +5028,11 @@
         (Array.isArray(x.dep) ? x.dep : []).forEach(function (dn) { var y = ST0.filter(function (z) { return z.n === dn; })[0]; ((y && y.stale) || []).forEach(function (q) { if (q && q.re != null && !prev28.some(function (p0) { return p0.k === "prior:" + x.n && veq(p0.v, q.v); })) prev28.push({ k: "prior:" + x.n, v: q.v, re: q.re }); }); }); });
       /* دورِ ۲۹ (C89/C142): اصلاحی که در سشن ثبت شده (staleMark / liveSessStale همین نوبت) با همان زنجیره و همان تابعِ پیشنهاد — مقدارِ جاریِ همهٔ داده‌ها */
       var se29 = o.sid ? S.get(o.sid) : null, ch29 = null; try { if (se29) { ch29 = chain29(se29, D, { look: true }); if (ch29 && ch29.e) D = ch29.D; else ch29 = null; } } catch (e29) { ch29 = null; }
-      var out = {}; props29(RC, D, ch29, null, { clause: fragClause(String(o.src || o.frag || ""), D) || String(o.frag || ""), noCtx: true, prev27: prev28 }).forEach(function (it) { var m = /^prior:(\d+)$/.exec(it.k); if (!m) return; (out[m[1]] = out[m[1]] || []).push({ v: it.v, re: it.re, ask: !!it.ask }); });
+      /* دورِ ۲۹ (C143/C47): ترتیبِ نوشتن در دفتر هم — گامی که پیش از نخستین پیامِ همان داده نوشته شد از آن ساخته نشده (همان ord27.preAt ِ مسئلهٔ زنده) */
+      var ord29 = null; try { if (se29 && txt(o.frag)) { var U29 = umsgs(se29), src29 = U29.filter(function (u) { return fzHas(String(u.text || ""), String(o.frag)); }).pop();
+          if (src29) { var key29 = datumKey27(src29.text, D), f29 = key29 ? U29.filter(function (u) { return fzHas(String(u.text || ""), key29); })[0] : null; if (f29 && f29.at) { ord29 = { fresh: [], freshAt: "", preAt: String(f29.at), edit: null };
+              RC.forEach(function (rc) { if (!/^prior:/.test(rc.k) || rc.at) return; var qq = nz((ST0.filter(function (x) { return "prior:" + x.n === rc.k; })[0] || {}).q || rc.t); var hm = U29.filter(function (u) { return u.at && nz(u.text).indexOf(qq) >= 0; })[0]; if (hm) rc.at = String(hm.at); }); } } } } catch (e29b) { ord29 = null; }
+      var out = {}; props29(RC, D, ch29, null, { clause: fragClause(String(o.src || o.frag || ""), D) || String(o.frag || ""), noCtx: true, prev27: prev28, ord27: ord29 }).forEach(function (it) { var m = /^prior:(\d+)$/.exec(it.k); if (!m) return; (out[m[1]] = out[m[1]] || []).push({ v: it.v, re: it.re, ask: !!it.ask }); });
       /* دورِ ۲۷ (R2، C47 نیمهٔ دوم؛ بانکِ R27 #67/#73): گامی از دفتر که به گامِ کهنه‌ای وابسته است (dep ِ دفتر) و عبارتی از آن ندارد هم کهنه است — بی عدد (پرسش)؛ زنجیره‌ای.
          فقط وقتی فراخوان dep ِ گام‌ها را می‌دهد (قرارداد برای a45: steps[i].dep) */
       for (var g27 = true; g27;) { g27 = false; ST0.forEach(function (x) { if (out[x.n] || !Array.isArray(x.dep)) return; if (x.dep.some(function (d) { return !!out[d]; })) { out[x.n] = []; g27 = true; } }); }
@@ -5109,7 +5123,10 @@
     var sup29 = function (x) { return ch29 && ch29.prevE && x.c29 === ch29.prevE.id; };
     if (ch29 && (ch29.prevE || items.length)) { var keep = []; (L.stale24 || []).forEach(function (x) { if (sup29(x)) { (L.stale24h = L.stale24h || []).push(Object.assign({ supAt: nowISO(), how: "superseded by a later correction of the same datum" }, x)); return; }
         x.items = (x.items || []).filter(function (it) { var hit = items.some(function (y) { return y.k === it.k && veq(y.v, it.v); }); if (hit) (L.stale24h = L.stale24h || []).push({ supAt: nowISO(), how: "superseded (current value of every datum)", from: x.from, item: it }); return !hit; });
-        if (x.items.length) keep.push(x); }); L.stale24 = keep; S.put(pg); }
+        if (x.items.length) keep.push(x); }); L.stale24 = keep;
+      /* دورِ ۲۹ (C160؛ بانکِ R29 #97 «نه ببخشید، همون ۴ درست بود»): اصلاحی که پس گرفته شد — داده به مقدارِ نخستش برگشت؛ پیشنهادهای ساخته بر مقدارِ پس‌گرفته در دفتر «کنار رفته» می‌شوند (در تاریخچه)، نه کهنهٔ باز */
+      if (ch29.e && ch29.e.back && L.prior && Array.isArray(L.prior.steps)) L.prior.steps.forEach(function (x) { ["stale", "stale25"].forEach(function (k) { if (!x[k]) return; (x.staleHist = x.staleHist || []).push(Object.assign({ done: nowISO(), how: "withdrawn: the correction was taken back (C160)" }, x[k])); delete x[k]; }); });
+      S.put(pg); }
     if (!items.length) return null;
     var ent = { at: (base && base.at) || nowISO(), src: (base && base.src) || "", sess: (base && base.sess) || "", c29: ch29 && ch29.e ? ch29.e.id : "", from: { o: D.parts ? D.parts.map(function (p) { return p.o; }).join("، ") : D.o, n: D.parts ? D.parts.map(function (p) { return p.n; }).join("، ") : D.n }, items: items };
     L.stale24 = (L.stale24 || []).filter(function (x) { return !(x.from.o === ent.from.o && x.from.n === ent.from.n); }).concat([ent]);

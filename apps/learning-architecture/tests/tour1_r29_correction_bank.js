@@ -55,7 +55,8 @@ async function run(ctx) {
     return { ok: PROPS(x, { 3: [960, 1080], 4: [6960, 7080], 5: [2320, 2360] }) && !marked(x, 1) && !marked(x, 2), got: { prior: x.prior, sys: x.sys } }; };
   C[68] = async () => { await scen({ prior: [RES('دیوارها ۴۸ مترمربع، هر لیتر ۱۲ مترمربع: ۴۸ ÷ ۱۲ = ۴ لیتر؛ هر قوطی ۴ لیتر میشه، پس ۱ قوطی')], stmtChat: 'دیوارها ۴۸ مترمربع، هر قوطی ۴ لیتر' });
     await turn('یه اصلاحِ دیگه: هر قوطی ۴ لیتر نمیشه، ۵ لیتر میشه', 'فرستادم.', RT({ msg: 'هر قوطی ۴ لیتر میشه', key: 'datum:قوطی', what: 'fact', fix: '۵ لیتر' })); const x = await snap('');
-    return { ok: /هر قوطی ۵ لیتر/.test(x.stmtChat) && !/انجام نشد|نشانهٔ اصلاح/.test(allText(x)), got: { stmt: x.stmtChat, sys: x.sys, ref: x.refused } }; };
+    /* صورتِ گفت‌وگو این‌جا ساختگی است (از پیامِ او نیامده) — بانک «اندازهٔ قوطی ۵ با تاریخچه» و «هرگز ردِ اصلاح» را می‌خواهد: سطرِ اصلاح با «۵» و بی رد */
+    return { ok: /اصلاح شد/.test(J(x.sysAll)) && /«۵(?: لیتر)?»/.test(J(x.sysAll)) && !/انجام نشد|نشانهٔ اصلاح/.test(allText(x)) && !x.refused, got: { stmt: x.stmtChat, sys: x.sys, ref: x.refused } }; };
   C[69] = async () => { await scen({ prior: [RES('۵ تا سبد داریم، هر سبد ۱۲ تا سیب: ۵ × ۱۲ = ۶۰ تا سیب')], stmtChat: '۵ تا سبد داریم، هر سبد ۱۲ تا سیب' });
     await turn('هر سبد ۱۲ تا سیب نمیشه، ۱۰ تا میشه', 'فرستادم.', RT({ msg: 'هر سبد ۱۲ تا سیب', key: 'datum:سبد', what: 'fact', fix: '۱۰ تا' })); const x = await snap('');
     return { ok: /هر سبد ۱۰ تا سیب/.test(x.stmtChat) && /60>50(?![.\d])/.test(J(x.s26)) && !/انجام نشد/.test(allText(x)), got: { stmt: x.stmtChat, s26: x.s26, sys: x.sys, ref: x.refused } }; };
@@ -129,7 +130,7 @@ async function run(ctx) {
     return { ok: [1, 2, 3, 4, 5].every(n => !marked(x, n)) && /۶ متر در ۴ متر/.test(J(x.prior)), got: { prior: x.prior } }; };
   C[94] = async () => { await scen({ prior: ['مجموعِ ۱/(n(n+1)) برای n از ۱ تا ۱۵ چند میشه؟'], stmtChat: 'مجموعِ ۱/(n(n+1)) برای n از ۱ تا ۱۵ چند میشه؟' });
     await turn('منظورم n از ۱ تا ۲۰ بود', 'فرستادم.', RT({ msg: 'n از ۱ تا ۱۵', key: 'datum:بازه', what: 'fact', fix: 'n از ۱ تا ۲۰' })); const x = await snap('');
-    return { ok: (x.stmtChat === 'مجموعِ ۱/(n(n+1)) برای n از ۱ تا ۲۰ چند میشه؟' || /کدام/.test(allText(x))) && /۱\/\(n\(n\+۱\)\)|1\/\(n\(n\+1\)\)/.test(x.stmtChat), got: { stmt: x.stmtChat, sys: x.sys } }; };
+    return { ok: (x.stmtChat === 'مجموعِ ۱/(n(n+1)) برای n از ۱ تا ۲۰ چند میشه؟' || /کدام/.test(allText(x))) && x.stmtChat.indexOf('مجموعِ ۱/(n(n+1)) برای n از ۱ تا') === 0, got: { stmt: x.stmtChat, sys: x.sys } }; };
   C[95] = async () => { const pid = await moket(); await turn('آهان، اصلاً ۵ متر بود، نه ۴ — اگه ۶ بود چی می‌شد؟', 'فرستادم.', RT({ msg: 'اتاق ۶ متر در ۴ متر', key: 'datum:عرض', what: 'fact', fix: '۵ متر' })); const x = await snap(pid);
     return { ok: PROPS(x, { 1: [24, 30] }) && !anyRe(x, [36]), got: { prior: x.prior } }; };
   C[96] = async () => { const pid = await moket(); await turn('نصاب ساعتِ ۴ نمیاد، ساعتِ ۵ میاد', 'فرستادم.', RT({ msg: 'نصاب ساعتِ ۴ میاد', key: 'datum:ساعت', what: 'fact', fix: 'ساعتِ ۵' })); const x = await snap(pid);
