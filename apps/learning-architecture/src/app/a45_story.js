@@ -431,8 +431,9 @@
     if (A0.cut >= 0) to = A0.cut;   // دورِ ۲۹ (C125): «X گفت …، پس …» — از «پس» به بعد مالِ خودش
     else if (LIST28.test(T.slice(A0.end, A0.sent.b)) || /(?:^|[\s«])(?:اینا|این[‌\s]?ها|این\s+حساب|نسخه)/.test(S0)) { to = T.length; var rest = T.slice(A0.sent.b), sm = null, k = A0.sent.b;
       /* دورِ ۲۹ (C125، B29·D12 nB2 «داداشم یه حسابِ دیگه هم کرد: … . همسایه‌مون گفت …، پس …»): فهرستِ آن دیگری در جمله‌ای که نسبتِ تازه‌ای دارد (کسِ دیگری می‌گوید/می‌کند)
-         یا با «پس / بنابراین» آغاز می‌شود هم تمام می‌شود — همان مرزِ «پس» ِ دورِ ۲۸ (B28·D9) */
-      rest.split(SENT28).some(function (x) { if (MINEV28.test(x) || /^\s*(?:پس|بنابراین|در\s*نتیجه)(?![آ-ی])/.test(x) || (OTHER28.lastIndex = 0, OTHER28.test(x))) { sm = k; return true; } k += x.length + 1; return false; }); OTHER28.lastIndex = 0; if (sm != null) to = sm; }
+         یا با «پس / بنابراین» آغاز می‌شود هم تمام می‌شود — همان مرزِ «پس» ِ دورِ ۲۸ (B28·D9)؛ و (D29-12 tD1 «… . مامانم کمکم کرد … . اوستا گفت …») فهرست فقط سطرهای حسابِ برهنه
+         (آغاز با عدد/پرانتز/نشانهٔ فهرست) را ادامه می‌دهد — جمله‌ای که نهادِ خودش را دارد پایانِ فهرستِ آن دیگری است */
+      rest.split(SENT28).some(function (x) { if (MINEV28.test(x) || /^\s*(?:پس|بنابراین|در\s*نتیجه)(?![آ-ی])/.test(x) || (OTHER28.lastIndex = 0, OTHER28.test(x)) || (x.trim() && !/^\s*(?:[-•*●▪]|\(?[0-9۰-۹])/.test(x))) { sm = k; return true; } k += x.length + 1; return false; }); OTHER28.lastIndex = 0; if (sm != null) to = sm; }
     else { var mm = MINE27.exec(T.slice(A0.end, to)); if (mm) to = A0.end + mm.index; }
     while (to > from && /\s/.test(T.charAt(to - 1))) to--; while (from < to && /[\s»«"'،,:]/.test(T.charAt(from))) from++;
     return { who: A0.who, from: from, to: to, text: txt(T.slice(from, to)) };
@@ -786,7 +787,7 @@
      نشان نمی‌داد و گام بی‌پرسش جابه‌جا می‌شد. حالا وابستگی از خودِ دفتر خوانده می‌شود، با همان قاعدهٔ «وابسته»ی صفحه (C25-15): dep ِ ثبت‌شده، یا گامِ بعدی که عددِ نتیجهٔ
      این گام را به کار برده — زنجیره‌ای. key: «pb_l_…» (مسئلهٔ زنده)، «achat_…|pk» یا «achat_…»؛ line: سطرِ همان گام در 📜 (برای یافتنِ دفترِ درست). */
   function depsOf29(pr, n) { var steps = (pr && pr.steps) || [], out = [], q = [n];
-    while (q.length) { var k = q.shift(), x = steps[k - 1]; if (!x) continue; var R = (x.said || []).concat(resNums(curText(x))).filter(Boolean);
+    while (q.length) { var k = q.shift(), x = steps[k - 1]; if (!x) continue; var R = (x.said || []).concat(resNums(curText(x))).filter(Boolean); if (!R.length) R = numsOf(curText(x));   // گامِ داده (بی حساب): عددهای خودش پایهٔ گام‌های بعدی است
       steps.forEach(function (y) { if (!y || y.n <= k || y.test || out.indexOf(y.n) >= 0 || y.n === n) return;
         if ((y.dep || []).indexOf(k) >= 0 || R.some(function (r) { return numRe(r).test(digs(curText(y))); })) { out.push(y.n); q.push(y.n); } }); }
     return out.sort(function (a, b) { return a - b; }); }
