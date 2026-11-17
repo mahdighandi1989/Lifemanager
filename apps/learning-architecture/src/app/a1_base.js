@@ -154,6 +154,15 @@ var APP = window.APP = {};
   /* دورِ ۲۳ (Q1، A23-28/A23-38): ثبت‌گاهِ «دانسته‌های سامانه دربارهٔ خودش» — هر بخش دادهٔ خودش را با «به چه کار می‌آید / کجا ذخیره می‌شود / آفلاین /
      مستقل از مدل» ثبت می‌کند و «# نقشهٔ سامانه» ِ دستیار از همین می‌سازد (نه فهرستِ دستی در پرامپت). f(field) تابع هم می‌تواند باشد (حالتِ ذخیره در لحظه). */
   A.SELF_FACTS = A.SELF_FACTS || [];
+  /* دورِ ۲۹ (R7، F19 — C150؛ A29-29 oA1 p38: نقشهٔ «خودِ سامانه» ِ دستیار قاعده‌های دورِ ۲۸ (C87، C96، C124) را نداشت و دستیار نمی‌توانست بانکِ مالک ۴۲/۶۴/۶۵ را با شاهد جواب دهد):
+     ثبت‌گاهِ «قاعده‌هایی که صفحه خودش اجرا می‌کند». هر قاعده با `by` = نامِ تابعِ صادرشده‌ای که اجرایش می‌کند («ST.dataSrc28»، «AS.sysQ28» …) ثبت می‌شود؛ بلوکِ
+     «## خودِ سامانه» ِ پرامپت (a26 AS.manifest — بلوکِ ساختهٔ صفحه در پیامِ کاربر، نه AS.SYS) فقط قاعده‌ای را می‌آورد که تابعش در همین ساخت هست ⇒ قاعده‌ای که اصلاح‌گری
+     می‌افزاید با یک ثبت در همین‌جا (یا با A.pageRule کنارِ تابعِ خودش) بی دست‌بردن در پرامپت در نقشه می‌آید، و قاعده‌ای که برداشته شد خودبه‌خود می‌افتد.
+     {id: شمارهٔ حکم (شاهد برای مدل، C174 — هرگز در نمای او)، fa: آنچه صفحه می‌کند به زبانِ او، see: کجا می‌بیند/برمی‌گرداند، asks: پرسش‌هایی از او که همین جوابشان است، by} */
+  A.PAGE_RULES = A.PAGE_RULES || [];
+  A.pageRule = function (r) { if (!r || !r.id || !r.fa) return null; var i = A.PAGE_RULES.map(function (x) { return x.id; }).indexOf(r.id); if (i >= 0) A.PAGE_RULES[i] = r; else A.PAGE_RULES.push(r); return r; };
+  A.ruleBy = function (path) { var o = window, P = String(path || "").split("."), root = { A: A, AS: A.ASSIST, ST: A.STORY, PR: A.PR, PRE: A.PRE }; if (root[P[0]]) { o = root[P[0]]; P = P.slice(1); } else o = A;
+    for (var i = 0; i < P.length && o; i++) o = o[P[i]]; return typeof o === "function" ? o : null; };
   A.SELF_FACTS.push({ id: "store", fa: "ذخیرهٔ داده‌های این صفحه",
     use: "همهٔ رکوردهای صفحه",
     where: function () { return S.mode === "host" ? "سرورِ Lifemanager، در فضای حسابِ خودِ کاربر" : S.mode === "gas" ? "در Google Apps Script ِ خودِ کاربر (برگه‌های Drive ِ خودش)" : "فقط در همین مرورگر (localStorage)"; },

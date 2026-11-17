@@ -158,3 +158,24 @@ result's scale, it records no relation rather than guessing one.
 ### How to Apply Elsewhere
 Any pipeline that normalizes text and reports spans should carry an index map through every substitution and convert spans at the boundary; and any
 ambiguity resolver should ask only when the outcome actually depends on the reading, never when every reading gives the same verdict.
+
+## Update 2026-11-17 (Pólya round 29, «prior») — one judge per line; a weaker second reader may only say «unchecked»; never quote a text the person did not write
+
+**Challenge.** A ledger of the person's earlier steps re-checked her corrected step with a second, scale-blind reader after the exact engine had
+already accepted it: «8 million minus 6 million and 150 is 1 million and 850» was ✓ in the engine and «still does not read» four times in the
+ledger (the light reader saw 1 and 850; the engine's own stored value for a compound amount was not even a usable number). Two more failures came
+from the same layer: the page substituted the corrected datum into an old step («5.5 m by 4 m = 20»), failed to read it, and showed it as «your new
+text»; and every later message that merely shared a word («metre») was taken as a new attempt at that step. Separately, a reason string split on
+commas and «and» and re-joined with commas looked «changed» to a diff, which stamped «the earlier reason no longer holds» on untouched steps.
+
+**Rule.** (1) Each arithmetic claim has one judge: match the old wrong calculation to the new text by the judge's own key (its normalized
+expression), and take the judge's verdict. A lighter reader may confirm or add «unchecked»; it never rejects, and a value is evidence only when it is
+the plain number the person wrote. (2) A text the system built (substitution, template) is never attributed to the person; if it does not verify,
+mark the step «needs recomputation», not «your attempt failed». (3) A step waiting for recomputation accepts only a recomputation containing the new
+value; word overlap is not attribution. (4) When a derived string is «the original minus some clauses», return the original byte-for-byte when no
+clause is dropped, and never split inside a quantity («2 million and 850»).
+
+### How to Apply Elsewhere
+Any system with more than one validator for the same user claim should route the verdict through one authority and let the others only annotate;
+diff-based «changed» markers must compare like with like (return the source unchanged when the transform is a no-op), and any text shown as «yours»
+must be traceable to the user's own input.

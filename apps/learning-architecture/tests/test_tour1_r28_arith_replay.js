@@ -40,7 +40,8 @@ const DIR = path.join(__dirname, 'fixtures', 'r28_arith');
     const B10 = blockOf(callFor(R, /sqrt\(15\.73\)/)), B17 = blockOf(callFor(R, /دقیق‌ترش: ۲√۳/)), B18 = blockOf(callFor(R, /رفت‌وبرگشت/)), U19 = callFor(R, /منظورم ۲ میلیون و ۸۰۰ هزار بود/);
     const B7 = blockOf(callFor(R, /sqrt\(3\.67\^2 \+ 1\.6\^2\) ≈ 4\.005/));
     chk(!/✗/.test(B7), 'A_s02 p7 (C13 across messages): her «3.67» is her own rounding from p4 — «≈ 4.005» is never ✗ :: ' + B7);
-    chk(/✓ «sqrt\(۱۵\.۷۳\) = ۳\.۹۷» می‌خواند/.test(B10) && !/نسنجیده/.test(B10), 'A_s02 p10 (A28-7): «sqrt(…)» is read like «√» :: ' + line(B10, /sqrt/));
+    /* دورِ ۲۹ (بانکِ R29 #19، #44؛ C29-18): «≈» ِ خودِ او در سطرِ مربی «≈» می‌ماند (پیش‌تر «=») */
+    chk(/✓ «sqrt\(۱۵\.۷۳\) [=≈] ۳\.۹۷» می‌خواند/.test(B10) && !/نسنجیده/.test(B10), 'A_s02 p10 (A28-7): «sqrt(…)» is read like «√» :: ' + line(B10, /sqrt/));
     chk(/✓ «۲ میلیون و ۸۰۰ \+ ۲۰۰ هزار = ۳ میلیون» می‌خواند/.test(B17) && /— حسابِ «۲√۳ ≈ ۳\.۴۶» را صفحه نسنجیده/.test(B17) && /✗ «۲ میلیون و ۸۰۰ \/ ۲» را «۱ میلیون و ۵۰۰» نوشته — حسابِ صفحه: ۱ میلیون و ۴۰۰ هزار .*یا ۱ میلیون و ۴۰۰ /.test(B17),
       'A_s02 p17 (A28-8/9/10): the tip line ✓ (never «واحدِ ناشناخته»), «۲√۳» «نسنجیده», ✗ with both values in her words :: ' + B17);
     chk(/؟ «۲ میلیون و ۸۰۰» دو خوانش دارد/.test(B18), 'A_s02 p18: «÷ ۲ = ۱۴۰۰» asks which reading :: ' + B18);

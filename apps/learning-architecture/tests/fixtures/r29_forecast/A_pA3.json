@@ -1,0 +1,221 @@
+{
+"from": "round29A/pA3",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام. می‌خوام برای اردوی بچه‌ها یه چادرِ هرمی بدوزم: کفش مربعِ ۲ در ۲ متره و ارتفاعش از وسطِ کف تا نوک ۱٫۵ متر. برای چهار تا دیوارهٔ مثلثیش چقدر پارچه لازمه؟ کف رو جدا می‌خرم."
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.value='1988-06-21';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()})()"
+},
+{
+"say": "یعنی می‌خوام مساحتِ چهار تا مثلثِ دیواره رو پیدا کنم. هر دیواره یه مثلثه که قاعده‌ش ۲ متره. ولی مساحتِ مثلث رو یادم نیست… قاعده ضربدر ارتفاع بود؟ یا ضلع ضربدر ضلع؟"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+300)})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"say": "مساحتِ مستطیل طول ضربدر عرضه، یعنی ۶. اگه از قطر نصفش کنم، هر نیمه یه مثلثه، پس ۳. آهان! پس مساحتِ مثلث = نصفِ قاعده ضربدر ارتفاع. خب، ارتفاعِ هر دیواره همون ۱٫۵ ـه دیگه؟ پس هر کدوم ۱٫۵ متر مربع."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+200)})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"say": "کشیدم. ۱٫۵ از وسطِ کف تا نوکه، عمودی. ولی ارتفاعِ دیواره از وسطِ لبهٔ کف تا نوکه و کج‌تره، پس بلندتره. یه مثلثِ قائم درست میشه: یه ضلعش ۱ متر (از وسطِ کف تا وسطِ لبه)، یکی ۱٫۵، و کج‌ترینش همون که می‌خوام. ولی نمی‌دونم ضلعِ سوم رو چطوری حساب کنم. اسمِ فیثاغورس رو شنیدم ولی بلد نیستم."
+},
+{
+"say": "کشیدم، ضلعِ کج ۵ سانت شد. ۳ و ۴ و ۵… ۳+۴ که ۷ میشه. ولی ۹ + ۱۶ = ۲۵! یعنی مربعِ ضلع‌ها جمع بشه میشه مربعِ ضلعِ کج؟ پس برای چادر: ۱ + ۲٫۲۵ = ۳٫۲۵. یعنی ضلعِ کج رادیکالِ ۳٫۲۵ ـه. حالا رادیکالِ ۳٫۲۵ رو بی ماشین‌حساب چطوری پیدا کنم؟ اینو هم بلد نیستم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify(APP.PRE.all(sc).map(x=>[x.id,x.concept,x.state,x.parent,x.depth]))})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+1000)})()"
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[5];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');t&&t.scrollIntoView({block:'center'});return g.length+' pts | '+x.getAttribute('aria-label')+' || TIP: '+(t?t.innerText:'')})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"say": "۶ به توانِ دو میشه ۳۶، ۸ به توانِ دو ۶۴، جمعش ۱۰۰؛ پس وتر ۱۰ ـه. با خط‌کش هم کشیدم، ۱۰ شد."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify(APP.PRE.all(sc).map(x=>[x.id,x.state]))})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify(APP.PRE.all(sc).map(x=>[x.id,x.state]))})()"
+},
+{
+"say": "با فیثاغورس ضلعِ کج میشه رادیکالِ ۳٫۲۵. ولی گفتم که رادیکال رو بی ماشین‌حساب بلد نیستم."
+},
+{
+"say": "۱٫۵ × ۱٫۵ میشه ۲٫۲۵ و ۲ × ۲ میشه ۴. پس رادیکالِ ۳٫۲۵ بینِ ۱٫۵ و ۲ ـه… ولی دقیقش رو نمی‌دونم چطوری پیدا کنم."
+},
+{
+"say": "۲ × ۲ میشه ۴، ۲٫۲ × ۲٫۲ میشه ۴٫۸۴، ۲٫۳ × ۲٫۳ میشه ۵٫۲۹. پس رادیکالِ ۵ حدودِ ۲٫۲۴. حالا برای ۳٫۲۵: ۱٫۸ × ۱٫۸ = ۳٫۲۴. خیلی نزدیکه! پس ارتفاعِ هر دیواره تقریباً ۱٫۸ متره."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const sc=APP.PRE.scope(s);return JSON.stringify(APP.PRE.all(sc).map(x=>[x.id,x.state]))})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go(\"route\",s.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+1200)})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"say": "فیثاغورس که تموم شده بود! ارتفاعِ هر دیواره ۱٫۸ متره. برگردم به مساحت: هر مثلث نصفِ ۲ × ۱٫۸ یعنی ۱٫۸ متر مربع، چهار تا میشه ۷٫۲ متر مربع. با ده درصد برای درز و دوخت حدودِ ۸ متر پارچه می‌خرم."
+},
+{
+"say": "یه مدلِ کاغذیِ یک‌دهم ساختم: دیواره‌ها با قاعدهٔ ۲۰ سانت و ارتفاعِ کجِ ۱۸ سانت، دورش رو بریدم و چسبوندم، دقیقاً جور شد. درسم اینه که وقتی یه چیزی رو بلد نیستم، اسمش رو پیدا می‌کنم، از یه حالتِ ساده می‌سازمش و بعد برمی‌گردم سرِ همون نقطه. سؤالِ «مثلثِ ۳ و ۴ رو بکش و بسنج» از همه بیشتر کمک کرد. این جور کارهای دستی که حساب دارن رو دوست دارم."
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqniyoezr');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlutchw6r0');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqniyoezr');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqniyoezr');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt6rbvs6t');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqniyoezr');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqniyoezr');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlysnxyapa');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqniyoezr');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "برای خرید یادداشت کردم: ۷٫۲ متر مربع = ۷۲۰۰۰ سانتی‌متر مربع. پارچه عرضش ۱٫۵ متره، پس ۸ / ۱٫۵ = ۵٫۳۳ متر طول می‌خوام. پارچه‌فروش به ذرع می‌فروشه: ۵ ذرع = ۵٫۲ متر."
+},
+{
+"eval": "(()=>{const f=APP.STORY.arithChk;const T=[\"۷٫۲ متر مربع = ۷۲۰۰۰ سانتی‌متر مربع.\",\"پس ۸ / ۱٫۵ = ۵٫۳۳ متر طول می‌خوام.\",\"۸ / ۱٫۵ = ۵٫۳۳\",\"۵ ذرع = ۵٫۲ متر.\",\"۲ کیلو = ۲۰۰۰ گرم\",\"۳ کیلووات‌ساعت = ۱۰۸۰۰ کیلوژول\",\"برای خرید یادداشت کردم: ۷٫۲ متر مربع = ۷۲۰۰۰ سانتی‌متر مربع. پارچه عرضش ۱٫۵ متره، پس ۸ / ۱٫۵ = ۵٫۳۳ متر طول می‌خوام. پارچه‌فروش به ذرع می‌فروشه: ۵ ذرع = ۵٫۲ متر.\"];return JSON.stringify(T.map(t=>[t.slice(0,40),(f(t)||[]).map(c=>c.expr+\"=\"+c.said+\":\"+c.ok+(c.unit?\" u=\"+c.unit:\"\")+(c.conv?\" conv\":\"\")+(c.note?\" \"+c.note:\"\"))]))})()"
+}
+],
+"replies": [
+"{\"reply\": \"چادرِ هرمی را خودت قدم‌به‌قدم حساب می‌کنی و من کنارت می‌پرسم؛ اگر بخواهی، می‌شود آن را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت کرد تا گام‌هایش بماند. پیش از جزئیات: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"پارچهٔ چادرِ هرمی\", \"pinned\": \"متراژِ پارچهٔ چهار دیوارهٔ مثلثیِ چادرِ هرمی\", \"memory\": \"چادرِ هرمی: کف مربعِ ۲×۲ متر، ارتفاع از وسطِ کف تا نوک ۱.۵ متر؛ پارچهٔ چهار دیوارهٔ مثلثی؛ کف جدا. پرسیدم کل را در یک جمله.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"فهمِ مسئله\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"کل را درست گفتی: مساحتِ چهار مثلثِ دیواره. این گام یک چیزِ مشخص لازم دارد: «مساحتِ مثلث» — و این‌که یادت نیست، کمبودِ همین یک مفهوم است، نه چیزِ دیگر. یک وارسیِ کوتاه: مستطیلی ۲ در ۳ را از قطرش نصف کن؛ مساحتِ هر نیمه چقدر است؟\", \"memory\": \"چادرِ هرمی: کف ۲×۲، ارتفاع از وسطِ کف تا نوک ۱.۵؛ پارچهٔ چهار دیواره. کل را گفت. پیش‌نیازِ «مساحتِ مثلث» در گامِ «مساحتِ هر دیوارهٔ مثلثی»؛ پرسشِ تشخیصی: نصفِ مستطیلِ ۲×۳.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"پیش‌نیاز: مساحتِ مثلث\", \"s\": \"now\", \"view\": \"whole\"}, {\"t\": \"مساحتِ دیواره‌ها\", \"s\": \"todo\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u1\"], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq\": {\"concept\": \"مساحتِ مثلث\", \"step\": \"مساحتِ هر دیوارهٔ مثلثی\", \"quote\": \"مساحتِ مثلث رو یادم نیست\", \"q\": \"مستطیلی ۲ در ۳ را از قطرش نصف کن؛ مساحتِ هر نیمه چقدر است؟\", \"topic\": \"مساحت\"}}]}",
+"{\"reply\": \"«مساحتِ مثلث = نصفِ قاعده × ارتفاع» را خودت از مستطیل ساختی. برگردیم به مسئلهٔ اصلی، گامِ «مساحتِ هر دیوارهٔ مثلثی»: قاعده ۲ متر است و حالا فرمولش را داری. فقط «ارتفاعِ دیواره همان ۱.۵ است» را با یک شکل بسنج: یک دیواره و آن ۱.۵ متر را بکش — ۱.۵ کجای شکل می‌افتد و ارتفاعِ خودِ دیواره کجا؟\", \"memory\": \"چادرِ هرمی: کف ۲×۲، ارتفاع ۱.۵؛ پیش‌نیازِ «مساحتِ مثلث» را خودش از نصفِ مستطیل ساخت (تسلط). برگشت به گامِ مساحتِ هر دیواره؛ او ارتفاعِ دیواره را ۱.۵ گرفت — پرسیدم با شکل بسنجد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"پیش‌نیاز: مساحتِ مثلث\", \"s\": \"done\", \"view\": \"whole\"}, {\"t\": \"مساحتِ دیواره‌ها\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\", \"guess\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"missing\", \"mastery\": \"yes\", \"quote\": \"آهان! پس مساحتِ مثلث = نصفِ قاعده ضربدر ارتفاع\"}, \"guess\": {\"text\": \"ارتفاعِ هر دیواره همون ۱٫۵ ـه دیگه؟ پس هر کدوم ۱٫۵ متر مربع\", \"q\": \"یک دیواره و آن ۱.۵ متر را بکش — ۱.۵ کجای شکل می‌افتد و ارتفاعِ خودِ دیواره کجا؟\"}}]}",
+"{\"reply\": \"شکلت درست است: ارتفاعِ دیواره وترِ یک مثلثِ قائم با ضلع‌های ۱ و ۱.۵ است. برای ضلعِ سوم یک چیزِ مشخص لازم داری: «قضیهٔ فیثاغورس» — و نشنیده بودنش کمبودِ همین یک مفهوم است. یک وارسیِ کوتاه: مثلثِ قائمی با دو ضلعِ ۳ و ۴ سانت بکش و وترش را با خط‌کش بسنج — چند شد؟\", \"memory\": \"چادرِ هرمی: پیش‌نیازِ «مساحتِ مثلث» آموخته شد؛ خودش با شکل دید ارتفاعِ دیواره وترِ مثلثِ قائمِ ۱ و ۱.۵ است؛ پیش‌نیازِ دوم «قضیهٔ فیثاغورس» در گامِ «ارتفاعِ کجِ دیواره»؛ پرسشِ تشخیصی: مثلثِ ۳ و ۴ را بکش و بسنج.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"پیش‌نیاز: مساحتِ مثلث\", \"s\": \"done\", \"view\": \"whole\"}, {\"t\": \"پیش‌نیاز: فیثاغورس\", \"s\": \"now\", \"view\": \"whole\"}, {\"t\": \"مساحتِ دیواره‌ها\", \"s\": \"todo\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq\": {\"concept\": \"قضیهٔ فیثاغورس\", \"step\": \"ارتفاعِ کجِ دیواره (وترِ مثلثِ قائم با ضلع‌های ۱ و ۱.۵)\", \"quote\": \"اسمِ فیثاغورس رو شنیدم ولی بلد نیستم\", \"q\": \"مثلثِ قائمی با دو ضلعِ ۳ و ۴ سانت بکش و وترش را با خط‌کش بسنج — چند شد؟\", \"topic\": \"هندسه\"}}]}",
+"{\"reply\": \"خودت از ۳ و ۴ و ۵ به همان «قضیهٔ فیثاغورس» رسیدی: در مثلثِ قائم، مربعِ وتر برابرِ جمعِ مربع‌های دو ضلعِ دیگر است. ولی یک نمونه هنوز کافی نیست؛ یک امتحانِ تازه: مثلثِ قائمی با ضلع‌های ۶ و ۸، وترش چند است؟ (رادیکالِ ۳.۲۵ را هم یادداشت کردم — بعد از این، همان را با هم پیدا می‌کنیم.)\", \"memory\": \"چادرِ هرمی: «مساحتِ مثلث» آموخته شد. پیش‌نیازِ «قضیهٔ فیثاغورس»: با مثلثِ ۳-۴-۵ خودش قاعده را دید (نبود)؛ پرسشِ تسلط: ۶ و ۸. پیش‌نیازِ تو در توی «تخمینِ رادیکال بی ماشین‌حساب» (زیرِ فیثاغورس) برای √۳.۲۵ ثبت شد و منتظر است.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"پیش‌نیاز: مساحتِ مثلث\", \"s\": \"done\", \"view\": \"whole\"}, {\"t\": \"پیش‌نیاز: فیثاغورس (تسلط)\", \"s\": \"now\", \"view\": \"whole\"}, {\"t\": \"پیش‌نیازِ تو در تو: تخمینِ رادیکال\", \"s\": \"todo\", \"view\": \"whole\"}, {\"t\": \"مساحتِ دیواره‌ها\", \"s\": \"todo\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq_res\": {\"id\": \"pq2\", \"diag\": \"missing\", \"quote\": \"یعنی مربعِ ضلع‌ها جمع بشه میشه مربعِ ضلعِ کج؟\"}, \"prereq\": {\"concept\": \"تخمینِ رادیکال (جذر) بی ماشین‌حساب\", \"step\": \"ارتفاعِ کجِ دیواره = √۳.۲۵\", \"quote\": \"حالا رادیکالِ ۳٫۲۵ رو بی ماشین‌حساب چطوری پیدا کنم؟ اینو هم بلد نیستم\", \"q\": \"عددی پیدا کن که در خودش ضرب شود و به ۳.۲۵ نزدیک شود — ۱.۵ × ۱.۵ و ۲ × ۲ چند می‌شوند؟\", \"parent\": \"pq2\", \"topic\": \"جذر\"}}]}",
+"{\"reply\": \"۱۰ درست است و با خط‌کش هم وارسی کردی — «قضیهٔ فیثاغورس» را حالا داری. می‌رویم سراغِ پیش‌نیازِ تو در تو، «تخمینِ رادیکال بی ماشین‌حساب»، که برای √۳.۲۵ لازم است. یک وارسیِ کوتاه: ۱.۵ × ۱.۵ و ۲ × ۲ چند می‌شوند، و ۳.۲۵ میانِ کدام‌هاست؟\", \"memory\": \"چادرِ هرمی: «مساحتِ مثلث» آموخته؛ «قضیهٔ فیثاغورس»: ۳-۴-۵ خودش دید، تسلط با ۶ و ۸ ⇒ ۱۰ ✓. پیش‌نیازِ تو در توی «تخمینِ رادیکال» برای √۳.۲۵: پرسشِ تشخیصی ۱.۵² و ۲².\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"پیش‌نیاز: فیثاغورس\", \"s\": \"done\", \"view\": \"whole\"}, {\"t\": \"پیش‌نیازِ تو در تو: تخمینِ رادیکال\", \"s\": \"now\", \"view\": \"whole\"}, {\"t\": \"مساحتِ دیواره‌ها\", \"s\": \"todo\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq_res\": {\"id\": \"pq2\", \"mastery\": \"yes\", \"quote\": \"۶ به توانِ دو میشه ۳۶، ۸ به توانِ دو ۶۴، جمعش ۱۰۰؛ پس وتر ۱۰ ـه\"}}]}",
+"{\"reply\": \"درست — فیثاغورس تو را تا √۳.۲۵ رساند و حالا فقط یک چیزِ کوچک مانده: «تخمینِ رادیکال بی ماشین‌حساب». یک وارسیِ کوتاه: ۱.۵ × ۱.۵ و ۲ × ۲ چند می‌شوند، و ۳.۲۵ میانِ کدام‌هاست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"بازه را درست پیدا کردی: میانِ ۱.۵ و ۲. «تخمینِ رادیکال» همین را ادامه می‌دهد: عددهای میانه را در خودشان ضرب کن تا به ۳.۲۵ نزدیک شوی — مثلاً برای √۱۰: ۳×۳=۹ کم است، ۳.۲×۳.۲=۱۰.۲۴ کمی زیاد، پس حدودِ ۳.۱۶. حالا خودت امتحان کن: √۵ تقریباً چند است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq_res\": {\"id\": \"pq3\", \"diag\": \"missing\", \"quote\": \"ولی دقیقش رو نمی‌دونم چطوری پیدا کنم\"}}]}",
+"{\"reply\": \"√۵ ≈ ۲.۲۴ را خودت درست تخمین زدی — «تخمینِ رادیکال» را داری. برگردیم به مسئلهٔ اصلی، چادرِ هرمی، گامِ «ارتفاعِ کجِ دیواره = √۳.۲۵»: خودت با ۱.۸ × ۱.۸ = ۳.۲۴ برداشتی‌اش — حدودِ ۱.۸ متر. حالا با مساحتِ مثلث که داری، پارچهٔ چهار دیواره چقدر می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"result\"], \"result\": \"ارتفاعِ هر دیواره تقریباً ۱٫۸ متره\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq_res\": {\"id\": \"pq3\", \"mastery\": \"yes\", \"quote\": \"پس رادیکالِ ۵ حدودِ ۲٫۲۴\"}}]}",
+"{\"reply\": \"درست می‌گویی — فیثاغورس تمام شده بود و حالا خودت تا آخر رفتی: هر دیواره ۱.۸ متر مربع، چهار تا ۷.۲، با ده درصدِ درز حدودِ ۸ متر. پیش از خرید: نتیجه را با واقعیت می‌سنجی — مثلاً با یک مدلِ کاغذیِ کوچک، کدام پیش‌بینی‌ات درست درمی‌آید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"با ده درصد برای درز و دوخت حدودِ ۸ متر پارچه می‌خرم\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"مدلِ کاغذیِ یک‌دهم وارسیِ خوبی بود و جور درآمد. درست را خودت گفتی: نامِ چیزِ کم را پیدا کنی، از حالتِ ساده بسازی‌اش و سرِ همان نقطه برگردی. مسئله، وارسی، درس، پرسشِ سودمند و سلیقه‌ات را ثبت می‌کنم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"پارچهٔ چادرِ هرمی\", \"statement\": \"می‌خوام برای اردوی بچه‌ها یه چادرِ هرمی بدوزم: کفش مربعِ ۲ در ۲ متره و ارتفاعش از وسطِ کف تا نوک ۱٫۵ متر. برای چهار تا دیوارهٔ مثلثیش چقدر پارچه لازمه؟ کف رو جدا می‌خرم.\", \"kind\": \"find\", \"lesson\": \"وقتی یه چیزی رو بلد نیستم، اسمش رو پیدا می‌کنم، از یه حالتِ ساده می‌سازمش و بعد برمی‌گردم سرِ همون نقطه\", \"check\": \"یه مدلِ کاغذیِ یک‌دهم ساختم: دیواره‌ها با قاعدهٔ ۲۰ سانت و ارتفاعِ کجِ ۱۸ سانت، دورش رو بریدم و چسبوندم، دقیقاً جور شد\", \"bestQ\": \"سؤالِ «مثلثِ ۳ و ۴ رو بکش و بسنج»\", \"taste\": \"این جور کارهای دستی که حساب دارن رو دوست دارم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"check\"], \"ans\": [\"b1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"taste\": {\"text\": \"این جور کارهای دستی که حساب دارن رو دوست دارم\"}}]}",
+"{\"reply\": \"یادداشتت را خواندم: ۷٫۲ متر مربع همان ۷۲۰۰۰ سانتی‌متر مربع است و ۸ / ۱٫۵ حدودِ ۵٫۳۳ متر می‌شود. تبدیلِ ذرع به متر را من و صفحه نسنجیده‌ایم — اندازهٔ ذرعِ پارچه‌فروش را از خودش بپرس. گامِ بعدیِ تو چیست، و پیش از برداشتنش فکر می‌کنی چه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"مساحتِ هر وجه و چهار وجه درست‌اند؛ ضربِ دورریز را یک بار دیگر خودت بزن. پس از آن، چند متر پارچه می‌خری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"l\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}"
+],
+"keys": [
+"سلام. می‌خوام برای اردوی بچه‌ها یه چادرِ هرمی بدوزم: کفش مربعِ ۲ در ۲ متره و ارتفاعش از وسطِ کف تا نوک ۱٫۵ متر. برای چهار تا دیوارهٔ مثلثیش چقدر پارچه لازمه؟ کف رو جدا می‌خرم.",
+"یعنی می‌خوام مساحتِ چهار تا مثلثِ دیواره رو پیدا کنم. هر دیواره یه مثلثه که قاعده‌ش ۲ متره. ولی مساحتِ مثلث رو یادم نیست… قاعده ضربدر ارتفاع بود؟ یا ضلع ضربدر ضلع؟",
+"مساحتِ مستطیل طول ضربدر عرضه، یعنی ۶. اگه از قطر نصفش کنم، هر نیمه یه مثلثه، پس ۳. آهان! پس مساحتِ مثلث = نصفِ قاعده ضربدر ارتفاع. خب، ارتفاعِ هر دیواره همون ۱٫۵ ـه دیگه؟ پس هر کدوم ۱٫۵ متر مربع.",
+"کشیدم. ۱٫۵ از وسطِ کف تا نوکه، عمودی. ولی ارتفاعِ دیواره از وسطِ لبهٔ کف تا نوکه و کج‌تره، پس بلندتره. یه مثلثِ قائم درست میشه: یه ضلعش ۱ متر (از وسطِ کف تا وسطِ لبه)، یکی ۱٫۵، و کج‌ترینش همون که می‌خوام. ولی نمی‌دونم ضلعِ سوم رو چطوری حساب",
+"کشیدم، ضلعِ کج ۵ سانت شد. ۳ و ۴ و ۵… ۳+۴ که ۷ میشه. ولی ۹ + ۱۶ = ۲۵! یعنی مربعِ ضلع‌ها جمع بشه میشه مربعِ ضلعِ کج؟ پس برای چادر: ۱ + ۲٫۲۵ = ۳٫۲۵. یعنی ضلعِ کج رادیکالِ ۳٫۲۵ ـه. حالا رادیکالِ ۳٫۲۵ رو بی ماشین‌حساب چطوری پیدا کنم؟ اینو هم بلد",
+"۶ به توانِ دو میشه ۳۶، ۸ به توانِ دو ۶۴، جمعش ۱۰۰؛ پس وتر ۱۰ ـه. با خط‌کش هم کشیدم، ۱۰ شد.",
+"با فیثاغورس ضلعِ کج میشه رادیکالِ ۳٫۲۵. ولی گفتم که رادیکال رو بی ماشین‌حساب بلد نیستم.",
+"۱٫۵ × ۱٫۵ میشه ۲٫۲۵ و ۲ × ۲ میشه ۴. پس رادیکالِ ۳٫۲۵ بینِ ۱٫۵ و ۲ ـه… ولی دقیقش رو نمی‌دونم چطوری پیدا کنم.",
+"۲ × ۲ میشه ۴، ۲٫۲ × ۲٫۲ میشه ۴٫۸۴، ۲٫۳ × ۲٫۳ میشه ۵٫۲۹. پس رادیکالِ ۵ حدودِ ۲٫۲۴. حالا برای ۳٫۲۵: ۱٫۸ × ۱٫۸ = ۳٫۲۴. خیلی نزدیکه! پس ارتفاعِ هر دیواره تقریباً ۱٫۸ متره.",
+"فیثاغورس که تموم شده بود! ارتفاعِ هر دیواره ۱٫۸ متره. برگردم به مساحت: هر مثلث نصفِ ۲ × ۱٫۸ یعنی ۱٫۸ متر مربع، چهار تا میشه ۷٫۲ متر مربع. با ده درصد برای درز و دوخت حدودِ ۸ متر پارچه می‌خرم.",
+"یه مدلِ کاغذیِ یک‌دهم ساختم: دیواره‌ها با قاعدهٔ ۲۰ سانت و ارتفاعِ کجِ ۱۸ سانت، دورش رو بریدم و چسبوندم، دقیقاً جور شد. درسم اینه که وقتی یه چیزی رو بلد نیستم، اسمش رو پیدا می‌کنم، از یه حالتِ ساده می‌سازمش و بعد برمی‌گردم سرِ همون نقطه. سؤ",
+"برای خرید یادداشت کردم: ۷٫۲ متر مربع = ۷۲۰۰۰ سانتی‌متر مربع. پارچه عرضش ۱٫۵ متره، پس ۸ / ۱٫۵ = ۵٫۳۳ متر طول می‌خوام. پارچه‌فروش به ذرع می‌فروشه: ۵ ذرع = ۵٫۲ متر.",
+"یه بار دیگه همه رو با هم نوشتم: هر وجه ۱/۲ × ۲ × ۱٫۸ = ۱٫۸ متر مربع، چهار وجه ۴ × ۱٫۸ = ۷٫۲، با ۱۰٪ دورریز ۷٫۲ × ۱٫۱ = ۷٫۸ متر مربع پارچه."
+]
+}

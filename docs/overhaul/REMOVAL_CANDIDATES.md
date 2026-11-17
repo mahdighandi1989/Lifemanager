@@ -499,3 +499,27 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
 - **Why replaced:** DECISIONS_R28 C134 — «مهلت سه‌شنبه نیست، چهارشنبه است» on a Tuesday moved next week's Tuesday deadline to tomorrow; the
   replacing weekday belongs to the week of the replaced date, and a what-only correction never moves the date.
 - **Status:** reachable, not called. Delete only with the owner's approval.
+
+## 2026-11-17 — Tour 1 round 29, fixer «arith»: C105 branch and the C108 inline remainder kept as quarantine in `a46_arith.js`
+- **What:** `lockC105R28(s, n2)` (exported as `ST.arithC105R28`, switch `ST.arithC105R28On = false`): «تومن / تومان / ریال» after M fixed the units reading
+  of «N میلیون و M». The inline C108 remainder (`remc` from «the last N تا before the calc larger than the result») inside `chains`, behind
+  `ST.arithC108R28On` (never set).
+- **Why replaced:** C135 revokes C105 (S1 D29-1, D29-2: «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰ تومن» was ✗ «۱۸٫۷»). C141 replaces the C108 inline rule by
+  `remains29` (S1 C29-1: after a subtraction the inline rule picked «۱۵» as the total and told the coach «✗ ۱۵ − ۳ … ۱۲»).
+- **Status:** reachable only by flipping the switches; not called. Delete only with the owner's approval.
+## Pólya R29 «correction» — tiers (ج)/(د) of the guessed one-op relation in `staleCore25` (quarantined 2026-11-17)
+- **What:** the two ratio shapes of `a38` `staleCore25` tiers (ج)/(د) (`implicit(c, 3)` / `implicit(c, 4)`): (a) the number is itself a
+  factor of her written expression (`c.opnd` / `c.run`) and the guessed relation solves the product for it; (b) a remainder clause
+  «N تا می‌مونه / کم میاد / اضافه میاد». Plus two guards: a lone result record built by dividing by the corrected datum, and an equal digit in
+  another magnitude. Behind `A.LIVE_R29_QUARANTINE_C89.on` (default `false`, listed in `.shapes`); the tiers themselves stay for every
+  other number (nine R24–R26 bank verdicts rely on relations she wrote in words).
+- **Why quarantined:** DECISIONS_R29 C89 «Scaling a number by the ratio of a correction is never a proposal»; R2 «the ratio path is
+  quarantined, not kept as a fallback». A guessed product solved for one factor is exactly that (D29-11 «۱۸ ⇒ ۱۵ = ۲۷۰۰ ÷ ۱۸۰», B29·D13
+  «۶ ⇒ ۶٫۴»).
+- **Status:** reachable (flag), not called on the page path. Delete only with the owner's approval.
+## 2026-11-17 — Tour 1 round 29, fixer «dates»: `doneFromHer28` kept as `PR.R29_QUARANTINE.doneFromHer28`
+- **What:** in `apps/learning-architecture/src/app/a41_practice.js` the round-28 body of `PR.doneFromHer28` (counted only booked 📌/⏰ as «زنگ زدم»
+  candidates) is no longer called; `PR.doneFromHer28` now gathers booked records AND the page's open date-ask items in one judge (`cands29`, `close29`,
+  `which29`, `stay29`), and `lapse27` no longer closes ask items itself through `didIt28`. The old body stays as `PR.R29_QUARANTINE.doneFromHer28`.
+- **Why replaced:** DECISIONS_R29 C117 (B29·D19, D29-18; group C's «held» was only the line — the asks were silently closed by `lapse27`), C165–C167.
+- **Status:** reachable, not called. Delete only with the owner's approval.

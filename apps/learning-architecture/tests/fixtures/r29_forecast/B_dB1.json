@@ -1,0 +1,154 @@
+{
+"from": "round29B/dB1",
+"t0": "2026-11-23T09:00:00",
+"base": 0,
+"inject": "(()=>{if(window.__RD)return;const RD=Date;window.__RD=RD;window.__off=0;function D(...a){if(!new.target)return new RD(RD.now()+window.__off).toString();return a.length?new RD(...a):new RD(RD.now()+window.__off)}D.prototype=RD.prototype;D.now=()=>RD.now()+window.__off;D.UTC=RD.UTC;D.parse=RD.parse;window.Date=D;window.__adv=(d)=>{window.__off+=d*864e5;try{APP.render()}catch(e){};return new D().toISOString()};})();\nwindow.__fx={set(sel,v){const e=typeof sel==='string'?document.querySelector(sel):sel;if(!e)return 'NOEL '+sel;const pr=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(pr,'value').set.call(e,v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'},\nbtn(re,root){const b=[...(root?document.querySelector(root):document).querySelectorAll('button')].filter(b=>b.getClientRects().length).find(b=>re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,60)},\nfields(){return [...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>e.getClientRects().length).map(e=>(e.id||e.name||'?')+'|'+e.type+'|'+(e.getAttribute('aria-label')||e.placeholder||'').slice(0,70)+'|'+String(e.value).slice(0,40))},\nbtns(){return [...document.querySelectorAll('#main button')].filter(b=>b.getClientRects().length).map(b=>b.textContent.trim().slice(0,50))},\nmain(n){return document.getElementById('main').innerText.slice(0,n||3000)}};'fx'\n",
+"steps": [
+{
+"say": "سلام. من ۴۵ سالمه و معلمِ ریاضیِ پایه‌ی نهمم. می‌خوام یه برنامه‌ی مرور بچینم که تا امتحانِ نوبتِ اول میانگینِ کلاس از ۱۲ به ۱۵ برسه. پنجشنبه یه آزمونِ کوتاه می‌گیرم."
+},
+{
+"say": "داده‌ها: نمره‌ی آزمونِ مهر میانگین ۱۲ بود؛ بیشتر توی معادله‌ی درجه دو می‌پرن. شنبه هم با مدیر درباره‌ی ساعتِ اضافه حرف می‌زنم."
+},
+{
+"say": "آره."
+},
+{
+"say": "هشت جلسه تا امتحان دارم. آزمون رو پنجشنبه نه، یکشنبه می‌گیرم."
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);const b=[...document.querySelectorAll('.as-editb')];return b.length+' :: '+b.map((x,i)=>i+':'+(x.closest('.as-msg,.as-bubble,li,div[class*=msg]')||x.parentElement.parentElement).textContent.slice(0,50)).join(' | ')})()"
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go('today');await w(1500);const t=document.getElementById('main').innerText;return t.slice(0,2500)})()"
+},
+{
+"click": ".as-editb >> nth=1"
+},
+{
+"fill": [
+".as-edtx",
+"داده‌ها: نمره‌ی آزمونِ مهر میانگین ۱۲ بود؛ بیشتر توی معادله‌ی درجه دو می‌پرن. دوشنبه هم با مدیر درباره‌ی ساعتِ اضافه حرف می‌زنم."
+]
+},
+{
+"click": ".as-edsave"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return document.querySelectorAll(\".as-editb\").length})()"
+},
+{
+"click": ".as-editb >> nth=1"
+},
+{
+"fill": [
+".as-edtx",
+"داده‌ها: نمره‌ی آزمونِ مهر میانگین ۱۲ بود؛ بیشتر توی معادله‌ی درجه دو می‌پرن. دوشنبه هم با مدیر درباره‌ی ساعتِ اضافه حرف می‌زنم."
+]
+},
+{
+"click": ".as-edsave"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"say": "آره، درسته. سرِ برج هم نمره‌ها رو جمع می‌زنم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"say": "باشه. آخرِ سال هم گزارشِ کلاس رو به اداره می‌دم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"say": "آره. بعد از عید هم دوره‌ی دوم رو شروع می‌کنم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"say": "نه، منظورم بعد از عیدِ نوروزه. وسطِ ماه هم یه آزمونِ دیگه می‌گیرم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"say": "نه، وسطِ ماه یعنی حدودِ ۱۵ دی. عید هم یه برنامه‌ی تمرینِ خونه بهشون می‌دم. آخرِ سالِ تحصیلی می‌خوام همه حداقل ۱۵ شده باشن."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"say": "سلام، امروز جمعه‌ست. عید درسته. تا جمعه برگه‌های آزمونِ قبلی رو تصحیح می‌کنم. ۷۰ درصد مطمئنم میانگینِ آزمونِ یکشنبه به ۱۳ می‌رسه.",
+"eval0": "__adv(4);1"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');return JSON.stringify(Object.values(R).filter(r=>r&&r.type==='fcast').map(p=>{const o={};for(const k in p){if(!/^(id|type|src|prob|dim|created|updated|by)$/.test(k))o[k]=p[k]}return o}))})()"
+},
+{
+"say": "همین امروز. احتمالش ۶۰ درصده که هیچ‌کس زیرِ ۱۰ نگیره. تقریباً مطمئنم بچه‌ها از آزمونِ کوتاه استقبال می‌کنن. پارسال ۹۰ درصد مطمئن بودم همه قبول میشن و نشد. مدیرمون هم میگه ۸۰ درصد مطمئنه کلاس به ۱۵ می‌رسه."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');return JSON.stringify(Object.values(R).filter(r=>r&&r.type==='fcast').map(p=>{const o={};for(const k in p){if(!/^(id|type|src|prob|dim|created|updated|by)$/.test(k))o[k]=p[k]}return o}))})()"
+},
+{
+"say": "نه، هنوز آزمون رو نگرفتم. ۶۵ درصد. میانگینِ ۱۳ رو هم الان ۸۰ درصد مطمئنم، نه ۷۰."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-5).map(m=>m.role+': '+m.text.slice(0,500)).join('\\n')})()"
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');return JSON.stringify(Object.values(R).filter(r=>r&&r.type==='fcast').map(p=>{const o={};for(const k in p){if(!/^(id|type|src|prob|dim|created|updated|by)$/.test(k))o[k]=p[k]}return o}))})()"
+}
+],
+"replies": [
+"{\"reply\": \"خواسته روشن است: میانگینِ کلاس از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول. آزمونِ کوتاهِ پنجشنبه هم برنامهٔ خودتان است. پیش از طرح: چه دارید — کدام داده دربارهٔ کلاس (نمره‌های قبلی، مبحث‌هایی که می‌پرد) اثرِ محسوس دارد؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"plan\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"پنجشنبه یه آزمونِ کوتاه می‌گیرم\", \"when\": \"2026-11-26\"}}]}",
+"{\"reply\": \"دو دادهٔ مهم: میانگینِ مهر ۱۲، و گیرِ اصلی معادلهٔ درجه دو. حرف با مدیر دربارهٔ ساعتِ اضافه هم برنامهٔ شماست. شرط چیست — تا امتحان چند جلسه و چه وقتی واقعاً دارید؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\", \"plan\"], \"ans\": [\"u2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"شنبه هم با مدیر درباره‌ی ساعتِ اضافه حرف می‌زنم\", \"when\": \"2026-11-28\"}}]}",
+"{\"reply\": \"باشد. پس شرط را بگویید: تا امتحانِ نوبتِ اول چند جلسه دارید؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"هشت جلسه شرطِ واقعیِ کار است. آزمون را از پنجشنبه به یکشنبه بردید؛ اصلاحش را برای صفحه فرستادم و صفحه خودش روزش را از شما می‌پرسد. با هشت جلسه، آیا این داده‌ها برای رسیدن به ۱۵ کافی‌اند — یا چیزی کم است؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"c\", \"plan\"], \"ans\": [\"u3\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"retract\": {\"msg\": \"پنجشنبه یه آزمونِ کوتاه می‌گیرم\", \"key\": \"plan:pl1\", \"what\": \"plan\", \"fix\": \"یکشنبه\", \"old\": \"پنجشنبه\", \"rests\": []}}]}",
+"{\"reply\": \"اصلاحتان نشست: حرف با مدیر حالا دوشنبه است و ثبتِ شنبه کنار رفت؛ روزِ تازه را صفحه خودش از شما می‌پرسد. با هشت جلسه، این داده‌ها برای رسیدن به ۱۵ کافی‌اند یا چیزی کم است؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"جمع زدنِ نمره‌ها سرِ برج هم برنامهٔ خودتان است. هنوز یک پرسش مانده: با هشت جلسه، این داده‌ها برای رسیدن به ۱۵ کافی‌اند یا چیزی کم است؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"سرِ برج هم نمره‌ها رو جمع می‌زنم\", \"when\": \"2026-12-22\"}}]}",
+"{\"reply\": \"گزارشِ آخرِ سال هم برنامهٔ شماست. و آن پرسشِ مانده: با هشت جلسه، چیزی برای رسیدن به ۱۵ کم است؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"آخرِ سال هم گزارشِ کلاس رو به اداره می‌دم\", \"when\": \"2027-03-20\"}}]}",
+"{\"reply\": \"شروعِ دورهٔ دوم بعد از عید هم برنامهٔ شماست. و هنوز: با هشت جلسه، چیزی برای رسیدن به ۱۵ کم است؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"بعد از عید هم دوره‌ی دوم رو شروع می‌کنم\", \"when\": \"next-session\"}}]}",
+"{\"reply\": \"روشن شد: «بعد از عید» یعنی بعد از نوروز، نه این جمعه. آزمونِ وسطِ ماه هم برنامهٔ شماست؛ روزِ دقیقش را صفحه از شما می‌پرسد. و آن پرسش: با هشت جلسه، چیزی برای رسیدن به ۱۵ کم است؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"وسطِ ماه هم یه آزمونِ دیگه می‌گیرم\", \"when\": \"next-session\"}}]}",
+"{\"reply\": \"پس آزمونِ دوم حدودِ ۱۵ دی است. تمرینِ خانه برای عید و این‌که آخرِ سالِ تحصیلی همه دست‌کم ۱۵ باشند هم روشن شد — این دومی خواستهٔ بلندترتان است. با هشت جلسه تا نوبتِ اول، چیزی برای رسیدن به ۱۵ کم است؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"plan\", \"u\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"وسطِ ماه یعنی حدودِ ۱۵ دی\", \"when\": \"2027-01-05\"}}]}",
+"{\"reply\": \"تصحیحِ برگه‌ها تا جمعه برنامهٔ شماست. پیش‌بینی‌تان هم روشن است: میانگینِ آزمونِ یکشنبه به ۱۳ می‌رسد، با ۷۰ درصد اطمینان. اگر نرسید، از آن چه دربارهٔ طرحِ مرور می‌فهمید؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"تا جمعه برگه‌های آزمونِ قبلی رو تصحیح می‌کنم\", \"when\": \"2026-11-27\"}}]}",
+"{\"reply\": \"پیش‌بینیِ تازه‌تان روشن است: هیچ‌کس زیرِ ۱۰ نمی‌گیرد، با ۶۰ درصد. «تقریباً مطمئنم» دربارهٔ استقبالِ بچه‌ها را با یک عدد بگویید تا بشود بعداً سنجیدش — چند درصد؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"روشن شد: آزمون هنوز مانده. استقبالِ بچه‌ها ۶۵ درصد، و میانگینِ ۱۳ حالا ۸۰ درصد به‌جای ۷۰. یکشنبه کدام را اول می‌سنجید؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"میانگین ۱۳٫۲ شد — از ۱۲ بالا آمد. این را با پیش‌بینی‌تان بسنجید: آنچه شد با آنچه فکر می‌کردید چه فاصله‌ای داشت؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"آزمون رو امروز گرفتم: میانگین شد ۱۳٫۲\"}]}",
+"{\"reply\": \"اصلاحتان نشست: حرف با مدیر حالا «شنبه» است و ثبتِ ۹ آذر کنار رفت؛ روزِ تازه را صفحه از شما می‌پرسد. میانگینِ ۱۳٫۲ را با پیش‌بینی‌تان سنجیدید — چه فاصله‌ای داشت؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"پس حرف با مدیر شنبهٔ پیش انجام شد و قبول کرد. پیش‌بینیِ «میانگین به ۱۳ می‌رسد» هم به گفتهٔ خودتان درست درآمد. پروندهٔ «کالیبراسیونِ اعتماد» را برای سنجیدنِ پیش‌بینی‌هایتان خواستم؛ صفحه می‌گوید باز شد یا نه. حالا با ۱۳٫۲ و هفت جلسهٔ مانده، طرحِ بعدی‌تان برای رسیدن به ۱۵ چیست؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"start_practice\", \"tid\": 24, \"topic\": \"پیش‌بینی‌های کلاسِ نهم\", \"consent\": {\"quote\": \"یه پرونده‌ی تمرین هم برای سنجیدنِ پیش‌بینی‌هام باز کن\", \"kind\": \"request\"}}, {\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan_done\": {\"id\": \"pl2\", \"done\": true}}]}",
+"{\"reply\": \"پس حرف با مدیر شنبهٔ پیش انجام شد و قبول کرد. پیش‌بینیِ «میانگین به ۱۳ می‌رسد» هم به گفتهٔ خودتان درست درآمد. پروندهٔ «کالیبراسیونِ اعتماد» را برای سنجیدنِ پیش‌بینی‌هایتان دارم بازش می‌کنم. حالا با ۱۳٫۲ و هفت جلسهٔ مانده، طرحِ بعدی‌تان برای رسیدن به ۱۵ چیست؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"start_practice\", \"tid\": 24, \"topic\": \"پیش‌بینی‌های کلاسِ نهم\", \"consent\": {\"quote\": \"یه پرونده‌ی تمرین هم برای سنجیدنِ پیش‌بینی‌هام باز کن\", \"kind\": \"request\"}}, {\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan_done\": {\"id\": \"pl2\", \"done\": true}}]}",
+"{\"reply\": \"طرحتان روشن است: هر جلسه ۱۰ دقیقه معادلهٔ درجه دو با پرسشِ «اول مجهول چیست؟»، و سه جلسهٔ دیگر آزمونِ کوتاهِ بعدی. پیش از آن آزمون: فکر می‌کنید میانگین به کجا برسد، و چقدر مطمئنید؟\", \"title\": \"برنامهٔ مرورِ کلاسِ نهم\", \"pinned\": \"میانگینِ کلاسِ نهم از ۱۲ به ۱۵ تا امتحانِ نوبتِ اول\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"هر جلسه ۱۰ دقیقه معادله‌ی درجه دو با یه سؤالِ «اول مجهول چیه؟»\", \"when\": \"next-session\"}}]}"
+],
+"keys": [
+"سلام. من ۴۵ سالمه و معلمِ ریاضیِ پایه‌ی نهمم. می‌خوام یه برنامه‌ی مرور بچینم که تا امتحانِ نوبتِ اول میانگینِ کلاس از ۱۲ به ۱۵ برسه. پنجشنبه یه آزمونِ کوتاه می‌گیرم.",
+"داده‌ها: نمره‌ی آزمونِ مهر میانگین ۱۲ بود؛ بیشتر توی معادله‌ی درجه دو می‌پرن. شنبه هم با مدیر درباره‌ی ساعتِ اضافه حرف می‌زنم.",
+"آره.",
+"هشت جلسه تا امتحان دارم. آزمون رو پنجشنبه نه، یکشنبه می‌گیرم.",
+"[اصلاحِ پیامِ قبلی] «شنبه» ⇐ «دوشنبه» — متنِ درستِ پیامم: «داده‌ها: نمره‌ی آزمونِ مهر میانگین ۱۲ بود؛ بیشتر توی معادله‌ی درجه دو می‌پرن. دوشنبه هم با مدیر درباره‌ی ساعتِ اضافه حرف می‌زنم.»",
+"آره، درسته. سرِ برج هم نمره‌ها رو جمع می‌زنم.",
+"باشه. آخرِ سال هم گزارشِ کلاس رو به اداره می‌دم.",
+"آره. بعد از عید هم دوره‌ی دوم رو شروع می‌کنم.",
+"نه، منظورم بعد از عیدِ نوروزه. وسطِ ماه هم یه آزمونِ دیگه می‌گیرم.",
+"نه، وسطِ ماه یعنی حدودِ ۱۵ دی. عید هم یه برنامه‌ی تمرینِ خونه بهشون می‌دم. آخرِ سالِ تحصیلی می‌خوام همه حداقل ۱۵ شده باشن.",
+"سلام، امروز جمعه‌ست. عید درسته. تا جمعه برگه‌های آزمونِ قبلی رو تصحیح می‌کنم. ۷۰ درصد مطمئنم میانگینِ آزمونِ یکشنبه به ۱۳ می‌رسه.",
+"همین امروز. احتمالش ۶۰ درصده که هیچ‌کس زیرِ ۱۰ نگیره. تقریباً مطمئنم بچه‌ها از آزمونِ کوتاه استقبال می‌کنن. پارسال ۹۰ درصد مطمئن بودم همه قبول میشن و نشد. مدیرمون هم میگه ۸۰ درصد مطمئنه کلاس به ۱۵ می‌رسه.",
+"نه، هنوز آزمون رو نگرفتم. ۶۵ درصد. میانگینِ ۱۳ رو هم الان ۸۰ درصد مطمئنم، نه ۷۰.",
+"سلام. آزمون رو امروز گرفتم: میانگین شد ۱۳٫۲!",
+"[اصلاحِ پیامِ قبلی] «دوشنبه» ⇐ «شنبه» — متنِ درستِ پیامم: «داده‌ها: نمره‌ی آزمونِ مهر میانگین ۱۲ بود؛ بیشتر توی معادله‌ی درجه دو می‌پرن. شنبه هم با مدیر درباره‌ی ساعتِ اضافه حرف می‌زنم.»",
+"نه، اون شنبه گذشت؛ با مدیر شنبه‌ی پیش صحبت کردم و قبول کرد. میانگینِ ۱۳٫۲ یعنی پیش‌بینیِ ۱۳ درست درومد. یه پرونده‌ی تمرین هم برای سنجیدنِ پیش‌بینی‌هام باز کن.",
+"نه، اون شنبه گذشت؛ با مدیر شنبه‌ی پیش صحبت کردم و قبول کرد. میانگینِ ۱۳٫۲ یعنی پیش‌بینیِ ۱۳ درست درومد. یه پرونده‌ی تمرین هم برای سنجیدنِ پیش‌بینی‌هام باز کن.\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: پرونده هنوز با",
+"طرحم: هر جلسه ۱۰ دقیقه معادله‌ی درجه دو با یه سؤالِ «اول مجهول چیه؟». سه جلسه‌ی دیگه یه آزمونِ کوتاهِ دیگه."
+]
+}

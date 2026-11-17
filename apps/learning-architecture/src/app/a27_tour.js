@@ -1808,13 +1808,64 @@
   var SYSDID28 = /(?:نوشتی|ثبت(?:ش|شون)?[\s‌]*کردی|یادداشت[\s‌]*کردی)(?![آ-ی])/;
   var SYSPART28 = /(?:^|[\s‌«(،])(?:سرکشی|نظارت[\s‌]*و[\s‌]*سرکشی|دفترِ?[\s‌]*پیش[‌\s]?بینی)/;
   function sysQ28(q) { q = String(q || "").replace(/[‏‎]/g, "").replace(/\s+/g, " ").trim(); if (!/[؟?]\s*$/.test(q)) return false;
-    if (SYS2P28.test(q) || SYSWHERE28.test(q) || SYSDID28.test(q) || SYSPART28.test(q)) return true; return SYSPASS28.test(q) && (SYSOBJ28.test(q) || MYWORDS28.test(q)); }
-  AS.sysQ28 = sysQ28;
+    if (SYS2P28.test(q) || SYSWHERE28.test(q) || SYSDID28.test(q) || SYSPART28.test(q)) return true; if (SYSPASS28.test(q) && (SYSOBJ28.test(q) || MYWORDS28.test(q))) return true;
+    return sysQ29(q); }
+  /* دورِ ۲۹ (R7، F13 — A29-26 pwA1 «یه نقشه از این که از کجا شروع کردم، کجاها اشتباه داشتم و الان کجام نشونم میدی؟» «مسئلهٔ ۲ از ۲» و مقصدِ «↪» شد؛ D28-10 oD1b
+     «این سامانه اصلاً برای این‌جور کارها ساخته شده یا فقط برای مسئله‌های ریاضی؟» مقصدِ 🧭؛ B27·D14 oB1 «… این صفحه آفلاین هم کار می‌کنه؟ و شما دارید یه مدلِ خودتون
+     می‌سازید …؟» مسئلهٔ گفت‌وگو؛ C27-6 «سامانه روشی برای این داره؟»). ریشه: sysQ28 فقط «کاری که صفحه روی ثبت‌ها و خبرهای او می‌کند» را می‌شناخت، نه پرسشی که
+     **خودِ سامانه نهادِ آن است**. سه شکل، هر سه بی عدد و بی رابطه (پرسشی با عدد دربارهٔ مسئلهٔ اوست):
+     (۱) نامِ خودِ سامانه — «سامانه/دستیار» ِ بی اضافه و بی «‌م» ِ مالکیت («سامانهٔ ثبت‌نام»، «سامانه‌م» ِ قرص‌دونِ او، «دستیارم» نه)، یا «این/همین صفحه» (نه «صفحه از کتاب»)؛
+     (۲) پرسش از یکی از وجه‌های ثبت‌گاهِ A.SELF_FACTS («کاربرد، جا، آفلاین، مدل») با خطابِ دوم‌شخص — «آفلاین»، «مدلت / مدلِ خودتون / مدلِ خاص … ‌ای؟»، «هوش مصنوعی»؛
+     (۳) خواستنِ «نشونم بده / نشونم میدی؟» ِ یکی از ساخته‌های صفحه (نقشه، کارنامه، پرونده، دفتر، فهرست، خلاصه، تاریخچه، سابقه، گزارش، مسیر) دربارهٔ کارِ خودِ او در همین‌جا
+     («… شروع کردم / اشتباه داشتم / کجام / کجای کارم») — همان خانوادهٔ «خبرم می‌کنی؟» ِ SYS2P28. «نقشهٔ مسیرِ سفر به شیراز رو نشونم میدی؟» (بی کارِ خودش در صفحه) مسئله می‌ماند.
+     نمونه‌های منفیِ واقعی (C136، رونوشت‌های ۲۸/۲۹): «یه صفحه ۱۰×۱۰ …»، «یه کتاب ۴۸ صفحه داره …»، «سامانه‌م فقط یکی حساب کرد» — همه بیرون. */
+  /* پس از نام فقط پایانِ بند یا واژهٔ دستوری/فعل می‌آید — «سامانه آبیاری …» (اضافهٔ نانوشته: سامانهٔ کسِ دیگر) بیرون */
+  var NEXT29 = "(?=[\\s‌]*(?:$|[؟?،,.:؛!»)]|(?:رو|را|هم|خودش|خودت|خودتون|اصلاً|اصلا|فقط|واقعاً|واقعا|چی|چه|چطور|چطوری|چجوری|کجا|کی|از|به|برای|واسه|با|تو|توی|در|که|یا|و|داره|داری|دارد|دارید|دارین|ندارد|نداره|هست|نیست|باشه|نباشه|بلده|روشی|راهی|ابزاری|چیزی|بخشی|قاعده‌ای|ثبت|نگه|حساب|خبر|یادش|اینو|اینا|این|اون|همه|کار)(?![آ-ی‌])|(?:می|نمی)[‌\\s]?[آ-ی]))";
+  var SYSNAME29 = new RegExp("(?:^|[\\s‌«(،:])(?:(?:این|همین|خودِ?|تو|توی|در|به|از|بخشِ?|کجای)[\\s‌]+)?(?:سامانه|دستیار)(?:ات|ت|تون|تان)?" + NEXT29 + "|(?:^|[\\s‌«(،:])(?:این|همین)[\\s‌]+صفحه(?![\\s‌]+(?:از|کتاب)(?![آ-ی]))" + NEXT29);
+  var FACET29 = /آفلاین|هوش[\s‌]*مصنوعی|مدل(?:ت|تون|تان)(?![آ-ی])|مدل[ِ\s‌]+(?:خودتون|خودتان|خودت)(?![آ-ی])/;
+  var FACET2P29 = /مدل[ِ\s‌]+(?:خاص|زبانی)(?![آ-ی])[^؟?]*(?:‌?ای|‌?اید|ید|ین)[\s‌]*[؟?]\s*$/;
+  var SHOW29 = /(?:نشون|نشان)(?:م|مون)?[\s‌]*(?:می[‌\s]?دی|میدی|می[‌\s]?دهی|می[‌\s]?دین|میدین|بده|بدی|بدید|بدین)(?![آ-ی])/;
+  var ARTEF29 = /(?:^|[\s‌«(،])(?:یه[\s‌]+|یک[\s‌]+)?(?:نقشه|کارنامه|پرونده|دفتر|فهرست|خلاصه|تاریخچه|سابقه|گزارش|مسیر)(?:ٔ|‌ی|ی|ِ)?(?![آ-ی])/;
+  var MYWORK29 = /(?:(?:پرونده|کارنامه|دفتر|مسئله|پیش[‌\s]?بینی|گام|حرف|کار)(?:‌?ها|‌?های)?(?:‌?م|‌?ام|مو)(?![آ-ی])|شروع[\s‌]*کردم|اشتباه[\s‌]*(?:داشتم|کردم)|کجا(?:ها)?[\s‌]*اشتباه|کجام(?![آ-ی])|کجای[\s‌]*کار(?:م|مم)|پیشرفت(?:م|هام)(?![آ-ی])|حرف[‌\s]?(?:ها|ا)م(?![آ-ی])|گفته[‌\s]?هام)/;
+  /* «این برنامه/اپ/سایت» دوپهلوست («این برنامه رو چطور بچینم؟» برنامهٔ اوست) ⇒ فقط با گزارهٔ کاربرد/توانِ خودِ سامانه («ساخته شده؟»، «کار می‌کنه؟»، «بلده؟») — بانکِ R29 #263 */
+  var SYSAPP29 = /(?:^|[\s‌«(،:])(?:این|همین)[\s‌]+(?:برنامه|اپ|اپلیکیشن|سایت)(?![آ-یءٔ‌ِ])[^؟?]{0,40}?(?:ساخته[\s‌]*شده|درست[\s‌]*شده|کار[\s‌]*می[‌\s]?کنه|بلده|می[‌\s]?تونه|می[‌\s]?فهمه|می[‌\s]?دونه)(?![آ-ی])/;
+  /* بانکِ R29 #297 «این مسئله‌ی جدول رو کجای پرونده‌م ببینم؟»: «کجای ⟨ساختهٔ صفحه⟩ ببینم/پیداش کنم» پرسش از جای رکورد است، نه مسئلهٔ تازه */
+  var WHEREIN29 = /کجای[\s‌]*(?:این[\s‌]*)?(?:پرونده|دفتر|کارنامه|صفحه|نقشه|سامانه|امروز)(?:‌?م|‌?ام|‌?مون)?[\s‌]*(?:ببینم|ببینمش|پیداش|پیدا[\s‌]*کنم|هست|ثبت|می[‌\s]?بینم)/;
+  /* بانکِ R26 #245 «چطور از همین صفحه برای کنکورم برنامه بریزم؟»: کارِ خودِ او (اول‌شخص) با کمکِ صفحه، مسئلهٔ اوست — نامِ صفحه نهادِ پرسش نیست */
+  var OWNACT29 = /(?:بریزم|بچینم|بنویسم|بسازم|حل[\s‌]*کنم|حلش[\s‌]*کنم|بخونم|بخوانم|برسم|بگیرم|بفروشم|بخرم)[\s‌]*[؟?]\s*$/;
+  function sysQ29(q) { var x = faDigits(q); if (/[0-9]/.test(x) || /[=<>≤≥×÷]/.test(x) || OWNACT29.test(q)) return false;
+    if (SYSNAME29.test(q) || SYSAPP29.test(q) || WHEREIN29.test(q)) return true;
+    if (FACET29.test(q) || FACET2P29.test(q)) return true;
+    return SHOW29.test(q) && ARTEF29.test(q) && MYWORK29.test(q); }
+  AS.sysQ28 = sysQ28; AS.sysQ29 = sysQ29;
+  /* دورِ ۲۹ (R7، C175 — C29-23 pwC2 p50–p51 «پیش‌بینی‌هام کدوما بازه و کدوما داوری شده؟» ⇒ «🎯 دفترِ پیش‌بینی» باز شد و پیگیریِ صفحه به مدل گفت «فیلدها را پر کن … دکمهٔ ثبت
+     را بزن» — یک 🎯 ِ ساختگی): پیامی که فقط **دیدن** می‌خواهد («کجاست؟»، «کدوما …؟»، «می‌خوام ببینمشون»، «نشونم بده») خواستهٔ ساختن نیست؛ پیگیریِ پس از بازشدنِ نما
+     (a26) برایش «پر نکن، دکمه نزن، بگو چه می‌بیند» می‌گوید. «ثبتش کن / بساز / اضافه کن / بنویس» (خواستهٔ کار) بیرون است. */
+  var SEE29 = /کجا(?:ست|ن|ند)?[\s‌]*[؟?]|کجا[\s‌]*(?:ببینم|می[‌\s]?بینم|پیداش|هست)|کدوما|کدام(?:‌?ها)?(?:ند|ن)?[\s‌]+(?:بازه|باز|داوری|مونده|مانده)|(?:^|[\s‌])(?:فقط[\s‌]+)?(?:ببینم|ببینمش|ببینمشون|ببینمشان|نگاه[\s‌]*کنم|نگاهی[\s‌]*بندازم)(?![آ-ی])|نشون(?:م)?[\s‌]*(?:بده|میدی|می[‌\s]?دی)/;
+  var MAKE29 = /(?:ثبت|اضافه|درست|یادداشت|پر)[\s‌]*(?:ش|شون)?[\s‌]*(?:کن|کنی|کنیم|بکن)(?![آ-ی])|بساز|بنویس(?:ش)?(?![آ-ی])|ثبتش|یه[\s‌]+(?:پیش[‌\s]?بینی|🎯)[\s‌]+(?:تازه|جدید)/;
+  AS.seeOnly29 = function (t) { t = String(t || ""); return SEE29.test(t) && !MAKE29.test(t); };
   /* پیامی که جز پرسش‌های دربارهٔ سامانه (و پیش‌درآمدِ کوتاهِ «یه سؤال:»/«راستی») چیزی ندارد ⇒ مسئله نیست (C99) */
-  function onlySysQ28(t) { var L = String(t || "").replace(/[‏‎]/g, "").match(/[^.!؟?\n]+[.!؟?\n]*/g) || [], n = 0;
+  /* دورِ ۲۹ (R7، F13 — B27·D14 oB1 «سلام، یه روز گذشت. چند تا سؤالِ دیگه دارم که برام مهمه، یکی‌یکی: … ؟ و … ؟»): پیش‌درآمد فقط «یه سؤال:» ِ سه‌واژه‌ای نبود — سلام،
+     گذرِ زمان («یه روز گذشت»، «برگشتم») و اعلامِ پرسش («چند تا سؤالِ دیگه دارم …:») هم پیش‌درآمدند، نه مسئله. پیش‌درآمدی که خودش می‌گوید پرسش‌ها «دربارهٔ خودِ سامانه/صفحه»
+     است (oA1 c143 «سه تا سؤال دربارهٔ خودِ سامانه: …») حکمِ همهٔ پرسش‌های بعدی را می‌دهد، حتی با عدد (عددِ نقل‌شده از کارِ خودش). */
+  var PREQ29 = /^(?:(?:یه|یک|چند|دو|سه|چهار|پنج)[\s‌]*(?:تا[\s‌]*)?)?(?:سؤال|سوال|پرسش)(?:‌?ها|‌?های|ی)?(?:[\s‌]*(?:دیگه|دیگر|دیگم))?(?![آ-ی])[^؟?]{0,60}$/;
+  var PRESYS29 = /(?:سؤال|سوال|پرسش)[^؟?:]{0,30}(?:دربارهٔ?|درباره‌ی|راجع[\s‌]*به)[\s‌]*(?:خودِ?[\s‌]*)?(?:سامانه|صفحه|سیستم|دستیار)(?![آ-ی])/;
+  var PRETIME29 = /^(?:سلام|درود|خب|خوب)?[\s،,]*(?:(?:یه|یک|دو|سه|چند)[\s‌]*(?:روز|هفته|ساعت|شب)[\s‌]*(?:گذشت|شد|گذشته)|برگشتم|باز[\s‌]*اومدم|اومدم)[\s.!،,]*$/;
+  function preamble29(x) { var b = String(x || "").replace(/^(?:سلام|درود|خب|خوب|راستی|ببخشید)[\s،,!.]*/, "").replace(/[\s.!،,:：؛]+$/, "").trim();
+    if (!b) return true; if (/[0-9۰-۹]/.test(b)) return false; return PREQ29.test(b) || PRETIME29.test(b) || PRESYS29.test(b); }
+  /* بازگشت با وصف به مسئلهٔ بسته (C27-6؛ مصرف در گذرِ مرحله، پایینِ همین پرونده) */
+  var BACKREF29 = /(?:دربارهٔ?|درباره‌ی|راجع[\s‌]*به|برای|سرِ?|مالِ?)[\s‌]*(?:همون|همان|اون|آن)[\s‌]+[^.؟?!\n:]{1,50}?[\s‌]+که[\s‌]+[^.؟?!\n:]{0,25}?(?:حلش[\s‌]*کرد(?:یم|م)|حل[\s‌]*(?:شد|کردیم|کردم)|(?:بستیم|بستمش|بستیمش)|بسته[\s‌]*شد)(?![آ-ی])|(?:تیکه|تکه)(?:ٔ|‌ی|ی)?[\s‌]*(?:تازه|جدید)(?:ٔ|‌ی|ی)?[\s‌]*(?:برای|از|مالِ?)[\s‌]*(?:همون|همان|اون|آن)(?![آ-ی])/;
+  AS.backRef29 = function (t) { return BACKREF29.test(String(t || "")); };
+  function onlySysQ28(t) { var L = String(t || "").replace(/[‏‎]/g, "").match(/[^.!؟?\n]+[.!؟?\n]*/g) || [], n = 0, all29 = false;
     for (var i = 0; i < L.length; i++) { var x = L[i].trim(); if (!x) continue;
-      if (/[؟?]\s*$/.test(x)) { if (!sysQ28(x.replace(/^(?:یه|یک)[\s‌]*(?:سؤال|سوال|پرسش)[\s‌]*[:：،]?\s*|^راستی[\s،]*/, ""))) return false; n++; continue; }
+      /* پیش‌درآمدِ پیش از «:» در همان تکه («… سؤالِ دیگه دارم، یکی‌یکی: اگه …؟») */
+      var ci = x.search(/[:：]/); if (ci > 0 && preamble29(x.slice(0, ci))) { if (PRESYS29.test(x.slice(0, ci))) all29 = true; x = x.slice(ci + 1).trim(); if (!x) continue; }
+      /* دورِ ۲۹ (بانکِ R29 #265 «… ثبت کردی کِی جواب می‌گیره؟ از کجا بفهمم؟»): پرسشِ کوتاهِ دنباله (بی عدد، تا ۴ واژه) پس از پرسشی دربارهٔ سامانه همان پرسش است */
+      if (n > 0 && /[؟?]\s*$/.test(x) && !/[0-9۰-۹=<>]/.test(x) && x.replace(/[؟?!.،,]/g, " ").trim().split(/\s+/).length <= 4) { n++; continue; }
+      if (/[؟?]\s*$/.test(x)) { if (!all29 && !sysQ28(x.replace(/^(?:یه|یک)[\s‌]*(?:سؤال|سوال|پرسش)[\s‌]*[:：،]?\s*|^راستی[\s،]*|^(?:و|یا|بعد|دوم|سوم|یک|دو|سه)[\s:،]+/, ""))) return false; n++; continue; }
       if (/^(?:یه|یک)[\s‌]*(?:سؤال|سوال|پرسش)|^راستی|^ببخشید/.test(x) && x.split(/\s+/).length <= 3) continue;
+      if (preamble29(x)) { if (PRESYS29.test(x)) all29 = true; continue; }
+      if (n > 0 && /^(?:(?:من|خب)[\s‌]+)?(?:می[‌\s]?خوا(?:م|ستم)[\s‌]+)?(?:فقط[\s‌]+)?(?:ببینم|ببینمش|ببینمشون|ببینمشان|نگاه[\s‌]*کنم|نگاهی[\s‌]*بندازم)(?:[\s‌]+(?:چیا|چی|کدوما)[\s‌]*(?:بازه|هست))?[\s.!،,]*$/.test(x)) continue;   // C175: «… کجاست؟ می‌خوام فقط ببینمشون»
       return false; }
     return n > 0; }
   AS.onlySysQ28 = onlySysQ28;
@@ -1834,7 +1885,7 @@
   /* دورِ ۲۸ (R7، D28-19 tD2 p1–p2): گشایشِ برنامه‌ریزیِ یک کارِ زندگی («ماهِ دیگه باید اسباب‌کشی کنم و می‌خوام برنامه‌ش رو درست بچینم که هیچی جا نمونه: …») خودش مسئله است —
      خواسته: برنامه‌ای که هیچ کاری از آن جا نماند (طرح در زبانِ پولیا). GOAL22 خواستهٔ بی عدد و بی «برای/تا» را عمداً نمی‌گرفت («می‌خوام برم خونه»)؛ این‌جا نشانه خودِ
      کارِ برنامه‌چینی است، نه هر «می‌خوام». «برنامهٔ امروزم رو نشون بده» (فرمانِ صفحه) و «می‌خوام برنامهٔ تمرین رو باز کنم» نه — فعل باید چیدن/ریختن/نوشتنِ برنامه باشد. */
-  var PLAN28 = /(?:می[‌\s]?خوا(?:م|یم|هم)|قصد[\s‌]*دار(?:م|یم))[\s‌]+(?:[^.؟?!\n]{0,30}?[\s‌])?(?:برنامه|نقشه|ترتیبِ?[\s‌]*کارها|کارها)(?:‌?ش|‌?اش|‌?ی|ِ|ٔ)?(?:[\s‌]+(?:رو|را))?[\s‌]+(?:(?:درست|خوب|دقیق|کامل)[\s‌]+)?(?:بچینم|بچینیم|بریزم|بریزیم|بنویسم|بنویسیم|مرتب[\s‌]*کنم)(?![آ-ی])|(?:می[‌\s]?خوا(?:م|یم|هم)|باید)[\s‌]+(?:[^.؟?!\n]{0,30}?[\s‌])?برنامه[\s‌]*ریزی[\s‌]*کن(?:م|یم)(?![آ-ی])/;
+  var PLAN28 = /(?:می[‌\s]?خوا(?:م|یم|هم)|قصد[\s‌]*دار(?:م|یم))[\s‌]+(?:[^.؟?!\n]{0,30}?[\s‌])?(?:برنامه|نقشه|ترتیبِ?[\s‌]*کارها|کارها)(?:‌?ش|‌?اش|‌?ی|ِ|ٔ)?(?:[\s‌]+(?:رو|را))?[\s‌]+(?:(?:درست|خوب|دقیق|کامل)[\s‌]+)?(?:بچینم|بچینیم|بریزم|بریزیم|بنویسم|بنویسیم|مرتب[\s‌]*کنم)(?![آ-ی])|(?:می[‌\s]?خوا(?:م|یم|هم)|باید)[\s‌]+(?:[^.؟?!\n]{0,30}?[\s‌])?برنامه[\s‌]*ریزی[\s‌]*کن(?:م|یم)(?![آ-ی])|(?:^|[\s‌])(?:یه[\s‌]+|یک[\s‌]+)?(?:برنامه|نقشه)(?:‌ی|ی|ٔ|ِ)?[\s‌]+[^.؟?!\n]{0,40}?(?:می[‌\s]?خوا(?:م|یم|هم)|قصد[\s‌]*دار(?:م|یم))[\s‌]+(?:بچینم|بچینیم|بریزم|بریزیم|بنویسم|بنویسیم)(?![آ-ی])/;   // دورِ ۲۹ (بانکِ R29 #295): «یه نقشه‌ی راه برای یادگیریِ آمار می‌خوام بچینم»
   var LEADPROB24 =/مسئله|معما|تمرین|(?:سؤال|سوال|سواله|تکلیف|پرسش)[^.؟?!\n]{0,24}(?:داده|دادن|داد|کتاب|امتحان|کلاس|درس|المپیاد|کنکور)(?![آ-ی])/;
   function statesProblem(t, o) {
     t = String(t || "").replace(/[‏‎]/g, "").trim(); if (!t || AS.notProblem(t)) return false;
@@ -2290,6 +2341,11 @@
     /* دورِ ۲۶ (story Q3، C21 — oB1 p29/p31، B26x oB1 p25/p28): او با نام به مسئلهٔ بسته‌ای برگشته (a45 ST.namedClosed) ⇒ حرفِ این نوبت دربارهٔ همان مسئله است (اصلاح، نتیجهٔ
        دیرآمده، سرانجامِ پیش‌بینی)، نه صورتِ یک مسئلهٔ تازهٔ گفت‌وگو — مسئلهٔ تازه فقط با معرفیِ خودش («یه مسئلهٔ دیگه دارم: …») */
     try { if (closedHere23 && A.STORY && A.STORY.namedClosed && A.STORY.namedClosed(s)) afterClose23 = true; } catch (e) { }
+    /* دورِ ۲۹ (R7، F13 — C27-6 نیمهٔ C، pC2 p13 «راستی دربارهٔ همون بخاری که حلش کردیم و بستیم: یه تیکهٔ تازه دارم … سامانه روشی برای این داره؟»): تکه با **وصف** به همان
+       مسئلهٔ بسته برمی‌گردد («همون … که حلش کردیم/بستیم»، «یه تیکهٔ تازه برای همون …») — نامِ عنوانش را نمی‌برد، پس namedClosed نمی‌دید و همان پیام هم «⏸ تکهٔ تازهٔ … منتظرِ برگه»
+       ِ مسئلهٔ بسته شد و هم «مسئلهٔ گفت‌وگو» ِ تازه با 🧭 ِ خودش (یک پیام، دو خانه). تکه‌ای که خودش می‌گوید مالِ همان مسئلهٔ بسته است صورتِ مسئلهٔ تازه نیست. «یه مسئلهٔ تازه
+       دارم: …» همان راهِ پیشین است. */
+    if (closedHere23 && !afterClose23 && BACKREF29.test(ownText(mt)) && !/مسئله(?:‌ی|ی|ٔ)?\s*(?:تازه|جدید|دیگه|دیگر|جدا)/.test(mt)) afterClose23 = true;
     var intro = !C.stmt && !AS.notProblem(mt) && !closureOnly(mt) && !metaMsg22(mt) && !afterClose23 && !narr27(mt);
     /* تورِ پولیا (RM6c، B·D1 s11): «پس X = n» ِ الگو (RESULT_WEAK) به‌تنهایی مرحله را به بازنگری نمی‌برد — فرمول/عدد درونِ ادعا یا هنگامِ گفتنِ
        صورت نتیجه نیست؛ مرحله فقط با گزارشِ مدل (said:result) یا نتیجهٔ ثبت‌شده؛ الگو فقط پیشنهاد می‌کند (C.prev.weakRes ⇒ سطرِ زمینه) */
@@ -3074,7 +3130,15 @@
       if (ch === "»" && d > 0) { d--; if (d === 0) { out += "«" + (qb.indexOf("«") < 0 && (pageLabel25(se, qb) || pageQuote27(qb, pre)) ? fn(qb) : qb) + "»"; qb = ""; } else qb += ch; continue; }
       if (d === 0) buf += ch; else qb += ch; }
     return out + (d > 0 ? "«" + qb : "") + fn(buf); }
-  AS.regSys = function (se, t) { var rg = ""; try { rg = AS.convRegister(se, "", []); } catch (e) { } var x = String(t == null ? "" : t); try { if (A.faDates) x = A.faDates(x); } catch (e) { } return rg === "shoma" ? outMap25(se, x, toShoma) : x; };
+  /* دورِ ۲۹ (R7، F14 — C100/C151/C174؛ B29·D1 s13 «… (it1_o4sv) · …»، nB1/nB2 و A29-23 «… شمرده نمی‌شود (C57)»): برچسبِ قاعده («(C57)»، «(دورِ ۲۷، C53)») و شناسهٔ
+     خامِ رکورد («(it1_o4sv)») ساختهٔ خودِ صفحه‌اند و به نمای او و سطرهای نقل‌شدهٔ مربی نمی‌رسند. ریشه: هر سازندهٔ سطر خودش آن‌ها را می‌چسباند و هیچ گذرگاهِ مشترکی
+     پاکشان نمی‌کرد. یک پالایه برای همهٔ گذرگاه‌های نمای او: سطرِ صفحه (regSys — حباب و تاریخچهٔ پرامپت)، 📜 (A.EVLOG.add و clean ِ a40) و پاسخِ مدل پیش از نشستن در
+     حباب (پس‌وارسیِ C174 در a26). فقط **بیرونِ** «…» (نقلِ حرفِ خودِ او دست نمی‌خورد — «کدِ کلاسم C57 ـه»، «مدلِ دستگاه it1_x200»، C55) و فقط شکل‌های پرانتزدار/«قاعدهٔ Cn»
+     که خودِ صفحه می‌سازد. شمارهٔ قاعده در بلوکِ «خودِ سامانه» ِ پرامپت (شاهد برای مدل) می‌ماند (C174). */
+  var LAB29 = /[ \t]*\((?:دورِ?\s*[۰-۹0-9]+[a-z]?\s*[،,]\s*)?C[0-9]{2,3}(?:\s*[،,/]\s*C[0-9]{2,3})*\)|[ \t]*\(it[0-9]+_[a-z0-9]{3,6}\)|[ \t]*(?<![A-Za-z0-9_])it[0-9]+_[a-z0-9]{4}(?![A-Za-z0-9_])|(قاعده(?:ٔ|ی|‌ی)?)\s+C[0-9]{2,3}(?![0-9])/g;
+  A.noLabels29 = function (t) { if (typeof t !== "string" || !/C[0-9]{2,3}|it[0-9]+_/.test(t)) return t;
+    return t.split(/(«[^«»]*(?:«[^«»]*»[^«»]*)*»)/).map(function (seg, i) { return i % 2 ? seg : seg.replace(LAB29, function (m0, q) { return q || ""; }); }).join(""); };
+  AS.regSys = function (se, t) { var rg = ""; try { rg = AS.convRegister(se, "", []); } catch (e) { } var x = A.noLabels29(String(t == null ? "" : t)); try { if (A.faDates) x = A.faDates(x); } catch (e) { } return rg === "shoma" ? outMap25(se, x, toShoma) : x; };
   AS.R25_QUARANTINE = Object.assign(AS.R25_QUARANTINE || {}, { regSys24: function (se, t) { var rg = ""; try { rg = AS.convRegister(se, "", []); } catch (e) { } var x = String(t == null ? "" : t); try { if (A.faDates) x = A.faDates(x); } catch (e) { } return rg === "shoma" ? outMap23(x, toShoma) : x; } });
   /* دورِ ۲۵ (P6، A23-14 «STILL» ِ سه دور، U33، C25-3): ضمیرِ سطرِ صفحه فقط هنگامِ نقش بستن گذاشته می‌شد؛ متنِ ذخیره‌شدهٔ سشن (که پرونده، برون‌بری، ایمیل و هر خواننده‌ای جز
      حبابِ گفت‌وگو می‌خواند) «تو» می‌ماند. حالا همان یک گذرگاه (AS.regSys) هنگامِ ذخیرهٔ سشن هم روی سطرهای «سامانه» می‌نشیند: text = آنچه دیده می‌شود، text0 = متنِ خامِ صفحه
@@ -3901,6 +3965,16 @@
   function hasFragN(T, y) { var r = fragReN(y); return !!r && r.test(String(T || "")); }
   function repFragN(T, y, x) { var r = fragReN(y); return r ? String(T).replace(r, function () { return x; }) : T; }
   function numRe19b(n) { var rf = fragRe(n); return rf ? new RegExp("(^|[^0-9۰-۹٠-٩.٫])" + rf.source + "(?![0-9۰-۹٠-٩]|[.٫][0-9۰-۹٠-٩])") : null; }
+  /* دورِ ۲۹ (R2 correction، D29-5 tD1 «… گام ۵: جمع …» ⇒ «گام ۵٫۵: جمع»؛ بانکِ R29 #61): شمارهٔ گام/مرحله/ردیف برچسب است، نه داده — هرگز جایگزین نمی‌شود؛ نخستین همانندِ غیرِبرچسب عوض می‌شود */
+  var LABEL29 = /(?:گام|مرحله|مرحلهٔ|قدم|ردیف|سطر|بند|شماره|step)[\s‌]*$/i;
+  function repNum29(T, re, X) { T = String(T); if (!re) return null; var g = new RegExp(re.source, "g"), m;
+    while ((m = g.exec(T))) { var st = m.index + (m[1] || "").length; if (LABEL29.test(T.slice(Math.max(0, st - 12), st))) { if (g.lastIndex === m.index) g.lastIndex++; continue; } return T.slice(0, st) + X + T.slice(m.index + m[0].length); }
+    return null; }
+  AS.retractLabel29 = LABEL29;
+  /* دورِ ۲۹ (D29-26 arD2 «چراغ ۱۵ متره» ⇒ «چراغ ۱۲ متر»): وقتی پیشین و تازه فقط در عدد فرق دارند (پسوندِ «ـه/است» جزوِ داده نیست) فقط رقم‌ها عوض می‌شوند — نقلِ او بیرون از عدد بایت‌به‌بایت */
+  function numOnly29(o, n) { o = String(o); n = String(n); var D0 = /[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g, a = o.match(D0) || [], b = n.match(D0) || []; if (a.length !== 1 || b.length !== 1) return n;
+    var cut = function (t, d) { return t.replace(d, "#").replace(/[\s‌]*[،,:؛.]+[\s‌]*$/, "").replace(/[\s‌]*(?:ـ?ه|است|هست|اند|ان)[\s‌]*$/, "").replace(/[\s‌]+/g, " ").trim(); };
+    return cut(o, a[0]) === cut(n, b[0]) ? o.replace(a[0], b[0]) : n; }
   function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
   function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
   var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
@@ -4006,17 +4080,20 @@
     var rep = function (m, x) { return T.slice(0, m.s) + x + T.slice(m.e); }, nx = tok20(X).length;
     var d = diff20(F, X); if (d && d.same) return null;
     if (d && d.oldT) { var mf = findTok20(T, F), ms = findTok20(T, d.oldT, true);
+      if (/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(String(d.oldT).trim())) ms = ms.filter(function (x) { return !LABEL29.test(T.slice(Math.max(0, x.s - 12), x.s)); });   // دورِ ۲۹ (D29-5): برچسبِ گام نه
       if (ms.length) { var pick = (mf && ms.filter(function (x) { return x.s >= mf.s && x.e <= mf.e; })[0]) || ms[0]; return rep(pick, d.newT); } }
     var fo0 = nums19b(F).filter(function (n) { return nums19b(X).indexOf(n) < 0; }), xo0 = rawNums(X).filter(function (n) { return nums19b(F).indexOf(faDigits(n).replace(/٫/g, ".")) < 0; });
-    if (fo0.length === 1 && xo0.length === 1 && tok20(X).length === 1) { var r0 = numRe19b(fo0[0]); if (r0 && r0.test(T)) return T.replace(r0, function (a, p) { return p + xo0[0]; }); }
+    if (fo0.length === 1 && xo0.length === 1 && tok20(X).length === 1) { var r0 = numRe19b(fo0[0]), rp0 = r0 ? repNum29(T, r0, xo0[0]) : null; if (rp0 != null) return rp0; }   // دورِ ۲۹ (D29-5): نه برچسبِ گام
     var Ys = oldsOf20(cur, old);
     for (var i = 0; i < Ys.length; i++) { var y = Ys[i]; if (!y || hasTok20(X, y)) continue; if (F && !hasTok20(F, y) && !old) continue;
       var my = findTok20(T, y); if (!my) continue;
+      if (/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(String(y).trim()) && LABEL29.test(T.slice(Math.max(0, my.s - 12), my.s))) { var rl29 = repNum29(T, numRe19b(String(y).trim()), X); if (rl29 != null && tok20(X).length === 1) return rl29; continue; }   // دورِ ۲۹ (D29-5): برچسبِ گام نه
       var val = X; if (nx > 2) { var wy = WD19b.exec(y), wx0 = WD19b.exec(X), nr = newRun20(F || y, X); if (wy && wx0) val = wx0[0]; else if (nr && tok20(nr).length <= tok20(y).length + 2) val = nr; }
       return rep(my, val); }
     var fo = nums19b(F).filter(function (n) { return nums19b(X).indexOf(n) < 0; }), xo = rawNums(X).filter(function (n) { return nums19b(F).indexOf(faDigits(n).replace(/٫/g, ".")) < 0; });
-    if (fo.length === 1 && xo.length === 1) { var r2 = numRe19b(fo[0]); if (r2 && r2.test(T)) return T.replace(r2, function (a, p) { return p + xo[0]; }); }
+    if (fo.length === 1 && xo.length === 1) { var r2 = numRe19b(fo[0]), rp2 = r2 ? repNum29(T, r2, xo[0]) : null; if (rp2 != null) return rp2; }
     var wf = WD19b.exec(F), wx = WD19b.exec(X); if (wf && wx && nx <= 4) { var mw = findTok20(T, wf[0]); if (mw) return rep(mw, nx > 2 ? wx[0] : X); }
+    if (F && /^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(F)) return repNum29(T, numRe19b(F), X);   // دورِ ۲۹ (D29-5)
     if (F) { var mF = findTok20(T, F); if (mF) return rep(mF, X); }
     if (F && T.trim() && hasTok20(F, T.trim()) && !numLost24(T, F, X)) return X;   // دورِ ۲۴ (R3، B24·D5)
     return null;
@@ -4028,15 +4105,16 @@
     var re = /(?:^|[\s،,.])(?:نه|به[\s‌]*جای|بجای)[\s‌]+([^،,.!؟?\n]{1,50})/g, m, cu = String(cur || "");
     while ((m = re.exec(cu))) { var w = m[1].replace(/[\s‌]+(?:بود|است|نبود)$/, "").trim().split(/[\s‌]+/); for (var k = w.length; k >= 1; k--) Ys.push(w.slice(0, k).join(" ")); }
     for (var i = 0; i < Ys.length; i++) { var y = Ys[i]; if (!y || hasFrag(X, y) || !(!F || hasFrag(F, y) || !!old)) continue;
-      if (/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(y)) { var ry = numRe19b(y); if (ry.test(T)) return T.replace(ry, function (a0, p0) { return p0 + X; }); continue; }   // عدد فقط به‌تمامی («۵» درونِ «۱۵» نه)
+      if (/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(y)) { var ry = numRe19b(y), rp29 = ry ? repNum29(T, ry, X) : null; if (rp29 != null) return rp29; continue; }  /* دورِ ۲۹: نه برچسبِ گام */   // عدد فقط به‌تمامی («۵» درونِ «۱۵» نه)
       var wy = fragRe(y), ry2 = wy ? new RegExp("(^|[^آ-یa-zA-Z0-9۰-۹‌])" + wy.source + "(?![آ-یa-zA-Z0-9۰-۹‌])") : null;   // واژه به‌تمامی («خسته» درونِ «خسته‌ام» نه)
       if (ry2 && ry2.test(T)) return T.replace(ry2, function (a1, p1) { return p1 + X; }); }
     var fo = nums19b(F).filter(function (n) { return nums19b(X).indexOf(n) < 0; }), xo = rawNums(X).filter(function (n) { return nums19b(F).indexOf(faDigits(n).replace(/٫/g, ".")) < 0; });
-    if (fo.length === 1 && xo.length === 1) { var r2 = numRe19b(fo[0]); if (r2 && r2.test(T)) return T.replace(r2, function (a, p) { return p + xo[0]; }); }
+    if (fo.length === 1 && xo.length === 1) { var r2 = numRe19b(fo[0]), rq2 = r2 ? repNum29(T, r2, xo[0]) : null; if (rq2 != null) return rq2; }   // دورِ ۲۹ (D29-5): نه برچسبِ گام
     var wf = WD19b.exec(F), wx = WD19b.exec(X); if (wf && wx && hasFrag(T, wf[0]) && X.split(/\s+/).length <= 4) return repFrag(T, wf[0], X);
     var ft = F.split(/\s+/).filter(Boolean), xt = X.split(/\s+/).filter(Boolean);
     for (var xi = 0; xi < xt.length; xi++) { if (xt[xi].length < 2 || /^[0-9۰-۹٠-٩=+\-−×*\/^.,]+$/.test(xt[xi])) continue; var fi = ft.indexOf(xt[xi]); if (fi < 0) continue;
       var s0 = Math.max(0, fi - xi), win = ft.slice(s0, s0 + xt.length).join(" "); if (win && win !== X && hasFragN(T, win)) return repFragN(T, win, X); break; }
+    if (F && /^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(F)) return repNum29(T, numRe19b(F), X);   // دورِ ۲۹ (D29-5): عددِ تنها هرگز برچسبِ گام را نمی‌گیرد
     if (F && hasFragN(T, F)) return repFragN(T, F, X);   // دورِ ۲۴ (R3، C24-12): مرزِ عدد
     if (F && T.trim() && hasFrag(F, T.trim()) && !numLost24(T, F, X)) return X;
     return null;
@@ -4080,6 +4158,9 @@
   var CORR20 = new RegExp(CORR19b.source + "|(?:^|[\\s،,.])نه[\\s‌]*[،,!]|(?:^|[\\s،,.])نه[\\s‌]+[^\\s]|بود(?![آ-ی])|نبود(?:م|یم|ی)?(?![آ-ی])|غلط|اشتباه(?![\\s‌]*کردم)|تصحیح|منظورم|راستش|در[\\s‌]*واقع|درواقع|درست[\\s‌]*کن(?![آ-ی])|(?:رو|را)[\\s‌]+[^\\s]+[\\s‌]+(?:کن|کنید)(?![آ-ی])|درست(?:ش|ه)(?![آ-ی])");
   /* دورِ ۲۷ (R2، C74): فرضی که در همان پیام به واقعیت بدل شد («اگه ۵ نفر بودیم …؟ آهان، اصلاً ۵ نفر بودیم») — بخشِ واقعیت نشانهٔ اصلاح است، بخشِ فرضی به مربی می‌رود */
   CORR20 = new RegExp(CORR20.source + "|(?:^|[\\s،,.؟?])(?:آهان|آها)?[\\s،,]*(?:اصلاً|اصلا|در[\\s‌]*واقع|درواقع)[\\s‌]+[^.!؟?\\n]{0,40}?بود(?:ه|یم|ند|ن|م)(?![آ-ی])");
+  /* دورِ ۲۹ (R2 correction، C142؛ C29-13 s23 «یه اصلاحِ دیگه: هر کیک ۸ تیکه نمیشه، ۱۰ تیکه میشه» رد شد): «X نمیشه/نمیاد، Y میشه/میاد» (با عددِ تازه پس از ویرگول) و «یه اصلاحِ (دیگه):» هم اصلاح‌اند.
+     منفی‌ها (بانکِ R29 #84، #91): «… نمیشه مساوی تقسیم کرد» (بی مقدارِ تازه) و «یه اصلاحِ دیگه هم بکنم؟» (بی دونقطه) اصلاح نیستند. */
+  CORR20 = new RegExp(CORR20.source + "|(?:^|[\\s،,.:])(?:یه|یک)[\\s‌]*اصلاحِ?(?:[\\s‌]*(?:دیگه|دیگر|دیگهٔ?|کوچیک|کوچک))?[\\s‌]*[:：]|نمی[\\s‌]*(?:شه|شود|یاد|آید|اد)[\\s‌]*[،,][^.!؟?\\n]{0,40}?[0-9۰-۹][^.!؟?\\n]{0,30}?می[\\s‌]*(?:شه|شود|یاد|آید|اد)(?![آ-ی])");
   AS.CORR_RE20 = CORR20;
   /* دلیلِ رد به زبانِ ساده (سطرِ سامانه برای خودش) */
   function plainErr20(e) { e = String(e || "");
@@ -4131,6 +4212,13 @@
       var occ28 = typeof A.liveOccOf28 === "function" ? A.liveOccOf28(src.text, named28.o) : [];
       var bare28 = !String(own).replace(/«[^»]*»/g, " ").split(/[\s،,.!؟?:؛]+/).some(function (w) { w = w.replace(/^ـ/, ""); return w.length >= 2 && !/^[0-9۰-۹٠-٩.٫]+$/.test(w) && !/^(?:نیست|نیستن|نیستند|نیسته|نبود|نبوده|نه|است|ست|هست|بود|بوده|ه|ـه|درست|درسته|اشتباه|گفتم|ببخشید)$/.test(w); });
       if (bare28 && occ28.length > 1) return { err: "«" + clip(named28.o, 20) + "» در آن پیام چند بار آمده («" + occ28.slice(0, 4).join("»، «") + "») — کدام عدد را اصلاح می‌کنی؟", ask28: true };
+      /* دورِ ۲۹ (R2 correction، C143؛ بانکِ R29 #70 «۴ نیست، ۵» کنارِ «۶ متر در ۴ متر»، «۴ تا پنجره»، «ساعتِ ۴»): جمله‌اش کمیتی نام نبرد و همان رقم در پیام‌های پیشینش چند کمیتِ
+         گوناگون است (همسایهٔ دیگر) ⇒ صفحه می‌پرسد کدام — حتی اگر پیامِ منبع یک بار آن را دارد؛ هیچ چیز عوض نمی‌شود تا او بگوید */
+      if (bare28 && /^[0-9۰-۹٠-٩.٫]+$/.test(String(named28.o).trim()) && typeof A.liveOccOf28 === "function") { var all29 = [];
+        for (var j29 = 0; j29 < ui; j29++) if (isUser(M[j29]) && !EDIT20.test(String(M[j29].text || ""))) (A.liveOccOf28(M[j29].text, named28.o) || []).forEach(function (t0) { t0 = String(t0).trim(); var w = t0.split(/[\s‌]+/), ix = w.findIndex(function (z) { return /[0-9۰-۹٠-٩]/.test(z); }); if (ix < 0 || (ix > 0 && LABEL29.test(w[ix - 1] + " "))) return;
+          var key = (w[ix + 1] || w[ix - 1] || "").replace(/[،,:؛.]+$/, ""); if (all29.every(function (x) { return x.k !== key; })) all29.push({ k: key, t: t0 }); });
+        all29 = all29.map(function (x) { return x.t; });
+        if (all29.length > 1) return { err: "«" + clip(named28.o, 20) + "» در پیام‌هایت چند کمیت است («" + all29.slice(0, 4).join("»، «") + "») — کدام عدد را اصلاح می‌کنی؟", ask28: true }; }
       /* فقط وقتی مقدارِ نام‌برده اصلاً در آن پیام نیست می‌پرسد؛ اگر هست ولی جایش را این خواننده نیافت، راهِ پیشین (old ِ مدل، numParts …) می‌ماند */
       var nv28 = String(named28.o).replace(/[^0-9۰-۹٠-٩.٫]+.*$/, ""), hasV28 = !!nv28 && new RegExp("(?:^|[^0-9۰-۹٠-٩.٫])" + nv28.replace(/[.٫]/g, "[.٫]") + "(?![0-9۰-۹٠-٩]|[.٫][0-9۰-۹٠-٩])").test(String(src.text) + " " + frag);
       var bareX28 = /^[0-9۰-۹٠-٩.٫]+$/.test(String(named28.o).trim());   // با یکا («۱۶۰ سانت» برای «۱.۶» ِ متر) شاید همان مقدار در یکای دیگر است ⇒ راهِ پیشین
@@ -4139,9 +4227,18 @@
     var frag48 = typeof A.liveNegStrip48 === "function" ? A.liveNegStrip48(frag) || frag : frag;
     /* … و وقتی مقدارِ پیشین را مدل نام برده و در تکه هست («۵» در «ما ۵ نفریم و ۴ میلیون پول داریم»)، سنجه همان مقدار است، نه هر عددِ دیگرِ تکه («۴ میلیون») */
     var old48 = txtOf(x.old).trim(), byOld = (!!old48 && hasTok20(frag, old48) && !hasTok20(old48, fix)) || !!(cd28 && cd28.c88 === "named" && !cd28.absent28);   // دورِ ۲۸ (C88): X ِ نام‌برده‌اش در تکه پیدا شد («۴» ِ «√(۳² + ۴²)»)
+    /* دورِ ۲۹ (R2 correction، C160/C142؛ بانکِ R29 #97 «نه ببخشید، همون ۴ درست بود»): پس‌گرفتنِ اصلاح — منبع پیامِ اصلاحِ پیشین است و مقدارِ «درست» همان مقدارِ نخستِ داده؛
+       تکه همان مقدارِ جاری (مقدارِ اصلاح) است، نه X ِ نفی‌شدهٔ آن پیام ⇒ داده با تاریخچه برمی‌گردد (ثبتِ اصلاح‌ها back) */
+    try { if (!edit && A.liveCorrReg29) { var fxn29 = nums19b(fix), bk29 = fxn29.length === 1 ? A.liveCorrReg29(s.id).filter(function (e) { return e && !e.sup && e.cm === msgId19b(src) && Math.abs(+e.a0 - +fxn29[0]) < 1e-9; }).pop() : null;
+        if (bk29) { frag = fa(String(+bk29.b)).replace(/\./g, "٫"); frag48 = frag; byOld = false; } } } catch (e29) { }
     if ((!byOld && hasTok20(frag48, fix)) || (typeof A.liveSameVal === "function" && A.liveSameVal(x.old ? txtOf(x.old) : frag48, fix))) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };   // دورِ ۲۲: «۷۴ کیلو» = «۷۴ کیلوئه» به معنا
     /* دورِ ۲۳ (Q4، D23-7 aD3 «اولش که گفتم ۶۷ ماه اشتباه بود؛ درستش ۶۱ و نیمه»): «اشتباه گفتم» (لغزشِ گفتن) با «نتیجه‌ام رد شد» فرق دارد — حدس/نتیجه‌ای که خودش
        آزمود و رد شد بازنویسی نمی‌شود؛ «رد شد» شاهدِ کارِ اوست و مقدارِ تازه نتیجهٔ تازهٔ اوست (✏️ ِ خودِ پیام جداست) */
+    /* دورِ ۲۹ (R2 correction، C142 «پس جوابم غلط بود marks her result as hers-rejected; it never rewrites it» (C74)؛ D29-23 s31 «… با چهار تا ۲.۵^۴ حدود ۳۹. پس جوابم غلط بود!» رکوردِ «۵×۵=۲۵» را بازنویسی کرد):
+       ردِ نتیجهٔ خودش (بی «X نیست، Y» ِ صریح) اصلاحِ گفتار نیست — نتیجه همان می‌ماند و «ردشده به حرفِ خودت» نشان می‌گیرد؛ منفی (بانکِ R29 #98): «جوابم غلط نبود»؛ بی مقدارِ تازه («غلط»، بانکِ R20 #73) همان خود-اصلاحِ پیشین (ans پس گرفته با تاریخچه) — چیزی بازنویسی نمی‌شود */
+    if (!edit && REJ29.test(own) && /[0-9۰-۹٠-٩]/.test(fix) && !/غلط[\s‌]*نبود|اشتباه[\s‌]*نبود/.test(own) && !/[0-9۰-۹٠-٩][^.!؟?\n]{0,15}نیست[\s‌]*[،,]/.test(own)) { var nR29 = 0;
+      (s.coachEv || []).forEach(function (e) { if (e && !e.wd && e.ok && (e.how === "res" || e.how === "solved") && (e.msg === msgId19b(src) || (e.src20 && hasTok20(String(e.src20.span || ""), frag)))) { e.rej29 = { at: nowIso(), by: msgId19b(um), why: "ردشده به حرفِ خودت" }; nR29++; } });
+      return { err: "آن نتیجه را خودش آزمود و رد شد («" + clip(frag, 40) + "») — «ردشده به حرفِ خودت» ثبت شد؛ نوشته‌اش همان می‌ماند و مقدارِ تازه نتیجهٔ تازهٔ اوست", refuted: true, rej29: nR29 }; }
     if (!edit) { var refG = refutedTarget23(s, frag, what, key); if (refG) return { err: "آن حدس/نتیجه را خودش آزمود و رد شد («" + clip(refG, 40) + "») — «رد شد» همان می‌ماند و مقدارِ تازه نتیجهٔ تازهٔ اوست، نه اصلاحِ اشتباهِ گفتاری", refuted: true }; }
     /* مقدارِ نادرستی که صریح نام برد («اون شنبه رو یکشنبه کن»، old ِ مدل) باید به‌تنهایی (مرزِ واژه) در آن پیام باشد — «شنبه» درونِ «پنجشنبه» نه */
     var olds = [].concat(x.old ? [txtOf(x.old).trim()] : [], edit ? [] : rooKon20(own, fix).map(function (o) { return o.x; })).filter(Boolean);
@@ -4153,6 +4250,8 @@
   }
   AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
   /* دورِ ۲۳ (Q4، D23-7): هدفِ اصلاح حدسی/نتیجه‌ای است که آزموده و رد شد؟ (حدسِ گفت‌وگو با res=refuted، یا حدسِ مسئلهٔ زنده با سرانجامِ ردشده) */
+  var REJ29 = /(?:جوابم|جوابِ?[\s‌]*من|نتیجه[\s‌]*ام|نتیجم|حسابم)[\s‌]*(?:غلط|اشتباه)[\s‌]*(?:بود|بوده|ه|است|درومد|دراومد|از[\s‌]*آب[\s‌]*دراومد)(?![آ-ی])/;
+  AS.retractRej29 = REJ29;
   function refutedTarget23(s, frag, what, key) {
     var C = (s && s.coach) || {}, kg = /^guess:(.+)$/i.exec(String(key || "")), onG = what === "guess" || what === "ans" || !!kg;
     if (!onG) return ""; var hit = function (t) { return !!t && (hasTok20(t, frag) || hasTok20(frag, t) || quoteIn(frag, t)); };
@@ -4351,13 +4450,30 @@
         while (fo.length > 1 && fn.length > 1 && nzT(fo[0]) === nzT(fn[0])) { fo.shift(); fn.shift(); }
         while (fo.length > 1 && fn.length > 1 && nzT(fo[fo.length - 1]) === nzT(fn[fn.length - 1])) { fo.pop(); fn.pop(); }
         var De = { o: fo.join(" "), n: fn.join(" ") }; if (A.liveFixVal(srcT, De) != null) D21 = De; } } catch (e) { D21 = null; }
+    /* دورِ ۲۹ (R2 correction، C142؛ بانکِ R29 #61 «عرض ۵ هم نیست، ۵٫۵» با تکهٔ گزارش‌شدهٔ «اتاق ۶ متر در ۴ متر» ⇒ «گام ۴» ⇒ «گام ۵٫۵»): X ِ جملهٔ خودش مقدارِ جاریِ داده‌ای است که پیش‌تر
+       اصلاح شد (ثبتِ اصلاح‌های سشن) و در تکهٔ گزارش‌شده نیست ⇒ اصلاحِ دومِ همان داده: جفت «X ⇒ مقدارِ تازه» روی متن‌هایی که X ِ جاری را دارند */
+    try { if (!R.edit && A.liveCorrReg29) { var xm29 = /([0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?)[^،,.؛\n]{0,20}?(?:نیست|نبود|نمیشه|نمی‌شه|نه)(?![آ-ی])/.exec(ownText(cu)), fx29 = rawNums(R.fix);
+        if (xm29 && fx29.length === 1) { var xv29 = faDigits(xm29[1]).replace(/٫/g, "."), fr29 = nums19b(R.frag);
+          if (fr29.indexOf(xv29) < 0 && A.liveCorrReg29(s.id).some(function (e) { return e && !e.sup && Math.abs(+e.b - +xv29) < 1e-9; })) D21 = { o: xm29[1], n: fx29[0], c88: "chain29" }; } } } catch (e29) { }
     var fullNew21 = R.edit ? ((/متنِ درستِ پیامم:\s*«([\s\S]*)»\s*$/.exec(cu) || [])[1] || "") : "";
+    /* دورِ ۲۹ (R2 correction، C143 «a range «از a تا b» is replaced as one unit or the page asks»؛ C29-15 s25 «منظورم n از ۱ تا ۲۰ بود، نه از ۱ تا ۱۰» ⇒ «۱/(n(n+2)) n … n = ۱ تا ۱۰» ِ درهم):
+       بازهٔ پیشین (از «نه (از) a تا b» ِ جملهٔ خودش، یا تنها بازهٔ تکه) و بازهٔ تازه (از مقدارِ درست) — فقط دو سرِ همان یک بازه در متن عوض می‌شوند؛ چند بازهٔ همانند ⇒ هیچ (پرسیده می‌شود) */
+    var RNG29 = /([0-9۰-۹٠-٩]+)[\s‌]*تا[\s‌]*([0-9۰-۹٠-٩]+)/g, rng29 = function (t) { var o = [], m; RNG29.lastIndex = 0; while ((m = RNG29.exec(String(t || "")))) o.push({ a: faDigits(m[1]), b: faDigits(m[2]), s: m.index, e: m.index + m[0].length, ia: m.index, la: m[1].length, ib: m.index + m[0].length - m[2].length, lb: m[2].length }); return o; };
+    var R29n = rng29(R.fix), R29o = (function () { var m = /(?:^|[\s،,])نه[\s‌]+(?:از[\s‌]+)?([0-9۰-۹٠-٩]+[\s‌]*تا[\s‌]*[0-9۰-۹٠-٩]+)/.exec(ownText(cu)); if (m) return rng29(m[1]); var f = rng29(R.frag); return f.length === 1 ? f : []; })();
+    var rangeSub29 = function (T) { if (R29n.length !== 1 || R29o.length !== 1) return null; var o = R29o[0], nn = R29n[0]; if (o.a === nn.a && o.b === nn.b) return null; var hit = rng29(T).filter(function (x) { return x.a === o.a && x.b === o.b; }); if (hit.length !== 1) return null; var h = hit[0];
+      var na = String(R.fix).slice(nn.ia, nn.ia + nn.la), nb = String(R.fix).slice(nn.ib, nn.ib + nn.lb); return T.slice(0, h.ia) + na + T.slice(h.ia + h.la, h.ib) + nb + T.slice(h.ib + h.lb); };
     var sub = function (T, typed) { var v = null;
+      if (typeof T === "string" && R29n.length === 1 && R29o.length === 1) { var rs29 = rangeSub29(T); if (rs29 != null) return rs29; if (rng29(T).some(function (x) { return x.a === R29o[0].a && x.b === R29o[0].b; })) return null; }
       try { if (D21 && A.liveFixVal && (D21.n || "").trim()) v = A.liveFixVal(T, D21); } catch (e) { v = null; }
       /* دورِ ۲۸ (R2، C88): جفتِ کمینه از حرفِ خودش (D21.c88) که جایگزینیِ درجایش برابریِ نوشته‌شده‌ای را دروغ می‌کرد رد شد — جایگزینیِ زمخت‌تر («۵ متر²)») جایش نمی‌نشیند؛ عددهای کهنه را موتورِ کهنگی می‌گوید */
       if (v == null && D21 && D21.c88 && typeof T === "string" && String(D21.o).trim()) { var esc28 = String(D21.o).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/[.٫]/g, "[.٫]"), re28 = new RegExp("(^|[^0-9۰-۹٠-٩.٫])(" + esc28 + ")(?![0-9۰-۹٠-٩]|[.٫][0-9۰-۹٠-٩])", "g"), m28 = T.match(re28) || [];
         /* همان یک جای X در این رکورد (جایگزینیِ کمینه؛ برابریِ نوشته‌شده‌ای که دیگر برقرار نیست را موتورِ کهنگی «کهنه» می‌گوید) — چند جا ⇒ هیچ (نه حدس) */
-        return m28.length === 1 ? T.replace(re28, function (all, pre) { return pre + String(D21.n); }) : null; }
+        m28 = (function () { var g = new RegExp(re28.source, "g"), x, k = []; while ((x = g.exec(T))) { var at = x.index + x[1].length; if (!LABEL29.test(T.slice(Math.max(0, at - 12), at))) k.push(x[0]); } return k; })();   // دورِ ۲۹ (D29-5): برچسبِ گام شمرده نمی‌شود
+        /* دورِ ۲۹ (R2 correction، C88/C143؛ D29-26 arD2 «عرضِ حیاط ۵ نیست، ۴» — «۵» سه جا در صورت بود و صورت دست نخورد): چند جا ⇒ همان جایی که تکهٔ نام‌بردهٔ او («حیاط ۵ متر در ۸ متره») در همین متن است؛ وگرنه هیچ (نه حدس) */
+        if (m28.length > 1 && R.frag) { var fz29 = String(T).indexOf(String(R.frag).trim()), fl29 = String(R.frag).trim().length; if (fz29 < 0) { var fr29 = fragRe(String(R.frag).trim()), mm29 = fr29 && fr29.exec(String(T)); if (mm29) { fz29 = mm29.index; fl29 = mm29[0].length; } }
+          if (fz29 >= 0) { var g29 = new RegExp(re28.source, "g"), x29, hit29 = []; while ((x29 = g29.exec(T))) { var at29 = x29.index + x29[1].length; if (at29 >= fz29 && at29 < fz29 + fl29) hit29.push({ s: at29, e: at29 + x29[2].length }); }
+            if (hit29.length === 1) return T.slice(0, hit29[0].s) + numOnly29(T.slice(hit29[0].s, hit29[0].e), String(D21.n)) + T.slice(hit29[0].e); } }
+        if (m28.length !== 1) return null; var g1 = new RegExp(re28.source, "g"), y1; while ((y1 = g1.exec(T))) { var a1 = y1.index + y1[1].length; if (LABEL29.test(T.slice(Math.max(0, a1 - 12), a1))) continue; return T.slice(0, a1) + numOnly29(y1[2], String(D21.n)) + T.slice(a1 + y1[2].length); } return null; }
       if (v == null) v = subst20(T, R.frag, R.fix, cu, R.old); if (v == null) v = subst19b(T, R.frag, R.fix, cu, R.old);
       if (v == null && fullNew21 && String(T || "").trim() && (String(T).trim() === srcT.trim() || (String(T).length >= 40 && srcT.indexOf(String(T).replace(/…$/, "")) === 0))) v = clip(fullNew21, 400);
       /* دورِ ۲۴ (R3، C24-12 s23 «۱.۵.۷۵ برابر» ⇒ «۱۲۰»): رکوردِ همان نوع که تکه را ندارد فقط وقتی کلاً با مقدارِ درست جایگزین می‌شود که نه ✏️ باشد (در ✏️ تکه و
@@ -4414,6 +4530,9 @@
     var inWin = function (x) { var c = String(x.created || x.at || ""); return !!c && x.sess === s.id && c >= String(R.src.at || "") && (!nxt || c < String(nxt.at || "~")); };
     try { S.all("deadline", function (x) { return x && !x.done && ((x.src20 && x.src20.msg === R.srcId && x.src20.sess === s.id) || (!x.src20 && inWin(x))); }).forEach(function (dl) { if (!dl.src20) dl.src20 = { sess: s.id, msg: R.srcId, span: dl.what, key: "deadline:" + dl.id };
       if (!(R.what === "plan" || aff("deadline:" + dl.id, dl.src20.span || dl.what, []) || over(dl.what))) return;
+      /* دورِ ۲۹ (dates، C144؛ B29·D21 dB2 c12–c14، بانکِ R29 #147): ✏️ فقط رکوردی را عوض می‌کند که متنش با همین ✏️ عوض شد — موعدِ آزمونِ همان پیام («تا ۲۵ آذر …»)
+         با «پنجشنبه ⇐ سه‌شنبه» ِ جلسه جابه‌جا یا «جایگزین» نمی‌شود (پیش‌تر R.what === "plan" همهٔ موعدهای پیام را به newDay134 می‌داد) */
+      if (!!R.edit || /^\s*\[اصلاحِ/.test(cu)) { var t29 = String(dl.quote || dl.what || ""), v29 = null; try { v29 = sub(t29, false); } catch (e) { v29 = null; } if (v29 == null || String(v29).replace(/\s+/g, " ").trim() === t29.replace(/\s+/g, " ").trim()) return; }
       var hm = /(?:ساعت[\s‌]*)?([0-9۰-۹]{1,2})(?:[:٫.]([0-9۰-۹]{2}))?[\s‌]*(صبح|ظهر|عصر|بعد[\s‌]*از[\s‌]*ظهر|شب)?/.exec(faDigits(R.fix)), tm = "", dd = dl.date;
       if (hm && (/ساعت|صبح|ظهر|عصر|شب|:/.test(R.fix) || dl.time)) { var hh = +hm[1], mm = hm[2] ? +hm[2] : 0; if (hm[3] && /عصر|بعد|شب/.test(hm[3]) && hh < 12) hh += 12; if (hh <= 23 && mm <= 59) tm = (hh < 10 ? "0" : "") + hh + ":" + (mm < 10 ? "0" : "") + mm; }
       /* دورِ ۲۸ (C134): روزِ تازه از هفتهٔ همان تاریخِ ثبت‌شده (نه از امروز)، و اصلاحِ «چه» با همان واژهٔ روز روز را عوض نمی‌کند. خوانشِ پیشین (planDate18 از امروز)
@@ -4437,7 +4556,9 @@
     (s.promises || []).forEach(function (p) { if (p.done || !(p.src === R.srcId || quoteIn(p.ask, R.src.text)) || !(over(p.ask) === true || (over(p.ask) == null && rel19b(p.ask, R.frag)))) return; var v = sub(p.ask, false); if (v == null || v === p.ask) return;
       corrPush(p, p.ask, v, ctx); put("درخواست", p.ask, v); p.ask = clip(v, 200); });
     /* صورتِ مسئلهٔ گفت‌وگو و مجهول به حرفِ خودش — فقط همان تکه (بی جایگزینیِ کلِ متن با مقدارِ درست) */
-    if (C.stmt && hasFrag(R.src.text, String(C.stmt).slice(0, 40)) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
+    /* دورِ ۲۹ (R2 correction، C142؛ بانکِ R29 #62 «نه ببخشید، ۵ نفریم نه ۴»؛ A29-14 s04): اصلاحِ دومِ همان داده پیامِ اصلاحِ اول را نشانه می‌گیرد — صورتی که آن اصلاح نوشت (stmtHist.by) هم پیرو است */
+    var stBy29 = (C.stmtHist || []).some(function (h) { return h && h.by && h.by === R.srcId; });
+    if (C.stmt && (hasFrag(R.src.text, String(C.stmt).slice(0, 40)) || stBy29) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
       /* دورِ ۲۳ (Q4، B·D4 s19): جایگزینیِ درجایی که ترتیبِ واژه‌ها را وارونه می‌کند («عروسی ۱۵ اسفنده برادرم مونده») نه — صورتِ گفت‌وگو همان می‌ماند و جملهٔ اصلاحِ خودش کنارش */
       if (sv != null && sv !== C.stmt && D21 && A.liveGrowGarble && A.liveGrowGarble(C.stmt, D21)) { var fs23 = (A.liveFragSent ? A.liveFragSent(ownText(cu), R.fix) : "") || R.fix; sv = String(C.stmt).replace(/[\s.!]+$/, "") + " (اصلاحِ خودم: " + String(fs23).trim().replace(/[.!]+$/, "") + ")."; }
       if (sv != null && sv !== C.stmt) { var stP = false; try { stP = !AS.notProblem(C.stmt) && (/[؟?0-9۰-۹=]/.test(C.stmt) || qToks(C.stmt).length >= 6) && (/[0-9۰-۹=+\-−×÷^√]/.test(R.frag + " " + R.fix) || qToks(R.frag).length >= 6 || R.what === "fact" || R.what === "ans"); } catch (e) { }
@@ -4563,7 +4684,7 @@
     if (!Object.keys(pids).length && !R.edit && typeof A.liveRetractSessApply === "function") { try { var ls22 = A.liveRetractSessApply(s.id, R.srcId, { frag: R.frag, fix: R.fix, old: R.old, key: R.key || "", cur: cu });
       (ls22.changed || []).forEach(function (c) { var o0 = typeof c.old === "string" ? c.old : "", n0 = typeof c["new"] === "string" ? c["new"] : ""; chS.push({ rec: String(c.label || c.rec || "رکورد"), old: clip(plainTx(o0), 160), "new": clip(plainTx(n0), 160), why: !String(c.why || "").trim() || /^اصلاح شد ⇐ «/.test(String(c.why)) ? why23 : String(c.why) }); ch.push(o0 || n0 ? chLine20(String(c.label || c.rec || "رکورد"), o0, n0) : String(c.label || "")); }); } catch (e) { console.warn(e); } }
     /* دورِ ۲۶ (Q2، C26-37 s23 p6 «یعنی ۱۰۰ دقیقه»، بانکِ R26 #52): مسئلهٔ گفت‌وگو (بی رکوردِ زنده) هم فهرستِ «عددهای حساب‌شده از …» ِ خودش را دارد — همان موتور، روی نوشته‌های همین سشن */
-    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId });
+    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId, cm: R.curId || "", mAt: (R.src && R.src.at) || "", cAt: (R.cur && R.cur.at) || "" });   // دورِ ۲۹ (C89/C142): پیامِ اصلاح‌کننده و زمان‌ها برای ثبتِ اصلاح
       if (ss26 && !chS.some(function (c) { return c.rec === ss26.label; })) { chS.push({ rec: ss26.label, old: ss26.old, "new": ss26["new"], why: ss26.why }); ch.push(ss26.label + ": «" + ss26.old + "» — " + ss26["new"]); } } catch (e) { console.warn(e); } }
     /* دفترِ کارها: خودِ اصلاح یک کارِ تاریخ‌دار است (برای پرونده و کارنامه) */
     C.acts20 = (C.acts20 || []).concat([{ at: nowIso(), kind: "correction", sess: s.id, msg: R.curId, from: R.srcId, key: R.key || R.what, old: clip(R.frag, 160), "new": clip(R.fix, 160), changed: ch.length, edit: !!R.edit }]).slice(-80);

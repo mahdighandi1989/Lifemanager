@@ -70,6 +70,8 @@
   /* ---------- 🎯 دفترِ پیش‌بینی ---------- */
   A.fcastBrier = function (list) { var r = (list || S.all("fcast")).filter(function (x) { return x.outcome === "شد" || x.outcome === "نشد"; }); if (!r.length) return null; var s = 0; r.forEach(function (x) { var p = num(x.p) / 100; s += Math.pow(p - (x.outcome === "شد" ? 1 : 0), 2); }); return { n: r.length, brier: Math.round(1000 * s / r.length) / 1000 }; };
   A.V.fcast = function () {
+    /* دورِ ۲۹ (forecast R5، C152): موعدِ خوانده‌شده از حرفِ خودش که تأییدش باز است (a41 PR.predPendDue29) */
+    var pend29 = function (x) { try { return !x.due && A.PR && A.PR.predPendDue29 ? A.PR.predPendDue29(x.id) : ""; } catch (e) { return ""; } };
     var root = h("div", { class: "page", dir: "rtl" });
     root.appendChild(A.head("تصمیم و خودتنظیمی", "🎯 دفترِ پیش‌بینی", "پیش‌بینی‌های زندگی‌ات را با احتمال و موعد بنویس؛ در موعد بگو «شد» یا «نشد». امتیازِ Brier (هر چه کمتر بهتر؛ همیشه ۵۰٪ گفتن = ۰٫۲۵) و کالیبراسیونت در «🧠 کارنامهٔ ذهن» می‌آید."));
     var q = h("input", { type: "text", id: "fcQ", placeholder: "مثلاً «تا آخرِ آذر از شرکت تعدیل می‌شوم»" });
@@ -89,9 +91,9 @@
     var row = function (x) {
         /* پیش‌بینیِ گامِ «🔭 مسئلهٔ حل‌نشدهٔ خودم»: نتیجه را خودِ گام ثبت می‌کند (شد/نشد/تاحدی/انجام نشد) — این‌جا فقط نشان داده و به گام پیوند داده می‌شود تا دو جا ناهم‌خوان نشوند */
         var jd = judged(x), how = jd ? " ⇐ " + x.outcome + (x.judgedBy && x.judgedBy.quote ? " — به گفتهٔ خودت: «" + String(x.judgedBy.quote).slice(0, 80) + "»" : "") : "";
-        if (x.live && x.live.pid) return h("li", { class: "row gap wrap fc-live" + (jd ? " fc-done" : " fc-open"), dir: "rtl" }, h("span", {}, x.q + " — " + (x.p != null ? fa(x.p) + "٪ · " : "") + (x.due ? "موعد " + A.fdate(x.due) : "بی موعد — داوری با گزارشِ خودت") + how),
+        if (x.live && x.live.pid) return h("li", { class: "row gap wrap fc-live" + (jd ? " fc-done" : " fc-open"), dir: "rtl" }, h("span", {}, x.q + " — " + (x.p != null ? fa(x.p) + "٪ · " : "") + (x.due ? "موعد " + A.fdate(x.due) : pend29(x) ? "موعدِ پیشنهادی " + A.fdate(pend29(x)) + " — از حرفِ خودت؛ منتظرِ «آره»ی تو در گفت‌وگو" : "بی موعد — داوری با گزارشِ خودت") + how),
           h("span", { class: "chip fc-liveout" }, x.outcome || "— هنوز —"), h("button", { class: "btn ghost sm fc-golive", type: "button", onclick: function () { A.go("lprob", x.live.pid, "exec"); } }, "🔭 نتیجه در گامِ همان مسئله"));
-        return h("li", { class: "row gap wrap " + (jd ? "fc-done" : "fc-open") }, h("span", {}, x.q + " — " + (x.p != null ? fa(x.p) + "٪ · " : "") + (x.due ? "موعد " + A.fdate(x.due) : "بی موعد — داوری با گزارشِ خودت") + how),
+        return h("li", { class: "row gap wrap " + (jd ? "fc-done" : "fc-open") }, h("span", {}, x.q + " — " + (x.p != null ? fa(x.p) + "٪ · " : "") + (x.due ? "موعد " + A.fdate(x.due) : pend29(x) ? "موعدِ پیشنهادی " + A.fdate(pend29(x)) + " — از حرفِ خودت؛ منتظرِ «آره»ی تو در گفت‌وگو" : "بی موعد — داوری با گزارشِ خودت") + how),
           jd ? h("label", { class: "small muted" }, "تغییرِ داوری: ") : null,
           h("select", { "aria-label": "نتیجهٔ «" + x.q + "»", onchange: function (e) { x.outcome = e.target.value; x.outcomeAt = A.nowISO(); S.put(x); A.render(); } }, ["", "شد", "نشد"].map(function (o) { return h("option", { value: o, selected: (x.outcome || "") === o ? true : null }, o || (jd ? "— دوباره باز —" : "— هنوز —")); })));
     };

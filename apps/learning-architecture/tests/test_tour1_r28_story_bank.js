@@ -93,7 +93,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     const R = await p.evaluate(([P, Q]) => ({ p: __ev(P).filter(e => e.mv && /🎯/.test(e.t)).length, q: __ev(Q).filter(e => /🎯/.test(e.t) && !e.wd).length }), [P, Q]);
     return [b.length >= 1 && b.every(n => n >= 1) && hit && R.p === 1 && R.q === 0, J({ b, R })]; };
   E[192] = async () => { const [P, Q] = await PQ(); await turnA(BIKE, [csx({ ph: 'e', said: [], prior: BIKEP })]); const b = await p.evaluate((Q) => { APP.go('dossier', Q); return [...document.querySelectorAll('#main .lp-dmv')].map(x => x.textContent).filter(t => /^↪ گامِ/.test(t)); }, Q);
-    const hit = await clickMv(Q, 'کارِ پیشین', 'گامِ ۱ مالِ'); const R = await p.evaluate((P) => __ev(P).filter(e => e.mv).map(e => e.l[0]), P);
+    const hit = await clickMv(Q, 'کارِ پیشین', 'گامِ ۱ مالِ');
+    /* دورِ ۲۹ (C124، a45 ST.stepDeps29): گامِ ۲ بر دادهٔ گامِ ۱ بناست ⇒ صفحه می‌پرسد؛ «فقط گامِ ۱» همان جابه‌جاییِ این ورودی است */
+    await p.evaluate((Q) => { APP.go('dossier', Q); const b = document.querySelector('#main .lp-dmvone'); if (b) b.click(); }, Q); const R = await p.evaluate((P) => __ev(P).filter(e => e.mv).map(e => e.l[0]), P);
     return [b.some(t => /گامِ ۱/.test(t)) && b.some(t => /گامِ ۳/.test(t)) && hit && R.length === 1 && /^گامِ ۱/.test(R[0]), J({ b, R })]; };
   E[193] = async () => { const [P, Q] = await misfiled(); const hit = await clickMv(P, '۶ متر در ۵ متر', 'کفِ انباری');
     const R = await p.evaluate(([P, Q]) => ({ q: __ev(Q).filter(e => e.mv && e.l.some(l => /۶ متر در ۵ متر/.test(l))), pl: __ev(P).filter(e => e.l.some(l => /۶ متر در ۵ متر/.test(l))), today: APP.today(), unmv: (APP.go('dossier', Q), document.querySelectorAll('#main .lp-dunmv').length), fixTxt: (APP.go('dossier', P), /اصلاح شد ⇐ «—»/.test(document.getElementById('main').innerText)) }), [P, Q]);
