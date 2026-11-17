@@ -491,3 +491,9 @@ When a value object is copied between layers (reader ⇒ stored record ⇒ re-bu
 picking fields at each site, and never default a missing discriminator to a plausible value. Test with the real upstream payloads (recorded model
 replies through the real harness), not only with the reader's input. And reject model reports that contradict the page's own clock of the same
 turn (a record cannot be created and completed in the same step).
+
+## Update 2026-11-17 — a verdict covers only what was read (Pólya R29 «story»)
+A validator that reads part of an input must not stamp the whole input. The page wrote one ✓ for a whole sentence whenever its arithmetic reader had read *some* calculation in it — so a wrong clause the reader never saw («نصفش هم میشه ۱ میلیون و ۳۰۰») looked verified (S1). Fix: segment the input into the units the user means (clauses), mark each unit the reader covered by its recorded position, and give every unit with a claim but no coverage an explicit «unchecked» mark beside it. The extra reader only adds «unchecked»; it never judges (one judge). The same shape fixed duplicate filing: two writers (model report and page reader) filing per sentence vs per clause; and a dependency ask that read dependencies from display text that only existed after a correction — read the record, not its rendering.
+
+### How to Apply Elsewhere
+Any validation badge (✓/✗/score) must carry the scope it covers. When a checker returns positions, test coverage by span overlap, and render uncovered claims as «not checked» next to themselves rather than inheriting the badge of their neighbours. Derive relations (dependencies, ownership) from the stored model, never from strings the UI happens to print. Check every new rule against look-alike sentences from real transcripts before shipping it.
