@@ -4157,7 +4157,8 @@
     var wo = wdOf(oldT), wn = wdOf(newT); if (!iso || !wo || !wn || wo.w === wn.w) return iso;
     var d0 = new Date(String(iso).slice(0, 10) + "T12:00:00Z"); if (isNaN(d0)) return iso;
     var pw = (d0.getUTCDay() + 1) % 7, delta = wn.w - pw; if (delta < 0 && /بعد/.test(nz(newT))) delta += 7;
-    var d1 = new Date(d0.getTime() + delta * 864e5), o = d1.toISOString().slice(0, 10); if (o < A.today()) o = new Date(d1.getTime() + 7 * 864e5).toISOString().slice(0, 10);
+    /* دورِ ۲۸ (C134): «اگر گذشته، همان روز در نخستین هفتهٔ بعد» — تاریخِ جایگزین‌شده‌ای که چند هفته پیش بود با یک +۷ هنوز گذشته می‌ماند */
+    var d1 = new Date(d0.getTime() + delta * 864e5), o = d1.toISOString().slice(0, 10); while (o < A.today()) { d1 = new Date(d1.getTime() + 7 * 864e5); o = d1.toISOString().slice(0, 10); }
     return o;
   }
   A.retractShiftDate = shiftDate;

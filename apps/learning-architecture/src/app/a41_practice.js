@@ -3266,6 +3266,9 @@
           /* دورِ ۲۷ (C49): نامِ روز («جمعهٔ بعد»، «همین امروز») فقط تازه‌ترین پرسش را جواب می‌دهد — پرسشِ باز، یا اگر پرسشِ بازی نیست تنها/تازه‌ترینِ مانده‌ها */
           if (!first && !(isNew && !open)) { var mw = it.opts ? mine.filter(function (o) { return it.opts.indexOf(o.date) >= 0 && ovD27(o.what, it.what) >= 1; })[0] : null;
             if (mw) { it.date = mw.date; it.amb = false; delete it.opts; var lw = bookItem26(s0, P0, it); if (lw) done.push(lw); said = true; } else left.push(it); return; }
+          /* دورِ ۲۸ (C134 ← C92/C49؛ بانکِ R22 #80 در یک سه‌شنبه): پرسشِ دوپهلویی که دیگر زیرِ آخرین پاسخِ صفحه باز نیست («بی‌جواب ماند») فقط با پیامی جواب می‌گیرد
+             که جز روز چیزی نمی‌گوید یا همان کار را نام می‌برد — «امروز وقت ندارم» سه پیام بعد، «نه امروز» ِ آن موعد نیست و «سه‌شنبهٔ بعد» را ثبت نمی‌کند */
+          if (!first && !bare27 && !(ovD27(t, it.what) >= 1 && sameAct28(t, it.what))) { left.push(it); return; }
           var k26 = ambPick26(it, P0.d0, xA, same, next, R.pos), od = k26 >= 0 ? ambO26(it, P0.d0)[k26] : "";
           if (od && od < td) { left.push(it); return; }   /* دورِ ۲۸ (F6، B28·D7 dB1 p11): گزینهٔ «همان روز» ِ پرسشی که روزش گذشته ثبت نمی‌شود (۲ آذر در ۶ آذر) */
           if (od && R.neg.indexOf(od) < 0) { it.date = od; it.amb = false; delete it.opts; var l1 = bookItem26(s0, P0, it); if (l1) done.push(l1); said = true; }
@@ -3484,7 +3487,9 @@
     var mm = /متنِ درستِ پیامم: «([\s\S]*)»\s*$/.exec(String(t)); if (!mm) return null; var nt = mm[1], pairs = [], re = /«([^«»]*)» ⇐ «([^«»]*)»/g, g;
     while ((g = re.exec(String(t).slice(0, mm.index)))) pairs.push([g[1], g[2]]);
     var em = userMsgs(s0).filter(function (u) { return !/^\s*\[/.test(String(u.text || "")) && nrm26(u.text) === nrm26(nt); }).slice(-1)[0] || null;
-    return { text: nt, at: em ? String(em.at || "") : "", apply: function (x) { var y = String(x || ""); pairs.forEach(function (p) { if (p[0] && y.indexOf(p[0]) >= 0) y = y.split(p[0]).join(p[1]); }); return y; } };
+    return { text: nt, at: em ? String(em.at || "") : "", apply: function (x) { var y = String(x || ""); pairs.forEach(function (p) { if (p[0] && y.indexOf(p[0]) >= 0) y = y.split(p[0]).join(p[1]); }); return y; },
+      /* دورِ ۲۸ (C134): متنِ پیشین از متنی که راهِ دیگری (a27) پیش‌تر بازنوشته بود — تا «فقط چه عوض شد» دیده شود */
+      unapply: function (x) { var y = String(x || ""); pairs.slice().reverse().forEach(function (p) { if (p[1] && y.indexOf(p[1]) >= 0) y = y.split(p[1]).join(p[0]); }); return y; } };
   }
   PR.editOf27 = editOf27;
   /* برنامهٔ ثبت‌شدهٔ همین گفت‌وگو که روزش را حالا نفی کرد ⇒ ثبت کنار (q.whenHist)، روزِ تازه (اگر یکی است) یک بار پرسیده می‌شود؛ بی روزِ تازه ⇒ «کدام روز؟» (C71) */
@@ -3527,10 +3532,21 @@
       var d0 = A.epiRevDate(J.y + "-" + (JM26.split("|").indexOf(m[2]) + 1) + "-" + (+m[1])); return d0 && d0 < base ? d0 : ""; } catch (e) { return ""; }
   }
   PR.pastDay28 = pastDay28;
+  /* دورِ ۲۸ (C134): دو متن روزِ یکسانی می‌گویند؟ (هر دو با یک پایه؛ هیچ‌کدام روزی نگوید هم «یکسان» است) */
+  function sameDay134(a, b, base) { var r = function (t) { var I = null; try { I = PR.whenInfo(String(t || ""), base); } catch (e) { } return I && I.date ? [I.date, !!I.amb, !!I.free, (I.opts || []).join(",")].join("|") : ""; };
+    var x = nrm26(String(a || "")), y = nrm26(String(b || "")), pa = /(?:^| )(دیروز|پریروز)(?![آ-ی])/.exec(x), pb = /(?:^| )(دیروز|پریروز)(?![آ-ی])/.exec(y);
+    if ((pa ? pa[1] : "") !== (pb ? pb[1] : "")) return false; return r(a) === r(b); }
+  PR.sameDay134 = sameDay134;
   function rebook27(s0, x, o) {
     if (!s0 || !x || !o) return null; var td = today(), isPl = o.kind === "plan";
     if (isPl ? (!/^\d{4}-\d\d-\d\d$/.test(String(x.when || "")) || x.done || (x.state && x.state !== "open")) : (x.done || !x.date)) return null;
     var cur = isPl ? x.when : x.date, I = null;
+    /* دورِ ۲۸ (C134): اصلاحی که فقط «چه» را عوض می‌کند هرگز روز را جابه‌جا نمی‌کند — حتی وقتی جملهٔ اصلاح‌شده نامِ روزی دارد («باید سه‌شنبه طرحش ⇐ بودجه‌ش …»).
+       وقتی فراخوان روزِ تازه را نداده و روز فقط از بازخوانیِ متنِ تازه درمی‌آید، متنِ پیشین و تازه با یک پایه خوانده می‌شوند؛ خوانشِ یکسان ⇒ روز دست نمی‌خورد
+       (پیش‌تر متنِ تازه از نو خوانده می‌شد و در خودِ روزِ نام‌برده دوپهلو یا «گذشته» درمی‌آمد ⇒ ثبت کنار می‌رفت و دوباره پرسیده می‌شد) */
+    if (!(o.date && /^\d{4}-\d\d-\d\d$/.test(String(o.date))) && o.src != null) {
+      var oS134 = o.old != null ? String(o.old) : String((isPl ? x.text : (x.quote || x.what)) || ""), b134 = o.base && o.base <= td ? o.base : td;
+      if (oS134 && nrm26(oS134) !== nrm26(String(o.src)) && sameDay134(oS134, String(o.src), b134)) return null; }
     if (o.date && /^\d{4}-\d\d-\d\d$/.test(String(o.date))) I = { date: o.date };
     else { try { I = PR.whenInfo(String(o.src || ""), o.base && o.base <= td ? o.base : td); } catch (e) { I = null; } }
     /* دورِ ۲۸ (dates، C93؛ D28-27 tD2 p20، B28·D14 dB1 p15، D28-28 tD2 p21، A28-2 s01 p27، C28-10 aC3 p28): نوبتِ ✏️ ِ خودش — روزِ نسبیِ جملهٔ اصلاح‌شده از روزی
@@ -3575,9 +3591,9 @@
   function editBooked27(s0, ed, at) {
     var out = []; if (!ed || !ed.at) return out; var td = today(), b0 = (A.localDay ? A.localDay(ed.at) : "") || td, base = b0 <= td ? b0 : td, why = "✏️ ِ خودش — جایگزین شد؛ روزِ تازه پرسیده شد";
     (s0.plans || []).forEach(function (q) { if (!q || String(q.at || "") !== String(ed.at)) return;
-      var r = rebook27(s0, q, { kind: "plan", src: ed.apply(q.text), base: q.d && q.d <= td ? q.d : base, at: at, why: why, by: "edit" }); if (r && r.it) out.push(r.it); });
+      var r = rebook27(s0, q, { kind: "plan", src: ed.apply(q.text), old: ed.unapply ? ed.unapply(q.text) : undefined, base: q.d && q.d <= td ? q.d : base, at: at, why: why, by: "edit" }); if (r && r.it) out.push(r.it); });
     S.all("deadline", function (r) { return r && !r.done && /^her/.test(String(r.by || "")) && r.src && String(r.src.at || "") === String(ed.at); }).forEach(function (r) {
-      var z = rebook27(s0, r, { kind: "deadline", src: ed.apply(r.quote || r.what), base: base, at: at, why: why, by: "edit" }); if (z && z.it) out.push(z.it); });
+      var z = rebook27(s0, r, { kind: "deadline", src: ed.apply(r.quote || r.what), old: ed.unapply ? ed.unapply(r.quote || r.what) : undefined, base: base, at: at, why: why, by: "edit" }); if (z && z.it) out.push(z.it); });
     return out;
   }
   PR.editBooked27 = editBooked27;

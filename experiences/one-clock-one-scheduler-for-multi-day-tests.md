@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T12:00:00Z"
 created_at: "2026-10-17T12:00:00Z"
-updated_at: "2026-11-15T12:00:00Z"
+updated_at: "2026-11-17T12:00:00Z"
 merged_from: []
 ---
 
@@ -105,3 +105,13 @@ same act; keep the owner line (the one with the person's answer buttons) and fol
   («27 Aban»).
 - **How to apply elsewhere:** when a test asserts that two dates differ, derive at least one from the test's clock (today + k), or
   guard the collision explicitly. Before you trust a "red on unchanged main", ask whether today's date is special for the test.
+
+## Update 2026-11-17
+- **Weekday-dependent bugs hide until the suite runs on that weekday.** A date rule written as «the first such weekday after today» is right on
+  six days of the week and wrong on the seventh (on a Tuesday, «Wednesday, not Tuesday» became tomorrow instead of the Wednesday of the booked
+  Tuesday's week). Two old tests had also hard-coded a calendar date that later slipped into the past.
+- **Rule:** any test whose expectation involves a weekday or a relative day runs on all seven weekdays: freeze the page clock per run
+  (Playwright `page.clock.install({time})` before `goto`, or `setSystemTime` between runs in one page), and compute every expectation from the
+  frozen day in the test, never from the machine's clock. Installing the clock at «now» first keeps the rest of an old suite unchanged.
+- **Replacement rule for weekdays:** a weekday that replaces a booked weekday is read from the replaced date — the same weekday nearest to it (the other one if passed); a «calendar week» rule looked right on the motivating example but broke two older verdicts at the week boundary;
+  a correction that keeps the same day word is a «what» correction and never moves the date.

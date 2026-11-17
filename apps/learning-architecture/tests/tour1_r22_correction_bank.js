@@ -110,10 +110,15 @@ async function run(ctx) {
     const src = await ev((pid) => APP.S.get('eprob_' + pid).src, pid);
     await turn('۳۵ نه، ۳۲ تا فروختم', 'فرستادم.', RT({ msg: '۳۵ تا فروختم', what: 'fact', key: 'datum:فروش', fix: '۳۲ تا فروختم', old: '۳۵' }));
     const x = await snap(pid); return { ok: (src.parts || []).length >= 2 && /۴۰ تا لیوان آوردم/.test(x.st) && /۳۲ تا فروختم/.test(x.st), got: { src, st: x.st } }; };
-  C[80] = async () => { await scen({ prior: ['کارگاه رو ماه بعد شروع می‌کنم', 'باید سه‌شنبه طرحش رو تحویل بدم', 'یه کم نگرانم', 'هنوز شروع نکردم', 'امروز وقت ندارم', 'فردا شاید', 'شاید هم نه', 'باید برنامه بریزم', 'خسته‌ام'],
-      dl: [{ id: 'd1', what: 'تحویلِ طرحِ کارگاه', date: '2026-10-20', span: 'سه‌شنبه طرحش رو تحویل بدم', from: 1 }] });
+  /* دورِ ۲۸ (C134): تاریخِ ثابتِ «2026-10-20» (که حالا گذشته است) جایش را به سه‌شنبهٔ پیشِ روی روزِ صفحه داد — همان روزی که جمله می‌گوید؛ معنای انتظار همان است:
+     اصلاحِ «چه» روزِ همان موعد (d1) را عوض نمی‌کند. موعد با شناسه‌اش (d1) خوانده می‌شود، نه x.dls[0] (که ترتیبِ رکوردها را می‌سنجید)، و همان فرضِ ضمنیِ پیشین — یک موعد —
+     صریح شد: موعدِ دومی از همان جمله با روزِ دیگر (در سه‌شنبه: «امروز وقت ندارم» پرسشِ بی‌جواب‌ماندهٔ «همین امروز یا سه‌شنبهٔ بعد؟» را ثبت می‌کرد) همان موعدِ جابه‌جاشده است. این بررسی در هر هفت
+     روزِ هفته اجرا می‌شود (WEEK134 پایین؛ ساعتِ صفحه نگه داشته) */
+  C[80] = async () => { const tue = await ev(() => { for (let k = 1; k < 8; k++) { const d = APP.addDays(APP.today(), k); if (new Date(d + 'T12:00:00Z').getUTCDay() === 2) return d; } });
+    await scen({ prior: ['کارگاه رو ماه بعد شروع می‌کنم', 'باید سه‌شنبه طرحش رو تحویل بدم', 'یه کم نگرانم', 'هنوز شروع نکردم', 'امروز وقت ندارم', 'فردا شاید', 'شاید هم نه', 'باید برنامه بریزم', 'خسته‌ام'],
+      dl: [{ id: 'd1', what: 'تحویلِ طرحِ کارگاه', date: tue, span: 'سه‌شنبه طرحش رو تحویل بدم', from: 1 }] });
     await turn('طرح نه، بودجه‌ش رو باید تحویل بدم', 'فرستادم.', RT({ msg: 'باید سه‌شنبه طرحش رو تحویل بدم', what: 'fact', key: 'deadline:d1', fix: 'بودجه‌ش', old: 'طرحش' }));
-    const x = await snap(''), d = x.dls[0]; return { ok: d && /بودجه/.test(d.what) && d.date === '2026-10-20' && x.rets && x.rets.ok, got: { d, rets: x.rets } }; };
+    const x = await snap(''), d = x.dls.filter(z => z.id === 'd1')[0]; return { ok: x.dls.length === 1 && d && /بودجه/.test(d.what) && d.date === tue && x.rets && x.rets.ok, got: { tue, d, all: x.dls, rets: x.rets } }; };
   C[81] = async () => { const pid = await scen({ prior: ['اندازه‌ی قالب ۲۰ بود و فر ۱۸۰ درجه'], live: { stmt: 'اندازه‌ی قالب ۲۰ بود و فر ۱۸۰ درجه', u: { dl: [{ id: 'd1', t: 'قالب ۲۰' }, { id: 'd2', t: 'دمای فر ۱۸۰ درجه' }] }, g: { guess: '۱.۷۵ ساعت', test: 'با دمای فر ۱۸۰ درجه امتحان کردم و سوخت', hit: 'نادرست بود' } } });
     await turn('اندازه‌ی قالب ۲۲ بود نه ۲۰', 'فرستادم.', RT({ msg: 'اندازه‌ی قالب ۲۰ بود', what: 'fact', key: 'datum:قالب', fix: '۲۲', old: '۲۰', rests: [] }));
     const x = await snap(pid); return { ok: x.g.hit === 'نادرست بود' && !x.g.sup, got: x.g }; };
@@ -206,9 +211,13 @@ async function run(ctx) {
     return { ok: x.plot, got: x }; };
   C[184] = async () => C[95]();
   function NC(why) { return { nc: why }; }
+  /* دورِ ۲۸ (C134): بررسی‌های تاریخی در هر هفت روزِ هفته — ctx.atDay(روز) ساعتِ صفحه را روی آن روز می‌گذارد (atDay(null) ⇒ اکنون) */
+  const WEEK134 = ctx.atDay && ctx.days ? [80] : [];
+  const week134 = async (f) => { const bad = []; for (const d of ctx.days) { await ctx.atDay(d); let r; try { r = await f(); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
+      if (!r.ok) bad.push({ day: d, got: r.got }); } await ctx.atDay(null); return { ok: !bad.length, got: bad }; };
   for (const e of P3) { const i = idx(e), f = C[i]; let r;
     if (!f) { out.nc[i] = 'no check written'; out.summary.nc++; out.fail.push('#' + i + ' has no check'); continue; }
-    try { r = await f(); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
+    try { r = WEEK134.indexOf(i) >= 0 ? await week134(f) : await f(); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
     if (r.nc) { out.nc[i] = r.nc; out.summary.nc++; continue; }
     if (r.ok) out.summary.pass++; else { out.summary.fail++; out.fail.push('#' + i + ' [' + e.kind + '/' + e.role + '] «' + e.text.slice(0, 80) + '» → ' + e.expect.slice(0, 140) + ' :: ' + JSON.stringify(r.got).slice(0, +process.env.GOTN || 700)); } }
   return out;

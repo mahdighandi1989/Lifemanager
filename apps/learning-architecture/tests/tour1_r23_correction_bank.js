@@ -143,7 +143,9 @@ async function run(ctx) {
     await ev(async (M) => __edit(__U(1), M.replace('شکر ۱ پیمانه', 'شکر ۱٫۵ پیمانه').replace('نمک ۲ قاشق', 'نمک ۳ قاشق')), M);
     const x = await snap(pid), d1 = ask(x, 'dl:d1'), last = await ev(() => { const r = (__cur().retracts || []).filter(z => !z.copy).slice(-1)[0] || {}; return { n: (r.changed || []).length, ask: (r.ask || []).length }; });
     return { ok: !!d1 && /۱٫۵ پیمانه شکر/.test(d1.new) && (last.n > 0 || last.ask > 0) && /شکر ۱٫۵ پیمانه/.test(x.st), got: { x, last } }; };
-  C[123] = async () => { const tue = (() => { for (let k = 1; k < 8; k++) { const d = new Date(); d.setDate(d.getDate() + k); if (d.getUTCDay() === 2) return d.toISOString().slice(0, 10); } })();
+  /* دورِ ۲۸ (C134): سه‌شنبهٔ پیشِ رو از روزِ صفحه حساب می‌شود (پیش‌تر از ساعتِ node با getUTCDay ِ تاریخِ محلی)؛ معنای انتظار همان است — چهارشنبهٔ هفتهٔ همان سه‌شنبه
+     (فردای آن). در هر هفت روزِ هفته اجرا می‌شود (WEEK134 پایین؛ ساعتِ صفحه نگه داشته) */
+  C[123] = async () => { const tue = await ev(() => { for (let k = 1; k < 8; k++) { const d = APP.addDays(APP.today(), k); if (new Date(d + 'T12:00:00Z').getUTCDay() === 2) return d; } });
     await scen({ prior: [{ t: 'گزارش رو سه‌شنبه باید تحویل بدم.', a: [{ do: 'deadline', what: 'تحویلِ گزارش', date: tue }] }] });
     await turn('مهلت سه‌شنبه نیست، چهارشنبه است', 'فرستادم.', RT({ msg: 'گزارش رو سه‌شنبه باید تحویل بدم', key: 'deadline:d1', what: 'fact', fix: 'چهارشنبه', old: 'سه‌شنبه' }));
     const x = await snap(''), wed = (() => { const d = new Date(tue + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10); })();
@@ -167,9 +169,13 @@ async function run(ctx) {
     const ca = await ev(() => APP.ASSIST.corrAsk('اشتباه کردم امروز اومدم سرکار'));
     await turn('اشتباه کردم امروز اومدم سرکار', 'باشه.'); const x = await snap(pid); return { ok: ca === false && !x.asks.length && !x.acts, got: { ca, x } }; };
 
+  /* دورِ ۲۸ (C134): بررسی‌های تاریخی در هر هفت روزِ هفته — ctx.atDay(روز) ساعتِ صفحه را روی آن روز می‌گذارد (atDay(null) ⇒ اکنون) */
+  const WEEK134 = ctx.atDay && ctx.days ? [123] : [];
+  const week134 = async (f) => { const bad = []; for (const d of ctx.days) { await ctx.atDay(d); let r; try { r = await f(); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
+      if (!r.ok) bad.push({ day: d, got: r.got }); } await ctx.atDay(null); return { ok: !bad.length, got: bad }; };
   for (const e of Q4) { const i = idx(e), f = C[i];
     if (!f) { out.summary.nc++; out.nc[i] = 'no check written'; out.fail.push('#' + i + ' has no check'); continue; }
-    let r; try { r = await f(); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
+    let r; try { r = WEEK134.indexOf(i) >= 0 ? await week134(f) : await f(); } catch (ex) { r = { ok: false, got: 'exception ' + String(ex && ex.stack || ex).split('\n').slice(0, 3).join(' | ') }; }
     if (r.ok) out.summary.pass++; else { out.summary.fail++; out.fail.push('#' + i + ' [' + e.kind + '/' + e.role + '] ' + String(e.text).slice(0, 70) + ' got ' + J(r.got).slice(0, +process.env.GOTN || 700)); } }
   return out;
 }
