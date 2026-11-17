@@ -350,3 +350,4 @@
 - 2026-11-17: surface 1015b #12 fix merged (d7a29d38); tests running. Waiting: correction, dates.
 - 2026-11-17: correction merged into merge29 (60968ff7, 162/159); tests running. Waiting: dates only (→ 163/160). Then two-part gate on merge29.
 - 2026-11-17: container restarted. Dates fixer's commits safe (e594dc31, clean worktree); its suite was cut → resumed it to finish the suite and hand back. Pre-gate (node suite, 2 halves via `gate_node_part.sh`) running on merge29 60968ff7 in `gatewt` to catch cross-fixer breaks early; real gate re-runs after dates merges.
+- 2026-11-17: dates merged into merge29 (1d07c4c3, 163/160; a41 conflict → forecast's 🎯 line). All seven fixers + story integration + surface 1015b fix in merge29. Pre-gate on 60968ff7: 138/191 node tests, 0 fail so far. Next: two-part gate on 1d07c4c3 → main.
