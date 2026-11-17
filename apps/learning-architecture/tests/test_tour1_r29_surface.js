@@ -87,6 +87,13 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   chk(!M.unresolved.length, 'F19: every registered rule resolves to the function that enforces it :: ' + M.unresolved.join(', '));
   chk(!/it[0-9]+_|sk-|api[_-]?key/i.test(M.self), 'bank #298: no raw ids or secrets in the block');
 
+  /* fix29 (test_fixes_1015b #12): بلوکِ قاعده‌ها پیش از هر فیلد و دکمهٔ صفحه کنار می‌رود؛ در نوبتِ عادی کامل است */
+  const LP = await ev(() => { const AS = APP.ASSIST, m = document.getElementById('main'), keep = m.innerHTML;
+    m.innerHTML = '<p>' + 'متنِ توضیحیِ بسیار بلندِ صفحه '.repeat(2500) + '</p>' + Array.from({ length: 140 }, (_, i) => '<label>فیلدِ ' + i + ' <textarea>' + 'پاسخِ بلندِ کاربر '.repeat(60) + '</textarea></label>').join('') + '<button type="button">موضوع بساز</button>';
+    const u = AS.prompt(AS.newSession(), 'پیامِ تازه', AS.scan(), ''); m.innerHTML = keep; const n = AS.prompt(AS.newSession(), 'پیامِ تازه', AS.scan(), '');
+    return { last: u.includes('«فیلدِ 139»'), btn: u.includes('«موضوع بساز»'), cut: /بقیهٔ فهرستِ این صفحه/.test(u), rulesNormal: /- قاعدهٔ صفحه \[C124\]/.test(n) }; });
+  chk(LP.last && LP.btn && !LP.cut && LP.rulesNormal, 'fix29: on a long page the rule lines give way before any field or button; on a normal page they are whole :: ' + JSON.stringify(LP));
+
   /* ---------- loop B27·D16: گذرِ بی میزبانِ برگه نوبت را نمی‌گیرد ---------- */
   const W = await ev(async () => { let n = 0; const orig = APP.PRE.sysCheck, h0 = APP.HOST; APP.PRE.sysCheck = () => { n++; return Promise.resolve(); };
     const ld = APP.S.loaded; APP.S.loaded = true;   /* میزبان‌ها (و هارنسِ دونده‌ها) S.loaded را می‌نشانند */

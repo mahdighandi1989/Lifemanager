@@ -549,7 +549,10 @@
          (test_fixes_1015b #12)؛ «خودِ سامانه» فقط فشرده می‌شود (کاربرد/جا/آفلاین/مدل هر سطر می‌ماند، هر بخش کوتاه‌تر)، هرگز نمی‌افتد */
       /* دورِ ۲۹ (F19): سطرِ قاعده فشرده می‌شود (شماره + آغازِ کارش)، هرگز نمی‌افتد */
       [/(?:^|\n)## خودِ سامانه/, function (sec) { return sec.split("\n").map(function (l) { return /^- قاعدهٔ صفحه /.test(l) ? clip(l.split(" — ")[0], 110) : !/^- /.test(l) ? l : l.split(" — ").map(function (c, j) { return j === 0 ? c : clip(c, 70); }).join(" — "); }).join("\n"); }],
-      [/^## ثبت‌گاه‌ها/, function (sec) { return sec.split("\n").map(function (l, i) { return i === 0 ? l : clip(l, 120); }).join("\n"); }]];
+      [/^## ثبت‌گاه‌ها/, function (sec) { return sec.split("\n").map(function (l, i) { return i === 0 ? l : clip(l, 120); }).join("\n"); }],
+      /* دورِ ۲۹ (fix29، test_fixes_1015b #12): در صفحهٔ خیلی بلند سطرهای قاعده (F19) پیش از هر فیلد و دکمهٔ صفحه کنار می‌روند — فقط شماره‌ها می‌مانند تا مدل بداند هستند */
+      [/(?:^|\n)## خودِ سامانه/, function (sec) { var ids = [], out = sec.split("\n").filter(function (l) { var m = /^- قاعدهٔ صفحه \[([^\]]+)\]/.exec(l); if (m) { ids.push(m[1]); return false; } return !/^### قاعده‌هایی که صفحه/.test(l); });
+        if (ids.length) out.push("(قاعده‌های صفحه " + ids.join("، ") + " برای جا کنار رفت — متنشان در این نوبت نیست؛ بی شاهد دربارهٔ آن‌ها حکم نده)"); return out.join("\n"); }]];
     for (var i = 0; i < steps.length && L0 - P.join("\n").length < need; i++) P = P.map(function (sec) { return !MAN_KEEP.test(sec) && steps[i][0].test(sec) ? steps[i][1](sec) : sec; });
     var out = P.join("\n");
     if (hard && L0 - out.length < need) out += "\n[سامانه: نقشهٔ سامانه تا جای ممکن کوتاه شد؛ قلمروها و «چه کسی مسئولِ چیست» کامل ماند]";
