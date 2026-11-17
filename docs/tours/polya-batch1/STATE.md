@@ -341,3 +341,4 @@
 
 - 2026-11-17: story fixer done (head 9c493c51, 51/51 + replay 18/18; docs renumber at merge). Report `reports/fix29/story.md`. Waiting: arith, prior, correction, forecast, dates, surface. Merge order unchanged (arith first).
 - 2026-11-17: arith fixer done (head 4476d561, bank 59/59, replay A–D, suite 178/178). Report `reports/fix29/arith.md`. merge29 (in scratch merge27) = BASE29 + arith (fast-forward). Trial merge of story on top: no source conflicts; tests running. Waiting: prior, correction, forecast, dates, surface.
+- 2026-11-17: prior fixer done (head 224c96e1). Report `reports/fix29/prior.md`. merge29 now in scratch worktree `m29` = BASE29 + arith + prior (85c545c9, docs gate 14). Trial story-on-arith showed B226 integration gap (📜 must read `ST.arithClauses`) → one integration pass on merge29 after all seven merges, before the gate.
