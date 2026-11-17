@@ -343,7 +343,7 @@
   function claim29(t) { if (/[؟?]\s*$/.test(t)) return false; if (REM29.test(t)) return true; var m = CLM29.exec(t); if (!m) return false; var pre = t.slice(0, m.index); return /[0-9۰-۹]/.test(pre) || OPW29.test(" " + pre); }
   function unreadClaims29(q, off, ck) {
     var C0 = (ck || []).concat((ck && ck.unread) || []); var cov = function (A0, B0) { return C0.some(function (c) { return c && c.pos != null && c.pe != null && c.pos < B0 && c.pe > A0; }); };
-    if (C0.some(function (c) { return c && (c.pos == null || c.pe == null); })) return [];   // سنجشی بی جایگاه ⇒ این گیت چیزی نمی‌افزاید (رفتارِ پیشین)
+    if (C0.some(function (c) { return c && (c.pos == null || c.pe == null); })) return [];   // سنجشی بی جایگاه ⇒ این دروازه چیزی نمی‌افزاید (رفتارِ پیشین)
     return clauseSpans29(q).filter(function (x) { return claim29(x.t) && !cov(off + x.a, off + x.b); }).map(function (x) { return { text: x.t, why: "", pos: off + x.a, pe: off + x.b, c138: true }; }); }
   ST.unreadClaims29 = unreadClaims29;
   /* ---------- دورِ ۲۸ (story R5، C86؛ S1 A28-5 s01 📜: «۱۸ میلیون × ۱۲ = ۲۱۶ میلیون» ِ اصلاح‌شده و درست با «✗ … نمی‌خواند») ----------
