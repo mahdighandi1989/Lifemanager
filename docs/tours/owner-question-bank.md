@@ -76,3 +76,28 @@ Columns: question · the system's correct answer today (exists / partial / missi
 | 70 | Where is a sentence of mine that was recorded nowhere? | unknown | story `ST.ownCalc28` | from R29 | — |
 | 71 | Where is the line I moved, and how do I bring it back? | claimed by R28 fixer, to verify (story C95) | a40 `mvApply28` | from R29 | — |
 | 72 | Which of my forecasts were not recorded because of how I phrased the confidence? | claimed by R28 fixer, to verify (forecast C90/C118) | a41 | from R29 | — |
+| 73 | The page called my right calculation wrong; I objected — why did the verdict stay, and where do I say «this is the page's mistake»? | fixed by R29 arith (C135 quarantine), to verify | a46 `tokens` / a45 `tryFix` | from R29 D29-1 | — |
+| 74 | When I say «۱ میلیون و ۲۰۰ تومن», what amount does the page read? | fixed by R29 arith (C154), to verify | a46 `bareX` | from R29 D29-2 | — |
+| 75 | A percent inside my calculation («۱۰ درصد پرت») was filed as a forecast — where do I remove it? | to verify (forecast C148/C168) | a41 | from R29 D29-3 | — |
+| 76 | A price I corrected twice in a row — which of my calculations did it reach? | to verify (correction C142) | a38 | from R29 D29-10 | — |
+| 77 | I said «زنگ زدم» — which call was closed, and where did the other call's day go? | to verify (dates C147) | a41 | from R29 D29-18 / B | — |
+| 78 | How is a forecast «about 40» judged when it came out 42? | to verify (forecast) | a41 `verdict28` | from R29 D29-21 | — |
+| 79 | How do I take back a forecast verdict from the chat? | to verify (forecast C160) | a41 | from R29 D29-22 | — |
+| 80 | I answered the day question with «پس‌فردا صبح انجامش میدم» — why was it not recorded? | to verify (dates) | a41 | from R29 D29-25 | — |
+| 81 | When I said «my answer was wrong», where did my previous answer stay in the dossier? | to verify (correction/story C164) | a40 | from R29 D29-23 | — |
+| 82 | When ✓ stands next to my whole sentence, which part was actually checked? | fixed by R29 story+arith (C138), to verify | a45 `markOf27`, a46 `ST.arithClauses` | from R29 A | — |
+| 83 | I never made a forecast — why does «امروز» ask «شد یا نشد؟»? | to verify (forecast C170) | a41 | from R29 A | — |
+| 84 | I repeated my forecast with «یعنی …» — did it count twice in my calibration? | to verify (forecast C173) | a41 | from R29 A | — |
+| 85 | If I move a step, what happens to the steps resting on it? | fixed by R29 story (C124/C172), to verify | a40 `deps28`, a45 `ST.stepDeps29` | from R29 A / C | — |
+| 86 | Can the assistant tell me the rule behind what the page just did, and where it is written? | to verify (surface C150/C174) | a26 | from R29 A | — |
+| 87 | I fixed my wrong step myself — why does the ledger still say «نمی‌خواند» while the sentence shows ✓? | to verify (prior C139) | a45 `tryFix` | from R29 B29·D11 | — |
+| 88 | If I correct one message with ✏️, what else from that message silently changes or closes? | to verify (correction C144) | a38 | from R29 B | — |
+| 89 | My two-part forecast became one; when half of it came out wrong, what happened to my calibration? | to verify (forecast) | a41 | from R29 B | — |
+| 90 | Where did the «exact» proposal come from — a real calculation or a ratio of two numbers? | to verify (correction C161 / arith `ST.arithExactT`) | a38, a46 | from R29 B | — |
+| 91 | Why is my forecast sentence «داده» in the dossier, with no 🎯? | fixed by R29 story (C149 `dataKind29`), to verify | a45 `onState` | from R29 B | — |
+| 92 | I corrected one number and then another — is the proposal built on both, and does it say which is stale? | to verify (correction C142/C164) | a38 | from R29 C | — |
+| 93 | Two different «5»s are in my problem — does the page know which one I corrected? | to verify (correction C143) | a38 | from R29 C | — |
+| 94 | I said «امروز صبح فرمش رو پر کردم» about a plan — is the plan still kept for the day I named? | to verify (dates C146/C166) | a41 | from R29 C | — |
+| 95 | «۲ و ۵ دهم درصد × ۴ = ۱۰ درصد» — does the page see «درصد» as the unit on both sides? | fixed by R29 arith (C140), to verify | a46 `agree` | from R29 C29-2 | — |
+| 96 | Does a weekday in my forecast become its due date, or a reminder I never asked for? | to verify (forecast/dates C152) | a41 | from R29 C | — |
+| 97 | My dad told me a fact and I worked out the rest — whose work is it on my record? | fixed by R29 story (C125) for 📜; coach line open | a45 `ST.otherWorks29`, a46 `otherSpans` | from R29 C | — |
