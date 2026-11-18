@@ -150,3 +150,32 @@ Merge order: arith ⇒ prior ⇒ correction ⇒ story ⇒ forecast ⇒ dates ⇒
 - **C188 (D27-33).** «داداشم علی گفت کابل رو از مغازهٔ حسن آقا بگیرم» is advice from another person: a datum with its source («به گفتهٔ
   برادرت: …», names per C22/C38/C57), never silently dropped. Look-alike: her own plan «خودم از مغازه می‌گیرم» is hers. Owner: story.
 - Method questions «بازنگری دقیقاً یعنی چی؟» (C26-23, C26-24) are questions about the page's method: surface (system-question path).
+
+## Clarifications on the C178 corpora (C189–C200; answers to the corpus builder's 12 questions, same order; C136 applied)
+- **C189 (F2-005).** C157 also covers «نصفش» whose antecedent is a quantity stated in the same sentence: «۸۴ متر پارچه، نصفش میشه ۴۲» ✓.
+  Look-alike: «نصفش» with no antecedent in the sentence or the live statement stays «نسنجیده» (C157).
+- **C190 (F2-047).** When the message fixes a named earlier line of hers («گامِ ۳ رو درست می‌کنم: … پس ۴۰۰ می‌مونه»), that line's numbers
+  are in scope for C180, because she brought them into this message. An earlier line she does not name is never in scope.
+- **C191 (F2-064).** If the sentence holds several possible totals for one remainder («… ۱۸ … ۱۲ … ۶ … و ۳ تا می‌مونه») and they do not
+  agree on one verdict, the clause gets «؟ نسنجیده» — the page never picks. This changes a runner's ✓ (round30, F2-064): named here
+  under C136; the ✓ was a pick the page cannot justify.
+- **C192 (F2-071).** «سرها همون ۳۵ می‌مونه» (a value that stays) and «پاها ۲ تا کم میشه» (a change per step) are not remainder clauses;
+  C180 does not apply. Their numeric claims follow C138 (judged if the engine reads them, else «نسنجیده»).
+- **C193 (F6-031).** «بیمه رو بعداً» withdraws the booked day of that act and leaves it as an open «کدام روز؟» row; nothing else moves.
+- **C194 (F6-050).** «کلاسِ … اولیش ۱ اردیبهشت» for a class she is taking is her own plan: asked per C147 (unchanged — runners judged
+  that ask correct in A, C, D). Look-alike: another person's schedule she merely reports («کلاسِ داداشم اولیش …») is not asked (C19).
+- **C195 (F6-063).** A dayless intention the page RECORDED («یه روز باید … زنگ بزنم» as an open row) is an open call for C117: «زنگ زدم»
+  with it and another open call asks «کدام؟». An intention the page did not record does not count.
+- **C196 (F6-119).** «اولیش ۱ اردیبهشته و تا اون موقع تمرین می‌کنم»: her own deadline (C34) — the organiser's date becomes her deadline
+  row and is asked once; it is not dropped under C19.
+- **C197 (F8-028).** A proposal follows the RECORDED relation: a discount recorded as a percentage of the price is re-derived (10 % of
+  2,700,000 ⇒ «۲ میلیون و ۴۳۰»); one recorded as a fixed amount stays (2,700,000 − 240,000 = «۲ میلیون و ۴۶۰»); if the record cannot
+  tell, the line is marked stale and the page asks. Never pick.
+- **C198 (F8-030).** «میزِ دوم ۸ برش می‌خواد» against the recorded «۶ × ۷» (six tables of seven): only the second table changes, so the
+  exact proposal is 5 × 7 + 8 = 43 and the dependent remainder 50 − 43 = 7; the product line is shown as replaced by «۵ × ۷ + ۸».
+- **C199 (F8-070).** A single value replaced by a range: each dependant is marked stale; where it is one monotone formula of that value
+  the proposal is the exact range at both ends («از a تا b»); otherwise the page asks. Never keeps the old single value silently.
+- **C200 (F8-083).** «نه، ۳۰۰ نیست» with no new value: the datum is marked disputed, its dependants stale, and the page asks «پس چند
+  است؟»; nothing is proposed.
+- Corpus note F6-075 (tD2 p6): a date ask for another person's act («ودیعه رو صاحبخونه آخرِ سال پس میده») breaks C19 — added to TAIL_dates.
+  F2-076 (aC3 «۱۸۰ − ۶۰ − ۲۲.۵ = حدود ۹۷.۵» exactly right): arith checks it at page level.

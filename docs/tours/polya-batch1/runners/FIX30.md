@@ -98,7 +98,7 @@ Final reply: commits, root causes (file:line), tests, bank results with reasons,
   A30-9 s03 «mod» half.
 - TAIL_prior: A30-21, A30-22, C27-3.
 - TAIL_correction: B28·D15 (the pwB1 duplicate-proposal shape), D26-43, D26-50, U38.
-- TAIL_dates: A25-21, A26-30, D26-1, D26-42, D26-47 (S2), D27-29 (C187), D29-24, D30-4 (C181).
+- TAIL_dates: F6-075 (C19, corpus), A25-21, A26-30, D26-1, D26-42, D26-47 (S2), D27-29 (C187), D29-24, D30-4 (C181).
 - TAIL_forecast: none in the tail — your F4 list is long; finish it.
 - TAIL_surface: A26-19, A26-25 (C185), A30-1, B24·D16, B26·D12, B26·D16, B30·D1, B30·D3, C26-18 (C186), C26-23, C26-24, C26-33 (S2),
   C26-39, C28-21, D25-17 (check first that the reversed formula is the real rendering, not text extraction), D26-36, D26-40, D28-10, U59.
