@@ -24,6 +24,8 @@ const DIR = path.join(__dirname, 'fixtures', 'r30_dates');
       catch (e) { const m = String(e && e.message || e).split('\n')[0]; if (R) await R.close().catch(() => { }); if (k === 0 && /crashed|closed|ERR_/i.test(m)) { try { await b.close(); } catch (e2) { } b = await chromium.launch({ args: ['--disable-dev-shm-usage'] }); continue; } errors.push(name + ' — exception: ' + m); return; } } };
 
   await run('D_s35', async (v) => { const a = after(v, /^U نه، شنبه نه — یکشنبه/) || [];
+    const s44 = after(v, /^U دو هفته پیش باید می‌نشستم/) || [], s29 = after(v, /^U می‌خوام هر دو هفته یه بار بشینم/) || [];
+    X('D26-42 s35 s29/s44: آهنگِ «هر دو هفته یه بار» ِ پیامِ آغاز در پرونده؛ جلسه ثبت با موعدِ بعد (نه «موعدی ندارد»، نه «پیدا نشد»)', s29.some(x => /پروندهٔ تمرین باز شد/.test(x) && /موعدِ بعد/.test(x)) && s44.some(x => /✓ جلسهٔ/.test(x) && /آهنگِ خود/.test(x)) && !s44.some(x => /موعدی ندارد|پیدا نشد/.test(x)), { s29, s44 });
     X('D30-4 s35 s22 (C181): «نه، شنبه نه — یکشنبه» ⇒ هیچ ثبت؛ یکشنبه ۱۰ آبان (به‌جای ۹ آبان) پرسیده', !a.some(x => /ثبت شد و در «امروز»/.test(x)) && a.some(x => /یکشنبه ۱۰ آبان ۱۴۰۵ \(به‌جای ۹ آبان/.test(x)), a); });
   await run('A_s01', async (v) => {
     const p24 = after(v, /^U نه، زنگِ بنگاه همون پنجشنبه‌ست/) || [], p43 = after(v, /^U آره، فردا و پس‌فردا/) || [], p44 = after(v, /^U شناسنامه و کارت ملی/) || [], p49 = after(v, /^U .*سه‌شنبه‌ی هفته‌ی بعد، ۲۰ آذر/) || [], p53 = after(v, /^U سلام، امروز اولِ دیه/) || [];

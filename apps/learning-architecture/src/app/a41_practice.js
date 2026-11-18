@@ -1309,6 +1309,9 @@
       var had = PR.find(tid, subj), c = PR.start(tid, subj, { src: "assistant" });
       if (!c) return "پرونده ساخته نشد";
       if (a.rhythm && PR.quoteIn(a.rhythm, (turnMsgs(s).last || {}).text || "") && PR.rhythmIn(a.rhythm)) PR.rhythm(c, a.rhythm);   /* دورِ ۲۱: آهنگِ خودش هنگامِ شروع */
+      /* دورِ ۳۰ (D26-42 s35: «می‌خوام هر دو هفته یه بار بشینم … یه پرونده براش باز کن» ⇒ پرونده بی آهنگ، «موعدی ندارد»): آهنگی که خودش در همان پیامِ آغاز گفت، بی نیاز به a.rhythm ِ مدل
+         از حرفِ خودش خوانده می‌شود (همان PR.rhythmIn) */
+      else if (!(c.urhythm && c.urhythm.every)) { try { var qs30 = sentsOf25(String((turnMsgs(s).last || {}).text || "")).filter(function (z) { return PR.rhythmIn(z); })[0]; if (qs30) PR.rhythm(c, qs30.trim()); } catch (e30) { } }
       if (s) { s.prcs = s.prcs || []; if (s.prcs.indexOf(c.id) < 0) s.prcs.push(c.id); if (!c.sess) { c.sess = s.id; S.put(c); } }
       AS._prcNote = (had ? "پروندهٔ باز ادامه یافت: " : "پروندهٔ تمرین باز شد: ") + fa(tid) + " · " + A.TM[tid].fa + " — " + PR.subjLabel(c.subj) + (c.due ? " · موعدِ بعد " + fdate(c.due) : "") + (c.misfit ? " · ⚠ " + c.misfit : "");
       return "✓ " + AS._prcNote;   /* دورِ ۲۰ (RO3): نتیجهٔ صفحه به گفت‌وگو و نوبتِ بعدِ مدل می‌رسد */
@@ -1403,7 +1406,7 @@
     return out;
   };
   function caseOfAction(a, s) {
-    if (a.prc) { var c0 = S.get(a.prc); return c0 && c0.type === "practice" && c0.kind !== "list" ? c0 : null; }
+    if (a.prc) { var c0 = S.get(a.prc); if (c0 && c0.type === "practice" && c0.kind !== "list") return c0; }   /* دورِ ۳۰ (D26-47/D26-42): شناسه‌ای که پرونده‌ای نیست (کهنه/نادرست) ⇒ همان راه‌های پایین، نه «پیدا نشد» ِ فوری */
     var L = PR.sessCases(s), tid = +(a.tid || 0);
     if (a.pid) L = L.concat(PR.cases({ subj: PR.subj("live", a.pid) }));
     if (a.topic) { var tp = S.get(a.topic); L = L.concat(PR.cases({ subj: tp && tp.type === "topic" ? PR.subj("topic", a.topic) : PR.subj("topic", "", a.topic) })); }
