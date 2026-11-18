@@ -40141,6 +40141,9 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۸ (R2، C88): عبارتِ عددیِ کامل («۲ میلیون و ۳۰۰» ⇐ «۲ میلیون و ۵۰۰») همان کوچک‌ترین تکه است — نه «… و ۳۰۰» */
     var NP28 = function (t) { var w = String(t || "").trim().split(/\s+/); return w.length > 1 && w.length <= 7 && w.every(function (x) { return /^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(x) || /^(?:و|هزار|میلیون|میلیارد)$/.test(x); }); };
     if (NP28(o) && NP28(n)) return label + ": «" + String(n).trim() + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + String(o).trim() + "»" + (extraO || "") + ")";
+    /* دورِ ۳۰ (tail D26-43، C55 «سرخط تغییر را دقیق می‌گوید»؛ s36 «حدس: «۲۸ میشه ۱۴٪. پس» (اصلاح شد ⇐ «پس»)»): تکه‌ای که تکهٔ پیشینش درونِ تکهٔ تازه‌اش است همترازیِ نادرست است
+       (واژهٔ مشترکِ «پس» دو تکه ساخت) — آن وقت یک پنجره از نخستین تا واپسین واژهٔ متفاوت نشان داده می‌شود (winDiff23)، نه تکه‌های بریده */
+    if (d.runs.length > 1 && d.runs.some(function (r) { var ro = String(r.o || "").trim(), rn = String(r.n || "").trim(); return !ro || !rn || (" " + rn + " ").indexOf(" " + ro + " ") >= 0 || (" " + ro + " ").indexOf(" " + rn + " ") >= 0; })) { var w30 = winDiff23(o, n); return label + ": «" + w30.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + w30.o + "»" + (extraO || "") + ")"; }
     if (d.runs.length > 1) return label + ": " + d.runs.slice(0, 4).map(function (r) { return "«" + r.n + "» (اصلاح شد ⇐ «" + r.o + "»)"; }).join("، ") + (extraN || "");
     /* دورِ ۲۳ (Q4، A23-30 «صورتِ مسئلهٔ گفت‌وگو: «۱۲» (اصلاح شد ⇐ «۱۰»)»): تکهٔ تنهای عددی یا بسیار کوتاه با واژهٔ پیرامونش نشان داده می‌شود */
     if (d.runs.length === 1 && /^[^\s]{1,8}$/.test(d.o) && /^[^\s]{1,8}$/.test(d.n) && /[0-9۰-۹]/.test(d.o + d.n) && String(o || "").split(/\s+/).length > 2) { var w23 = winDiff23(plainTx(String(o)).replace(/\s+/g, " ").trim(), plainTx(String(n)).replace(/\s+/g, " ").trim()); return label + ": «" + w23.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + w23.o + "»" + (extraO || "") + ")"; }
@@ -40344,7 +40347,12 @@ APP.goFromURL = function (q) {
     /* صورتِ مسئلهٔ گفت‌وگو و مجهول به حرفِ خودش — فقط همان تکه (بی جایگزینیِ کلِ متن با مقدارِ درست) */
     /* دورِ ۲۹ (R2 correction، C142؛ بانکِ R29 #62 «نه ببخشید، ۵ نفریم نه ۴»؛ A29-14 s04): اصلاحِ دومِ همان داده پیامِ اصلاحِ اول را نشانه می‌گیرد — صورتی که آن اصلاح نوشت (stmtHist.by) هم پیرو است */
     var stBy29 = (C.stmtHist || []).some(function (h) { return h && h.by && h.by === R.srcId; });
-    if (C.stmt && (hasFrag(R.src.text, String(C.stmt).slice(0, 40)) || stBy29) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
+    /* دورِ ۳۰ (tail D26-50، C88 «درست کردنِ یک نتیجه هرگز داده را عوض نمی‌کند»؛ dp2 «پس طوفان ۷۳۴۴ متر دور بوده؟» ⇒ صورت «… طوفان ۲۰۴۰ متر …»): وقتی آنچه او درست کرد جواب/نتیجهٔ خودش است
+       (what = ans/result) و هر جای مقدارِ پیشین در صورتِ گفت‌وگو جایگاهِ حاصل دارد (پس از «میشه/پس/=…» — همان خوانندهٔ موتورِ کهنگی، A.liveAnn25)، صورت همان نوشتهٔ اوست و دست نمی‌خورد؛
+       نتیجه در ثبتِ خودش (حدس/دفتر) درست می‌شود. دادهٔ صورت («۶ ثانیه»، «۱۲۲۴») هرگز با این راه عوض نمی‌شد. */
+    var res30 = false; try { if (C.stmt && /^(?:ans|result|res|answer)$/i.test(String(R.what || "")) && A.liveAnn25) { var ov30 = (A.liveNumOccs ? A.liveNumOccs(String((D21 && D21.o) || R.frag || "")) : []).map(function (x) { return x.v; });
+        var AO30 = A.liveAnn25(C.stmt).filter(function (x) { return ov30.some(function (v) { return Math.abs(v - x.v) < 1e-9; }); }); res30 = AO30.length > 0 && AO30.every(function (x) { return x.mark && !x.opnd; }); } } catch (e30) { res30 = false; }
+    if (C.stmt && !res30 && (hasFrag(R.src.text, String(C.stmt).slice(0, 40)) || stBy29) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
       /* دورِ ۲۳ (Q4، B·D4 s19): جایگزینیِ درجایی که ترتیبِ واژه‌ها را وارونه می‌کند («عروسی ۱۵ اسفنده برادرم مونده») نه — صورتِ گفت‌وگو همان می‌ماند و جملهٔ اصلاحِ خودش کنارش */
       if (sv != null && sv !== C.stmt && D21 && A.liveGrowGarble && A.liveGrowGarble(C.stmt, D21)) { var fs23 = (A.liveFragSent ? A.liveFragSent(ownText(cu), R.fix) : "") || R.fix; sv = String(C.stmt).replace(/[\s.!]+$/, "") + " (اصلاحِ خودم: " + String(fs23).trim().replace(/[.!]+$/, "") + ")."; }
       if (sv != null && sv !== C.stmt) { var stP = false; try { stP = !AS.notProblem(C.stmt) && (/[؟?0-9۰-۹=]/.test(C.stmt) || qToks(C.stmt).length >= 6) && (/[0-9۰-۹=+\-−×÷^√]/.test(R.frag + " " + R.fix) || qToks(R.frag).length >= 6 || R.what === "fact" || R.what === "ans"); } catch (e) { }
@@ -50844,8 +50852,13 @@ APP.goFromURL = function (q) {
        با شماره («<نام>ِ دوم») را می‌گوید فقط به جمله‌هایی می‌بندد که همان نام را دارند و شمارهٔ دیگری از آن را نمی‌گویند — هم‌رقمِ جمله‌ای که آن نام را ندارد («۱۸ + ۷ = ۲۵» ِ مهمان‌ها،
        «اتاقِ اول») ریشه نیست. ضربِ «N × V» ِ جمله‌ای که «هر <نام> V» و «N <نام>» را دارد یک عضو از N عضو است: (N − ۱) × V + مقدارِ تازه (C198)، نه N × مقدارِ تازه. */
     var Q30 = opt.qual30 || null;
+    /* بندِ همان عدد (تا ویرگول) شمارهٔ دیگری از همان نام را بگوید ⇒ کمیتِ دیگری است («گلدونِ آخر ۱۶ / ۴»)؛ و وقتی داده در نوشتهٔ او برای «هر <نام>» آمده («هر میز ۷ برش») جمله‌ای که آن نام را
+       ندارد هم‌رقمِ دیگری است («۱۸ + ۷ = ۲۵» ِ مهمان‌ها). فهرستِ قدها («(۴ + ۸ + …) / ۵») بی نام همان داده می‌ماند (A s07، جایگاهِ عضو در فهرست). */
+    var each30 = Q30 ? RC.some(function (rc) { return new RegExp("(?:^|[\\s‌،,:])هر[\\s‌]+" + Q30.stem + "[آ-ی]{0,3}(?:ِ|‌ی)?[\\s‌]+[^.؛;،,\\n]{0,12}?[0-9۰-۹]").test(rc.t) && rc.O.some(function (q) { return pairs.some(function (p0) { return veq(p0.a, q.v); }); }); }) : false;
     if (Q30) occ.forEach(function (o) { if (!o.root || o.root.st !== "old") return; var T = RC[o.ri].t, SN = sents25(T), z = SN[o.sent] || [0, T.length], st = T.slice(z[0], z[1]);
-      if (!qualHit30(st, Q30)) { o.q30 = true; o.root = null; } });
+      var c0 = z[0], c1 = z[1]; for (var q0 = o.s - 1; q0 >= z[0]; q0--) if (/[،,؛;]/.test(T.charAt(q0))) { c0 = q0 + 1; break; } for (var q1 = o.e; q1 < z[1]; q1++) if (/[،,؛;]/.test(T.charAt(q1))) { c1 = q1; break; }
+      var cl = T.slice(c0, c1), nm = new RegExp("(?:^|[^آ-ی])" + Q30.stem).test(cl), nmS = new RegExp("(?:^|[^آ-ی])" + Q30.stem).test(st);
+      if ((nm && !qualHit30(cl, Q30)) || (each30 && !nmS)) { o.q30 = true; o.root = null; } });
     var member30 = function (r, c) { if (!r.two || !r.two[0] || !r.two[1]) return null; var x = r.two[0], y = r.two[1], R0 = x.root && x.root.st === "old" ? x : y.root && y.root.st === "old" ? y : null, N0 = R0 === x ? y : x; if (!R0 || N0.root) return null;
       var T = RC[c.ri].t, SN = sents25(T), z = SN[c.sent] || [0, T.length], st = T.slice(z[0], z[1]); if (!new RegExp("(?:^|[\\s‌،,:])هر[\\s‌]+" + Q30.stem).test(st)) return null;
       if (!RC[c.ri].O.some(function (q) { return q !== N0 && q.sent === c.sent && veq(q.v, N0.v) && new RegExp("^[\\s‌]*(?:تا[\\s‌]+)?" + Q30.stem).test(T.slice(q.e)); })) return null;
@@ -51217,6 +51230,9 @@ APP.goFromURL = function (q) {
         var low = mag / 1000, lowN = MAGN30[low] || ""; if (!N) return sg + fmtNum(rest, { fa: true }) + (lowN ? " " + lowN : "");
         return sg + fmtNum(N, { fa: true }) + " " + MAGN30[mag] + (rest ? " و " + fmtNum(rest, { fa: true }) : ""); } }
     return sg + fmtNum(a, { fa: true }) + " " + MAGN30[mag]; }
+  /* دورِ ۳۰ (tail B28·D15، pwB1 «۰٫۰۸۲ ⇒ ≈ ۰٫۰۹۸، ۰٫۰۸۲ ⇒ ۰٫۰۹۸»): یک عدد با یک مقدارِ تازه یک پیشنهاد است — دو رکوردِ همان عدد (یکی گردشده «≈») یک بار، با نوشتارِ دقیق */
+  function uq30(X) { var o = []; X.forEach(function (x) { var j = o.findIndex(function (y) { return veq(y.v, x.v) && (y.mag || 0) === (x.mag || 0) && y.re != null && x.re != null && Math.abs(y.re - x.re) <= 0.005 * Math.max(1, Math.abs(x.re)); });
+      if (j < 0) o.push(x); else if (o[j].rd && !x.rd) o[j] = x; }); return o; }
   function fmtV30(x) { return x && x.mag ? fmtQ30(x.v, x.mag, x.dec30) : fmtNum(x.v, { fa: true }); }
   A.liveFmtQ30 = fmtQ30;
   function fmtRe25(x) { if (x && x.mag && MAGN30[x.mag] && x.re != null && !x.rd) { var ex = exact30(x.re); return ex ? ex + " " + MAGN30[x.mag] : fmtQ30(x.re, x.mag, x.dec30); }
@@ -51324,7 +51340,7 @@ APP.goFromURL = function (q) {
     S.put(pg);
     var U = function (X) { return X.filter(function (t, i) { return X.indexOf(t) === i; }); };
     var sure = items.filter(function (x) { return x.re != null; }), askI = items.filter(function (x) { return x.re == null; });
-    var reF = U(sure.map(function (x) { return fmtV30(x) + " ⇒ " + fmtRe25(x); })), askF = U(askI.map(function (x) { return fmtV30(x); })).filter(function (t) { return !sure.some(function (x) { return fmtV30(x) === t; }); });
+    var reF = U(uq30(sure).map(function (x) { return fmtV30(x) + " ⇒ " + fmtRe25(x); })), askF = U(askI.map(function (x) { return fmtV30(x); })).filter(function (t) { return !sure.some(function (x) { return fmtV30(x) === t; }); });
     /* C11: فقط حسابِ خودِ صفحه «مقدارِ تازه» است؛ بقیه پرسیده می‌شوند */
     return { kind: "stale", label: "عددهای حساب‌شده از «" + clip(ent.from.o, 30) + "»", old: U(items.map(function (x) { return fmtV30(x); })).join("، "),
       new: "کهنه پس از اصلاح — با «" + clip(ent.from.n, 30) + "» دوباره حساب شود" + (reF.length ? " (" + reF.join("، ") + ")" : "") + (askF.length ? " — «" + askF.join("، ") + "»: از «" + clip(ent.from.o, 30) + "» حساب شده بود؟ (صفحه رابطه‌اش را نشناخت و عددی پیشنهاد نمی‌کند)" : ""),
@@ -51989,7 +52005,7 @@ APP.goFromURL = function (q) {
       S.put(se); if (!items.length) return null;
       var U = function (X) { return X.filter(function (t, i) { return X.indexOf(t) === i; }); }, sure = items.filter(function (x) { return x.re != null; }), askI = items.filter(function (x) { return x.re == null; });
       var oT = D.parts ? D.parts.map(function (p) { return p.o; }).join("، ") : D.o, nT = D.parts ? D.parts.map(function (p) { return p.n; }).join("، ") : D.n;
-      var reF = U(sure.map(function (x) { return fmtV30(x) + " ⇒ " + fmtRe25(x); })), askF = U(askI.map(function (x) { return fmtV30(x); })).filter(function (t) { return !sure.some(function (x) { return fmtV30(x) === t; }); });
+      var reF = U(uq30(sure).map(function (x) { return fmtV30(x) + " ⇒ " + fmtRe25(x); })), askF = U(askI.map(function (x) { return fmtV30(x); })).filter(function (t) { return !sure.some(function (x) { return fmtV30(x) === t; }); });
       (se.stale26 = se.stale26 || []).push({ at: nowISO(), src: o.mid || "", c29: ch29 && ch29.e ? ch29.e.id : "", from: { o: oT, n: nT }, items: items.map(function (x) { return { k: x.k, lab: x.lab, raw: x.raw, v: x.v, re: x.re, ask: !!x.ask, mag: x.mag || 0, dec30: !!x.dec30 }; }) }); if (se.stale26.length > 20) se.stale26 = se.stale26.slice(-20); S.put(se);
       return { kind: "stale", label: "عددهای حساب‌شده از «" + clip(oT, 30) + "»", old: U(items.map(function (x) { return fmtV30(x); })).join("، "),
         "new": "کهنه پس از اصلاح — با «" + clip(nT, 30) + "» دوباره حساب شود" + (reF.length ? " (" + reF.join("، ") + ")" : "") + (askF.length ? " — «" + askF.join("، ") + "»: از «" + clip(oT, 30) + "» حساب شده بود؟ (صفحه رابطه‌اش را نشناخت و عددی پیشنهاد نمی‌کند)" : ""), why: "این عددها در نوشتهٔ خودش حاصلِ حساب از «" + clip(oT, 30) + "» بودند" }; } catch (e) { console.warn(e); return null; } };

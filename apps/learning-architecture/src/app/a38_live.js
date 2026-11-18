@@ -4778,8 +4778,13 @@
        با شماره («<نام>ِ دوم») را می‌گوید فقط به جمله‌هایی می‌بندد که همان نام را دارند و شمارهٔ دیگری از آن را نمی‌گویند — هم‌رقمِ جمله‌ای که آن نام را ندارد («۱۸ + ۷ = ۲۵» ِ مهمان‌ها،
        «اتاقِ اول») ریشه نیست. ضربِ «N × V» ِ جمله‌ای که «هر <نام> V» و «N <نام>» را دارد یک عضو از N عضو است: (N − ۱) × V + مقدارِ تازه (C198)، نه N × مقدارِ تازه. */
     var Q30 = opt.qual30 || null;
+    /* بندِ همان عدد (تا ویرگول) شمارهٔ دیگری از همان نام را بگوید ⇒ کمیتِ دیگری است («گلدونِ آخر ۱۶ / ۴»)؛ و وقتی داده در نوشتهٔ او برای «هر <نام>» آمده («هر میز ۷ برش») جمله‌ای که آن نام را
+       ندارد هم‌رقمِ دیگری است («۱۸ + ۷ = ۲۵» ِ مهمان‌ها). فهرستِ قدها («(۴ + ۸ + …) / ۵») بی نام همان داده می‌ماند (A s07، جایگاهِ عضو در فهرست). */
+    var each30 = Q30 ? RC.some(function (rc) { return new RegExp("(?:^|[\\s‌،,:])هر[\\s‌]+" + Q30.stem + "[آ-ی]{0,3}(?:ِ|‌ی)?[\\s‌]+[^.؛;،,\\n]{0,12}?[0-9۰-۹]").test(rc.t) && rc.O.some(function (q) { return pairs.some(function (p0) { return veq(p0.a, q.v); }); }); }) : false;
     if (Q30) occ.forEach(function (o) { if (!o.root || o.root.st !== "old") return; var T = RC[o.ri].t, SN = sents25(T), z = SN[o.sent] || [0, T.length], st = T.slice(z[0], z[1]);
-      if (!qualHit30(st, Q30)) { o.q30 = true; o.root = null; } });
+      var c0 = z[0], c1 = z[1]; for (var q0 = o.s - 1; q0 >= z[0]; q0--) if (/[،,؛;]/.test(T.charAt(q0))) { c0 = q0 + 1; break; } for (var q1 = o.e; q1 < z[1]; q1++) if (/[،,؛;]/.test(T.charAt(q1))) { c1 = q1; break; }
+      var cl = T.slice(c0, c1), nm = new RegExp("(?:^|[^آ-ی])" + Q30.stem).test(cl), nmS = new RegExp("(?:^|[^آ-ی])" + Q30.stem).test(st);
+      if ((nm && !qualHit30(cl, Q30)) || (each30 && !nmS)) { o.q30 = true; o.root = null; } });
     var member30 = function (r, c) { if (!r.two || !r.two[0] || !r.two[1]) return null; var x = r.two[0], y = r.two[1], R0 = x.root && x.root.st === "old" ? x : y.root && y.root.st === "old" ? y : null, N0 = R0 === x ? y : x; if (!R0 || N0.root) return null;
       var T = RC[c.ri].t, SN = sents25(T), z = SN[c.sent] || [0, T.length], st = T.slice(z[0], z[1]); if (!new RegExp("(?:^|[\\s‌،,:])هر[\\s‌]+" + Q30.stem).test(st)) return null;
       if (!RC[c.ri].O.some(function (q) { return q !== N0 && q.sent === c.sent && veq(q.v, N0.v) && new RegExp("^[\\s‌]*(?:تا[\\s‌]+)?" + Q30.stem).test(T.slice(q.e)); })) return null;
@@ -5151,6 +5156,9 @@
         var low = mag / 1000, lowN = MAGN30[low] || ""; if (!N) return sg + fmtNum(rest, { fa: true }) + (lowN ? " " + lowN : "");
         return sg + fmtNum(N, { fa: true }) + " " + MAGN30[mag] + (rest ? " و " + fmtNum(rest, { fa: true }) : ""); } }
     return sg + fmtNum(a, { fa: true }) + " " + MAGN30[mag]; }
+  /* دورِ ۳۰ (tail B28·D15، pwB1 «۰٫۰۸۲ ⇒ ≈ ۰٫۰۹۸، ۰٫۰۸۲ ⇒ ۰٫۰۹۸»): یک عدد با یک مقدارِ تازه یک پیشنهاد است — دو رکوردِ همان عدد (یکی گردشده «≈») یک بار، با نوشتارِ دقیق */
+  function uq30(X) { var o = []; X.forEach(function (x) { var j = o.findIndex(function (y) { return veq(y.v, x.v) && (y.mag || 0) === (x.mag || 0) && y.re != null && x.re != null && Math.abs(y.re - x.re) <= 0.005 * Math.max(1, Math.abs(x.re)); });
+      if (j < 0) o.push(x); else if (o[j].rd && !x.rd) o[j] = x; }); return o; }
   function fmtV30(x) { return x && x.mag ? fmtQ30(x.v, x.mag, x.dec30) : fmtNum(x.v, { fa: true }); }
   A.liveFmtQ30 = fmtQ30;
   function fmtRe25(x) { if (x && x.mag && MAGN30[x.mag] && x.re != null && !x.rd) { var ex = exact30(x.re); return ex ? ex + " " + MAGN30[x.mag] : fmtQ30(x.re, x.mag, x.dec30); }
@@ -5258,7 +5266,7 @@
     S.put(pg);
     var U = function (X) { return X.filter(function (t, i) { return X.indexOf(t) === i; }); };
     var sure = items.filter(function (x) { return x.re != null; }), askI = items.filter(function (x) { return x.re == null; });
-    var reF = U(sure.map(function (x) { return fmtV30(x) + " ⇒ " + fmtRe25(x); })), askF = U(askI.map(function (x) { return fmtV30(x); })).filter(function (t) { return !sure.some(function (x) { return fmtV30(x) === t; }); });
+    var reF = U(uq30(sure).map(function (x) { return fmtV30(x) + " ⇒ " + fmtRe25(x); })), askF = U(askI.map(function (x) { return fmtV30(x); })).filter(function (t) { return !sure.some(function (x) { return fmtV30(x) === t; }); });
     /* C11: فقط حسابِ خودِ صفحه «مقدارِ تازه» است؛ بقیه پرسیده می‌شوند */
     return { kind: "stale", label: "عددهای حساب‌شده از «" + clip(ent.from.o, 30) + "»", old: U(items.map(function (x) { return fmtV30(x); })).join("، "),
       new: "کهنه پس از اصلاح — با «" + clip(ent.from.n, 30) + "» دوباره حساب شود" + (reF.length ? " (" + reF.join("، ") + ")" : "") + (askF.length ? " — «" + askF.join("، ") + "»: از «" + clip(ent.from.o, 30) + "» حساب شده بود؟ (صفحه رابطه‌اش را نشناخت و عددی پیشنهاد نمی‌کند)" : ""),
@@ -5923,7 +5931,7 @@
       S.put(se); if (!items.length) return null;
       var U = function (X) { return X.filter(function (t, i) { return X.indexOf(t) === i; }); }, sure = items.filter(function (x) { return x.re != null; }), askI = items.filter(function (x) { return x.re == null; });
       var oT = D.parts ? D.parts.map(function (p) { return p.o; }).join("، ") : D.o, nT = D.parts ? D.parts.map(function (p) { return p.n; }).join("، ") : D.n;
-      var reF = U(sure.map(function (x) { return fmtV30(x) + " ⇒ " + fmtRe25(x); })), askF = U(askI.map(function (x) { return fmtV30(x); })).filter(function (t) { return !sure.some(function (x) { return fmtV30(x) === t; }); });
+      var reF = U(uq30(sure).map(function (x) { return fmtV30(x) + " ⇒ " + fmtRe25(x); })), askF = U(askI.map(function (x) { return fmtV30(x); })).filter(function (t) { return !sure.some(function (x) { return fmtV30(x) === t; }); });
       (se.stale26 = se.stale26 || []).push({ at: nowISO(), src: o.mid || "", c29: ch29 && ch29.e ? ch29.e.id : "", from: { o: oT, n: nT }, items: items.map(function (x) { return { k: x.k, lab: x.lab, raw: x.raw, v: x.v, re: x.re, ask: !!x.ask, mag: x.mag || 0, dec30: !!x.dec30 }; }) }); if (se.stale26.length > 20) se.stale26 = se.stale26.slice(-20); S.put(se);
       return { kind: "stale", label: "عددهای حساب‌شده از «" + clip(oT, 30) + "»", old: U(items.map(function (x) { return fmtV30(x); })).join("، "),
         "new": "کهنه پس از اصلاح — با «" + clip(nT, 30) + "» دوباره حساب شود" + (reF.length ? " (" + reF.join("، ") + ")" : "") + (askF.length ? " — «" + askF.join("، ") + "»: از «" + clip(oT, 30) + "» حساب شده بود؟ (صفحه رابطه‌اش را نشناخت و عددی پیشنهاد نمی‌کند)" : ""), why: "این عددها در نوشتهٔ خودش حاصلِ حساب از «" + clip(oT, 30) + "» بودند" }; } catch (e) { console.warn(e); return null; } };
