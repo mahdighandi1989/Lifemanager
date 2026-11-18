@@ -3654,6 +3654,8 @@
     /* دورِ ۲۷ (DECISIONS_R26 C35 دوباره؛ A27-20 aA3 p4، C27-27 tC1 p3): آیندهٔ شرطی («اگر اولی را زودتر شروع کنم…»، «اگه با یه سنسور نشه…») تا خودش تعهد نکند
        نه برنامه می‌شود نه «📌 قولِ بی‌تاریخ» */
     if (/(?:^|[\s،,!؟?.:])(?:اگه|اگر)(?![آ-ی‌])/.test(String(pt || ""))) return;
+    /* دورِ ۳۰ (A26-30 aA4، C19): عادت/روایتِ گذشته («اول طولِ هر تکه را درمی‌آوردم …») برنامه نیست (a41 PR.pastHabit30) */
+    try { if (A.PR && A.PR.pastHabit30 && A.PR.pastHabit30(pt)) return; } catch (e) { }
     /* حرفِ زمان‌دارِ او در همین پیام یا دو پیامِ پیشِ خودش («از کی؟» ⇐ «از فردا»)؛ تاریخِ گذشته همچنان رد می‌شود (پایین) */
     var her24 = (s.msgs || []).filter(isUser).slice(-3).map(function (m) { return String(m.text || ""); }).join(" \n ");
     if (realDate(w) && w >= td && !HER_WHEN24.test(String(pt || "")) && !HER_WHEN24.test(her24)) w = "next-session";
@@ -3777,8 +3779,13 @@
   }
   AS.plansDue = plansDue;
   /* یک تپِ «امروز» (INF10): همان وضعِ برنامه که plan_done ِ گفت‌وگو می‌نویسد؛ «هنوز نه» ⇒ باز می‌ماند، تا فردا پنهان، و دست‌کم یک بارِ دیگر پرسیده می‌شود (نه بیشتر) */
+  /* دورِ ۳۰ (D30-15 tD4 ۵ آذر): 📌 ِ ثبت‌شده‌ای که روزش گذشت و «انجام شد؟» ِ گفت‌وگو بی‌پاسخ ماند (plansDueR18 ⇒ expired) هنوز تعهدِ باز است — «expired» یعنی گفت‌وگو
+     دیگر نمی‌پرسد، نه اینکه کار بسته شد. ریشه: یک وضع (state) هر دو را می‌گفت، پس 📌 ِ بانک/بیمه/آرایشگاه از «امروز» افتادند و ⏰ ِ خیاطی (که این وضع را ندارد) ماند.
+     حالا 📌 ِ تاریخ‌دارِ expired در «امروز» با همان «موعد: … — انجام شد؟» و همان سه دکمه می‌ماند تا خودش جواب دهد. */
+  function dueExp30(q) { return !!q && !q.done && q.state === "expired" && q.dateBy === "her-yes" && /^\d{4}-\d\d-\d\d$/.test(String(q.when || "")); }   /* فقط 📌 ِ «ثبت‌شده» با «آره» ِ خودش (a41 bookItem26: dateBy) — برنامهٔ تاریخ‌دارِ مدل/کهنه مثلِ پیش (بانکِ R18 #9، R19 #15) */
+  AS.dueExp30 = dueExp30;
   function planTap(pid, v) {
-    var x = plansAll(null).filter(function (y) { return y.p.id === pid; })[0]; if (!x || !planOpen(x.p)) return false; var q = x.p;
+    var x = plansAll(null).filter(function (y) { return y.p.id === pid; })[0]; if (!x || !(planOpen(x.p) || dueExp30(x.p))) return false; var q = x.p;
     if (v === "notyet") { q.notYet = (q.notYet || 0) + 1; delete q.askKey; delete q.askD; delete q.askSess; q.snooze = A.addDays(A.today(), 1); q.notYetAt = nowIso(); }
     else { q.done = true; q.state = v === "done" ? "done" : "notdone"; q.doneAt = nowIso(); q.by = "today"; }
     try { S.put(x.s); } catch (e) { } return true;
@@ -3917,7 +3924,7 @@
     A.dueList = function () {
       var items = rawDueP.apply(this, arguments) || [], td = A.today();
       /* RN2d: وضعِ مؤثر (گامِ پیوسته، سرانجامِ حدس) پیش از نمایش؛ INF10: یک‌تپ «انجام دادم / انجام ندادم / هنوز نه» — همان وضعِ plan_done (AS.planTap) */
-      try { plansAll(null).forEach(function (x) { var q = x.p; if (planSync(x) !== "open") return; if (q.when !== "next-session" && (!q.when || String(q.when) > td)) return; if (q.snooze && String(q.snooze) > td) return;
+      try { plansAll(null).forEach(function (x) { var q = x.p; if (planSync(x) !== "open" && !dueExp30(q)) return; if (q.when !== "next-session" && (!q.when || String(q.when) > td)) return; if (q.snooze && String(q.snooze) > td) return;
         var rer = function () { if (A.state && A.state.view === "home" && A.render) A.render(); };
         var acts = [{ t: "انجام دادم", v: "done" }, { t: "انجام ندادم", v: "notdone" }].concat(q.notYet ? [] : [{ t: "هنوز نه", v: "notyet" }]).map(function (b) {
           return { t: b.t, cls: "dopt plan-tap plan-" + b.v, fn: function () { if (planTap(q.id, b.v)) { A.toast(b.v === "notyet" ? "باشد — فردا دوباره می‌آید." : "ثبت شد: «" + clip(plainTx(q.text), 40) + "» — " + b.t + "."); rer(); } } }; });
@@ -4285,9 +4292,21 @@
     /* دورِ ۲۸ (R2، C88؛ D28-12 tD1 «۵ متر نیست، ۵٫۵ متره» بی old ِ مدل ⇒ «۴ متر» جایگزین شد): عددی که خودش نام برد («X نیست، Y» / «Y نه X») مقدارِ پیشین است —
        اگر در آن پیام نیست، صفحه می‌پرسد کدام عدد (هرگز عددِ دیگری از همان جمله) */
     for (var j = 0; j <= M.indexOf(src); j++) if (M[j] && M[j].role === "user") n++;
+<<<<<<< HEAD
     /* دورِ ۳۰ (correction — یک خواننده؛ C30-5 «۱۸ تان» ⇐ «۱۶ تا میشن»): مقدارِ درستی که همان تکه است با فعل/رابطهٔ جملهٔ اصلاح («میشن»، «می‌خورن»، «ـه») همان تکه با رقمِ تازه است —
        فعلِ جملهٔ اصلاح به متنِ صورت/رکورد نمی‌رود («دخترم ۱۶ تا میشن مهمون») */
     try { var nf30 = numOnly29(txtOf(x.old).trim() || frag, fix); if (nf30 !== fix && (nf30.match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []).length === 1) fix = nf30; } catch (e30) { }
+=======
+    /* دورِ ۳۰ (A25-21 s09 p16، C88): «درست»ِ گزارش‌شده گاهی واژهٔ پیش از «نادرست» در پیامِ او و فعلِ ربطِ جملهٔ اصلاح را هم دارد (old «۱۵ آذر»، fix «تا ۲۰ آذره» در
+       «باید تا ۱۵ آذر قیمت…») و جایگزینی «باید تا تا ۲۰ آذره قیمت…» می‌ساخت. نقلِ او بیرون از تکهٔ جایگزین‌شده دست نمی‌خورد: واژه‌های آغازِ fix که همان واژه‌های پیش از old
+       در پیامِ اوست، و «ـه/است/ست» ِ پایانِ fix وقتی پس از old در پیامِ او چنین فعلی نیست، کنار می‌روند. */
+    try { var o30 = txtOf(x.old).trim(); if (o30 && fix && src && src.text) { var T30 = String(src.text), k30 = T30.indexOf(o30);
+        if (k30 >= 0) { var pre30 = T30.slice(0, k30).trim().split(/\s+/).filter(Boolean), fw30 = String(fix).trim().split(/\s+/), cut = 0;
+          for (var c30 = Math.min(fw30.length - 1, pre30.length); c30 >= 1; c30--) if (fw30.slice(0, c30).join(" ") === pre30.slice(pre30.length - c30).join(" ")) { cut = c30; break; }
+          var f30 = fw30.slice(cut).join(" "), post30 = T30.slice(k30 + o30.length);
+          if (!/^(?:‌?ه|‌?ست| ?است|‌?اِ?)(?![آ-ی])/.test(post30) && /[^\s‌](?:‌?ه|‌?ست)$/.test(f30) && !/ه$/.test(o30)) { var g30 = f30.replace(/‌?(?:ه|ست)$/, ""); if (/[0-9۰-۹]\s*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)$/.test(g30)) f30 = g30; }   /* فقط روزِ تقویمی («۲۰ آذره» ⇒ «۲۰ آذر»)؛ «۱۸۰ متره» دست نمی‌خورد (بانکِ R23 #94) */
+          if (f30 && f30 !== fix) fix = f30; } } } catch (e30) { }
+>>>>>>> worktree-agent-a5e93703fb247d84e
     return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, key: key, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um), edit: edit, rests: A.liveRestsOf ? A.liveRestsOf(x.rests) : null, srcSess: xsS ? xsS.id : "" };
   }
   AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };

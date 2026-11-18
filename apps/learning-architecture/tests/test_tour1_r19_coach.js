@@ -234,10 +234,11 @@ const normC = (t) => String(t || '').replace(/[«»]/g, '').replace(/[\s‌]+/g,
     await turn('نامه رو فرستادم.', 'خوب.', [cs({ ph: 'e', plan_done: { id: 'pl1', done: true } })]);
     await day('2026-10-17'); u = await turn('سلام.'); td = await p.evaluate(() => __today());
     T(13, !asked(u) && !td.length, { a: asked(u), td });
-    // 15 (neg) — expired ⇒ not asked, no Today line
+    // 15 (neg) — expired ⇒ not asked in chat; Today line stays (R30 D30-15)
     await wipe(); await day('2026-10-15'); await fresh(); await say('فردا کتاب رو پس می‌دم.', { text: 'فردا کتاب رو پس می‌دم', when: '2026-10-16' }); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «… درست است؟» ِ صفحه و «آره» ِ او می‌نشیند — «آره» افزوده شد؛ بقیهٔ ورودی همان است */ await turn('آره'); 
     await day('2026-10-17'); await turn('سلام.'); await turn('خب.'); u = await turn('بعد؟'); pl = await p.evaluate(() => __plans()); td = await p.evaluate(() => __today());
-    T(14, pl[0].state === 'expired' && !asked(u) && !td.length, { pl, td });
+    /* دورِ ۳۰ (DECISIONS_R30 F6، D30-15): 📌 ِ ثبت‌شده با «آره» ِ او در «امروز» با «انجام شد؟» می‌ماند (گفت‌وگو دیگر نمی‌پرسد)؛ پیش‌تر: !td.length */
+    T(14, pl[0].state === 'expired' && !asked(u) && td.length === 1 && /انجام شد؟/.test(td[0].sub || ''), { pl, td });
     // 16 (neg) — tap «انجام ندادم» ⇒ notdone, never asked again
     await wipe(); await day('2026-10-15'); await fresh(); await say('تا شنبه گزارش رو تموم می‌کنم.', { text: 'تا شنبه گزارش رو تموم می‌کنم', when: '2026-10-17' }); /* دورِ ۲۶ (DECISIONS_R26 Q5 — C12 بر مسیرِ برنامه): روزِ برنامه با «… درست است؟» ِ صفحه و «آره» ِ او می‌نشیند — «آره» افزوده شد؛ بقیهٔ ورودی همان است */ await turn('آره');
     await day('2026-10-17'); await p.evaluate(() => APP.go('home')); await p.waitForTimeout(100);
