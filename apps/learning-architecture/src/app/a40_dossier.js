@@ -298,7 +298,9 @@
     if (b && (b.verdict || (b.verdictHist || []).length || b.chkSup)) {
       /* دورِ ۲۰ (RO6، D·6/B·D7): «وارسی نشد» هرگز بی‌توضیح کنارِ «نتیجه سالم ماند» — گزارشِ گفت‌وگو جدا و پیوندِ «اصلاح شد ⇐» */
       var sup = b.superseded || b.chkSup, vl = [verdFa(b.verdict)];
-      if (b.chkRes) vl.push(b.verdict === "verified" || b.verdict === "proved" ? "نتیجهٔ وارسی: " + b.chkRes : "گزارشِ گفت‌وگو: «" + b.chkRes + "» — " + (sup ? "حکمِ «وارسی شد» کنار رفت چون " + (sup.why || sup.note || "پیامی که بر آن بود اصلاح شد") : "از پیام‌های خودت سنجیده نشد"));
+      /* دورِ ۳۰ (story، C186 — D26-28 s33 «✅ رد شد — … ردِ تو وارسی شد» کنارِ «… — از پیام‌های خودت سنجیده نشد»): حکمی که خودِ صفحه از کارِ او داد (رد شد، ناممکن، درست در دامنه)
+         وارسیِ پیام‌های اوست؛ «سنجیده نشد» فقط برای «شاید»/«وارسی نشد». */
+      if (b.chkRes) vl.push(/^(?:verified|proved|disproved|refuted|impossible|range)$/.test(String(b.verdict || "")) ? "نتیجهٔ وارسی: " + b.chkRes : "گزارشِ گفت‌وگو: «" + b.chkRes + "» — " + (sup ? "حکمِ «وارسی شد» کنار رفت چون " + (sup.why || sup.note || "پیامی که بر آن بود اصلاح شد") : "از پیام‌های خودت سنجیده نشد"));
       add({ k: "verdict", at: (sup && sup.at) || b.at, title: "حکمِ وارسی", lines: vl.concat((b.chkMsgs || []).map(function (t) { return "پیامِ وارسی: «" + t + "»"; })),
         hist: (b.verdictHist || []).map(function (x) { return { at: x.at, old: verdFa(x.verdict), new: verdFa(b.verdict), why: "اصلاح شد ⇐ " + (x.why || "") }; }).concat(b.chkSup && !b.superseded ? [{ at: b.chkSup.at, old: verdFa(b.chkSup.verdictPrev), new: verdFa(b.verdict), why: b.chkSup.note || "" }] : []), out: sup ? "حکمِ پیشین کنار رفت" : "" });
     }
@@ -309,7 +311,9 @@
     if (L.chat && L.chat.sess) { var seC = S.get(L.chat.sess), usedM = {}; ev.forEach(function (e) { if (e.src && e.src.mid) usedM[e.src.mid] = 1; });
       /* دورِ ۳۰ (story F11، B27·D7 aB2: مسئلهٔ ۲ «1+3+5+…+99» همهٔ پیام‌های مسئلهٔ ۱ ِ ۳ آبان را «کارِ تو در گفت‌وگو» داشت): هر پیامِ او تا بستن برداشته می‌شد، از هر مسئلهٔ همان
          گفت‌وگو. حالا فقط پیامی که مالِ همین مسئله است (A.STORY.owns: پنجرهٔ chatImp یا بستگیِ سشن در آن لحظه). هم‌شکلِ منفی: مسئلهٔ تکِ گفت‌وگو همهٔ پیام‌هایش را دارد. */
-      var own30 = function (m) { try { return !(A.STORY && A.STORY.owns) || A.STORY.owns(seC, pid, String(m.at || "")); } catch (e) { return true; } };
+      /* پنجرهٔ واردشده از گفت‌وگو (chatImp) از «cut» آغاز می‌شود — پیامِ آغازی که همین مسئله از آن زاده شد (tB1) مالِ همین مسئله است، هرچند owns آن را بیرونِ [from, to] می‌بیند. */
+      var I30 = (L.chatImp && L.chatImp.sess === seC.id) ? L.chatImp : null;
+      var own30 = function (m) { try { var a = String(m.at || ""); if (!(A.STORY && A.STORY.owns) || A.STORY.owns(seC, pid, a)) return true; return !!(I30 && I30.cut && a >= String(I30.cut) && a <= String(I30.to || "~")); } catch (e) { return true; } };
       if (seC) (seC.msgs || []).filter(function (m) { return m && m.role === "user" && !sysTurn(m.text) && String(m.at || "") <= String(L.chat.at || L.stateAt || "~") && own30(m); }).forEach(function (m) { var mid0 = A.liveMsgId ? A.liveMsgId(m) : ""; if (usedM[mid0]) return;
         add({ k: "chatwork", at: m.at || "", title: "کارِ تو در گفت‌وگو", lines: [clip(m.text, 400)], src: { sess: seC.id, mid: mid0, text: m.text, at: m.at || "", title: seC.title || "" } }); }); }
     if (b && b.done) add({ k: "back", at: b.at, title: "بازنگری", lines: [b.glance ? "در یک نگاه: " + val(b.glance) : "", b.use ? "درس: " + val(b.use) : "", b.chkHow ? "وارسی: " + val(b.chkHow) : "", b.bestQ ? "پرسشی که بیشتر کمک کرد: " + val(b.bestQ) : "", b.taste ? "این نوع مسئله برایت: " + val(b.taste) : ""].filter(Boolean), from: b.from === "chat" ? "از گفت‌وگو" : "", hist: histOf(b, "use"), src: b.src && b.src.use ? srcOf(pid, { src: b.src.use }) : null });

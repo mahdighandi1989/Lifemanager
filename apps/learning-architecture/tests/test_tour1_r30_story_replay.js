@@ -51,6 +51,13 @@ const DIR = path.join(__dirname, 'fixtures', 'r30_story');
   K.C186_A_aA1 = async () => { const R = await run('A_aA1', 0, ALLS); const L = R.x.filter(r => r[1] === 'verdict');
     return [L.length >= 1 && L.every(r => /^وارسی شد — با پیام‌های خودت/.test(r[2]) && /پیامِ وارسی: «۶ و ۶ و ۶ میشه ۱۸/.test(r[2])) && !R.errors.length, J(L.map(r => r[2].slice(0, 200)))]; };
 
+  /* ---------- C186 / D26-28 (D s33): حکمِ خودِ صفحه («رد شد … وارسی شد») کنارِ «از پیام‌های خودت سنجیده نشد» نمی‌آید ---------- */
+  K.C186_D_s33 = async () => { const R = await run('D_s33', 0, ALLS); const L = R.x.filter(r => r[1] === 'verdict');
+    return [L.length >= 1 && L.every(r => !/سنجیده نشد/.test(r[2]) && /نتیجهٔ وارسی: نتیجه سالم ماند/.test(r[2])) && !R.errors.length, J(L.map(r => r[2].slice(0, 220)))]; };
+  /* ---------- B27·D7 هم‌شکلِ منفی (B tB1، پسرفتِ C179): پیامی که مسئله از آن زاده شد در «کارِ تو در گفت‌وگو» ِ همان مسئله می‌ماند ---------- */
+  K.B27_D7_neg_B_tB1 = async () => { const R = await run('B_tB1', 0, ALLS); const L = R.x.filter(r => r[1] === 'chatwork' && /^سلام\. یه ایده دارم و می‌خوام از ایده برسم/.test(r[2]));
+    return [L.length >= 1 && !R.errors.length, J(L.length)]; };
+
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 1200)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   console.log(JSON.stringify(info));

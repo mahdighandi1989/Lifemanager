@@ -497,3 +497,9 @@ A validator that reads part of an input must not stamp the whole input. The page
 
 ### How to Apply Elsewhere
 Any validation badge (✓/✗/score) must carry the scope it covers. When a checker returns positions, test coverage by span overlap, and render uncovered claims as «not checked» next to themselves rather than inheriting the badge of their neighbours. Derive relations (dependencies, ownership) from the stored model, never from strings the UI happens to print. Check every new rule against look-alike sentences from real transcripts before shipping it.
+
+## Update 2026-11-18 — when the page stops waiting for the model, downstream contracts fire (Pólya R30 «story»)
+The page left a verdict at «maybe» whenever the model did not quote the user's own check message, even when that message was right there in the conversation. Letting the page find the check itself (≥ 2 meaningful words of the reported check, outside the problem statement) fixed the verdict — and a whole-scenario replay then showed a second-order effect: a now-«verified» verdict that rested on a datum the user later corrected was superseded, and the existing "re-check with the corrected value" question stayed the turn question for nine turns while she talked about other things. Nothing in the changed function was wrong; a stronger, correct state reached a contract that had only ever seen weaker states.
+
+### How to Apply Elsewhere
+When you make the validator assert *more* (a stronger state, more often), replay whole real sessions turn by turn, not just the target turn, and list every downstream rule keyed on that state. A late, more precise report from the model must still be able to replace the validator's own find (keep a `by` field such as `page` vs `model` so the upgrade path stays open).

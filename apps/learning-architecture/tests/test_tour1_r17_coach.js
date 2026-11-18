@@ -319,7 +319,9 @@ function modalityConflicts(text) {
     const maybe2 = await run(++i, ['n=4 رو امتحان کردم.', 'شرط هم برقرار بود.', 'پس حله.'], { check: 'برای n=4 آزمود و شرط برقرار بود' }, null);
     r.neg = res.map(x => x.v).concat([maybe1.v, maybe2.v]);
     chk(res.every(x => x.v !== 'verified'), 'rc4- (no check / assistant message / missing id / intention / refuting / other problem / abandoned answer ⇒ never «verified») ' + JSON.stringify(r.neg));
-    chk(maybe1.v === 'maybe' && maybe2.v === 'maybe', 'rc4 fallback: without coach_state.check the overlap gives only "maybe" — never verified and never «وارسی نشد» ' + JSON.stringify([maybe1.v, maybe2.v]));
+    /* دورِ ۳۰ (DECISIONS_R30 C186 جانشینِ این ادعا شد): «شاید … سنجیده نشد» فقط وقتی پیام‌های او وارسی‌ای ندارند — این دو پیام خودشان همان وارسی‌اند («… از اول حل کردم و همون جواب اومد»،
+       «n=4 رو امتحان کردم. شرط هم برقرار بود»)، پس صفحه خودش آن را می‌یابد ⇒ «verified»؛ هنوز هرگز «وارسی نشد». (پیشین: maybe1.v === 'maybe' && maybe2.v === 'maybe') */
+    chk(maybe1.v === 'verified' && maybe2.v === 'verified', 'rc4 fallback (C186): with coach_state.check but no quoted msgs, the page finds her own check message itself — verified, never «وارسی نشد» ' + JSON.stringify([maybe1.v, maybe2.v]));
     // s31 (D·4): وارسی در سه پیام + گزارشِ مدل ⇒ وارسی شد
     const s31 = await run(++i, ['n=5 رو گذاشتم، شرط برقرار نیست پس این ادعا رد شد.', 'مثبت بودنِ جمله‌ها رو هم چک کردم، همه‌شون مثبتن.', 'یه نگاه کلی هم: چون هر جمله از قبلی کوچیک‌تره، حد وجود داره.'],
       { check: 'n=5 را رد کرد، مثبت بودن را سنجید و یک نگاه کلی داد' }, { msgs: ['n=5 رو گذاشتم', 'مثبت بودنِ جمله‌ها رو هم چک کردم', 'چون هر جمله از قبلی کوچیک‌تره'] });
