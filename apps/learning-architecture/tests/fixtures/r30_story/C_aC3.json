@@ -1,0 +1,882 @@
+{
+"from": "round30C/aC3",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سلام. بازنشستهٔ آموزش‌وپرورشم، حقوقم ماهی ۱۸ میلیون تومنه. می‌خوام تا ۱۰ ماه دیگه ۶۰ میلیون پس‌انداز کنم که برم پیش دخترم. ولی خرج داروهام الان ماهی ۲ میلیونه و هر سه ماه حدود ۱۰ درصد گرون‌تر میشه. ماهی چقدر کنار بذارم که برسم؟",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';APP.clock.dev=true;localStorage.setItem('lla.dev','1');'ok'",
+"c": 1
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(300);const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value=\"۳۱ اسفند ۱۳۳۷\";i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();await W(400);const e=c.querySelector('.age-err');return 'typed='+\"۳۱ اسفند ۱۳۳۷\"+' err='+(e?e.textContent:'')+' | birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+!!document.querySelector('.age-ask')})()",
+"c": 2
+},
+{
+"c": 3
+},
+{
+"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='بعداً').click();return 'later; age='+APP.AGE.age()})()",
+"c": 4
+},
+{
+"say": "می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داشته باشم و خرجِ داروهام هم کم نیاد. راستی متولد ۲۵ اسفند ۱۳۳۷ام؛ اون کارت تاریخم رو قبول نکرد، نمی‌دونم چی رو اشتباه زدم.",
+"c": 5
+},
+{
+"eval": "(()=>'birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' said='+JSON.stringify((APP.S.settings().profile||{}).ageSaid||null)+' sys='+JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys'&&/تولد/.test(m.text)).map(m=>m.text)))()",
+"c": 6
+},
+{
+"say": "حقوق و ۶۰ میلیون قطعیه. ۱۰ درصد رو از داروخونه پرسیدم، تقریبیه. پس هر سه ماه داروم ۱۰ درصد بیشتر میشه، یعنی تو ۹ ماه ۳۰ درصد بیشتر. ثبتش کنید.",
+"c": 7
+},
+{
+"c": 8
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 9
+},
+{
+"c": 10
+},
+{
+"say": "اول ۱۱۰ هزار میشه. دفعهٔ دوم ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار. آهان، پس هر بار روی قیمت جدید حساب میشه، جمع ساده نیست.",
+"c": 11
+},
+{
+"say": "داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جمعِ ده ماه: ۳×۲ + ۳×۲.۲ + ۳×۲.۴۲ + ۲.۶۶ = ۶ + ۶.۶ + ۷.۲۶ + ۲.۶۶ = ۲۲.۵۲ میلیون. حقوقِ ده ماه ۱۸۰ میلیون. برای ۶۰ میلیون پس‌انداز باید ماهی ۶ میلیون کنار بذارم. پس می‌مونه ۱۸۰ − ۶۰ − ۲۲.۵ = حدود ۹۷.۵ میلیون برای بقیهٔ خرج‌ها، یعنی ماهی ۹.۷. فکر کنم بشه.",
+"c": 12
+},
+{
+"say": "دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم. پس ۹.۷ تنگه ولی میشه. از اولِ آبان هر ماه ۶ میلیون می‌ذارم کنار. ماهِ بعد میام بهتون می‌گم چی شد.",
+"c": 13
+},
+{
+"say": "اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. پس جا داره.",
+"c": 14
+},
+{
+"c": 15
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1500);const t=document.querySelector('#main').innerText;const i=t.indexOf('از گفت‌وگو');return 'phase='+APP.livePhase(p)+' story='+(APP.liveStoryPhase?APP.liveStoryPhase(p):'?')+' || '+(i>=0?t.slice(Math.max(0,i-300),i+1200):'NO «از گفت‌وگو»')+' || HEAD '+t.slice(0,1500)})()",
+"c": 16
+},
+{
+"c": 17
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 18
+},
+{
+"c": 19
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-26')+' pid='+p})()",
+"c": 20
+},
+{
+"c": 21,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 22
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go(\"today\");await W(1500);return \"TODAY \"+APP.today()+\" || \"+document.querySelector(\"#main\").innerText.slice(0,2500)})()",
+"c": 23
+},
+{
+"c": 24
+},
+{
+"say": "سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه.",
+"c": 25
+},
+{
+"say": "پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها روی هم جمع نمیشن. یه چیزی: تاریخِ تولدم رو درست ثبت کردی؟ تو شناسنامه نوشته 1337/12/25.",
+"c": 26
+},
+{
+"eval": "(()=>'birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' said='+JSON.stringify((APP.S.settings().profile||{}).ageSaid||null)+' sys='+JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys'&&/تولد/.test(m.text)).map(m=>m.text)))()",
+"c": 27
+},
+{
+"say": "اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم.",
+"c": 28
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-11-23')+' pid='+p})()",
+"c": 29
+},
+{
+"c": 30,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 31
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go(\"today\");await W(1500);return \"TODAY \"+APP.today()+\" || \"+document.querySelector(\"#main\").innerText.slice(0,1800)})()",
+"c": 32
+},
+{
+"c": 33
+},
+{
+"say": "سلام، اولِ آذره. ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون. داروی این ماه هنوز ۲ میلیون بود.",
+"c": 34
+},
+{
+"say": "پیشرفت که دیدید. آموختم که با یه دفترچه و حسابِ ساده، کمتر نگرانم.",
+"c": 35
+},
+{
+"say": "حساب کردم: ۶ میلیون × ۱۰ = ۶۰ میلیون، داروی سه ماه ۲ میلیون × ۳ = ۶ میلیون، و ۲۰ درصدِ ۳۰۰ هزار = ۶۰ هزار. یه جا هم اشتباهی نوشتم ۲ میلیون × ۳ = ۶ هزار.",
+"c": 36
+},
+{
+"say": "سرِ برج دوباره ۶ میلیون می‌ذارم کنار. عید هم می‌رم پیش دخترم، پس تا آخرِ سال باید کلِ پول جمع باشه.",
+"c": 37
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 38
+},
+{
+"c": 39
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,2500)),1200))})()",
+"c": 40
+},
+{
+"c": 41
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 42
+},
+{
+"c": 43
+},
+{
+"c": 44
+},
+{
+"c": 45
+},
+{
+"c": 46
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('mind');await W(1800);const t=document.querySelector('#main').innerText;const out=[];let i=-1;for(const m of t.matchAll(/هنجار|هم‌سن|گروه‌های سنی|سن: |علت|ضعیف‌ترین|پیش‌نیاز ·/g)){if(m.index-i>250){out.push(t.slice(Math.max(0,m.index-150),m.index+350));i=m.index;}}return out.join(' ⟂ ').slice(0,4000)})()",
+"c": 47
+},
+{
+"c": 48
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1200);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2500)})()",
+"c": 49
+},
+{
+"c": 50
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();APP.go('dossier',s.id);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 51
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 52
+},
+{
+"c": 53
+},
+{
+"c": 54,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 55
+},
+{
+"say": "یه سؤال هم دارم: نوه‌م که کلاس چهارمه گاهی با همین تبلت میاد این‌جا مسئله حل می‌کنه. کارنامهٔ ذهنِ اون با مالِ من قاطی نمیشه؟ جدا نگهش می‌دارید؟",
+"c": 56
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-4).map(m=>m.text)))()",
+"c": 57
+},
+{
+"c": 58
+},
+{
+"eval": "(()=>document.querySelector('#main').innerText.slice(0,1100))()",
+"c": 59
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>{const t=document.querySelector('#main').innerText;r((t.match(/مسئله‌های این گفت‌وگو[^]{0,260}/)||['one problem'])[0].replace(/\\n/g,' | '))},900))})()",
+"c": 60
+},
+{
+"c": 61,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-11-25');APP.render&&APP.render();'clock '+APP.today()",
+"c": 62
+},
+{
+"say": "سلام. برای ادامهٔ برنامهٔ پس‌اندازم چند تا کار دارم که می‌خوام یادم بمونه. اول این‌که سرِ برج قسطِ بیمهٔ تکمیلی رو هم پرداخت می‌کنم، ۲ میلیون و ۸۰۰.",
+"c": 63
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 64
+},
+{
+"say": "آخرِ سال هم کلِ حسابِ پس‌اندازم رو با دخترم چک می‌کنم.",
+"c": 65
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 66
+},
+{
+"say": "بله",
+"c": 67
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 68
+},
+{
+"say": "عید هم که می‌رم پیش دخترم.",
+"c": 69
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 70
+},
+{
+"say": "بعد از عید داروهام رو برای سالِ بعد تمدید می‌کنم.",
+"c": 71
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 72
+},
+{
+"say": "وسطِ ماه هم باید برم آزمایشِ خون.",
+"c": 73
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 74
+},
+{
+"say": "نوه‌م آخرِ سالِ تحصیلی امتحانِ ریاضی داره؛ قبلش هفته‌ای یه بار باهاش تمرین می‌کنم.",
+"c": 75
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 76
+},
+{
+"say": "باشه",
+"c": 77
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 78
+},
+{
+"say": "پنجشنبه نه، شنبه می‌رم بانک که حسابِ پس‌انداز رو جدا کنم.",
+"c": 79
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 80
+},
+{
+"say": "آره",
+"c": 81
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 82
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(800);const F=\"\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u0628\\u0627\\u0646\\u06a9\",O=\"\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u0628\\u0627\\u0646\\u06a9\",N=\"\\u06cc\\u06a9\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u0628\\u0627\\u0646\\u06a9\";const w=[...document.querySelectorAll('.as-mtools')].reverse().find(w=>(w.parentElement.innerText||'').includes(F));if(!w)return 'NO TOOLS';w.querySelector('.as-editb').click();await W(700);const ta=w.parentElement.querySelector('textarea')||document.querySelector('.as-edtx');if(!ta)return 'NO TA';const o=ta.value;ta.value=o.replace(O,N);ta.dispatchEvent(new Event('input',{bubbles:true}));if(ta.value===o)return 'NOT REPLACED '+o.slice(0,200);await W(300);const b=document.querySelector('.as-edsave');if(!b)return 'NO SAVE';b.click();await W(2500);return 'saved: '+ta.value.slice(0,200)})()",
+"c": 83
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 84
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(800);const F=\"\\u06cc\\u06a9\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u0628\\u0627\\u0646\\u06a9\",O=\"\\u06cc\\u06a9\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u0628\\u0627\\u0646\\u06a9\",N=\"\\u06f2\\u06f0 \\u0622\\u0628\\u0627\\u0646 \\u0631\\u0641\\u062a\\u0645 \\u0628\\u0627\\u0646\\u06a9\";const w=[...document.querySelectorAll('.as-mtools')].reverse().find(w=>(w.parentElement.innerText||'').includes(F));if(!w)return 'NO TOOLS';w.querySelector('.as-editb').click();await W(700);const ta=w.parentElement.querySelector('textarea')||document.querySelector('.as-edtx');if(!ta)return 'NO TA';const o=ta.value;ta.value=o.replace(O,N);ta.dispatchEvent(new Event('input',{bubbles:true}));if(ta.value===o)return 'NOT REPLACED '+o.slice(0,200);await W(300);const b=document.querySelector('.as-edsave');if(!b)return 'NO SAVE';b.click();await W(2500);return 'saved: '+ta.value.slice(0,200)})()",
+"c": 85
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 86
+},
+{
+"say": "قسطِ بیمه رو حساب کردم: ۲ میلیون و ۸۰۰ × ۱۲ = ۳۳ میلیون و ۶۰۰ در سال. نصفش هم میشه: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰. اگه به‌جای ۶ میلیون ماهی ۶ میلیون و ۵۰۰ کنار بذارم: ۶ میلیون و ۵۰۰ × ۱۰ = ۶۰ میلیون.",
+"c": 87
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 88
+},
+{
+"say": "یه حسابِ دیگه: ۱ میلیون و ۲۰۰ + ۸۰۰ هزار = ۲ میلیون. و ۵ میلیون و ۵۰۰ × ۲ = ۱۱ میلیون. اینم امروز: ۲ × ۳ = ۶ تا تخم‌مرغ خریدیم برای نوه‌م.",
+"c": 89
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 90
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3500)),1500))})()",
+"c": 91
+},
+{
+"c": 92
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,9000)),1500))})()",
+"c": 93
+},
+{
+"c": 94
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1300);o.push('## '+r.p.title+' ['+(APP.liveClosure(r.p.id)||{}).state+']\\n'+document.querySelector('#main').innerText.slice(0,6000));}return o.join('\\n\\n')})()",
+"c": 95
+},
+{
+"c": 96,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-11-26');APP.render&&APP.render();'clock '+APP.today()",
+"c": 97
+},
+{
+"say": "سلام. حسابِ این ماه رو نوشتم: حقوقم ۴ میلیون و ۲۰۰ ـه و ۱ میلیون و ۵۰۰ هم نوه‌م کمک کرد: ۴ میلیون و ۲۰۰ + ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰.",
+"c": 98
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 99
+},
+{
+"say": "یه جای دیگه هم نوشتم ۳ میلیون و ۶۰۰ + ۲ میلیون و ۷۰۰ = ۵ میلیون و ۳۰۰. از ۵ میلیون و ۸۰۰ هم ۸۰۰ رو دادم به نوه‌م: ۵ میلیون و ۸۰۰ − ۸۰۰ = ۵ میلیون.",
+"c": 100
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 101
+},
+{
+"say": "بانک ۸۰۰ تومن کارمزد کم کرد: ۱ میلیون و ۸۰۰ تومن − ۸۰۰ تومن = ۱ میلیون تومن. نون هم دو تا گرفتم: ۸۰ هزار و ۵۰۰ × ۲ = ۱۶۱ هزار.",
+"c": 102
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 103
+},
+{
+"say": "سودِ سپرده ماهی ۲ و ۵ دهم درصده؛ ۴ ماه میشه ۲ و ۵ دهم × ۴ = ۱۰ درصد. سه ماهِ اول هم ۱ و ۵ دهم × ۳ = ۴ و ۸ دهم بود.",
+"c": 104
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 105
+},
+{
+"say": "تقسیمِ پول بینِ بچه‌ها: ۱۰ میلیون ÷ ۳ ≈ ۳ میلیون و ۳۳۳ هزار، و اگه هفت قسمت کنم ۱۰ میلیون ÷ ۷ ≈ ۱ میلیون و ۵۰۰ هزار.",
+"c": 106
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 107
+},
+{
+"say": "جمعِ شش قسطِ اول: ۱ میلیون و ۲۰۰ + ۱ میلیون و ۳۰۰ + ۱ میلیون و ۱۰۰ + ۱ میلیون و ۴۰۰ + ۱ میلیون و ۵۰۰ + ۱ میلیون و ۵۰۰ = ۸ میلیون. امروز هم ۲ × ۳ = ۶ تا نون خریدم.",
+"c": 108
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 109
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1200);const t=document.querySelector('#main').innerText;o.push('## '+r.p.title.slice(0,40)+'\\n'+t.slice(0,3500));}return o.join('\\n')})()",
+"c": 110
+},
+{
+"c": 111
+},
+{
+"say": "یه برنامه: دوشنبه می‌رم داروخونه دفترچه‌م رو تمدید کنم.",
+"c": 112
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 113
+},
+{
+"say": "دوشنبه درسته.",
+"c": 114
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 115
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(800);const F=\"\\u062f\\u0648\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u062f\\u0627\\u0631\\u0648\\u062e\\u0648\\u0646\\u0647\",O=\"\\u062f\\u0648\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u062f\\u0627\\u0631\\u0648\\u062e\\u0648\\u0646\\u0647\",N=\"\\u06f2 \\u0622\\u0630\\u0631 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u062f\\u0627\\u0631\\u0648\\u062e\\u0648\\u0646\\u0647\";const w=[...document.querySelectorAll('.as-mtools')].reverse().find(w=>(w.parentElement.innerText||'').includes(F));if(!w)return 'NO TOOLS';w.querySelector('.as-editb').click();await W(700);const ta=w.parentElement.querySelector('textarea')||document.querySelector('.as-edtx');if(!ta)return 'NO TA';const o=ta.value;ta.value=o.replace(O,N);ta.dispatchEvent(new Event('input',{bubbles:true}));if(ta.value===o)return 'NOT REPLACED '+o.slice(0,200);await W(300);const b=document.querySelector('.as-edsave');if(!b)return 'NO SAVE';b.click();await W(2500);return 'saved: '+ta.value.slice(0,200)})()",
+"c": 116
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 117
+},
+{
+"say": "فردا به دکترم زنگ می‌زنم برای نوبت. شنبه هم به بانک زنگ می‌زنم برای وام.",
+"c": 118
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 119
+},
+{
+"say": "زنگ زدم.",
+"c": 120
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 121
+},
+{
+"say": "پسفردا می‌رم بیمه رو تمدید کنم؛ امروز صبح فرمش رو پر کردم.",
+"c": 122
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 123
+},
+{
+"say": "ماهِ دیگه هم باید قبضِ گاز رو بدم.",
+"c": 124
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 125
+},
+{
+"say": "وسطِ ماهِ دیگه باید برم چکاپ، یعنی حدودِ ۱۵ دی.",
+"c": 126
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 127
+},
+{
+"say": "وسطِ ماه هم کارگر میاد خونه رو رنگ کنه.",
+"c": 128
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 129
+},
+{
+"say": "اون برنامهٔ داروخونه رو که اصلاح کردم چرا رفت سالِ بعد؟ کجا ثبت شد؟",
+"c": 130
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 131
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3500)),1500))})()",
+"c": 132
+},
+{
+"c": 133
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,9000)),1500))})()",
+"c": 134
+},
+{
+"c": 135
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1300);o.push('## '+r.p.title+' ['+(APP.liveClosure(r.p.id)||{}).state+']\\n'+document.querySelector('#main').innerText.slice(0,6000));}return o.join('\\n\\n')})()",
+"c": 136
+},
+{
+"c": 137,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-11-28');APP.render&&APP.render();'clock '+APP.today()",
+"c": 138
+},
+{
+"say": "سلام. اسباب‌کشیِ پسرم: کامیون ۴ میلیون و ۲۰۰ + کارگر ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰. از ۸ میلیونی که کنار گذاشتم، ۲ میلیون و ۳۰۰ می‌مونه.",
+"c": 139
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 140
+},
+{
+"say": "ببخشید، کامیون ۴ میلیون و ۲۰۰ نیست، ۴ میلیون و ۵۰۰.",
+"c": 141
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 142
+},
+{
+"say": "فرشِ خونه‌ش: اتاقِ اول ۱۲ متره، اتاقِ دوم ۱۰ متر: ۱۲ + ۱۰ = ۲۲ متر فرش.",
+"c": 143
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 144
+},
+{
+"say": "اتاقِ دوم ۱۰ نیست، ۱۴ متره.",
+"c": 145
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 146
+},
+{
+"say": "جمعِ ۹ قسطِ پارسال: ۱ میلیون و ۱۰۰ + ۱ میلیون و ۲۰۰ + ۱ میلیون و ۳۰۰ + ۱ میلیون و ۴۰۰ + ۱ میلیون و ۵۰۰ + ۱ میلیون و ۶۰۰ + ۱ میلیون و ۷۰۰ + ۱ میلیون و ۸۰۰ + ۱ میلیون و ۹۰۰ = ۱۳ میلیون و ۵۰۰.",
+"c": 147
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 148
+},
+{
+"say": "قسط‌های امسال هر ۹ تاش ۲ میلیون و ۵۰۰ بود: ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ = ۲۲ میلیون.",
+"c": 149
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 150
+},
+{
+"say": "برای یخچال ۱۸ میلیون لازمه، ۱۵ میلیون و ۵۰۰ دارم، ۲ میلیون و ۵۰۰ کم دارم. از ۲ میلیون هم ۱ میلیون و ۳۵۰ دادم بازار، ۷۵۰ هزار برام موند.",
+"c": 151
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 152
+},
+{
+"say": "اینا رو هم نوه‌م نوشته: ۳ میلیون + ۲ میلیون = ۵ میلیون و ۱ میلیون و ۵۰۰ × ۲ = ۳ میلیون.",
+"c": 153
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 154
+},
+{
+"say": "اینا رو برادرم نوشته بود، اینا رو هم ببین:\n۲ × ۳٫۱۴ × ۵ = ۳۱٫۴\nπ × ۲² ≈ ۱۲٫۵۶\n۱۰۰ ÷ ۳ ≈ ۳۳\n۵۰۰ تومن × ۴ = ۲۰۰۰ تومن\n۷ × ۸ = ۵۴\n۱۲ + ۱۹ = ۳۱",
+"c": 155
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 156
+},
+{
+"say": "فروشنده گفت یخچال ماهِ بعد ۱۲٪ گرون میشه. یعنی ۳۷٪ از حقوقم میره برای قسط.",
+"c": 157
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 158
+},
+{
+"say": "فردا به خواهرم زنگ می‌زنم. پس‌فردا هم به پسرم زنگ می‌زنم.",
+"c": 159
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 160
+},
+{
+"say": "آره، فردا و پس‌فردا.",
+"c": 161
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 162
+},
+{
+"say": "زنگ زدم.",
+"c": 163
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 164
+},
+{
+"say": "امروز خسته‌ام، حال ندارم.",
+"c": 165
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 166
+},
+{
+"say": "۲۰ آبان رفتم بانک و قبضِ آب رو دادم.",
+"c": 167
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 168
+},
+{
+"say": "سه‌شنبه می‌رم آزمایشگاه، چهارشنبه هم می‌رم بازار.",
+"c": 169
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 170
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(800);const F=\"\\u0633\\u0647\\u200c\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u0622\\u0632\\u0645\\u0627\\u06cc\\u0634\\u06af\\u0627\\u0647\",O=\"\\u0633\\u0647\\u200c\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u0622\\u0632\\u0645\\u0627\\u06cc\\u0634\\u06af\\u0627\\u0647\",N=\"\\u067e\\u0646\\u062c\\u0634\\u0646\\u0628\\u0647 \\u0645\\u06cc\\u200c\\u0631\\u0645 \\u0622\\u0632\\u0645\\u0627\\u06cc\\u0634\\u06af\\u0627\\u0647\";const w=[...document.querySelectorAll('.as-mtools')].reverse().find(w=>(w.parentElement.innerText||'').includes(F));if(!w)return 'NO TOOLS';w.querySelector('.as-editb').click();await W(700);const ta=w.parentElement.querySelector('textarea')||document.querySelector('.as-edtx');if(!ta)return 'NO TA';const o=ta.value;ta.value=o.replace(O,N);ta.dispatchEvent(new Event('input',{bubbles:true}));if(ta.value===o)return 'NOT REPLACED '+o.slice(0,200);await W(300);const b=document.querySelector('.as-edsave');if(!b)return 'NO SAVE';b.click();await W(2500);return 'saved: '+ta.value.slice(0,200)})()",
+"c": 171
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 172
+},
+{
+"say": "یکشنبه‌ی هفته‌ی بعد، ۱۸ آذر، می‌رم دندون‌پزشکی.",
+"c": 173
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 174
+},
+{
+"say": "فردا بانک.",
+"c": 175
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 176
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,4000)),1500))})()",
+"c": 177
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1200);const t=document.querySelector('#main').innerText;o.push('## '+r.p.title.slice(0,40)+'\\n'+t.slice(-5000));}const s=APP.ASSIST.cur();if(s){APP.go('dossier',s.id);await W(1300);o.push('## SESSION\\n'+document.querySelector('#main').innerText.slice(-6000));}return o.join('\\n')})()",
+"c": 178
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-12-22');APP.render&&APP.render();'clock '+APP.today()",
+"c": 179
+},
+{
+"say": "سلام. سرِ برج قبضِ برق رو میدم و به مستأجرم زنگ می‌زنم اجاره رو بگیرم.",
+"c": 180
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 181
+},
+{
+"say": "آره، هر دو.",
+"c": 182
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 183
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,4000)),1500))})()",
+"c": 184
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3500)),1500))})()",
+"c": 185
+},
+{
+"c": 186
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,9000)),1500))})()",
+"c": 187
+},
+{
+"c": 188
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1300);o.push('## '+r.p.title+' ['+(APP.liveClosure(r.p.id)||{}).state+']\\n'+document.querySelector('#main').innerText.slice(0,6000));}return o.join('\\n\\n')})()",
+"c": 189
+},
+{
+"c": 190,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"سلام. عددها را روشن گفتید؛ پیش از حساب یک قدم عقب‌تر: کلِ مسئله را در یک جمله و به زبانِ خودتان می‌گویید؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: سلام. بازنشستهٔ آموزش‌وپرورشم، حقوقم ماهی ۱۸ میلیون تومنه. می‌خوام تا ۱۰ ماه دیگه ۶۰ میلیو / دستیار: سلام. عددها را روشن گفتید؛ پیش از حساب یک قدم عقب‌تر: کلِ مسئله را در \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\", \"u\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"خواسته روشن است: مبلغِ ثابتِ ماهانه‌ای که پس از ۱۰ ماه ۶۰ میلیون بشود و خرجِ دارو هم کم نیاید. تاریخِ تولد را همان‌طور که گفتید به صفحه می‌دهم تا خودش ثبت و نشانتان بدهد. برای این حساب، جز حقوق و خرجِ دارو چه داده‌ای دارید — خرج‌های دیگرِ ماهانه چقدر است؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: سلام. بازنشستهٔ آموزش‌وپرورشم، حقوقم ماهی ۱۸ میلیون تومنه. می‌خوام تا ۱۰ ماه دیگه ۶۰ میلیو / دستیار: سلام. عددها را روشن گفتید؛ پیش از حساب یک قدم عقب‌تر: کلِ مسئله را در  / کاربر: می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داش / دستیار: خواسته روشن است: مبلغِ ثابتِ ماهانه‌ای که پس از ۱۰ ماه ۶۰ میلیون بشود \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"۲۵ اسفند ۱۳۳۷\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. برای حسابِ خرجِ دارو یک مفهومِ مشخص لازم است: «درصدِ درصد». برای دیدنش: اگر دارو از ۲ میلیون ۱۰ درصد گران شود و سه ماه بعد دوباره ۱۰ درصد، بارِ دوم ۱۰ درصدِ چه مبلغی است؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: سلام. بازنشستهٔ آموزش‌وپرورشم، حقوقم ماهی ۱۸ میلیون تومنه. می‌خوام تا ۱۰ ماه دیگه ۶۰ میلیو / دستیار: سلام. عددها را روشن گفتید؛ پیش از حساب یک قدم عقب‌تر: کلِ مسئله را در  / کاربر: می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داش / دستیار: خواسته روشن است: مبلغِ ثابتِ ماهانه‌ای که پس از ۱۰ ماه ۶۰ میلیون بشود  / کاربر: حقوق و ۶۰ میلیون قطعیه. ۱۰ درصد رو از داروخونه پرسیدم، تقریبیه. پس هر سه ماه داروم ۱۰ درصد / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. برای حسابِ خرجِ دارو یک مفهوم\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"پس‌انداز ۶۰ میلیون در ۱۰ ماه با خرجِ داروی رو به گرانی\", \"statement\": \"حقوقم ماهی ۱۸ میلیون تومنه. می‌خوام تا ۱۰ ماه دیگه ۶۰ میلیون پس‌انداز کنم که برم پیش دخترم. خرج داروهام الان ماهی ۲ میلیونه و هر سه ماه حدود ۱۰ درصد گرون‌تر میشه. می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داشته باشم و خرجِ داروهام هم کم نیاد.\", \"nat\": \"practical\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"prereq\": {\"concept\": \"درصدِ درصد (رشدِ مرکب: هر افزایش روی مبلغِ تازه)\", \"step\": \"حسابِ خرجِ دارو در ۱۰ ماه\", \"quote\": \"هر سه ماه داروم ۱۰ درصد بیشتر میشه، یعنی تو ۹ ماه ۳۰ درصد بیشتر\", \"q\": \"اگر دارو از ۲ میلیون ۱۰ درصد گران شود و سه ماه بعد دوباره ۱۰ درصد، بارِ دوم ۱۰ درصدِ چه مبلغی است؟\", \"topic\": \"درصد\"}}]}",
+"{\"reply\": \"همین است و خودتان دیدید: هر بار روی قیمتِ تازه حساب می‌شود (۱۱۰ و بعد ۱۲۱). برمی‌گردیم به همان گام، خرجِ دارو: با همین روش، ۲ میلیونِ امروز پس از سه بار گرانی در این ۱۰ ماه چقدر می‌شود؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: سلام. بازنشستهٔ آموزش‌وپرورشم، حقوقم ماهی ۱۸ میلیون تومنه. می‌خوام تا ۱۰ ماه دیگه ۶۰ میلیو / دستیار: سلام. عددها را روشن گفتید؛ پیش از حساب یک قدم عقب‌تر: کلِ مسئله را در  / کاربر: می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داش / دستیار: خواسته روشن است: مبلغِ ثابتِ ماهانه‌ای که پس از ۱۰ ماه ۶۰ میلیون بشود  / کاربر: حقوق و ۶۰ میلیون قطعیه. ۱۰ درصد رو از داروخونه پرسیدم، تقریبیه. پس هر سه ماه داروم ۱۰ درصد / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. برای حسابِ خرجِ دارو یک مفهوم / کاربر: اول ۱۱۰ هزار میشه. دفعهٔ دوم ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار. / دستیار: همین است و خودتان دیدید: هر بار روی قیمتِ تازه حساب می‌شود (۱۱۰ و بعد \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار\", \"learned\": {\"concept\": \"درصدِ درصد (رشدِ مرکب: هر افزایش روی مبلغِ تازه)\", \"quote\": \"هر بار روی قیمت جدید حساب میشه، جمع ساده نیست\"}, \"prior\": [{\"step\": \"افزایشِ اول\", \"quote\": \"اول ۱۱۰ هزار میشه\", \"verdict\": \"ok\", \"why\": \"\"}, {\"step\": \"افزایشِ دوم\", \"quote\": \"ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار\", \"verdict\": \"ok\", \"why\": \"\", \"dep\": [1]}]}]}",
+"{\"reply\": \"حساب‌هایتان می‌خواند: داروی ده ماه ۲۲.۵۲ میلیون، و پس از ۶۰ میلیون پس‌انداز حدودِ ۹۷.۵ میلیون، یعنی ماهی ۹.۷ برای بقیهٔ خرج‌ها. «فکر کنم بشه» هنوز حدس است: چطور می‌آزماییدش — خرجِ واقعیِ یکی دو ماهِ اخیرتان، بی دارو، چقدر بوده؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه. / دستیار: سلام. قدمِ اول را طبقِ برنامه برداشتید: ۶ میلیونِ آبان کنار رفت. تا ای / کاربر: پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها ر / دستیار: این را خودتان به دست آوردید: با حساب‌کردن ترس کمتر شد، و «درصدها روی ه / کاربر: اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم. / دستیار: باشد؛ قرارِ خودتان اولِ آذر است، پس از کنارگذاشتنِ ماهِ دوم. پیگیری‌اش / کاربر: سلام، اولِ آذره. ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون. داروی این ماه هنوز ۲  / دستیار: سلام. دو ماه، دو بار ۶ میلیون: ۱۲ میلیون کنار رفته و دارو هنوز ۲ میلیو / کاربر: پیشرفت که دیدید. آموختم که با یه دفترچه و حسابِ ساده، کمتر نگرانم. / دستیار: این درسِ خودتان است و با عددِ واقعیِ دو ماه پشتش ایستاده: دفترچه و حسا / کاربر: یه سؤال هم دارم: نوه‌م که کلاس چهارمه گاهی با همین تبلت میاد این‌جا مسئله حل می‌کنه. کارنا / دستیار: صادقانه: روی همین تبلت قاطی می‌شود. همهٔ رکوردها و کارنامه فقط در همین / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: حساب‌هایتان می‌خواند: داروی ده ماه ۲۲.۵۲ میلیون، و پس از ۶۰ میلیون پس‌\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"ماهی ۶ میلیون کنار بذارم\", \"guess\": {\"text\": \"فکر کنم بشه\", \"q\": \"چطور می‌آزماییدش — خرجِ واقعیِ یکی دو ماهِ اخیرتان، بی دارو، چقدر بوده؟\"}}]}",
+"{\"reply\": \"با دفترچه سنجیدید و خودتان دیدید ۹٫۷ تنگ است ولی شدنی. برنامه‌تان از اولِ آبان است و پیگیری‌اش می‌تواند در «امروز» بیاید. پیش از شروع: فکر می‌کنید آخرِ آبان خرجِ ماه (جز دارو) چقدر درآمده باشد و چقدر به این پیش‌بینی مطمئنید؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: سلام. بازنشستهٔ آموزش‌وپرورشم، حقوقم ماهی ۱۸ میلیون تومنه. می‌خوام تا ۱۰ ماه دیگه ۶۰ میلیو / دستیار: سلام. عددها را روشن گفتید؛ پیش از حساب یک قدم عقب‌تر: کلِ مسئله را در  / کاربر: می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داش / دستیار: خواسته روشن است: مبلغِ ثابتِ ماهانه‌ای که پس از ۱۰ ماه ۶۰ میلیون بشود  / کاربر: حقوق و ۶۰ میلیون قطعیه. ۱۰ درصد رو از داروخونه پرسیدم، تقریبیه. پس هر سه ماه داروم ۱۰ درصد / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. برای حسابِ خرجِ دارو یک مفهوم / کاربر: اول ۱۱۰ هزار میشه. دفعهٔ دوم ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار. / دستیار: همین است و خودتان دیدید: هر بار روی قیمتِ تازه حساب می‌شود (۱۱۰ و بعد  / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم / دستیار: با دفترچه سنجیدید و خودتان دیدید ۹٫۷ تنگ است ولی شدنی. برنامه‌تان از ا\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"از اولِ آبان هر ماه ۶ میلیون می‌ذارم کنار\", \"when\": \"2026-10-23\"}}]}",
+"{\"reply\": \"این طرحِ دومِ شماست برای وقتی که دارو بیشتر گران شود: کم‌کردن از ۹٫۷ و آن ۵ میلیونِ کنارگذاشته. این گام به کدام داده تکیه دارد — گرانیِ دارو تا چه اندازه را با این دو می‌شود پوشاند؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داش / دستیار: خواسته روشن است: مبلغِ ثابتِ ماهانه‌ای که پس از ۱۰ ماه ۶۰ میلیون بشود  / کاربر: حقوق و ۶۰ میلیون قطعیه. ۱۰ درصد رو از داروخونه پرسیدم، تقریبیه. پس هر سه ماه داروم ۱۰ درصد / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. برای حسابِ خرجِ دارو یک مفهوم / کاربر: اول ۱۱۰ هزار میشه. دفعهٔ دوم ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار. / دستیار: همین است و خودتان دیدید: هر بار روی قیمتِ تازه حساب می‌شود (۱۱۰ و بعد  / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم / دستیار: با دفترچه سنجیدید و خودتان دیدید ۹٫۷ تنگ است ولی شدنی. برنامه‌تان از ا / کاربر: اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. / دستیار: این طرحِ دومِ شماست برای وقتی که دارو بیشتر گران شود: کم‌کردن از ۹٫۷ و\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\", \"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"سلام. قدمِ اول را طبقِ برنامه برداشتید: ۶ میلیونِ آبان کنار رفت. تا این‌جا چه پیشرفتی کرده‌اید و از این حساب‌وکتاب دربارهٔ خودتان چه دستتان آمده؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: حقوق و ۶۰ میلیون قطعیه. ۱۰ درصد رو از داروخونه پرسیدم، تقریبیه. پس هر سه ماه داروم ۱۰ درصد / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. برای حسابِ خرجِ دارو یک مفهوم / کاربر: اول ۱۱۰ هزار میشه. دفعهٔ دوم ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار. / دستیار: همین است و خودتان دیدید: هر بار روی قیمتِ تازه حساب می‌شود (۱۱۰ و بعد  / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم / دستیار: با دفترچه سنجیدید و خودتان دیدید ۹٫۷ تنگ است ولی شدنی. برنامه‌تان از ا / کاربر: اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. / دستیار: این طرحِ دومِ شماست برای وقتی که دارو بیشتر گران شود: کم‌کردن از ۹٫۷ و / کاربر: سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه. / دستیار: سلام. قدمِ اول را طبقِ برنامه برداشتید: ۶ میلیونِ آبان کنار رفت. تا ای\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"اولِ آبان ۶ میلیون رو گذاشتم کنار\", \"plan_done\": {\"id\": \"pl1\", \"done\": true}}]}",
+"{\"reply\": \"این را خودتان به دست آوردید: با حساب‌کردن ترس کمتر شد، و «درصدها روی هم جمع نمی‌شوند». تاریخِ تولد را همان‌طور که در شناسنامه است به صفحه می‌دهم؛ خودِ صفحه آن را با آنچه ثبت است می‌سنجد و نشانتان می‌دهد. برای ماهِ دوم، چه داده‌ای را باید از همین حالا یادداشت کنید تا آخرِ ماه معلوم شود طرح می‌خواند؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: اول ۱۱۰ هزار میشه. دفعهٔ دوم ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار. / دستیار: همین است و خودتان دیدید: هر بار روی قیمتِ تازه حساب می‌شود (۱۱۰ و بعد  / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم / دستیار: با دفترچه سنجیدید و خودتان دیدید ۹٫۷ تنگ است ولی شدنی. برنامه‌تان از ا / کاربر: اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. / دستیار: این طرحِ دومِ شماست برای وقتی که دارو بیشتر گران شود: کم‌کردن از ۹٫۷ و / کاربر: سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه. / دستیار: سلام. قدمِ اول را طبقِ برنامه برداشتید: ۶ میلیونِ آبان کنار رفت. تا ای / کاربر: پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها ر / دستیار: این را خودتان به دست آوردید: با حساب‌کردن ترس کمتر شد، و «درصدها روی ه\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"1337/12/25\"}, {\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"باشد؛ قرارِ خودتان اولِ آذر است، پس از کنارگذاشتنِ ماهِ دوم. پیگیری‌اش می‌تواند همان روز در «امروز» بیاید. آن روز کدام دو عدد را با خودتان می‌آورید تا طرح را بسنجیم؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم / دستیار: با دفترچه سنجیدید و خودتان دیدید ۹٫۷ تنگ است ولی شدنی. برنامه‌تان از ا / کاربر: اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. / دستیار: این طرحِ دومِ شماست برای وقتی که دارو بیشتر گران شود: کم‌کردن از ۹٫۷ و / کاربر: سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه. / دستیار: سلام. قدمِ اول را طبقِ برنامه برداشتید: ۶ میلیونِ آبان کنار رفت. تا ای / کاربر: پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها ر / دستیار: این را خودتان به دست آوردید: با حساب‌کردن ترس کمتر شد، و «درصدها روی ه / کاربر: اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم. / دستیار: باشد؛ قرارِ خودتان اولِ آذر است، پس از کنارگذاشتنِ ماهِ دوم. پیگیری‌اش\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم\", \"when\": \"2026-11-22\"}}]}",
+"{\"reply\": \"سلام. دو ماه، دو بار ۶ میلیون: ۱۲ میلیون کنار رفته و دارو هنوز ۲ میلیون است، همان‌طور که برای سه ماهِ اول حساب کرده بودید. خرجِ آبان (جز دارو) با آن ۹٫۷ میلیون چه فاصله‌ای داشت؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: جدولِ سه‌ماهه‌تان با همان «درصدِ درصد» درست چیده شده و سطرِ ضرب‌ها می‌ / کاربر: دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم / دستیار: با دفترچه سنجیدید و خودتان دیدید ۹٫۷ تنگ است ولی شدنی. برنامه‌تان از ا / کاربر: اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. / دستیار: این طرحِ دومِ شماست برای وقتی که دارو بیشتر گران شود: کم‌کردن از ۹٫۷ و / کاربر: سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه. / دستیار: سلام. قدمِ اول را طبقِ برنامه برداشتید: ۶ میلیونِ آبان کنار رفت. تا ای / کاربر: پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها ر / دستیار: این را خودتان به دست آوردید: با حساب‌کردن ترس کمتر شد، و «درصدها روی ه / کاربر: اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم. / دستیار: باشد؛ قرارِ خودتان اولِ آذر است، پس از کنارگذاشتنِ ماهِ دوم. پیگیری‌اش / کاربر: سلام، اولِ آذره. ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون. داروی این ماه هنوز ۲  / دستیار: سلام. دو ماه، دو بار ۶ میلیون: ۱۲ میلیون کنار رفته و دارو هنوز ۲ میلیو\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون\", \"plan_done\": {\"id\": \"pl2\", \"done\": true}}]}",
+"{\"reply\": \"این درسِ خودتان است و با عددِ واقعیِ دو ماه پشتش ایستاده: دفترچه و حسابِ ساده، نگرانیِ کمتر. هشت ماه مانده؛ اولین سه‌ماههٔ گرانیِ دارو که برسد، کدام عددِ طرح را اول نگاه می‌کنید؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم / دستیار: با دفترچه سنجیدید و خودتان دیدید ۹٫۷ تنگ است ولی شدنی. برنامه‌تان از ا / کاربر: اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. / دستیار: این طرحِ دومِ شماست برای وقتی که دارو بیشتر گران شود: کم‌کردن از ۹٫۷ و / کاربر: سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه. / دستیار: سلام. قدمِ اول را طبقِ برنامه برداشتید: ۶ میلیونِ آبان کنار رفت. تا ای / کاربر: پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها ر / دستیار: این را خودتان به دست آوردید: با حساب‌کردن ترس کمتر شد، و «درصدها روی ه / کاربر: اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم. / دستیار: باشد؛ قرارِ خودتان اولِ آذر است، پس از کنارگذاشتنِ ماهِ دوم. پیگیری‌اش / کاربر: سلام، اولِ آذره. ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون. داروی این ماه هنوز ۲  / دستیار: سلام. دو ماه، دو بار ۶ میلیون: ۱۲ میلیون کنار رفته و دارو هنوز ۲ میلیو / کاربر: پیشرفت که دیدید. آموختم که با یه دفترچه و حسابِ ساده، کمتر نگرانم. / دستیار: این درسِ خودتان است و با عددِ واقعیِ دو ماه پشتش ایستاده: دفترچه و حسا\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"این سه حساب می‌خواند: ۶۰ میلیون در ده ماه، داروی سه ماهِ اول ۶ میلیون، و ۲۰ درصدِ ۳۰۰ هزار ۶۰ هزار. «۶ هزار» را خودتان اشتباه دانستید و درستش همان ۶ میلیون است که نوشتید. ایدهٔ اصلیِ طرحتان روشن است: هر ماه ۶ میلیون و دارو جدا؛ گامِ بعد فقط کنار گذاشتنِ ماهِ سوم است.\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها ر / دستیار: این را خودتان به دست آوردید: با حساب‌کردن ترس کمتر شد، و «درصدها روی ه / کاربر: اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم. / دستیار: باشد؛ قرارِ خودتان اولِ آذر است، پس از کنارگذاشتنِ ماهِ دوم. پیگیری‌اش / کاربر: سلام، اولِ آذره. ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون. داروی این ماه هنوز ۲  / دستیار: سلام. دو ماه، دو بار ۶ میلیون: ۱۲ میلیون کنار رفته و دارو هنوز ۲ میلیو / کاربر: پیشرفت که دیدید. آموختم که با یه دفترچه و حسابِ ساده، کمتر نگرانم. / دستیار: این درسِ خودتان است و با عددِ واقعیِ دو ماه پشتش ایستاده: دفترچه و حسا / کاربر: یه سؤال هم دارم: نوه‌م که کلاس چهارمه گاهی با همین تبلت میاد این‌جا مسئله حل می‌کنه. کارنا / دستیار: صادقانه: روی همین تبلت قاطی می‌شود. همهٔ رکوردها و کارنامه فقط در همین / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: حساب‌هایتان می‌خواند: داروی ده ماه ۲۲.۵۲ میلیون، و پس از ۶۰ میلیون پس‌ / کاربر: حساب کردم: ۶ میلیون × ۱۰ = ۶۰ میلیون، داروی سه ماه ۲ میلیون × ۳ = ۶ میلیون، و ۲۰ درصدِ ۳۰۰ / دستیار: این سه حساب می‌خواند: ۶۰ میلیون در ده ماه، داروی سه ماهِ اول ۶ میلیون،\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"برنامه‌تان روشن است: سرِ برج ماهِ سوم را کنار می‌گذارید و تا آخرِ سال، پیش از عید، کلِ پول باید جمع باشد. پیش از گامِ بعد: فکر می‌کنید تا عید چقدر جمع شده باشد و چقدر به آن مطمئنید؟\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم. / دستیار: باشد؛ قرارِ خودتان اولِ آذر است، پس از کنارگذاشتنِ ماهِ دوم. پیگیری‌اش / کاربر: سلام، اولِ آذره. ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون. داروی این ماه هنوز ۲  / دستیار: سلام. دو ماه، دو بار ۶ میلیون: ۱۲ میلیون کنار رفته و دارو هنوز ۲ میلیو / کاربر: پیشرفت که دیدید. آموختم که با یه دفترچه و حسابِ ساده، کمتر نگرانم. / دستیار: این درسِ خودتان است و با عددِ واقعیِ دو ماه پشتش ایستاده: دفترچه و حسا / کاربر: یه سؤال هم دارم: نوه‌م که کلاس چهارمه گاهی با همین تبلت میاد این‌جا مسئله حل می‌کنه. کارنا / دستیار: صادقانه: روی همین تبلت قاطی می‌شود. همهٔ رکوردها و کارنامه فقط در همین / کاربر: داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جم / دستیار: حساب‌هایتان می‌خواند: داروی ده ماه ۲۲.۵۲ میلیون، و پس از ۶۰ میلیون پس‌ / کاربر: حساب کردم: ۶ میلیون × ۱۰ = ۶۰ میلیون، داروی سه ماه ۲ میلیون × ۳ = ۶ میلیون، و ۲۰ درصدِ ۳۰۰ / دستیار: این سه حساب می‌خواند: ۶۰ میلیون در ده ماه، داروی سه ماهِ اول ۶ میلیون، / کاربر: سرِ برج دوباره ۶ میلیون می‌ذارم کنار. عید هم می‌رم پیش دخترم، پس تا آخرِ سال باید کلِ پول  / دستیار: برنامه‌تان روشن است: سرِ برج ماهِ سوم را کنار می‌گذارید و تا آخرِ سال،\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"سرِ برج دوباره ۶ میلیون می‌ذارم کنار\", \"when\": \"2026-12-22\"}}]}",
+"{\"reply\": \"صادقانه: روی همین تبلت قاطی می‌شود. همهٔ رکوردها و کارنامه فقط در همین مرورگر نگه داشته می‌شود و یک نفر فرض می‌شود؛ سن و مقایسه هم از تاریخِ تولدِ شما حساب می‌شود، پس کارِ نوه‌تان در کارنامهٔ شما می‌نشیند و با او مثلِ بزرگسال حرف زده می‌شود. راهِ امروز فقط مرورگر یا پروفایلِ جدا برای اوست. این کمبودِ سامانه است؛ برای ثبت بررسی می‌کنم.\", \"title\": \"پس‌انداز برای سفر پیشِ دختر\", \"pinned\": \"رسیدن به ۶۰ میلیون در ۱۰ ماه با خرجِ دارویی که گران می‌شود\", \"memory\": \"کاربر: اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. / دستیار: این طرحِ دومِ شماست برای وقتی که دارو بیشتر گران شود: کم‌کردن از ۹٫۷ و / کاربر: سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه. / دستیار: سلام. قدمِ اول را طبقِ برنامه برداشتید: ۶ میلیونِ آبان کنار رفت. تا ای / کاربر: پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها ر / دستیار: این را خودتان به دست آوردید: با حساب‌کردن ترس کمتر شد، و «درصدها روی ه / کاربر: اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم. / دستیار: باشد؛ قرارِ خودتان اولِ آذر است، پس از کنارگذاشتنِ ماهِ دوم. پیگیری‌اش / کاربر: سلام، اولِ آذره. ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون. داروی این ماه هنوز ۲  / دستیار: سلام. دو ماه، دو بار ۶ میلیون: ۱۲ میلیون کنار رفته و دارو هنوز ۲ میلیو / کاربر: پیشرفت که دیدید. آموختم که با یه دفترچه و حسابِ ساده، کمتر نگرانم. / دستیار: این درسِ خودتان است و با عددِ واقعیِ دو ماه پشتش ایستاده: دفترچه و حسا / کاربر: یه سؤال هم دارم: نوه‌م که کلاس چهارمه گاهی با همین تبلت میاد این‌جا مسئله حل می‌کنه. کارنا / دستیار: صادقانه: روی همین تبلت قاطی می‌شود. همهٔ رکوردها و کارنامه فقط در همین\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}], \"gap\": {\"title\": \"چند کاربر روی یک دستگاه: کارنامه، سن و رکوردهای جدا برای هر نفر (پدربزرگ/مادربزرگ و نوه)\", \"area\": \"sys-territory\", \"kind\": \"build\", \"abstract\": \"خانواده‌هایی که یک دستگاهِ مشترک دارند؛ دادهٔ کودک نباید با دادهٔ بزرگ‌تر قاطی شود و زبان و مقایسه باید از سنِ خودِ هر نفر بیاید\", \"missing\": \"پروفایلِ جدا درونِ صفحه با ذخیره، تاریخِ تولد و کارنامهٔ خودِ هر نفر\", \"where\": \"ذخیرهٔ داده‌های صفحه، کارتِ تاریخِ تولد، کارنامهٔ ذهن\", \"how\": \"انتخابِ «چه کسی این‌جاست» در سرِ صفحه و فضای ذخیرهٔ جدا برای هر پروفایل\", \"relations\": \"بستهٔ سن؛ ایمنیِ کم‌سال\", \"docs\": \"docs/decisions/2026-10-18-age-and-user-scope.md\", \"why_area\": \"مرزِ دادهٔ کاربران در خودِ سامانه\", \"why_not\": \"خطا نیست؛ طراحیِ امروز تک‌کاربره است\", \"evidence\": \"نقشهٔ سامانه: داده‌ها «فقط در همین مرورگر»\", \"confidence\": 0.85}}",
+"{\"agree\":true,\"area\":\"sys-territory\",\"kind\":\"build\",\"dup_of\":null,\"reason\":\"در نقشهٔ سامانه و برگه‌های باز چیزی همین را پوشش نمی‌دهد؛ برگهٔ بازِ دیگر موضوعِ جدایی دارد. قلمرو و نوع درست است.\",\"fix\":{}}\n",
+"{\"reply\": \"یادداشت کردم که سرِ برج قسطِ بیمهٔ تکمیلی، ۲ میلیون و ۸۰۰، را هم می‌پردازید؛ روزش را صفحه زیرِ همین پیام از شما می‌پرسد. این قسط را از همان ۹٫۷ میلیونِ خرجِ ماهانه می‌دهید یا از جای دیگر؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\", \"plan\": {\"text\": \"سرِ برج قسطِ بیمهٔ تکمیلی رو هم پرداخت می‌کنم، ۲ میلیون و ۸۰۰\", \"when\": \"2026-12-22\"}}]}",
+"{\"reply\": \"این را هم یادداشت کردم: آخرِ سال کلِ حسابِ پس‌انداز را با دخترتان چک می‌کنید؛ روزش را صفحه از شما می‌پرسد. برای آن چک، چه چیزی را می‌خواهید کنارِ هم ببینید — فقط جمعِ پس‌انداز، یا خرجِ دارو هم؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\", \"plan\": {\"text\": \"آخرِ سال هم کلِ حسابِ پس‌اندازم رو با دخترم چک می‌کنم\", \"when\": \"2027-03-20\"}}]}",
+"{\"reply\": \"باشد. پاسخِ «بله» ِ شما را صفحه خودش برای تاریخ می‌خواند و نتیجه را زیرِ همین پیام می‌گوید.\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"پس عید پیشِ دخترتان هستید؛ این همان هدفِ ۶۰ میلیون است. تا آن وقت چند ماهِ دیگر پس‌انداز دارید، به حسابِ خودتان؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\", \"plan\": {\"text\": \"عید هم که می‌رم پیش دخترم\", \"when\": \"2027-03-21\"}}]}",
+"{\"reply\": \"تمدیدِ داروها بعد از عید را هم یادداشت کردم؛ روزِ دقیقش را صفحه می‌پرسد. با گرانیِ هر سه ماه، برای تمدیدِ سالِ بعد پولی جدا کنار می‌گذارید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\", \"plan\": {\"text\": \"بعد از عید داروهام رو برای سالِ بعد تمدید می‌کنم\", \"when\": \"\"}}]}",
+"{\"reply\": \"آزمایشِ خونِ وسطِ ماه را هم یادداشت کردم؛ صفحه روزش را از شما می‌پرسد. آزمایش ناشتاست یا هزینه‌ای دارد که باید در حسابِ این ماه بیاید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\", \"plan\": {\"text\": \"وسطِ ماه هم باید برم آزمایشِ خون\", \"when\": \"\"}}]}",
+"{\"reply\": \"تمرینِ هفتگی با نوه‌تان تا امتحانِ آخرِ سالِ تحصیلی را یادداشت کردم؛ روزِ امتحان را صفحه از شما می‌پرسد. کدام روزِ هفته برای این تمرین بهتر است؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"باشد؛ روزِ امتحان را هر وقت دانستید بنویسید تا صفحه آن را ثبت کند.\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"پس شنبه به بانک می‌روید تا حسابِ پس‌انداز جدا شود؛ صفحه روزش را از شما می‌پرسد. حسابِ جدا را با همان ۶ میلیونِ ماهانه پر می‌کنید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\", \"plan\": {\"text\": \"شنبه می‌رم بانک که حسابِ پس‌انداز رو جدا کنم\", \"when\": \"2026-11-28\"}}]}",
+"{\"reply\": \"باشد؛ پاسختان را صفحه برای تاریخِ بانک می‌خواند.\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"x\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"برنامهٔ بانک از «شنبه» به «یکشنبه» عوض شد و ثبتِ ۷ آذر کنار رفت؛ روزِ تازه را صفحه از شما می‌پرسد.\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"متنِ برنامهٔ بانک به «۲۰ آبان رفتم بانک…» عوض شد.\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"دو حسابِ قسط می‌خواند: ۲ میلیون و ۸۰۰ × ۱۲ = ۳۳ میلیون و ۶۰۰ در سال، و نصفش ۱ میلیون و ۴۰۰. سومی را صفحه نمی‌خواند: «۶ میلیون و ۵۰۰ × ۱۰ = ۶۰ میلیون». خودتان یک بار دوباره حساب می‌کنید — ده تا ۵۰۰ هزارِ اضافه کجا رفت؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"هر سه می‌خواند: ۱ میلیون و ۲۰۰ + ۸۰۰ هزار = ۲ میلیون، ۵ میلیون و ۵۰۰ × ۲ = ۱۱ میلیون، و ۶ تخم‌مرغ. با این حساب‌ها، برنامهٔ ده‌ماهه‌تان هنوز به ۶۰ میلیون می‌رسد؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"حسابِ این ماه درست است: ۴ میلیون و ۲۰۰ + ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰. از این ۵ میلیون و ۷۰۰، چقدرش امسال به سهمِ پس‌انداز می‌رود؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"دومی درست است: ۵ میلیون و ۸۰۰ هزار منهای ۸۰۰ هزار، ۵ میلیون می‌شود. ولی جمعِ ۳ میلیون و ۶۰۰ و ۲ میلیون و ۷۰۰ با حساب نمی‌خواند؛ هزارها را جدا جمع بزنید: ۶۰۰ و ۷۰۰ هزار روی هم چند می‌شود؟\", \"title\": \"پس‌اندازِ ۶۰ میلیون\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"هر دو می‌خواند: کارمزدِ ۸۰۰ تومانی از ۱ میلیون و ۸۰۰ تومان، ۱ میلیون تومان می‌گذارد، و دو نانِ ۸۰ هزار و ۵۰۰ تومانی ۱۶۱ هزار تومان است. این خرج‌های کوچک را هم در جدولِ ماهانه‌تان آورده‌اید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"سودِ ۴ ماه درست است: ۲ و ۵ دهم × ۴ = ۱۰ درصد. سه ماهِ اول ولی با حساب نمی‌خواند — ۱ و ۵ دهم را سه بار با هم جمع بزنید؛ چند می‌شود؟\", \"title\": \"پس‌اندازِ ۶۰ میلیون\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"تقسیم بر ۳ درست است (حدودِ ۳ میلیون و ۳۳۳ هزار). تقسیم بر ۷ ولی با حساب نمی‌خواند؛ ۷ × ۱ میلیون و ۵۰۰ هزار را حساب کنید — از ۱۰ میلیون بیشتر می‌شود یا کمتر؟\", \"title\": \"پس‌اندازِ ۶۰ میلیون\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"هر دو درست است: جمعِ شش قسط ۸ میلیون و ۲ × ۳ = ۶ نان. با ۸ میلیونِ قسط‌ها، از ۶۰ میلیون چقدر مانده است؟\", \"title\": \"پس‌اندازِ ۶۰ میلیون\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"برنامه‌تان را گرفتم: دوشنبه داروخانه برای تمدیدِ دفترچه. صفحه روزش را از خودتان می‌پرسد. با تمدیدِ دفترچه، خرجِ داروی ماهِ بعد عوض می‌شود؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\", \"plan\": {\"text\": \"دوشنبه می‌رم داروخونه دفترچه‌م رو تمدید کنم\", \"when\": \"دوشنبه\"}}]}",
+"{\"reply\": \"باشد؛ صفحه همین پاسخ را برای روزِ داروخانه می‌خواند. تا دوشنبه، چیزی هست که برای تمدید لازم باشد و هنوز آماده نکرده‌اید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"اصلاحتان ثبت شد: برنامهٔ داروخانه حالا «۲ آذر» نوشته شده؛ روزش را صفحه از خودتان می‌پرسد.\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"دو تماس را گرفتم: فردا با دکتر برای نوبت، و شنبه با بانک برای وام؛ روزهایشان را صفحه از خودتان می‌پرسد. وامِ بانک با برنامهٔ پس‌اندازِ ۶۰ میلیونی‌تان چه نسبتی دارد؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\", \"plan\": {\"text\": \"فردا به دکترم زنگ می‌زنم برای نوبت\", \"when\": \"2026-11-27\"}}, {\"do\": \"coach_state\", \"plan\": {\"text\": \"شنبه هم به بانک زنگ می‌زنم برای وام\", \"when\": \"2026-11-28\"}}]}",
+"{\"reply\": \"خوب است. به کدام زنگ زدید — دکتر یا بانک — و چه شد؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"فرمِ بیمه را امروز صبح پر کردید و پسفردا برای تمدید می‌روید. هزینهٔ تمدید را در حسابِ این ماه آورده‌اید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\", \"plan\": {\"text\": \"پسفردا می‌رم بیمه رو تمدید کنم\", \"when\": \"2026-11-28\"}}, {\"do\": \"deadline_done\", \"what\": \"پسفردا می‌رم بیمه رو تمدید کنم\"}]}",
+"{\"reply\": \"قبضِ گازِ ماهِ دیگر را هم گرفتم؛ روزش را صفحه از خودتان می‌پرسد. مبلغِ قبض را حدوداً می‌دانید تا در حسابِ ماهِ بعد بیاید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\", \"plan\": {\"text\": \"ماهِ دیگه هم باید قبضِ گاز رو بدم\", \"when\": \"\"}}]}",
+"{\"reply\": \"چکاپِ وسطِ ماهِ دیگر، حدودِ ۱۵ دی، را گرفتم؛ صفحه روزش را با شما وارسی می‌کند. خرجِ چکاپ را هم در حسابِ دی آورده‌اید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\", \"plan\": {\"text\": \"وسطِ ماهِ دیگه باید برم چکاپ، یعنی حدودِ ۱۵ دی\", \"when\": \"2027-01-05\"}}]}",
+"{\"reply\": \"پس وسطِ ماه کارگر برای رنگ‌کاری می‌آید. هزینهٔ رنگ‌کاری را هم در برنامهٔ پس‌انداز دیده‌اید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"به سالِ بعد نرفت. وقتی آن را به «۲ آذر» اصلاح کردید، صفحه گفت این روز گذشته و روزِ تازه را پرسید؛ بعد که گفتید «پسفردا می‌رم بیمه رو تمدید کنم»، صفحه همان «پسفردا» یعنی ۷ آذر را برای داروخانه ثبت کرد — که به نظر می‌رسد مالِ بیمه بود. داروخانه را واقعاً کدام روز می‌روید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"جمعِ کامیون و کارگر درست است: ۵ میلیون و ۷۰۰ هزار. و ۸ میلیون منهای ۵ میلیون و ۷۰۰ هزار هم ۲ میلیون و ۳۰۰ هزار می‌شود — درست. این ۲ میلیون و ۳۰۰ را برای چه کنار می‌گذارید؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"اصلاح را فرستادم: کامیون ۴ میلیون و ۵۰۰، نه ۴ میلیون و ۲۰۰؛ صفحه نوبتِ بعد می‌گوید چه عوض شد. با این عدد، جمعِ کامیون و کارگر چند می‌شود؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"retract\": {\"msg\": \"کامیون ۴ میلیون و ۲۰۰\", \"key\": \"datum:کرایهٔ کامیون\", \"what\": \"fact\", \"fix\": \"۴ میلیون و ۵۰۰\", \"rests\": []}}]}",
+"{\"reply\": \"صفحه عددِ کامیون را در ثبتِ گفت‌وگو از ۲۰۰ به ۵۰۰ عوض کرد. جمعِ فرش هم درست است: ۱۲ + ۱۰ = ۲۲ متر. فرش را متری چند می‌خرید؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"اصلاح را فرستادم: اتاقِ دوم ۱۴ متر، نه ۱۰؛ صفحه نوبتِ بعد می‌گوید چه عوض شد. با ۱۴ متر، کلِ فرش چند متر می‌شود؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"retract\": {\"msg\": \"اتاقِ دوم ۱۰ متر\", \"key\": \"datum:مساحتِ اتاقِ دوم\", \"what\": \"fact\", \"fix\": \"۱۴ متره\", \"rests\": []}}]}",
+"{\"reply\": \"صفحه فرش را با ۱۴ متر کهنه نشان داد: ۲۲ ⇒ ۲۶. جمعِ نُه قسطِ پارسال هم درست است: ۱۳ میلیون و ۵۰۰ هزار. امسال قسط‌ها چقدر بود؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"این جمع با حساب نمی‌خواند. ۹ تا ۲ میلیون و ۵۰۰ هزار: اول ۹ تا ۲ میلیون، بعد ۹ تا ۵۰۰ هزار — هر کدام چند می‌شود؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"برای یخچال درست است: ۱۸ میلیون منهای ۱۵ میلیون و ۵۰۰ هزار، ۲ میلیون و ۵۰۰ هزار کم دارید. دومی را دوباره ببینید: ۲ میلیون منهای ۱ میلیون و ۳۵۰ هزار — هزارها چند می‌شود؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"هر دو حسابِ نوه‌تان درست است: ۳ میلیون + ۲ میلیون = ۵ میلیون، و ۱ میلیون و ۵۰۰ هزار × ۲ = ۳ میلیون. این‌ها کارِ اوست و جدا نوشته می‌شود. برای پس‌اندازِ خودتان، قدمِ بعد چیست؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"other\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"این‌ها حساب‌های برادرتان است و جدا نوشته می‌شود: پنج تا درست است، ولی «۷ × ۸ = ۵۴» با حساب نمی‌خواند. اگر خواستید به او بگویید ۷ × ۸ را دوباره ببیند. برای خودتان، کدام‌یک از این‌ها به حسابِ پس‌انداز ربط دارد؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"other\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"پس دو داده دارید: گرانیِ ۱۲٪ ِ یخچال به گفتهٔ فروشنده، و ۳۷٪ ِ حقوق برای قسط. با این دو، یخچال را این ماه بخرید یا ماهِ بعد؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"دو تماس: فردا با خواهرتان و پس‌فردا با پسرتان. در تماس با پسرتان می‌خواهید دربارهٔ هزینهٔ اسباب‌کشی هم حرف بزنید؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"فردا به خواهرم زنگ می‌زنم\", \"when\": \"2026-11-29\"}}]}",
+"{\"reply\": \"باشد. بعد از تماس‌ها، اگر عددی از هزینه‌ها عوض شد، همین‌جا بنویسید تا حساب را به‌روز کنیم.\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"خوب است. چه شد — قسط یا هزینه‌ای عوض شد؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"پس امروز را سبک بگیرید. حساب‌ها سرِ جایشان می‌مانند؛ هر وقت سرحال بودید از همان‌جا ادامه می‌دهیم.\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"پس قبضِ آب را ۲۰ آبان داده‌اید. قبض‌های دیگرِ این ماه هم مانده؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"سه‌شنبه آزمایشگاه و چهارشنبه بازار. برای بازار فهرستِ خرید و سقفِ خرج دارید؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"سه‌شنبه می‌رم آزمایشگاه\"}}]}",
+"{\"reply\": \"صفحه برنامهٔ آزمایشگاه را از سه‌شنبه به پنجشنبه عوض کرد؛ بازار همان چهارشنبه است.\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"دندان‌پزشکی را یادداشت کنید؛ صفحه روزش را از خودتان می‌پرسد. برای هزینه‌اش هم چیزی کنار گذاشته‌اید؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"فردا بانک — برای قسط یا کارِ دیگری؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"سلام. دو کار برای سرِ برج: قبضِ برق و تماس با مستأجر. مبلغِ اجاره را در حسابِ پس‌انداز هم می‌آورید؟\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"باشد، هر دو کار. بعد از گرفتنِ اجاره، مبلغش را بنویسید تا در حسابِ ماه بیاید.\", \"title\": \"اسباب‌کشیِ پسرم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}"
+],
+"keys": [
+"سلام. بازنشستهٔ آموزش‌وپرورشم، حقوقم ماهی ۱۸ میلیون تومنه. می‌خوام تا ۱۰ ماه دیگه ۶۰ میلیون پس‌انداز کنم که برم پیش دخترم. ولی خرج داروهام الان ماهی ۲ میلیونه و هر سه ماه حدود ۱۰ درصد گرون‌تر میشه. ماهی چقدر کنار بذارم که برسم؟",
+"می‌خوام بدونم اگه هر ماه یه مبلغ ثابت کنار بذارم، چقدر باشه که بعد از ۱۰ ماه ۶۰ میلیون داشته باشم و خرجِ داروهام هم کم نیاد. راستی متولد ۲۵ اسفند ۱۳۳۷ام؛ اون کارت تاریخم رو قبول نکرد، نمی‌دونم چی رو اشتباه زدم.",
+"حقوق و ۶۰ میلیون قطعیه. ۱۰ درصد رو از داروخونه پرسیدم، تقریبیه. پس هر سه ماه داروم ۱۰ درصد بیشتر میشه، یعنی تو ۹ ماه ۳۰ درصد بیشتر. ثبتش کنید.",
+"اول ۱۱۰ هزار میشه. دفعهٔ دوم ده درصدِ ۱۱۰ هزار رو اضافه می‌کنم که ۱۱ هزاره، میشه ۱۲۱ هزار. آهان، پس هر بار روی قیمت جدید حساب میشه، جمع ساده نیست.",
+"داروی ماهانه: سه ماهِ اول ۲ میلیون، سه ماهِ دوم ۲.۲، سه ماهِ سوم ۲.۴۲، و ماهِ دهم ۲.۶۶. جمعِ ده ماه: ۳×۲ + ۳×۲.۲ + ۳×۲.۴۲ + ۲.۶۶ = ۶ + ۶.۶ + ۷.۲۶ + ۲.۶۶ = ۲۲.۵۲ میلیون. حقوقِ ده ماه ۱۸۰ میلیون. برای ۶۰ میلیون پس‌انداز باید ماهی ۶ میلیون کنا",
+"دفترچه‌م رو نگاه کردم: مهر ۸.۵ میلیون خرج کردم، شهریور ۱۰.۲ — چون شهریور تعمیرِ کولر داشتم. پس ۹.۷ تنگه ولی میشه. از اولِ آبان هر ماه ۶ میلیون می‌ذارم کنار. ماهِ بعد میام بهتون می‌گم چی شد.",
+"اگه دارو بیشتر گرون شد، از اون ۹.۷ کم می‌کنم؛ یه ۵ میلیون هم تو حساب دارم برای روزِ مبادا. پس جا داره.",
+"سلام دوباره. اولِ آبان ۶ میلیون رو گذاشتم کنار، طبقِ برنامه.",
+"پیشرفت این‌که دیدم با حساب کردن، ترسم کمتر شد؛ قبلاً فکر می‌کردم نمیشه. یاد گرفتم درصدها روی هم جمع نمیشن. یه چیزی: تاریخِ تولدم رو درست ثبت کردی؟ تو شناسنامه نوشته 1337/12/25.",
+"اولِ آذر میام، بعد از این‌که ماهِ دوم رو کنار گذاشتم.",
+"سلام، اولِ آذره. ماهِ دوم هم ۶ میلیون کنار گذاشتم. روی هم ۱۲ میلیون. داروی این ماه هنوز ۲ میلیون بود.",
+"پیشرفت که دیدید. آموختم که با یه دفترچه و حسابِ ساده، کمتر نگرانم.",
+"حساب کردم: ۶ میلیون × ۱۰ = ۶۰ میلیون، داروی سه ماه ۲ میلیون × ۳ = ۶ میلیون، و ۲۰ درصدِ ۳۰۰ هزار = ۶۰ هزار. یه جا هم اشتباهی نوشتم ۲ میلیون × ۳ = ۶ هزار.",
+"سرِ برج دوباره ۶ میلیون می‌ذارم کنار. عید هم می‌رم پیش دخترم، پس تا آخرِ سال باید کلِ پول جمع باشه.",
+"یه سؤال هم دارم: نوه‌م که کلاس چهارمه گاهی با همین تبلت میاد این‌جا مسئله حل می‌کنه. کارنامهٔ ذهنِ اون با مالِ من قاطی نمیشه؟ جدا نگهش می‌دارید؟",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"سلام. برای ادامهٔ برنامهٔ پس‌اندازم چند تا کار دارم که می‌خوام یادم بمونه. اول این‌که سرِ برج قسطِ بیمهٔ تکمیلی رو هم پرداخت می‌کنم، ۲ میلیون و ۸۰۰.",
+"آخرِ سال هم کلِ حسابِ پس‌اندازم رو با دخترم چک می‌کنم.",
+"بله",
+"عید هم که می‌رم پیش دخترم.",
+"بعد از عید داروهام رو برای سالِ بعد تمدید می‌کنم.",
+"وسطِ ماه هم باید برم آزمایشِ خون.",
+"نوه‌م آخرِ سالِ تحصیلی امتحانِ ریاضی داره؛ قبلش هفته‌ای یه بار باهاش تمرین می‌کنم.",
+"باشه",
+"پنجشنبه نه، شنبه می‌رم بانک که حسابِ پس‌انداز رو جدا کنم.",
+"آره",
+"[اصلاحِ پیامِ قبلی] «شنبه» ⇐ «یکشنبه» — متنِ درستِ پیامم: «پنجشنبه نه، یکشنبه می‌رم بانک که حسابِ پس‌انداز رو جدا کنم.»",
+"[اصلاحِ پیامِ قبلی] «یکشنبه می‌رم» ⇐ «۲۰ آبان رفتم» — متنِ درستِ پیامم: «پنجشنبه نه، ۲۰ آبان رفتم بانک که حسابِ پس‌انداز رو جدا کنم.»",
+"قسطِ بیمه رو حساب کردم: ۲ میلیون و ۸۰۰ × ۱۲ = ۳۳ میلیون و ۶۰۰ در سال. نصفش هم میشه: ۲ میلیون و ۸۰۰ ÷ ۲ = ۱ میلیون و ۴۰۰. اگه به‌جای ۶ میلیون ماهی ۶ میلیون و ۵۰۰ کنار بذارم: ۶ میلیون و ۵۰۰ × ۱۰ = ۶۰ میلیون.",
+"یه حسابِ دیگه: ۱ میلیون و ۲۰۰ + ۸۰۰ هزار = ۲ میلیون. و ۵ میلیون و ۵۰۰ × ۲ = ۱۱ میلیون. اینم امروز: ۲ × ۳ = ۶ تا تخم‌مرغ خریدیم برای نوه‌م.",
+"سلام. حسابِ این ماه رو نوشتم: حقوقم ۴ میلیون و ۲۰۰ ـه و ۱ میلیون و ۵۰۰ هم نوه‌م کمک کرد: ۴ میلیون و ۲۰۰ + ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰.",
+"یه جای دیگه هم نوشتم ۳ میلیون و ۶۰۰ + ۲ میلیون و ۷۰۰ = ۵ میلیون و ۳۰۰. از ۵ میلیون و ۸۰۰ هم ۸۰۰ رو دادم به نوه‌م: ۵ میلیون و ۸۰۰ − ۸۰۰ = ۵ میلیون.",
+"بانک ۸۰۰ تومن کارمزد کم کرد: ۱ میلیون و ۸۰۰ تومن − ۸۰۰ تومن = ۱ میلیون تومن. نون هم دو تا گرفتم: ۸۰ هزار و ۵۰۰ × ۲ = ۱۶۱ هزار.",
+"سودِ سپرده ماهی ۲ و ۵ دهم درصده؛ ۴ ماه میشه ۲ و ۵ دهم × ۴ = ۱۰ درصد. سه ماهِ اول هم ۱ و ۵ دهم × ۳ = ۴ و ۸ دهم بود.",
+"تقسیمِ پول بینِ بچه‌ها: ۱۰ میلیون ÷ ۳ ≈ ۳ میلیون و ۳۳۳ هزار، و اگه هفت قسمت کنم ۱۰ میلیون ÷ ۷ ≈ ۱ میلیون و ۵۰۰ هزار.",
+"جمعِ شش قسطِ اول: ۱ میلیون و ۲۰۰ + ۱ میلیون و ۳۰۰ + ۱ میلیون و ۱۰۰ + ۱ میلیون و ۴۰۰ + ۱ میلیون و ۵۰۰ + ۱ میلیون و ۵۰۰ = ۸ میلیون. امروز هم ۲ × ۳ = ۶ تا نون خریدم.",
+"یه برنامه: دوشنبه می‌رم داروخونه دفترچه‌م رو تمدید کنم.",
+"دوشنبه درسته.",
+"[اصلاحِ پیامِ قبلی] «دوشنبه» ⇐ «۲ آذر» — متنِ درستِ پیامم: «یه برنامه: ۲ آذر می‌رم داروخونه دفترچه‌م رو تمدید کنم.»",
+"فردا به دکترم زنگ می‌زنم برای نوبت. شنبه هم به بانک زنگ می‌زنم برای وام.",
+"زنگ زدم.",
+"پسفردا می‌رم بیمه رو تمدید کنم؛ امروز صبح فرمش رو پر کردم.",
+"ماهِ دیگه هم باید قبضِ گاز رو بدم.",
+"وسطِ ماهِ دیگه باید برم چکاپ، یعنی حدودِ ۱۵ دی.",
+"وسطِ ماه هم کارگر میاد خونه رو رنگ کنه.",
+"اون برنامهٔ داروخونه رو که اصلاح کردم چرا رفت سالِ بعد؟ کجا ثبت شد؟",
+"سلام. اسباب‌کشیِ پسرم: کامیون ۴ میلیون و ۲۰۰ + کارگر ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰. از ۸ میلیونی که کنار گذاشتم، ۲ میلیون و ۳۰۰ می‌مونه.",
+"ببخشید، کامیون ۴ میلیون و ۲۰۰ نیست، ۴ میلیون و ۵۰۰.",
+"فرشِ خونه‌ش: اتاقِ اول ۱۲ متره، اتاقِ دوم ۱۰ متر: ۱۲ + ۱۰ = ۲۲ متر فرش.",
+"اتاقِ دوم ۱۰ نیست، ۱۴ متره.",
+"جمعِ ۹ قسطِ پارسال: ۱ میلیون و ۱۰۰ + ۱ میلیون و ۲۰۰ + ۱ میلیون و ۳۰۰ + ۱ میلیون و ۴۰۰ + ۱ میلیون و ۵۰۰ + ۱ میلیون و ۶۰۰ + ۱ میلیون و ۷۰۰ + ۱ میلیون و ۸۰۰ + ۱ میلیون و ۹۰۰ = ۱۳ میلیون و ۵۰۰.",
+"قسط‌های امسال هر ۹ تاش ۲ میلیون و ۵۰۰ بود: ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ + ۲ میلیون و ۵۰۰ = ۲۲ میلیون.",
+"برای یخچال ۱۸ میلیون لازمه، ۱۵ میلیون و ۵۰۰ دارم، ۲ میلیون و ۵۰۰ کم دارم. از ۲ میلیون هم ۱ میلیون و ۳۵۰ دادم بازار، ۷۵۰ هزار برام موند.",
+"اینا رو هم نوه‌م نوشته: ۳ میلیون + ۲ میلیون = ۵ میلیون و ۱ میلیون و ۵۰۰ × ۲ = ۳ میلیون.",
+"اینا رو برادرم نوشته بود، اینا رو هم ببین:\n۲ × ۳٫۱۴ × ۵ = ۳۱٫۴\nπ × ۲² ≈ ۱۲٫۵۶\n۱۰۰ ÷ ۳ ≈ ۳۳\n۵۰۰ تومن × ۴ = ۲۰۰۰ تومن\n۷ × ۸ = ۵۴\n۱۲ + ۱۹ = ۳۱",
+"فروشنده گفت یخچال ماهِ بعد ۱۲٪ گرون میشه. یعنی ۳۷٪ از حقوقم میره برای قسط.",
+"فردا به خواهرم زنگ می‌زنم. پس‌فردا هم به پسرم زنگ می‌زنم.",
+"آره، فردا و پس‌فردا.",
+"زنگ زدم.",
+"امروز خسته‌ام، حال ندارم.",
+"۲۰ آبان رفتم بانک و قبضِ آب رو دادم.",
+"سه‌شنبه می‌رم آزمایشگاه، چهارشنبه هم می‌رم بازار.",
+"[اصلاحِ پیامِ قبلی] «سه‌شنبه» ⇐ «پنجشنبه» — متنِ درستِ پیامم: «پنجشنبه می‌رم آزمایشگاه، چهارشنبه هم می‌رم بازار.»",
+"یکشنبه‌ی هفته‌ی بعد، ۱۸ آذر، می‌رم دندون‌پزشکی.",
+"فردا بانک.",
+"سلام. سرِ برج قبضِ برق رو میدم و به مستأجرم زنگ می‌زنم اجاره رو بگیرم.",
+"آره، هر دو."
+]
+}

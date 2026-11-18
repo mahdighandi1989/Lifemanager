@@ -101,7 +101,10 @@
       .map(function (x) { return txt(x).replace(/[.،,]+$/, ""); }).filter(function (x) { return toks(x).length >= 1 && x.length >= 2; }).slice(0, 8);
   };
   ST.planPieces = planPieces; ST.dataOf = dataOf; ST.condOf = condOf;
-  function sentences(t) { return String(t || "").split(/(?<=[.؟?…]|(?<![A-Za-z)])!)\s+|\n+/).map(txt).filter(Boolean); }   // دورِ ۲۵ (classify P6، A25-12-b): «n! حداکثر …» یک جمله است
+  /* دورِ ۳۰ (story F15، A30-8 s03 p17–p19): «…» ِ درونِ یک رشتهٔ حساب («۱ + ۲ + … + ۲۰ = ۲۱۰») پایانِ جمله نیست — پیش‌تر جمله از آن‌جا می‌شکست، 📜 تکه‌های
+     «+ ۲۰ = ۲۱۰ و ۱ + ۲ + …» را «نسنجیده» می‌زد و ✗ ِ «۱ + … + ۱۰ = ۵۰» (که موتور و مربی دیدند) در نمای او نبود. «…» فقط وقتی میانِ دو عملگر/عدد ِ یک رشته است
+     نمی‌شکند؛ «… ۲۲ … هیچی جور نمیشه» (پیش و پسش واژه) همان پایانِ جمله می‌ماند (هم‌شکلِ منفی، s08 p1). */
+  function sentences(t) { return String(t || "").split(/(?<=[.؟?]|(?<![+\-−×÷*\/=,،]\s*)…(?!\s*[+\-−×÷*\/=])|(?<![A-Za-z)])!)\s+|\n+/).map(txt).filter(Boolean); }   // دورِ ۲۵ (classify P6، A25-12-b): «n! حداکثر …» یک جمله است
   /* مجهول به حرفِ خودش: جمله‌ای از پیامش که بیشترین هم‌واژگی را با صورتِ همین مسئله دارد — نه جملهٔ کناری («ولی خب، ۵ منهای ۳ چرا نمیشه؟»)؛ بی صورت ⇒ همان unkPhrase ِ a27 */
   /* دورِ ۲۴ (R2، C24-11، D24-12): مجهول هرگز پرسشِ متا دربارهٔ سامانه/دستیار («… از کجا آوردی؟ یه قاعده‌ست تو سامانه؟»)، تلاش/طرح («فکر کردم دورش سه تا مثلث…»)،
      کمبودِ دانسته («مساحتِ مثلث رو نمی‌دونم») یا ترتیبِ کار («اول می‌خوام بفهمم…») نیست. نشانهٔ صریحِ مجهول («دنبالِ اینم که…»، «می‌خوام بدونم…»، «یعنی: …») مقدم است؛
@@ -114,7 +117,19 @@
      برچسبِ خودِ او («مجهول:»، «داده‌ها:»، «شرط:») خوانده نمی‌شد — «مجهول:» با دونقطه نشانهٔ مجهول نبود و جمله‌ای که بیشترین واژهٔ مشترک با صورت داشت (همان «داده‌ها») برنده می‌شد.
      جملهٔ برچسب‌خوردهٔ «داده/شرط/فرض» هرگز مجهول نیست؛ «مجهول: X» خودِ X است. */
   var LABELD26 = /^\s*(?:داده(?:‌ها)?|شرط(?:‌ها)?|فرض(?:‌ها)?|معلوم(?:‌ها)?)\s*[:：]/;
-  function unkOf(t, stmt, whole) {
+  /* دورِ ۳۰ (story، D25-8 — هشت اجرای oD1*): مقصدِ 🧭 خودِ جملهٔ او بود، با برچسبِ آغازینش و فعلِ خواستن: «یه جمله: می‌خوام بدونم «مادرم قرصِ امروزش رو برداشته
+     یا نه»، فقط از روی وزنِ قرص‌دون، بی دوربین». ریشه: unkOf جملهٔ نشانه‌دار (UNKMARK24) را همان‌طور برمی‌گرداند — برچسبی که جوابِ پرسشِ خودِ صفحه است
+     («کلِ مسئله را در یک جمله…» ⇐ «یه جمله: …») و «می‌خوام بدونم» که نشانهٔ مجهول است نه خودِ مجهول، در مقصد می‌ماندند. حالا هستهٔ مجهول:
+       • برچسبِ کوتاهِ آغازِ جمله («یه جمله:»، «خلاصه:»، «مجهول:» — تا سه واژه، بی عدد) برداشته می‌شود؛
+       • «می‌خوام بدونم/بفهمم/ببینم «X»» ⇒ خودِ X (نقلِ داخلِ گیومه همان چیزی است که می‌خواهد بداند)؛ قیدهای پس از آن («فقط از روی وزن، بی دوربین») شرط‌اند و جدا ثبت می‌شوند.
+     هم‌شکلِ منفی (C136): جمله‌ای بی برچسب و بی گیومه («می‌خوام بدونم چند تا بخرم») همان می‌ماند؛ «داده‌ها: …»/«شرط: …» هرگز مجهول نبود و نیست (LABELD26). */
+  var ULBL30 = /^\s*((?:[^\s:：«»0-9۰-۹]+\s*){1,3})[:：]\s+/, UQ30 = /می[‌\s]?خوا(?:م|هم|یم)\s*(?:بدونم|بدانم|ببینم|بفهمم|بدونیم|بفهمیم)\s*(?:که\s*)?«([^»]{4,})»/;
+  function unkCore30(x) { var t = txt(x), m = ULBL30.exec(t); if (m && toks(t.slice(m[0].length)).length >= 1) t = t.slice(m[0].length);
+    var q = UQ30.exec(t); if (q && toks(q[1]).length >= 2) t = txt(q[1]); return t; }
+  ST.unkCore30 = unkCore30;
+  function unkOf(t, stmt, whole) { var u = unkOfR29(t, stmt, whole); return u ? unkCore30(u) : u; }
+  ST.unkOf30 = unkOf; ST.unkOfR29 = function (t, stmt, whole) { return unkOfR29(t, stmt, whole); };   // ST.unkOfR29: نسخهٔ پیشین (برای سنجشِ هم‌شکل‌ها)
+  function unkOfR29(t, stmt, whole) {
     var Qs = (String(t || "").match(/«[^»]{6,}»/g) || []).map(function (x) { return txt(x.slice(1, -1)); });
     var base = toks(stmt), S0 = sentences(t).concat(Qs).map(function (x) { return x.replace(/^(?:یعنی|پس|خب|خوب|آره|بله)\s*[:：،]?\s*/, ""); }).filter(function (x) { return toks(x).length >= 2 && !(whole && nz(whole).indexOf(nz(x)) >= 0) && !WHOLE_RE.test(" " + x) && !METAQ24.test(x) && !NOTUNK24.test(x) && !LABELD26.test(x); });
     var mk = S0.filter(function (x) { return UNKMARK24.test(x); })[0] || sentences(t).filter(function (x) { return OWNQ_S24.test(x) && !METAQ24.test(x); }).pop(); if (mk) return mk.replace(/^\s*مجهول(?:م|ش|مون)?\s*[:：]\s*/, "").replace(/[.!…]+$/, "");   // پرسشِ اول‌شخصِ خودش («چند تا بخرم؟») هم نشانهٔ مجهول است
@@ -168,7 +183,11 @@
       var m = /^l:(.+)$/.exec(pk); if (m) return "L:" + m[1];
       var lv = ""; try { lv = ST.lived26 ? ST.lived26(se, pk) : ""; } catch (e) { } if (lv) return "L:" + lv;
       var P = (C.probs26 || {})[pk];
-      if (P && txt(P.stmt)) { var same = ""; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { if (!same && r && r.sess === se.id && sameProb26(P.stmt, r.p.statement)) same = r.p.id; }); } catch (e) { } return same ? "L:" + same : pk; }   // همان صورت که بعدتر در 🔭 ثبت شد (حتی اگر pk در این میان عوض شد)
+      /* دورِ ۳۰ (story، C26-1 s21 «مسئلهٔ ۲ از ۲» برای یک مسئله): مسئلهٔ زنده‌ای که مدل از همین گفت‌وگو ساخت (live_new) رکوردش sess ندارد — فقط در lprobLog ِ همین سشن است؛
+         پس همان صورت (sameProb26) با آن جفت نمی‌شد و پیامِ آغاز «مسئلهٔ ۱» ِ جدا می‌ماند. حالا مسئله‌های زندهٔ این سشن = sess ِ رکورد یا lprobLog/lprob ِ همین سشن.
+         هم‌شکلِ منفی: صورتِ دیگری (sameProb26 نادرست) همان مسئلهٔ جدا می‌ماند. */
+      var mineL30 = function (r) { return r && (r.sess === se.id || se.lprob === r.p.id || (se.lprobLog || []).some(function (e) { return e && e.p === r.p.id; })); };
+      if (P && txt(P.stmt)) { var same = ""; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { if (!same && mineL30(r) && sameProb26(P.stmt, r.p.statement)) same = r.p.id; }); } catch (e) { } return same ? "L:" + same : pk; }   // همان صورت که بعدتر در 🔭 ثبت شد (حتی اگر pk در این میان عوض شد)
       if (pk === String(C.pk || "") && txt(C.stmt)) { try { if (!(AS.notProblem && AS.notProblem(String(C.stmtRaw24 || C.stmt)))) return pk; } catch (e) { return pk; } return ""; }
       if (!C.probs26) { var w = ST.pkWindow(se, pk), f = U.filter(function (x) { return String(x.at || "") >= String(w.from || "") && String(x.at || "") < String(w.to || "~"); })[0];   // سشنِ پیش از دورِ ۲۶ (بی فهرست): نخستین پیامِ پنجره مسئله‌ای می‌گوید؟
         try { if (f && AS.notProblem && !AS.notProblem(String(f.text || "")) && storyOf(se, pk).items.length) return pk; } catch (e) { } }
@@ -353,7 +372,21 @@
   var REM29 = /[0-9۰-۹][0-9۰-۹.٫,٬\/]*(?:\s+[^\s0-9۰-۹،,.]+){0,3}?\s+(?:(?:کم|اضافه|زیاد)\s*(?:میاد|می[‌\s]?آد|می[‌\s]?آید|میاره|می[‌\s]?مونه)|(?:باقی\s*)?می[‌\s]?مونه|(?:باقی\s*)?میمونه)(?![آ-ی])/;
   function clauseSpans29(q) { var o = [], re = /[،؛;!؟?\n]|\.(?![0-9۰-۹])|,\s/g, m, a = 0; while ((m = re.exec(q))) { o.push({ a: a, b: m.index }); a = m.index + m[0].length; } o.push({ a: a, b: q.length });
     return o.map(function (x) { var t = q.slice(x.a, x.b), l = t.length - t.replace(/^\s+/, "").length; return { a: x.a + l, b: x.a + txt(t).length + l, t: txt(t) }; }).filter(function (x) { return x.t && /[0-9۰-۹]/.test(x.t); }); }
-  function claim29(t) { if (/[؟?]\s*$/.test(t)) return false; if (REM29.test(t)) return true; var m = CLM29.exec(t); if (!m) return false; var pre = t.slice(0, m.index); return /[0-9۰-۹]/.test(pre) || OPW29.test(" " + pre); }
+  /* دورِ ۳۰ (story F15، C30-1 s24 p2 «a_1 = 1، a_2 = 2، a_3 = 4»؛ A30-9 s03 p17 «اگه 2x + 3 = 11 باشه x = 4»، p18 «دستورِ n(n+1)/2 = ۵۰۵۰»): «=» ای که سمتِ چپش متغیر دارد
+     (حرفِ لاتینِ تک — a_2، x، 2x، n(n+1)) تعریف یا معادله است، نه ادعای حسابیِ عددی — پیش‌تر رقمِ زیرنویس («a_2») یا ضریب («2x») پیش از «=» آن را «ادعای حساب» می‌کرد و
+     📜 «؟ نسنجیده» می‌زد، درحالی‌که دفترِ کارِ پیشین همان بند را ✓ داشت (دو داور، C139). حالا بندی که همهٔ «=» هایش چنین‌اند ادعا نیست؛ سنجشِ موتور (ck) اگر چیزی خواند
+     همان می‌ماند (این دروازه فقط «نسنجیده» ِ الگو را برمی‌دارد). هم‌شکلِ منفی (C136): «۲۰ m × ۳ = ۶۰» (واحد پس از عدد و فاصله) و «π × ۲² = ۱۲٫۵۶» ادعای حساب‌اند. */
+  var VAR30 = /(?:^|[^A-Za-z])(?:[A-Za-z](?:_\(?[0-9A-Za-z+\-−]+\)?|\([^()]{0,12}\))?)(?![A-Za-z])/;
+  function algebra30(t) { var T = String(t || ""), parts = T.split("="); if (parts.length < 2) return false;
+    for (var i = 0; i < parts.length - 1; i++) { var lhs = parts[i].split(/[،,:؛]|\s(?:و|اگه|اگر|پس|یعنی|که)\s/).pop().replace(/[0-9۰-۹][0-9۰-۹.٫]*\s+[A-Za-z]{1,3}(?![A-Za-z])/g, " 0").replace(/\(mod[^)]*\)/g, " ");
+      if (!VAR30.test(lhs)) return false;
+      /* سمتِ راست یک جمله‌ی ساده است (عدد یا نامِ متغیر): «a_2 = 2»، «x = 4»، «n(n+1)/2 = ۵۰۵۰»؛ اتحادِ نمادینِ چندجمله‌ای («[n/2^k] = a_k + 2a_{k+1} + …») ادعاست و «نسنجیده» اش (C107) می‌ماند */
+      var rhs30 = parts[i + 1].split(/[،,:؛]|\s(?:و|با|اگه|اگر|پس|یعنی|که|باشه|باشد)\s/)[0], noNum30 = function (x) { return !/[0-9۰-۹]/.test(String(x).replace(/_\{[^}]*\}|_\([^)]*\)|_[0-9A-Za-z۰-۹]+/g, "")); };
+      if (noNum30(lhs) && noNum30(rhs30) && VAR30.test(rhs30)) continue;   // رابطهٔ تعریفی میانِ نام‌ها («a_n = a_(n−1) + a_(n−2) + a_(n−3)») — هیچ عددی برای سنجیدن ندارد
+      if (!/^\s*[\-−]?(?:[0-9۰-۹][0-9۰-۹.٫]*|[A-Za-z](?:_\(?[0-9A-Za-z+\-−]+\)?)?)(?!\s*[+\-−×÷*\/^²³√(\[])(?:\s|$|[،,.؛])/.test(parts[i + 1])) return false; }
+    return true; }
+  ST.algebra30 = algebra30;
+  function claim29(t) { if (/[؟?]\s*$/.test(t)) return false; if (REM29.test(t)) return true; var m = CLM29.exec(t); if (!m) return false; if (m[0].indexOf("=") >= 0 && algebra30(t) && !/(?:^|[\s،,])(?:میشه|می[‌\s]?شه|می[‌\s]?شود|درمیاد)\s/.test(t)) return false; var pre = t.slice(0, m.index); return /[0-9۰-۹]/.test(pre) || OPW29.test(" " + pre); }
   function unreadClaims29(q, off, ck) {
     var C0 = (ck || []).concat((ck && ck.unread) || []); var cov = function (A0, B0) { return C0.some(function (c) { return c && c.pos != null && c.pe != null && c.pos < B0 && c.pe > A0; }); };
     if (C0.some(function (c) { return c && (c.pos == null || c.pe == null); })) return [];   // سنجشی بی جایگاه ⇒ این دروازه چیزی نمی‌افزاید (رفتارِ پیشین)
@@ -383,7 +416,7 @@
        با همان جملهٔ «برای خودش» ِ ST.arithNote (عددِ درستِ ✗ لو نمی‌رود)؛ سطری که حسابی ندارد نشانی نمی‌گیرد */
     var mk27 = markOf27(it, um); if (mk27) lines = lines.concat([mk27]);
     /* دورِ ۲۸ (C96/C125): دادهٔ او با منبعش — «فروشنده گفت ۱۲٪» دادهٔ مسئلهٔ اوست، نه «کارِ دیگری» */
-    if (it.k === "d" && um) { var ds28 = ""; try { ds28 = ST.dataSrc28(um.text, it.t); } catch (e) { } if (ds28) lines = lines.concat(["منبع: به گفتهٔ «" + ds28 + "»"]); }
+    if (it.k === "d" && um) { var ds28 = ""; try { ds28 = it.src30 || ST.dataSrc28(um.text, it.t); } catch (e) { } if (ds28) lines = lines.concat(["منبع: به گفتهٔ «" + ds28 + "»"]); }
     var src = um ? { sess: s.id, mid: mid(um), text: um.text, at: um.at || "", title: s.title || "" } : null;
     try { A.EVLOG.add(Object.assign(pid ? { pid: pid } : { sess: s.id }, { id: "st23_" + key.replace(/[^\w]/g, "_") + "_" + it.k + "_" + it.n, k: EV_K[it.k], at: it.at, title: title27(it), lines: lines, out: "", src: src, by: "coach" })); } catch (e) { }
   }
@@ -427,6 +460,12 @@
   var MINEV28 = /(?:^|[\s،,.])(?:(?:ولی|اما)\s+)?(?:من|خودم)(?![آ-ی])|(?:گذاشتم|کردم|گرفتم|نوشتم|رسیدم|درآوردم|شمردم|دیدم|زدم|خریدم|ساختم)(?![آ-ی])/;
   function sentAt28(T, i) { var a = 0, b = T.length, m; SENT28.lastIndex = 0; while ((m = SENT28.exec(T))) { if (m.index < i) a = m.index + 1; else { b = m.index + 1; break; } } return { a: a, b: b }; }
   var PASS29 = /(?:[،,]\s*|\s)(?:پس|بنابراین|در\s*نتیجه)(?![آ-ی])/;
+  /* دورِ ۳۰ (story، A30-19 s09 p23 «از زبانِ «نوه‌ی»» برای «نوه‌ی همسایه‌مون نوشته»): نسبتِ اضافه‌دار («نوه‌ی …»، «دوستِ …»، «پسرِ …») کامل نیست — واژهٔ بعد، اگر خودش
+     نسبت/نقش است («همسایه‌مون»، «داداشم»)، بخشی از همان گوینده است. واژه‌ای که نسبت نیست (نام یا فعل) افزوده نمی‌شود (C22/C38 — نام هرگز). */
+  var WHOW30 = new RegExp("^" + WHO27 + "$");
+  function whoX30(T, m) { var w = String(m[1] || ""), at = m.index + String(m[0]).indexOf(w) + w.length; if (!/(?:ِ|ٔ|‌ی)$/.test(w)) return w;
+    var nx = /^\s+([^\s.!؟?،,:«»]+)/.exec(String(T).slice(at)); return nx && WHOW30.test(nx[1]) ? w + " " + nx[1] : w; }
+  ST.whoX30 = whoX30;
   function attr28(ut) { var T = String(ut || ""), m, out = []; OTHER28.lastIndex = 0;
     while ((m = OTHER28.exec(T))) { var mid0 = m[2] || "", end = m.index + m[0].length, se = sentAt28(T, end - 1), after = T.slice(end, se.b), cut29 = -1;
       /* دورِ ۲۹ (C125، C29-4 aC1 p29، B29·D12 nB2): «X گفت <داده>، پس <حساب>» — استنتاجِ پس از «پس / بنابراین / در نتیجه» کارِ خودِ اوست؛ گفتهٔ X تا همان‌جاست */
@@ -435,7 +474,7 @@
       if (m[3] && /^کرد$/.test(m[3]) && !/حساب|ضرب|جمع|تقسیم/.test(mid0)) continue;   // «داداشم فقط نگاه کرد: …» نسبتِ حساب نیست (بانکِ R28 #207)
       if (/(?:^|[\s،,.])(?:خودم|من)\s+[^.!؟?]{0,20}(?:حساب\s*کردم|نوشتم|درآوردم|شمردم)(?![آ-ی])/.test(T.slice(se.a, m.index))) continue;   // «خودم حساب کردم، داداشم …» — کارِ خودش
       var calc = !!m[3], claim = CALCX28.test(after) || CLAIM28.test(after);
-      out.push({ who: m[1], at: m.index, end: end, sent: se, calc: calc, claim: claim, other: (calc && /[0-9۰-۹]/.test(T.slice(end, T.length))) || (!calc && claim), say: !calc, after: after, cut: cut29 }); }
+      out.push({ who: whoX30(T, m), at: m.index, end: end, sent: se, calc: calc, claim: claim, other: (calc && /[0-9۰-۹]/.test(T.slice(end, T.length))) || (!calc && claim), say: !calc, after: after, cut: cut29 }); }
     return out; }
   ST.otherWork27 = function (ut) {
     var T = String(ut || ""), A0 = attr28(T).filter(function (x) { return x.other; })[0]; if (!A0) return null; return span29(T, A0); };
@@ -456,6 +495,14 @@
     return { who: A0.who, from: from, to: to, text: txt(T.slice(from, to)) };
   }
   /* منبعِ یک داده (C96): «فروشنده گفت ۱۲٪»، «استادم میگه …» — نامِ نسبت اگر جملهٔ همین داده آن را به گوینده‌ای نسبت می‌دهد و آن گفته کارِ دیگری نیست */
+  /* دورِ ۳۰ (C188): «X گفت (که) <کاری که او بکند>» — توصیهٔ دیگری به او. خروجی { who, t } (t = بندِ توصیه، بایت‌به‌بایت) یا null. فعلِ التزامیِ اول‌شخص («بگیرم/بخرم/برم/نذارم»)
+     نشانِ توصیه به اوست؛ گفته‌ای با حساب یا عدد مالِ مسیرِ C96 است (کارِ دیگری/منبعِ داده)، و پرسش توصیه نیست. */
+  ST.advice30 = function (ut) { var T = String(ut || ""), re = new RegExp("(?:^|[\\s،,.:«(])(" + WHO27 + ")(?:\\s+[^\\s.!؟?،:]{1,14}){0,2}?\\s+(?:گفت|گفته|می[‌\\s]?گه|میگه|پیشنهاد\\s*(?:داد|داده|کرد)|توصیه\\s*(?:کرد|کرده))\\s+(?:که\\s+)?([^.!؟?\\n]{6,})", "g"), m;
+    while ((m = re.exec(T))) { var t = txt(m[2].split(/\s+(?:ولی|اما|ولیکن)\s|،\s*(?:به\s*نظرم|ولی|اما)\s/)[0]).replace(/[.!…]+$/, ""), end = T.slice(m.index + m[0].length).replace(/^\s+/, "").charAt(0);
+      if (/[؟?]/.test(end) || /[0-9۰-۹]/.test(t) || /[=×÷«]/.test(t) || /(?:^|\s)(?:شاید|ممکنه)(?![آ-ی])/.test(t)) continue;   // نقلِ گیومه‌دار و «شاید …» توصیهٔ کاری نیست
+      if (!/(?:^|\s)(?:ب[آ-ی‌]{1,12}م|ن(?:گیرم|خرم|رم|زنم|ذارم|کنم|بندم|دم))(?![آ-ی‌])/.test(t)) continue;
+      return { who: m[1], t: t }; }
+    return null; };
   ST.dataSrc28 = function (ut, d) { var T = String(ut || ""), i = d ? T.indexOf(String(d).replace(/…$/, "").slice(0, 16)) : -1;
     var A0 = attr28(T).filter(function (x) { return x.say && !x.other && /[0-9۰-۹]/.test(x.after) && (i < 0 || (i >= x.sent.a && i < x.sent.b)); })[0]; return A0 ? A0.who : ""; };
   /* q (نقلِ نتیجهٔ مدل) درونِ تکهٔ دیگری است؛ بی q: هیچ عددی بیرون از آن تکه نیست */
@@ -536,6 +583,10 @@
         }
       }
     }
+    /* دورِ ۳۰ (story، C188 — D27-33 arD2 p12 «داداشم علی گفت کابل رو از مغازهٔ حسن آقا بگیرم، اونجا ارزون‌تره» بی هیچ رد): توصیهٔ کسِ دیگری به او دادهٔ مسئلهٔ اوست با منبعش،
+       نه «کارِ دیگری» و نه هیچ — پیش‌تر فقط وقتی مدل «d» می‌گفت و عددی بود خوانده می‌شد. نقل بایت‌به‌بایت (C55)؛ منبع با نسبت، نه نام (C22/C38/C57).
+       هم‌شکلِ منفی: برنامهٔ خودش («خودم از مغازه می‌گیرم») مالِ خودش است؛ «داداشم گفت ۳ × ۵ = ۱۵» کارِ دیگری است (C96، OW). */
+    try { var adv30 = corr ? null : ST.advice30(ut); if (adv30 && !inOW29(OWS29, ut.indexOf(adv30.t)) && !I.some(function (x) { return nz(x.t).indexOf(nz(adv30.t).slice(0, 30)) >= 0; })) I.push({ k: "d", t: clip(adv30.t, 200), src30: adv30.who }); } catch (e30) { }
     /* دورِ ۲۵ (P1، D25-7 — pwD1 «… به نظرم این دیگه حل شد»): پیامی که هم جوابِ کل را می‌گوید و هم «حل شد»؛ a27 «نتیجه» را به‌خاطرِ ادعای «حل شد» از said برمی‌دارد،
        ولی نقلِ نتیجهٔ مدل در همین پیام هست و نشانهٔ جوابِ کل دارد ⇒ در داستان می‌ماند (وگرنه صفحه نمی‌داند در گفت‌وگو حل شده و قابِ فهم را دوباره می‌خواهد) */
     if (so && real && !corr && said.indexOf("result") < 0 && !I.some(function (x) { return x.k === "res"; })) { var rt5 = txtOf(a.result);
@@ -1902,10 +1953,17 @@
       /* دورِ ۲۷ (story R6، C30؛ B27·D15 oB1 «برگردیم به مسئله‌ی بیداری ساعت ۶» وقتی کانون همان بیداری بود ⇒ صفحه به «شام» بست): نامی که به مسئلهٔ کنونی بیشتر می‌خورد
          جابه‌جایی نیست؛ برابر ⇒ صفحه می‌پرسد (کنونی + بهترینِ دیگر)، هرگز حدس نمی‌زند */
       if (f.strong && me > mx) return null;
+      /* دورِ ۳۰ (story F11، A30-18 s08 p12 «برگردیم به معمای ساعت‌شنیِ ۷ و ۱۱ برای ۱۵ دقیقه: …» با دو مسئلهٔ «ساعت‌شنی» ⇒ «کدام؟» و پیام بی‌سطر ماند): واژه‌های نام برابر بودند
+         و عددهای نام («۷ و ۱۱»، «۱۵») شمرده نمی‌شدند. برابریِ واژه‌ها را عددهای همان نام می‌شکنند: مسئله‌ای که عددهای نام در عنوان/صورتش هست و دیگری هیچ‌کدام را ندارد ⇒ همان.
+         هم‌شکلِ منفی: نامی بی عدد، یا عددی که در هر دو هست ⇒ همان پرسشِ «کدام؟» (C21، هرگز حدس). */
+      var nT30 = numsOf(f.tail), byN30 = function (L) { if (!nT30.length) return null; var sc30 = L.map(function (x) { var X = numsOf(x.title + " " + x.stmt); return { p: x, n: nT30.filter(function (v) { return X.indexOf(v) >= 0; }).length }; }), m30 = Math.max.apply(null, [0].concat(sc30.map(function (z) { return z.n; }))), b30 = sc30.filter(function (z) { return z.n === m30 && m30 > 0; });
+        return b30.length === 1 && sc30.every(function (z) { return z === b30[0] || z.n === 0; }) ? b30[0].p : null; };
+      if (me === mx) { var tieL30 = P.filter(function (x) { return x.id === cur || others.some(function (z) { return z.p === x && z.n === mx; }); }), w30 = byN30(tieL30); if (w30) { if (w30.id === cur) return null; return { to: w30, frame: f }; } }
       if (f.strong && me && me === mx) { var cpe = P.filter(function (x) { return x.id === cur; })[0]; return { ask: (cpe ? [cpe] : []).concat(others.filter(function (z) { return z.n === mx; }).map(function (z) { return z.p; })), frame: f }; }
       if (f.bare || f.about) { var byT0 = others.filter(function (z) { var X = toks(z.p.title); return W.some(function (w) { return w.length >= 3 && hit26(w, X); }); }); if (!byT0.length) continue; }   // بی قابِ صریح، فقط واژهٔ عنوان   // بی «برگردیم»، واژه‌ای که به مسئلهٔ کنونی هم می‌خورد نام‌بردنِ دیگری نیست
       var best = others.filter(function (z) { return z.n === mx; }).map(function (z) { return z.p; });
       if (best.length === 1) return { to: best[0], frame: f };
+      var bn30 = byN30(best); if (bn30) return { to: bn30, frame: f };   // دورِ ۳۰ (A30-18): عددهای نام برابریِ واژه‌ها را می‌شکنند
       /* عنوان مقدم بر صورت: «مسئلهٔ تاس» ⇐ مسئله‌ای که عنوانش تاس دارد، نه هر صورتی که تاس را نام برد */
       var byT = best.filter(function (x) { var X = toks(x.title); return W.some(function (w) { return w.length >= 3 && hit26(w, X); }); }); if (byT.length === 1) return { to: byT[0], frame: f };
       return { ask: best, frame: f };
@@ -2032,11 +2090,11 @@
     var se = S.get(rid.sess), C = (se && se.coach) || {}, E = storyOf(se || {}, String(C.pk || "c:0")), st = ST.stmtOfSess(se);
     if (E.unk && txt(E.unk.t)) return clip(E.unk.t, 100);
     /* دورِ ۲۶ (Q6): خواسته‌ای که خودش با نشانهٔ صریح گفت («دنبالِ اینم که …»، «حل‌شدن یعنی …») مقدم بر جملهٔ پرسشیِ صورت است */
-    var iu26 = E.items.filter(function (x) { return x.k === "u" && UNKMARK24.test(x.t); }).pop(); if (iu26) return clip(iu26.t, 100);
+    var iu26 = E.items.filter(function (x) { return x.k === "u" && UNKMARK24.test(x.t); }).pop(); if (iu26) return clip(unkCore30(iu26.t), 100);   // دورِ ۳۰ (D25-8): هستهٔ مجهول، نه برچسب و فعلِ خواستن (سطرهای ذخیره‌شدهٔ پیشین هم)
     var q2 = qSentence(st); if (q2) return clip(q2, 100);
     /* مجهولِ به حرفِ خودش فقط اگر به صورتِ همین مسئله می‌خورد — جملهٔ کناری («ولی خب ۵ منهای ۳ چرا نمیشه») مقصد نیست */
     var ub = C.unkBy && C.pk ? txt(C.unkBy[C.pk]) : "", bt = toks(st); if (ub && toks(ub).filter(function (w) { return hit(w, bt); }).length >= Math.max(1, Math.ceil(toks(ub).length / 2))) return clip(ub, 100);
-    var iu = E.items.filter(function (x) { return x.k === "u"; }).pop(); if (iu && !METHODQ26.test(iu.t)) return clip(iu.t, 100);
+    var iu = E.items.filter(function (x) { return x.k === "u"; }).pop(); if (iu && !METHODQ26.test(iu.t)) return clip(unkCore30(iu.t), 100);
     var g26 = /[؟?]/.test(st) ? goalSentence26(String(C.stmtRaw24 || st)) : ""; if (g26) return clip(g26, 100);   // فقط وقتی صورت پرسشی داشت که پرسشِ روش بود و کنار رفت
     return "خواستهٔ مسئله";
   };

@@ -1,0 +1,296 @@
+{
+"from": "round30C/s21",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می‌کند. FEN: 5k2/8/5K2/8/8/8/8/R2Q4 w - - 0 1 . من کیش با وزیر رو زدم ولی شاه فرار می‌کنه. یه رخ سفید گوشه‌ی صفحه هست که اصلاً نمی‌دونم چرا اونجاست.",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok'",
+"c": 1
+},
+{
+"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='2014-03-11';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()",
+"c": 2
+},
+{
+"say": "شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ها رو امتحان می‌کنم: وزیر d8 کیش، وزیر d7 کیش، رخ a8 کیش. هر دفعه شاه میره e8 یا g8. اون رخ گوشه به نظرم بی‌فایده‌ست، فقط تزئینیه. می‌خوام خودم حلش کنم، جوابو نگو. بیا تو سامانه ثبتش کنیم.",
+"c": 3
+},
+{
+"eval": "JSON.stringify(APP.liveCoach(APP.state.arg))",
+"c": 4
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpOne','می‌خواهم حرکتِ اولِ سفید را پیدا کنم که بعدش هر کاری سیاه بکند، با حرکتِ دوم مات شود.');F('lpWhy','چون مسابقه داریم و کنجکاوم رخ چرا آن‌جاست.');await W(300);const b=B(/ثبتِ کل/);await W(900);return 'kind='+JSON.stringify(APP.liveKindInfo(pid))+' | '+b+' || IDS: '+IDS()+' || '+T('۱) فهمِ مسئله',3500);})()",
+"c": 5
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpUnk','حرکتِ اولِ سفید که بعد از هر جوابِ سیاه، حرکتِ دوم مات کند');F('lpD_d1','شاه سفید در f6');F('lpD_d2','وزیر سفید در d1');await W(300);B(/دادهٔ دیگر/);await W(400);F('lpD_d3','رخ سفید در a1 (گوشه)');await W(300);B(/دادهٔ دیگر/);await W(400);F('lpD_d4','شاه سیاه در f8، نوبت سفید');F('lpCond','سفید اول حرکت می‌کند\\nسیاه هر جوابی می‌تواند بدهد\\nحرکتِ دومِ سفید باید مات باشد');P('lpSat',/^بله/);P('lpSuff',/^کافی/);F('lpSuffW','مسئله‌های شطرنج کامل گفته شده‌اند؛ صفحه همه‌چیز را نشان می‌دهد');F('lpFig','صفحه را روی کاغذ کشیدم با خانه‌های e8 و g8 که شاه به آن‌ها فرار می‌کند');F('lpGuess','حرکتِ اول یک کیشِ وزیر است که درست نزده‌ام');P('lpConf',/60|۶۰/);F('lpTest','همهٔ کیش‌های وزیر را یکی‌یکی روی کاغذ می‌زنم');await W(300);const ifr=[...document.getElementById('lpIfRef').options].map(o=>o.text).join(' / ');P('lpIfRef',/حدسِ تازه|حدسی تازه|عوض/);await W(300);const b=B(/ثبتِ فهم/);await W(1000);return 'ifref opts: '+ifr+' || '+b+' phase='+APP.livePhase(pid)+' kind='+APP.liveKind(pid)+' || '+T('ثبتِ فهم',100)+' || MSG: '+[...document.querySelectorAll('#main .msg,#main .warn,#main .note,#main [role=alert]')].map(x=>x.innerText).slice(-5).join(' ## ');})()",
+"c": 6
+},
+{
+"eval": "(()=>{const t=document.querySelector('#main').innerText;const i=t.lastIndexOf('ثبتِ فهم');const toast=[...document.querySelectorAll('.toast,.flash,[class*=toast]')].map(x=>x.innerText).join('|');return 'TOAST:'+toast+' || '+t.slice(i-2500,i+600);})()",
+"c": 7
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;P('lpIfRef',/کنار می‌گذارم/);await W(200);B(/ثبتِ فهم/);await W(800);const b=B(/^۲ کامل$/);await W(1000);return b+' phase='+APP.livePhase(pid)+' kind='+APP.liveKind(pid)+' || '+T('۲) طرح',3500)+' || IDS '+IDS();})()",
+"c": 8
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpAsk','نه دقیقاً همین را. یک بار مسئله‌ای دیدم که حرکتِ اول کیش نبود ولی یادم نیست چه بود.');['lpAD_d1','lpAD_d2','lpAD_d4'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});await W(300);const a=B(/ثبتِ پاسخ/);await W(800);F('lpPlan','با وزیر کیشِ دیگری می‌دهم که شاه را به گوشه ببرد و بعد با وزیر و شاهِ خودم مات می‌کنم.');await W(300);const ids=IDS();const b2=B(/ثبتِ طرح/);await W(1100);const t=document.querySelector('#main').innerText;const i=t.indexOf('ثبتِ طرح');return a+' | '+b2+' phase='+APP.livePhase(pid)+' used='+JSON.stringify(APP.liveUsed(pid))+' unused='+JSON.stringify(APP.liveUnused(pid))+' || IDS '+ids.slice(ids.indexOf('lpPlan')-200)+' || '+t.slice(Math.max(0,i-2500),i+400);})()",
+"c": 9
+},
+{
+"eval": "(()=>{const t=document.querySelector('#main').innerText;const i=t.indexOf('طرحت: نخست');const s=document.getElementById('lpPU_a_d3');return t.slice(i-300,i+2600)+' || OPTS '+(s&&s.options?[...s.options].map(o=>o.value+'='+o.text).join(' / '):s&&s.type);})()",
+"c": 10
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;P('lpMv',/شکستن به حالت/);F('lpMvWhy','همهٔ کیش‌های ممکن را یکی‌یکی می‌آزمایم تا ببینم کدام شاه را بی‌فرار می‌گذارد');await W(300);const m=B(/ثبتِ حرکت|افزودنِ حرکت|^ثبت$/);await W(600);P('lpPU_a_d3',/لازم نیست/);F('lpPU_w_d3','رخ فقط تزئینی است؛ در کیش‌ها و مات نقشی ندارد');['lpPC_0','lpPC_2'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});await W(300);const b=B(/ثبتِ طرح/);await W(1100);const t=document.querySelector('#main').innerText;const i=t.indexOf('داده‌هایی که هنوز');return m+' | '+b+' phase='+APP.livePhase(pid)+' heur='+JSON.stringify(APP.liveRec(pid).p.heur||null)+' used='+JSON.stringify(APP.liveUsed(pid))+' || '+t.slice(i,i+900)+' || '+T('۳) اجرا',1200);})()",
+"c": 11
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const o=[...document.getElementById('lpClear').options].map(o=>o.text).join('/');F('lpStep','وزیر به d7 کیش می‌دهد؛ شاه سیاه به g8 فرار می‌کند و با حرکتِ دوم مات نمی‌شود');P('lpClear',/^بله/);F('lpProof','وزیر از d7 ردیفِ هفتم و ستونِ d و قطرها را می‌گیرد؛ g8 در هیچ‌کدام نیست و شاه سفید f6 هم g8 را نمی‌گیرد، پس شاه به g8 فرار می‌کند');F('lpPrem','جای وزیر و شاه‌ها');['lpSD_d1','lpSD_d2','lpSD_d4'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});await W(300);const t0=document.body.innerText;const b=B(/ثبتِ گام/);await W(1200);const L0=new Set(t0.split('\\n'));const diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,30).join(' ¦ ');return 'clear opts='+o+' | '+b+' steps='+JSON.stringify((APP.liveRec(pid).p.steps||[]).map(s=>[s.t||s.text,s.out&&s.out.kind]))+' || NEW: '+diff;})()",
+"c": 12
+},
+{
+"eval": "(()=>{const pid=APP.state.arg;const r=APP.liveRec(pid).p;return JSON.stringify({plan:r.plan,steps:(r.steps||[]).map(s=>({t:s.t||s.text,tag:s.tag,fol:s.follows})),tag:APP.liveStepFollowsTag?APP.liveStepFollowsTag(pid,'وزیر به d7 کیش می‌دهد؛ شاه سیاه به g8 فرار می‌کند و با حرکتِ دوم مات نمی‌شود'):'na',tag2:APP.liveStepFollowsTag?APP.liveStepFollowsTag(pid,'با وزیر کیش نمی‌دهم؛ شاه را آزاد می‌گذارم'):'na'}).slice(0,1500);})()",
+"c": 13
+},
+{
+"say": "کیش با وزیر d7 رو ثبت کردم، شاه میره g8. گیر کردم. هیچ کیشی جواب نمیده. رخ هم که به درد نمی‌خوره.",
+"c": 14
+},
+{
+"say": "آها! از آخر فکر کردم: مات چه شکلیه؟ اگه شاه سیاه g8 باشه و رخ بره a8، ردیف هشتم بسته میشه؛ اگه ردیف هفتم هم بسته باشه مات میشه. پس اول وزیر d7 بدون کیش... نه صبر کن، وزیر d7 کیشه. پس اول وزیر یه جای آروم که ردیف هفتم رو بگیره، مثلاً وزیر d7 نه، وزیر b7! اونوقت شاه سیاه فقط e8 یا g8 داره و رخ a8 مات. رخ اصلاً بی‌فایده نبود!",
+"c": 15
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpStep','حرکتِ اول: وزیر b7 (کیش نیست، ردیفِ هفتم را می‌گیرد). سیاه فقط Ke8 یا Kg8 دارد. حرکتِ دوم: رخ a8 مات.');P('lpClear',/^بله/);F('lpProof','وزیر b7 خانه‌های e7 f7 g7 h7 را می‌گیرد و شاه سفید f6 هم e7 f7 g7 را؛ پس شاه سیاه فقط e8 یا g8 دارد. در هر دو، رخ a8 ردیفِ هشتم را می‌گیرد و ردیفِ هفتم با وزیر بسته است، پس مات است.');['lpSD_d1','lpSD_d2','lpSD_d3','lpSD_d4'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click();});document.querySelectorAll('[id^=lpSC_]').forEach(e=>{if(e.type==='checkbox'&&!e.checked)e.click();});await W(300);const t0=document.body.innerText;const b=B(/ثبتِ گام/);await W(1200);const L0=new Set(t0.split('\\n'));const diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,30).join(' ¦ ');return b+' used='+JSON.stringify(APP.liveUsed(pid))+' || NEW: '+diff+' || IDS '+IDS().slice(-600);})()",
+"c": 16
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;P('lpSwitch',/طرح را عوض کردم/);await W(400);const ids=IDS();const w=ids.match(/lpSwWhy|lpSwitchWhy|lpSwW\\w*/);if(w)F(w[0],'کیش‌ها جواب نداد؛ از وضعِ مات به عقب فکر کردم: حرکتِ آرامِ وزیر و بعد رخ');await W(300);const t0=document.body.innerText;const b=B(/ثبتِ گام/);await W(1300);const L0=new Set(t0.split('\\n'));const diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,30).join(' ¦ ');return 'why='+(w&&w[0])+' '+b+' used='+JSON.stringify(APP.liveUsed(pid))+' || NEW: '+diff;})()",
+"c": 17
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const ids=IDS();const m=ids.split(' | ').filter(x=>/lpSw|چرا/.test(x));const w=m.find(x=>/چرا/.test(x)&&/^lpSw/.test(x));if(w)F(w.split(':')[0],'کیش‌ها جواب نداد؛ از وضعِ مات به عقب فکر کردم: حرکتِ آرامِ وزیر و بعد رخ');await W(300);const t0=document.body.innerText;const b=B(/ثبتِ گام/);await W(1300);const L0=new Set(t0.split('\\n'));const diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,30).join(' ¦ ');return JSON.stringify(m)+' '+b+' used='+JSON.stringify(APP.liveUsed(pid))+' || NEW: '+diff;})()",
+"c": 18
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const tag=APP.liveStepFollowsTag?JSON.stringify(APP.liveStepFollowsTag(pid,'حرکتِ اول: وزیر b7 (کیش نیست، ردیفِ هفتم را می‌گیرد). سیاه فقط Ke8 یا Kg8 دارد. حرکتِ دوم: رخ a8 مات.')):'na';const c=B(/✅ حل شد/);await W(1200);return 'follows='+tag+' | '+c+' phase='+APP.livePhase(pid)+' closure='+JSON.stringify(APP.liveClosure(pid))+' || '+T('۴) بازنگری',4500)+' || IDS '+IDS().slice(IDS().indexOf('lpB'));})()",
+"c": 19
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const ids=IDS();P('lpBWant',/همان‌قدر/);F('lpBChk','هر دو جوابِ سیاه (e8 و g8) را روی صفحه چیدم و رخ a8 را زدم؛ هر دو مات بود');P('lpBRes',/سالم/);F('lpBOther','با فهرست کردنِ همهٔ حرکت‌های آرامِ وزیر که ردیفِ هفتم را می‌گیرند');F('lpBGlance','حرکتِ آرامِ وزیر راه‌های فرار را می‌بندد و رخ از دور مات می‌کند');F('lpBWorked','از وضعِ مات به عقب فکر کردن؛ دفعهٔ بعد اول وضعِ مات را تصور می‌کنم');P('lpBMulti',/^یکی/);P('lpBBest',/رخ|کنار گذاشته|بی‌ربط/);P('lpBTool',/همهٔ داده‌ها/);F('lpBUse','در مسئلهٔ کامل، مهره‌ای که بی‌کار به نظر می‌رسد احتمالاً کلید است؛ از آخر به عقب فکر کنم');F('lpBTaste','کار به عقب را دوست داشتم؛ امتحانِ همهٔ کیش‌ها را نه');F('lpBNew','یک مسئلهٔ مات در دو خودم می‌سازم که در آن یک فیلِ گوشه بی‌کار به نظر برسد ولی کلید باشد');P('lpBNewS',/روش/);F('lpBNewW','همان حرکتِ آرام که راه‌های فرار را می‌بندد و مهرهٔ دور مات می‌کند');P('lpBHit',/نادرست/);document.querySelectorAll('[id^=lpBCP_]').forEach(s=>{const o=[...s.options].find(o=>/^بله/.test(o.text));s.value=o.value;s.dispatchEvent(new Event('change',{bubbles:true}));});F('lpBHitW','فرض کردم حرکتِ اول باید کیش باشد چون «مات در دو» یعنی فشار؛ و رخِ گوشه را بی‌کار دیدم');await W(600);const t0=document.body.innerText;const b=B(/ثبتِ بازنگری/);await W(1500);const L0=new Set(t0.split('\\n'));const t='SAVE '+b+' closure='+JSON.stringify(APP.liveClosure(pid))+' NEW: '+document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,40).join(' ¦ ');return t+' || IDS '+IDS().slice(IDS().indexOf('lpBHit'));})()",
+"c": 20
+},
+{
+"eval": "(()=>{const p=window.__PID||APP.state.arg;if(p)localStorage.setItem('__PID',p);return (APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'))+' pid='+p})()",
+"c": 21
+},
+{
+"c": 22,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()",
+"c": 23
+},
+{
+"eval": "(async()=>{const all=APP.liveAll();const L=all.map(r=>r.p?r.p:r).map(p=>({id:p.id,t:p.title,nat:p.nat,natBy:p.natBy,origin:p.origin,kind:APP.liveKind(p.id)}));const o=APP.today;(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'));APP.go('today');await W(1200);const t=document.querySelector('#main').innerText;const i=t.indexOf('🧩');return JSON.stringify(L)+' || TODAY: '+t.slice(Math.max(0,i-200),i+700);})()",
+"c": 24
+},
+{
+"eval": "(async()=>{(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'));const s1=APP.ASSIST.cur();const child=(window.__PID||APP.state.arg);const b=APP.liveBindSession(child,s1,{force:true});const before=APP.liveSessionPid(s1);APP.ASSIST.newSession&&APP.ASSIST.newSession();const s2=APP.ASSIST.cur();APP.go('e_prob',null,'live');await W(1000);const ids=IDS();F('lpNewT','مسئلهٔ دوم آزمایشی');F('lpNewS','مسئلهٔ شطرنج: سفید در سه حرکت مات می‌کند. شاه سفید g6، فیل c4، شاه سیاه h8.');await W(500);const nat=document.getElementById('lpNewNat');const nv=(nat&&nat.value)+'/type='+(document.getElementById('lpNewType')||{}).value;const c=B(/ساختنِ مسئلهٔ حل‌نشده/);await W(1200);const all=APP.liveAll().map(r=>r.p.id);return 'bind='+b+' s1before='+before+' s1after='+APP.liveSessionPid(s1)+' s2='+(s2&&s2.id)+' s2pid='+APP.liveSessionPid(s2)+' sameSess='+(s1===s2)+' natPre='+nv+' '+c+' view='+APP.state.view+' '+APP.state.arg+' all='+all.join(',')+' || '+ids.slice(0,400);})()",
+"c": 25
+},
+{
+"c": 26,
+"reload": true
+},
+{
+"eval": "(async()=>{(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'));window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); return 'ok';};window.W=ms=>new Promise(r=>setTimeout(r,ms));window.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id).join(' | ');window.B=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN'; b.click(); return 'clicked';};const s1=APP.ASSIST.cur();const child=(window.__PID||APP.state.arg);const b=APP.liveBindSession(child,s1,{force:true});const before=APP.liveSessionPid(s1);APP.ASSIST.newSession&&APP.ASSIST.newSession();const s2=APP.ASSIST.cur();APP.go('e_prob',null,'live');await W(1000);const ids=IDS();F('lpNewT','مسئلهٔ دوم آزمایشی');F('lpNewS','مسئلهٔ شطرنج: سفید در سه حرکت مات می‌کند. شاه سفید g6، فیل c4، شاه سیاه h8.');await W(500);const nat=document.getElementById('lpNewNat');const nv=(nat&&nat.value)+'/type='+(document.getElementById('lpNewType')||{}).value;const c=B(/ساختنِ مسئلهٔ حل‌نشده/);await W(1200);const all=APP.liveAll().map(r=>r.p.id);return 'bind='+b+' s1before='+before+' s1after='+APP.liveSessionPid(s1)+' s2='+(s2&&s2.id)+' s2pid='+APP.liveSessionPid(s2)+' sameSess='+(s1===s2)+' natPre='+nv+' '+c+' view='+APP.state.view+' '+APP.state.arg+' all='+all.join(',')+' || '+ids.slice(0,400);})()",
+"c": 27
+},
+{
+"c": 28,
+"reload": true
+},
+{
+"eval": "(()=>{const p=window.__PID||APP.state.arg;if(p)localStorage.setItem('__PID',p);return (APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-20'))+' pid='+p})()",
+"c": 29
+},
+{
+"c": 30,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()",
+"c": 31
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-20'));APP.go(\"today\");await W(1500);const t=document.querySelector(\"#main\").innerText;const i=t.indexOf(\"🧩 مسئلهٔ تازه\");return i<0?\"NONE\":t.slice(i,i+300);})()",
+"c": 32
+},
+{
+"c": 33,
+"reload": true
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur()||{};const L=APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const sv=pg.solve||{};return {t:r.p.title,st:(APP.liveClosure?APP.liveClosure(r.p.id).state:''),g:sv.g,steps:((sv.live||{}).steps||[]).map(x=>({t:(x.text||'').slice(0,60),out:x.out}))}});const ph=APP.MIND.phases();return JSON.stringify({ph:ph.rows.map(x=>[x.id,x.k,x.n,Object.keys(x.src).join('+'),Math.round(x.pWeak*100)]),weak:ph.weakest&&ph.weakest.fa,coachGuess:s.coach&&s.coach.guess,checkRep:s.coach&&s.coach.checkRep,reg:s.register||(s.coach&&s.coach.reg),prom:s.promises,plans:s.plans||(s.coach&&s.coach.plans),dl:(APP.S.all('deadline')||[]).map(d=>[d.what||d.title,d.date||d.due]),live:L})})()",
+"c": 34
+},
+{
+"c": 35,
+"reload": true
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await W(800);const b=document.querySelector('.as-msg .mx-board');if(!b)return 'NOBOARD msgs='+document.querySelectorAll('.as-msg').length+' sessions?';b.scrollIntoView({block:'center'});await W(300);const sq=[...b.querySelectorAll('[data-sq]')].filter(x=>x.textContent).map(x=>x.getAttribute('data-sq')+x.textContent).join(' ');return 'BOARD '+sq+' || '+b.innerText.slice(-20)+' || plots='+document.querySelectorAll('.as-msg .mx-plot').length+' || msg='+b.closest('.as-msg').innerText.slice(0,160);})()",
+"c": 36
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const i=document.querySelector('textarea.as-in');i.value='این یکی رو ببین: 6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1 ، رخ d8 مات؟';i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const vis=[...document.querySelectorAll('.as-root .mx-prev')].filter(p=>!p.hidden);return 'FENPREV '+vis.map(p=>p.innerText.replace(/\\n/g,'')).join(' | ');})()",
+"c": 37
+},
+{
+"eval": "(()=>{const i=document.querySelector('textarea.as-in');i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));return 'cleared'})()",
+"c": 38
+},
+{
+"c": 39,
+"reload": true
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.sessions().find(x=>(x.msgs||[]).some(m=>/5k2\\/8/.test(m.text||'')));if(!s)return 'NOSESS';localStorage.setItem('lla.assist.cur',JSON.stringify(s.id));APP.ASSIST.toggle(false);await W(300);APP.ASSIST.toggle(true);await W(1200);const b=document.querySelector('.as-msg .mx-board');if(!b)return 'NOBOARD msgs='+document.querySelectorAll('.as-msg').length;b.scrollIntoView({block:'center'});await W(300);const sq=[...b.querySelectorAll('[data-sq]')].filter(x=>x.textContent).map(x=>x.getAttribute('data-sq')+x.textContent).join(' ');return 'BOARD '+sq+' || '+b.innerText.slice(-20)+' || plots='+document.querySelectorAll('.as-msg .mx-plot').length+' || msg='+b.closest('.as-msg').innerText.slice(0,160);})()",
+"c": 40
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const i=document.querySelector('textarea.as-in');i.value='این یکی رو ببین: 6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1 ، رخ d8 مات؟';i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const vis=[...document.querySelectorAll('.as-root .mx-prev')].filter(p=>!p.hidden);const b=document.querySelector('.as-msg .mx-board');if(b)b.scrollIntoView({block:'center'});return 'FENPREV '+vis.map(p=>p.innerText.replace(/\\n/g,'')).join(' | ');})()",
+"c": 41
+},
+{
+"eval": "(()=>{const i=document.querySelector('textarea.as-in');i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));return 'cleared'})()",
+"c": 42
+},
+{
+"c": 43,
+"reload": true
+},
+{
+"eval": "(()=>{const o=[];APP.ASSIST.sessions().forEach(s=>(s.msgs||[]).forEach((m,i)=>{const t=m.text||'';const se=APP.MATH.series(t),f=APP.MATH.fen(t),segs=(APP.MATH.segments?APP.MATH.segments(t):[]);const mx=Array.isArray(segs)?segs.filter(x=>x&&x.m).map(x=>x.src||x.text||x.tex||JSON.stringify(x).slice(0,60)):[];if(se||f)o.push(m.role+' PLOT/FEN '+(se?JSON.stringify(se).slice(0,80):'')+(f?' FEN':'')+' :: '+t.slice(0,80));if(mx.length)o.push(m.role+' MATH '+mx.slice(0,6).join(' ¦ ').slice(0,200));}));return o.join('\\n')||'none';})()",
+"c": 44
+},
+{
+"eval": "(()=>{const L=APP.liveAll();const p=window.__PID||APP.state.arg||(L.slice(-1)[0]||{p:{}}).p.id;localStorage.setItem('__PID',p);return 'pid '+p+' || '+L.map(r=>r.p.id+':'+r.p.title+':'+APP.liveClosure(r.p.id).state).join(' | ')})()",
+"c": 45
+},
+{
+"c": 46,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 47
+},
+{
+"eval": "(()=>{const o={today:APP.today()};const s=APP.ASSIST.cur();const cl=(x,n)=>String(x==null?'':x).slice(0,n||200);\no.user=(s.msgs||[]).filter(m=>m.role==='user').map((m,i)=>(i+1)+'['+APP.ASSIST.msgId(m)+'] '+cl(m.text,110)+((m.corr||[]).length?' {corr:'+JSON.stringify(m.corr).slice(0,200)+'}':'')+(m.textHist?' {hist:'+JSON.stringify(m.textHist).slice(0,200)+'}':''));\no.probs=APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const sv=pg.solve||{};const L=sv.live||{};return {t:cl(r.p.title,50),st:APP.liveClosure(r.p.id).state,stmt:cl(r.p.statement,220),pfix:cl(JSON.stringify(r.p.fixHist||null),300),u1:cl(JSON.stringify(sv.u||null),300),g:cl(JSON.stringify(sv.g||null),500),chat:cl(JSON.stringify(L.chat||null),300),plan:cl(JSON.stringify(L.plan||null),160),retr:cl(JSON.stringify(L.retracts||null),500),steps:(L.steps||[]).map(x=>cl((x.text||''),50)+' due='+x.due+' out='+cl(JSON.stringify(x.out||null),260)+' fix='+cl(JSON.stringify(x.fixHist||null),200))}});\no.plans=(APP.ASSIST.plansAll?APP.ASSIST.plansAll(s):[]).map(x=>{const p=x.p;return p.id+' «'+cl(p.text,60)+'» when='+p.when+' state='+p.state+(p.corr?' corr='+cl(JSON.stringify(p.corr),200):'')});\no.guesses=((s.coach||{}).guesses||[]).map(g=>g.id+' «'+cl(g.text,60)+'» res='+(g.res||'')+(g.wd||g.retracted?' WD':'')+(g.corr?' corr='+cl(JSON.stringify(g.corr),160):''));\no.retracts=cl(JSON.stringify((s.coach||{}).retracts||null),600)+' | se='+cl(JSON.stringify(s.retracts||null),600);\ntry{const P=APP.MIND.phases();o.mind=(P.weakest?'WEAK '+P.weakest.fa+' ':'nodistinct ')+P.rows.map(X=>X.fa+' '+X.k+'/'+X.n+' acts:'+(X.acts||[]).map(a=>(a.ok?'+':'-')+a.src).join(',')).join(' || ');}catch(e){o.mind='ERR '+e.message}\ntry{const d=APP.dossier(APP.liveAll().slice(-1)[0].p.id);o.dossier=(d.events||[]).length+' events: '+(d.events||[]).map(e=>e.k+(e.hist&&e.hist.length?'*':'')).join(',');}catch(e){o.dossier='ERR '+e.message}\nreturn JSON.stringify(o,null,1);})()\n",
+"c": 48
+},
+{
+"c": 49
+},
+{
+"c": 50
+},
+{
+"c": 51
+},
+{
+"c": 52
+},
+{
+"c": 53
+},
+{
+"c": 54
+},
+{
+"eval": "(()=>{const o=[];APP.liveAll().forEach(r=>{try{const d=APP.dossier(r.p.id);o.push(r.p.title+' :: '+(d.events||[]).map(e=>e.k+'@'+String(e.at||'').slice(0,16)+' '+String(e.title||'').slice(0,50)).join(' | '))}catch(e){o.push('ERR '+e.message)}});return o.join('\\n')})()",
+"c": 55
+},
+{
+"c": 56
+},
+{
+"c": 57,
+"reload": true
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('lprob',r.p.id);await W(900);const h=[...document.querySelectorAll('#main summary,#main h3,#main h2')].find(x=>/پرونده‌های تمرین/.test(x.innerText));let t='';if(h){const b=h.closest('details')||h.parentElement;t=b.innerText.split('\\n').filter(x=>/حدس/.test(x)).join(' / ')}const pg=APP.S.get('eprog_'+r.p.id)||{};const g=((pg.solve||{}).g||{})[1]||{};o.push(r.p.title.slice(0,30)+' ['+APP.liveClosure(r.p.id).state+'] BOX: '+t+' || g.hit='+(g.hit||'')+' testRes='+(g.testRes||'')+' refuted='+(g.refuted||'')+' res='+(g.res||''))}return o.join('\\n')})()",
+"c": 58
+},
+{
+"c": 59,
+"reload": true
+},
+{
+"c": 60
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let d=null;try{d=APP.dossierSess?APP.dossierSess(s.id):APP.dossier(s.id)}catch(e){return 'ERR '+e.message}return 'EVENTS '+((d&&d.events)||[]).map(e=>(e.at||'').slice(0,16)+' '+e.k+' '+String(e.title||'').slice(0,60)).join(' | ')+' || TEXT '+document.querySelector('#main').innerText.slice(0,6000)})()",
+"c": 61
+},
+{
+"c": 62
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,50))}:'NO MODEL')})()",
+"c": 63
+},
+{
+"c": 64
+},
+{
+"c": 65
+},
+{
+"c": 66
+},
+{
+"c": 67
+},
+{
+"c": 68
+},
+{
+"c": 69
+},
+{
+"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()",
+"c": 70
+},
+{
+"c": 71,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"سلام بردیا. کیش‌ها را امتحان کرده‌ای و شاه فرار کرده؛ پیش از حرکتِ بعدی یک قدم عقب برویم: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"ماتِ دوحرکته با رخِ گوشه\", \"pinned\": \"حلِ مسئلهٔ ماتِ دوحرکتهٔ شطرنج به دستِ خودش\", \"memory\": \"کاربر: سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می / دستیار: سلام بردیا. کیش‌ها را امتحان کرده‌ای و شاه فرار کرده؛ پیش از حرکتِ بعد\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": true, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"باشه، جواب را نمی‌گویم و می‌برمت به «🔭 مسئلهٔ حل‌نشدهٔ خودم» تا همان‌جا ثبتش کنیم. دربارهٔ رخ گفتی «بی‌فایده‌ست، فقط تزئینیه»: چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟\", \"title\": \"ماتِ دوحرکته با رخِ گوشه\", \"pinned\": \"حلِ مسئلهٔ ماتِ دوحرکتهٔ شطرنج به دستِ خودش\", \"memory\": \"کاربر: سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می / دستیار: سلام بردیا. کیش‌ها را امتحان کرده‌ای و شاه فرار کرده؛ پیش از حرکتِ بعد / کاربر: شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ها رو امتحا / دستیار: باشه، جواب را نمی‌گویم و می‌برمت به «🔭 مسئلهٔ حل‌نشدهٔ خودم» تا همان‌ج\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"go\", \"view\": \"lprob\"}, {\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": true, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"اون رخ گوشه به نظرم بی‌فایده‌ست، فقط تزئینیه\", \"q\": \"چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟\"}}]}",
+"{\"reply\": \"«مسئله‌های حل‌نشده» را باز می‌کنم تا همان‌جا ساخته شود.\", \"title\": \"ماتِ دوحرکته با رخِ گوشه\", \"pinned\": \"حلِ مسئلهٔ ماتِ دوحرکتهٔ شطرنج به دستِ خودش\", \"memory\": \"کاربر: سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می / دستیار: سلام بردیا. کیش‌ها را امتحان کرده‌ای و شاه فرار کرده؛ پیش از حرکتِ بعد / کاربر: شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ها رو امتحا / دستیار: باشه، جواب را نمی‌گویم و می‌برمت به «🔭 مسئلهٔ حل‌نشدهٔ خودم» تا همان‌ج / دستیار: «مسئله‌های حل‌نشده» را باز می‌کنم تا همان‌جا ساخته شود.\", \"status\": \"related\", \"next\": true, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"click\", \"k\": \"k4\"}]}",
+"{\"reply\": \"عنوان و صورتِ مسئله را از حرفِ خودت پر می‌کنم و «ساختنِ مسئلهٔ حل‌نشده» را می‌زنم.\", \"title\": \"ماتِ دوحرکته با رخِ گوشه\", \"pinned\": \"حلِ مسئلهٔ ماتِ دوحرکتهٔ شطرنج به دستِ خودش\", \"memory\": \"کاربر: سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می / دستیار: سلام بردیا. کیش‌ها را امتحان کرده‌ای و شاه فرار کرده؛ پیش از حرکتِ بعد / کاربر: شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ها رو امتحا / دستیار: باشه، جواب را نمی‌گویم و می‌برمت به «🔭 مسئلهٔ حل‌نشدهٔ خودم» تا همان‌ج / دستیار: «مسئله‌های حل‌نشده» را باز می‌کنم تا همان‌جا ساخته شود. / دستیار: عنوان و صورتِ مسئله را از حرفِ خودت پر می‌کنم و «ساختنِ مسئلهٔ حل‌نشده\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"fill\", \"k\": \"k11\", \"value\": \"ماتِ دوحرکته با رخِ گوشه\"}, {\"do\": \"fill\", \"k\": \"k12\", \"value\": \"سفید بازی می‌کند و در دو حرکت مات می‌کند. FEN: 5k2/8/5K2/8/8/8/8/R2Q4 w - - 0 1 . شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. کیش با وزیر رو زدم ولی شاه فرار می‌کنه. یه رخ سفید گوشه‌ی صفحه هست که نمی‌دونم چرا اونجاست.\"}, {\"do\": \"fill\", \"k\": \"k13\", \"value\": \"find\"}, {\"do\": \"fill\", \"k\": \"k14\", \"value\": \"objective\"}, {\"do\": \"click\", \"k\": \"k17\"}]}",
+"{\"reply\": \"مسئله ساخته شد. فیلدهای فهم به قلمِ خودت است؛ از همین‌جا شروع کن: کلِ مسئله را بی‌جزئیات، در یک جملهٔ کامل و به زبانِ خودت، می‌گویی؟\", \"title\": \"ماتِ دوحرکته با رخِ گوشه\", \"pinned\": \"حلِ مسئلهٔ ماتِ دوحرکتهٔ شطرنج به دستِ خودش\", \"memory\": \"کاربر: سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می / دستیار: سلام بردیا. کیش‌ها را امتحان کرده‌ای و شاه فرار کرده؛ پیش از حرکتِ بعد / کاربر: شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ها رو امتحا / دستیار: باشه، جواب را نمی‌گویم و می‌برمت به «🔭 مسئلهٔ حل‌نشدهٔ خودم» تا همان‌ج / دستیار: «مسئله‌های حل‌نشده» را باز می‌کنم تا همان‌جا ساخته شود. / دستیار: عنوان و صورتِ مسئله را از حرفِ خودت پر می‌کنم و «ساختنِ مسئلهٔ حل‌نشده / دستیار: مسئله ساخته شد. فیلدهای فهم به قلمِ خودت است؛ از همین‌جا شروع کن: کلِ \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"کیشِ d7 را آزمودی و دیدی شاه به g8 می‌رود؛ همین یک راه را دقیق بست. رخِ گوشه را کنار گذاشته بودی چون «فقط تزئینی است»: هنوز بی‌ربط است؟ دادهٔ کنارگذاشته گاهی همان عنصرِ غایب است.\", \"title\": \"ماتِ دوحرکته با رخِ گوشه\", \"pinned\": \"حلِ مسئلهٔ ماتِ دوحرکتهٔ شطرنج به دستِ خودش\", \"memory\": \"کاربر: سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می / دستیار: سلام بردیا. کیش‌ها را امتحان کرده‌ای و شاه فرار کرده؛ پیش از حرکتِ بعد / کاربر: شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ها رو امتحا / دستیار: باشه، جواب را نمی‌گویم و می‌برمت به «🔭 مسئلهٔ حل‌نشدهٔ خودم» تا همان‌ج / دستیار: «مسئله‌های حل‌نشده» را باز می‌کنم تا همان‌جا ساخته شود. / دستیار: عنوان و صورتِ مسئله را از حرفِ خودت پر می‌کنم و «ساختنِ مسئلهٔ حل‌نشده / دستیار: مسئله ساخته شد. فیلدهای فهم به قلمِ خودت است؛ از همین‌جا شروع کن: کلِ  / کاربر: کیش با وزیر d7 رو ثبت کردم، شاه میره g8. گیر کردم. هیچ کیشی جواب نمیده. رخ هم که به درد نم / دستیار: کیشِ d7 را آزمودی و دیدی شاه به g8 می‌رود؛ همین یک راه را دقیق بست. رخ\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": true, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"شاه میره g8\", \"step\": {\"step\": \"1\", \"done\": \"yes\", \"what\": \"شاه میره g8\", \"match\": \"no\"}}]}",
+"{\"reply\": \"از آخر به اول آمدی و خودت دیدی رخ برای بستنِ ردیفِ هشتم لازم است. گامی که گفتی بخشِ «سیاه هر جوابی می‌تواند بدهد» از شرط را هم به کار می‌برد؟\", \"title\": \"ماتِ دوحرکته با رخِ گوشه\", \"pinned\": \"حلِ مسئلهٔ ماتِ دوحرکتهٔ شطرنج به دستِ خودش\", \"memory\": \"کاربر: سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می / دستیار: سلام بردیا. کیش‌ها را امتحان کرده‌ای و شاه فرار کرده؛ پیش از حرکتِ بعد / کاربر: شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ها رو امتحا / دستیار: باشه، جواب را نمی‌گویم و می‌برمت به «🔭 مسئلهٔ حل‌نشدهٔ خودم» تا همان‌ج / دستیار: «مسئله‌های حل‌نشده» را باز می‌کنم تا همان‌جا ساخته شود. / دستیار: عنوان و صورتِ مسئله را از حرفِ خودت پر می‌کنم و «ساختنِ مسئلهٔ حل‌نشده / دستیار: مسئله ساخته شد. فیلدهای فهم به قلمِ خودت است؛ از همین‌جا شروع کن: کلِ  / کاربر: کیش با وزیر d7 رو ثبت کردم، شاه میره g8. گیر کردم. هیچ کیشی جواب نمیده. رخ هم که به درد نم / دستیار: کیشِ d7 را آزمودی و دیدی شاه به g8 می‌رود؛ همین یک راه را دقیق بست. رخ / کاربر: آها! از آخر فکر کردم: مات چه شکلیه؟ اگه شاه سیاه g8 باشه و رخ بره a8، ردیف هشتم بسته میشه؛ / دستیار: از آخر به اول آمدی و خودت دیدی رخ برای بستنِ ردیفِ هشتم لازم است. گامی\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\", \"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"وزیر b7! اونوقت شاه سیاه فقط e8 یا g8 داره و رخ a8 مات\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}}]}"
+],
+"keys": [
+"سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می‌کند. FEN: 5k2/8/5K2/8/8/8/8/R2Q4 w - - 0 1 . من کیش با وزیر رو زدم ولی شاه فرار می‌کنه. یه رخ سفید گوشه‌ی صفحه هست که اصلاً نمی‌دونم چرا اونجاست.",
+"شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ها رو امتحان می‌کنم: وزیر d8 کیش، وزیر d7 کیش، رخ a8 کیش. هر دفعه شاه میره e8 یا g8. اون رخ گوشه به نظرم بی‌فایده‌ست، فقط تزئینیه. می‌خوام خودم حلش کنم، جوابو نگ",
+"[سامانه: «مسئلهٔ حل‌نشدهٔ خودم» باز شد. این نما فیلدی برای پر کردن ندارد — چیزی پر نکن. خواستهٔ همین پیامِ کاربر («شاه سفید f6، وزیر سفید d1، رخ سفید a1 گوشه، شاه سیاه f8. معمولاً اول همه‌ی کیش‌ه») هنوز انجام نشده: اگر دکمه یا زبانه‌ای در ه",
+"[سامانه: « مسئله‌های بزرگ» — زبانهٔ « مسئلهٔ حل‌نشدهٔ خودم» باز شد. حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]",
+"[سامانه: «مسئلهٔ حل‌نشدهٔ خودم» (قدم/برگهٔ u) باز شد؛ پیامِ صفحه پس از کارهایت: «مسئله ساخته شد؛ اول بفهمیمش.» — بر پایهٔ همین پیام ادامه بده (حدس نزن). حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن — فقط فیلدهایی که «به قلمِ خودِ کارب",
+"کیش با وزیر d7 رو ثبت کردم، شاه میره g8. گیر کردم. هیچ کیشی جواب نمیده. رخ هم که به درد نمی‌خوره.",
+"آها! از آخر فکر کردم: مات چه شکلیه؟ اگه شاه سیاه g8 باشه و رخ بره a8، ردیف هشتم بسته میشه؛ اگه ردیف هفتم هم بسته باشه مات میشه. پس اول وزیر d7 بدون کیش... نه صبر کن، وزیر d7 کیشه. پس اول وزیر یه جای آروم که ردیف هفتم رو بگیره، مثلاً وزیر d7"
+]
+}

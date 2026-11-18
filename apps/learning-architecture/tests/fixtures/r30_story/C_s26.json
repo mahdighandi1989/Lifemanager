@@ -1,0 +1,227 @@
+{
+"from": "round30C/s26",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سه نفریم، یه موتور داریم که فقط دو نفر سوار می‌شن، سرعتش ۴۰ کیلومتر، پیاده هم ۵ کیلومتر. ایستگاه ۳۰ کیلومتره. قطار ۲ ساعت دیگه حرکت می‌کنه. می‌رسیم؟ به نظرم نه، نفر سوم ۶ ساعت پیاده‌ست.",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok'",
+"c": 1
+},
+{
+"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='2000-07-07';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()",
+"c": 2
+},
+{
+"say": "آره، ثبتش کن.",
+"c": 3
+},
+{
+"eval": "(()=>{const pid=APP.state.arg;window.__PID=pid;return APP.state.view+' '+JSON.stringify(APP.liveKindInfo(pid));})()\n",
+"c": 4
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;P('lpNat',/کامل‌بیان‌شده/);await W(600);F('lpOne','می‌خواهم بدانم کمترین زمانی که هر سه نفر با یک موتورِ دونفره و پیاده‌روی به ایستگاه می‌رسند کمتر از ۲ ساعت است یا نه.');F('lpWhy','قطار را از دست ندهیم.');await W(300);B(/ثبتِ کل/);await W(900);F('lpUnk','کمترین زمانِ رسیدنِ هر سه نفر (T)');F('lpD_d1','موتور ۴۰ کیلومتر در ساعت و فقط دو نفر');F('lpD_d2','پیاده ۵ کیلومتر در ساعت');await W(300);B(/دادهٔ دیگر/);await W(400);F('lpD_d3','فاصله تا ایستگاه ۳۰ کیلومتر');await W(300);B(/دادهٔ دیگر/);await W(400);F('lpD_d4','قطار ۲ ساعت دیگر حرکت می‌کند');F('lpCond','موتور A و B را تا جایی می‌برد و B پیاده می‌شود\\nC از اول پیاده راه می‌افتد\\nموتور برمی‌گردد و C را برمی‌دارد\\nهر سه باید هم‌زمان یا زودتر از ۲ ساعت برسند');P('lpSat',/هنوز نمی‌دانم/);P('lpSuff',/هنوز نمی‌دانم/);F('lpSuffW','نمی‌دانم چند معادله لازم است');F('lpFig','خطِ ۰ تا ۳۰ با نقطهٔ x (پیاده‌شدنِ B) و y (جای برخوردِ موتور و C)');const box=document.querySelector('[id^=lpNS_0]');F('lpNS_0','x');F('lpNM_0','جایی که B پیاده می‌شود (کیلومتر از مبدأ)');await W(200);const addN=B(/نمادِ دیگر/);await W(400);F('lpNS_1','t1');F('lpNM_1','زمانِ رسیدنِ موتور به x');B(/نمادِ دیگر/);await W(400);F('lpNS_2','y');F('lpNM_2','جای برخوردِ موتورِ برگشتی و C');B(/نمادِ دیگر/);await W(400);F('lpNS_3','t2');F('lpNM_3','زمانِ برخورد');F('lpGuess','نه، نمی‌رسیم');P('lpConf',/۷۰/);F('lpTest','زمانِ هر سه را با معادله حساب می‌کنم');P('lpIfRef',/کنار می‌گذارم/);await W(400);let t0=document.body.innerText;B(/ثبتِ فهم/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,8).join(' ¦ ');return 'NEW: '+diff;})()",
+"c": 5
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;B(/^۲ کامل$/);await W(1000);const r=APP.liveRec(pid);const t=T('۲) طرح',1500);return 'kind='+JSON.stringify(APP.liveKindInfo(pid))+' notation='+JSON.stringify((r.p.u||r.p.sol||{}).nota||null).slice(0,200)+' || '+t;})()",
+"c": 6
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const s=JSON.stringify(APP.liveRec(pid));const i=s.indexOf('جایی که B');P('lpSuff',/هنوز نمی‌دانم/);F('lpSuffW','چهار مجهول دارم و هنوز نشمرده‌ام چند معادله دارم');await W(200);B(/^ثبت$/);await W(700);P('lpMv',/نماد بگذار/);F('lpMvWhy','هر بخشِ شرط را با x، y، t1، t2 به معادله ترجمه می‌کنم');await W(200);B(/افزودنِ حرکت/);await W(700);F('lpPlan','نخست هر بخشِ شرط را به یک معادله با x، y، t1، t2 ترجمه می‌کنم، سپس دستگاه را حل می‌کنم و T را با ۲ ساعت مقایسه می‌کنم.');document.querySelectorAll('[id^=lpPC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);let t0=document.body.innerText;B(/ثبتِ طرح/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,6).join(' ¦ ');return 'notaStored='+(i>=0?s.slice(i-150,i+60):'NO')+' phase='+APP.livePhase(pid)+' NEW: '+diff;})()",
+"c": 7
+},
+{
+"eval": "(async()=>{let hits=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);const v=localStorage.getItem(k);if(v&&v.indexOf('جایی که B')>=0)hits.push(k+':'+v.slice(v.indexOf('جایی که B')-200,v.indexOf('جایی که B')+100));}let s2='';try{const all=(APP.S&&APP.S.all)?JSON.stringify(APP.S.all()):'';const j=all.indexOf('جایی که B');s2=j>=0?all.slice(j-250,j+150):'notInS';}catch(e){s2='err '+e.message}return 'LS='+hits.join(' ## ').slice(0,700)+' || S='+s2;})()",
+"c": 8
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;P('lpSuffQ_p',/هنوز نمی‌دانم/);F('lpSuffQW_p','چهار مجهول دارم و هنوز نشمرده‌ام چند معادله دارم');await W(200);const bt=[...document.querySelectorAll('#main button')].find(b=>b.textContent.trim()==='ثبت');bt.click();await W(800);['d1','d3','d4'].forEach(d=>{P('lpPU_a_'+d,/حالا به کارش/);});F('lpPU_w_d1','سرعتِ موتور در معادله‌های t1 و t2');F('lpPU_w_d3','x و y بینِ ۰ و ۳۰');F('lpPU_w_d4','T را با ۲ مقایسه می‌کنم');if(!document.getElementById('lpPlan').value)F('lpPlan','نخست هر بخشِ شرط را به یک معادله با x، y، t1، t2 ترجمه می‌کنم، سپس دستگاه را حل می‌کنم و T را با ۲ ساعت مقایسه می‌کنم.');await W(300);let t0=document.body.innerText;B(/ثبتِ طرح/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,6).join(' ¦ ');return 'phase='+APP.livePhase(pid)+' NEW: '+diff;})()",
+"c": 9
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpStep','معادله‌ها: t1 = x/40 ؛ y = 5·t2 ؛ x − y = 40·(t2 − t1)');P('lpClear',/^بله/);await W(400);F('lpProof','اولی: موتور با ۴۰ تا x می‌رود. دومی: C در زمانِ t2 با ۵ به y رسیده. سومی: موتور از x تا y را در t2 − t1 برمی‌گردد.');document.querySelectorAll('[id^=lpSD_]').forEach(e=>{if(!e.checked)e.click();});const sc=[...document.querySelectorAll('[id^=lpSC_]')];if(sc[0]&&!sc[0].checked)sc[0].click();if(sc[1]&&!sc[1].checked)sc[1].click();if(sc[2]&&!sc[2].checked)sc[2].click();await W(300);let t0=document.body.innerText;B(/ثبتِ گام/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,14).join(' ¦ ');return 'eqs='+JSON.stringify(APP.liveEquations(pid))+' NEW: '+diff+' || IDS '+IDS().split(' | ').filter(x=>/Eq/.test(x)).join(' | ');})()",
+"c": 10
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpEqUnk','۴');await W(200);const b=[...document.querySelectorAll('#main button')].find(b=>b.textContent.trim()==='بسنج'&&b.closest('*')&&document.getElementById('lpEqUnk').parentElement.parentElement.contains(b))||[...document.querySelectorAll('#main button')].filter(b=>b.textContent.trim()==='بسنج').pop();b.click();await W(900);return T('معادله‌ها در برابرِ مجهول‌ها',900)+' || condUnused='+JSON.stringify(APP.liveCoach(pid).condUnused);})()",
+"c": 11
+},
+{
+"say": "صفحه میگه معادله کمه. ۴ مجهول دارم ۳ معادله: t1 = x/40 ، y = 5·t2 ، x − y = 40(t2 − t1). گیر کردم، نمی‌دونم معادله‌ی چهارم از کجا بیاد.",
+"c": 12
+},
+{
+"eval": "(()=>{const c=APP.liveCoach(window.__PID);return c.src+' | q='+c.q+' | card='+c.card;})()\n",
+"c": 13
+},
+{
+"eval": "(()=>{const p=window.__PID||APP.state.arg;if(p)localStorage.setItem('__PID',p);return (APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'))+' pid='+p})()",
+"c": 14
+},
+{
+"c": 15,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()",
+"c": 16
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpStep','بخشِ «هر سه هم‌زمان برسند»: B و C هر دو بخشی را پیاده می‌روند و مسئله نسبت به آن دو متقارن است، پس 30 − x = y. با سه معادلهٔ قبلی: x = 4.5y ⇒ y ≈ 5.45 ، x ≈ 24.55 ، T = t2 + (30 − y)/40 ≈ 1.70 ساعت');P('lpClear',/^بله/);await W(400);F('lpProof','اگر یکی بیشتر پیاده برود دیرتر می‌رسد؛ کمترین T وقتی است که هر دو هم‌زمان برسند ⇒ مسافتِ پیادهٔ برابر. جای‌گذاری: x − y = 40(y/5) − x ⇒ 2x = 9y.');document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);let t0=document.body.innerText;B(/ثبتِ گام/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,10).join(' ¦ ');const c=B(/✅ حل شد/);await W(1200);const ids=IDS();return 'NEW: '+diff+' || '+c+' gate='+JSON.stringify(APP.liveClosure(pid).gate)+' || IDS '+ids.slice(ids.indexOf('lpBWant'));})()",
+"eval0": "(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'));'ok'",
+"c": 17
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;P('lpBWant',/همان‌قدر/);document.querySelectorAll('[id^=lpBCP_]').forEach(s=>{const o=[...s.options].find(o=>/^بله/.test(o.text));s.value=o.value;s.dispatchEvent(new Event('change',{bubbles:true}));});F('lpBChk','x و y را در هر سه معادله گذاشتم؛ برقرارند و هر سه هم‌زمان می‌رسند');F('lpBLimit','اگر پیاده ۰ بود، C هرگز نمی‌رسید مگر موتور دو بار برود؛ اگر پیاده هم ۴۰ بود، T = ۳۰/۴۰ = ۰٫۷۵ — فرمولِ من همین‌ها را می‌دهد');P('lpBRes',/سالم/);F('lpBOther','نمودارِ مکان-زمان می‌کشیدم');F('lpBGlance','B و C هر کدام یک‌پنجم و نیمِ مسیر را پیاده می‌روند و بقیه را موتور');F('lpBWorked','تقارنِ دو نفرِ پیاده');P('lpBMulti',/^یکی/);document.getElementById('lpBBest').selectedIndex=1;document.getElementById('lpBBest').dispatchEvent(new Event('change',{bubbles:true}));F('lpBUse','وقتی معادله کم است، دنبالِ بخشی از شرط بگردم که هنوز معادله نشده — مثلاً تقارن');F('lpBTaste','تقارن را دوست داشتم؛ حسابِ کسرها را نه');F('lpBNew','چهار نفر و یک موتورِ دونفره');P('lpBNewS',/^روش/);F('lpBNewW','همان تقارنِ پیاده‌ها و رفت‌وبرگشتِ موتور');P('lpBHit',/نادرست/);await W(300);if(document.getElementById('lpBHitW'))F('lpBHitW','فقط یک رفت را دیدم و فکر کردم نفرِ سوم کلِ راه را پیاده می‌رود');let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1300);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,6).join(' ¦ ');const tour=APP.ASSIST.tourText?APP.ASSIST.tourText(APP.ASSIST.cur()):'';return 'phase='+APP.livePhase(pid)+' NEW: '+diff+' || TOUR: '+String(tour).slice(0,600);})()",
+"c": 18
+},
+{
+"c": 19,
+"reload": true
+},
+{
+"say": "هنوز نمی‌دونم. گیرم، نمی‌فهمم معادله‌ی چهارم از کجا میاد.",
+"c": 20
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur()||{};const L=APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const sv=pg.solve||{};return {t:r.p.title,st:(APP.liveClosure?APP.liveClosure(r.p.id).state:''),g:sv.g,steps:((sv.live||{}).steps||[]).map(x=>({t:(x.text||'').slice(0,60),out:x.out}))}});const ph=APP.MIND.phases();return JSON.stringify({ph:ph.rows.map(x=>[x.id,x.k,x.n,Object.keys(x.src).join('+'),Math.round(x.pWeak*100)]),weak:ph.weakest&&ph.weakest.fa,coachGuess:s.coach&&s.coach.guess,checkRep:s.coach&&s.coach.checkRep,reg:s.register||(s.coach&&s.coach.reg),prom:s.promises,plans:s.plans||(s.coach&&s.coach.plans),dl:(APP.S.all('deadline')||[]).map(d=>[d.what||d.title,d.date||d.due]),live:L})})()",
+"c": 21
+},
+{
+"c": 22,
+"reload": true
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));if(APP.ASSIST&&APP.ASSIST.toggle)APP.ASSIST.toggle(false);const L=APP.liveAll().filter(r=>!APP.liveClosure||APP.liveClosure(r.p.id).state!=='solved');const r=L[L.length-1]||APP.liveAll()[0];APP.go('lprob',r.p.id);await W(1500);const f=[...document.querySelectorAll('#main textarea[id^=lp],#main input[id^=lp][type=text]')].filter(e=>e.offsetParent)[0];if(!f)return 'NOFIELD';f.scrollIntoView({block:'center'});f.focus();f.value=\"x − y = 40(t2 − t1)\";f.dispatchEvent(new Event('input',{bubbles:true}));f.setSelectionRange(f.value.length,f.value.length);await W(300);const tog=document.querySelector('.mx-bar-tog');if(tog&&tog.getAttribute('aria-expanded')!=='true')tog.click();await W(200);const sq=document.querySelector('.mx-sym[data-k=le]');if(sq)sq.click();await W(200);f.value=f.value+' ۱۰۰';f.dispatchEvent(new Event('input',{bubbles:true}));await W(400);const pv=document.querySelector('.mx-prev[data-for=\"'+f.id+'\"]');return 'PID '+r.p.title+' FIELD '+f.id+' VAL '+f.value+' || PREV '+(pv&&!pv.hidden?pv.innerText:'(none)')+' || BAR '+(document.querySelector('.mx-bar')?[...document.querySelectorAll('.mx-sym')].map(x=>x.textContent).join(' '):'none')+' focus='+(document.activeElement===f);})()",
+"c": 23
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await W(600);const i=document.querySelector('textarea.as-in');i.focus();i.value=\"t1 = x/40 ، y = 5·t2 ، x − y = 40(t2 − t1)\";i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const tog=document.querySelector('.mx-bar-tog');if(tog&&tog.getAttribute('aria-expanded')!=='true')tog.click();await W(300);const pv=document.querySelector('.mx-prev[data-for]')&&[...document.querySelectorAll('.mx-prev')].find(p=>p.previousElementSibling===i||p.parentElement===i.parentElement||p.closest('.as-root'));const all=[...document.querySelectorAll('.as-root .mx-prev')];const vis=all.filter(p=>!p.hidden);if(vis[0])vis[0].scrollIntoView({block:'end'});return 'CHATPREV '+vis.map(p=>p.innerText).join(' | ')+' || plots='+document.querySelectorAll('.as-msg .mx-plot').length+' boards='+document.querySelectorAll('.as-msg .mx-board').length;})()",
+"c": 24
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const i=document.querySelector('textarea.as-in');i.value=\"قطار ساعت ۱۴:۳۰ حرکت می‌کنه، بلیت ۱۲۰٬۰۰۰ تومان، کد رزرو TR-2026/10\";i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const vis=[...document.querySelectorAll('.as-root .mx-prev')].filter(p=>!p.hidden);return 'NONMATH prev='+vis.map(p=>p.innerText).join(' | ');})()",
+"c": 25
+},
+{
+"eval": "(()=>{const i=document.querySelector('textarea.as-in');if(i){i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));}return 'cleared'})()",
+"c": 26
+},
+{
+"c": 27,
+"reload": true
+},
+{
+"eval": "(()=>{const o=[];APP.ASSIST.sessions().forEach(s=>(s.msgs||[]).forEach((m,i)=>{const t=m.text||'';const se=APP.MATH.series(t),f=APP.MATH.fen(t),segs=(APP.MATH.segments?APP.MATH.segments(t):[]);const mx=Array.isArray(segs)?segs.filter(x=>x&&x.m).map(x=>x.src||x.text||x.tex||JSON.stringify(x).slice(0,60)):[];if(se||f)o.push(m.role+' PLOT/FEN '+(se?JSON.stringify(se).slice(0,80):'')+(f?' FEN':'')+' :: '+t.slice(0,80));if(mx.length)o.push(m.role+' MATH '+mx.slice(0,6).join(' ¦ ').slice(0,200));}));return o.join('\\n')||'none';})()",
+"c": 28
+},
+{
+"eval": "(()=>{const L=APP.liveAll();const p=window.__PID||APP.state.arg||(L.slice(-1)[0]||{p:{}}).p.id;localStorage.setItem('__PID',p);return 'pid '+p+' || '+L.map(r=>r.p.id+':'+r.p.title+':'+APP.liveClosure(r.p.id).state).join(' | ')})()",
+"c": 29
+},
+{
+"c": 30,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 31
+},
+{
+"eval": "(()=>{const o={today:APP.today()};const s=APP.ASSIST.cur();const cl=(x,n)=>String(x==null?'':x).slice(0,n||200);\no.user=(s.msgs||[]).filter(m=>m.role==='user').map((m,i)=>(i+1)+'['+APP.ASSIST.msgId(m)+'] '+cl(m.text,110)+((m.corr||[]).length?' {corr:'+JSON.stringify(m.corr).slice(0,200)+'}':'')+(m.textHist?' {hist:'+JSON.stringify(m.textHist).slice(0,200)+'}':''));\no.probs=APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const sv=pg.solve||{};const L=sv.live||{};return {t:cl(r.p.title,50),st:APP.liveClosure(r.p.id).state,stmt:cl(r.p.statement,220),pfix:cl(JSON.stringify(r.p.fixHist||null),300),u1:cl(JSON.stringify(sv.u||null),300),g:cl(JSON.stringify(sv.g||null),500),chat:cl(JSON.stringify(L.chat||null),300),plan:cl(JSON.stringify(L.plan||null),160),retr:cl(JSON.stringify(L.retracts||null),500),steps:(L.steps||[]).map(x=>cl((x.text||''),50)+' due='+x.due+' out='+cl(JSON.stringify(x.out||null),260)+' fix='+cl(JSON.stringify(x.fixHist||null),200))}});\no.plans=(APP.ASSIST.plansAll?APP.ASSIST.plansAll(s):[]).map(x=>{const p=x.p;return p.id+' «'+cl(p.text,60)+'» when='+p.when+' state='+p.state+(p.corr?' corr='+cl(JSON.stringify(p.corr),200):'')});\no.guesses=((s.coach||{}).guesses||[]).map(g=>g.id+' «'+cl(g.text,60)+'» res='+(g.res||'')+(g.wd||g.retracted?' WD':'')+(g.corr?' corr='+cl(JSON.stringify(g.corr),160):''));\no.retracts=cl(JSON.stringify((s.coach||{}).retracts||null),600)+' | se='+cl(JSON.stringify(s.retracts||null),600);\ntry{const P=APP.MIND.phases();o.mind=(P.weakest?'WEAK '+P.weakest.fa+' ':'nodistinct ')+P.rows.map(X=>X.fa+' '+X.k+'/'+X.n+' acts:'+(X.acts||[]).map(a=>(a.ok?'+':'-')+a.src).join(',')).join(' || ');}catch(e){o.mind='ERR '+e.message}\ntry{const d=APP.dossier(APP.liveAll().slice(-1)[0].p.id);o.dossier=(d.events||[]).length+' events: '+(d.events||[]).map(e=>e.k+(e.hist&&e.hist.length?'*':'')).join(',');}catch(e){o.dossier='ERR '+e.message}\nreturn JSON.stringify(o,null,1);})()\n",
+"c": 32
+},
+{
+"c": 33
+},
+{
+"c": 34
+},
+{
+"c": 35
+},
+{
+"c": 36
+},
+{
+"c": 37
+},
+{
+"c": 38
+},
+{
+"eval": "(()=>{const o=[];APP.liveAll().forEach(r=>{try{const d=APP.dossier(r.p.id);o.push(r.p.title+' :: '+(d.events||[]).map(e=>e.k+'@'+String(e.at||'').slice(0,16)+' '+String(e.title||'').slice(0,50)).join(' | '))}catch(e){o.push('ERR '+e.message)}});return o.join('\\n')})()",
+"c": 39
+},
+{
+"c": 40
+},
+{
+"c": 41,
+"reload": true
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('lprob',r.p.id);await W(900);const h=[...document.querySelectorAll('#main summary,#main h3,#main h2')].find(x=>/پرونده‌های تمرین/.test(x.innerText));let t='';if(h){const b=h.closest('details')||h.parentElement;t=b.innerText.split('\\n').filter(x=>/حدس/.test(x)).join(' / ')}const pg=APP.S.get('eprog_'+r.p.id)||{};const g=((pg.solve||{}).g||{})[1]||{};o.push(r.p.title.slice(0,30)+' ['+APP.liveClosure(r.p.id).state+'] BOX: '+t+' || g.hit='+(g.hit||'')+' testRes='+(g.testRes||'')+' refuted='+(g.refuted||'')+' res='+(g.res||''))}return o.join('\\n')})()",
+"c": 42
+},
+{
+"c": 43,
+"reload": true
+},
+{
+"c": 44
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let d=null;try{d=APP.dossierSess?APP.dossierSess(s.id):APP.dossier(s.id)}catch(e){return 'ERR '+e.message}return 'EVENTS '+((d&&d.events)||[]).map(e=>(e.at||'').slice(0,16)+' '+e.k+' '+String(e.title||'').slice(0,60)).join(' | ')+' || TEXT '+document.querySelector('#main').innerText.slice(0,6000)})()",
+"c": 45
+},
+{
+"c": 46
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,50))}:'NO MODEL')})()",
+"c": 47
+},
+{
+"c": 48
+},
+{
+"c": 49
+},
+{
+"c": 50
+},
+{
+"c": 51
+},
+{
+"c": 52
+},
+{
+"c": 53
+},
+{
+"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()",
+"c": 54
+},
+{
+"c": 55,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"«نمی‌رسیم» فعلاً حدسِ توست و من داوری‌اش نمی‌کنم؛ اگر بخواهی مسئله را ثبت می‌کنم تا صفحهٔ خودش باز شود. چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: سه نفریم، یه موتور داریم که فقط دو نفر سوار می‌شن، سرعتش ۴۰ کیلومتر، پیاده هم ۵ کیلومتر. ا / دستیار: «نمی‌رسیم» فعلاً حدسِ توست و من داوری‌اش نمی‌کنم؛ اگر بخواهی مسئله را \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"به نظرم نه، نفر سوم ۶ ساعت پیاده‌ست\", \"q\": \"چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟\"}}]}",
+"{\"reply\": \"ثبتش می‌کنم؛ صفحهٔ خودش باز می‌شود و فهم را همان‌جا پر کن.\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: سه نفریم، یه موتور داریم که فقط دو نفر سوار می‌شن، سرعتش ۴۰ کیلومتر، پیاده هم ۵ کیلومتر. ا / دستیار: «نمی‌رسیم» فعلاً حدسِ توست و من داوری‌اش نمی‌کنم؛ اگر بخواهی مسئله را  / کاربر: آره، ثبتش کن. / دستیار: ثبتش می‌کنم؛ صفحهٔ خودش باز می‌شود و فهم را همان‌جا پر کن.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"سه نفر، یک موتورِ دونفره، ایستگاهِ ۳۰ کیلومتری در ۲ ساعت\", \"statement\": \"سه نفریم، یه موتور داریم که فقط دو نفر سوار می‌شن، سرعتش ۴۰ کیلومتر، پیاده هم ۵ کیلومتر. ایستگاه ۳۰ کیلومتره. قطار ۲ ساعت دیگه حرکت می‌کنه. می‌رسیم؟\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"سه معادله‌ات را دیدم و شمارشت درست است: چهار مجهول، سه معادله. کدام بخشِ شرط هنوز به معادله درنیامده؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: سه نفریم، یه موتور داریم که فقط دو نفر سوار می‌شن، سرعتش ۴۰ کیلومتر، پیاده هم ۵ کیلومتر. ا / دستیار: «نمی‌رسیم» فعلاً حدسِ توست و من داوری‌اش نمی‌کنم؛ اگر بخواهی مسئله را  / کاربر: آره، ثبتش کن. / دستیار: ثبتش می‌کنم؛ صفحهٔ خودش باز می‌شود و فهم را همان‌جا پر کن. / کاربر: صفحه میگه معادله کمه. ۴ مجهول دارم ۳ معادله: t1 = x/40 ، y = 5·t2 ، x − y = 40(t2 − t1). گ / دستیار: سه معادله‌ات را دیدم و شمارشت درست است: چهار مجهول، سه معادله. کدام بخ\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\", \"c\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"cause\": {\"kind\": \"knot\", \"quote\": \"گیر کردم، نمی‌دونم معادله‌ی چهارم از کجا بیاد\"}}]}",
+"{\"reply\": \"این همان مسئله‌ای است که بستی، پس از درسِ خودت کمک بگیریم. درسِ خودت در بازنگریِ همین مسئله: «وقتی معادله کم است، دنبالِ بخشی از شرط بگردم که هنوز معادله نشده — مثلاً تقارن» — همین را این‌جا چطور به کار می‌بری؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: سه نفریم، یه موتور داریم که فقط دو نفر سوار می‌شن، سرعتش ۴۰ کیلومتر، پیاده هم ۵ کیلومتر. ا / دستیار: «نمی‌رسیم» فعلاً حدسِ توست و من داوری‌اش نمی‌کنم؛ اگر بخواهی مسئله را  / کاربر: آره، ثبتش کن. / دستیار: ثبتش می‌کنم؛ صفحهٔ خودش باز می‌شود و فهم را همان‌جا پر کن. / کاربر: صفحه میگه معادله کمه. ۴ مجهول دارم ۳ معادله: t1 = x/40 ، y = 5·t2 ، x − y = 40(t2 − t1). گ / دستیار: سه معادله‌ات را دیدم و شمارشت درست است: چهار مجهول، سه معادله. کدام بخ / کاربر: هنوز نمی‌دونم. گیرم، نمی‌فهمم معادله‌ی چهارم از کجا میاد. / دستیار: این همان مسئله‌ای است که بستی، پس از درسِ خودت کمک بگیریم. درسِ خودت د\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"cause\": {\"kind\": \"knot\", \"quote\": \"گیرم، نمی‌فهمم معادله‌ی چهارم از کجا میاد\"}}]}"
+],
+"keys": [
+"سه نفریم، یه موتور داریم که فقط دو نفر سوار می‌شن، سرعتش ۴۰ کیلومتر، پیاده هم ۵ کیلومتر. ایستگاه ۳۰ کیلومتره. قطار ۲ ساعت دیگه حرکت می‌کنه. می‌رسیم؟ به نظرم نه، نفر سوم ۶ ساعت پیاده‌ست.",
+"آره، ثبتش کن.",
+"صفحه میگه معادله کمه. ۴ مجهول دارم ۳ معادله: t1 = x/40 ، y = 5·t2 ، x − y = 40(t2 − t1). گیر کردم، نمی‌دونم معادله‌ی چهارم از کجا بیاد.",
+"هنوز نمی‌دونم. گیرم، نمی‌فهمم معادله‌ی چهارم از کجا میاد."
+]
+}
