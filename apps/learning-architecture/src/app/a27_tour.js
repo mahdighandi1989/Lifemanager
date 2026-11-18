@@ -3466,7 +3466,7 @@
   /* coach_state.check که پس از chat_solved ِ همین نوبت (یا دیرتر) می‌رسد: حکمِ مسئلهٔ بسته‌شدهٔ همین سشن به‌روز می‌شود */
   function chkLate(s, ok) {
     var mine = chatClosed().filter(function (x) { return (x.L.chat || {}).sess === s.id; }).pop(); if (!mine || !ok.length) return;
-    var b = mine.b; if (b.verdict === "verified") return;
+    var b = mine.b; if (b.verdict === "verified" && b.chkBy !== "page30") return;   // دورِ ۳۰ (C186): پیامِ وارسی‌ای که صفحه خودش یافت جای نقلِ دقیقِ دیرآمدهٔ مدل را نمی‌گیرد
     var W = chkWindow(s, mine.r.p.statement, mine.r), ok2 = ok.filter(function (m) { return W.indexOf(m) >= 0; }); if (!ok2.length) return;
     b.verdict = "verified"; b.chkRes = "نتیجه سالم ماند"; b.chkBy = "msgs"; b.chkMsgs = ok2.map(function (m) { return clip(m.text, 160); }); S.put(mine.pg);
   }
