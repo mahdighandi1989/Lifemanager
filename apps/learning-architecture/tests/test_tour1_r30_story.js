@@ -59,6 +59,14 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       return { woke: [a.ph, a.q, a.ladderEnd], all: [b2.ph, b2.q, b2.ladderEnd] }; });
     return [x.woke[2] === false && x.all[2] === true, J(x)]; };
 
+  /* ---------- C183 (A23-8 s10): نتیجهٔ وارسی‌شده و فقط بازنگری مانده ⇒ «پیدا شد: …»؛ هم‌شکلِ منفی: «شاید» ⇒ همان خواسته ---------- */
+  K.U_C183 = async () => { const x = await ev(() => { APP.S.loaded = true; const mk = (v) => { const r = APP.liveCreate('چیدمانِ میزها', 'آیا چیدمانی هست که همهٔ قوانین را برآورد، یا ناممکن است؟', 'find', { by: 'user' }); const pid = r.p.id;
+      const pg = APP.S.get('eprog_' + pid); const so = pg.solve = pg.solve || {}; const L = so.live = so.live || {}; const at = new Date().toISOString();
+      L.state = 'solved'; L.stateAt = at; L.chat = { sess: '', at, solution: 'با میزهای چهارنفره چیدمان درومد' }; so.b = { 1: { state: 'solved', verdict: v, chkRes: 'نتیجه سالم ماند', at, done: false, from: 'chat' } }; APP.S.put(pg);
+      const M = APP.ROUTE.model(pid); return [M.dest, M.nowFa, M.remain]; };
+      return { ver: mk('verified'), maybe: mk('maybe') }; });
+    return [/^پیدا شد: «با میزهای چهارنفره چیدمان درومد» — گامِ بعد: بازنگری$/.test(x.ver[0]) && !/پیدا شد/.test(x.maybe[0]), J(x)]; };
+
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 1200)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   console.log(JSON.stringify(info));
