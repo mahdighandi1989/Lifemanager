@@ -61560,7 +61560,7 @@ APP.goFromURL = function (q) {
       ((AC && AC.clauses) || []).forEach(function (c) { if (!c.claim || !(c.checks || []).length || inOw(c.a, c.b)) return; var q = c.t, lab = /^([^:：«»\n]{1,60})[:：]\s*/.exec(q);
         if (lab && META30.test(lab[1]) && /[0-9۰-۹]/.test(q.slice(lab[0].length))) q = q.slice(lab[0].length); q = txt(q).replace(/^(?:ولی|اما|و)\s+/, "");
         if (q && !TEST25.test(q) && !EX30.test(sentOf30(T, c.a))) P.push({ step: clip(q, 80), quote: q, verdict: c.mark === "bad" ? "wrong" : c.mark === "ok" ? "ok" : "unchecked" }); }); }
-    if (!P.length) return null;
+    if (P.length < 2) return null;   // یک حسابِ تنها («بابام کمکم کرد … ۴ × ۹ = ۳۶»، بانکِ R28 #188) سطرِ «حسابِ تو» ِ 📜 می‌ماند (قراردادِ story) — دفترِ ساختهٔ صفحه فقط برای کارِ چندگامی
     var rep = priorOf(s, { prior: P }, um); if (rep) rep.steps.forEach(function (x) { x.page30 = true; }); return rep;
   }
   ST.pagePrior30 = pagePrior30;
