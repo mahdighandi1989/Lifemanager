@@ -40040,7 +40040,7 @@ APP.goFromURL = function (q) {
         if (k30 >= 0) { var pre30 = T30.slice(0, k30).trim().split(/\s+/).filter(Boolean), fw30 = String(fix).trim().split(/\s+/), cut = 0;
           for (var c30 = Math.min(fw30.length - 1, pre30.length); c30 >= 1; c30--) if (fw30.slice(0, c30).join(" ") === pre30.slice(pre30.length - c30).join(" ")) { cut = c30; break; }
           var f30 = fw30.slice(cut).join(" "), post30 = T30.slice(k30 + o30.length);
-          if (!/^(?:‌?ه|‌?ست| ?است|‌?اِ?)(?![آ-ی])/.test(post30) && /[^\s‌](?:‌?ه|‌?ست)$/.test(f30) && !/ه$/.test(o30)) { var g30 = f30.replace(/‌?(?:ه|ست)$/, ""); if (/[0-9۰-۹]\s*[آ-ی]+$/.test(g30) || /[0-9۰-۹]$/.test(g30)) f30 = g30; }
+          if (!/^(?:‌?ه|‌?ست| ?است|‌?اِ?)(?![آ-ی])/.test(post30) && /[^\s‌](?:‌?ه|‌?ست)$/.test(f30) && !/ه$/.test(o30)) { var g30 = f30.replace(/‌?(?:ه|ست)$/, ""); if (/[0-9۰-۹]\s*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)$/.test(g30)) f30 = g30; }   /* فقط روزِ تقویمی («۲۰ آذره» ⇒ «۲۰ آذر»)؛ «۱۸۰ متره» دست نمی‌خورد (بانکِ R23 #94) */
           if (f30 && f30 !== fix) fix = f30; } } } catch (e30) { }
     return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, key: key, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um), edit: edit, rests: A.liveRestsOf ? A.liveRestsOf(x.rests) : null, srcSess: xsS ? xsS.id : "" };
   }
