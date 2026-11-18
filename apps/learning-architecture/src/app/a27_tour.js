@@ -1414,6 +1414,22 @@
   function optCheck(t) { t = ownText(t); return OPTCHK_RE.test(t) && OPT_RE.test(t); }
   /* دورِ ۱۰ (ادغام): کارِ خودش به اول‌شخص — «تا اینجا … حساب کردم/گرفتم/نوشتم/کشیدم/امتحان کردم/به دست آوردم» — تلاشِ دیدنی است */
   var OWNWORK_RE = /(?:تا\s*(?:این\s*جا|اینجا)[^.؟?!\n]{0,80})?(?:حساب|امتحان|رسم|فرض|جایگذاری|جای‌گذاری)\s*کردم|(?:^|[\s،؛])(?:گرفتم|نوشتم|کشیدم|به\s*دست\s*آوردم|بدست\s*آوردم|رسیدم)(?=$|[\s.،؛!؟])/;
+  /* دورِ ۳۰ (prior، C27-3 s28 p4 «… فهرست کردم ۱۴×۱۴ حالت، با حداقل یه پسرِ سه‌شنبه ۲۷ حالت، دوپسر ۱۳ تا ⇒ ۱۳/۲۷. فکر کنم درسته»): مدل «⇒ ۱۳/۲۷. فکر کنم درسته» را guess
+     گزارش کرد و صفحه آن را حدسِ «از گفت‌وگو» ثبت کرد، «تأیید شد» گرفت و به کالیبراسیون رفت. مدل گزارش می‌دهد، صفحه می‌سنجد: حکمِ خودش («فکر کنم / به نظرم درسته»،
+     «همینه») دربارهٔ نتیجه‌ای که همین پیام از کارِ خودش («فهرست/حساب کردم، شمردم، نوشتم …») به دست آورده — هر عددِ آن نتیجه پیش‌تر در همان کار آمده — حدسِ تازه نیست.
+     شبیهِ منفی: «حساب کردم ۱۲ تا میشه، فکر کنم جوابِ کل ۵۰ باشه» (۵۰ در کارش نیست) و «فکر کنم ۱/۲ درسته» بی کار ⇒ همان حدس. */
+  var SELFOK30 = /(?:فکر\s*(?:می[‌\s]?)?کنم|به\s*نظرم|احتمالاً|احتمالا)?\s*(?:درسته|درست\s*(?:است|ه|باشه)|همینه|همین\s*(?:است|ه))\s*[.!؟?]*\s*$/;
+  var OWNWORK30 = /(?:فهرست|لیست|شمارش|بررسی|حساب|جدول|رسم)\s*کردم|شمردم|نوشتم|درآوردم|به\s*دست\s*آوردم|رسیدم/;
+  function dg30(t) { return String(t || "").replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 1776); }).replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 1632); }).replace(/٫/g, "."); }
+  function selfVerdict30(ut, gt) {
+    var u = String(ut || ""), g = String(gt || "").trim(); if (!SELFOK30.test(g)) return false;
+    var core = g.replace(SELFOK30, "").replace(/^[\s⇒=>→،,.:]+|[\s،,.:]+$/g, ""), cn = dg30(core).match(/\d+(?:\.\d+)?/g) || []; if (!cn.length) return false;
+    var i = u.indexOf(g.slice(0, 12)); if (i < 0) i = u.indexOf(core.slice(0, 8)); if (i <= 0) return false;
+    var pre = ownText(u.slice(0, i)); if (!(OWNWORK30.test(pre) || OWNWORK_RE.test(pre))) return false;
+    var pn = dg30(pre).match(/\d+(?:\.\d+)?/g) || [];
+    return cn.every(function (n) { return pn.indexOf(n) >= 0; });
+  }
+  AS.selfVerdict30 = selfVerdict30;
   function attemptIn(t, teach) { var w = ownText(t); return formulas(w).length > 0 || OWNWORK_RE.test(w) || varEq(w) || PLAN_RE.test(w) || GUESS_REF_RE.test(w) || FOUND_RE.test(w) || AHA_RE.test(w) || guessNow(t, teach); }
   /* پیامِ معرفیِ مسئله فقط خودش؛ وگرنه پیام‌های پیشینِ همین سشن هم (تلاشی که پیش‌تر گفت) */
   function attemptSeen(s, mt, teach, intro) {
@@ -3510,6 +3526,7 @@
     if (rk) { var sg = regSigns(userVoice25(ut)), own = rk === "shoma" ? sg.sh : sg.to; if (own) { C.reg = rk; C.regAt = at; } }
     // guess {text}
     var gt = txtOf(a.guess);
+    if (gt && quoteIn(gt, ut) && selfVerdict30(ut, gt)) gt = "";   // دورِ ۳۰ (C27-3): داوریِ خودش دربارهٔ نتیجهٔ کارِ خودش حدس نیست
     if (gt && quoteIn(gt, ut) && predTurn23(s, ut)) { if (A.PR && A.PR.bookPred) A.PR.bookPred(s, gt, at, key, "model"); gt = ""; }   // دورِ ۲۳ (A23-15): پیش‌بینی، نه حدس — PR.bookPred (a41) ثبتش می‌کند
     if (gt && quoteIn(gt, ut)) { C.guess = { text: clip(gt, 300), key: key, at: at }; guessReg(s, gt, key, at);   // RN2d: شناسهٔ حدس برای پیوندِ on_guess
       /* تورِ پولیا (RM4b): حدس روی پیامِ دستیارِ همین نوبت (m.guess) با «q» — همان پرسشی از همین پیام که حدس را می‌آزماید، عیناً زیررشتهٔ آن پیام؛

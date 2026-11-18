@@ -1,0 +1,156 @@
+{
+"from": "round30C/s28",
+"t0": "2026-11-17T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "این معما رو برای همکارام گذاشتم: «یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر دو پسر باشن؟» معلومه ۱/۲ دیگه. همکارم میگه ۱/۳. بهش بگو اشتباه می‌کنه.",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok'"
+},
+{
+"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='1996-05-05';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()"
+},
+{
+"say": "همین که گفتم! دو بچه، یکی پسره، اون یکی یا پسره یا دختر، پس ۱/۲. باشه ثبتش کن ببینیم."
+},
+{
+"eval": "(()=>{window.__PID=APP.state.arg;return JSON.stringify(APP.liveKindInfo(APP.state.arg));})()\n"
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpOne','احتمالِ این‌که هر دو بچه پسر باشند، وقتی می‌دانیم حداقل یکی پسر است.');F('lpWhy','می‌خواهم ثابت کنم همکارم اشتباه می‌کند.');await W(300);B(/ثبتِ کل/);await W(900);F('lpUnk','احتمالِ دو پسر');F('lpD_d1','دو بچه');F('lpD_d2','حداقل یکی پسر است');F('lpCond','هر بچه پسر یا دختر با احتمالِ برابر\\nحداقل یکی پسر است');P('lpSat',/^بله/);P('lpSuff',/^کافی/);F('lpSuffW','همه‌چیز گفته شده');F('lpFig','—');F('lpGuess','۱/۲');P('lpConf',/۱۰۰/);await W(500);F('lpTest','هیچ؛ واضح است');F('lpGChal','هیچ چیز ردش نمی‌کند');P('lpIfRef',/نادیده می‌گیرم/);await W(700);P('lpGWant',/^بله/);await W(600);const t=T('اگر آزمون حدس را رد کند',1500);return t+' || IDS '+IDS().split(' | ').filter(x=>/lpIf|lpG(Chal|Contra|Want)/.test(x)).join(' | ');})()"
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpIfRefW','چون ۱/۲ واضح است');F('lpGContra','هیچ');await W(300);let t0=document.body.innerText;B(/ثبتِ فهم/);await W(1100);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,6).join(' ¦ ');return 'NEW: '+diff;})()"
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpGChal','اگر فهرستِ همهٔ خانواده‌های دوفرزندی با حداقل یک پسر نسبتی جز ۱/۲ بدهد؛ همین حالا فهرست می‌کنم');F('lpGContra','فهرستِ کاملِ حالت‌ها (پپ، پد، دپ، دد) و شمردنِ آن‌هایی که حداقل یک پسر دارند');const G=document.querySelector('[id^=lpGK][id$=_r0]').id.replace('_r0','');F(G+'_r0','۱/۲');F(G+'_rt0','فهرستِ حالت‌ها: اگر از حالت‌های با حداقل یک پسر نیمی دوپسر باشند');F(G+'_r1','۱/۳');F(G+'_rt1','همان فهرست: اگر یک‌سوم دوپسر باشند');P(G+'_w',/حدسِ ۱/);P(G+'_ww',/ارزان/);F('lpSoftWhy','می‌خواهم همین را ثبت کنم؛ آزمون را بعد از ثبت انجام می‌دهم');await W(300);const box=document.getElementById(G+'_r0').closest('details');[...box.querySelectorAll('button')].find(b=>/بسنج/.test(b.textContent)).click();await W(800);let t0=document.body.innerText;B(/ثبتِ فهم/);await W(1100);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,8).join(' ¦ ');let sv='';for(let i=0;i<localStorage.length;i++){const v=localStorage.getItem(localStorage.key(i));const j=v?v.indexOf('softLog'):-1;if(j>=0)sv+=v.slice(j,j+300);const k=v?v.indexOf('\"soft\"'):-1;if(k>=0)sv+=' || '+v.slice(k,k+250);}return 'SOFT='+sv+' ifRefW='+(document.getElementById('lpIfRefW')||{}).value+' NEW: '+diff;})()"
+},
+{
+"eval": "(async()=>{B(/^۲ کامل$/);await W(900);return APP.livePhase(APP.state.arg);})()"
+},
+{
+"eval": "(()=>{let sv='';for(let i=0;i<localStorage.length;i++){const v=localStorage.getItem(localStorage.key(i));const j=v?v.indexOf('softLog'):-1;if(j>=0)sv+=v.slice(j,j+300);const k=v?v.indexOf('\"soft\":'):-1;if(k>=0)sv+=' || '+v.slice(k,k+250);}return sv||'NONE';})()\n"
+},
+{
+"say": "فهرست کردم: پپ، پد، دپ، دد. با حداقل یه پسر سه تا می‌مونه: پپ، پد، دپ. فقط یکیش دوپسره... یعنی ۱/۳! همکارم راست می‌گفت. واقعاً خجالت کشیدم، جلوی همه گفته بودم ۱/۲."
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;P('lpMv',/شکستن به حالت/);F('lpMvWhy','همهٔ خانواده‌ها را فهرست می‌کنم تا هیچ حالتی جا نیفتد');await W(200);let t0=document.body.innerText;B(/افزودنِ حرکت/);await W(800);let L0=new Set(t0.split('\\n'));let mv=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,3).join(' ¦ ');F('lpPlan','نخست همهٔ خانواده‌های دوفرزندی (پپ، پد، دپ، دد) را فهرست می‌کنم، سپس آن‌هایی را که حداقل یک پسر دارند نگه می‌دارم و سهمِ دوپسر را می‌شمارم.');document.querySelectorAll('[id^=lpPC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);t0=document.body.innerText;B(/ثبتِ طرح/);await W(1100);L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,4).join(' ¦ ');return 'MV: '+mv+' || phase='+APP.livePhase(pid)+' NEW: '+diff;})()"
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;P('lpPU_a_d1',/حالا به کارش/);F('lpPU_w_d1','چهار خانوادهٔ دوفرزندی از همین دو بچه می‌آیند');await W(200);B(/ثبتِ طرح/);await W(1100);F('lpStep','از چهار حالتِ هم‌احتمال (پپ، پد، دپ، دد)، «حداقل یک پسر» دد را کنار می‌گذارد؛ سه حالت می‌ماند و فقط پپ دوپسر است ⇒ ۱/۳');P('lpClear',/^بله/);await W(400);F('lpProof','هر بچه مستقل و با احتمالِ ½ پسر است، پس چهار حالت هم‌احتمال‌اند؛ شرط فقط دد را حذف می‌کند و سه حالتِ باقی هم‌احتمال می‌مانند.');document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);B(/ثبتِ گام/);await W(1100);const c=B(/✅ حل شد/);await W(1200);P('lpBWant',/بیشتر/);F('lpBChk','با شبیه‌سازیِ ذهنیِ ۱۰۰ خانواده: ۷۵ تا حداقل یک پسر، ۲۵ تا دوپسر ⇒ ۱/۳');P('lpBRes',/سالم/);await W(300);document.querySelectorAll('[id^=lpBCP_]').forEach(s=>{const o=[...s.options].find(o=>/^بله/.test(o.text));s.value=o.value;s.dispatchEvent(new Event('change',{bubbles:true}));});F('lpBGlance','شرط یکی از چهار حالت را حذف می‌کند، نه نیمی از آن‌ها را');F('lpBWorked','فهرستِ کاملِ حالت‌ها پیش از حکم');if(document.getElementById('lpBMulti'))P('lpBMulti',/^یکی/);document.getElementById('lpBBest').selectedIndex=1;document.getElementById('lpBBest').dispatchEvent(new Event('change',{bubbles:true}));F('lpBUse','پیش از حکم دربارهٔ احتمال، فضای حالت‌ها را کامل فهرست کنم');F('lpBTaste','فهرست کردن را دوست داشتم؛ پذیرفتنِ اشتباه را نه');F('lpBNew','دو بچه، حداقل یکی پسری است که سه‌شنبه به دنیا آمده؛ احتمالِ دو پسر؟');P('lpBNewS',/^شرط/);F('lpBNewW','همان شرطِ «حداقل یکی پسر» با یک ویژگیِ اضافه (روزِ تولد)');P('lpBHit',/نادرست/);await W(400);let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,4).join(' ¦ ');return c+' BEST='+[...document.getElementById('lpBBest').options].map(o=>o.text).join(' / ')+' NEW: '+diff;})()"
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpBOther','احتمالِ شرطی: P(دو پسر | حداقل یک پسر) = (۱/۴)/(۳/۴) = ۱/۳');F('lpBHitW','فرضِ پنهان: فکر کردم «یکی پسر است» یعنی یک بچهٔ مشخص (مثلاً بزرگ‌تر) پسر است؛ پس فقط دیگری را دیدم');await W(300);let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1300);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,10).join(' ¦ ');return 'phase='+APP.livePhase(pid)+' verdict='+APP.liveClosure(pid).verdict+' NEW: '+diff;})()"
+},
+{
+"eval": "(()=>{const p=window.__PID||APP.state.arg;if(p)localStorage.setItem('__PID',p);return (APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'))+' pid='+p})()"
+},
+{},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()"
+},
+{
+"eval": "(async()=>{(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-19'));const kids=APP.liveAll().map(r=>[r.p.title.slice(0,40),r.p.nat,r.p.natBy]);const child=APP.liveAll().find(r=>/سه‌شنبه/.test(r.p.title));APP.go('lprob',child.p.id);await W(900);return JSON.stringify(kids)+' view='+APP.state.arg;})()"
+},
+{
+"say": "جلسه دوم: نسخه‌ی سه‌شنبه رو آوردم. این بار با احتیاط: فهرست کردم ۱۴×۱۴ حالت، با حداقل یه پسرِ سه‌شنبه ۲۷ حالت، دوپسر ۱۳ تا ⇒ ۱۳/۲۷. فکر کنم درسته."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({ph:s.coach&&s.coach.ph,own:(s.coach&&s.coach.ownLog||[]).slice(-1),coachPage:APP.liveCoach(window.__PID||APP.state.arg).ph});})()\n"
+},
+{
+"say": "خب، حالا بعدش چی کار کنم؟"
+},
+{
+"say": "یه سؤال: تو صورتِ این معما «سه‌شنبه» هست. صفحه اینو یه قرار برای من حساب نمی‌کنه؟"
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()"
+},
+{},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,2000)),1200))})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur()||{};const L=APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const sv=pg.solve||{};return {t:r.p.title,st:(APP.liveClosure?APP.liveClosure(r.p.id).state:''),g:sv.g,steps:((sv.live||{}).steps||[]).map(x=>({t:(x.text||'').slice(0,60),out:x.out}))}});const ph=APP.MIND.phases();return JSON.stringify({ph:ph.rows.map(x=>[x.id,x.k,x.n,Object.keys(x.src).join('+'),Math.round(x.pWeak*100)]),weak:ph.weakest&&ph.weakest.fa,coachGuess:s.coach&&s.coach.guess,checkRep:s.coach&&s.coach.checkRep,reg:s.register||(s.coach&&s.coach.reg),prom:s.promises,plans:s.plans||(s.coach&&s.coach.plans),dl:(APP.S.all('deadline')||[]).map(d=>[d.what||d.title,d.date||d.due]),live:L})})()"
+},
+{},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));if(APP.ASSIST&&APP.ASSIST.toggle)APP.ASSIST.toggle(false);const L=APP.liveAll().filter(r=>!APP.liveClosure||APP.liveClosure(r.p.id).state!=='solved');const r=L[L.length-1]||APP.liveAll()[0];APP.go('lprob',r.p.id);await W(1500);const f=[...document.querySelectorAll('#main textarea[id^=lp],#main input[id^=lp][type=text]')].filter(e=>e.offsetParent)[0];if(!f)return 'NOFIELD';f.scrollIntoView({block:'center'});f.focus();f.value=\"P = ۱۳/۲۷\";f.dispatchEvent(new Event('input',{bubbles:true}));f.setSelectionRange(f.value.length,f.value.length);await W(300);const tog=document.querySelector('.mx-bar-tog');if(tog&&tog.getAttribute('aria-expanded')!=='true')tog.click();await W(200);const sq=document.querySelector('.mx-sym[data-k=le]');if(sq)sq.click();await W(200);f.value=f.value+' ۱۰۰';f.dispatchEvent(new Event('input',{bubbles:true}));await W(400);const pv=document.querySelector('.mx-prev[data-for=\"'+f.id+'\"]');return 'PID '+r.p.title+' FIELD '+f.id+' VAL '+f.value+' || PREV '+(pv&&!pv.hidden?pv.innerText:'(none)')+' || BAR '+(document.querySelector('.mx-bar')?[...document.querySelectorAll('.mx-sym')].map(x=>x.textContent).join(' '):'none')+' focus='+(document.activeElement===f);})()"
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await W(600);const i=document.querySelector('textarea.as-in');i.focus();i.value=\"P(دوپسر | یک پسرِ سه‌شنبه) = ۱۳/۲۷ و ۱/۳ = (۱/۴) ÷ (۳/۴)\";i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const tog=document.querySelector('.mx-bar-tog');if(tog&&tog.getAttribute('aria-expanded')!=='true')tog.click();await W(300);const pv=document.querySelector('.mx-prev[data-for]')&&[...document.querySelectorAll('.mx-prev')].find(p=>p.previousElementSibling===i||p.parentElement===i.parentElement||p.closest('.as-root'));const all=[...document.querySelectorAll('.as-root .mx-prev')];const vis=all.filter(p=>!p.hidden);if(vis[0])vis[0].scrollIntoView({block:'end'});return 'CHATPREV '+vis.map(p=>p.innerText).join(' | ')+' || plots='+document.querySelectorAll('.as-msg .mx-plot').length+' boards='+document.querySelectorAll('.as-msg .mx-board').length;})()"
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const i=document.querySelector('textarea.as-in');i.value=\"همکارم گفت ۵۰٪ ولی من ۳۳٪ گفتم؛ جلسه ۱۴۰۵/۰۷/۲۹ ساعت ۹ صبح\";i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const vis=[...document.querySelectorAll('.as-root .mx-prev')].filter(p=>!p.hidden);return 'NONMATH prev='+vis.map(p=>p.innerText).join(' | ');})()"
+},
+{
+"eval": "(()=>{const i=document.querySelector('textarea.as-in');if(i){i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));}return 'cleared'})()"
+},
+{},
+{
+"eval": "(()=>{const o=[];APP.ASSIST.sessions().forEach(s=>(s.msgs||[]).forEach((m,i)=>{const t=m.text||'';const se=APP.MATH.series(t),f=APP.MATH.fen(t),segs=(APP.MATH.segments?APP.MATH.segments(t):[]);const mx=Array.isArray(segs)?segs.filter(x=>x&&x.m).map(x=>x.src||x.text||x.tex||JSON.stringify(x).slice(0,60)):[];if(se||f)o.push(m.role+' PLOT/FEN '+(se?JSON.stringify(se).slice(0,80):'')+(f?' FEN':'')+' :: '+t.slice(0,80));if(mx.length)o.push(m.role+' MATH '+mx.slice(0,6).join(' ¦ ').slice(0,200));}));return o.join('\\n')||'none';})()"
+},
+{
+"eval": "(()=>{const L=APP.liveAll();const p=window.__PID||APP.state.arg||(L.slice(-1)[0]||{p:{}}).p.id;localStorage.setItem('__PID',p);return 'pid '+p+' || '+L.map(r=>r.p.id+':'+r.p.title+':'+APP.liveClosure(r.p.id).state).join(' | ')})()"
+},
+{},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID"
+},
+{
+"eval": "(()=>{const o={today:APP.today()};const s=APP.ASSIST.cur();const cl=(x,n)=>String(x==null?'':x).slice(0,n||200);\no.user=(s.msgs||[]).filter(m=>m.role==='user').map((m,i)=>(i+1)+'['+APP.ASSIST.msgId(m)+'] '+cl(m.text,110)+((m.corr||[]).length?' {corr:'+JSON.stringify(m.corr).slice(0,200)+'}':'')+(m.textHist?' {hist:'+JSON.stringify(m.textHist).slice(0,200)+'}':''));\no.probs=APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const sv=pg.solve||{};const L=sv.live||{};return {t:cl(r.p.title,50),st:APP.liveClosure(r.p.id).state,stmt:cl(r.p.statement,220),pfix:cl(JSON.stringify(r.p.fixHist||null),300),u1:cl(JSON.stringify(sv.u||null),300),g:cl(JSON.stringify(sv.g||null),500),chat:cl(JSON.stringify(L.chat||null),300),plan:cl(JSON.stringify(L.plan||null),160),retr:cl(JSON.stringify(L.retracts||null),500),steps:(L.steps||[]).map(x=>cl((x.text||''),50)+' due='+x.due+' out='+cl(JSON.stringify(x.out||null),260)+' fix='+cl(JSON.stringify(x.fixHist||null),200))}});\no.plans=(APP.ASSIST.plansAll?APP.ASSIST.plansAll(s):[]).map(x=>{const p=x.p;return p.id+' «'+cl(p.text,60)+'» when='+p.when+' state='+p.state+(p.corr?' corr='+cl(JSON.stringify(p.corr),200):'')});\no.guesses=((s.coach||{}).guesses||[]).map(g=>g.id+' «'+cl(g.text,60)+'» res='+(g.res||'')+(g.wd||g.retracted?' WD':'')+(g.corr?' corr='+cl(JSON.stringify(g.corr),160):''));\no.retracts=cl(JSON.stringify((s.coach||{}).retracts||null),600)+' | se='+cl(JSON.stringify(s.retracts||null),600);\ntry{const P=APP.MIND.phases();o.mind=(P.weakest?'WEAK '+P.weakest.fa+' ':'nodistinct ')+P.rows.map(X=>X.fa+' '+X.k+'/'+X.n+' acts:'+(X.acts||[]).map(a=>(a.ok?'+':'-')+a.src).join(',')).join(' || ');}catch(e){o.mind='ERR '+e.message}\ntry{const d=APP.dossier(APP.liveAll().slice(-1)[0].p.id);o.dossier=(d.events||[]).length+' events: '+(d.events||[]).map(e=>e.k+(e.hist&&e.hist.length?'*':'')).join(',');}catch(e){o.dossier='ERR '+e.message}\nreturn JSON.stringify(o,null,1);})()\n"
+},
+{},
+{},
+{},
+{},
+{},
+{},
+{
+"eval": "(()=>{const o=[];APP.liveAll().forEach(r=>{try{const d=APP.dossier(r.p.id);o.push(r.p.title+' :: '+(d.events||[]).map(e=>e.k+'@'+String(e.at||'').slice(0,16)+' '+String(e.title||'').slice(0,50)).join(' | '))}catch(e){o.push('ERR '+e.message)}});return o.join('\\n')})()"
+},
+{},
+{},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('lprob',r.p.id);await W(900);const h=[...document.querySelectorAll('#main summary,#main h3,#main h2')].find(x=>/پرونده‌های تمرین/.test(x.innerText));let t='';if(h){const b=h.closest('details')||h.parentElement;t=b.innerText.split('\\n').filter(x=>/حدس/.test(x)).join(' / ')}const pg=APP.S.get('eprog_'+r.p.id)||{};const g=((pg.solve||{}).g||{})[1]||{};o.push(r.p.title.slice(0,30)+' ['+APP.liveClosure(r.p.id).state+'] BOX: '+t+' || g.hit='+(g.hit||'')+' testRes='+(g.testRes||'')+' refuted='+(g.refuted||'')+' res='+(g.res||''))}return o.join('\\n')})()"
+},
+{},
+{},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let d=null;try{d=APP.dossierSess?APP.dossierSess(s.id):APP.dossier(s.id)}catch(e){return 'ERR '+e.message}return 'EVENTS '+((d&&d.events)||[]).map(e=>(e.at||'').slice(0,16)+' '+e.k+' '+String(e.title||'').slice(0,60)).join(' | ')+' || TEXT '+document.querySelector('#main').innerText.slice(0,6000)})()"
+},
+{},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,50))}:'NO MODEL')})()"
+},
+{},
+{},
+{},
+{},
+{},
+{},
+{
+"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()"
+},
+{}
+],
+"replies": [
+"{\"reply\": \"من میانِ شما و همکارتان داوری نمی‌کنم؛ «۱/۲» و «۱/۳» هر دو فعلاً ادعا هستند و راهش آزمودن است. پیش از جزئیات: کلِ مسئله را در یک جمله و به زبانِ خودتان می‌گویید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: این معما رو برای همکارام گذاشتم: «یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر  / دستیار: من میانِ شما و همکارتان داوری نمی‌کنم؛ «۱/۲» و «۱/۳» هر دو فعلاً ادعا \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"معلومه ۱/۲ دیگه\"}}]}",
+"{\"reply\": \"ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ استدلالتان را همان‌جا به‌عنوانِ حدس بنویسید. چطور می‌آزماییدش — با کدام وارسی یا حالتِ خاص؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: این معما رو برای همکارام گذاشتم: «یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر  / دستیار: من میانِ شما و همکارتان داوری نمی‌کنم؛ «۱/۲» و «۱/۳» هر دو فعلاً ادعا  / کاربر: همین که گفتم! دو بچه، یکی پسره، اون یکی یا پسره یا دختر، پس ۱/۲. باشه ثبتش کن ببینیم. / دستیار: ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ استدلالتان را همان‌جا به‌عنوانِ حدس\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"دو بچه، دست‌کم یکی پسر: احتمالِ دو پسر\", \"statement\": \"یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر دو پسر باشن؟\", \"nat\": \"objective\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"d\"], \"ans\": [\"u0\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"دو بچه، یکی پسره، اون یکی یا پسره یا دختر، پس ۱/۲\", \"q\": \"چطور می‌آزماییدش — با کدام وارسی یا حالتِ خاص؟\"}}]}",
+"{\"reply\": \"حدستان را خودتان آزمودید و همان فهرست ردش کرد؛ این همان کاری است که روش می‌خواهد، حتی وقتی جلوی دیگران گفته باشید. نتیجه‌ای گفتید — از راهِ دیگری هم به همین ۱/۳ می‌رسید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: این معما رو برای همکارام گذاشتم: «یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر  / دستیار: من میانِ شما و همکارتان داوری نمی‌کنم؛ «۱/۲» و «۱/۳» هر دو فعلاً ادعا  / کاربر: همین که گفتم! دو بچه، یکی پسره، اون یکی یا پسره یا دختر، پس ۱/۲. باشه ثبتش کن ببینیم. / دستیار: ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ استدلالتان را همان‌جا به‌عنوانِ حدس / کاربر: فهرست کردم: پپ، پد، دپ، دد. با حداقل یه پسر سه تا می‌مونه: پپ، پد، دپ. فقط یکیش دوپسره...  / دستیار: حدستان را خودتان آزمودید و همان فهرست ردش کرد؛ این همان کاری است که رو\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"فقط یکیش دوپسره... یعنی ۱/۳\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}, \"err_stage\": {\"ph\": \"u\", \"quote\": \"با حداقل یه پسر سه تا می‌مونه: پپ، پد، دپ\"}}]}",
+"{\"reply\": \"این بار با فهرست جلو آمدید و سه گامتان را خواندم: ۱۴ × ۱۴ حالت، ۲۷ حالت با دست‌کم یک پسرِ سه‌شنبه، و ۱۳ دوپسر از میانشان. گامِ بعد بازنگری است: ۲۷ و ۱۳ را از راهِ دیگری هم می‌توانید بشمارید؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: این معما رو برای همکارام گذاشتم: «یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر  / دستیار: من میانِ شما و همکارتان داوری نمی‌کنم؛ «۱/۲» و «۱/۳» هر دو فعلاً ادعا  / کاربر: همین که گفتم! دو بچه، یکی پسره، اون یکی یا پسره یا دختر، پس ۱/۲. باشه ثبتش کن ببینیم. / دستیار: ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ استدلالتان را همان‌جا به‌عنوانِ حدس / کاربر: فهرست کردم: پپ، پد، دپ، دد. با حداقل یه پسر سه تا می‌مونه: پپ، پد، دپ. فقط یکیش دوپسره...  / دستیار: حدستان را خودتان آزمودید و همان فهرست ردش کرد؛ این همان کاری است که رو / کاربر: جلسه دوم: نسخه‌ی سه‌شنبه رو آوردم. این بار با احتیاط: فهرست کردم ۱۴×۱۴ حالت، با حداقل یه پ / دستیار: این بار با فهرست جلو آمدید، نه با «معلوم است»؛ دربارهٔ درستیِ ۱۳/۲۷ من\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"با حداقل یه پسرِ سه‌شنبه ۲۷ حالت، دوپسر ۱۳ تا ⇒ ۱۳/۲۷\", \"guess\": {\"text\": \"⇒ ۱۳/۲۷. فکر کنم درسته\", \"q\": \"۲۷ و ۱۳ را از راهِ دیگری هم می‌توانید بشمارید؟\"}, \"prior\": [{\"step\": \"فهرستِ همهٔ حالت‌ها\", \"quote\": \"فهرست کردم ۱۴×۱۴ حالت\", \"verdict\": \"ok\", \"why\": \"هر بچه ۲ جنس × ۷ روز = ۱۴ حالت؛ دو بچه ۱۴ × ۱۴ = ۱۹۶\"}, {\"step\": \"حالت‌های دست‌کم یک پسرِ سه‌شنبه\", \"quote\": \"با حداقل یه پسرِ سه‌شنبه ۲۷ حالت\", \"verdict\": \"ok\", \"why\": \"۱۴ + ۱۴ − ۱ = ۲۷ (حالتِ هر دو پسرِ سه‌شنبه دو بار شمرده نمی‌شود)\"}, {\"step\": \"حالت‌های دوپسر در میانِ آن‌ها\", \"quote\": \"دوپسر ۱۳ تا\", \"verdict\": \"ok\", \"why\": \"۷ + ۷ − ۱ = ۱۳\"}, {\"step\": \"نسبت\", \"quote\": \"⇒ ۱۳/۲۷\", \"verdict\": \"ok\", \"why\": \"۱۳ از ۲۷ حالتِ هم‌احتمال\"}]}]}",
+"{\"reply\": \"در صفحهٔ همین مسئله کارتِ «در گفت‌وگو به نتیجه رسیدی» هست؛ با «✅ حل شد — بازنگری» لازم نیست چیزی را دوباره بنویسید و فقط بازنگری می‌ماند. برای همان بازنگری: جواب را در شرط جای‌گذاری کنید — همهٔ شرط برقرار است؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: این معما رو برای همکارام گذاشتم: «یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر  / دستیار: من میانِ شما و همکارتان داوری نمی‌کنم؛ «۱/۲» و «۱/۳» هر دو فعلاً ادعا  / کاربر: همین که گفتم! دو بچه، یکی پسره، اون یکی یا پسره یا دختر، پس ۱/۲. باشه ثبتش کن ببینیم. / دستیار: ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ استدلالتان را همان‌جا به‌عنوانِ حدس / کاربر: فهرست کردم: پپ، پد، دپ، دد. با حداقل یه پسر سه تا می‌مونه: پپ، پد، دپ. فقط یکیش دوپسره...  / دستیار: حدستان را خودتان آزمودید و همان فهرست ردش کرد؛ این همان کاری است که رو / کاربر: جلسه دوم: نسخه‌ی سه‌شنبه رو آوردم. این بار با احتیاط: فهرست کردم ۱۴×۱۴ حالت، با حداقل یه پ / دستیار: این بار با فهرست جلو آمدید، نه با «معلوم است»؛ دربارهٔ درستیِ ۱۳/۲۷ من / کاربر: خب، حالا بعدش چی کار کنم؟ / دستیار: در صفحهٔ همین مسئله کارتِ «در گفت‌وگو به نتیجه رسیدی» هست؛ با «✅ حل شد\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"نه. «سه‌شنبه» در صورتِ معماست، نه کاری که شما در آن روز می‌کنید؛ صفحه برای آن پیام تاریخی نپرسید و چیزی در «امروز» نگذاشت. برای بازنگریِ ۱۳/۲۷ یک حالتِ خاص را بیازمایید: اگر به‌جای «سه‌شنبه» شرطِ روز را برداریم، همان شمارشِ شما باید به ۱/۳ برگردد — برمی‌گردد؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: این معما رو برای همکارام گذاشتم: «یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر  / دستیار: من میانِ شما و همکارتان داوری نمی‌کنم؛ «۱/۲» و «۱/۳» هر دو فعلاً ادعا  / کاربر: همین که گفتم! دو بچه، یکی پسره، اون یکی یا پسره یا دختر، پس ۱/۲. باشه ثبتش کن ببینیم. / دستیار: ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ استدلالتان را همان‌جا به‌عنوانِ حدس / کاربر: فهرست کردم: پپ، پد، دپ، دد. با حداقل یه پسر سه تا می‌مونه: پپ، پد، دپ. فقط یکیش دوپسره...  / دستیار: حدستان را خودتان آزمودید و همان فهرست ردش کرد؛ این همان کاری است که رو / کاربر: جلسه دوم: نسخه‌ی سه‌شنبه رو آوردم. این بار با احتیاط: فهرست کردم ۱۴×۱۴ حالت، با حداقل یه پ / دستیار: این بار با فهرست جلو آمدید، نه با «معلوم است»؛ دربارهٔ درستیِ ۱۳/۲۷ من / کاربر: خب، حالا بعدش چی کار کنم؟ / دستیار: در صفحهٔ همین مسئله کارتِ «در گفت‌وگو به نتیجه رسیدی» هست؛ با «✅ حل شد / کاربر: یه سؤال: تو صورتِ این معما «سه‌شنبه» هست. صفحه اینو یه قرار برای من حساب نمی‌کنه؟ / دستیار: نه. «سه‌شنبه» در صورتِ معماست، نه کاری که شما در آن روز می‌کنید؛ صفحه \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"این معما رو برای همکارام گذاشتم: «یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر دو پسر باشن؟» معلومه ۱/۲ دیگه. همکارم میگه ۱/۳. بهش بگو اشتباه می‌کنه.",
+"همین که گفتم! دو بچه، یکی پسره، اون یکی یا پسره یا دختر، پس ۱/۲. باشه ثبتش کن ببینیم.",
+"فهرست کردم: پپ، پد، دپ، دد. با حداقل یه پسر سه تا می‌مونه: پپ، پد، دپ. فقط یکیش دوپسره... یعنی ۱/۳! همکارم راست می‌گفت. واقعاً خجالت کشیدم، جلوی همه گفته بودم ۱/۲.",
+"جلسه دوم: نسخه‌ی سه‌شنبه رو آوردم. این بار با احتیاط: فهرست کردم ۱۴×۱۴ حالت، با حداقل یه پسرِ سه‌شنبه ۲۷ حالت، دوپسر ۱۳ تا ⇒ ۱۳/۲۷. فکر کنم درسته.",
+"خب، حالا بعدش چی کار کنم؟",
+"یه سؤال: تو صورتِ این معما «سه‌شنبه» هست. صفحه اینو یه قرار برای من حساب نمی‌کنه؟"
+]
+}
