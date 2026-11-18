@@ -8,7 +8,8 @@ const DIR = path.join(__dirname, 'fixtures', 'r30_story');
 
 (async () => {
   const b = await chromium.launch(); const errors = []; const info = { n: 0, ok: 0 }; const J = (x) => JSON.stringify(x); const K = {};
-  const run = async (fx, upto, fn, arg) => { const R = await replay(b, fx, { dir: DIR, upto: upto || 0 }); try { const x = await R.p.evaluate(fn, arg); return { x, errors: R.errors, calls: R.calls }; } finally { await R.close(); } };
+  const run = async (fx, upto, fn, arg) => { const R = await replay(b, fx, { dir: DIR, upto: upto || 0 }); try { let x = await R.p.evaluate(fn, arg); /* بازپخشی که با «reload» تمام می‌شود: زیرِ بار، رکوردها شاید هنوز بار نشده باشند — یک بار پس از درنگ دوباره خوانده می‌شود */
+      if (Array.isArray(x) && !x.length) { await R.p.waitForTimeout(1500); x = await R.p.evaluate(fn, arg); } return { x, errors: R.errors, calls: R.calls }; } finally { await R.close(); } };
   /* همهٔ رویدادهای پرونده‌ها: [عنوانِ مسئله یا «S»، k، سطرها، عنوانِ رویداد] */
   const ALL = () => { const o = []; APP.liveAll().forEach(r => { const D = APP.dossier(r.p.id); (D.events || []).forEach(e => o.push([r.p.title, e.k, (e.lines || []).join(' ¦ '), e.title || '', e.at || ''])); });
     APP.S.all('achat', x => x && x.msgs && x.msgs.length).forEach(se => { (APP.dossier(se.id).events || []).forEach(e => o.push(['S', e.k, (e.lines || []).join(' ¦ '), e.title || '', e.at || ''])); }); return o; };
