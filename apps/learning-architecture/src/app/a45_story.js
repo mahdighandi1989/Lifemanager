@@ -2264,6 +2264,9 @@
        حسابیِ پوشش‌نیافته (هر بندی که سنجشِ موتور رویش افتاد یا ادعای عددی دارد — C138) سطر می‌گیرند؛ بندهایی که یک حساب از رویشان می‌گذرد یک سطر می‌شوند. */
     sentences(ut).forEach(function (x) { var i = ut.indexOf(x); if (inOW29(OW, i)) return; var ck = []; try { ck = ST.arithChk(x, ut) || []; } catch (e) { }
       var CL = clauseSpans29(x).map(function (c) { return { a: i + c.a, b: i + c.b, t: c.t }; }), CK = ck.concat(ck.unread || []), G = [];
+      /* دورِ ۳۰ (arith): «هیچی نمی‌مونه» / «یکی می‌مونه» بندِ بی‌رقم است ولی حکمِ خودش را دارد ⇒ بندِ خودش (C141) */
+      CK.forEach(function (k) { if (!k || !(k.kind === "remc" || k.rem29) || k.pos == null || CL.some(function (c) { return k.pos >= c.a && k.pos < c.b; })) return; CL.push({ a: k.pos, b: k.pe, t: txt(ut.slice(k.pos, k.pe)) }); });
+      CL.sort(function (p1, p2) { return p1.a - p2.a; });
       CL.forEach(function (c) { var hitC = CK.filter(function (k) { return k && k.pos != null && k.pos < c.b && k.pe > c.a; }); c.ck = hitC; c.on = hitC.length > 0 || claim29(c.t);
         var g = G[G.length - 1]; if (g && hitC.some(function (k) { return g.ck.indexOf(k) >= 0; })) { g.b = c.b; g.ck = g.ck.concat(hitC); g.on = true; } else G.push(c); });
       if (!CK.length && !G.some(function (g) { return g.on; })) return;
@@ -2271,13 +2274,17 @@
       /* دورِ ۲۹ (C173، بانکِ R29 #261): همان بند که بعدتر دوباره گفته شد («یعنی ۱۵ ÷ ۴ = ۳٫۷۵») سطرِ تازه نمی‌سازد — متنِ همان حساب در قلمی از پیام‌های پیشینِ همین مسئله */
       var rest29 = function (t) { var z = nz(t).replace(/^(?:یعنی|پس|خب|خوب|آره|همون|گفتم|که)\s+/, "").replace(/[.!؟?…\s]+$/, ""); return z.length >= 5 && /[=×÷+\-−*\/]/.test(z) && E.items.some(function (y) { return y && y.mid !== m0 && nz(y.t).indexOf(z) >= 0; }); };
       var covT = function (t) { var N = numsOf(t); if (!N.length) return true; return rest29(t) || have.some(function (y) { return nz(y.t).indexOf(nz(t)) >= 0; }) || have.some(function (y) { var Y = numsOf(y.t); return N.every(function (n) { return Y.indexOf(n) >= 0; }); }); };
+      /* دورِ ۳۰ (arith، A30-2/A30-9/B30·D11؛ C141 «هرگز بی‌صدا»): بندِ باقی/کم/اضافه که موتور برایش حکمِ خودش را دارد («۵۰۰ می‌مونه» ✗، «هیچی نمی‌مونه» ✓) با «عددهایش
+         در قلمِ دیگری هست» پوشیده نمی‌شود — فقط با همان متن. وگرنه «۵۰۰» ِ «بودجه‌مون ۲ میلیون و ۵۰۰» سطرِ ✗ ِ او را می‌بلعید */
+      var REMT30 = CL.filter(function (c) { return CK.some(function (k) { return k && (k.kind === "remc" || k.rem29) && k.pos != null && k.pos >= c.a && k.pos < c.b; }); }).map(function (c) { return c.t; });
+      var covT0 = covT; covT = function (t) { return REMT30.some(function (r) { return String(t).indexOf(r) >= 0; }) ? have.some(function (y) { return nz(y.t).indexOf(nz(t)) >= 0; }) : covT0(t); };
       var ON = G.filter(function (g) { return g.on; }); if (!ON.length) return;
       /* هیچ بندی از این جمله پیش‌تر ننشسته ⇒ همان یک سطرِ کلِ جمله (با زمینه‌اش؛ نشانِ هر بند را markOf27/C138 می‌گذارد)؛ وگرنه فقط بندهای حسابیِ پوشش‌نیافته، هر کدام یک سطر */
       var anyCov = CL.some(function (c) { return /[0-9۰-۹]/.test(c.t) && covT(c.t); });
       var part = function (g) { var cs = CL.filter(function (c) { return c.a >= g.a && c.b <= g.b && !covT(c.t); }); var all = CL.filter(function (c) { return c.a >= g.a && c.b <= g.b && /[0-9۰-۹]/.test(c.t); });
         return cs.length && cs.length === all.length ? [txt(U0.slice(g.a, g.b))] : cs.map(function (c) { return c.t; }); };
       (anyCov ? [].concat.apply([], ON.map(part)) : [txt(x)]).forEach(function (t) {
-        if (anyCov ? covT(t) : (!numsOf(t).length || covT(t))) return;
+        if (anyCov ? covT(t) : ((!numsOf(t).length && !REMT30.some(function (r) { return t.indexOf(r) >= 0; })) || covT(t))) return;
         var it = { k: "calc", t: clip(t, 300) }; I.push(it); have.push(it); }); });
     /* دادهٔ بی‌گزارش (بانکِ R28 #201، D28-17 tD1 p17 «هزینهٔ جمع کردنِ موکتِ قدیمی هم ۵۰۰ هزار تومنه»): جملهٔ خبریِ او با یک مقدار و واحدش، بی حساب و بی پرسش و بی فعلِ آینده،
        که هیچ قلمِ همان پیام پوشش نمی‌دهد ⇒ «داده (از گفت‌وگو)» */
