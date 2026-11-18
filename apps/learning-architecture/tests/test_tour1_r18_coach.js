@@ -291,7 +291,8 @@ function devScan(sys, user) {
     /* دورِ ۲۶ (DECISIONS_R26 Q5): روزِ برنامه با «آره» ِ او می‌نشیند */ await turn('آره');
     await day('2026-10-19'); await fresh(); const a8 = await turn('سلام.'); await turn('یه مسئله‌ی دیگه.');
     await day('2026-10-25'); await fresh(); const c8 = await turn('سلام دوباره.'); const s8 = await plans(); const tp8 = await todayP();
-    T(8, dueL(a8).length === 1 && !dueL(c8).length && s8[0].state === 'expired' && !tp8.length && !fup(c8).length, { a: dueL(a8), c: dueL(c8), s8, tp8 });
+    /* دورِ ۳۰ (DECISIONS_R30 F6، D30-15): 📌 ِ ثبت‌شده با «آره» ِ او پس از روزش در «امروز» با «انجام شد؟» می‌ماند — «expired» فقط یعنی گفت‌وگو دیگر نمی‌پرسد؛ پیش‌تر: !tp8.length */
+    T(8, dueL(a8).length === 1 && !dueL(c8).length && s8[0].state === 'expired' && tp8.length === 1 && !fup(c8).length, { a: dueL(a8), c: dueL(c8), s8, tp8 });
     x = await simple(10, '2026-10-19'); T(10, x.ok, x);
     // منفی‌ها
     const negPlain = async (i) => { await wipe(); await day(T0); await fresh(); const t = strip(E[i].text); const u = await turn(t, 'می‌فهمم.'); const st = await plans(); const u2 = await turn('باشه.');

@@ -39533,7 +39533,7 @@ APP.goFromURL = function (q) {
   /* دورِ ۳۰ (D30-15 tD4 ۵ آذر): 📌 ِ ثبت‌شده‌ای که روزش گذشت و «انجام شد؟» ِ گفت‌وگو بی‌پاسخ ماند (plansDueR18 ⇒ expired) هنوز تعهدِ باز است — «expired» یعنی گفت‌وگو
      دیگر نمی‌پرسد، نه اینکه کار بسته شد. ریشه: یک وضع (state) هر دو را می‌گفت، پس 📌 ِ بانک/بیمه/آرایشگاه از «امروز» افتادند و ⏰ ِ خیاطی (که این وضع را ندارد) ماند.
      حالا 📌 ِ تاریخ‌دارِ expired در «امروز» با همان «موعد: … — انجام شد؟» و همان سه دکمه می‌ماند تا خودش جواب دهد. */
-  function dueExp30(q) { return !!q && !q.done && q.state === "expired" && /^\d{4}-\d\d-\d\d$/.test(String(q.when || "")); }
+  function dueExp30(q) { return !!q && !q.done && q.state === "expired" && q.dateBy === "her-yes" && /^\d{4}-\d\d-\d\d$/.test(String(q.when || "")); }   /* فقط 📌 ِ «ثبت‌شده» با «آره» ِ خودش (a41 bookItem26: dateBy) — برنامهٔ تاریخ‌دارِ مدل/کهنه مثلِ پیش (بانکِ R18 #9، R19 #15) */
   AS.dueExp30 = dueExp30;
   function planTap(pid, v) {
     var x = plansAll(null).filter(function (y) { return y.p.id === pid; })[0]; if (!x || !(planOpen(x.p) || dueExp30(x.p))) return false; var q = x.p;
@@ -57352,6 +57352,9 @@ APP.goFromURL = function (q) {
     var piece = pieceAt26(x, sp.i), ev = /^ ?(?:ـ ?)?(?:ه|هست|است|ست)(?![آ-ی])/.test(x.slice(sp.j));
     if (PAST26.test(piece) || PAST25.test(c) || OTHER26.test(piece)) return null;
     var first = FIRST26.test(piece) || IMPER27.test(piece), cn = COMMITN26.test(x), third = THIRD26.test(piece);
+    /* دورِ ۳۰ (C19؛ F6-080 tD2 p6 «ودیعه رو صاحبخونه آخرِ سال پس میده» ⇒ «… — شنبه ۲۹ اسفند — درست است؟»): بندی که فعلش سوم‌شخص است («پس میده»، «میاد»، «میرن») و
+       هیچ فعلِ اول‌شخص یا واژهٔ تعهدِ او ندارد، کارِ کسِ دیگری است — پرسشِ روزِ او نمی‌سازد (THIRD26 فقط «صاحب‌خونه‌م» ِ با ضمیر را می‌شناخت) */
+    if (!first && !cn && /(?:^| )ن?می ?(?!وه(?![آ-ی]))[آ-ی]{1,8}(?:ه|ن|ند)(?![آ-ی])/.test(piece)) return null;
     /* دورِ ۲۷ (بانکِ R27 #131): «امتحانای بچه‌ها هفته‌ی بعده» — واژهٔ تعهد مالِ کسِ دیگری است (بی «ـم» ِ خودش) */
     if (!first && OTHERN27.test(piece)) return null;
     /* دورِ ۲۷ (C19/C35 دوباره؛ A27-15 s09 p6، D27-29 s34 p17، B27·D1 s15، A27-17 s10 p9) — سه نشانهٔ دستوری که بندِ تاریخ‌دار را از «کارِ آیندهٔ خودش» بیرون می‌برد:

@@ -3753,7 +3753,7 @@
   /* دورِ ۳۰ (D30-15 tD4 ۵ آذر): 📌 ِ ثبت‌شده‌ای که روزش گذشت و «انجام شد؟» ِ گفت‌وگو بی‌پاسخ ماند (plansDueR18 ⇒ expired) هنوز تعهدِ باز است — «expired» یعنی گفت‌وگو
      دیگر نمی‌پرسد، نه اینکه کار بسته شد. ریشه: یک وضع (state) هر دو را می‌گفت، پس 📌 ِ بانک/بیمه/آرایشگاه از «امروز» افتادند و ⏰ ِ خیاطی (که این وضع را ندارد) ماند.
      حالا 📌 ِ تاریخ‌دارِ expired در «امروز» با همان «موعد: … — انجام شد؟» و همان سه دکمه می‌ماند تا خودش جواب دهد. */
-  function dueExp30(q) { return !!q && !q.done && q.state === "expired" && /^\d{4}-\d\d-\d\d$/.test(String(q.when || "")); }
+  function dueExp30(q) { return !!q && !q.done && q.state === "expired" && q.dateBy === "her-yes" && /^\d{4}-\d\d-\d\d$/.test(String(q.when || "")); }   /* فقط 📌 ِ «ثبت‌شده» با «آره» ِ خودش (a41 bookItem26: dateBy) — برنامهٔ تاریخ‌دارِ مدل/کهنه مثلِ پیش (بانکِ R18 #9، R19 #15) */
   AS.dueExp30 = dueExp30;
   function planTap(pid, v) {
     var x = plansAll(null).filter(function (y) { return y.p.id === pid; })[0]; if (!x || !(planOpen(x.p) || dueExp30(x.p))) return false; var q = x.p;

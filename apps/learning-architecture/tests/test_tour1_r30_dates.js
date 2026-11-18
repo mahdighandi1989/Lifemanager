@@ -174,6 +174,13 @@ const T0 = Date.parse('2026-11-16T10:00:00+03:30');
     X('D26-42: «هر دو هفته یه بار» ِ خودش با همان گزارش آهنگِ پرونده شد (۱۴ روز)', r.rh && r.rh.every === 14, r.rh);
     X('D27-29 C187: سطرِ پرونده در پرامپت نردبانِ زمان‌بندی را دارد', /نردبانِ زمان‌بندی/.test(r.prompt) && /نردبانِ زمان‌بندی/.test(r.lad), r.lad); });
 
+  /* ---------- F6-080 (tD2 p6، C19): کارِ کسِ دیگر با فعلِ سوم‌شخص («ودیعه رو صاحبخونه آخرِ سال پس میده») پرسشِ روزِ او نیست ---------- */
+  await run('F6-080 tD2', async () => { await fresh(0);
+    const r = await E(async () => { await __say('سلام، کارای اسباب‌کشی رو می‌چینم.'); const n0 = __sys().length; await __say('قسطِ آخرِ اجاره رو سرِ برج می‌دم، ودیعه رو صاحبخونه آخرِ سال پس میده، و رنگ‌کاریِ خونهٔ تازه بعد از عید.'); return { l: __sys().slice(n0), pend: __pend() }; });
+    X('F6-080 C19: هیچ پرسشِ روز برای ودیعه؛ قسطِ اجاره پرسیده', !r.pend.some(x => /ودیعه/.test(x.what)) && r.pend.some(x => /قسط/.test(x.what)), r);
+    const r2 = await E(async () => { const n0 = __sys().length; await __say('امتحانم ' + __dm(__D(9)) + ' برگزار میشه.'); return { pend: __pend(), d: __D(9) }; });
+    X('F6-080 منفی: واژهٔ تعهد («امتحانم … برگزار میشه») هنوز پرسیده می‌شود', r2.pend.some(x => x.date === r2.d), r2); });
+
   try { await b.close(); } catch (e) { }
   const ks = Object.keys(res); console.log(JSON.stringify({ cases: ks.length, ok: ks.filter(k => res[k]).length, red: ks.filter(k => !res[k]) }));
   if (errors.length) { console.log('ERRORS (' + errors.length + '):\n' + errors.join('\n')); process.exit(1); }
