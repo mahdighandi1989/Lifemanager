@@ -137,6 +137,13 @@
     R(/(\d%?)\s*[xX]\s*(?=\d)/g, "$1 * "); R(/(\d%?)\s+در\s+(?=\d)/g, "$1 * ");
     R(/(^|[\s،,.؛:])(?:میشه|می[\u200c\s]?شه|می[\u200c\s]?شود|میشود|می[\u200c\s]?شد|شد)(?=$|[\s،,.؛:!؟?]|\d)/g, "$1 ＝ ");   /* «＝» = برشی که از واژه آمده («میشه»): دورِ ۲۶ (C18) */
     R(/[≃≅]/g, "≈");
+    /* دورِ ۳۰ (A30-20): «یک میلیون و ۷۵» — «یک/یه» پیش از واژهٔ مقیاس همان ۱ است */
+    R(/(^|[^آ-ی‌])(?:یک|یه)(?=\s*(?:میلیون|میلیارد|هزار)(?![آ-ی]))/g, "$11");
+    /* دورِ ۳۰ (U26، aB1 p5؛ s14 p3): «۴۲ ضربدر ۵ … ۲۱۰!»، «۱ + ۰.۳ ... یعنی تقریباً ۱.۳» — «…» میانِ عبارتی با عملگر و یک عدد (که خودش عبارتِ تازه‌ای را آغاز نمی‌کند)
+       نشانهٔ نتیجه است. «۱ + ۲ + … + n» (C64) و «۱، ۲، … ۱۰» دست نمی‌خورند: پیش از «…» عدد و در همان بند عملگر لازم است، پس از عدد عملگر/«=» نه */
+    R(/(\d)\s*…\s*(?:یعنی\s+)?(?=(?:تقریباً|تقریبا|حدود(?:ِ|اً)?)?\s*\d+(?:\.\d+)?(?![\d.])(?!\s*[*\/+\-~^=≈…])(?!\s*＝\s*[\d(]))/g, function (m, d, a, all) {
+      var s = all.slice(0, a) + d, b = -1, re = /[،,؛!؟?\n…=＝:]|\.(?!\d)/g, x; while ((x = re.exec(s))) b = x.index;
+      return /\d\s*[*\/+\-~^]\s*[\d(]/.test(s.slice(b + 1)) ? d + " = " : m; });
     R(/\s+در\s+(?=\d)/g, darProdF);
     R(new RegExp(APX + "\\s*[=＝]\\s*", "g"), "≈ "); R(new RegExp("[=＝]\\s*" + APX + "\\s*", "g"), "≈ ");
     /* «۴ از ۲۶ میشه ۱۵٪»: «از» پیش از نتیجهٔ درصدی، نسبت است (D26-24) — هم‌طول؛ دورِ ۲۷ (بانکِ R27 #35) */
@@ -1059,6 +1066,13 @@
       var kd = /^کم/.test(verb) ? "short" : /^(?:اضافه|زیاد)/.test(verb) && !/مون|میمونه/.test(verb) ? "sur" : "rem", of = pm[1] || pm[5];
       sts.push({ a: a, nb: nb, e: v0 + m[0].length, raw: zero ? "0" : g2 === "یکی" ? "1" : g2, tk: tk, nv: zero ? F(Z) : g2 === "یکی" ? F(ONE) : null, zero: zero, w: w, kd: kd, verb: verb, of: of ? dec(of) : null });
     }
+    /* دورِ ۳۰ (D26-24، aD4 p4؛ C141 «هرگز بی‌صدا»): فعل پیش از عدد — «… ۱۸۰، می‌مونه حدود ۵۹ و ۷ دهم» — کلِ آن (درازای تخته، برش) در جمله نیست ⇒ «؟ نسنجیده»؛ صفحه حدس نمی‌زند */
+    var VF30 = /(?<![آ-ی‌])(?:باقی[‌\s]?)?(?:می[‌\s]?مونه|میمونه|می[‌\s]?ماند)\s+(?:(?:حدود(?:ِ|اً)?|تقریباً|تقریبا)\s*)?(?=\d)/g, mv;
+    while ((mv = VF30.exec(t))) { var kv = tokAt(mv.index + mv[0].length); if (kv < 0) continue; var tv = T[kv]; if (tv.pct || tv.cst) continue;
+      var inC = all.some(function (c) { return c.pos <= tv.a && tv.a < c.pe; }) || U.some(function (u) { return u.pos <= tv.a && tv.a < u.pe; }); if (inC) continue;
+      if (/^\s*[*\/+\-~^=＝≈]/.test(t.slice(tv.b))) continue;   // «می‌مونه ۱۱۵ − ۷۰ = ۴۵»: خودِ حساب است
+      if (/(?:ماه|روز|سال|هفته|ساعت|گام|مرحله|سطر|ردیف|شماره)\s*\d+\s*$/.test(t.slice(Math.max(0, mv.index - 20), mv.index))) continue;   // «ماه ۲۴ می‌مونه ۴۲۸ میلیون» (C136: round28 aD3 p4): مانده به حکمِ فرمول، نه باقی
+      U.push({ text: pretty(t.slice(mv.index, tv.b)), why: "کلی که این باقی از آن است در متنش نیست", pos: mv.index, pe: tv.b, cut: mv.index, rem29: "rem" }); }
     if (!sts.length) return;
     var K3 = F(B(1000)), money = false;
     /* «۸ میلیونی»، «۱۲ میلیونه» — واژهٔ مقیاس با پسوند هم مقیاس است (فقط در این خواننده) */
@@ -1177,6 +1191,16 @@
         ok: !!hit, kind: "of29", pos: m.index, pe: tk.b, sx: true, rdShow: !!(hit && tk.alt && hit === tk.v && cmp(tk.v, tk.alt) !== 0), rdC: hit && tk.alt ? "«" + fa(pretty(tk.cmT)) + (hit === tk.alt ? " هزار»" : "» ِ واحد") : "" });
     }
   }
+  /* دورِ ۳۰ (U26، aB3 p15؛ C138): بندی که نتیجه ادعا می‌کند («… ، میشه ۶۰ میلیون») و در جمله‌اش پیش از آن عملِ حساب (درصدِ، ضرب، تقسیم، جمع، منها) آمده، ولی هیچ سنجشی رویش
+     نیفتاد («۲۰ درصدِ ۳۰۰ میلیون رو بذارم طلا، میشه ۶۰ میلیون» — واژه میانِ عبارت و نتیجه) ⇒ «؟ نسنجیده» با دلیل، هرگز بی‌صدا و هرگز «داده». حکم نمی‌دهد. */
+  function claimU30(t, all, U) {
+    var re = /(?:[^،,؛.!؟?\n]|\.(?=\d))+/g, m; var cov = function (a, b) { return all.some(function (c) { return c.pos < b && c.pe > a; }) || U.some(function (u) { return u.pos < b && u.pe > a; }); };
+    while ((m = re.exec(t))) { var a = m.index, b = a + m[0].length, x = m[0];
+      var cm = /^\s*(?:＝|=)\s*(\d+(?:\.\d+)?)/.exec(x); if (!cm || cov(a, b)) continue;   // بندی که با «میشه N» آغاز می‌شود
+      var s0 = a; while (s0 > 0 && !/[.!?؟\n؛]/.test(t[s0 - 1])) s0--; var pre = t.slice(s0, a);
+      if (/[A-Za-z]/.test(t.slice(s0, b)) || !/\d\s*%\s*\*\s*\d|\d\s*[*\/]\s*\d/.test(pre) || cov(s0, a)) continue;   // فقط «N درصدِ M …»/«A × B …» ِ نخوانده در بندِ پیشینِ همان جمله؛ جبر نه
+      U.push({ text: pretty(x), why: "میانِ حساب و نتیجه واژه آمده", pos: a + (x.length - x.replace(/^\s+/, "").length), pe: b, cut: a + cm.index + cm[0].length - cm[1].length }); }
+  }
   /* ---------- درگاه ---------- */
   function run(t, reg, note, CU) {
     var out = [], un = [], U = [];
@@ -1184,6 +1208,7 @@
     try { units(t.replace(/＝/g, "="), un, note); } catch (e2) { console.warn(e2); }
     try { if (ST.arithRem29On) remains29(t, out.concat(un), out, U); else remains30(t, out.concat(un), out, U); } catch (e4) { console.warn(e4); }   // دورِ ۳۰: remains29 قرنطینه
     try { ofPrev29(t, out.concat(un), out, U); } catch (e5) { console.warn(e5); }
+    try { claimU30(t, out.concat(un), U); } catch (e6) { console.warn(e6); }
     /* خواننده‌ٔ واحد (تبدیل، جمعِ ناهم‌واحد) بر خوانشِ «فقط عدد» ِ همان سطر مقدم است */
     out = out.filter(function (c) { return !(c.uw && un.some(function (u) { return u.pos < c.pe && c.pos < u.pe; })); }).concat(un).sort(function (a, b) { return a.pos - b.pos; });
     out.unread = U.filter(function (u) { return !out.some(function (c) { return c.pos <= u.cut && u.cut < c.pe; }); });

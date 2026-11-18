@@ -37,6 +37,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   /* بندی که متنش re را دارد با نشانِ mk (ok | bad | ask | unread) */
   const clMark = (r, re) => { const x = r.cl.filter(c => re.test(c.t)); return x.length ? x.map(c => c.mark).join('+') : 'NONE'; };
   const noLine = (r, re) => !r.lines.some(l => re.test(l));
+  const noBad = (r) => !r.lines.some(l => /^✗/.test(l));
 
   // ================= c180 — S1 C30-7 =================
   await section('c180', async () => {
@@ -73,6 +74,31 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     for (const [t, re, mk, tag] of keep) { r = await AC(t); chk(clMark(r, re) === mk, 'C136 look-alike ' + tag + ' keeps «' + mk + '» :: ' + J(r)); }
   });
 
+  // ================= tail — U26، D26-24، A30-20 (جمله‌های خودِ دونده‌ها؛ هم‌شکل‌های C136 از round26*–round30*) =================
+  await section('tail', async () => {
+    await CTX({});
+    let r = await AC('۴۲ ضربدر ۵ … ۲۱۰! ۲۱۰ از ۱۷۸ بیشتره، پس همه جا میشن. پس جواب ۵ اتوبوسه.');
+    chk(r.lines.some(l => /^✓ «۴۲ × ۵ = ۲۱۰»/.test(l)), 'U26 aB1 p5: «۴۲ ضربدر ۵ … ۲۱۰» is read ✓ (the ellipsis before one number after an expression is a result mark) :: ' + J(r));
+    r = await AC('خب: t = (960-988)/(20/√25) = -28/4 = -7. بعد گفتم احتمال = ۱ + ۰.۳ ... یعنی تقریباً ۱.۳ شد. جواب ۱.۳.');
+    chk(r.lines.some(l => /^✓ «۱ \+ ۰\.۳ ≈ ۱\.۳»/.test(l)), 'U26 s14 p3: «۱ + ۰.۳ ... یعنی تقریباً ۱.۳» is read ✓ :: ' + J(r));
+    r = await AC('دو تا حسابِ دیگه کردم: اگه ۲۰ درصدِ ۳۰۰ میلیون رو بذارم طلا، میشه ۶۰ میلیون. سودِ سپرده ۵۷٫۵ تقسیم بر ۱۲ = ۵ میلیون در ماه.');
+    chk(r.lines.some(l => /^— حسابِ «میشه ۶۰ میلیون» را صفحه نسنجیده/.test(l)), 'U26 aB3 p15: «۲۰ درصدِ ۳۰۰ میلیون رو بذارم طلا، میشه ۶۰ میلیون» gets «؟ نسنجیده» (never silent, never «داده») :: ' + J(r));
+    r = await AC('نقشهٔ برش رو کشیدم: تختهٔ ۱ و ۲: هر کدوم یه بغلِ ۱۸۰، می‌مونه حدود ۵۹ و ۷ دهم که به کارِ طبقه نمیاد.');
+    chk(r.lines.some(l => /^— حسابِ «می‌مونه حدود ۵۹ و ۷ دهم» را صفحه نسنجیده/.test(l)) && noBad(r), 'D26-24 aD4 p4: verb-first «می‌مونه حدود ۵۹ و ۷ دهم» is never silent — «؟ نسنجیده» (the board length is not in her text) :: ' + J(r));
+    r = await AC('برای اینکه سود ۲۰۰ بمونه قیمت باید حداقل ۸۷۵ + ۲۰۰ = یک میلیون و ۷۵ باشه.');
+    chk(r.lines.some(l => /^✓ «۸۷۵ \+ ۲۰۰ = ۱ میلیون و ۷۵»/.test(l)), 'A30-20 pA2 p6: «یک میلیون و ۷۵» (word «یک» before a scale word) is read ✓ under the thousands reading :: ' + J(r));
+    // C136 هم‌شکل‌ها: هیچ سطرِ تازه
+    const quiet = [
+      ['فرمول رو ساده‌تر کردم: B_n = 1000 − 400·1.015^n. ماه ۲۴ می‌مونه ۴۲۸ میلیون، ماه ۳۰ حدود ۳۷۵.', /۴۲۸/, 'D aD3 p4 (round26/28): a month\'s balance by formula is not a remainder'],
+      ['قفسه‌ها: گفته بودم ۴ تا با ۷۰ درصد، شد ۳ تا.', /شد ۳|میشه ۳/, 'A s05 p28: a forecast outcome is not a claim'],
+      ['پس 4/n − 1/x = 4/n − 4/(n+3) = 12/(n(n+3)) = 3/(n·(n+3)/4)، و هر کسری به شکلِ 3/m همیشه به صورتِ 1/y + 1/z درمیاد.', /نسنجیده \(میانِ حساب/, 'D pwD2 p1: algebra gets no «میانِ حساب و نتیجه» line'],
+      ['سلام، امروز گفت مسئلهٔ ۱ + ۲ + … + n برگشته: 2 + 4 + … + 2n = 2(1 + 2 + … + n) = n(n + 1).', /میانِ حساب|^✓|^✗/, 'C aC2 p9: C64 «… + n» sums are not turned into results'],
+      ['امروز رفتم ۶ متر خریدم و بریدم: ۳ قواره درآمد و ۱۵ سانت اضافه ماند.', /^✗/, 'A aA4 p9: three different units — never ✗ «۶ − ۳»'],
+      ['دیشب بازی ۳-۲ شد و بخاری تا ۱۰:۳۰ روشن موند.', /موند/, 'D arD1 p10: a clock time is not a remainder'],
+    ];
+    for (const [t, re, tag] of quiet) { r = await AC(t); chk(!r.lines.some(l => re.test(l)), 'C136 ' + tag + ' :: ' + J(r)); }
+  });
+
   // ================= corpus — C178: CORPUS_R30_F2.json، هر ۷۹ ورودی =================
   //  انتظارِ موتور برای هر ورودی از «expected» ِ خودِ آن (و حکم‌های C189–C192): [الگوی متنِ بند، نشان] یا یک بررسیِ دیگر.
   //  OUT: بخشی از «expected» که کارِ موتورِ حساب نیست (دفترِ گام C8/C86، 🎯، تاریخ) — جدا گزارش می‌شود، هرگز بی‌صدا رد نمی‌شود.
@@ -84,7 +110,6 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     const PACKS = 'می‌خوایم بستهٔ تیله بخریم. فروشنده گفت ۱۲ درصد تخفیف میده. هر بسته ۱۲ تا تیله داره. ۵ تا بسته چند تا تیله میشه؟';
     const PARTY = 'برای تولدِ ۶۰ سالگیِ مامانم یه مهمونی می‌گیرم؛ بودجه‌م ۱۲ میلیونه و می‌خوام ببینم برای کیک و گل پول می‌مونه یا نه.';
     const remLine = (r) => r.lines.some(l => /(?:می‌مونه|میمونه|موند|ماند|کم دار|کم میا|اضافه میا)/.test(l));
-    const noBad = (r) => !r.lines.some(l => /^✗/.test(l));
     const EXP = {
       '001': [[/۶ × ۷ = ۴۲/, 'ok'], [/از ۵۰ تا ۷ تا می‌مونه/, 'bad']], '002': [[/۴٫۴۶ میلیون می‌مونه/, 'ok']], '003': [[/۴۲ × ۱۲۰/, 'ok'], [/۵۸۰ هزار کم دارم/, 'ok']],
       '004': [[/۴۲ × ۰٫۵/, 'ok'], [/۸ متر اضافه میاد/, 'bad']], '005': [[/نصفش میشه ۴۲/, 'ok']], '006': [[/نصفش میشه ۲۰/, 'unread']],
