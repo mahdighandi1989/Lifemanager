@@ -111,8 +111,8 @@ const T0 = Date.parse('2026-11-16T10:00:00+03:30');
     X('B30·D19 C12: «فردا بانک.» ⇒ یک پرسشِ D+1', r.pend.filter(x => /بانک/.test(x.what) && x.date === r.d1).length === 1, r); });
   await run('bare neg', async () => { await fresh(0);
     const r = await E(async () => { const o = {}; await __say('فردا صبح.'); await __say('فردا ساعت ۱۰.'); await __say('فردا تعطیله.'); await __say('پنجشنبه‌ست.'); o.pend = __pend();
-      await __say('فردا میرم بانک.'); await __say('آره'); const n0 = __sys().length; await __say('فردا بانک.'); o.l = __sys().slice(n0); o.pend2 = __pend(); return o; });
-    X('C12 منفی: «فردا صبح/ساعت ۱۰/تعطیله»، «پنجشنبه‌ست» کار نیستند؛ «فردا بانک.» پس از ثبتِ همان کار پرسشِ دوم نمی‌سازد (F6-032)', !r.pend.length && !r.pend2.length && !r.l.some(x => /^📅/.test(x)), r); });
+      await __say('فردا شد. یه ایده دارم.'); o.pend0 = __pend(); await __say('فردا میرم بانک.'); await __say('آره'); const n0 = __sys().length; await __say('فردا بانک.'); o.l = __sys().slice(n0); o.pend2 = __pend(); return o; });
+    X('C12 منفی: «فردا صبح/ساعت ۱۰/تعطیله»، «پنجشنبه‌ست» کار نیستند؛ «فردا بانک.» پس از ثبتِ همان کار پرسشِ دوم نمی‌سازد (F6-032)', !r.pend.length && !r.pend0.length && !r.pend2.length && !r.l.some(x => /^📅/.test(x)), r); });
   /* ---------- D26-1 (aD2 p2، C19): «امم… رباتیک فقط ⟨روز⟩‌ست» برنامهٔ هفتگیِ چیزی است، نه کارِ او ---------- */
   await run('D26-1 aD2', async () => { await fresh(0);
     const r = await E(async () => { const o = {}; const n0 = __sys().length; await __say('امم… رباتیک فقط ' + __wn(__D(2)) + '‌ست.'); o.l = __sys().slice(n0); o.pend = __pend();
@@ -180,6 +180,13 @@ const T0 = Date.parse('2026-11-16T10:00:00+03:30');
     X('F6-080 C19: هیچ پرسشِ روز برای ودیعه؛ قسطِ اجاره پرسیده', !r.pend.some(x => /ودیعه/.test(x.what)) && r.pend.some(x => /قسط/.test(x.what)), r);
     const r2 = await E(async () => { const n0 = __sys().length; await __say('امتحانم ' + __dm(__D(9)) + ' برگزار میشه.'); return { pend: __pend(), d: __D(9) }; });
     X('F6-080 منفی: واژهٔ تعهد («امتحانم … برگزار میشه») هنوز پرسیده می‌شود', r2.pend.some(x => x.date === r2.d), r2); });
+
+  /* N6-1 با برنامهٔ گزارش‌شدهٔ مدل (A30-4 s01 p49): برنامه هم «کدام یکی؟» می‌شود */
+  await run('N6-1 plan', async () => { await fresh(0);
+    const r = await E(async () => { const o = {}; o.t = APP.PR.whenInfo(__wn(__D(1)) + '‌ی هفته‌ی بعد').date; o.d = APP.addDays(o.t, 3); await __say('سلام. امروز کارای هفته رو می‌چینم.');
+      const t = __wn(o.t) + '‌ی هفته‌ی بعد، ' + __dm(o.d) + '، جلسهٔ ساختمون می‌رم.'; const n0 = __sys().length; await __say(t, 'خب.', __plan(t.replace(/\.$/, ''))); o.l = __sys().slice(n0); o.pend = __pend();
+      await __say(__wn(o.t) + ' درسته، ' + __dm(o.t) + '.'); o.pend2 = __pend(); o.w = __when(/جلسهٔ ساختمون/); return o; });
+    X('N6-1 plan: یک پرسشِ «کدام یکی؟» با هر دو؛ پاسخ ⇒ همان روز، بی ردیفِ مانده', r.pend.length === 1 && r.l.some(x => /کدام یکی؟/.test(x)) && r.w === r.t && !r.pend2.length, r); });
 
   try { await b.close(); } catch (e) { }
   const ks = Object.keys(res); console.log(JSON.stringify({ cases: ks.length, ok: ks.filter(k => res[k]).length, red: ks.filter(k => !res[k]) }));

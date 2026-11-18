@@ -3224,7 +3224,8 @@
          «فردا صبح.»، «فردا ساعت ۱۰.»، «فردا درسته.»، «فردا تعطیله.» کار نیستند؛ کاری که پیش‌تر برای همان روز ثبت شده دوباره پرسیده نمی‌شود (covered25، F6-032). */
       if (!got.length && parts.length === 1) { var c30 = parts[0], I30 = null; try { I30 = PR.whenInfo(c30); } catch (e) { } var x30 = nrm26(c30);
         if (I30 && I30.date && !I30.amb && !I30.free && I30.date >= today() && I30.src !== "idiom") { var w30 = toks(x30.replace(DATEW27, " ").replace(/(?:^| )(?:هم|و)(?![آ-ی])/g, " ").replace(TOD30, " ").replace(FILL29, " ").replace(FILL29, " "));
-          if (w30.length >= 1 && w30.length <= 2 && !w30.some(function (w) { return /[0-9۰-۹]/.test(w) || /^(?:درسته|درست|آره|بله|نه|خوبه|همینه|اوکی|اوکیه|باشه|تعطیل|تعطیله|خالی|آزاد|آزادم|بیکار|بیکارم)$/.test(w); }) && !pres28(x30).length && !/(?:^| )(?:ب|ن)[آ-ی]{2,}(?:م|یم)(?![آ-ی])/.test(x30) && !PAST26.test(x30) && !/(?:ـ|^| )(?:ه|است|ست|هست|نیست)$/.test(x30.trim()) && !(THIRD26.test(x30) || OTHER26.test(x30)) && !state29(x30))
+          var V30 = /\(\?:ن\?می \?\|ن\)\?\(\?:([^)]*)\)/.exec(PAST26.source), VR30 = new RegExp("^ن?(?:شد|بود|" + (V30 ? V30[1] : "رفت") + ")(?:ه)?$");   /* «فردا شد.» (R30A s03): فعلِ سوم‌شخص کار نیست */
+          if (w30.length >= 1 && w30.length <= 2 && !w30.some(function (w) { return VR30.test(w) || /[0-9۰-۹]/.test(w) || /^(?:درسته|درست|آره|بله|نه|خوبه|همینه|اوکی|اوکیه|باشه|تعطیل|تعطیله|خالی|آزاد|آزادم|بیکار|بیکارم)$/.test(w); }) && !pres28(x30).length && !/(?:^| )(?:ب|ن)[آ-ی]{2,}(?:م|یم)(?![آ-ی])/.test(x30) && !PAST26.test(x30) && !/(?:ـ|^| )(?:ه|است|ست|هست|نیست)$/.test(x30.trim()) && !(THIRD26.test(x30) || OTHER26.test(x30)) && !state29(x30))
             got = [{ c: c30.trim(), I: I30, first: true }]; } }
       /* دورِ ۲۹ (C133/C49؛ A29-5 s01، D28-21 tD2، C aC3 «وسطِ ماهِ دیگه باید برم چکاپ، یعنی حدودِ ۱۵ دی»): بندی که جز روز چیزی ندارد («یعنی حدودِ ۱۵ دی») روزِ همان کارِ
          همین جمله را بازمی‌گوید ⇒ ردیفِ «کدام روز؟» ِ اصطلاح کنار می‌رود و فقط روزِ خودش (با حرفِ خودش) یک بار پرسیده می‌شود — یک کار، یک پرسش */
@@ -4033,6 +4034,9 @@
     delete s0._dq26;
     /* حرفِ خودش که هیچ‌کدام از بالایی‌ها نبود */
     own.forEach(function (it) { if (it.ev30) return;   /* دورِ ۳۰ (D26-1): روزِ برنامهٔ هفتگی پرسشِ تازه نیست */
+      /* دورِ ۳۰ (N6 #1، A30-4 s01 p49): برنامهٔ گزارش‌شدهٔ همین پیام با یکی از دو خوانش همان کار است ⇒ همان قلم «کدام یکی؟» می‌شود (نه پرسشِ یک‌روزه‌ای که خوانشِ دیگر را بی‌صدا بیندازد) */
+      if (it.dis30 && it.opts) { var zp30 = items.filter(function (z) { return z.plan && !z.amb && it.opts.indexOf(z.date) >= 0; })[0];
+        if (zp30) { zp30.amb = true; zp30.opts = it.opts.slice(); zp30.dis30 = true; zp30.wd = ""; zp30.date = it.opts[0]; var qd30 = (s0.plans || []).filter(function (y) { return y && y.id === zp30.plan; })[0]; if (qd30) { delete qd30.whenPend; qd30.whenAsk = "—"; qd30.whenAskO = { date: it.opts[0], opts: it.opts.slice() }; } return; } }
       /* دورِ ۳۰ (C92/C144؛ A30-5 s01 p53، B30·D25، D30-12، F6-102): دو کارِ یک پیام که هر دو اصطلاحِ دوپهلو دارند («سرِ برج … اجاره …، قسطِ وام رو هم سرِ برج») هر کدام
          پرسشِ خودش را دارند — پیش‌تر هر پرسشِ دوپهلوی دوم بی‌صدا کنار می‌رفت ((z.amb && it.amb)). فقط همان کار (همان متن یا بی چیزِ تازه) یک پرسش است */
       if (items.some(function (z) { return (z.date === it.date && !z.amb && (norm(z.what) === norm(it.what) || z.plan || z.dl || z.pred || z.was || !newObj29(it.what, z.what))) || (z.amb && it.amb && (norm(z.what) === norm(it.what) || z.plan || z.pred || !newObj29(it.what, z.what))); })) return;   /* دورِ ۲۹ (بانکِ R29 #153): کارِ دیگری در همان روز («بنگاه … بانک هم …») پرسشِ خودش را دارد */
