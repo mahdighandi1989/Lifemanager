@@ -152,7 +152,7 @@
       var last = A.trail[A.trail.length - 1];
       bar.appendChild(h("div", { class: "trailrow" },
         h("button", { class: "btn sm backbtn", onclick: function () { A.back(); }, title: "دقیقاً به همان صفحه و همان جای اسکرول برمی‌گردی" },
-          "↩ برگرد به «" + last.label + "»"),
+          "↩ برگرد به " + A.qLab30(last.label)),
         last.ctx ? h("span", { class: "small muted fromctx" }, "از بخشِ «" + last.ctx + "» آمدی") : null,
         A.trail.length > 1 ? h("details", { class: "trailall" }, h("summary", { class: "small" }, "مسیری که آمدی (" + A.fa(A.trail.length) + " قدم)"),
           h("ol", { class: "small" }, A.trail.map(function (e, i) {
@@ -168,8 +168,10 @@
       m.insertBefore(crumbs(), m.firstChild);
       if (A.trail.length) {
         var last = A.trail[A.trail.length - 1];
-        m.appendChild(h("button", { class: "backfab", title: "برگرد به «" + last.label + "»", "aria-label": "برگرد به «" + last.label + "»", onclick: function () { A.back(); } }, "↩ برگرد"));
+        m.appendChild(h("button", { class: "backfab", title: "برگرد به " + A.qLab30(last.label), "aria-label": "برگرد به " + A.qLab30(last.label), onclick: function () { A.back(); } }, "↩ برگرد"));
       }
     } catch (e) { console.error(e); }
   };
 })(APP);
+/* دورِ ۳۰ (surface، C28-21 tC1 «↩ برگرد به ««هشدارِ یخ‌زدگی …»»»): نامِ صفحه‌ای که خودش در «…» است دوباره در گیومه نمی‌رود — یک جفت گیومه، نه دو */
+APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^«»]*(?:«[^«»]*»[^«»]*)*»$/.test(l) ? l : "«" + l + "»"; };

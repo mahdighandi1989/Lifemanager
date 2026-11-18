@@ -1,0 +1,348 @@
+{
+"from": "round30C/oC1",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام بعد اصلاحش کنم، همه‌چیزی که ازش ساختی دنبالش عوض میشه؟ یا باید خودم همه‌جا رو درست کنم؟ مسئله‌م اینه: سه تا پروژه دارم — یه کتاب، یه اپ، یه دورهٔ آموزشی — و هفته‌ای ۱۵ ساعت وقتِ آزاد. نمی‌دونم ترتیبشون چی باشه و ساعت‌ها رو چطوری تقسیم کنم.",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';APP.clock.dev=true;localStorage.setItem('lla.dev','1');'ok'",
+"c": 1
+},
+{
+"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='1988-03-08';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()",
+"c": 2
+},
+{
+"say": "یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقعاً تموم شده باشه.» ولی صبر کن — این «یه جمله» رو که الان گفتی از کجا آوردی؟ یه قاعده‌ست تو سامانه یا خودت ساختی؟ وصله به چیزی؟",
+"c": 3
+},
+{
+"say": "کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ جلسهٔ ضبط‌شده. ولی یه چیزی: هر چی تا الان گفتیم و پر کردیم یه جا هست که همه رو یکجا ببینم؟ نمی‌خوام لای گفت‌وگو گم بشه.",
+"c": 4
+},
+{
+"say": "آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره یا یه چیزی از خودت درمیاری؟",
+"c": 5
+},
+{
+"say": "معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ تولد رو پر کردم. منو با هم‌سن‌هام مقایسه می‌کنی؟ دقیقاً با کیا؟",
+"c": 6
+},
+{
+"say": "روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دوم؛ دوره سوم. پس هفته‌ای ۶ ساعت کتاب، ۳ ساعت اپ، ۱ ساعت دوره.",
+"c": 7
+},
+{
+"say": "حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» — اشتباه گفتم، واقعیش ۱۲ ساعته. ببینم دنبالش چی عوض میشه، همون‌طور که گفتی.",
+"c": 8
+},
+{
+"say": "به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کجام. نشونم بده. و بگو اون اصلاحِ ۱۵ به ۱۲ کجای نقشه‌ست.",
+"c": 9
+},
+{
+"c": 10
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 11
+},
+{
+"c": 12
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1500);const t=document.querySelector('#main').innerText;const i=t.indexOf('از گفت‌وگو');return 'phase='+APP.livePhase(p)+' story='+(APP.liveStoryPhase?APP.liveStoryPhase(p):'?')+' || '+(i>=0?t.slice(Math.max(0,i-300),i+1500):'NO «از گفت‌وگو»')+' || HEAD '+t.slice(0,1200)})()",
+"c": 13
+},
+{
+"c": 14
+},
+{
+"say": "نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت»ـه — اصلاحم به همه‌جا رسیده، خوبه. یه پیشنهاد هم برای سازنده‌ها ثبت کن: کاش نقشه کنارِ هر نقطه می‌گفت از کدوم پیامم اومده. و یه سؤال: تو به یه مدلِ خاص بسته‌ای؟ اگه فردا یه مدلِ دیگه — یا یه مدلِ ضعیف‌تر — پشتت باشه، روشت عوض میشه یا این‌ها خراب میشه؟",
+"c": 15
+},
+{
+"say": "باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه.",
+"c": 16
+},
+{
+"eval": "(async()=>{const pid=(window.__PID||APP.state.arg||(APP.liveAll()[0]||{p:{}}).p.id);window.__PID=pid;localStorage.setItem('__PID',pid);APP.go('lprob',pid);await W(1500);const r=[];r.push(F('lpOne','با ۱۰ تا ۱۲ ساعت در هفته، کدام پروژه اول و با چه سهمی، که شش ماه دیگر دست‌کم یکی واقعاً تمام شده باشد.'));r.push(F('lpWhy','سه کار نیمه‌کاره دارم و هیچ‌کدام تمام نمی‌شود.'));await W(300);B(/ثبتِ کل/);await W(1200);r.push(F('lpUnk','ترتیب و سهمِ ساعتِ هفتگیِ کتاب، اپ و دوره'));r.push(F('lpD_d1','۱۰ تا ۱۲ ساعت در هفته'));r.push(F('lpD_d2','کتاب حدودِ ۱۲۰ ساعت کار مانده؛ ویراستار منتظر است'));r.push(F('lpCond','شش ماه دیگر دست‌کم یکی تمام: دست‌نوشتهٔ کامل، یا اپ با ۱۰ کاربرِ واقعی، یا ۸ جلسهٔ ضبط‌شده'));await W(400);let t0=document.body.innerText;B(/ثبتِ فهم/);await W(1400);if([...document.querySelectorAll('#main button')].some(b=>/^۲ کامل$/.test(b.textContent))){B(/^۲ کامل$/);await W(1200);}let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,12).join(' ¦ ');return r.join(',')+' phase='+APP.livePhase(pid)+' NEW: '+diff+' || IDS '+IDS().slice(0,1200)})()",
+"c": 17
+},
+{
+"eval": "(async()=>{const pid=(window.__PID||APP.state.arg||(APP.liveAll()[0]||{p:{}}).p.id);P('lpSat',/^بله/);if(document.getElementById('lpSuff'))P('lpSuff',/^کافی|^بله/);F('lpSuffW','با ساعت‌ها و نشانهٔ تمام‌شدنِ هر پروژه، ترتیب و سهم معین می‌شود');F('lpGuess','کتاب اول، اپ دوم، دوره سوم؛ ۶/۳/۱ ساعت');if(document.getElementById('lpConf'))P('lpConf',/۷۰|۶۰/);F('lpTest','بعد از یک هفته ساعت‌های واقعی را با برنامه مقایسه می‌کنم');if(document.getElementById('lpIfRef'))P('lpIfRef',/کنار می‌گذارم|اصلاح/);await W(300);let t0=document.body.innerText;B(/ثبتِ فهم/);await W(1400);if([...document.querySelectorAll('#main button')].some(b=>/^۲ کامل$/.test(b.textContent))){B(/^۲ کامل$/);await W(1200);}F('lpPlan','نخست هفته‌ای ۶ ساعت کتاب تا دست‌نوشته تمام شود، سپس ۳ ساعت اپ و ۱ ساعت دوره؛ هفته‌های ۱۲ساعته ۲ ساعتِ اضافه به اپ');document.querySelectorAll('[id^=lpPC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);for(const d of ['d1','d2']){if(document.getElementById('lpPU_a_'+d))P('lpPU_a_'+d,/حالا به کارش|استفاده کردم|^بله/);if(document.getElementById('lpPU_w_'+d))F('lpPU_w_'+d,'در سهمِ ساعت‌ها');}await W(300);B(/ثبتِ طرح/);await W(1400);if(document.getElementById('lpPSoftWhy')&&document.getElementById('lpPSoftWhy').offsetParent){F('lpPSoftWhy','داده‌ها در سهمِ ساعت‌ها آمده‌اند');B(/ثبت با همین/);await W(1200);}let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,14).join(' ¦ ');return 'phase='+APP.livePhase(pid)+' NEW: '+diff})()",
+"c": 18
+},
+{
+"c": 19
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 20
+},
+{
+"c": 21
+},
+{
+"c": 22
+},
+{
+"say": "فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که واقعاً نگفته بودم — منصفانه بود. اون پیشنهادی که برای سازنده‌ها ثبت کردی به گام‌های مسئلهٔ من که ربطی نداره، نه؟ حالا یه فکرِ دیگه: اصلاً شاید به‌جای ترتیب، هر سه رو هم‌زمان پیش ببرم، هر روز یه کم؟",
+"c": 23
+},
+{
+"say": "نشونه: صفحه‌های کتاب در هفته. پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت — پس عملاً ردش کردم. برمی‌گردم به ترتیب. سه تا سؤالِ دیگه: اگه یه چیزی که لازم دارم تو این سامانه نباشه چی میشه — ساخته میشه و خودت می‌فهمی؟ اگه اینترنت نباشه، این کار می‌کنه؟ و داریم یه مدلِ محلیِ خودمون هم می‌سازیم؟",
+"c": 24
+},
+{
+"say": "جمعهٔ بعد برمی‌گردم، با تعدادِ صفحه‌ها.",
+"c": 25
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-25')+' pid='+p})()",
+"c": 26
+},
+{
+"c": 27,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 28
+},
+{
+"c": 29
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1500);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2000)})()",
+"c": 30
+},
+{
+"say": "برگشتم. هفتهٔ اول: کتاب ۵ ساعت شد نه ۶، و ۱۸ صفحه نوشتم. اپ ۴ ساعت. ولی صبر کن — اون اول گفتم کتاب ۱۲۰ ساعت مونده؛ اشتباه بود، ۱۴۰ ساعته. بازم با شش ماه جور درمیاد؟ و یادت مونده دفعهٔ قبل چی گفتیم؟",
+"c": 31
+},
+{
+"say": "۵ × ۲۶ = ۱۳۰، کمه. با ۶ ساعت ۱۵۶ میشه که بسه. پس باید همون ۶ رو واقعاً بذارم. یه چیز آخر: از این گفت‌وگو چی کم بود که اگه بود بهتر بود؟ صادق باش. و یه ایدهٔ اختراع هم دارم؛ با همین روشِ پولیا و ابزارهای الانِ سامانه میشه تا یه برنامهٔ مشخص بردش، یا جاهایی کم میاره؟",
+"c": 32
+},
+{
+"say": "پیشرفت: ۱۸ صفحه و یه ترتیبِ روشن. آموختم که عددِ «واقعی» رو باید از هفتهٔ واقعی بگیرم نه از امیدم. بله، دادهٔ ۲ رو هم عوض کن.",
+"c": 33
+},
+{
+"say": "یه اصلاحِ کوچیک: اون هفته کتاب ۴ ساعت شد، نه ۵.",
+"c": 34
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 35
+},
+{
+"eval": "(()=>{const o=[];APP.liveAll().forEach(r=>{try{const d=APP.dossier(r.p.id);const c=APP.liveClosure(r.p.id)||{};o.push('## '+r.p.title+' ['+(c.state||'')+'/'+APP.livePhase(r.p.id)+']\\n'+(d.events||[]).map(e=>'  '+e.k+' · '+String(e.title||'').slice(0,60)+' · '+String(e.text||e.body||e.sum||e.v||'').replace(/\\s+/g,' ').slice(0,110)).join('\\n'))}catch(e){o.push('ERR '+e.message)}});return o.join('\\n')})()",
+"c": 36
+},
+{
+"c": 37
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 38
+},
+{
+"c": 39
+},
+{
+"c": 40
+},
+{
+"c": 41
+},
+{
+"c": 42
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('mind');await W(1800);const t=document.querySelector('#main').innerText;const out=[];let i=-1;for(const m of t.matchAll(/هنجار|هم‌سن|گروه‌های سنی|سن: |علت|ضعیف‌ترین|پیش‌نیاز ·/g)){if(m.index-i>250){out.push(t.slice(Math.max(0,m.index-150),m.index+350));i=m.index;}}return out.join(' ⟂ ').slice(0,4000)})()",
+"c": 43
+},
+{
+"c": 44
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1200);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2500)})()",
+"c": 45
+},
+{
+"c": 46
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();APP.go('dossier',s.id);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 47
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 48
+},
+{
+"c": 49
+},
+{
+"c": 50,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-10-25');APP.render&&APP.render();'clock '+APP.today()",
+"c": 51
+},
+{
+"say": "آره، همون ۱۰۴ درسته.",
+"c": 52
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 53
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];const s=APP.ASSIST.cur();APP.go('dossier',s.id);await W(1400);const t=document.querySelector('#main').innerText;const L=t.split('\\n').filter(l=>/۱۰۴|۱۳۰|پذیر|کهنه/.test(l)).slice(0,14);return L.join(' / ')})()",
+"c": 54
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3500)),1500))})()",
+"c": 55
+},
+{
+"c": 56
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,9000)),1500))})()",
+"c": 57
+},
+{
+"c": 58
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1300);o.push('## '+r.p.title+' ['+(APP.liveClosure(r.p.id)||{}).state+']\\n'+document.querySelector('#main').innerText.slice(0,6000));}return o.join('\\n\\n')})()",
+"c": 59
+},
+{
+"c": 60,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-10-26');APP.render&&APP.render();'clock '+APP.today()",
+"c": 61
+},
+{
+"say": "این صفحه از کجا می‌فهمه کدوم عدد کهنه شده؟",
+"c": 62
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 63
+},
+{
+"say": "سامانه پیشنهادِ «۱۳۰ ⇒ ۱۰۴» رو چطوری ساخت؟",
+"c": 64
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 65
+},
+{
+"say": "کجای پرونده‌م ببینم که چی اصلاح شد؟",
+"c": 66
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 67
+},
+{
+"say": "قاعده‌اش کجا نوشته؟",
+"c": 68
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 69
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1200);const t=document.querySelector('#main').innerText;o.push('## '+r.p.title.slice(0,40)+'\\n'+t.slice(-5000));}const s=APP.ASSIST.cur();if(s){APP.go('dossier',s.id);await W(1300);o.push('## SESSION\\n'+document.querySelector('#main').innerText.slice(-6000));}return o.join('\\n')})()",
+"c": 70
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3500)),1500))})()",
+"c": 71
+},
+{
+"c": 72
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,9000)),1500))})()",
+"c": 73
+},
+{
+"c": 74
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1300);o.push('## '+r.p.title+' ['+(APP.liveClosure(r.p.id)||{}).state+']\\n'+document.querySelector('#main').innerText.slice(0,6000));}return o.join('\\n\\n')})()",
+"c": 75
+},
+{
+"c": 76,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"بله: هر رکوردی که از جملهٔ اصلاح‌شده ساخته شده دنبالش عوض می‌شود و پیشین در تاریخچه می‌ماند؛ جاهایی را که خودت در فرم تایپ کرده‌ای صفحه می‌پرسد و بی «بله» ِ تو دست نمی‌زند. حالا مسئلهٔ خودت: کلِ آن را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام  / دستیار: بله: هر رکوردی که از جملهٔ اصلاح‌شده ساخته شده دنبالش عوض می‌شود و پیش\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را حل کنیم») است و در سامانه همان پرسشِ اولِ کارتِ «فهمِ مسئله» در «🔭 مسئلهٔ حل‌نشدهٔ خودم» است؛ جمله‌ات هم همان‌جا می‌نشیند. در جمله‌ات «واقعاً تموم شده» آمده: برای هر کدام از سه پروژه، تمام‌شدن دقیقاً یعنی چه؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام  / دستیار: بله: هر رکوردی که از جملهٔ اصلاح‌شده ساخته شده دنبالش عوض می‌شود و پیش / کاربر: یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقع / دستیار: از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"c\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زمان نشان می‌دهد؛ و اگر این مسئله در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت شود، فهم، طرح و گام‌هایش می‌ماند و در «امروز» برمی‌گردد. سه تعریفِ «تمام‌شدن» را گرفتم. از ۱۵ ساعتِ هفته، همیشه همین‌قدر در دست داری؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام  / دستیار: بله: هر رکوردی که از جملهٔ اصلاح‌شده ساخته شده دنبالش عوض می‌شود و پیش / کاربر: یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقع / دستیار: از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را  / کاربر: کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ ج / دستیار: هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زما\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"c\", \"d\"], \"ans\": [\"u3\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ‌ها، گام‌ها، حدس‌ها و پیش‌بینی‌هایی که سرانجام گرفته‌اند) و کنارِ هر عدد «از کجا؟» دارد که رویدادهایش را نشان می‌دهد؛ جایی که داده نیست می‌نویسد «هنوز داده‌ای نیست» و عددی ساخته نمی‌شود. برگردیم به ساعت‌ها: همیشه همان ۱۵ ساعت را در دست داری؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام  / دستیار: بله: هر رکوردی که از جملهٔ اصلاح‌شده ساخته شده دنبالش عوض می‌شود و پیش / کاربر: یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقع / دستیار: از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را  / کاربر: کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ ج / دستیار: هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زما / کاربر: آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره  / دستیار: ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"ترتیب و سهمِ ساعتِ سه پروژه\", \"statement\": \"سه تا پروژه دارم — یه کتاب، یه اپ، یه دورهٔ آموزشی — و هفته‌ای ۱۵ ساعت وقتِ آزاد. نمی‌دونم ترتیبشون چی باشه و ساعت‌ها رو چطوری تقسیم کنم. با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقعاً تموم شده باشه. کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ جلسهٔ ضبط‌شده.\", \"nat\": \"life\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن، و مقایسه با گروهِ سنیِ خودت در «📐 سنجشِ استاندارد» — فقط با داده‌های جمعیتیِ همان گروه، و هر جا هنجارِ معتبر نباشد همان را می‌نویسد و مقایسه نمی‌کند. این‌که دقیقاً کدام نمونه است را خودِ همان نما کنارِ هر سنجه نوشته؛ من از این‌جا عددش را نمی‌سازم. حالا ساعت‌ها: برنامه را روی ۱۵ می‌چینی یا روی ۱۰؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام  / دستیار: بله: هر رکوردی که از جملهٔ اصلاح‌شده ساخته شده دنبالش عوض می‌شود و پیش / کاربر: یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقع / دستیار: از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را  / کاربر: کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ ج / دستیار: هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زما / کاربر: آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره  / دستیار: ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ / کاربر: معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ ت / دستیار: صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که خودت بسنجی‌اش: از دست‌نوشتهٔ کتاب چقدر کار مانده و با ۶ ساعت در هفته تا شش ماه تمام می‌شود؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام  / دستیار: بله: هر رکوردی که از جملهٔ اصلاح‌شده ساخته شده دنبالش عوض می‌شود و پیش / کاربر: یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقع / دستیار: از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را  / کاربر: کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ ج / دستیار: هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زما / کاربر: آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره  / دستیار: ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ / کاربر: معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ ت / دستیار: صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن / کاربر: روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دو / دستیار: طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\", \"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"plan\": {\"text\": \"هفته‌ای ۶ ساعت کتاب، ۳ ساعت اپ، ۱ ساعت دوره\", \"steps\": [\"۶ ساعت کتاب\", \"۳ ساعت اپ\", \"۱ ساعت دوره\"]}}]}",
+"{\"reply\": \"اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گویم چه عوض شد. طرحت را روی ۱۰ ساعت چیده بودی، پس خودِ تقسیم به آن بند نیست. با ۱۲ ساعتِ واقعی، آن ۲ ساعتِ بیرون از طرح را به کدام پروژه می‌دهی؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام  / دستیار: بله: هر رکوردی که از جملهٔ اصلاح‌شده ساخته شده دنبالش عوض می‌شود و پیش / کاربر: یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقع / دستیار: از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را  / کاربر: کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ ج / دستیار: هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زما / کاربر: آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره  / دستیار: ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ / کاربر: معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ ت / دستیار: صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن / کاربر: روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دو / دستیار: طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که / کاربر: حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» —  / دستیار: اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گ\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"retract\": {\"msg\": \"هفته‌ای ۱۵ ساعت وقتِ آزاد\", \"key\": \"datum:ساعتِ آزادِ هفته\", \"what\": \"fact\", \"fix\": \"۱۲\", \"old\": \"۱۵\", \"rests\": []}}]}",
+"{\"reply\": \"با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نویسِ «مجهول» و پیش‌نویسِ دادهٔ ۳. نقشهٔ مسیر را باز می‌کنم: اصلاح‌ها آن‌جا قوسِ خط‌چینِ برگشت (↶) هستند و مقصد هم با ۱۲ ساعت نوشته می‌شود.\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقع / دستیار: از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را  / کاربر: کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ ج / دستیار: هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زما / کاربر: آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره  / دستیار: ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ / کاربر: معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ ت / دستیار: صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن / کاربر: روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دو / دستیار: طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که / کاربر: حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» —  / دستیار: اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گ / کاربر: به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کج / دستیار: با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نو\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"go\", \"view\": \"route\", \"arg\": \"pb_l_mwcnf3v3mzu\"}, {\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"این نقشهٔ مسیرِ همین مسئله است: مبدأ صورتِ خودت، حلقه جایی که الان هستی («اجرای طرح»)، سه گامِ طرحت روی خط، و قوسِ خط‌چینِ ↶ همان اصلاحِ ۱۵ به ۱۲ است؛ موس روی هر نقطه می‌گوید چه بود و چه شد.\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"دستیار: از خودم نیست: قاعدهٔ «اول کل، بعد جزءها» از کتابِ پولیا («چگونه آن را  / کاربر: کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ ج / دستیار: هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زما / کاربر: آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره  / دستیار: ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ / کاربر: معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ ت / دستیار: صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن / کاربر: روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دو / دستیار: طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که / کاربر: حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» —  / دستیار: اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گ / کاربر: به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کج / دستیار: با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نو / دستیار: این نقشهٔ مسیرِ همین مسئله است: مبدأ صورتِ خودت، حلقه جایی که الان هست\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"پیشنهادت را برای سازنده‌ها ثبت می‌کنم (برای ثبت بررسی می‌کنم). دربارهٔ مدل: به مدلِ خاصی بسته نیستم؛ رکوردها، فرم‌ها، نقشه، حساب و قاعده‌ها مالِ خودِ صفحه‌اند و با عوض شدنِ مدل عوض نمی‌شوند، فقط گفت‌وگو مدل می‌خواهد. مدلِ ضعیف‌تر می‌تواند پرسشِ بدتری بپرسد یا گزارشِ ناقص بدهد، ولی صفحه هر گزارش را با حرفِ خودت می‌سنجد و نقلِ ساختگی را رد می‌کند.\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"دستیار: هست: «📜 پروندهٔ این گفت‌وگو» همهٔ آنچه گفته و ثبت شده را به ترتیبِ زما / کاربر: آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره  / دستیار: ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ / کاربر: معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ ت / دستیار: صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن / کاربر: روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دو / دستیار: طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که / کاربر: حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» —  / دستیار: اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گ / کاربر: به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کج / دستیار: با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نو / دستیار: این نقشهٔ مسیرِ همین مسئله است: مبدأ صورتِ خودت، حلقه جایی که الان هست / کاربر: نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت / دستیار: پیشنهادت را برای سازنده‌ها ثبت می‌کنم (برای ثبت بررسی می‌کنم). دربارهٔ\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}], \"gap\": {\"title\": \"نقشهٔ مسیر: کنارِ هر نقطه پیامی که از آن آمده\", \"area\": \"sys-territory\", \"kind\": \"build\", \"abstract\": \"کاربر می‌خواهد در نقشهٔ مسیر ببیند هر نقطه از کدام حرفِ خودش ساخته شده، تا ردِ هر رکورد تا منبعش دیده شود\", \"missing\": \"نمایشِ «از این پیامت آمد» کنارِ (یا در راهنمای) هر نقطهٔ 🧭 با پیوند به همان پیام؛ امروز 📜 منبع را دارد ولی نقشه نه\", \"where\": \"🧭 نقشهٔ مسیرِ مسئله — راهنمای هر نقطه\", \"how\": \"از همان src ِ رکوردها (سشن و پیام) که 📜 نشان می‌دهد، در راهنمای نقطه یک سطرِ «از پیامِ …» با پیوند\", \"relations\": \"📜 پروندهٔ کامل؛ دفترِ رویدادها\", \"docs\": \"apps/learning-architecture/docs/HANDBOOK.md — نقشهٔ مسیر\", \"why_area\": \"بهبودِ نمای موجودِ سامانه است\", \"why_not\": \"خطا نیست؛ در کارِ جاریِ روتین‌ها نیست\", \"evidence\": \"نمای route در پویشِ صفحه سطرِ منبعِ پیام ندارد\", \"confidence\": 0.8}}",
+"{\"agree\":true,\"area\":\"sys-territory\",\"kind\":\"build\",\"dup_of\":null,\"reason\":\"در نقشهٔ سامانه و برگه‌های باز چیزی همین را پوشش نمی‌دهد؛ برگهٔ بازِ دیگر موضوعِ جدایی دارد. قلمرو و نوع درست است.\",\"fix\":{}}\n",
+"{\"reply\": \"خوب است؛ ردیف‌هایی که «از گفت‌وگو: … درست است؟» دارند را فقط تأیید یا اصلاح می‌کنی و صفحه چیزی را که گفته‌ای دوباره نمی‌پرسد. کدام فرم را اول باز می‌کنی؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"دستیار: ثبتش می‌کنم. کارنامهٔ ذهن از خودِ کارهای تو در صفحه ساخته می‌شود (پاسخ / کاربر: معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ ت / دستیار: صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن / کاربر: روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دو / دستیار: طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که / کاربر: حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» —  / دستیار: اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گ / کاربر: به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کج / دستیار: با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نو / دستیار: این نقشهٔ مسیرِ همین مسئله است: مبدأ صورتِ خودت، حلقه جایی که الان هست / کاربر: نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت / دستیار: پیشنهادت را برای سازنده‌ها ثبت می‌کنم (برای ثبت بررسی می‌کنم). دربارهٔ / کاربر: باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه. / دستیار: خوب است؛ ردیف‌هایی که «از گفت‌وگو: … درست است؟» دارند را فقط تأیید یا \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"درست است: آن برگه دربارهٔ خودِ سامانه است و هیچ گامی از مسئلهٔ تو را منتظر نکرده. «هم‌زمان، هر روز یک کم» یک حدسِ تازه است در برابرِ طرحِ ترتیبی‌ات: با کدام نشانه می‌فهمی کدام‌یک بهتر جلو می‌برد، و چه چیزی این حدس را رد می‌کند؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"دستیار: صفحه فقط تاریخِ تولدت را نگه می‌دارد و از آن دو کار می‌کند: شیوهٔ گفتن / کاربر: روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دو / دستیار: طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که / کاربر: حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» —  / دستیار: اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گ / کاربر: به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کج / دستیار: با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نو / دستیار: این نقشهٔ مسیرِ همین مسئله است: مبدأ صورتِ خودت، حلقه جایی که الان هست / کاربر: نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت / دستیار: پیشنهادت را برای سازنده‌ها ثبت می‌کنم (برای ثبت بررسی می‌کنم). دربارهٔ / کاربر: باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه. / دستیار: خوب است؛ ردیف‌هایی که «از گفت‌وگو: … درست است؟» دارند را فقط تأیید یا  / کاربر: فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که  / دستیار: درست است: آن برگه دربارهٔ خودِ سامانه است و هیچ گامی از مسئلهٔ تو را م\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"guess\": {\"text\": \"شاید به‌جای ترتیب، هر سه رو هم‌زمان پیش ببرم، هر روز یه کم\", \"q\": \"با کدام نشانه می‌فهمی کدام‌یک بهتر جلو می‌برد، و چه چیزی این حدس را رد می‌کند؟\"}}]}",
+"{\"reply\": \"هم‌زمانی را با تجربهٔ پارسالِ خودت رد کردی و به ترتیب برگشتی. سه جواب: اگر چیزی نباشد برگهٔ کمبود ثبت می‌شود، گامِ تو «منتظر» می‌ماند، و وقتی ساخته شد صفحه خودش می‌سنجد که به همان گام می‌خورد و در «امروز» خبر می‌دهد. بی اینترنت رکوردها، فرم‌ها، نقشه و «امروز» کار می‌کنند؛ فقط گفت‌وگو مدل می‌خواهد. دربارهٔ مدلِ محلی در نقشهٔ سامانه چیزی نیست؛ برای ثبت بررسی می‌کنم.\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"دستیار: طرحت روشن است و جمعش ۱۰ ساعت می‌شود: ۶ کتاب، ۳ اپ، ۱ دوره. برای این‌که / کاربر: حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» —  / دستیار: اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گ / کاربر: به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کج / دستیار: با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نو / دستیار: این نقشهٔ مسیرِ همین مسئله است: مبدأ صورتِ خودت، حلقه جایی که الان هست / کاربر: نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت / دستیار: پیشنهادت را برای سازنده‌ها ثبت می‌کنم (برای ثبت بررسی می‌کنم). دربارهٔ / کاربر: باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه. / دستیار: خوب است؛ ردیف‌هایی که «از گفت‌وگو: … درست است؟» دارند را فقط تأیید یا  / کاربر: فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که  / دستیار: درست است: آن برگه دربارهٔ خودِ سامانه است و هیچ گامی از مسئلهٔ تو را م / کاربر: نشونه: صفحه‌های کتاب در هفته. پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت — پس عملا / دستیار: هم‌زمانی را با تجربهٔ پارسالِ خودت رد کردی و به ترتیب برگشتی. سه جواب:\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"result\": \"پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}}], \"gap\": {\"title\": \"وضعِ «مدلِ محلیِ خودمان» و گفت‌وگوی آفلاین در نقشهٔ سامانه\", \"area\": \"sys-territory\", \"kind\": \"build\", \"abstract\": \"کاربر می‌خواهد بداند گفت‌وگو بی اینترنت و با مدلِ محلی ممکن است یا در راه است؛ سامانه باید وضعِ این را بداند و بگوید\", \"missing\": \"سطری در «خودِ سامانه» دربارهٔ مدلِ محلی: هست/در دست/برنامه، و این‌که بی آن گفت‌وگو آفلاین کار نمی‌کند\", \"where\": \"نقشهٔ سامانه — بخشِ «خودِ سامانه»\", \"how\": \"ثبتِ وضعِ مدلِ محلی و مجموعه‌دادهٔ تورها به‌صورتِ یک قلمِ نقشهٔ راه که دستیار بخواند\", \"relations\": \"پرسش‌های آفلاین و مستقل‌بودن از مدل\", \"docs\": \"docs/decisions/2026-10-18-tour-dataset-for-local-model.md\", \"why_area\": \"خودآگاهیِ سامانه از نقشهٔ راهش\", \"why_not\": \"خطا نیست؛ در کارِ جاریِ روتین‌ها نیامده\", \"evidence\": \"نقشهٔ سامانه فقط می‌گوید «فقط گفت‌وگو مدل می‌خواهد» و از مدلِ محلی چیزی ندارد\", \"confidence\": 0.8}}",
+"{\"agree\":true,\"area\":\"sys-territory\",\"kind\":\"build\",\"dup_of\":null,\"reason\":\"در نقشهٔ سامانه و برگه‌های باز چیزی همین را پوشش نمی‌دهد؛ برگهٔ بازِ دیگر موضوعِ جدایی دارد. قلمرو و نوع درست است.\",\"fix\":{}}\n",
+"{\"reply\": \"باشد؛ تا جمعه شمارِ صفحه‌های کتاب همان نشانهٔ خودت است. پیگیری‌اش می‌تواند همان روز در «امروز» بیاید. پیش از شروعِ هفته: فکر می‌کنی با ۶ ساعت چند صفحه می‌نویسی؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"دستیار: اصلاحت را گرفتم: ۱۲ ساعت، نه ۱۵؛ صفحه می‌سنجد و در نوبتِ بعد دقیق می‌گ / کاربر: به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کج / دستیار: با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نو / دستیار: این نقشهٔ مسیرِ همین مسئله است: مبدأ صورتِ خودت، حلقه جایی که الان هست / کاربر: نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت / دستیار: پیشنهادت را برای سازنده‌ها ثبت می‌کنم (برای ثبت بررسی می‌کنم). دربارهٔ / کاربر: باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه. / دستیار: خوب است؛ ردیف‌هایی که «از گفت‌وگو: … درست است؟» دارند را فقط تأیید یا  / کاربر: فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که  / دستیار: درست است: آن برگه دربارهٔ خودِ سامانه است و هیچ گامی از مسئلهٔ تو را م / کاربر: نشونه: صفحه‌های کتاب در هفته. پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت — پس عملا / دستیار: هم‌زمانی را با تجربهٔ پارسالِ خودت رد کردی و به ترتیب برگشتی. سه جواب: / کاربر: جمعهٔ بعد برمی‌گردم، با تعدادِ صفحه‌ها. / دستیار: باشد؛ تا جمعه شمارِ صفحه‌های کتاب همان نشانهٔ خودت است. پیگیری‌اش می‌ت\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"plan\": {\"text\": \"جمعهٔ بعد برمی‌گردم، با تعدادِ صفحه‌ها\", \"when\": \"2026-10-23\"}}]}",
+"{\"reply\": \"یادم مانده: طرحِ ۶/۳/۱ روی ۱۰ ساعت، کتاب اول، و نشانهٔ «صفحه در هفته». اصلاحِ ۱۴۰ ساعت را گرفتم؛ صفحه می‌سنجد و نتیجه را می‌گوید — «پس بسه» بر همان ۱۲۰ بنا بود و باید دوباره سنجیده شود. با ۱۴۰ ساعت و سرعتِ واقعیِ این هفته (۵ ساعت)، تا شش ماه خودت حساب می‌کنی چند ساعت می‌شود؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"دستیار: با اصلاحِ ۱۲ ساعت صفحه سه چیز را عوض کرد: صورتِ مسئلهٔ گفت‌وگو، پیش‌نو / دستیار: این نقشهٔ مسیرِ همین مسئله است: مبدأ صورتِ خودت، حلقه جایی که الان هست / کاربر: نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت / دستیار: پیشنهادت را برای سازنده‌ها ثبت می‌کنم (برای ثبت بررسی می‌کنم). دربارهٔ / کاربر: باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه. / دستیار: خوب است؛ ردیف‌هایی که «از گفت‌وگو: … درست است؟» دارند را فقط تأیید یا  / کاربر: فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که  / دستیار: درست است: آن برگه دربارهٔ خودِ سامانه است و هیچ گامی از مسئلهٔ تو را م / کاربر: نشونه: صفحه‌های کتاب در هفته. پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت — پس عملا / دستیار: هم‌زمانی را با تجربهٔ پارسالِ خودت رد کردی و به ترتیب برگشتی. سه جواب: / کاربر: جمعهٔ بعد برمی‌گردم، با تعدادِ صفحه‌ها. / دستیار: باشد؛ تا جمعه شمارِ صفحه‌های کتاب همان نشانهٔ خودت است. پیگیری‌اش می‌ت / کاربر: برگشتم. هفتهٔ اول: کتاب ۵ ساعت شد نه ۶، و ۱۸ صفحه نوشتم. اپ ۴ ساعت. ولی صبر کن — اون اول گ / دستیار: یادم مانده: طرحِ ۶/۳/۱ روی ۱۰ ساعت، کتاب اول، و نشانهٔ «صفحه در هفته».\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"result\": \"کتاب ۵ ساعت شد نه ۶، و ۱۸ صفحه نوشتم. اپ ۴ ساعت\", \"step\": {\"step\": \"1\", \"done\": \"part\", \"what\": \"کتاب ۵ ساعت شد نه ۶، و ۱۸ صفحه نوشتم\", \"match\": \"part\"}, \"plan_done\": {\"id\": \"pl2\", \"done\": true}, \"retract\": {\"msg\": \"حدود ۱۲۰ ساعت مونده، پس بسه\", \"key\": \"datum:ساعتِ ماندهٔ کتاب\", \"what\": \"fact\", \"fix\": \"۱۴۰\", \"old\": \"۱۲۰\", \"rests\": [\"verdict\"]}}]}",
+"{\"reply\": \"حسابت می‌خواند (۱۳۰ کم است، ۱۵۶ بس) و نتیجه‌اش را خودت گرفتی: همان ۶ ساعت را واقعاً بگذاری. صادقانه، دو چیز کم بود که برگه شد: نقشه نمی‌گوید هر نقطه از کدام پیامت آمده، و وضعِ مدلِ محلی در سامانه معلوم نیست؛ دادهٔ ۲ ِ فرم هم هنوز منتظرِ «بله» ِ توست. ایدهٔ اختراع را با همین روش تا برنامهٔ مشخص می‌شود برد، ولی هر جا گامی روشِ تخصصیِ یک رشته بخواهد که در قلمروها نیست، همان‌جا برگهٔ کمبود می‌خورد و منتظر می‌ماند. پیش از آن: از این هفته چه پیشرفتی کردی و چه آموختی؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت / دستیار: پیشنهادت را برای سازنده‌ها ثبت می‌کنم (برای ثبت بررسی می‌کنم). دربارهٔ / کاربر: باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه. / دستیار: خوب است؛ ردیف‌هایی که «از گفت‌وگو: … درست است؟» دارند را فقط تأیید یا  / کاربر: فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که  / دستیار: درست است: آن برگه دربارهٔ خودِ سامانه است و هیچ گامی از مسئلهٔ تو را م / کاربر: نشونه: صفحه‌های کتاب در هفته. پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت — پس عملا / دستیار: هم‌زمانی را با تجربهٔ پارسالِ خودت رد کردی و به ترتیب برگشتی. سه جواب: / کاربر: جمعهٔ بعد برمی‌گردم، با تعدادِ صفحه‌ها. / دستیار: باشد؛ تا جمعه شمارِ صفحه‌های کتاب همان نشانهٔ خودت است. پیگیری‌اش می‌ت / کاربر: برگشتم. هفتهٔ اول: کتاب ۵ ساعت شد نه ۶، و ۱۸ صفحه نوشتم. اپ ۴ ساعت. ولی صبر کن — اون اول گ / دستیار: یادم مانده: طرحِ ۶/۳/۱ روی ۱۰ ساعت، کتاب اول، و نشانهٔ «صفحه در هفته». / کاربر: ۵ × ۲۶ = ۱۳۰، کمه. با ۶ ساعت ۱۵۶ میشه که بسه. پس باید همون ۶ رو واقعاً بذارم. یه چیز آخر:  / دستیار: حسابت می‌خواند (۱۳۰ کم است، ۱۵۶ بس) و نتیجه‌اش را خودت گرفتی: همان ۶ س\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"result\": \"۵ × ۲۶ = ۱۳۰، کمه. با ۶ ساعت ۱۵۶ میشه که بسه\"}]}",
+"{\"reply\": \"دادهٔ ۲ ِ فرم هم با «بله» ِ تو عوض شد: «کتاب حدودِ ۱۴۰ ساعت کار مانده». درسِ خودت را هم گرفتم: عددِ واقعی از هفتهٔ واقعی. برای هفتهٔ دوم، چه چیزی باید فرق کند تا آن ۶ ساعتِ کتاب واقعاً پر شود؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه. / دستیار: خوب است؛ ردیف‌هایی که «از گفت‌وگو: … درست است؟» دارند را فقط تأیید یا  / کاربر: فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که  / دستیار: درست است: آن برگه دربارهٔ خودِ سامانه است و هیچ گامی از مسئلهٔ تو را م / کاربر: نشونه: صفحه‌های کتاب در هفته. پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت — پس عملا / دستیار: هم‌زمانی را با تجربهٔ پارسالِ خودت رد کردی و به ترتیب برگشتی. سه جواب: / کاربر: جمعهٔ بعد برمی‌گردم، با تعدادِ صفحه‌ها. / دستیار: باشد؛ تا جمعه شمارِ صفحه‌های کتاب همان نشانهٔ خودت است. پیگیری‌اش می‌ت / کاربر: برگشتم. هفتهٔ اول: کتاب ۵ ساعت شد نه ۶، و ۱۸ صفحه نوشتم. اپ ۴ ساعت. ولی صبر کن — اون اول گ / دستیار: یادم مانده: طرحِ ۶/۳/۱ روی ۱۰ ساعت، کتاب اول، و نشانهٔ «صفحه در هفته». / کاربر: ۵ × ۲۶ = ۱۳۰، کمه. با ۶ ساعت ۱۵۶ میشه که بسه. پس باید همون ۶ رو واقعاً بذارم. یه چیز آخر:  / دستیار: حسابت می‌خواند (۱۳۰ کم است، ۱۵۶ بس) و نتیجه‌اش را خودت گرفتی: همان ۶ س / کاربر: پیشرفت: ۱۸ صفحه و یه ترتیبِ روشن. آموختم که عددِ «واقعی» رو باید از هفتهٔ واقعی بگیرم نه ا / دستیار: دادهٔ ۲ ِ فرم هم با «بله» ِ تو عوض شد: «کتاب حدودِ ۱۴۰ ساعت کار مانده»\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"result\": \"۱۸ صفحه و یه ترتیبِ روشن\"}]}",
+"{\"reply\": \"گرفتم: کتاب آن هفته ۴ ساعت بود، نه ۵؛ صفحه می‌سنجد کدام عدد بر آن بنا شده بود و نتیجه را می‌گوید. با ۴ ساعتِ واقعی، فاصله‌اش با ۶ ساعتی که برای کتاب گذاشته بودی چقدر است؟\", \"title\": \"ترتیبِ سه پروژه با ۱۵ ساعت\", \"pinned\": \"چیدنِ ترتیب و سهمِ ساعتِ سه پروژه (کتاب، اپ، دوره)\", \"memory\": \"کاربر: فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که  / دستیار: درست است: آن برگه دربارهٔ خودِ سامانه است و هیچ گامی از مسئلهٔ تو را م / کاربر: نشونه: صفحه‌های کتاب در هفته. پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت — پس عملا / دستیار: هم‌زمانی را با تجربهٔ پارسالِ خودت رد کردی و به ترتیب برگشتی. سه جواب: / کاربر: جمعهٔ بعد برمی‌گردم، با تعدادِ صفحه‌ها. / دستیار: باشد؛ تا جمعه شمارِ صفحه‌های کتاب همان نشانهٔ خودت است. پیگیری‌اش می‌ت / کاربر: برگشتم. هفتهٔ اول: کتاب ۵ ساعت شد نه ۶، و ۱۸ صفحه نوشتم. اپ ۴ ساعت. ولی صبر کن — اون اول گ / دستیار: یادم مانده: طرحِ ۶/۳/۱ روی ۱۰ ساعت، کتاب اول، و نشانهٔ «صفحه در هفته». / کاربر: ۵ × ۲۶ = ۱۳۰، کمه. با ۶ ساعت ۱۵۶ میشه که بسه. پس باید همون ۶ رو واقعاً بذارم. یه چیز آخر:  / دستیار: حسابت می‌خواند (۱۳۰ کم است، ۱۵۶ بس) و نتیجه‌اش را خودت گرفتی: همان ۶ س / کاربر: پیشرفت: ۱۸ صفحه و یه ترتیبِ روشن. آموختم که عددِ «واقعی» رو باید از هفتهٔ واقعی بگیرم نه ا / دستیار: دادهٔ ۲ ِ فرم هم با «بله» ِ تو عوض شد: «کتاب حدودِ ۱۴۰ ساعت کار مانده» / کاربر: یه اصلاحِ کوچیک: اون هفته کتاب ۴ ساعت شد، نه ۵. / دستیار: گرفتم: کتاب آن هفته ۴ ساعت بود، نه ۵؛ صفحه می‌سنجد کدام عدد بر آن بنا \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"retract\": {\"msg\": \"هفتهٔ اول: کتاب ۵ ساعت شد نه ۶\", \"key\": \"datum:ساعتِ کتابِ هفتهٔ اول\", \"what\": \"fact\", \"fix\": \"۴\", \"old\": \"۵\", \"rests\": []}}]}",
+"{\"reply\": \"درست است: با ۴ ساعت در هفته، ۴ × ۲۶ = ۱۰۴. با ۱۰۴ ساعت، برای ۱۴۰ ساعتِ لازم چند ساعت کم می‌آوری و از کدام پروژه برمی‌داری؟\", \"title\": \"ترتیب و سهمِ ساعتِ سه پروژه\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"وقتی عددی را اصلاح می‌کنی (مثلِ «کتاب ۴ ساعت بود نه ۵»)، صفحه در نوشته‌های خودت عددهایی را می‌جوید که از همان عدد حساب شده بودند، آن‌ها را «کهنه» نشان می‌دهد و مقدارِ تازه را پیشنهاد می‌کند — مثلِ «۱۳۰ ⇒ ۱۰۴»؛ این‌ها را در 📜 ِ همین مسئله، زیرِ «اصلاحِ پیامِ پیشین»، می‌بینی.\", \"title\": \"ترتیب و سهمِ ساعتِ سه پروژه\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"۱۳۰ را خودت از «۵ ساعت در هفته × ۲۶ هفته» حساب کرده بودی؛ وقتی گفتی کتاب ۴ ساعت است نه ۵، صفحه همان حساب را با ۴ دوباره زد: ۴ × ۲۶ = ۱۰۴. خودِ پیشنهاد را صفحه می‌سازد، نه من، و تا «آره» نگویی جای عددِ تو نمی‌نشیند.\", \"title\": \"ترتیب و سهمِ ساعتِ سه پروژه\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"در «📜 پروندهٔ کامل» ِ همین مسئله؛ هر اصلاح یک سطرِ «اصلاحِ پیامِ پیشین» دارد با مقدارِ پیشین، مقدارِ تازه و ساعتش، و پیشنهادی که پذیرفتی هم همان‌جاست.\", \"title\": \"ترتیب و سهمِ ساعتِ سه پروژه\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"قاعده‌ای که صفحه این‌جا اجرا می‌کند این است: عددی که از عددِ اصلاح‌شدهٔ تو حساب شده بود «کهنه» می‌شود و صفحه مقدارِ تازه را فقط پیشنهاد می‌دهد؛ «آره» ِ تو آن را جای عددت می‌نشاند، و اگر پایهٔ پیشنهاد بعداً دوباره عوض شود، صفحه پایهٔ کهنه را نام می‌برد و گام را بازنویسی نمی‌کند. متنِ کاملِ قاعده‌های صفحه در «📘 دفترچهٔ راهنما» ِ همین صفحه است.\", \"title\": \"ترتیب و سهمِ ساعتِ سه پروژه\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}"
+],
+"keys": [
+"سلام. یه مسئلهٔ واقعی دارم ولی اول یه سؤال: اگه من اینجا یه چیزی رو اشتباه بگم و پنج پیام بعد اصلاحش کنم، همه‌چیزی که ازش ساختی دنبالش عوض میشه؟ یا باید خودم همه‌جا رو درست کنم؟ مسئله‌م اینه: سه تا پروژه دارم — یه کتاب، یه اپ، یه دورهٔ آموز",
+"یه جمله؟ «با ۱۵ ساعت در هفته، کدوم پروژه اول و با چه سهمی، که شش ماه دیگه دست‌کم یکیش واقعاً تموم شده باشه.» ولی صبر کن — این «یه جمله» رو که الان گفتی از کجا آوردی؟ یه قاعده‌ست تو سامانه یا خودت ساختی؟ وصله به چیزی؟",
+"کتاب: دست‌نوشتهٔ کامل که بدم ویراستار. اپ: نسخه‌ای که ۱۰ نفر واقعاً استفاده کنن. دوره: ۸ جلسهٔ ضبط‌شده. ولی یه چیزی: هر چی تا الان گفتیم و پر کردیم یه جا هست که همه رو یکجا ببینم؟ نمی‌خوام لای گفت‌وگو گم بشه.",
+"آره ثبتش کن. ولی قبلش: کارنامهٔ ذهنی که می‌گی منو می‌سنجه، از کجا میاد؟ هر عددش منبع داره یا یه چیزی از خودت درمیاری؟",
+"معمولاً ۱۵ ساعت، ولی بعضی هفته‌ها فقط ۱۰. یه سؤال دیگه: سنِ منو می‌دونی؟ اون کارتِ تاریخ تولد رو پر کردم. منو با هم‌سن‌هام مقایسه می‌کنی؟ دقیقاً با کیا؟",
+"روی ۱۰، که اگه هفته‌ی بد بود هم عقب نیفتم. اولویت هم: کتاب اول، چون ویراستار منتظره؛ اپ دوم؛ دوره سوم. پس هفته‌ای ۶ ساعت کتاب، ۳ ساعت اپ، ۱ ساعت دوره.",
+"حدود ۱۲۰ ساعت مونده، پس بسه. ولی صبر کن، یه اصلاح: اول گفتم «هفته‌ای ۱۵ ساعت وقتِ آزاد» — اشتباه گفتم، واقعیش ۱۲ ساعته. ببینم دنبالش چی عوض میشه، همون‌طور که گفتی.",
+"به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه «نقشهٔ مسیر» داره که از کجا شروع کردم و الان کجام. نشونم بده. و بگو اون اصلاحِ ۱۵ به ۱۲ کجای نقشه‌ست.",
+"[سامانه: « نقشهٔ مسیرِ مسئله» باز شد. کاربر فقط خواست ببیند («به اپ. حالا یه چیزی می‌خوام ببینم: گفتی یه  نقشهٔ مسیر  داره که از کجا شروع کردم») — هیچ فیلدی را پر نکن و هیچ دکمه‌ای (ثبت/ساخت/بعدی) را نزن؛ چیزی ساخته نشود. در یک جملهٔ کوتاه ",
+"نقشه رو دیدم: «اکنون: اجرای طرح»، سه گامِ طرحم از گفت‌وگو اومده و مقصد هم حالا با «۱۲ ساعت»ـه — اصلاحم به همه‌جا رسیده، خوبه. یه پیشنهاد هم برای سازنده‌ها ثبت کن: کاش نقشه کنارِ هر نقطه می‌گفت از کدوم پیامم اومده. و یه سؤال: تو به یه مدلِ خ",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"باشه، فرم‌ها رو خودم تأیید می‌کنم تا ببینم چی می‌پرسه.",
+"فرم‌ها رو تأیید کردم؛ ردیف‌های «از گفت‌وگو» آماده بودن و فقط دو سه تا سؤالِ تازه پرسید که واقعاً نگفته بودم — منصفانه بود. اون پیشنهادی که برای سازنده‌ها ثبت کردی به گام‌های مسئلهٔ من که ربطی نداره، نه؟ حالا یه فکرِ دیگه: اصلاً شاید به‌جای ",
+"نشونه: صفحه‌های کتاب در هفته. پارسال هم‌زمانی رو امتحان کردم و هیچ‌کدوم جلو نرفت — پس عملاً ردش کردم. برمی‌گردم به ترتیب. سه تا سؤالِ دیگه: اگه یه چیزی که لازم دارم تو این سامانه نباشه چی میشه — ساخته میشه و خودت می‌فهمی؟ اگه اینترنت نباشه،",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"جمعهٔ بعد برمی‌گردم، با تعدادِ صفحه‌ها.",
+"برگشتم. هفتهٔ اول: کتاب ۵ ساعت شد نه ۶، و ۱۸ صفحه نوشتم. اپ ۴ ساعت. ولی صبر کن — اون اول گفتم کتاب ۱۲۰ ساعت مونده؛ اشتباه بود، ۱۴۰ ساعته. بازم با شش ماه جور درمیاد؟ و یادت مونده دفعهٔ قبل چی گفتیم؟",
+"۵ × ۲۶ = ۱۳۰، کمه. با ۶ ساعت ۱۵۶ میشه که بسه. پس باید همون ۶ رو واقعاً بذارم. یه چیز آخر: از این گفت‌وگو چی کم بود که اگه بود بهتر بود؟ صادق باش. و یه ایدهٔ اختراع هم دارم؛ با همین روشِ پولیا و ابزارهای الانِ سامانه میشه تا یه برنامهٔ مشخص ",
+"پیشرفت: ۱۸ صفحه و یه ترتیبِ روشن. آموختم که عددِ «واقعی» رو باید از هفتهٔ واقعی بگیرم نه از امیدم. بله، دادهٔ ۲ رو هم عوض کن.",
+"یه اصلاحِ کوچیک: اون هفته کتاب ۴ ساعت شد، نه ۵.",
+"آره، همون ۱۰۴ درسته.",
+"این صفحه از کجا می‌فهمه کدوم عدد کهنه شده؟",
+"سامانه پیشنهادِ «۱۳۰ ⇒ ۱۰۴» رو چطوری ساخت؟",
+"کجای پرونده‌م ببینم که چی اصلاح شد؟",
+"قاعده‌اش کجا نوشته؟"
+]
+}

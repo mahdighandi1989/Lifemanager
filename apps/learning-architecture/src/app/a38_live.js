@@ -1342,9 +1342,13 @@
   /* ---------- بردهای کوچک (تور ۱، s34؛ «موفقیت‌های کوچک را بجویید») — یک سطرِ مشخص، بی امتیاز ---------- */
   function win(L, kind, t) { (L.wins = L.wins || []).push({ at: nowISO(), d: A.today(), kind: kind, t: clip(t, 120) }); if (L.wins.length > 40) L.wins = L.wins.slice(-40); }
   var WIN_FA = { pred: "پیش‌بینی‌ات درست درآمد", datum: "یک داده به کار رفت", goal: "یک گام به مجهول نزدیک‌تر", proof: "گامی که ثابتش کردی", idea: "ایده‌ای که پس از کنار گذاشتن آمد", sub: "زیرهدفی که رسیدی" };
+  var WIN_PROOF30 = "گامی که برهانش را خودت نوشتی";
   function winLine(L) {
     var w = (L.wins || []).filter(function (x) { return x.d === A.today(); }); if (!w.length) return null;
     var x = w[w.length - 1];
+    /* دورِ ۳۰ (surface، C26-39 s27 p4 «✓ … ثابتش کردید: «پس آنچه مدل از هر واژه دارد …»»): «برهان» ِ گام نوشتهٔ خودِ اوست و صفحه درستی‌اش را نمی‌سنجد (C138) —
+       برد همان نوشتن است، نه «ثابت شد»؛ نشانِ ✓ (که در همه‌جای صفحه حکمِ سنجش است) برای آن نمی‌آید. */
+    if (x.kind === "proof") return h("p", { class: "small good lp-win" }, "✍ " + WIN_PROOF30 + ": «" + x.t + "» — این یک پیشرفتِ واقعی است، نه دلداری؛ درستیِ برهان را صفحه نسنجید.");
     return h("p", { class: "small good lp-win" }, "✓ " + WIN_FA[x.kind] + ": «" + x.t + "» — این یک پیشرفتِ واقعی است، نه دلداری.");
   }
 

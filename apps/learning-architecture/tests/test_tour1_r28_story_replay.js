@@ -32,7 +32,7 @@ const DIR = path.join(__dirname, 'fixtures', 'r28_story');
       APP.go('dossier', H); await w(200); o.back = lis(/کل در یک جمله/).map(li => li.innerText.replace(/\n+/g, ' ¦ ')); o.today = APP.today(); return o; });
     const x = R.x, f = (n) => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
     const ok = x.dmv > 0 && x.misfiled.every(a => a.length >= 1 && a.every(n => n >= 1)) && x.stmt.every(n => n >= 1) /* C123: صورت هم «↪» دارد */ && /بمانم یا بروم/.test(x.label)
-      && x.src.length === 1 && /جابه‌جا شد ⇒ «بمانم یا بروم/.test(x.src[0]) && !/اصلاح شد ⇐ «—»/.test(x.src[0]) && x.dst.length === 1 && x.unmv === 1 && x.fc.every(n => n >= 1)
+      && x.src.length === 1 && /جابه‌جا شد (?:⇒|به) «بمانم یا بروم/.test(x.src[0]) && !/اصلاح شد ⇐ «—»/.test(x.src[0]) && x.dst.length === 1 && x.unmv === 1 && x.fc.every(n => n >= 1)
       && x.back.length === 1 && /برگشت به «دست‌دادن‌های مهمانی»/.test(x.back[0]) && !/— جابه‌جا شد/.test(x.back[0].split(' ¦ ')[0]) && !R.errors.length;
     return [ok, J(R)]; };
 
@@ -75,3 +75,4 @@ const DIR = path.join(__dirname, 'fixtures', 'r28_story');
   console.log(errors.length ? 'ERRORS(' + errors.length + '):\n' + errors.join('\n') : 'NO ERRORS');
   await b.close(); process.exit(errors.length ? 1 : 0);
 })();
+// دورِ ۳۰ (surface، C30-6 / #294 — یک قراردادِ پیکان): جابه‌جایی حالا «جابه‌جا شد به «…»» نوشته می‌شود (بی ⇒)؛ انتظارهای «جابه‌جا شد ⇒» هر دو ریخت را می‌پذیرند.

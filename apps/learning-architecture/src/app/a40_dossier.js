@@ -231,10 +231,11 @@
     return { id: e ? e.id : "" };
   };
   /* دورِ ۲۸ (C95، D28-18 tD1 / C28-23 s24 «اصلاح شد ⇐ «—» → «جابه‌جا شد ⇒ …»»): جابه‌جایی اصلاح نیست — سطرِ تاریخچه برچسبِ خودش را دارد (x.lab) */
-  function mvHistFa27(H) { return (H || []).map(function (x) { return { at: x.at, lab: x.back ? "برگشت به «" + titleOf27(x.back) + "»" : "جابه‌جا شد ⇒ «" + titleOf27(x.to) + "»", old: "", new: "", why: "" }; }); }
+  /* دورِ ۳۰ (C30-6، #294 — یک قراردادِ پیکان): جابه‌جایی «از «…» به «…»» / «جابه‌جا شد به «…»» بی پیکان نوشته می‌شود؛ تنها پیکانِ تاریخچه همان «تازه» (اصلاح شد ⇐ «پیشین») است. */
+  function mvHistFa27(H) { return (H || []).map(function (x) { return { at: x.at, lab: x.back ? "برگشت به «" + titleOf27(x.back) + "»" : "جابه‌جا شد به «" + titleOf27(x.to) + "»", old: "", new: "", why: "" }; }); }
   function mvView27(pid, e, r) {
     var H = mvHist27(e);
-    if (e.moved) return Object.assign(e, { withdrawn: true, wdLab: "جابه‌جا شد", out: "جابه‌جا شد ⇒ «" + titleOf27(e.moved.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)", hist: H, btns: [] });
+    if (e.moved) return Object.assign(e, { withdrawn: true, wdLab: "جابه‌جا شد", out: "جابه‌جا شد به «" + titleOf27(e.moved.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)", hist: H, btns: [] });
     if (e.undone) return Object.assign(e, { withdrawn: true, wdLab: "برگشت", out: "برگشت به «" + titleOf27(e.mvFrom.pid) + "» (جابه‌جایی پس گرفته شد)", hist: H, btns: [] });
     if (e.mvFrom) return Object.assign(e, { out: (e.out ? e.out + " · " : "") + "از «" + titleOf27(e.mvFrom.pid) + "» جابه‌جا شد (به گفتهٔ خودت)", hist: H,
       btns: [{ label: "↩ برگرداندنِ این سطر به «" + clip(titleOf27(e.mvFrom.pid), 40) + "»", cls: "lp-dunmv", go: function () { A.dossierUnmove27(pid, e.id); A.go("dossier", pid); } }] });
@@ -474,7 +475,9 @@
       o.push("### " + (hm(e.at) ? hm(e.at) + " — " : "") + e.title + (e.from ? " (" + e.from + ")" : "") + (e.withdrawn ? " — " + (e.wdLab || "پس گرفته شد") : ""));
       evLines(e).forEach(function (l) { o.push("- " + plain(l)); });
       if (e.out) o.push("- سرانجام: " + plain(e.out));
-      (e.hist || []).forEach(function (x) { if (x.lab) { o.push("- " + plain(x.lab) + (x.at ? " (" + A.fdate(day(x.at)) + ")" : "")); return; } o.push("- اصلاح شد ⇐ «" + plain(typeof x.old === "string" ? hv(x.old) : A.dossierVal(x.old)) + "» → «" + plain(typeof x.new === "string" || x.new == null ? hv(x.new, true) : A.dossierVal(x.new)) + "»" + (x.at ? " (" + A.fdate(day(x.at)) + ")" : "")); });
+      /* دورِ ۳۰ (B24·D16 / A30-12 / C30-6 — یک قراردادِ پیکان، R24/R27 R6): سطرِ تاریخچه دو پیکانِ ناهم‌سو داشت («اصلاح شد ⇐ «پیشین» → «تازه»») در حالی که همهٔ صفحه
+           «تازه» (اصلاح شد ⇐ «پیشین») می‌نویسد (a27 chLine20، corrPush، حباب). همهٔ نماهای تاریخچه (Markdown، HTML، DOM، نشانِ حباب) همان یک ریخت را دارند. */
+      (e.hist || []).forEach(function (x) { if (x.lab) { o.push("- " + plain(x.lab) + (x.at ? " (" + A.fdate(day(x.at)) + ")" : "")); return; } o.push("- «" + plain(typeof x.new === "string" || x.new == null ? hv(x.new, true) : A.dossierVal(x.new)) + "» (اصلاح شد ⇐ «" + plain(typeof x.old === "string" ? hv(x.old) : A.dossierVal(x.old)) + "»)" + (x.at ? " (" + A.fdate(day(x.at)) + ")" : "")); });
       if (e.src && e.src.unknown) o.push("- منبع: نامعلوم");
       if (e.src && e.src.text) o.push("- از پیامِ گفت‌وگو: «" + plain(clip(e.src.text, 200)) + "» (سشن " + e.src.sess + ")");
       (e.mind || []).forEach(function (m) { o.push("- کارنامهٔ ذهن: " + m.row + " " + (m.sign || "") + (m.withdrawn ? " (پس گرفته شد)" : "")); });
@@ -489,7 +492,7 @@
       o.push("<section data-ev=\"" + e.k + "\"><h3" + (e.withdrawn ? " class=\"w\"" : "") + ">" + esc((hm(e.at) ? hm(e.at) + " — " : "") + e.title + (e.from ? " (" + e.from + ")" : "") + (e.withdrawn ? " — " + (e.wdLab || "پس گرفته شد") : "")) + "</h3><ul>");
       evLines(e).forEach(function (l) { o.push("<li>" + htm(l) + "</li>"); });
       if (e.out) o.push("<li>سرانجام: " + htm(e.out) + "</li>");
-      (e.hist || []).forEach(function (x) { if (x.lab) { o.push("<li class=\"h\">" + esc(x.lab) + "</li>"); return; } o.push("<li class=\"h\">اصلاح شد ⇐ «" + htm(typeof x.old === "string" ? hv(x.old) : A.dossierVal(x.old)) + "» → «" + htm(typeof x.new === "string" || x.new == null ? hv(x.new, true) : A.dossierVal(x.new)) + "»</li>"); });
+      (e.hist || []).forEach(function (x) { if (x.lab) { o.push("<li class=\"h\">" + esc(x.lab) + "</li>"); return; } o.push("<li class=\"h\">«" + htm(typeof x.new === "string" || x.new == null ? hv(x.new, true) : A.dossierVal(x.new)) + "» (اصلاح شد ⇐ «" + htm(typeof x.old === "string" ? hv(x.old) : A.dossierVal(x.old)) + "»)</li>"); });
       if (e.src && e.src.text) o.push("<li class=\"h\">از پیامِ گفت‌وگو: «" + htm(clip(e.src.text, 200)) + "»</li>");
       (e.mind || []).forEach(function (m) { o.push("<li class=\"h\">کارنامهٔ ذهن: " + esc(m.row + " " + (m.sign || "") + (m.withdrawn ? " (پس گرفته شد)" : "")) + "</li>"); });
       o.push("</ul></section>"); });
@@ -536,7 +539,7 @@
         evLines(e).length ? h("ul", { class: "small" }, evLines(e).map(function (l) { return h("li", {}, mx(l)); })) : null,
         e.out ? h("p", { class: "small lp-dout" }, "سرانجام: ", mx(e.out)) : null,
         e.ask28 ? h("p", { class: "small lp-dmvask", role: "status" }, e.ask28) : null,
-        (e.hist || []).length ? h("ul", { class: "small muted lp-dhist" }, e.hist.map(function (x) { if (x.lab) return h("li", { class: "lp-dmvh" }, x.lab + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); return h("li", {}, "اصلاح شد ⇐ «", mx(typeof x.old === "string" ? hv(x.old) : x.old && x.old.done ? (DONE_FA[x.old.done] || x.old.done) + (x.old.what ? " — " + x.old.what : "") : A.dossierVal(x.old)), "» → «", mx(typeof x.new === "string" || x.new == null ? hv(x.new, true) : x.new.done ? (DONE_FA[x.new.done] || x.new.done) : A.dossierVal(x.new)), "»" + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); })) : null,
+        (e.hist || []).length ? h("ul", { class: "small muted lp-dhist" }, e.hist.map(function (x) { if (x.lab) return h("li", { class: "lp-dmvh" }, x.lab + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); return h("li", {}, "«", mx(typeof x.new === "string" || x.new == null ? hv(x.new, true) : x.new.done ? (DONE_FA[x.new.done] || x.new.done) : A.dossierVal(x.new)), "» (اصلاح شد ⇐ «", mx(typeof x.old === "string" ? hv(x.old) : x.old && x.old.done ? (DONE_FA[x.old.done] || x.old.done) + (x.old.what ? " — " + x.old.what : "") : A.dossierVal(x.old)), "»)" + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); })) : null,
         e.src && e.src.unknown ? h("p", { class: "small muted lp-dsrc" }, "منبع: نامعلوم (پیامی که این از آن آمد پیدا نشد)") : e.src && e.src.text ? h("p", { class: "small muted lp-dsrc" }, "از پیامِ گفت‌وگو: «", mx(clip(e.src.text, 200)), "» ", h("button", { class: "linkish small", type: "button", onclick: function () { openSess(e.src.sess); } }, "💬 باز کردنِ سشن")) : null,
         (e.btns || []).length ? h("p", { class: "row gap wrap small" }, e.btns.map(function (b0) { return h("button", { class: "btn ghost sm " + (b0.cls || "lp-dnewp"), type: "button", onclick: b0.go }, b0.label); })) : null,
         (e.btnsMore || []).length ? h("details", { class: "small lp-dmvmore" }, h("summary", {}, "↪ این سطر مالِ مسئلهٔ دیگری است…"), h("p", { class: "row gap wrap small" }, e.btnsMore.map(function (b0) { return h("button", { class: "btn ghost sm " + (b0.cls || "lp-dmv"), type: "button", onclick: b0.go }, b0.label); }))) : null,
@@ -633,7 +636,7 @@
       /* دورِ ۲۱ (R3h، B·D13 s19): حبابی که در گفت‌وگو یا با ✏️ اصلاح شد نشان دارد — «پیشین ⇐ درست» */
       /* دورِ ۲۲ (P3، B·D16 s19): نشانِ حباب با نتیجهٔ صفحه یکی است — اصلاحِ گفت‌وگو که هیچ رکوردی را عوض نکرد «اصلاح شد» نمی‌خورد، فقط «گفتی … — رکوردی از آن ثبت نشده بود» */
       if ((m.corr || []).length) wrap.appendChild(h("span", { class: "muted as-corr" }, (m.corr || []).map(function (x, i) { var none = x.chat && !x.n && !(x.pids || []).length;
-        return [i ? " · " : "", none ? "گفتی «" : "اصلاح شد ⇐ «", mx(x.frag), "» → «", mx(x.fix), "»", none ? " — رکوردی از آن ثبت نشده بود" : x.chat ? " (از گفت‌وگو)" : ""]; })));
+        return none ? [i ? " · " : "", "گفتی «", mx(x.frag), "» → «", mx(x.fix), "» — رکوردی از آن ثبت نشده بود"] : [i ? " · " : "", "«", mx(x.fix), "» (اصلاح شد ⇐ «", mx(x.frag), "»)", x.chat ? " (از گفت‌وگو)" : ""]; })));
       if (ED && ED.sid === s.id && ED.mid === mid) {
         var id = "asEd_" + String(mid).replace(/[^A-Za-z0-9]/g, "");
         var ta = h("textarea", { id: id, class: "as-edtx", rows: 2, dir: "auto", "aria-label": "متنِ درستِ این پیام" }); ta.value = ED.text; ta.addEventListener("input", function () { ED.text = ta.value; });
@@ -712,7 +715,7 @@
     try { (A.liveAll ? A.liveAll() : S.all("eprob", function (r) { return r && r.live && r.p; })).forEach(function (r) { if (r && r.p && !isTest(r)) push(r.p.id, true); }); } catch (e) { }
     return out;
   }
-  function mvH28(m) { var o = [{ at: m.at, lab: "جابه‌جا شد: از «" + titleOf28(m.from) + "» ⇒ «" + titleOf28(m.to) + "»" + (m.step ? " (گامِ " + fa(m.step) + ")" : "") }]; if (m.undone) o.push({ at: m.undone.at, lab: "برگشت به «" + titleOf28(m.from) + "»" }); return o; }
+  function mvH28(m) { var o = [{ at: m.at, lab: "جابه‌جا شد: از «" + titleOf28(m.from) + "» به «" + titleOf28(m.to) + "»" + (m.step ? " (گامِ " + fa(m.step) + ")" : "") }]; if (m.undone) o.push({ at: m.undone.at, lab: "برگشت به «" + titleOf28(m.from) + "»" }); return o; }
   var MVB29 = "";
   A.dossierMove28 = function (from, e, to, step) {
     if (!from || !to || from === to || !e) return null; var own = mvOwn28(from); if (!own) return null;
@@ -750,14 +753,14 @@
     D.events.forEach(function (e) {
       var k = key28(e), mine = out.filter(function (m) { return m.key === k; });
       if (mine.length) { e.hist = (e.hist || []).concat([].concat.apply([], mine.map(mvH28))); var act = mine.filter(function (m) { return !m.undone; }).pop();
-        if (act) { e.withdrawn = true; e.wdLab = "جابه‌جا شد"; e.out = "جابه‌جا شد ⇒ «" + titleOf28(act.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)"; e.btns = []; return; } }
+        if (act) { e.withdrawn = true; e.wdLab = "جابه‌جا شد"; e.out = "جابه‌جا شد به «" + titleOf28(act.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)"; e.btns = []; return; } }
       if (NOMV28[e.k] || e.withdrawn || e.mvFrom || e.mv28 || !(evLines(e).length || e.title)) return;
       var ds = dests(); if (!ds.length) return;
       var sn = e.k === "cprior" ? evLines(e).map(stepN28).filter(function (n, i, X) { return n && X.indexOf(n) === i; }) : [];
       if (sn.length) { var gone = {}; out.forEach(function (m) { if (m.step && !m.undone) gone[m.step] = m; });
         /* دورِ ۲۹ (C172): گامی که ماند ولی پایه‌اش رفت («فقط همین») — کنارش «پایه‌اش به ⟨مسئله⟩ رفت»؛ برگرداندن (undone) این را هم برمی‌دارد */
         var left29 = {}; Object.keys(gone).forEach(function (x) { var g = gone[x]; deps28(e, +x, me).forEach(function (d) { if (!gone[d] && !left29[d]) left29[d] = g; }); });
-        e.lines = (e.lines || []).map(function (l) { var n = stepN28(l), g = n && gone[n], b = n && left29[n]; return g ? l + " — جابه‌جا شد ⇒ «" + titleOf28(g.to) + "»" : b ? l + " — پایه‌اش (گامِ " + fa(b.step) + ") به «" + titleOf28(b.to) + "» رفت" : l; });
+        e.lines = (e.lines || []).map(function (l) { var n = stepN28(l), g = n && gone[n], b = n && left29[n]; return g ? l + " — جابه‌جا شد به «" + titleOf28(g.to) + "»" : b ? l + " — پایه‌اش (گامِ " + fa(b.step) + ") به «" + titleOf28(b.to) + "» رفت" : l; });
         sn = sn.filter(function (n) { return !gone[n]; }); }
       var q = ASK28[me]; if (q && q.ev === k && sn.length) { var tq = clip(titleOf28(q.to), 40);
         e.ask28 = "گامِ " + fa(q.step) + " وابسته دارد: " + q.deps.map(function (n) { return "گامِ " + fa(n); }).join("، ") + " — آن‌ها هم به «" + tq + "» بروند؟";

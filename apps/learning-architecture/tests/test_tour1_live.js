@@ -285,7 +285,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await click('main .lp-stepsave');
     sB = await S(PB);
     chk(sB.live.steps.length === 1 && sB.live.steps[0].closed && sB.live.steps[0].out.kind === 'proof' && !sB.live.steps[0].fc && !sB.live.steps[0].intuitive, '1b: proof step saved closed, no event forecast');
-    chk(/ثابتش کردی/.test(await txt('main .lp-win')), '17: a proven step is a small win');
+    chk(/ثابتش کردی|برهانش را خودت نوشتی/.test(await txt('main .lp-win')), '17: a proven step is a small win');   // دورِ ۳۰ (surface، C26-39): برهانِ نوشته‌شده «برهانش را خودت نوشتی» است، نه «ثابتش کردی» (صفحه برهان را نمی‌سنجد)
     info.hookB = await hookText({ id: 'hB2', lprob: PB, msgs: [] }, 'گامِ بعد را چطور ببینم؟');
     chk(!/هیچ‌کس نمی‌داند/.test(info.hookB) && /پاسخِ عینی دارد/.test(info.hookB) && /روشن می‌بینی که این گام درست است؟/.test(info.hookB) && /داور: مسئلهٔ کامل‌بیان‌شده/.test(info.hookB), '1b: hook for an objective problem: no «nobody knows», step check from TQ.exec');
     await click('main .lp-solved'); await closeSteps();
