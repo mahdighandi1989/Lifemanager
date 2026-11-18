@@ -62925,7 +62925,7 @@ APP.goFromURL = function (q) {
       var anyCov = CL.some(function (c) { return /[0-9۰-۹]/.test(c.t) && covT(c.t); });
       var part = function (g) { var cs = CL.filter(function (c) { return c.a >= g.a && c.b <= g.b && !covT(c.t); }); var all = CL.filter(function (c) { return c.a >= g.a && c.b <= g.b && /[0-9۰-۹]/.test(c.t); });
         return cs.length && cs.length === all.length ? [txt(U0.slice(g.a, g.b))] : cs.map(function (c) { return c.t; }); };
-      (anyCov ? [].concat.apply([], ON.map(part)) : [txt(x)]).forEach(function (t) {
+      (anyCov ? [].concat.apply([], ON.map(part)) : [txt(x)]).map(function (t) { return !/[0-9۰-۹]/.test(t) && REMT30.indexOf(t) >= 0 ? txt(x) : t; }).forEach(function (t) {   // دورِ ۳۰: «هیچی نمی‌مونه» با جمله‌اش (عددهای کل) ⇒ نشانِ 📜 دارد
         if (anyCov ? covT(t) : ((!numsOf(t).length && !REMT30.some(function (r) { return t.indexOf(r) >= 0; })) || covT(t))) return;
         var it = { k: "calc", t: clip(t, 300) }; I.push(it); have.push(it); }); });
     /* دادهٔ بی‌گزارش (بانکِ R28 #201، D28-17 tD1 p17 «هزینهٔ جمع کردنِ موکتِ قدیمی هم ۵۰۰ هزار تومنه»): جملهٔ خبریِ او با یک مقدار و واحدش، بی حساب و بی پرسش و بی فعلِ آینده،
