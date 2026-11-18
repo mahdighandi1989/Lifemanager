@@ -940,10 +940,27 @@
   var RATE29 = /^(?:روزی|ماهی|هفته[‌]?ای|ساعتی|سالی|نفری|دونه[‌]?ای|هر|تایی|متری|کیلویی|گام|مرحله|قدم|سطر|بند|شماره|ساعت|پارچِ|پارچ)$/;
   var HAVE29 = /داشت|داری|دارم|داره|داریم|موجود|بود(?![آ-ی])|مونده|کل(?![آ-ی])/, NEED29 = /لازم|نیاز|می[‌\s]?خوا|باید|برای(?![آ-ی])/;
   /* C156: عددهای سادهٔ صورتِ ثبت‌شدهٔ مسئلهٔ همین گفت‌وگو (نه نرخ، نه عددِ مرکب) — فقط وقتی صورت متنی جز همین پیام است */
+  /* دورِ ۳۰ (C180؛ S1 C30-7، aC1 p22/p33): صورتِ ثبت‌شده فقط صورتِ «مسئلهٔ کانونِ همین نوبت» است (a45 ST.focus26): مسئلهٔ زندهٔ بازِ بسته به سشن ⇒ صورتِ ثبت‌شده‌اش؛
+     مسئلهٔ گفت‌وگوییِ کانون ⇒ همان coach.stmt (فقط اگر coach.pk همان کانون است). مسئلهٔ بسته‌شده، مسئلهٔ دیگرِ همین گفت‌وگو یا صورتِ کهنهٔ coach.stmt ِ مسئلهٔ دیگر ⇒ هیچ.
+     ریشه: stmt29 ِ دورِ ۲۹ همیشه coach.stmt را می‌خواند — صورتِ مسئلهٔ دیگری («سه تا دفتر … ۳ × ۴۰۰ = ۱۲۰۰») کلِ «۲ تا می‌مونه» ِ تیله‌ها شد (✗ «۱۲۰۰ − ۱۴»). */
+  function focusStmt30() {
+    var s0 = null; try { s0 = AS && AS.cur ? AS.cur() : null; } catch (e) { s0 = null; } if (!s0) return "";
+    var C = s0.coach || {}, f = ""; try { f = ST.focus26 ? String(ST.focus26(s0) || "") : ""; } catch (e1) { f = ""; }
+    if (ST.arithStmtR29On) return String(C.stmt || "");   // قرنطینه: خواندنِ دورِ ۲۹ (هیچ‌جا روشن نمی‌شود)
+    if (f && !/^c:/.test(f)) { var r = null, ph = ""; try { r = A.liveRec ? A.liveRec(f) : null; ph = A.livePhase ? A.livePhase(f) : ""; } catch (e2) { r = null; } return r && r.p && ph !== "done" ? String(r.p.statement || "") : ""; }
+    if (f) { if (String(C.pk || "") === f) return String(C.stmt || ""); var P = (C.probs26 || {})[f]; return P && P.ph !== "done" ? String(P.stmt || "") : ""; }
+    return C.pk ? "" : String(C.stmt || "");   // سشنِ بی شمارهٔ مسئله (کهنه/آزمون): همان صورتِ تنها
+  }
+  ST.arithFocusStmt = focusStmt30;
   function stmt29(t) {
-    var st = ""; try { var s0 = AS && AS.cur ? AS.cur() : null; st = String((((s0 || {}).coach || {}).stmt) || ""); } catch (e) { st = ""; }
+    var st = focusStmt30();
     if (!st.trim()) return []; var tt = normM(st).t; if (t.indexOf(tt) >= 0) return []; var T = tokens(tt), o = [];
-    T.forEach(function (x, k) { if (x.k !== "n" || !x.int || x.mag || x.pct || x.cm || x.cst || x.v.d !== ONE) return; var pw = T[k - 1] && T[k - 1].k === "w" ? T[k - 1].t : "";
+    /* C180: عددِ حسابِ درونِ صورت (عملوند یا حاصل، «داداشم حساب کرد ۳ × ۴۰۰ = ۱۲۰۰») و نرخِ «هر بسته ۱۲ تا» / «هر کدوم ۴۰۰» کلِ لازم/موجود نیست */
+    var SP = []; try { var ck0 = run(tt, {}, null, null); SP = ck0.concat(ck0.unread || []).map(function (c) { return [c.pos, c.pe]; }); } catch (e3) { SP = []; }
+    var inSp = function (p) { return SP.some(function (x) { return x[0] <= p && p < x[1]; }); };
+    T.forEach(function (x, k) { if (x.k !== "n" || !x.int || x.mag || x.pct || x.cm || x.cst || x.v.d !== ONE) return; var pw = T[k - 1] && T[k - 1].k === "w" ? T[k - 1].t : "", pw2 = T[k - 2] && T[k - 2].k === "w" ? T[k - 2].t : "";
+      if (inSp(x.a) || (T[k - 1] && T[k - 1].k === "p" && /[=＝]/.test(T[k - 1].t)) || (T[k + 1] && T[k + 1].k === "p" && /[=＝]/.test(T[k + 1].t))) return;
+      if (pw2 === "هر" || (RATE29.test(pw2) && !pw)) return;
       if (RATE29.test(pw) || (T[k + 1] && T[k + 1].k === "o") || (T[k - 1] && T[k - 1].k === "o")) return;
       var nx = T[k + 1] && T[k + 1].k === "w" ? (T[k + 1].t === "تا" && T[k + 2] && T[k + 2].k === "w" ? T[k + 2].t : T[k + 1].t !== "تا" ? T[k + 1].t : "") : "";
       o.push({ v: x.v, raw: x.raw, a: -1e9 + k, w: nx.replace(/[ِٔ]+$/, "") }); });
@@ -1151,6 +1168,13 @@
     /* سنجشی که از مرزِ بند می‌گذرد بندها را یکی می‌کند («۲۵ ÷ ۴ = ۶، ۱ تا می‌مونه») */
     ck.concat(UR).forEach(function (c) { var a = c.pos - off, b = c.pe - off; if (!(b > 0 && a < q.length)) return;
       var i0 = -1, i1 = -1; C.forEach(function (x, j) { if (x.b > a && x.a < b) { if (i0 < 0) i0 = j; i1 = j; } }); if (i0 >= 0 && i1 > i0) C.splice(i0, i1 - i0 + 1, { a: C[i0].a, b: C[i1].b }); });
+    /* دورِ ۳۰ (C30-7 p22، A30-9): بندِ باقی/کم/اضافه («… = ۱۴ و ۲ تا می‌مونه») بندِ خودش است — اگر حسابِ دیگری پیش از آن در همان بند تمام شد، بند از «و» ِ میانشان
+       (یا از آغازِ بندِ باقی) دو تا می‌شود تا ✓ ِ آن حساب زیرِ «؟» یا «✗» ِ باقی گم نشود (C138: نشانِ هر بند کنارِ خودش) */
+    ck.concat(UR).filter(function (c) { return c.rem29 || c.kind === "remc"; }).forEach(function (c) { var a = c.pos - off; if (!(a > 0 && a < q.length)) return;
+      for (var j = 0; j < C.length; j++) { var x = C[j]; if (!(x.a < a && a < x.b)) continue;
+        var pre = ck.concat(UR).filter(function (d) { return d !== c && d.pe - off <= a && d.pe - off > x.a; }); if (!pre.length) break;
+        var pe0 = Math.max.apply(null, pre.map(function (d) { return d.pe - off; })), mid = q.slice(pe0, a), mw = /^\s*و\s+/.exec(mid), cut = mw ? pe0 + mw[0].length : a;
+        if (pe0 > x.a && cut < x.b) C.splice(j, 1, { a: x.a, b: pe0 }, { a: cut, b: x.b }); break; } });
     var ofIt = function (x, c) { var a = c.pos - off, b = c.pe - off; return b > x.a && a < x.b; };
     var out = C.map(function (x) {
       var t = q.slice(x.a, x.b), tt = t.replace(/^[\s.!?؟؛\n،,]+|[\s.!?؟؛\n،,]+$/g, ""), cs = ck.filter(function (c) { return ofIt(x, c); }), us = UR.filter(function (u) { return ofIt(x, u); });
