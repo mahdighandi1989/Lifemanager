@@ -57655,9 +57655,9 @@ APP.goFromURL = function (q) {
         var other = R.yesDates.filter(function (d) { return d !== it.date; });
         /* دورِ ۲۹ (C145، C165): «آره، فردا و پس‌فردا» — روزهایی که در همان «آره» نام برد، هر پرسشِ مانده با همان روز را هم جواب می‌دهد (به ترتیب)؛ «آره» ِ تنها فقط تازه‌ترین (C49) */
         /* دورِ ۳۰ (C181، A30-3 s01 p43: «آره، فردا و پس‌فردا» ردیفِ کهنهٔ «پنجشنبه نه، شنبه می‌رم» را روی پنجشنبهٔ نفی‌شده ثبت کرد): «آره» ِ چندروزه فقط پرسش‌های بازِ
-           همان نوبت را جواب می‌دهد — شاخهٔ دورِ ۲۹ ِ «!first … yesDates.length > 1» (پرسش‌های ماندهٔ کهنه با همان روز) با C181 برداشته شد؛ ردیفِ کهنه با روزِ خودش، با «تاریخ درسته»
-           یا با بازگفتنِ کارش جواب می‌گیرد */
-        if (first && R.yes && (R.yesDates.indexOf(it.date) >= 0 || (R.generic && !other.length))) { var l2 = bookItem26(s0, P0, it); if (l2) done.push(l2); said = true; }
+           همان نوبت را جواب می‌دهد — ردیفی که روزش را خودش نفی کرده (s0.dateNo) باز نیست و با «آره» تأیید نمی‌شود (C181)؛ پرسش‌های هنوز بازِ دیگر (در «امروز» به‌شکلِ پرسش)
+           مثلِ دورِ ۲۹ (C145) جواب می‌گیرند (F6-058 tD4 p7: بیمه ۳ آذر و بانک ۲ آذر؛ بانکِ R29 #143) */
+        if ((first && R.yes && (R.yesDates.indexOf(it.date) >= 0 || (R.generic && !other.length))) || (!first && R.yes && R.yesDates.length > 1 && R.yesDates.indexOf(it.date) >= 0 && (s0.dateNo || []).indexOf(it.date) < 0)) { var l2 = bookItem26(s0, P0, it); if (l2) done.push(l2); said = true; }
         /* C72: «بله، پس‌فردا» به پرسشِ «فردا» ⇒ روزِ خودش؛ یک بار با تاریخش تأیید می‌شود */
         else if (first && R.yes && other.length === 1) { said = true; quiet = true; re27.push(Object.assign({}, it, { date: other[0], what: whatFor(it, other[0]), was: it.date })); }
         /* دورِ ۲۹ (C145): چند روز در یک «آره» برای چند قلمِ همین پرسش ⇒ به ترتیب (قلمی که روزش در پاسخ نیست، روزِ هم‌جایش را یک بار تأیید می‌گیرد — C72) */

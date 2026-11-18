@@ -89,10 +89,7 @@ const HELPERS = () => {
     const r = await E(async (sep) => { const o = { d1: __D(1), d2: __D(2) }; if (sep) { await __say('فردا به بانک زنگ می‌زنم'); await __say('پس‌فردا هم به صاحب‌خونه زنگ می‌زنم'); } else await __say('فردا به بانک زنگ می‌زنم، پس‌فردا هم به صاحب‌خونه زنگ می‌زنم');
       o.p0 = __pend(); const n0 = __sys().length; await __say('آره، فردا و پس‌فردا'); Object.assign(o, __st(n0)); o.wb = __when(/بانک/); o.wl = __when(/صاحب/); return o; }, sep);
     await day(1); const r2 = await E(async () => { const n0 = __sys().length; await __say('امروز کارِ خاصی ندارم.'); return { l: __sys().slice(n0), wb: __when(/بانک/) }; });
-    /* دورِ ۳۰ (DECISIONS_R30 C181، A30-3): «آره ِ چندروزه» فقط پرسش‌های بازِ همان نوبت را جواب می‌دهد — در شکلِ «دو پرسشِ جدا» پرسشِ کهنهٔ بانک (waiting) می‌ماند
-       (ثبت نمی‌شود، جابه‌جا هم نمی‌شود)؛ پیش‌تر (C145 ِ دورِ ۲۹) هر دو ثبت می‌شدند. شکلِ «یک پرسشِ دوقلمی» همان است که بود. */
-    const bankOk = sep ? (r.wb === '' && r.pend.some(x => /بانک/.test(x.what) && x.date === r.d1) && r2.wb === '') : (r.wb === r.d1 && r2.wb === r.d1);
-    B(6, r.p0.length === 2 && bankOk && r.wl === r.d2 && !r2.l.some(x => /به‌جای/.test(x)) && !r.l.some(x => /به‌جای/.test(x)), Object.assign({ sep, r2 }, r)); });
+    B(6, r.p0.length === 2 && r.wb === r.d1 && r.wl === r.d2 && r2.wb === r.d1 && !r2.l.some(x => /به‌جای/.test(x)) && !r.l.some(x => /به‌جای/.test(x)), Object.assign({ sep, r2 }, r)); });
   /* #144: ✏️ به سه‌شنبه‌ای که گذشته، سپس «سه‌شنبه‌ی هفته‌ی بعد، ⟨D0+8⟩» — دوشنبهٔ بانک (k=0) و شکلِ هم‌ارز در روزهای دیگر (نامِ روزِ D0+1 و پاسخِ «… هفته‌ی بعد، ⟨D0+8⟩» از روزِ D0+3) */
   for (const wp of [true, false]) await run(7, async (k) => { await fresh(0); await E(async (wp) => { const t = __wn(__D(3)) + ' جلسه با مدیر دارم'; await __say(t, 'خب.', wp ? __plan(t) : undefined); await __say('آره'); }, wp); await day(3);
     const r = await E(async () => { const o = { d8: __D(5) }; const n0 = __sys().length; o.ok = await __edit(__um(0), __wn(__D(-2)) + ' جلسه با مدیر دارم'); o.l1 = __sys().slice(n0); o.p1 = __pend();
