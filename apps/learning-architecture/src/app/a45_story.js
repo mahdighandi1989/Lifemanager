@@ -960,7 +960,7 @@
     var SS = []; for (var k = 0; k + 1 < cuts.length; k++) if (cuts[k + 1] > cuts[k]) SS.push({ a: cuts[k], b: cuts[k + 1] });
     var CS = SS.filter(function (s0) { return cl.some(function (c) { return c.b > s0.a && c.a < s0.b; }) || /^\s*(?:پس|بنابراین|در\s*نتیجه)\s[^.!?؟]*[0-9۰-۹]/.test(T.slice(s0.a, s0.b)); });
     if (!CS.length) return T;
-    var DS = SS.filter(function (s0) { return s0.a >= CS[0].a && /[0-9۰-۹]/.test(T.slice(s0.a, s0.b)); });   // تا آخرین جملهٔ عدددار (باقیِ همان حساب: «… ؛ پس‌اندازم ۱۸ میلیونه، پس ۳ میلیون و ۷۰۰ کم دارم»)
+    var DS = SS.filter(function (s0) { var x = T.slice(s0.a, s0.b); return s0.a >= CS[0].a && (/[0-9۰-۹]/.test(x) || /^\s*(?:پس|بنابراین|در\s*نتیجه|یعنی)(?![آ-ی‌])/.test(x)); });   // نتیجهٔ بی‌عددِ همان حساب («… . پس بانکِ اول ارزون‌تره» — بانکِ R26 #102) هم مالِ گام است   // تا آخرین جملهٔ عدددار (باقیِ همان حساب: «… ؛ پس‌اندازم ۱۸ میلیونه، پس ۳ میلیون و ۷۰۰ کم دارم»)
     var o = T.slice(CS[0].a, DS[DS.length - 1].b).trim(), lab = /^([^:：«»\n]{1,60})[:：]\s*/.exec(o);
     if (lab && META30.test(lab[1]) && /[0-9۰-۹]/.test(o.slice(lab[0].length))) o = o.slice(lab[0].length);
     o = o.replace(/^[\s،,]+/, "").trim();
