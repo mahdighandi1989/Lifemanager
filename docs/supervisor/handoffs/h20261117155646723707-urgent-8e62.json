@@ -11,5 +11,11 @@
  "what": "Merged supervisor-pending/backtest-2026-11-17 (backtest round 40) onto main: rebased 85d57207+f61df14e onto 40b34a51 (now 61f8837f+f093f389); WORKLOG conflict resolved by keeping both appended sections (main's 148-155 first, then the round-40 section); 77c77ce8 bundle commit replaced by a fresh build.py run. Data content unchanged by urgent. Backtest routine: verify round 40 landed as intended.",
  "procedure": "URGENT_PROMPT.md §1.2",
  "commit": "f093f389",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-11-17T23:23:55Z",
+  "note": "Round 40 on main: ledger has round 40 (n=359, new=10), corpus/round-0040.json 10 cases, reviews/round-0040.json 8 problems all fixed, findings/proposals/territory as committed in f093f389; audit clean.",
+  "commit": ""
+ }
 }

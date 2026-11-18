@@ -7,9 +7,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-18",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI در Crossref و چکیده در Semantic Scholar/PubMed وارسی شد) — Gilbert et al. 1998"
+    },
+    {
+     "at": "2026-11-18",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "۳ گزارهٔ موجود؛ دو گزاره با منبعِ دوم پشتیبانی شد — Gilbert et al. 1998"
+    },
+    {
+     "at": "2026-11-18",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌دار (empirical/outside) با پایهٔ نوشته‌شده — Gilbert et al. 1998"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_decision"
   },
   "dc_calibration_forecasting": {
@@ -223,9 +241,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-18",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI در Crossref و چکیده در Semantic Scholar/PubMed وارسی شد) — Sheeran, Listrom & Gollwitzer 2024"
+    },
+    {
+     "at": "2026-11-18",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "۳ گزارهٔ موجود؛ دو گزاره با منبعِ دوم پشتیبانی شد — Sheeran, Listrom & Gollwitzer 2024"
+    },
+    {
+     "at": "2026-11-18",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌دار (empirical/outside) با پایهٔ نوشته‌شده — Sheeran, Listrom & Gollwitzer 2024"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_decision"
   },
   "dc_noise_hygiene": {

@@ -1,0 +1,49 @@
+{
+ "round": 41,
+ "reviewer": "زیرعاملِ جدا",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": false,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": false
+ },
+ "checkedWhy": {
+  "events_real": "هر ۷ واقعهٔ واقعی با منابعِ وب وارسی شد؛ تاریخِ ۱۸ نوامبرِ Plain Dealer مستقیماً دیده نشد (CBS همان سخن را تأیید می‌کند).",
+  "encoding_blind": "نشتِ پس‌ازتصدیق در داستانِ آیر و اراسموس — اصلاح شد.",
+  "frames_unselected": "قابِ تازه‌ای نیامد؛ دلیل (p_field_ml2 منتظرِ مالک، epi-decisions 401) وارسی‌پذیر نبود.",
+  "territory_evidence": "Williamson 2000 و IEP «Knowledge-First Theories of Justification» (Paul Silva Jr.) واقعی‌اند و خلاصه وفادار است.",
+  "findings_diagnosed": "چهار مکانِ ناقص بی‌تشخیص بود — تشخیص ثبت شد."
+ },
+ "problems": [
+  {
+   "what": "Ayer story leaked the post-claim self-reference critique and the 1946 'definition' retreat (basis of st_selfref).",
+   "fix": "انجام‌شده: جمله به why رفت، f با رمزگذارِ کورِ جدا از نو نوشته شد (f ِ پیشین در edits)، run --rerun. نتیجه: باز st_truth و st_selfref (و st_doubts از «انحصارِ راه‌ها»)؛ برچسب دست نخورد.",
+   "fixed": true
+  },
+  {
+   "what": "de Berk (and store abstract) st_istiqra rests on facts (data gathered after suspicion, incidents assigned while absent) that are only in why; no feature captures selection-biased data collection for a causal inference.",
+   "fix": "انجام‌شده (تشخیص، نه تغییرِ برچسب پس از حکم): علت = «خطای رمزگذاری/داستانِ پرونده» (داستان آن واقعیت‌ها را نداشت) + نامزدِ «خلأ جزوه»: s50 دربارهٔ استقراءِ ناقص و نمایندگیِ نمونه است و گردآوریِ داده پس از بدگمانی (نشانه‌گیری پس از شلیک) را صریح نمی‌گوید. موتور هستهٔ خطا (مغالطهٔ دادستان = صورتِ نامعتبر، st_aql) را گرفت ⇒ برای مسیرِ ۲ قضیه‌ای از حسابِ احتمالات با برهان لازم است؛ این دور پیشنهاد نشد (برهانِ آماده نبود؛ جعل نکردیم). در WORKLOG ثبت شد؛ دورِ بعد: داستانِ کامل‌تر با رمزگذاریِ کورِ دوم.",
+   "fixed": true
+  },
+  {
+   "what": "TEPCO and insurer st_resp labels do not match r_resp_inquiry (an inquiry was started); real fault is no precaution under high stakes while review pending.",
+   "fix": "انجام‌شده (تشخیص): برچسب پس از حکم عوض نشد. s80 ترکِ تحقیقِ ممکن را می‌گوید؛ این‌جا تحقیق آغاز شد ولی احتیاط در فاصله نشد — حکمِ «چه باید کرد در عدمِ قطعیت» به ارزش‌ها/تصمیم برمی‌گردد نه به صدق ⇒ بیرون از مسیرِ ۲ (قضیهٔ احتمالات نیست) و پیشنهادِ قاعده داده نشد. مکانِ ناقص در p_partial_location_findings (منتظرِ مالک) پوشش دارد.",
+   "fixed": true
+  },
+  {
+   "what": "Four partial locations (full:false) counted k:ok and attached to old findings' retest lists without diagnosis.",
+   "fix": "انجام‌شده: هر چهار در WORKLOG و همین بازبینی تشخیص گرفتند (بالا). شمردنشان در retest همان مسئلهٔ پیشنهادِ p_partial_location_findings (دورِ ۴۰، منتظرِ مالک) است؛ خودکار عوض نشد.",
+   "fixed": true
+  },
+  {
+   "what": "Minor: Erasmus story included 1522 events; Browne why cited only s11/s42 though r_core_mystic_unchecked fired; Ayer quote date varies (1976/78/79).",
+   "fix": "انجام‌شده: ۱۵۲۲ به why رفت؛ why ِ براون به s23/s24 هم ارجاع داد؛ منبعِ آیر «Men of Ideas, BBC 1978» ماند (پخشِ تلویزیونی ۱۹۷۸).",
+   "fixed": true
+  }
+ ],
+ "note": "بازبین هیچ خطای واقعیِ سخت نیافت؛ audit تمیز؛ کنترلِ منفی و مثبت ✓. همهٔ مشکل‌ها اصلاح یا تشخیص و ثبت شد؛ هیچ برچسبی پس از حکم عوض نشد."
+}

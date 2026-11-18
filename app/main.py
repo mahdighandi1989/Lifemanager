@@ -1401,9 +1401,16 @@ if frontend_dist.exists():
         # Todo-list system endpoints — purely API, no SPA route.
         "todo-items",
     )
+    # SPA pages whose path starts with one of the prefixes above (from
+    # frontend/src/lib/routesMeta.js). A browser navigation to them (refresh,
+    # bookmark, link in a Telegram/e-mail notice) must get the SPA shell, not
+    # the 307 → "/x/" → 401 JSON of the API router. API clients never send
+    # Accept: text/html, so their redirect is unchanged.
+    # tests/test_spa_routes_under_api_prefix.py keeps this in sync.
+    _SPA_PATHS_UNDER_API_PREFIX = ("notifications",)
 
     @app.get("/{full_path:path}", tags=["frontend"])
-    async def serve_frontend(full_path: str):
+    async def serve_frontend(full_path: str, request: Request):
         """
         Serve frontend static files for SPA routing.
 
@@ -1423,7 +1430,11 @@ if frontend_dist.exists():
         # as offline. Redirect to the trailing-slash form so fetch() reaches the
         # real handler.
         first_segment = full_path.split("/", 1)[0]
-        if first_segment in _API_PREFIXES:
+        _is_page_nav = (
+            full_path in _SPA_PATHS_UNDER_API_PREFIX
+            and "text/html" in (request.headers.get("accept") or "")
+        )
+        if first_segment in _API_PREFIXES and not _is_page_nav:
             # If this request already has a trailing slash, the
             # previous redirect didn't find a handler either —
             # return a clean 404 instead of looping back to
