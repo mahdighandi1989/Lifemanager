@@ -101,3 +101,23 @@ Columns: question · the system's correct answer today (exists / partial / missi
 | 95 | «۲ و ۵ دهم درصد × ۴ = ۱۰ درصد» — does the page see «درصد» as the unit on both sides? | fixed by R29 arith (C140), to verify | a46 `agree` | from R29 C29-2 | — |
 | 96 | Does a weekday in my forecast become its due date, or a reminder I never asked for? | to verify (forecast/dates C152) | a41 | from R29 C | — |
 | 97 | My dad told me a fact and I worked out the rest — whose work is it on my record? | fixed by R29 story (C125) for 📜; coach line open | a45 `ST.otherWorks29`, a46 `otherSpans` | from R29 C | — |
+| 98 | When I said «آره، فردا و پس‌فردا», why did an old question I had said «نه» to get booked too? | fixed by R30 dates (C181), to verify | a41 `herDays27`, `PR.dateAnswer` | from R30 A | — |
+| 99 | I told it I went to the bank last month — why did tomorrow's bank reminder disappear? | fixed by R30 dates (C182), to verify | a41 `pastActs30` | from R30 A | — |
+| 100 | If I take back my correction, will the page still let me accept a number built on the corrected one? | open (correction take-back, R31) | a38 | from R30 A | — |
+| 101 | The page shows «نسنجیده» on my «۱ + ۲ + … + ۱۰ = ۵۰» — why doesn't it say it is wrong, when the coach did? | fixed by R30 story (A30-8), to verify | a45 `sentences` | from R30 A | — |
+| 102 | My guess about what my manager is doing right now went into my forecast book — why? | fixed by R30 forecast (C170 `now30`), to verify | a41 `read28` | from R30 A | — |
+| 103 | The assistant says the page asks before moving a step others rest on; why didn't it ask? | to verify (story C172) | a40, a45 | from R30 A | — |
+| 104 | When I said «اشتباهی گفتم نه؛ همون بود», why didn't the tool come back? | fixed by R30 surface (B30·D3), to verify | a44 `backNow`, `sysSheet` | from R30 B | — |
+| 105 | If I change one table's number, why do all tables' guests and slices become stale? | fixed by R30 correction (C143/C198), to verify | a38 `qual30Of` | from R30 B | — |
+| 106 | What exact fraction is the «≈ ۸۸٫۸۹» proposal — why not say the fraction? | fixed by R30 correction (`exact30`, C161), to verify | a38 | from R30 B | — |
+| 107 | Why was a calculation my brother wrote recorded as mine? | to verify (story/prior C125) | a45 `own30` | from R30 B | — |
+| 108 | My two-part forecast was marked «شد» when half of it failed — what does my record say now? | fixed by R30 forecast (`ell30`), to verify | a41 `outcome28` | from R30 B | — |
+| 109 | Why did «۲۰ آبان رفتم بانک» appear nowhere in my file? | fixed by R30 dates (C182 `pastLog30`), to verify | a41 | from R30 B | — |
+| 110 | Where is the rule by which the page asks about calls written, and why can't the assistant see it? | fixed by R30 surface (PAGE_RULES C117/C89), to verify | a26 | from R30 B | — |
+| 111 | If my remainder sentence has no total, does the page take a number from something I said earlier? | fixed by R30 arith (C180 `focusStmt30`), to verify | a46 | from R30 C | — |
+| 112 | When I correct one guest count twice, is the cake plan built on the latest number? | open (correction chain s23, R31) | a38 | from R30 C | — |
+| 113 | If I take back my own correction («همون ۴ میلیون و ۲۰۰ درست بود»), does the old amount come back? | open (correction take-back C160, R31) | a38 | from R30 C | — |
+| 114 | When I fix one amount, why are unrelated prices and heights marked stale? | fixed by R30 correction (`mag30`), to verify | a38 | from R30 C | — |
+| 115 | «فکر کنم ۶۰ درصد اون جواب اشتباه بوده» — is that counted as a prediction? | fixed by R30 forecast (`perf29`/`now30`), to verify | a41 | from R30 C | — |
+| 116 | If I put two percentages in one sentence, do I get two predictions? | fixed by R30 forecast (C30-20), to verify | a41 `read28` | from R30 C | — |
+| 117 | When I write a list of lines, does my record keep them as separate lines? | to verify (story) | a45 | from R30 C | — |
