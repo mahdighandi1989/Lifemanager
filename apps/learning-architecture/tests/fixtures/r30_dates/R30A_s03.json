@@ -1,0 +1,1002 @@
+{
+"from": "round30A/s03",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سؤال: ثابت کنید از هر ۵ نقطه داخل یک مربع به ضلع ۱، دو تا هستند که فاصله‌شان حداکثر √۲/۲ است. اصلاً نمی‌دونم از کجا شروع کنم. مجهولش چیه؟"
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='2009-03-15';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()"
+},
+{
+"say": "فرض: ۵ نقطه، مربع ضلع ۱، نقطه‌ها داخلش. حکم: دو تا فاصله‌شون ≤ √۲/۲. هفت تا شکل کشیدم با ۵ نقطه، همیشه دو تا نزدیک بودن. پس درسته، ثابت شد دیگه!"
+},
+{
+"say": "باشه، می‌خوام ثابتش کنم ولی بلد نیستم. می‌خوام این رو به‌عنوان مسئلهٔ خودم ثبت کنم و قدم به قدم برم."
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,APP.liveKindInfo(r.p.id)]))\n"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0955xi\");S(\"lpType\",\"prove\");return JSON.stringify(APP.liveKindInfo(\"pb_l_mvaqm0955xi\"))})()"
+},
+{
+"eval": "(()=>{F(\"lpOne\",\"باید نشون بدم پنج نقطه توی یه مربع کوچیک همیشه دوتاشون به هم نزدیکن.\");F(\"lpWhy\",\"تمرین کلاس المپیاده و می‌خوام خودم بفهمم چرا.\");C(\".lp-onesave\");return 1})()"
+},
+{
+"eval": "(()=>{C('.lp-dadd');const D=['۵ نقطه داریم','مربع ضلعش ۱ است','نقطه‌ها داخل مربع‌اند (شاید روی مرز)'];const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>F(id,D[i]||''));\nF('lpUnk','دو نقطه از آن پنج تا هستند که فاصله‌شان حداکثر √۲/۲ است');F('lpCond','دو نقطه وجود دارند\\nفاصلهٔ آن دو ≤ √۲/۲');\nS('lpSuff','هنوز نمی‌دانم');F('lpSuffW','نمی‌دونم اگه ۴ نقطه باشه هم درسته یا نه');F('lpFig','مربع با پنج نقطه');F('lpNS_0','d');F('lpNM_0','فاصلهٔ دو نقطه');\nF('lpGuess','درسته، همیشه دو تا نزدیک‌اند');S('lpConf','100');F('lpTest','هیچی ردش نمی‌کنه، هفت شکل کشیدم');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','yes');\nC('.lp-usave');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn st()+'\\n'+FL('lpGC|lpClaim|lpProve|lpRef')+'\\n'+MT('اثبات یا رد کن',700)})()\n"
+},
+{
+"eval": "(()=>{F('lpGChal','اگه یه چیدمان پیدا کنم که همهٔ فاصله‌ها بیشتر از √۲/۲ باشه؛ امشب چند تا دیگه می‌کشم');F('lpGContra','اگه نقطه‌ها رو تو چهار گوشه و وسط پخش کنم شاید همه دور باشن');\nC('.lp-usave');C('.sv-g2');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-3).join(' || ');\nreturn st()+'\\nSUB:'+APP.state.sub+'\\nCLAIMS:'+JSON.stringify(APP.S.all('case').map(c=>[c.title,c.id]))+'\\n'+MT('۲) طرح',1200)})()\n"
+},
+{
+"say": "فردا شد. یه ایده دارم: مربع رو به ۴ تا مربع کوچیک تقسیم کنم. ولی نمی‌دونم چرا دو تا نقطه توی یه مربع کوچیک باید نزدیک باشن. گیر کردم.",
+"eval0": "(()=>{0;return 1})()",
+"clock": "2026-10-17"
+},
+{
+"say": "آهان! دو نقطه داخل یه شکل، فاصله‌شون از بزرگ‌ترین فاصلهٔ اون شکل بیشتر نمیشه. قطر مربع کوچیک sqrt((1/2)^2 + (1/2)^2) = sqrt(2)/2 هست! و ۵ نقطه تو ۴ تا مربع، پس دو تا تو یه مربع می‌افتن. فکر کنم حل شد."
+},
+{
+"eval": "(()=>{F('lpAsk','آره: دو نقطه داخل یه شکل، فاصله‌شون از قطر اون شکل بیشتر نمیشه');[...document.querySelectorAll('[id^=lpAD_]')].slice(0,2).forEach(e=>{if(!e.checked)e.click()});C('.lp-askgo');C('.sv-g2');\nS('lpMv','mv_decompose');F('lpMvWhy','مربع رو به چهار مربع کوچیک می‌شکنم که هر کدوم قطرش √۲/۲ باشه');C('.lp-mvadd');\nF('lpPlan','نخست مربع را به چهار مربعِ کوچکِ ضلع ½ تقسیم می‌کنم، سپس با پنج نقطه و چهار مربع نشان می‌دهم دو نقطه در یک مربع‌اند و فاصله‌شان از قطرِ آن بیشتر نیست.');\nfor(let i=1;i<=3;i++){S('lpPU_a_d'+i,'use');F('lpPU_w_d'+i,['پنج نقطه در چهار جعبه','ضلع ۱ ⇒ ضلعِ کوچک ½','نقطه‌ها داخلِ مربع‌اند پس داخلِ یکی از چهار مربع'][i-1]);}\n[...document.querySelectorAll('[id^=lpPC_]')].forEach(e=>{if(!e.checked)e.click()});\nC('.lp-plansave');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn st()+'\\nSUB:'+APP.state.sub+'\\n'+FL('lpStep|lpClear|lpPrem|lpProof|lpBase|lpSC|lpEq|lpPr')})()\n"
+},
+{
+"eval": "(()=>{const ids=FL('lpSuff');const sel=[...document.querySelectorAll('#main select')].filter(e=>/lpSuff/.test(e.id)).map(e=>e.id);\nsel.forEach(id=>S(id,'هنوز نمی‌دانم'));[...document.querySelectorAll('#main input,#main textarea')].filter(e=>/lpSuff.*W/.test(e.id)).forEach(e=>F(e.id,'هنوز ۴ نقطه رو امتحان نکردم'));\nconst b=[...document.querySelectorAll('#main button')].find(b=>/^ثبت$/.test(b.textContent.trim())&&b.closest('section,div')&&/دوباره: آیا شرط/.test(b.closest('section,div').innerText));if(b)b.click();\nC('.lp-plansave');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn ids+'\\n'+st()+'\\nSUB:'+APP.state.sub+'\\n'+FL('lpStep|lpClear|lpPrem|lpProof|lpBase|lpSC|lpEq|lpPr')})()\n"
+},
+{
+"eval": "(()=>{const S3=[['مربع را با دو خط وسط به چهار مربعِ کوچک با ضلع 1/2 تقسیم می‌کنم؛ قطرِ هر کدام sqrt((1/2)^2 + (1/2)^2) = sqrt(2)/2','قطرِ هر مربعِ کوچک √(¼+¼)=√۲/۲ است، با فیثاغورس',[1],[]],\n['پنج نقطه در چهار مربعِ کوچک‌اند، پس دست‌کم دو نقطه در یک مربعِ کوچک می‌افتند','اگر هر مربع حداکثر یک نقطه داشت، روی‌هم حداکثر ۴ نقطه بود؛ اما ۵ تاست',[0],[0]],\n['فاصلهٔ دو نقطه درونِ یک مربع از قطرِ آن بیشتر نیست، پس ≤ √۲/۲','بیشترین فاصله در مربع بین دو رأسِ روبه‌روست، یعنی قطر',[],[1]]];\nconst out=[];S3.forEach(([t,p,d,c])=>{F('lpStep',t);out.push('PV:'+[...document.querySelectorAll('#main .mx-prev')].map(e=>(getComputedStyle(e).display=='none'?'H ':'')+e.textContent.trim().slice(0,220)+' m='+e.querySelectorAll('math').length).join('|'));S('lpClear','بله');F('lpProof',p);F('lpPrem',p);\nconst ad=[...document.querySelectorAll('#main input[type=checkbox]')].filter(e=>/^lpS?AD_|lpStD/.test(e.id));\nd.forEach(i=>{const e=document.getElementById('lpSD_d'+(i+1))||ad[i];if(e&&!e.checked)e.click()});c.forEach(i=>{const e=document.getElementById('lpSC_'+i);if(e&&!e.checked)e.click()});\nC('.lp-stepsave');out.push([...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-1).join(''));});\nreturn out.join('\\n')+'\\n'+FL('lpS')+'\\n'+JSON.stringify(APP.liveUsed('pb_l_mvaqm0955xi'))+' unused='+JSON.stringify(APP.liveUnused('pb_l_mvaqm0955xi'))+'\\n'+MT('اثبات شد',300)+'\\n'+MT('سقفِ',300)})()\n"
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll('#main button')].find(b=>/^ثبت$/.test(b.textContent.trim())&&/دوباره: آیا همهٔ فرض/.test((b.closest('section,div')||{}).innerText||''));if(b)b.click();C('.lp-plansave');return (b?'clicked ':'NOB ')+TT()+' SUB:'+APP.state.sub})()\n"
+},
+{
+"eval": "(()=>{const S3=[['مربع را با دو خط وسط به چهار مربعِ کوچک با ضلع 1/2 تقسیم می‌کنم؛ قطرِ هر کدام sqrt((1/2)^2 + (1/2)^2) = sqrt(2)/2','قطرِ هر مربعِ کوچک √(¼+¼)=√۲/۲ است، با فیثاغورس',[1],[]],\n['پنج نقطه در چهار مربعِ کوچک‌اند، پس دست‌کم دو نقطه در یک مربعِ کوچک می‌افتند','اگر هر مربع حداکثر یک نقطه داشت، روی‌هم حداکثر ۴ نقطه بود؛ اما ۵ تاست',[0],[0]],\n['فاصلهٔ دو نقطه درونِ یک مربع از قطرِ آن بیشتر نیست، پس ≤ √۲/۲','بیشترین فاصله در مربع بین دو رأسِ روبه‌روست، یعنی قطر',[],[1]]];\nconst out=[];S3.forEach(([t,p,d,c])=>{F('lpStep',t);out.push('PV:'+[...document.querySelectorAll('#main .mx-prev')].map(e=>(getComputedStyle(e).display=='none'?'H ':'')+e.textContent.trim().slice(0,220)+' m='+e.querySelectorAll('math').length).join('|'));S('lpClear','بله');F('lpProof',p);F('lpPrem',p);\nconst ad=[...document.querySelectorAll('#main input[type=checkbox]')].filter(e=>/^lpS?AD_|lpStD/.test(e.id));\nd.forEach(i=>{const e=document.getElementById('lpSD_d'+(i+1))||ad[i];if(e&&!e.checked)e.click()});c.forEach(i=>{const e=document.getElementById('lpSC_'+i);if(e&&!e.checked)e.click()});\nC('.lp-stepsave');out.push([...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-1).join(''));});\nreturn out.join('\\n')+'\\n'+FL('lpS')+'\\n'+JSON.stringify(APP.liveUsed('pb_l_mvaqm0955xi'))+' unused='+JSON.stringify(APP.liveUnused('pb_l_mvaqm0955xi'))+'\\n'+MT('اثبات شد',300)+'\\n'+MT('سقفِ',300)})()\n"
+},
+{
+"eval": "(()=>{const r=F('lpStep','فاصلهٔ دو نقطه درونِ یک مربع از قطرِ آن بیشتر نیست، پس ≤ √۲/۲؛ و قطرِ کوچک sqrt((1/2)^2 + (1/2)^2) = sqrt(2)/2 است');const e=document.getElementById('lpStep');if(e)e.scrollIntoView({block:'center'});return r+' '+[...document.querySelectorAll('#main .mx-prev')].map(e=>e.textContent.trim()+' m='+e.querySelectorAll('math').length+' src='+[...e.querySelectorAll('[data-src]')].map(x=>x.getAttribute('data-src')).join(';')).join('|')})()"
+},
+{
+"eval": "F(\"lpStep\",\"\")"
+},
+{
+"say": "برهانمو نوشتم: چهار مربع، پنج نقطه، پس دو تا تو یه مربع، فاصله‌شون از قطر کمتره. الان تو بازنگری‌ام. چیزی جا نینداختم؟",
+"eval": "(()=>{C(\".lp-solved\");return APP.state.sub+\" \"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0955xi\"))})()"
+},
+{
+"eval": "APP.state.sub+\" \"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0955xi\"))+\"\\n\"+FL(\"lpB\")"
+},
+{
+"eval": "(()=>{const e=document.getElementById('lpBBest');return e?[...e.options].map(o=>o.value+'='+o.textContent).join(' || '):'NONE '+APP.state.view+' '+APP.state.sub})()"
+},
+{
+"eval": "FL(\"lpBEquiv\")+\" T:\"+APP.liveTransf(\"sqrt((1/2)^2 + (1/2)^2) = sqrt(2)/2\")+\" T2:\"+APP.liveTransf(\"قطر هر مربع √(¼+¼)=√۲/۲\")+\" T3:\"+APP.liveTransf(\"x^2 = 4 پس x = 2\")"
+},
+{
+"eval": "(()=>{const p=\"pb_l_mvaqm0955xi\";S(\"lpBWant\",\"more\");F(\"lpBChk\",\"با شکل چهار گوشه و وسط امتحان کردم؛ وسط با یه گوشه دقیقاً √۲/۲ فاصله داره\");S(\"lpBRes\",\"ایرادی یافتم\");S(\"lpBHyp\",\"notall\");const f=FL(\"lpBDef\");F(\"lpBDefW\",\"بخشِ «شاید روی مرز» به کار نرفت: نقطه‌ای که روی خطِ مشترکِ دو مربعِ کوچک است در کدام مربع حساب می‌شود؟\");S(\"lpBDefTo\",\"c\");C(\".lp-lbsave\");return f+\"\\nTT:\"+TT()+\"\\nSUB:\"+APP.state.sub+\"\\nCLOS:\"+JSON.stringify(APP.liveClosure(p))})()"
+},
+{
+"eval": "(()=>{const p='pb_l_mvaqm0955xi';\nF('lpStep','مربع‌های کوچک را بسته می‌گیرم (با مرزشان)؛ نقطهٔ روی خطِ مشترک را به یکی از آن‌ها می‌دهم — هر نقطه دست‌کم در یک مربعِ بسته است');S('lpClear','بله');F('lpProof','چهار مربعِ بسته کلِ مربع را می‌پوشانند و قطرِ مربعِ بسته هم √۲/۲ است، پس استدلالِ لانهٔ کبوتر برقرار می‌ماند');F('lpPrem','پوشش با مربع‌های بسته');\nconst e=document.getElementById('lpSD_d3');if(e&&!e.checked)e.click();C('.lp-stepsave');const t1=TT();C('.lp-solved');\nS('lpBWant','more');F('lpBChk','با شکل چهار گوشه و وسط امتحان کردم؛ وسط با یه گوشه دقیقاً √۲/۲ فاصله داره که مرزی است و درست درمی‌آد');S('lpBRes','نتیجه سالم ماند');S('lpBCP_0','yes');S('lpBCP_1','yes');F('lpBOther','با برهانِ خلف: اگر همهٔ فاصله‌ها بیشتر بود، هر مربعِ کوچک حداکثر یک نقطه داشت، پس حداکثر ۴ نقطه');F('lpBGlance','لانهٔ کبوتر با چهار مربعِ بسته');F('lpBWorked','نگاه به حکم و وارسیِ تک‌تکِ فرض');S('lpBHyp','all');S('lpBConcl','same');F('lpBDef','فاصله را از تعریفش (طول پاره‌خط) و قطر را بیشترین فاصله در مربع گرفتم');S('lpBBest','0');F('lpBUse','هر جا «دست‌کم دو تا» دارم: جعبه‌ها و چیزها را بشمارم');F('lpBTaste','کشفِ ایده را دوست داشتم؛ نوشتنِ مرزها خسته‌کننده بود');\nF('lpBNew','اگر ۴ نقطه باشد، حکم هنوز درست است؟');S('lpBNewS','cond');F('lpBNewW','همان شرط با یک نقطه کمتر — آیا فرضِ ۵ لازم است');S('lpBHit','درست بود');\nconst fl=FL('lpBCrit|lpBDir|lpBInd|lpBBase|lpBSens|lpBFL');C('.lp-lbsave');\nreturn t1+'\\nFL:'+fl+'\\n'+TT()+'\\nCLOS:'+JSON.stringify(APP.liveClosure(p))+'\\nKIDS:'+JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,r.dormant,APP.liveKindInfo(r.p.id)]))+'\\n'+MT('۴) بازنگری',500)})()\n"
+},
+{
+"eval": "(()=>{const r=S(\"lpBEquiv\",\"eq\");C(\".lp-lbsave\");return r+\" \"+TT()+\" CLOS:\"+JSON.stringify(APP.liveClosure(APP.state.arg))+\" KIDS:\"+JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title]))})()"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{0;APP.go(\"home\");const d=DUE();APP.go(\"lprob\",\"pb_l_mvc629xa5n2\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/شروع می‌کنم/.test(b.textContent));if(b)b.click();return d+\"\\n###\\n\"+FL(\"lpType|lpNat\")+\"\\n\"+MT(\"نوعِ مسئله\",500)})()",
+"clock": "2026-10-20"
+},
+{
+"eval": "(()=>{S('lpType','pod');F('lpOne','می‌خوام ببینم با چهار نقطه هم همیشه دو تا نزدیک‌اند یا نه.');F('lpWhy','ببینم فرضِ پنج لازم بوده یا نه');C('.lp-onesave');\nconst D=['۴ نقطه','مربع ضلع ۱','نقطه‌ها داخل مربع'];C('.lp-dadd');const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>F(id,D[i]||''));\nF('lpUnk','دو نقطه با فاصلهٔ حداکثر √۲/۲ هست');F('lpCond','دو نقطه وجود دارند\\nفاصله ≤ √۲/۲');S('lpSuff','کافی است');F('lpSuffW','همهٔ داده‌ها هست');\nF('lpGuess','نادرست است: چهار گوشه، کمترین فاصله ۱ است که از √۲/۲ بیشتر است');S('lpConf','90');F('lpTest','فاصله‌های چهار گوشه را حساب می‌کنم');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','neutral');\nC('.lp-usave');C('.sv-g2');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn st()+'\\nSUB:'+APP.state.sub+'\\n'+MT('رد کن',600)})()\n"
+},
+{
+"eval": "FL(\"lpSat|lpRel|lpCond|lpSuff\")"
+},
+{
+"eval": "(()=>{S(\"lpSat\",\"yes\");C(\".lp-usave\");C(\".sv-g2\");return TT()+\" SUB:\"+APP.state.sub})()"
+},
+{
+"eval": "(()=>{const p='pb_l_mvc629xa5n2';const sel=[...document.querySelectorAll('#main select')].filter(e=>/lpSuffQ/.test(e.id)).map(e=>e.id);sel.forEach(id=>S(id,'کافی است'));[...document.querySelectorAll('#main input,#main textarea')].filter(e=>/lpSuffQ.*W/.test(e.id)).forEach(e=>F(e.id,'همه هست'));\nconst b0=[...document.querySelectorAll('#main button')].find(b=>/^ثبت$/.test(b.textContent.trim())&&/دوباره: آیا شرط/.test((b.closest('section,div')||{}).innerText||''));if(b0)b0.click();\nS('lpMv','mv_special');F('lpMvWhy','حالتِ خاصِ چهار گوشه را می‌آزمایم که شاید مثالِ نقض باشد');C('.lp-mvadd');\nF('lpPlan','نخست چهار نقطه را در چهار گوشه می‌گذارم، سپس همهٔ فاصله‌ها را حساب می‌کنم و با √۲/۲ مقایسه می‌کنم.');\nfor(let i=1;i<=3;i++){S('lpPU_a_d'+i,'use');F('lpPU_w_d'+i,['چهار نقطه در چهار گوشه','ضلعِ ۱ فاصلهٔ گوشه‌ها را می‌دهد','گوشه‌ها داخلِ مربع (روی مرز) هستند'][i-1]);}\n[...document.querySelectorAll('[id^=lpPC_]')].forEach(e=>{if(!e.checked)e.click()});C('.lp-plansave');\nF('lpStep','چهار نقطه در چهار گوشه: کمترین فاصله ضلع است یعنی ۱، و ۱ > √۲/۲ ≈ ۰٫۷۱؛ پس هیچ دو نقطه‌ای فاصلهٔ حداکثر √۲/۲ ندارند — حکم برای ۴ نقطه نادرست است');S('lpClear','بله');F('lpProof','فاصلهٔ دو گوشهٔ مجاور ۱ و دو گوشهٔ روبه‌رو √۲ است؛ هر دو از √۲/۲ بیشترند');F('lpPrem','تعریفِ فاصله');\n[...document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]')].forEach(e=>{if(!e.checked)e.click()});C('.lp-stepsave');\nC('.lp-solved');\nS('lpBWant','same');F('lpBChk','فاصله‌ها را دوباره با فیثاغورس حساب کردم');S('lpBRes','نتیجه سالم ماند');F('lpBOther','با جابه‌جایی کمی از گوشه‌ها هم مثال نقض می‌ماند');F('lpBGlance','چهار گوشه مثالِ نقض است، پس فرضِ پنج لازم است');F('lpBWorked','آزمودنِ حالتِ خاص');\nconst s1=[...document.querySelectorAll('#main select')].map(e=>e.id).filter(x=>/lpB/.test(x));\nS('lpBHyp','all');S('lpBPod','refuted');window.__fl=FL('lpBPod|lpBCP');S('lpBConcl','same');F('lpBDef','فاصله با تعریفش');S('lpBBest','0');F('lpBUse','حذفِ یک فرض و یافتنِ مثالِ نقض');F('lpBTaste','کوتاه و قشنگ بود');F('lpBNew','با شش نقطه و فاصلهٔ کوچک‌تر چه؟');S('lpBNewS','method');F('lpBNewW','همان روشِ جعبه‌ها');S('lpBHit','درست بود');\nconst b=[...document.querySelectorAll('#main button')].find(b=>/ثبتِ بازنگری/.test(b.textContent));if(b)b.click();\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-3).join(' || ');\nC('.lp-lbsave');return window.__fl+'\\nTT:'+TT()+'\\n'+st()+'\\nSELS:'+s1.join(',')+'\\nCLOS:'+JSON.stringify(APP.liveClosure(p))+'\\n'+MT('۴) بازنگری',500)})()\n"
+},
+{
+"say": "یه مسئلهٔ تازه با همون روش: ۹ نقطه داخل یک مثلث متساوی‌الاضلاع به ضلع ۳ داریم؛ می‌خوام ثابت کنم دو تاشون فاصله‌شون حداکثر ۱ هست. اینم ثبتش کن."
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,r.p.statement]))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvggdclv55t\")"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvggdclv55t\");C('.lp-dadd');const D=['۹ نقطه داخلِ مثلث داریم','مثلث متساوی‌الاضلاع با ضلع ۳'];const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.slice(0,2).forEach((id,i)=>F(id,D[i]));F('lpUnk','دو نقطه که فاصله‌شان حداکثر ۱ است');const pid=APP.state.arg;const P=APP.S.get('eprog_'+pid)||{};return ids.join(',')+' | '+JSON.stringify(((P.solve||{}).live||{}).uDraft||null).slice(0,600)+' | '+TT()})()"
+},
+{
+"say": "اشتباه نوشتم: ۱۰ نقطه است، نه ۹."
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&so.u[1]&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"say": "حدسم اینه: مثلث رو به ۹ تا مثلثِ کوچیک با ضلع ۱ تقسیم کنم؛ بیشترین فاصلهٔ دو نقطه توی مثلثِ ضلع ۱ می‌شه ارتفاعش، یعنی √۳/۲."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&so.u[1]&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"say": "چهارشنبه برهانِ کاملشو می‌نویسم."
+},
+{
+"eval": "(()=>{const pid=\"pb_l_mvggdclv55t\";const s=APP.ASSIST.cur();const L=APP.S.get(\"eprog_\"+pid);const lv=L&&L.solve&&L.solve.live;return JSON.stringify({ph:APP.livePhase&&APP.livePhase(pid),story:APP.liveStoryPhase&&APP.liveStoryPhase(pid),chatPh:lv&&lv.chatPh,saidOk:s.coach&&s.coach.saidOk,story2:s.coach&&s.coach.story&&Object.keys(s.coach.story)})})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&so.u[1]&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"say": "کلش اینه: ۱۰ تا نقطه توی یه مثلث، باید نشون بدم همیشه دو تاشون به هم نزدیکن."
+},
+{
+"say": "فرض: ۱۰ نقطه، مثلث متساوی‌الاضلاع با ضلع ۳، نقطه‌ها داخلش. اصلِ لانهٔ کبوتری: ۱۰ نقطه تو ۹ مثلثِ کوچیک، پس دو تا تو یه مثلث می‌افتن."
+},
+{
+"eval": "JSON.stringify({ans:((APP.ASSIST.cur().coach||{}).ansLog||[]).slice(-3).map(a=>[a.q,a.pk,a.src]),own:((APP.ASSIST.cur().coach||{}).ownLog||[]).slice(-2).map(a=>[a.p,a.src]),u:(APP.S.get(\"eprog_pb_l_mvggdclv55t\")||{}).solve})"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&so.u[1]&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "(async()=>{const s=APP.ASSIST.cur();const m=s.msgs.find(m=>APP.ASSIST.msgId(m)==\"u10\");if(!m)return \"NOMSG\";const b=document.querySelector(\".as-mtools[data-mid=\\\"u10\\\"] .as-editb\");if(!b)return \"NOEDIT\";b.click();await new Promise(r=>setTimeout(r,400));const ta=document.querySelector(\".as-edtx\");ta.value=m.text.replace(\"چهارشنبه\",\"پنجشنبه\");ta.dispatchEvent(new Event(\"input\",{bubbles:true}));document.querySelector(\".as-edsave\").click();await new Promise(r=>setTimeout(r,300));return \"SAVED \"+ta.value+\" | \"+TT()})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&so.u[1]&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"say": "اشتباه کردم که دیشب تا دیروقت بیدار موندم، امروز خسته‌ام. معلمم هم گفت «اشتباه گفتی، ۱۲ نقطه لازمه»، ولی من مطمئن نیستم حق با اون باشه."
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&so.u[1]&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"say": "یه اصلاح دربارهٔ حدسم: گفتم بیشترین فاصله توی مثلثِ ضلع ۱ ارتفاعشه یعنی √۳/۲ — اشتباه گفتم؛ بیشترین فاصله خودِ ضلعه، یعنی ۱."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&so.u[1]&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvggdclv55t\")"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvggdclv55t\");const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"گفت‌وگوهای این مسئله\"))})()"
+},
+{
+"eval": "\"clock->2026-10-22\"",
+"clock": "2026-10-22"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0955xi\");const sel=document.querySelector(\".prc-tsel\");sel.value=\"41\";sel.dispatchEvent(new Event(\"change\",{bubbles:true}));document.querySelector(\".prc-start\").click();return APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,3000)+\"\\nFL:\"+FL()})()"
+},
+{
+"eval": "((async(o)=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const f=(id,v)=>{const e=document.getElementById(id);if(!e)return id+'?';e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nconst r=[];r.push(f('ex_topic','برهانِ پنج نقطه در مربعِ واحد'));r.push(f('ex_pred',String(o.pred)));r.push(f('ex_dump',o.dump));\n['ex_decl_0','ex_decl_1'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.checked)e.click()});\nconst ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await w(300);\nconst idea=['چهار مربعِ کوچکِ ضلع ۱/۲','لانهٔ کبوتری: ۵ نقطه در ۴ مربع','قطرِ مربعِ کوچک √۲/۲ بیشترین فاصله است','مرز: مربع‌های بسته'];\nfor(let i=0;i<idea.length;i++){if(!document.getElementById('ex_gaps_'+i+'_st')){const ad=[...document.querySelectorAll('#main button')].find(b=>/\\+ ردیف/.test(b.textContent));if(ad){ad.click();await w(200)}}\n const ii=document.querySelector('#ex_gaps_'+i+'_idea')||document.querySelectorAll('[id^=ex_gaps_'+i+']')[0];\n const inp=[...document.querySelectorAll('#main input,#main textarea')].filter(e=>e.id&&e.id.startsWith('ex_gaps_'+i)&&!/_st|_why/.test(e.id))[0]||document.querySelector('[aria-label=\"ایده/رابطه منبع\"]');\n if(inp){inp.value=idea[i];inp.dispatchEvent(new Event('input',{bubbles:true}));}\n r.push(f('ex_gaps_'+i+'_st',o.st[i]));if(o.why[i])f('ex_gaps_'+i+'_why',o.why[i]);}\nr.push(f('ex_actual',String(o.act)));r.push(f('ex_nextQ_0',o.q[0])||'');f('ex_nextQ',o.q[0]);r.push(f('ex_nextQ_1',o.q[1]));\ndocument.querySelectorAll('#main .rub, #main [class*=rub]').length;\nconst g=[...document.querySelectorAll('#main button')].filter(b=>/^۲ کامل$/.test(b.textContent.trim()));g.forEach(b=>b.click());await w(200);\nconst fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));if(fin)fin.click();await w(500);\nreturn r.join(',')+' | rub:'+g.length+' | '+TT()}))({\"pred\": 70, \"dump\": \"مربع رو چهار تا مربعِ کوچیک می‌کنم، ۵ نقطه تو ۴ مربع، پس دو تا تو یکی؛ فاصله‌شون از قطرِ مربعِ کوچیک بیشتر نیست که √۲/۲ هست. یه چیزی دربارهٔ مرز هم بود.\", \"st\": [\"کامل یادم بود\", \"کامل یادم بود\", \"کامل یادم بود\", \"ناقص/مبهم\"], \"why\": [\"\", \"\", \"\", \"یادم بود مرز مهمه ولی نه این‌که چرا مربع‌ها رو بسته می‌گیریم\"], \"act\": 80, \"q\": [\"چرا مربع‌های کوچیک رو بسته می‌گیریم و نقطهٔ روی خطِ مشترک کجا می‌ره؟\", \"چرا قطر بیشترین فاصله در مربع است؟\"]})"
+},
+{
+"eval": "JSON.stringify(APP.PR.all().map(c=>({id:c.id,tid:c.tid,subj:c.subj,state:c.state,due:c.due,sessions:c.sessions,stable:c.stable,hist:c.hist})))"
+},
+{
+"eval": "\"clock->2026-10-23\"",
+"clock": "2026-10-23"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>{return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/۴۱|بازیابی|پرونده|🧪|برگه سفید|مسئله/.test(t)))+\"\\nSCHED:\"+JSON.stringify((APP.SCHED.all(APP.today())||[]).filter(e=>/prac/.test(JSON.stringify(e))).slice(0,3))+\"\\nPR.due:\"+JSON.stringify(APP.PR.due(APP.today()))})()"
+},
+{
+"eval": "\"clock->2026-10-25\"",
+"clock": "2026-10-25"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>{return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/۴۱|بازیابی|پرونده|🧪|برگه سفید|مسئله/.test(t)))+\"\\nSCHED:\"+JSON.stringify((APP.SCHED.all(APP.today())||[]).filter(e=>/prac/.test(JSON.stringify(e))).slice(0,3))+\"\\nPR.due:\"+JSON.stringify(APP.PR.due(APP.today()))})()"
+},
+{
+"eval": "\"clock->2026-10-29\"",
+"clock": "2026-10-29"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>{return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/۴۱|بازیابی|پرونده|🧪|برگه سفید|مسئله/.test(t)))+\"\\nSCHED:\"+JSON.stringify((APP.SCHED.all(APP.today())||[]).filter(e=>/prac/.test(JSON.stringify(e))).slice(0,3))+\"\\nPR.due:\"+JSON.stringify(APP.PR.due(APP.today()))})()"
+},
+{
+"eval": "(()=>{const x=(APP.dueList()||[]).find(x=>/روز ۷/.test(x.txt));if(x&&x.go)x.go();return APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,1500)})()"
+},
+{
+"eval": "FL()"
+},
+{
+"eval": "(async()=>{F(\"pr_dump\",\"چهار مربعِ کوچیک، لانهٔ کبوتری… قطرش رو یادم نیست چرا بیشترین فاصله‌ست. مرز رو کلاً یادم رفته بود.\");const ob=[...document.querySelectorAll(\"#main button\")].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await new Promise(r=>setTimeout(r,300));F(\"pr_gaps\",\"چرا قطر بیشترین فاصله در مربع است؛ مربع‌های بسته برای نقطه‌های روی مرز\");F(\"pr_pct\",\"45\");const fin=[...document.querySelectorAll(\"#main button\")].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));fin&&fin.click();await new Promise(r=>setTimeout(r,500));return TT()+\"\\n\"+JSON.stringify(APP.PR.all().map(c=>({due:c.due,state:c.state,sessions:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas,s.src,s.why]),late:c.late,roles:c.roles})))+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برگه سفید|۴۱|🧪/.test(t)))})()"
+},
+{
+"eval": "\"clock->2026-10-30\"",
+"clock": "2026-10-30"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برگه سفید|۴۱|🧪|پرونده/.test(t))))()"
+},
+{
+"eval": "\"clock->2026-11-12\"",
+"clock": "2026-11-12"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برگه سفید|۴۱|🧪|پرونده/.test(t))))()"
+},
+{
+"eval": "(()=>{APP.go(\"practice\");const t=document.getElementById(\"main\").innerText;return t.slice(0,2500)})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");const j=t.indexOf(\"🏋 کارِ تکنیک‌ها\");return t.slice(i,i+2600)+\"\\n####\\n\"+t.slice(j,j+1200)})()"
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm0955xi\");const e=document.querySelector(\".prc-sec\");if(e)e.scrollIntoView({block:\"center\"});return e?e.innerText.slice(0,600):\"none\"})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqm0955xi\");const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"گفت‌وگوهای این مسئله\")).slice(0,200)+\" ... \"+(t.match(/.{0,80}(پروندهٔ تمرین|تمرین بازیابی|برگه سفید).{0,120}/g)||[]).join(\" || \")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"eval": "APP.today()+' '+APP.state.view+' '+APP.state.arg+' sess:'+APP.ASSIST.cur().id+' lp:'+(APP.ASSIST.cur().lprob||'')+' | '+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({id:c.id,subj:c.subj.t,due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src])})))"
+},
+{
+"say": "امروز برهانِ پنج نقطه رو بی‌نگاه نوشتم؛ چهار مربع و لانهٔ کبوتری یادم بود ولی این‌که چرا قطر بیشترین فاصله‌ست و مرز رو یادم رفته بود — حدود ۴۵ درصد."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({m:s.msgs.slice(-2).map(m=>m.role+': '+m.text.slice(0,300)),prc:APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late})),due:(APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||''))})})()"
+},
+{
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()",
+"clock": "2026-11-13"
+},
+{
+"eval": "(async(o)=>{const x=(APP.dueList()||[]).find(x=>new RegExp(o.re).test(x.txt));if(!x)return 'NODUE';x.go();await new Promise(r=>setTimeout(r,500));const v=APP.state.view+' '+APP.state.arg;\nF('pr_dump',o.dump);const ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await new Promise(r=>setTimeout(r,300));\nif(o.gaps)F('pr_gaps',o.gaps);F('pr_pct',String(o.pct));const fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));fin&&fin.click();await new Promise(r=>setTimeout(r,600));\nreturn v+' | '+TT()+'\\nPRC:'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late,roles:c.roles})))+'\\nDUE:'+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||'')))})({\"re\": \"برگه سفید روز ۱\", \"dump\": \"مربع رو با دو خط وسط به چهار مربعِ ضلع ۱/۲ تقسیم می‌کنم؛ ۵ نقطه در ۴ مربع ⇒ دو تا در یک مربع (لانهٔ کبوتری). بیشترین فاصله در مربعِ کوچک قطرشه: √((1/2)²+(1/2)²)=√2/2، چون فاصلهٔ دو نقطه در شکلِ محدب از قطرش بیشتر نیست. مربع‌ها بسته‌اند تا نقطه‌های روی مرز هم جا بگیرن.\", \"gaps\": \"\", \"pct\": 70})\n\n"
+},
+{
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()",
+"clock": "2026-11-15"
+},
+{
+"eval": "(async(o)=>{const x=(APP.dueList()||[]).find(x=>new RegExp(o.re).test(x.txt));if(!x)return 'NODUE';x.go();await new Promise(r=>setTimeout(r,500));const v=APP.state.view+' '+APP.state.arg;\nF('pr_dump',o.dump);const ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await new Promise(r=>setTimeout(r,300));\nif(o.gaps)F('pr_gaps',o.gaps);F('pr_pct',String(o.pct));const fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));fin&&fin.click();await new Promise(r=>setTimeout(r,600));\nreturn v+' | '+TT()+'\\nPRC:'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late,roles:c.roles})))+'\\nDUE:'+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||'')))})({\"re\": \"برگه سفید روز ۳\", \"dump\": \"مربع رو با دو خط وسط به چهار مربعِ ضلع ۱/۲ تقسیم می‌کنم؛ ۵ نقطه در ۴ مربع ⇒ دو تا در یک مربع (لانهٔ کبوتری). بیشترین فاصله در مربعِ کوچک قطرشه: √((1/2)²+(1/2)²)=√2/2، چون فاصلهٔ دو نقطه در شکلِ محدب از قطرش بیشتر نیست. مربع‌ها بسته‌اند تا نقطه‌های روی مرز هم جا بگیرن.\", \"gaps\": \"\", \"pct\": 80})\n\n"
+},
+{
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt).join(' || ')})()",
+"clock": "2026-11-19"
+},
+{
+"eval": "(async(o)=>{const x=(APP.dueList()||[]).find(x=>new RegExp(o.re).test(x.txt));if(!x)return 'NODUE';x.go();await new Promise(r=>setTimeout(r,500));const v=APP.state.view+' '+APP.state.arg;\nF('pr_dump',o.dump);const ob=[...document.querySelectorAll('#main button')].find(b=>/^باز کردن$/.test(b.textContent.trim()));if(ob)ob.click();await new Promise(r=>setTimeout(r,300));\nif(o.gaps)F('pr_gaps',o.gaps);F('pr_pct',String(o.pct));const fin=[...document.querySelectorAll('#main button')].find(b=>/^ثبت نهایی$/.test(b.textContent.trim()));fin&&fin.click();await new Promise(r=>setTimeout(r,600));\nreturn v+' | '+TT()+'\\nPRC:'+JSON.stringify(APP.PR.all().filter(c=>c.tid===41).map(c=>({due:c.due,state:c.state,ss:(c.sessions||[]).map(s=>[s.d,s.ok,s.meas&&s.meas.pct,s.src]),late:c.late,roles:c.roles})))+'\\nDUE:'+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+' | '+(x.sub||'')))})({\"re\": \"برگه سفید روز ۷\", \"dump\": \"مربع رو با دو خط وسط به چهار مربعِ ضلع ۱/۲ تقسیم می‌کنم؛ ۵ نقطه در ۴ مربع ⇒ دو تا در یک مربع (لانهٔ کبوتری). بیشترین فاصله در مربعِ کوچک قطرشه: √((1/2)²+(1/2)²)=√2/2، چون فاصلهٔ دو نقطه در شکلِ محدب از قطرش بیشتر نیست. مربع‌ها بسته‌اند تا نقطه‌های روی مرز هم جا بگیرن.\", \"gaps\": \"\", \"pct\": 90})\n\n"
+},
+{
+"eval": "(()=>{APP.go('lprob','pb_l_mvaqm0955xi');const e=document.querySelector('.prc-sec');if(e)e.scrollIntoView({block:'center'});return e?e.innerText.slice(0,900):'NOSEC'})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlthyl4bin');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlv7je1sd5');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt1pjbrxh');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt6ryv79i');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqluvtngt3t');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlthfj2ti9');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const p=APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id);APP.go(\"route\",p[p.length-1]);const t=document.getElementById(\"main\").innerText;return (t.match(/.{0,60}(چهارشنبه|پنجشنبه).{0,60}/g)||[]).join(\" ¦ \")})()"
+},
+{
+"eval": "JSON.stringify(APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>[r.p.id,r.p.title.slice(0,40)]))"
+},
+{
+"eval": "(()=>{APP.go(\"route\",\"pb_l_mvggdclv55t\");const t=document.getElementById(\"main\").innerText;return ((t.match(/.{0,50}(چهارشنبه|پنجشنبه).{0,50}/g))||[\"none\"]).join(\" ¦ \")})()"
+},
+{
+"say": "یه چیزِ کناری: برای تمرینِ جمع نوشتم ۱ + ۲ + … + ۲۰ = ۲۱۰ و ۱ + ۲ + … + ۱۰ = ۵۰. مساحتِ دایرهٔ شعاع ۲ هم π × ۲² = ۱۲٫۵۶ و ۱/۲ + ۱/۳ = ۵/۶. تازه ۱۷ ≡ ۲ (mod ۵) و اگه 2x + 3 = 11 باشه x = 4."
+},
+{
+"say": "آهان، ۱۰ × ۱۱ / ۲ = ۵۵ میشه. ولی اگه ۱ + ۲ + … + ۱۰۰ = ۵۰۵۰ باشه، پس جمعِ ۱ تا ۱۰۰ با دستورِ n(n+1)/2 = ۵۰۵۰ هم درسته."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltp2cyq6a');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "امروز ۲ × ۳ = ۶ تا تخم‌مرغ خریدیم برای صبحونه 😄 نمرهٔ امتحانم هم ۱۷ از ۲۰ شد. حالا برگردیم: ۱ + ۳ + … + ۱۹ = ۱۰۰ هم درسته؟"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltp6uh914');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltihorfus');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")+\" | \"+APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id+\":\"+r.p.title.slice(0,30)).join(\" ; \"))()"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');try{CT('^کلِ گفت‌وگو')}catch(e){};return new Promise(r=>setTimeout(()=>{const t=document.getElementById('main').innerText;r(t.slice(t.indexOf('📜')))},800))})()"
+},
+{
+"say": "مسابقهٔ المپیاد سه مرحله‌ست، اولیش ۱ اردیبهشته و تا اون موقع تمرین می‌کنم. یه حسابِ دیگه: ۱۰ نقطه رو سه‌تا سه‌تا گروه کنم، ۳ × ۳ = ۹، یکی می‌مونه. ۱۲ نقطه رو پنج‌تا پنج‌تا کنم، ۱۲ ÷ ۵ = ۲ و ۳ تا می‌مونه."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlq41n0aq9');try{CT('^کلِ گفت‌وگو')}catch(e){};return new Promise(r=>setTimeout(()=>{const t=document.getElementById('main').innerText;r(t.slice(Math.max(0,t.indexOf('📜'))))},700))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggdclv55t');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc629xa5n2');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvggd8goabj');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0955xi');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"این مسئلهٔ اثباتی است: مجهول ندارد؛ به‌جایش فرض دارد و حکمی که باید ثابت شود. خودت بگو: فرض چیست؟ حکم (آنچه باید ثابت شود) چیست؟\", \"title\": \"پنج نقطه در مربعِ واحد\", \"pinned\": \"اثبات: از ۵ نقطه در مربعِ واحد دو تا با فاصلهٔ ≤ √۲/۲\", \"memory\": \"کاربر مسئلهٔ اثباتیِ ۵ نقطه در مربعِ واحد را آورد و پرسید مجهول چیست. گفتم اثباتی است؛ پرسیدم فرض و حکم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u1\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"فرض و حکم را درست جدا کردی. ولی هفت شکل استدلالِ اکتشافی است، نه برهان: نمونه‌ها حدس را محتمل‌تر می‌کنند، ثابتش نمی‌کنند — پس فعلاً «ناتمام — اکتشافی». برهانش — چرا برای هر چیدمانِ پنج‌نقطه‌ای، نه فقط این هفت تا؟\", \"memory\": \"اثباتِ ۵ نقطه در مربعِ واحد. کاربر فرض و حکم را گفت؛ با هفت شکل گفت ثابت شد. گفتم اکتشافی است؛ پرسیدم برهانش.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"proof\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"ثبتش می‌کنم؛ قدم‌به‌قدم در صفحهٔ خودش جلو می‌رویم. فرض را بخش‌بخش جدا بنویس — هر بخش چه می‌گوید؟\", \"memory\": \"مسئلهٔ اثباتیِ ۵ نقطه در مربعِ واحد به‌عنوان مسئلهٔ زنده ثبت شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"پنج نقطه در مربعِ واحد\", \"statement\": \"ثابت کنید از هر ۵ نقطه داخل یک مربع به ضلع ۱، دو تا هستند که فاصله‌شان حداکثر √۲/۲ است.\", \"nat\": \"objective\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"تقسیم به چهار مربع ایدهٔ واقعی است — یک گام جلو بردی. برای همان گیر: از فرض چیزِ سودمندی بیرون می‌کشی، همهٔ فرض را به کار برده‌ای؟\", \"memory\": \"مسئلهٔ زنده pb_l_mvaqm0955xi (اثباتی). روز ۲: ایدهٔ ۴ مربع، گیر. پرسیدم همهٔ فرض به کار رفته؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"مربع رو به ۴ تا مربع کوچیک تقسیم کنم\"}}]}",
+"{\"reply\": \"ایدهٔ کلیدی — چهار مربعِ کوچک با قطرِ $\\\\sqrt{(1/2)^2+(1/2)^2}=\\\\frac{\\\\sqrt{2}}{2}$ — را خودت پیدا کردی، ولی «حل شد» را صفحه هنوز ندیده. برهانی گفتی — از راهِ دیگری هم به همین حکم می‌رسی؟ وارسی‌اش کن: هر بخشِ فرض — پنج نقطه، ضلعِ ۱، «داخلِ مربع» — کجا به کار رفت و نتیجه دقیقاً همان حکم است؟ بعد در صفحه «✅ حل شد» و بازنگری.\", \"memory\": \"کاربر ایدهٔ ۴ مربع + قطر √۲/۲ + ۵ در ۴ را یافت و گفت «فکر کنم حل شد»؛ تأیید نکردم؛ وارسیِ برهان (هر بخشِ فرض) را خواستم و او را به حل شد و بازنگریِ صفحه بردم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\", \"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"برهانت روی میز است و خودت در بازنگری هستی. یک وارسی: همهٔ فرض به کار رفت — هر بخشِ فرض (پنج نقطه، ضلعِ ۱، «داخلِ مربع») کجای برهان آمد؟\", \"memory\": \"pb_l_mvaqm0955xi: برهانِ سه‌گامی نوشته شد؛ پرسیدم هر گام را وارسی کند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"ثبتش می‌کنم؛ صفحه‌اش در «🔭 مسئلهٔ حل‌نشدهٔ خودم» باز می‌شود. اول کل، بعد جزءها: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"نقطه‌ها در مثلث\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"نقطه‌ها در مثلثِ متساوی‌الاضلاع\", \"statement\": \"۹ نقطه داخل یک مثلث متساوی‌الاضلاع به ضلع ۳ داریم؛ می‌خوام ثابت کنم دو تاشون فاصله‌شون حداکثر ۱ هست.\", \"nat\": \"objective\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"اصلاح را فرستادم: ۱۰ نقطه به‌جای ۹ — صفحه در نوبتِ بعد نتیجه را می‌گوید. اول کل، بعد جزءها: کلِ مسئله را بی‌جزئیات، در یک جملهٔ کامل و به زبانِ خودت، می‌گویی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"retract\": {\"msg\": \"۹ نقطه داخل یک مثلث متساوی‌الاضلاع به ضلع ۳ داریم\", \"key\": \"datum:تعدادِ نقطه‌ها\", \"what\": \"fact\", \"fix\": \"۱۰ نقطه\", \"old\": \"۹ نقطه\"}}]}",
+"{\"reply\": \"صفحه صورتِ مسئله را به «۱۰ نقطه» برد. حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"بیشترین فاصلهٔ دو نقطه توی مثلثِ ضلع ۱ می‌شه ارتفاعش، یعنی √۳/۲\", \"q\": \"حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟\"}}]}",
+"{\"reply\": \"چهارشنبه برای برهانِ کامل — خوب. پیش از آن: حکمی که باید ثابت شود، دقیقاً چیست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"چهارشنبه برهانِ کاملشو می‌نویسم\", \"when\": \"2026-10-21\", \"on_guess\": true}}]}",
+"{\"reply\": \"کلِ مسئله را خوب گفتی. طرحت تقسیم به ۹ مثلثِ کوچک است؛ هر گامش را وارسی کن: روشن می‌بینی که بیشترین فاصلهٔ دو نقطه در مثلثِ ضلع ۱ همان است که در حدست گفتی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u0\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"فرض را جدا کردی و لانهٔ کبوتری را هم دیدی: ده نقطه در نُه مثلث. می‌توانی ثابت کنی که این گام درست است — کدام داده، تعریف، قضیه یا گامِ پیشین آن را لازم می‌آورد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\", \"plan\"], \"ans\": [\"u2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"برنامه‌ات از چهارشنبه به پنجشنبه رفت؛ پیش‌نویسِ طرح هم همین را دارد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"حرفِ معلمت را چیزی عوض‌شده نمی‌گیرم — خودش یک ادعاست که می‌شود سنجیدش: با ۹ مثلثِ کوچک، چند نقطه برای لانهٔ کبوتری لازم است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"اصلاحِ حدست را فرستادم؛ صفحه در نوبتِ بعد نتیجه را می‌گوید. قاعدهٔ پاسکال در همین گام: به‌جای «بیشترین فاصله» تعریفش را بگذار — گام هنوز درست است و از کدام بخشِ تعریف استفاده می‌کند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"retract\": {\"msg\": \"بیشترین فاصلهٔ دو نقطه توی مثلثِ ضلع ۱ می‌شه ارتفاعش، یعنی √۳/۲\", \"key\": \"guess:g1\", \"what\": \"guess\", \"fix\": \"خودِ ضلعه، یعنی ۱\", \"old\": \"ارتفاعش، یعنی √۳/۲\"}}]}",
+"{\"reply\": \"گزارشِ این جلسه را برای پروندهٔ «پنج نقطه» فرستادم؛ صفحه نتیجه را نشان می‌دهد. همان بخشِ جاافتاده را حالا بی‌نگاه می‌گویی — چرا قطرِ مربعِ کوچک بیشترین فاصله است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}, {\"do\": \"practice_log\", \"prc\": \"prc_mvjb8wl5zpkvj\", \"what\": \"برهانِ پنج نقطه را بی‌نگاه نوشت\", \"pct\": 45, \"quote\": \"چهار مربع و لانهٔ کبوتری یادم بود ولی این‌که چرا قطر بیشترین فاصله‌ست و مرز رو یادم رفته بود — حدود ۴۵ درصد\"}]}",
+"{\"reply\": \"π × ۲² ≈ ۱۲٫۵۶ و ۱/۲ + ۱/۳ = ۵/۶ می‌خوانند؛ ۱ تا ۲۰ هم ۲۱۰ است (۲۰ × ۲۱ / ۲). اما جمعِ ۱ تا ۱۰ با ۵۰ نمی‌خواند — همان دستورِ جفت کردنِ اول و آخر را رویش بزن، چند می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۱۰ × ۱۱ / ۲ = ۵۵ درست است و ۱ تا ۱۰۰ هم با همان دستور ۵۰۵۰ می‌شود. حالا برگردیم به برهانِ ده نقطه — برهانِ کاملی که پنجشنبه می‌نویسی از کدام گام شروع می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"۱۰ × ۱۱ / ۲ = ۵۵\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"جمعِ فردها می‌خواند. حالا برگردیم سرِ برهان: گامِ بعدیِ برهانت کدام است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"گروه‌بندیِ ده نقطه درست است. «۱۲ ÷ ۵ = ۲ و ۳ تا می‌مونه» را یک بار دیگر بشمار. این گروه‌بندی‌ها چه ربطی به اصلِ لانهٔ کبوتر در مسئلهٔ مثلث دارد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"سؤال: ثابت کنید از هر ۵ نقطه داخل یک مربع به ضلع ۱، دو تا هستند که فاصله‌شان حداکثر √۲/۲ است. اصلاً نمی‌دونم از کجا شروع کنم. مجهولش چیه؟",
+"فرض: ۵ نقطه، مربع ضلع ۱، نقطه‌ها داخلش. حکم: دو تا فاصله‌شون ≤ √۲/۲. هفت تا شکل کشیدم با ۵ نقطه، همیشه دو تا نزدیک بودن. پس درسته، ثابت شد دیگه!",
+"باشه، می‌خوام ثابتش کنم ولی بلد نیستم. می‌خوام این رو به‌عنوان مسئلهٔ خودم ثبت کنم و قدم به قدم برم.",
+"فردا شد. یه ایده دارم: مربع رو به ۴ تا مربع کوچیک تقسیم کنم. ولی نمی‌دونم چرا دو تا نقطه توی یه مربع کوچیک باید نزدیک باشن. گیر کردم.",
+"آهان! دو نقطه داخل یه شکل، فاصله‌شون از بزرگ‌ترین فاصلهٔ اون شکل بیشتر نمیشه. قطر مربع کوچیک sqrt((1/2)^2 + (1/2)^2) = sqrt(2)/2 هست! و ۵ نقطه تو ۴ تا مربع، پس دو تا تو یه مربع می‌افتن. فکر کنم حل شد.",
+"برهانمو نوشتم: چهار مربع، پنج نقطه، پس دو تا تو یه مربع، فاصله‌شون از قطر کمتره. الان تو بازنگری‌ام. چیزی جا نینداختم؟",
+"یه مسئلهٔ تازه با همون روش: ۹ نقطه داخل یک مثلث متساوی‌الاضلاع به ضلع ۳ داریم؛ می‌خوام ثابت کنم دو تاشون فاصله‌شون حداکثر ۱ هست. اینم ثبتش کن.",
+"اشتباه نوشتم: ۱۰ نقطه است، نه ۹.",
+"حدسم اینه: مثلث رو به ۹ تا مثلثِ کوچیک با ضلع ۱ تقسیم کنم؛ بیشترین فاصلهٔ دو نقطه توی مثلثِ ضلع ۱ می‌شه ارتفاعش، یعنی √۳/۲.",
+"چهارشنبه برهانِ کاملشو می‌نویسم.",
+"کلش اینه: ۱۰ تا نقطه توی یه مثلث، باید نشون بدم همیشه دو تاشون به هم نزدیکن.",
+"فرض: ۱۰ نقطه، مثلث متساوی‌الاضلاع با ضلع ۳، نقطه‌ها داخلش. اصلِ لانهٔ کبوتری: ۱۰ نقطه تو ۹ مثلثِ کوچیک، پس دو تا تو یه مثلث می‌افتن.",
+"[اصلاحِ پیامِ قبلی] «چهارشنبه» ⇐ «پنجشنبه» — متنِ درستِ پیامم: «پنجشنبه برهانِ کاملشو می‌نویسم.»",
+"اشتباه کردم که دیشب تا دیروقت بیدار موندم، امروز خسته‌ام. معلمم هم گفت «اشتباه گفتی، ۱۲ نقطه لازمه»، ولی من مطمئن نیستم حق با اون باشه.",
+"یه اصلاح دربارهٔ حدسم: گفتم بیشترین فاصله توی مثلثِ ضلع ۱ ارتفاعشه یعنی √۳/۲ — اشتباه گفتم؛ بیشترین فاصله خودِ ضلعه، یعنی ۱.",
+"امروز برهانِ پنج نقطه رو بی‌نگاه نوشتم؛ چهار مربع و لانهٔ کبوتری یادم بود ولی این‌که چرا قطر بیشترین فاصله‌ست و مرز رو یادم رفته بود — حدود ۴۵ درصد.",
+"یه چیزِ کناری: برای تمرینِ جمع نوشتم ۱ + ۲ + … + ۲۰ = ۲۱۰ و ۱ + ۲ + … + ۱۰ = ۵۰. مساحتِ دایرهٔ شعاع ۲ هم π × ۲² = ۱۲٫۵۶ و ۱/۲ + ۱/۳ = ۵/۶. تازه ۱۷ ≡ ۲ (mod ۵) و اگه 2x + 3 = 11 باشه x = 4.",
+"آهان، ۱۰ × ۱۱ / ۲ = ۵۵ میشه. ولی اگه ۱ + ۲ + … + ۱۰۰ = ۵۰۵۰ باشه، پس جمعِ ۱ تا ۱۰۰ با دستورِ n(n+1)/2 = ۵۰۵۰ هم درسته.",
+"امروز ۲ × ۳ = ۶ تا تخم‌مرغ خریدیم برای صبحونه  نمرهٔ امتحانم هم ۱۷ از ۲۰ شد. حالا برگردیم: ۱ + ۳ + … + ۱۹ = ۱۰۰ هم درسته؟",
+"مسابقهٔ المپیاد سه مرحله‌ست، اولیش ۱ اردیبهشته و تا اون موقع تمرین می‌کنم. یه حسابِ دیگه: ۱۰ نقطه رو سه‌تا سه‌تا گروه کنم، ۳ × ۳ = ۹، یکی می‌مونه. ۱۲ نقطه رو پنج‌تا پنج‌تا کنم، ۱۲ ÷ ۵ = ۲ و ۳ تا می‌مونه."
+]
+}

@@ -1,0 +1,320 @@
+{
+"from": "round30A/aA4",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام. من هشتاد و یک سالمه، تولدم ۱۵ تیره. خیاطِ بازنشسته‌ام. برای اتاقِ نوه‌ام پرده می‌دوزم. پنجره ۱۸۰ سانت عرض و ۱۵۰ سانت ارتفاع دارد. پرده باید دو برابرِ عرضِ پنجره چین بخورد، از ۱۰ سانت بالای پنجره شروع شود و ۲۰ سانت پایین‌تر از پنجره تمام شود، و برای سجافِ بالا و پایین روی هم ۱۵ سانت اضافه می‌خواهد. پارچه‌ای که پسندیده‌ام توپش ۱۴۰ سانت عرض دارد. چند متر پارچه بخرم؟ قبلاً با چشم حساب می‌کردم، این بار می‌خواهم دقیق باشد."
+},
+{
+"eval": "(()=>{const c=document.querySelector(\".age-ask\");return JSON.stringify({birth:APP.AGE.birth(),age:APP.AGE.age(),said:(APP.S.get(\"settings\")||{}).profile,card:c?c.innerText:\"NOCARD\",msgs:APP.ASSIST.cur().msgs.slice(-3).map(m=>m.role+\": \"+m.text.slice(0,200))})})()"
+},
+{
+"eval": "(()=>{const P=t=>{try{return JSON.stringify(APP.AGE.parse(t))}catch(e){return \"ERR \"+e}};return [\"تولدم ۱۵ تیره\",\"۱۵ تیر\",\"هشتاد و یک سالمه، تولدم ۱۵ تیره\",\"من ۸۱ سالمه، تولدم ۱۵ تیره\",\"۱۳۲۴/۴/۵۱\",\"۳۱ مهر ۱۳۳۸\",\"1338/2/20\",\"۱۲ اسفند ۹۵\",\"۱۹ بهمن ۸۸\",\"۳۰ اسفند ۱۴۰۴\"].map(t=>t+\" => \"+P(t)).join(\"\\n\")+\"\\nfromChat:\"+typeof APP.AGE.fromChat})()"
+},
+{
+"say": "کلش این است: می‌خواهم بدانم برای یک پردهٔ چین‌دار که کلِ پنجره را بپوشاند چند متر پارچه بخرم که نه کم بیاید نه بی‌خود زیاد بخرم."
+},
+{
+"say": "ارتفاعِ پنجره و آن ۱۰ سانتِ بالا و ۲۰ سانتِ پایین و ۱۵ سانتِ سجاف روی طولِ هر تکه اثر دارند؛ عرضِ پنجره و چینِ دو برابر و عرضِ توپ روی تعدادِ تکه‌ها. این مسئله را در صفحهٔ مسئله‌هایم هم ثبت کنید که بعد ببینم."
+},
+{
+"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"از گفت\");return \"N=\"+(t.split(\"از گفت‌وگو\").length-1)+\"\\n\"+t.slice(0,3500)})()"
+},
+{
+"say": "همه حتمی‌اند: پرده با چینِ دو برابر باید کلِ عرضِ پنجره را بپوشاند، از ۱۰ سانت بالای پنجره تا ۲۰ سانت پایینِ آن باشد، و سجافِ بالا و پایین هم باید باشد."
+},
+{
+"say": "بله، ملافه و رومیزی زیاد دوخته‌ام؛ آن‌جا هم اول طولِ هر تکه را درمی‌آوردم و بعد تعدادِ قواره را. همین‌جا هم همان کار را می‌کنم. حساب: عرضِ لازم با چین ۱۸۰ ضربدر ۲ می‌شود ۳۶۰ سانت. ۳۶۰ تقسیم بر ۱۴۰ می‌شود ۲ و خرده‌ای، یعنی ۲٫۵۷ قواره. طولِ هر قواره ۱۵۰ + ۱۰ + ۲۰ + ۱۵ = ۱۹۵ سانت. پس ۲٫۵۷ ضربدر ۱٫۹۵ می‌شود حدودِ ۵ متر. ۵ متر می‌خرم."
+},
+{
+"say": "نه، بس نیست! قواره را که نمی‌شود تکه‌تکه دوخت؛ هر قواره یک عرضِ کاملِ پارچه است. پس باید به بالا گرد کنم: ۳ قواره. ۳ ضربدر ۱۹۵ می‌شود ۵۸۵ سانت، یعنی ۵ متر و ۸۵ سانت. با ۵ متر کم می‌آوردم! ۶ متر می‌خرم که جای برش هم داشته باشد."
+},
+{
+"say": "بله: ۳ قواره هر کدام ۱۴۰ سانت عرض دارد، روی هم ۴۲۰ سانت می‌شود که از ۳۶۰ بیشتر است؛ با ۲ قواره فقط ۲۸۰ سانت می‌شد که کم است. پس ۳ قواره درست است. راستی تاریخِ تولدم را کامل بنویسم: متولدِ 1324/4/15 هستم. فردا صبح به بازار می‌روم و ۶ متر می‌خرم."
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{APP.go(\"route\",\"pb_l_mvaqm59ejcs\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"اکنون:\");return t.slice(i,i+1500)})()"
+},
+{
+"say": "واحدها را نگاه کردم: همه را به سانت نوشته‌ام و ۶ متر یعنی ۶۰۰ سانت؛ به متر هم همان درمی‌آید. فکر می‌کنم ۱۵ سانت اضافه بماند، چون ۶۰۰ منهای ۵۸۵ می‌شود ۱۵؛ نود درصد مطمئنم، مگر این‌که فروشنده کج ببُرد."
+},
+{
+"eval": "(()=>{APP.go(\"today\");return (APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"clock": "2026-10-17"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")+(x.merged?\" MERGED:\"+JSON.stringify(x.merged).slice(0,200):\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "APP.go(\"whole\")"
+},
+{
+"say": "سلام. امروز رفتم ۶ متر خریدم و بریدم: ۳ قواره درآمد و ۱۵ سانت اضافه ماند — درست همان که پیش‌بینی کرده بودم. پرده را هم دوختم؛ کلِ پنجره را می‌پوشاند و چینش هم خوب است."
+},
+{
+"say": "درسش این است که قواره کسری ندارد و تعدادِ قواره را همیشه باید به بالا گرد کرد، و هر عدد را با شرطِ اصلی، یعنی پوشاندنِ کلِ پنجره، وارسی کرد. همین را برای ملافه و رومیزی هم به کار می‌برم. آن پرسشی که گفتید «۲٫۵۷ قواره را چطور می‌بُرید؟» بیشتر از همه کمکم کرد. این جور حساب‌ها را دوست دارم، مثلِ کارِ قدیمم است."
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const m=document.getElementById(\"main\");const ins=[...m.querySelectorAll(\"input\")].filter(i=>/تولد|birth|age/i.test((i.className||\"\")+(i.placeholder||\"\")+(i.getAttribute(\"aria-label\")||\"\")));return ins.map(i=>i.className+\"|\"+i.placeholder+\"|\"+i.getAttribute(\"aria-label\")+\"|\"+i.value).join(\"\\n\")+\"\\nPSY:\"+(m.innerText.match(/سن:[^\\n]*/)||[\"\"])[0]})()"
+},
+{
+"eval": "(()=>{const m=document.getElementById(\"main\");const i=[...m.querySelectorAll(\"input\")].find(i=>(i.getAttribute(\"aria-label\")||\"\").includes(\"تاریخِ تولد\"));i.scrollIntoView({block:\"center\"});i.value=\"۱۳۲۴/۴/۵۱\";i.dispatchEvent(new Event(\"input\",{bubbles:true}));i.dispatchEvent(new Event(\"change\",{bubbles:true}));const b=i.parentElement.querySelector(\"button\")||i.closest(\"div,p,section\").querySelector(\"button\");if(b)b.click();const box=i.closest(\"section,div,p\");return \"btn=\"+(b?b.innerText:\"none\")+\" birth=\"+APP.AGE.birth()+\" | \"+(box?box.innerText.slice(0,400):\"\")})()"
+},
+{
+"eval": "(()=>{const m=document.getElementById(\"main\");const i=[...m.querySelectorAll(\"input\")].find(i=>(i.getAttribute(\"aria-label\")||\"\").includes(\"تاریخِ تولد\"));let p=i.parentElement;for(let k=0;k<3&&p&&p.innerText.length<60;k++)p=p.parentElement;const live=[...document.querySelectorAll(\"[aria-live],[role=status],.toast\")].map(e=>e.textContent.trim()).filter(Boolean).slice(-4);return \"val=\"+i.value+\" | box=\"+(p?p.innerText.slice(0,500):\"\")+\" | live=\"+JSON.stringify(live)})()"
+},
+{
+"eval": "(()=>{APP.go(\"route\",\"pb_l_mvaqm59ejcs\");const g=[...document.querySelectorAll(\".rt-pt\")];const out=[];for(const k of [3,4,6]){const x=g[k];if(!x)continue;x.dispatchEvent(new MouseEvent(\"mouseenter\"));const t=document.querySelector(\".rt-tip\");out.push(k+\": \"+x.getAttribute(\"aria-label\")+\" || TIP: \"+(t?t.innerText.replace(/\\n/g,\" / \"):\"\"))}const T=document.getElementById(\"main\").innerText;const i=T.indexOf(\"اکنون:\");return g.length+\" pts\\n\"+T.slice(i,i+200)+\"\\n\"+out.join(\"\\n\")})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlvikwp8xk');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltmd22rp8');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.S.all(\"eprob\",r=>r&&r.live&&r.p)[0].p.id;const c=APP.liveClosure(pid);APP.go(\"lprob\",pid);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"در گفت‌وگو به نتیجه\");return JSON.stringify({sys:s.msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,330)),cl:c&&[c.state,c.label],card:i>=0?t.slice(i,i+300):\"no card\",preds:(s.coach&&s.coach.preds||[]).map(p=>[p.text.slice(0,50),p.p,p.out&&p.out.res]),due:DUE().slice(0,300)})})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltfogmmqb');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "JSON.stringify({t:APP.today(),fc:APP.S.all(\"fcast\",x=>1).map(x=>[(x.q||\"\").slice(0,50),x.p,x.due,x.outcome||null]),due:(APP.dueList()||[]).map(x=>x.txt.slice(0,120))})"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlswejwc1d');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return APP.today()+\"\\n\"+s.msgs.filter(m=>m.role!=\"ai\").slice(-10).map(m=>m.role[0]+\": \"+m.text.slice(0,230)).join(\"\\n\")+\"\\n--DUE\\n\"+DUE()})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt1b708vn');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{return (APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"say": "برای پردهٔ اتاقِ دیگر، اگر چین دو و نیم برابر باشد: ۱۸۰ × ۲٫۵ = ۴۰۰ سانت. نوه‌ام هم ۱۰ سالش است، تولدش ۳ مهر است."
+},
+{
+"eval": "APP.AGE.birth()+\" \"+APP.AGE.age()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlth3bs84d');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return DUE()})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltlw75232');try{CT('^کلِ گفت‌وگو')}catch(e){};return new Promise(r=>setTimeout(()=>{const t=document.getElementById('main').innerText;r(t.slice(Math.max(0,t.indexOf('📜'))))},700))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm59ejcs');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"سلام، خوش آمدید. این بار دقیق حساب می‌کنیم و حساب را خودتان پیش می‌برید. پیش از عددها: کلِ مسئله را در یک جمله و به زبانِ خودتان می‌گویید؟\", \"title\": \"پارچهٔ پردهٔ اتاقِ نوه\", \"memory\": \"خیاطِ بازنشسته؛ پرده برای پنجرهٔ ۱۸۰×۱۵۰، چینِ دو برابر، ۱۰ بالا و ۲۰ پایین، ۱۵ سجاف، توپِ ۱۴۰ سانتی؛ می‌خواهد دقیق حساب کند؛ پرسیدم کل را در یک جمله بگوید؛ با «شما».\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"۱۵ تیر\", \"age\": 81}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\", \"c\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"کل را روشن گفتید: چند متر بخرید که نه کم بیاید نه زیاد. حالا داده‌ها را جدا کنید: از عددهایی که دارید، کدام روی طولِ هر تکه اثر دارد و کدام روی تعدادِ تکه‌ها؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u0\", \"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"داده‌ها را درست دسته کردید: چهار عدد برای طولِ هر تکه، سه چیز برای تعدادِ تکه‌ها. مسئله را برای ثبت در «🔭 مسئله‌های من» فرستادم تا بعد هم ببینیدش. حالا شرط: کدام قیدها حتمی‌اند و کدام را می‌شود کمی جابه‌جا کرد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"پارچهٔ پردهٔ اتاقِ نوه\", \"statement\": \"پنجره ۱۸۰ سانت عرض و ۱۵۰ سانت ارتفاع دارد. پرده باید دو برابرِ عرضِ پنجره چین بخورد، از ۱۰ سانت بالای پنجره شروع شود و ۲۰ سانت پایین‌تر از پنجره تمام شود، و برای سجافِ بالا و پایین روی هم ۱۵ سانت اضافه می‌خواهد. توپِ پارچه ۱۴۰ سانت عرض دارد. چند متر پارچه بخرم؟\", \"nat\": \"practical\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [\"u2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"شرط‌ها را روشن گفتید و همه را حتمی دانستید: پوشاندنِ کلِ عرض با چینِ دو برابر، از ۱۰ سانت بالا تا ۲۰ سانت پایین، و سجاف. پیش‌تر مسئله‌ای شبیه این — در کارِ خودتان یا دیگران — دیده‌اید، و از آن چه به کار می‌آید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"c\"], \"ans\": [\"u3\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"تجربهٔ ملافه و رومیزی را به همین‌جا آوردید و حساب‌هایتان با حسابِ صفحه می‌خواند: ۳۶۰ سانت عرض، ۲٫۵۷ قواره، ۱۹۵ سانت طول، حدودِ ۵ متر. «۵ متر بس است» را من تأیید یا رد نمی‌کنم؛ یک گامش را خودتان وارسی کنید: ۲٫۵۷ قواره را چطور می‌بُرید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"result\"], \"result\": \"پس ۲٫۵۷ ضربدر ۱٫۹۵ می‌شود حدودِ ۵ متر. ۵ متر می‌خرم\", \"ans\": [\"p1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"plan\": {\"text\": \"اول طولِ هر تکه را درمی‌آوردم و بعد تعدادِ قواره را\", \"steps\": [\"عرضِ لازم با چین ۱۸۰ ضربدر ۲ می‌شود ۳۶۰ سانت\", \"۳۶۰ تقسیم بر ۱۴۰ می‌شود ۲ و خرده‌ای، یعنی ۲٫۵۷ قواره\", \"طولِ هر قواره ۱۵۰ + ۱۰ + ۲۰ + ۱۵ = ۱۹۵ سانت\", \"۲٫۵۷ ضربدر ۱٫۹۵ می‌شود حدودِ ۵ متر\"]}}]}",
+"{\"reply\": \"خودتان دیدید: قواره کسری ندارد، پس ۳ قواره؛ و حسابِ تازه‌تان با حسابِ صفحه می‌خواند — ۳ ضربدر ۱۹۵ می‌شود ۵۸۵ سانت، یعنی ۵ متر و ۸۵ سانت. پیش از خرید یک وارسی: با ۳ قواره کلِ عرضِ لازم با چین پوشیده می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"۳ ضربدر ۱۹۵ می‌شود ۵۸۵ سانت، یعنی ۵ متر و ۸۵ سانت. با ۵ متر کم می‌آوردم! ۶ متر می‌خرم\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"step\": {\"step\": 2, \"done\": \"yes\", \"what\": \"قواره کسری ندارد؛ به بالا گرد شد: ۳ قواره\", \"msg\": \"قواره را که نمی‌شود تکه‌تکه دوخت؛ هر قواره یک عرضِ کاملِ پارچه است. پس باید به بالا گرد کنم: ۳ قواره\"}}]}",
+"{\"reply\": \"وارسی‌تان روشن است: ۳ قواره ۴۲۰ سانت می‌دهد که از ۳۶۰ بیشتر است و ۲ قواره کم می‌آمد. تاریخِ تولدِ کامل را هم برای ثبت فرستادم. واحدها و ابعاد درست‌اند — اگر همه را با واحدِ دیگری بسنجید، رابطه درست می‌ماند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"1324/4/15\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"check\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"check\": {\"msgs\": [\"۳ قواره هر کدام ۱۴۰ سانت عرض دارد، روی هم ۴۲۰ سانت می‌شود که از ۳۶۰ بیشتر است؛ با ۲ قواره فقط ۲۸۰ سانت می‌شد که کم است\"]}, \"plan\": {\"text\": \"فردا صبح به بازار می‌روم و ۶ متر می‌خرم\", \"when\": \"2026-10-17\"}}]}",
+"{\"reply\": \"واحدها را هم وارسی کردید و پیش‌بینی‌تان را با درصدش گفتید: ۱۵ سانت اضافه، نود درصد. فردا پس از بریدن، همین را کنارِ آنچه شد می‌گذاریم. قاعدهٔ «قواره را به بالا گرد کن» را در چه حالتی آزموده‌اید — اگر عرضِ لازم درست مضربی از ۱۴۰ بود چه می‌گفت؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [\"b2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\"}]}",
+"{\"reply\": \"خریدید، بریدید و همان شد که پیش‌بینی کرده بودید: ۳ قواره و ۱۵ سانت اضافه؛ و پرده کلِ پنجره را می‌پوشاند — وارسی با خودِ واقعیت. حالا که کار تمام شد: از این حساب چه درسی برای کارهای بعدی برمی‌دارید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"۳ قواره درآمد و ۱۵ سانت اضافه ماند — درست همان که پیش‌بینی کرده بودم\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"plan_done\": {\"id\": \"pl2\", \"done\": true}}]}",
+"{\"reply\": \"درسِ خودتان روشن است: قواره کسری ندارد و تعدادش را باید به بالا گرد کرد، و هر عدد را با شرطِ اصلی — پوشاندنِ کلِ پنجره — وارسی کرد؛ و آن را به ملافه و رومیزی هم بردید. مسئله، وارسی، این درس، پرسشی که بیشتر کمکتان کرد و سلیقه‌تان را ثبت می‌کنم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"پارچهٔ پردهٔ اتاقِ نوه\", \"statement\": \"پنجره ۱۸۰ سانت عرض و ۱۵۰ سانت ارتفاع دارد. پرده باید دو برابرِ عرضِ پنجره چین بخورد، از ۱۰ سانت بالای پنجره شروع شود و ۲۰ سانت پایین‌تر از پنجره تمام شود، و برای سجافِ بالا و پایین روی هم ۱۵ سانت اضافه می‌خواهد. توپِ پارچه ۱۴۰ سانت عرض دارد. چند متر پارچه بخرم؟\", \"kind\": \"find\", \"lesson\": \"قواره کسری ندارد و تعدادِ قواره را همیشه باید به بالا گرد کرد، و هر عدد را با شرطِ اصلی، یعنی پوشاندنِ کلِ پنجره، وارسی کرد\", \"check\": \"۳ قواره درآمد و ۱۵ سانت اضافه ماند — درست همان که پیش‌بینی کرده بودم\", \"bestQ\": \"آن پرسشی که گفتید «۲٫۵۷ قواره را چطور می‌بُرید؟»\", \"taste\": \"این جور حساب‌ها را دوست دارم، مثلِ کارِ قدیمم است\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"شما\", \"taste\": {\"text\": \"این جور حساب‌ها را دوست دارم، مثلِ کارِ قدیمم است\"}}]}",
+"{\"reply\": \"ضربِ چینِ دو و نیم برابر را یک بار دیگر خودتان بزنید — ۱۸۰ را دو بار و نیم بشمارید، به چند می‌رسید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"l\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}"
+],
+"keys": [
+"سلام. من هشتاد و یک سالمه، تولدم ۱۵ تیره. خیاطِ بازنشسته‌ام. برای اتاقِ نوه‌ام پرده می‌دوزم. پنجره ۱۸۰ سانت عرض و ۱۵۰ سانت ارتفاع دارد. پرده باید دو برابرِ عرضِ پنجره چین بخورد، از ۱۰ سانت بالای پنجره شروع شود و ۲۰ سانت پایین‌تر از پنجره تم",
+"کلش این است: می‌خواهم بدانم برای یک پردهٔ چین‌دار که کلِ پنجره را بپوشاند چند متر پارچه بخرم که نه کم بیاید نه بی‌خود زیاد بخرم.",
+"ارتفاعِ پنجره و آن ۱۰ سانتِ بالا و ۲۰ سانتِ پایین و ۱۵ سانتِ سجاف روی طولِ هر تکه اثر دارند؛ عرضِ پنجره و چینِ دو برابر و عرضِ توپ روی تعدادِ تکه‌ها. این مسئله را در صفحهٔ مسئله‌هایم هم ثبت کنید که بعد ببینم.",
+"همه حتمی‌اند: پرده با چینِ دو برابر باید کلِ عرضِ پنجره را بپوشاند، از ۱۰ سانت بالای پنجره تا ۲۰ سانت پایینِ آن باشد، و سجافِ بالا و پایین هم باید باشد.",
+"بله، ملافه و رومیزی زیاد دوخته‌ام؛ آن‌جا هم اول طولِ هر تکه را درمی‌آوردم و بعد تعدادِ قواره را. همین‌جا هم همان کار را می‌کنم. حساب: عرضِ لازم با چین ۱۸۰ ضربدر ۲ می‌شود ۳۶۰ سانت. ۳۶۰ تقسیم بر ۱۴۰ می‌شود ۲ و خرده‌ای، یعنی ۲٫۵۷ قواره. طولِ ه",
+"نه، بس نیست! قواره را که نمی‌شود تکه‌تکه دوخت؛ هر قواره یک عرضِ کاملِ پارچه است. پس باید به بالا گرد کنم: ۳ قواره. ۳ ضربدر ۱۹۵ می‌شود ۵۸۵ سانت، یعنی ۵ متر و ۸۵ سانت. با ۵ متر کم می‌آوردم! ۶ متر می‌خرم که جای برش هم داشته باشد.",
+"بله: ۳ قواره هر کدام ۱۴۰ سانت عرض دارد، روی هم ۴۲۰ سانت می‌شود که از ۳۶۰ بیشتر است؛ با ۲ قواره فقط ۲۸۰ سانت می‌شد که کم است. پس ۳ قواره درست است. راستی تاریخِ تولدم را کامل بنویسم: متولدِ 1324/4/15 هستم. فردا صبح به بازار می‌روم و ۶ متر می‌",
+"واحدها را نگاه کردم: همه را به سانت نوشته‌ام و ۶ متر یعنی ۶۰۰ سانت؛ به متر هم همان درمی‌آید. فکر می‌کنم ۱۵ سانت اضافه بماند، چون ۶۰۰ منهای ۵۸۵ می‌شود ۱۵؛ نود درصد مطمئنم، مگر این‌که فروشنده کج ببُرد.",
+"سلام. امروز رفتم ۶ متر خریدم و بریدم: ۳ قواره درآمد و ۱۵ سانت اضافه ماند — درست همان که پیش‌بینی کرده بودم. پرده را هم دوختم؛ کلِ پنجره را می‌پوشاند و چینش هم خوب است.",
+"درسش این است که قواره کسری ندارد و تعدادِ قواره را همیشه باید به بالا گرد کرد، و هر عدد را با شرطِ اصلی، یعنی پوشاندنِ کلِ پنجره، وارسی کرد. همین را برای ملافه و رومیزی هم به کار می‌برم. آن پرسشی که گفتید «۲٫۵۷ قواره را چطور می‌بُرید؟» بیشت",
+"برای پردهٔ اتاقِ دیگر، اگر چین دو و نیم برابر باشد: ۱۸۰ × ۲٫۵ = ۴۰۰ سانت. نوه‌ام هم ۱۰ سالش است، تولدش ۳ مهر است."
+]
+}
