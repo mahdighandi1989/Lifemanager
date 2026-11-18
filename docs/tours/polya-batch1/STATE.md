@@ -360,3 +360,4 @@
 - 2026-11-18: container restart cut round 30 (A had 3 DONE, B/C/D 0). All four runners resumed from scenarios without DONE (half-done ones re-run from start).
 - 2026-11-18: round 30 group B DONE — 34 runs, 12 PASS, 0 S1, 8 S2 (r29: 32/11/1/13); r29 instances 33 FIXED / 7 CHANGED / 42 STILL; regressions B30·D1 (s12 strip register), B30·D3 (tB1 take-back of «نه»). Report T/reports/round30B_handback.md. Waiting on A, C, D.
 - 2026-11-18: round 30 group D DONE — 36 runs, 3 PASS, 0 S1 (r29: 2), S2 in 9 runs; regression D30-4 (s35 «نه، شنبه نه — یکشنبه» booked Saturday); corrections worse (D30-6..9), new families none (F2/F4/F6/F8/F17). Runner slip: one `pkill -P <own pid>` (children of its own batch only) — recorded. Report T/reports/round30D_handback.md. Waiting on A, C.
+- 2026-11-18: round 30 group A DONE — 21 runs, 1 PASS (aA3), 0 S1 (A29-1 ×3 fixed), 8 new S2 + 16 S3; A29 ids 18 FIXED / 2 CHANGED / 7 STILL. Report T/reports/round30A_handback.md. Waiting on C.
