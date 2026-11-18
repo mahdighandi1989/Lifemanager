@@ -31,7 +31,7 @@ const DIR = path.join(__dirname, 'fixtures', 'r30_arith');
     const B = blockOf(callFor(R, /۶۰۰ کم دارم/));
     chk(has(B, '✓ «۳ میلیون و ۱۰۰ هزار − ۲ میلیون و ۵۰۰ هزار = ۶۰۰ کم دارم» می‌خواند') && /✗ «۴ میلیون − ۳ میلیون و ۶۰۰ هزار» را «۵۰۰ می‌مونه» نوشته — حسابِ صفحه: ۴۰۰ هزار/.test(B)
       && has(B, '✓ «۱۲ − ۱۲ = هیچی نمی‌مونه» می‌خواند') && has(B, '✓ «۱۰ − ۶ = ۴ تا هم برای فردا می‌مونه» می‌خواند'), 'A_s06 p11 (A30-2): each remainder clause reaches the coach with its own verdict :: ' + B);
-    chk(dz(D, /۵۰۰ می‌مونه :: .*✗/).length && dz(D, /هیچی نمی‌مونه.*✓/).length && dz(D, /۴ تا هم برای فردا می‌مونه.*✓/).length && dz(D, /۶۰۰ کم دارم.*✓/).length,
+    chk(dz(D, /۵۰۰ می‌مونه.*✗/).length && dz(D, /هیچی نمی‌مونه.*✓/).length && dz(D, /۴ تا هم برای فردا می‌مونه.*✓/).length && dz(D, /۶۰۰ کم دارم.*✓/).length,
       'A_s06 📜 (A30-2): «۶۰۰ کم دارم» ✓, «۵۰۰ می‌مونه» ✗, «هیچی نمی‌مونه» ✓ and «۴ تا هم برای فردا» ✓ each have a 📜 line :: ' + JSON.stringify(dz(D, /کم دارم|می‌مونه/)));
   });
   await run('A_pA1', async (R, D) => {
@@ -71,7 +71,8 @@ const DIR = path.join(__dirname, 'fixtures', 'r30_arith');
     const B22 = blockOf(callFor(R, /۲ تا می‌مونه برای داداشم/)), B33 = blockOf(callFor(R, /۸ تا اضافه میاد/));
     chk(has(B22, '✓ «۸ + ۶ = ۱۴» می‌خواند') && !/۱۲۰۰|✗/.test(B22.replace(/نه ✓ و نه ✗/g, '').replace(/دربارهٔ «✗»/g, '')) && /— حسابِ «۲ تا می‌مونه» را صفحه نسنجیده/.test(B22), 'C_aC1 p22 (S1 C30-7, C180): «۲ تا می‌مونه» «؟ نسنجیده», never ✗ «۱۲۰۰ − ۱۴» :: ' + B22);
     chk(!/۲۰ − ۱۲/.test(B33) && /— حسابِ «۸ تا اضافه میاد» را صفحه نسنجیده/.test(B33), 'C_aC1 p33 (S1 C30-7, C180): «۸ تا اضافه میاد» «؟ نسنجیده», never ✓ «۲۰ − ۱۲» :: ' + B33);
-    chk(!dz(D, /۸ تا اضافه میاد/).some(l => /✓/.test(l)) && !dz(D, /۲ تا می‌مونه برای داداشم/).some(l => /✗/.test(l)), 'C_aC1 📜 (C30-7): no ✓ on «۸ تا اضافه میاد», no ✗ on «۲ تا می‌مونه» :: ' + JSON.stringify(dz(D, /اضافه میاد|برای داداشم/)));
+    chk(!D.some(l => /۲۰ − ۱۲|۱۲۰۰ − ۱۴/.test(l)) && dz(D, /؟ نسنجیده: «پس ۸ تا اضافه میاد»/).length && dz(D, /؟ نسنجیده: «۲ تا می‌مونه برای داداشم»/).length,
+      'C_aC1 📜 (C30-7): «۸ تا اضافه میاد» and «۲ تا می‌مونه» carry «؟ نسنجیده» beside the ✓ of their own sum/product; never «۲۰ − ۱۲» / «۱۲۰۰ − ۱۴» :: ' + JSON.stringify(dz(D, /اضافه میاد|برای داداشم/)));
     const B37 = blockOf(callFor(R, /۶ تا کم دارم/)), B38 = blockOf(callFor(R, /۱۲ تا کیک داشتیم/)), B39 = blockOf(callFor(R, /پول توجیبی/));
     chk(has(B37, '✓ «۲۰ − ۱۴ = ۶ تا کم دارم» می‌خواند') && /✗ «۳۰ − ۲۵» را «۶ تا کم میاد» نوشته/.test(B37), 'C_aC1 p37: «۶ تا کم دارم» ✓, «۶ تا کم میاد» ✗ :: ' + B37);
     chk(has(B38, '✓ «۱۲ − ۱۲ = هیچی نمی‌مونه» می‌خواند') && has(B38, '✓ «۱۴ − ۱۰ = ۴ تا هم برای فردا می‌مونه» می‌خواند'), 'C_aC1 p38 :: ' + B38);
@@ -90,9 +91,10 @@ const DIR = path.join(__dirname, 'fixtures', 'r30_arith');
     chk(/✗ «۳۰ − ۲۱» را «۸ متر اضافه میاد» نوشته/.test(B3) && has(B3, '✓ «نصفِ ۸۴ = ۴۲» می‌خواند'), 'D_tD3 p3: «۸ متر اضافه میاد» ✗ 9; «نصفش میشه ۴۲» ✓ (C189) :: ' + B3);
     chk(/✗ «۴۲ − ۳۵» را «۸ تا کم دارم» نوشته/.test(B7) && has(B7, '✓ «۶۰ − ۶۰ = هیچی نمی‌مونه» می‌خواند') && has(B7, '✓ «۱۴ − ۱۰ = ۴ تا هم برای فردا می‌مونه» می‌خواند'), 'D_tD3 p7 (D30-5): ✗ 7, ✓ 0, ✓ 4 :: ' + B7);
   });
-  await run('D_aD4', async (R) => {
-    const B = blockOf(callFor(R, /می‌مونه حدود ۵۹ و ۷ دهم/));
-    chk(/— حسابِ «می‌مونه حدود ۵۹ و ۷ دهم» را صفحه نسنجیده/.test(B) && !/✗/.test(B.replace(/نه ✓ و نه ✗/g, '').replace(/دربارهٔ «✗»/g, '')), 'D_aD4 p4 (D26-24): verb-first remainder never silent, never ✗ :: ' + B);
+  await run('D_aD4', async (R, D) => {
+    // این نوبت بلوکِ حسابِ مربی ندارد (مسیرِ دیگرِ همان پیام)؛ آنچه او می‌بیند 📜 است
+    const L = dz(D, /۵۹ و ۷ دهم/);
+    chk(L.some(l => /نسنجیده/.test(l)) && !L.some(l => /✗/.test(l)), 'D_aD4 p4 (D26-24): verb-first «می‌مونه حدود ۵۹ و ۷ دهم» is never silent in 📜 («؟ نسنجیده»), never ✗ :: ' + JSON.stringify(L));
   });
 
   console.log('replays: ' + JSON.stringify(res));
