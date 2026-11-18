@@ -18,11 +18,11 @@ const CASES = {
   // A28-14 (s04 p14): «اشتباه گفتم: ما ۵ نفر وارثیم نه ۴ نفر» ⇒ «داده به حرفِ خودت: «۵» (اصلاح شد ⇐ «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد برای هر»)»
   A_s04_p14: { fx: 'A_s04', upto: 104, name: 'A28-14 s04: the datum line names the smallest fragment «۴ ⇒ ۵», never the whole sentence; proposals stay exact (۲٫۷۵ ⇒ ۲٫۲، ۲۷۵۰ ⇒ ۲۲۰۰، ۲۷۵ ⇒ ۲۲۰)',
     base: '«داده به حرفِ خودت: «۵» (اصلاح شد ⇐ «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد برای هر»)»',
-    check: (x) => { const L = corrLines(x).pop() || ''; return { ok: /داده به حرفِ خودت: «۵(?: نفر)?» \(اصلاح شد ⇐ «۴(?: نفر)?»\)/.test(L) && !/اصلاح شد ⇐ «۱۱ میلیارد/.test(L) && /۲٫۷۵ ⇒ ۲٫۲/.test(L), got: L.slice(0, 500) }; } },
+    check: (x) => { const L = corrLines(x).pop() || ''; return { ok: /داده به حرفِ خودت: «۵(?: نفر)?» \(اصلاح شد ⇐ «۴(?: نفر)?»\)/.test(L) && !/اصلاح شد ⇐ «۱۱ میلیارد/.test(L) && /۲٫۷۵(?: میلیارد)? ⇒ ۲٫۲/.test(L) /* دورِ ۳۰ (B30·D8): به مقیاسِ خودش */, got: L.slice(0, 500) }; } },
   // A28-16 (s04 p19, no ledger): «آره، همون ۲٫۲ درسته» ⇒ no line, ۲٫۷۵ stayed stale (C68 only in the ledger)
   A_s04_p19: { fx: 'A_s04', upto: 133, name: 'A28-16 s04 (live problem, no ledger): accepting «۲٫۲» is a correction — one line names it and the dependants still stale (۲۷۵۰ ⇒ ۲۲۰۰، ۲۷۵ ⇒ ۲۲۰); the accepted value leaves the stale list',
     base: 'no page line; ۲٫۷۵ stays in «🕰 کهنه»',
-    check: (x) => { const L = x.sys[x.sys.length - 1] || ''; return { ok: /پذیرفتی — «۲٫۷۵ ⇒ ۲٫۲»/.test(L) && /۲۷۵۰ ⇒ ۲۲۰۰/.test(L) && !x.stale.some(z => near(z.v, 2.75)) && x.stale.some(z => near(z.v, 2750) && near(z.re, 2200)), got: { L: L.slice(0, 400), stale: x.stale } }; } },
+    check: (x) => { const L = x.sys[x.sys.length - 1] || ''; return { ok: /پذیرفتی — «۲٫۷۵(?: میلیارد)? ⇒ ۲٫۲(?: میلیارد)?»/.test(L) && /۲۷۵۰(?: میلیون)? ⇒ ۲۲۰۰/.test(L) /* دورِ ۳۰ (B30·D8): به مقیاسِ خودش */ && !x.stale.some(z => near(z.v, 2.75)) && x.stale.some(z => near(z.v, 2750) && near(z.re, 2200)), got: { L: L.slice(0, 400), stale: x.stale } }; } },
   // … منفی: «نه، ۲۲۰ نیست» چیزی را نمی‌پذیرد
   A_s04_neg: { fx: 'A_s04', upto: 136, name: 'A28-16 look-alike s04: «نه، ۲۲۰ نیست» accepts nothing; ۲۷۵ ⇒ ۲۲۰ stays',
     check: (x) => { const acc = x.sys.filter(t => /پذیرفتی/.test(t)); return { ok: acc.length === 1 && x.stale.some(z => near(z.v, 275) && near(z.re, 220)), got: { acc, stale: x.stale } }; } },
@@ -42,7 +42,7 @@ const CASES = {
   // D28-12 (tD1 p5): «۵ متر نیست، ۵٫۵ متره» ⇒ «۴ متر» replaced; proposals 20⇒27.5 …
   D_tD1_p5: { fx: 'D_tD1', upto: 7, name: 'D28-12 tD1: «۵ متر نیست، ۵٫۵ متره» changes the «۵ متر» she named — proposals ۲۰ ⇒ ۲۲ and ۳۰۰۰ ⇒ ۳۳۰۰; never ۲۷٫۵ / ۴۱۲۵ / «در ۵٫۵ متر»',
     base: '«… در ۵٫۵ متر …» (⇐ «… در ۴ متر …»); ۲۰ ⇒ ۲۷٫۵، ۳۰۰۰ ⇒ ۴۱۲۵',
-    check: (x) => { const L = corrLines(x).pop() || ''; return { ok: /۲۰ ⇒ ۲۲(?![٫\d۰-۹])/.test(L) && /۳۰۰۰ ⇒ ۳۳۰۰/.test(L) && !/۲۷٫۵|۴۱۲۵|در ۵٫۵ متر/.test(L), got: L.slice(0, 500) }; } },
+    check: (x) => { const L = corrLines(x).pop() || ''; return { ok: /۲۰ ⇒ ۲۲(?![٫\d۰-۹])/.test(L) && /۳۰۰۰(?: هزار)? ⇒ ۳۳۰۰/.test(L) /* دورِ ۳۰ (B30·D8) */ && !/۲۷٫۵|۴۱۲۵|در ۵٫۵ متر/.test(L), got: L.slice(0, 500) }; } },
   // D28-13 (tD1 p7): «آره، همون ۴۱۲۵ درسته» rewrote step 4 to «۲۷٫۵ × ۱۵۰ = ۴۱۲۵»
   D_tD1_p7: { fx: 'D_tD1', upto: 12, name: 'D28-13 tD1: no step is ever rewritten with the wrong base «۲۷٫۵ × ۱۵۰ = ۴۱۲۵»',
     base: 'step 4 «دستمزدِ نصب متری ۱۵۰ هزار: ۲۷٫۵ × ۱۵۰ = ۴۱۲۵ هزار تومن»',

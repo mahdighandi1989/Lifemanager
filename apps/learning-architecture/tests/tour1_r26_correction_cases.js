@@ -28,7 +28,7 @@ const CASES = {
   // U7 s19 c81: «عددهای حساب‌شده از «۱۶ هفته»: «۰٫۵، ۳٫۵» … (۰٫۵ ⇒ ≈ ۰٫۴۴، ۳٫۵ ⇒ ≈ ۳٫۴۴۴)» — ۳٫۵ اندازهٔ سنجیده است
   B_s19: { name: 'U7 s19 «۱۸ هفته … نه ۱۶»: the derived rate «نیم کیلو» IS stale (8 ÷ 18), the measured «۳٫۵ کیلو کم کردم» never is (no «⇒ ≈ ۳٫۴۴۴»)',
     check: (x) => { const p = x.probs.filter(q => /۱۸ هفته/.test(q.st))[0] || x.probs[0], L = lastCorr(x);
-      return { ok: !!p && p.stale.some(z => z.v === 0.5 && z.re != null && Math.abs(z.re - 8 / 18) < 1e-6) && !p.stale.some(z => z.v === 3.5) && !/۳٫۵|۳٫۴۴۴/.test(L) && /۰٫۵ ⇒ ≈ ۰٫۴۴/.test(L) && x.ev.filter(e => /۳٫۵ کیلو/.test(e.span)).every(e => !e.stale), got: { L: L.slice(0, 500), stale: p && p.stale.map(z => z.raw + '>' + z.re), ev: x.ev } }; } },
+      return { ok: !!p && p.stale.some(z => z.v === 0.5 && z.re != null && Math.abs(z.re - 8 / 18) < 1e-6) && !p.stale.some(z => z.v === 3.5) && !/۳٫۵|۳٫۴۴۴/.test(L) && /۰٫۵ ⇒ (?:۴ نهم )?≈ ۰٫۴۴/.test(L) /* دورِ ۳۰ (C161): کسرِ دقیق کنارِ ≈ */ && x.ev.filter(e => /۳٫۵ کیلو/.test(e.span)).every(e => !e.stale), got: { L: L.slice(0, 500), stale: p && p.stale.map(z => z.raw + '>' + z.re), ev: x.ev } }; } },
   // U31 (B26·D2) s16: پس از «۳۰ متره نه ۲۴» نوار همچنان «مانده: فقط بازنگریِ خودت — حل به نتیجه رسید»
   B_s16: { name: 'U31 s16 «حصار دورش ۳۰ متره نه ۲۴»: the strip no longer says a plain «حل به نتیجه رسید» for the result reached with 24', strip: true,
     check: (x) => ({ ok: !!x.sstrip && /نتیجه با عددِ پیشین به دست آمده بود/.test(x.stripText || '') && !/حل به نتیجه رسید/.test(x.stripText || ''), got: { sstrip: x.sstrip, strip: (x.stripText || '').slice(0, 300), sys: x.sys.slice(-1) } }) },
@@ -38,7 +38,7 @@ const CASES = {
       return { ok: /۹۸ ⇒ ۶۲/.test(L) && /۴۹ ⇒ ۳۱/.test(L) && /۱۰۰ ⇒ ۶۴/.test(L) && /۵۰ ⇒ ۳۲/.test(L) && /۴۸ ⇒ ۳۰/.test(L) && !p.dl.some(t => /۸×۸ \(۱۰۰/.test(t)) && !x.asks.some(q => /۸×۸ \(۱۰۰/.test(q.new)) && (p.dl.some(t => /۸×۸ \(۶۴ خانه\)/.test(t)) || x.asks.some(q => /۸×۸ \(۶۴ خانه\)/.test(q.new))), got: { L: L.slice(0, 500), dl: p.dl, asks: x.asks.map(q => q.label + '|' + q.new + '|' + q.state) } }; } },
   // B26·D4 class (aB3 p12): «کسری ۵.۷ میلیون …» پس از «حقوقم ۱۹ میلیونه» بی نشان ماند
   B_aB3: { name: 'B26·D4 aB3 «حقوقم ماهی ۱۸ نیست، ۱۹ میلیونه»: «۱۸ ضربدر ۱.۲ = ۲۱.۶» (⇒ 22.8) and the deficit «۵.۷» built on it (⇒ 4.5) are stale; her expense «۲۷.۳» is not',
-    check: (x) => { const p = x.probs[0], L = lastCorr(x); return { ok: /۲۱٫۶ ⇒ ۲۲٫۸/.test(L) && /۵٫۷ ⇒ ۴٫۵/.test(L) && !/۲۷٫۳ ⇒|۴٫۸ ⇒|۲۱ ⇒|۱٫۳ ⇒/.test(L), got: { L: L.slice(0, 900), stale: p && p.stale.map(z => z.k + ' ' + z.raw + '>' + z.re), ev: x.ev } }; } },
+    check: (x) => { const p = x.probs[0], L = lastCorr(x); return { ok: /۲۱٫۶ ⇒ ۲۲٫۸/.test(L) && /۵٫۷(?: میلیون)? ⇒ ۴٫۵/.test(L) /* دورِ ۳۰ (B30·D8): به مقیاسِ خودش */ && !/۲۷٫۳ ⇒|۴٫۸ ⇒|۲۱ ⇒|۱٫۳ ⇒/.test(L), got: { L: L.slice(0, 900), stale: p && p.stale.map(z => z.k + ' ' + z.raw + '>' + z.re), ev: x.ev } }; } },
   // U16 (B26·D29) oB1 p4: «چیزی برای عوض کردن نبود» در حالی که مجهولِ ثبت‌شده «… دو روز …» مانده
   B_oB1: { name: 'U16 oB1 «دو روز ⇒ سه روز»: never «چیزی برای عوض کردن نبود» while a record still holds «دو روز»', upto: 5,
     check: (x) => { const hold = J([x.story, Object.values((x.unk || {}))]), L = x.sys.slice(-2).join(' ‖ ');
@@ -46,7 +46,7 @@ const CASES = {
   /* ---------------- گروه‌های A، C، D (بازتولید روی BASE26 پیش از اصلاح) ---------------- */
   // A26-15 s04 p13: «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد» پس از «۵ نفر وارثیم نه ۴» کهنه نشان داده نشد
   A_s04: { name: 'A26-15 s04 «۵ نفر وارثیم نه ۴ نفر»: «۲٫۷۵ میلیارد» (⇒ 2.2) and the instalment built on it are stale; the house price «۱۱ میلیارد» and «۱۰ قسط» are not — and A25-9 s04 p7: the list index «۲.» is never stale',
-    check: (x) => { const L = lastCorr(x), A = x.sys.join(' ‖ '); return { ok: /۲٫۷۵ ⇒ ۲٫۲/.test(L) && !/۱۱ ⇒|۱۰ ⇒/.test(L) && !/«۲» — کهنه|۲ ⇒ ۲٫۷۵/.test(A), got: { L: L.slice(0, 700) } }; } },
+    check: (x) => { const L = lastCorr(x), A = x.sys.join(' ‖ '); return { ok: /۲٫۷۵(?: میلیارد)? ⇒ ۲٫۲/.test(L) /* دورِ ۳۰ (B30·D8): به مقیاسِ خودش */ && !/۱۱ ⇒|۱۰ ⇒/.test(L) && !/«۲» — کهنه|۲ ⇒ ۲٫۷۵/.test(A), got: { L: L.slice(0, 700) } }; } },
   // A26-15 s07: تفاضل‌های «۵، ۴، ۳، ۱» پس از ✏️ ِ قدها (۹⇒۸، ۱۶⇒۱۵) کهنه نشان داده نشدند
   // نکرده (گزارش‌شده، FIX26 «never silently skipped»): fixture ِ s07 نوبتِ ✏️ ِ قدها را ندارد (کنترلِ دونده در round26A/s07 آن را ضبط نکرد) ⇒ بازپخش به اصلاح نمی‌رسد؛ سازوکار (تفاضلِ نام‌برده) با بانکِ R26 #47 سنجیده است
   A_s07: { notDone: 'fixture lacks the runner ✏️ turn (9⇒8, 16⇒15) — not reproducible by replay; mechanism covered by bank R26 #47', name: 'A26-15 s07 ✏️ «۹⇒۸، ۱۶⇒۱۵»: each difference that touches an edited height is stale with the exact value (5 ⇒ 4, 4 ⇒ 5, 3 ⇒ 2, 1 ⇒ 2); her raw data are not',

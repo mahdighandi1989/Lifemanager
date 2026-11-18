@@ -3991,7 +3991,11 @@
   /* دورِ ۲۹ (D29-26 arD2 «چراغ ۱۵ متره» ⇒ «چراغ ۱۲ متر»): وقتی پیشین و تازه فقط در عدد فرق دارند (پسوندِ «ـه/است» جزوِ داده نیست) فقط رقم‌ها عوض می‌شوند — نقلِ او بیرون از عدد بایت‌به‌بایت */
   function numOnly29(o, n) { o = String(o); n = String(n); var D0 = /[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g, a = o.match(D0) || [], b = n.match(D0) || []; if (a.length !== 1 || b.length !== 1) return n;
     var cut = function (t, d) { return t.replace(d, "#").replace(/[\s‌]*[،,:؛.]+[\s‌]*$/, "").replace(/[\s‌]*(?:ـ?ه|است|هست|اند|ان)[\s‌]*$/, "").replace(/[\s‌]+/g, " ").trim(); };
-    return cut(o, a[0]) === cut(n, b[0]) ? o.replace(a[0], b[0]) : n; }
+    if (cut(o, a[0]) === cut(n, b[0])) return o.replace(a[0], b[0]);
+    /* دورِ ۳۰ (correction، C30-5/C142 «۱۸ تان» ⇐ «۱۶ تا میشن» ⇒ «دخترم ۱۶ تا میشن مهمون»): واژه‌های تازهٔ مقدارِ درست که فعل/رابطه‌اند («میشن»، «می‌خورن»، «تان»، «ـه») جزوِ مقدار نیستند —
+       فقط رقم عوض می‌شود؛ واژهٔ معنادارِ تازه («۱۶ تا بزرگسال») همان رفتارِ پیشین */
+    var W = function (t, d) { return cut(t, d).replace("#", " ").split(/[\s‌]+/).filter(Boolean); }, Wo = W(o, a[0]), extra = W(n, b[0]).filter(function (w) { return Wo.indexOf(w) < 0; });
+    return extra.length && extra.every(function (w) { return /^(?:می|نمی)/.test(w) || /^(?:تا|تان|تاست|است|هست|هستن|بود|بودن|شد|شدن|میشن|میشه|ه|ـه|ست|ان)$/.test(w); }) ? o.replace(a[0], b[0]) : n; }
   function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
   function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
   var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
@@ -4178,6 +4182,12 @@
   /* دورِ ۲۹ (R2 correction، C142؛ C29-13 s23 «یه اصلاحِ دیگه: هر کیک ۸ تیکه نمیشه، ۱۰ تیکه میشه» رد شد): «X نمیشه/نمیاد، Y میشه/میاد» (با عددِ تازه پس از ویرگول) و «یه اصلاحِ (دیگه):» هم اصلاح‌اند.
      منفی‌ها (بانکِ R29 #84، #91): «… نمیشه مساوی تقسیم کرد» (بی مقدارِ تازه) و «یه اصلاحِ دیگه هم بکنم؟» (بی دونقطه) اصلاح نیستند. */
   CORR20 = new RegExp(CORR20.source + "|(?:^|[\\s،,.:])(?:یه|یک)[\\s‌]*اصلاحِ?(?:[\\s‌]*(?:دیگه|دیگر|دیگهٔ?|کوچیک|کوچک))?[\\s‌]*[:：]|نمی[\\s‌]*(?:شه|شود|یاد|آید|اد)[\\s‌]*[،,][^.!؟?\\n]{0,40}?[0-9۰-۹][^.!؟?\\n]{0,30}?می[\\s‌]*(?:شه|شود|یاد|آید|اد)(?![آ-ی])");
+  /* دورِ ۳۰ (correction، F8 «یک خوانندهٔ اصلاح»؛ C30-5 «مهمونا ۱۸ تا نمیشن، ۱۶ تا میشن»، C30-3 «۲ تیکه نمی‌خورن، ۳ تیکه می‌خورن»): ریشه — C142 فقط صورت‌های «نمیشه/نمیاد» را
+     نام برده بود و هر صرفِ دیگرِ همان قالب (جمع، فعلِ دیگر، بی «می») بیرون می‌ماند. قالبِ کلی: فعلِ منفی، ویرگول، عددِ تازه، و **همان** فعل مثبت («نمی‌X…، N … می‌X…» / «نX…، N … X…»)
+     — یک قاعده برای همهٔ صرف‌ها؛ عددِ پیشین در بندِ منفی است. منفی‌ها: بی عددِ پیشین («سارا نمیاد، ۴ نفر میان»)، بی عددِ تازه پس از ویرگول، یا فعلِ دیگری در بندِ دوم («۲ تا نمی‌خورن، ۳ تا رو می‌برن») اصلاح نیست. */
+  var CORR_PAIR30 = /[0-9۰-۹][^.!؟?\n،,]{0,30}?(?:^|[\s‌])ن(?:می[\s‌]*)?(?<v30>[آ-ی]{1,6}?)(?:ن|ند|ه|د|م|یم|ی|ید|ست)?[\s‌]*[،,][^.!؟?\n]{0,40}?[0-9۰-۹][^.!؟?\n]{0,30}?(?:^|[\s‌])(?:می[\s‌]*)?\k<v30>(?:ن|ند|ه|د|م|یم|ی|ید|ست)?(?![آ-ی])/;
+  AS.CORR_PAIR30 = CORR_PAIR30;
+  CORR20 = new RegExp(CORR20.source + "|" + CORR_PAIR30.source);
   AS.CORR_RE20 = CORR20;
   /* دلیلِ رد به زبانِ ساده (سطرِ سامانه برای خودش) */
   function plainErr20(e) { e = String(e || "");
@@ -4263,6 +4273,9 @@
     /* دورِ ۲۸ (R2، C88؛ D28-12 tD1 «۵ متر نیست، ۵٫۵ متره» بی old ِ مدل ⇒ «۴ متر» جایگزین شد): عددی که خودش نام برد («X نیست، Y» / «Y نه X») مقدارِ پیشین است —
        اگر در آن پیام نیست، صفحه می‌پرسد کدام عدد (هرگز عددِ دیگری از همان جمله) */
     for (var j = 0; j <= M.indexOf(src); j++) if (M[j] && M[j].role === "user") n++;
+    /* دورِ ۳۰ (correction — یک خواننده؛ C30-5 «۱۸ تان» ⇐ «۱۶ تا میشن»): مقدارِ درستی که همان تکه است با فعل/رابطهٔ جملهٔ اصلاح («میشن»، «می‌خورن»، «ـه») همان تکه با رقمِ تازه است —
+       فعلِ جملهٔ اصلاح به متنِ صورت/رکورد نمی‌رود («دخترم ۱۶ تا میشن مهمون») */
+    try { var nf30 = numOnly29(txtOf(x.old).trim() || frag, fix); if (nf30 !== fix && (nf30.match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []).length === 1) fix = nf30; } catch (e30) { }
     return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, key: key, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um), edit: edit, rests: A.liveRestsOf ? A.liveRestsOf(x.rests) : null, srcSess: xsS ? xsS.id : "" };
   }
   AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
@@ -4372,6 +4385,9 @@
     /* دورِ ۲۸ (R2، C88): عبارتِ عددیِ کامل («۲ میلیون و ۳۰۰» ⇐ «۲ میلیون و ۵۰۰») همان کوچک‌ترین تکه است — نه «… و ۳۰۰» */
     var NP28 = function (t) { var w = String(t || "").trim().split(/\s+/); return w.length > 1 && w.length <= 7 && w.every(function (x) { return /^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(x) || /^(?:و|هزار|میلیون|میلیارد)$/.test(x); }); };
     if (NP28(o) && NP28(n)) return label + ": «" + String(n).trim() + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + String(o).trim() + "»" + (extraO || "") + ")";
+    /* دورِ ۳۰ (tail D26-43، C55 «سرخط تغییر را دقیق می‌گوید»؛ s36 «حدس: «۲۸ میشه ۱۴٪. پس» (اصلاح شد ⇐ «پس»)»): تکه‌ای که تکهٔ پیشینش درونِ تکهٔ تازه‌اش است همترازیِ نادرست است
+       (واژهٔ مشترکِ «پس» دو تکه ساخت) — آن وقت یک پنجره از نخستین تا واپسین واژهٔ متفاوت نشان داده می‌شود (winDiff23)، نه تکه‌های بریده */
+    if (d.runs.length > 1 && d.runs.some(function (r) { var ro = String(r.o || "").trim(), rn = String(r.n || "").trim(); return !ro || !rn || (" " + rn + " ").indexOf(" " + ro + " ") >= 0 || (" " + ro + " ").indexOf(" " + rn + " ") >= 0; })) { var w30 = winDiff23(o, n); return label + ": «" + w30.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + w30.o + "»" + (extraO || "") + ")"; }
     if (d.runs.length > 1) return label + ": " + d.runs.slice(0, 4).map(function (r) { return "«" + r.n + "» (اصلاح شد ⇐ «" + r.o + "»)"; }).join("، ") + (extraN || "");
     /* دورِ ۲۳ (Q4، A23-30 «صورتِ مسئلهٔ گفت‌وگو: «۱۲» (اصلاح شد ⇐ «۱۰»)»): تکهٔ تنهای عددی یا بسیار کوتاه با واژهٔ پیرامونش نشان داده می‌شود */
     if (d.runs.length === 1 && /^[^\s]{1,8}$/.test(d.o) && /^[^\s]{1,8}$/.test(d.n) && /[0-9۰-۹]/.test(d.o + d.n) && String(o || "").split(/\s+/).length > 2) { var w23 = winDiff23(plainTx(String(o)).replace(/\s+/g, " ").trim(), plainTx(String(n)).replace(/\s+/g, " ").trim()); return label + ": «" + w23.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + w23.o + "»" + (extraO || "") + ")"; }
@@ -4575,7 +4591,12 @@
     /* صورتِ مسئلهٔ گفت‌وگو و مجهول به حرفِ خودش — فقط همان تکه (بی جایگزینیِ کلِ متن با مقدارِ درست) */
     /* دورِ ۲۹ (R2 correction، C142؛ بانکِ R29 #62 «نه ببخشید، ۵ نفریم نه ۴»؛ A29-14 s04): اصلاحِ دومِ همان داده پیامِ اصلاحِ اول را نشانه می‌گیرد — صورتی که آن اصلاح نوشت (stmtHist.by) هم پیرو است */
     var stBy29 = (C.stmtHist || []).some(function (h) { return h && h.by && h.by === R.srcId; });
-    if (C.stmt && (hasFrag(R.src.text, String(C.stmt).slice(0, 40)) || stBy29) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
+    /* دورِ ۳۰ (tail D26-50، C88 «درست کردنِ یک نتیجه هرگز داده را عوض نمی‌کند»؛ dp2 «پس طوفان ۷۳۴۴ متر دور بوده؟» ⇒ صورت «… طوفان ۲۰۴۰ متر …»): وقتی آنچه او درست کرد جواب/نتیجهٔ خودش است
+       (what = ans/result) و هر جای مقدارِ پیشین در صورتِ گفت‌وگو جایگاهِ حاصل دارد (پس از «میشه/پس/=…» — همان خوانندهٔ موتورِ کهنگی، A.liveAnn25)، صورت همان نوشتهٔ اوست و دست نمی‌خورد؛
+       نتیجه در ثبتِ خودش (حدس/دفتر) درست می‌شود. دادهٔ صورت («۶ ثانیه»، «۱۲۲۴») هرگز با این راه عوض نمی‌شد. */
+    var res30 = false; try { if (C.stmt && /^(?:ans|result|res|answer)$/i.test(String(R.what || "")) && A.liveAnn25) { var ov30 = (A.liveNumOccs ? A.liveNumOccs(String((D21 && D21.o) || R.frag || "")) : []).map(function (x) { return x.v; });
+        var AO30 = A.liveAnn25(C.stmt).filter(function (x) { return ov30.some(function (v) { return Math.abs(v - x.v) < 1e-9; }); }); res30 = AO30.length > 0 && AO30.every(function (x) { return x.mark && !x.opnd; }); } } catch (e30) { res30 = false; }
+    if (C.stmt && !res30 && (hasFrag(R.src.text, String(C.stmt).slice(0, 40)) || stBy29) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
       /* دورِ ۲۳ (Q4، B·D4 s19): جایگزینیِ درجایی که ترتیبِ واژه‌ها را وارونه می‌کند («عروسی ۱۵ اسفنده برادرم مونده») نه — صورتِ گفت‌وگو همان می‌ماند و جملهٔ اصلاحِ خودش کنارش */
       if (sv != null && sv !== C.stmt && D21 && A.liveGrowGarble && A.liveGrowGarble(C.stmt, D21)) { var fs23 = (A.liveFragSent ? A.liveFragSent(ownText(cu), R.fix) : "") || R.fix; sv = String(C.stmt).replace(/[\s.!]+$/, "") + " (اصلاحِ خودم: " + String(fs23).trim().replace(/[.!]+$/, "") + ")."; }
       if (sv != null && sv !== C.stmt) { var stP = false; try { stP = !AS.notProblem(C.stmt) && (/[؟?0-9۰-۹=]/.test(C.stmt) || qToks(C.stmt).length >= 6) && (/[0-9۰-۹=+\-−×÷^√]/.test(R.frag + " " + R.fix) || qToks(R.frag).length >= 6 || R.what === "fact" || R.what === "ans"); } catch (e) { }
@@ -4701,7 +4722,7 @@
     if (!Object.keys(pids).length && !R.edit && typeof A.liveRetractSessApply === "function") { try { var ls22 = A.liveRetractSessApply(s.id, R.srcId, { frag: R.frag, fix: R.fix, old: R.old, key: R.key || "", cur: cu });
       (ls22.changed || []).forEach(function (c) { var o0 = typeof c.old === "string" ? c.old : "", n0 = typeof c["new"] === "string" ? c["new"] : ""; chS.push({ rec: String(c.label || c.rec || "رکورد"), old: clip(plainTx(o0), 160), "new": clip(plainTx(n0), 160), why: !String(c.why || "").trim() || /^اصلاح شد ⇐ «/.test(String(c.why)) ? why23 : String(c.why) }); ch.push(o0 || n0 ? chLine20(String(c.label || c.rec || "رکورد"), o0, n0) : String(c.label || "")); }); } catch (e) { console.warn(e); } }
     /* دورِ ۲۶ (Q2، C26-37 s23 p6 «یعنی ۱۰۰ دقیقه»، بانکِ R26 #52): مسئلهٔ گفت‌وگو (بی رکوردِ زنده) هم فهرستِ «عددهای حساب‌شده از …» ِ خودش را دارد — همان موتور، روی نوشته‌های همین سشن */
-    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId, cm: R.curId || "", mAt: (R.src && R.src.at) || "", cAt: (R.cur && R.cur.at) || "" });   // دورِ ۲۹ (C89/C142): پیامِ اصلاح‌کننده و زمان‌ها برای ثبتِ اصلاح
+    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId, cm: R.curId || "", cur30: (R.cur && R.cur.text) || "", mAt: (R.src && R.src.at) || "", cAt: (R.cur && R.cur.at) || "" });   // دورِ ۲۹ (C89/C142): پیامِ اصلاح‌کننده و زمان‌ها برای ثبتِ اصلاح
       if (ss26 && !chS.some(function (c) { return c.rec === ss26.label; })) { chS.push({ rec: ss26.label, old: ss26.old, "new": ss26["new"], why: ss26.why }); ch.push(ss26.label + ": «" + ss26.old + "» — " + ss26["new"]); } } catch (e) { console.warn(e); } }
     /* دفترِ کارها: خودِ اصلاح یک کارِ تاریخ‌دار است (برای پرونده و کارنامه) */
     C.acts20 = (C.acts20 || []).concat([{ at: nowIso(), kind: "correction", sess: s.id, msg: R.curId, from: R.srcId, key: R.key || R.what, old: clip(R.frag, 160), "new": clip(R.fix, 160), changed: ch.length, edit: !!R.edit }]).slice(-80);

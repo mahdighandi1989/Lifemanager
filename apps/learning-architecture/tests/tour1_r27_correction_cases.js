@@ -39,7 +39,7 @@ const CASES = {
   C_pwC1: { fx: 'C_pwC1', upto: 54, name: 'C27-26 pwC1 correction + question (C48): applied, «۱۲ × ۴٫۵ = ۵۴» ⇒ ۶۰ exactly; her written chain «با پمپ ۳۸ میلیون میشه ۹۲، با لوله‌کشی ۲۳ میشه ۱۱۵» follows exactly (۹۸، ۱۲۱); «۴٫۵» never read as containing «۵»',
     base: '«این اصلاح انجام نشد: این پیام پرسش بود، نه اصلاح»',
     check: (x) => { const L = lastCorr(x);
-      return { ok: /اصلاح شد/.test(L) && !/پرسش بود|انجام نشد|فرقی نداشت/.test(L) && /۵۴ ⇒ ۶۰/.test(L) && /۹۲ ⇒ ۹۸/.test(L) && /۱۱۵ ⇒ ۱۲۱/.test(L) && !/۱۲ ⇒/.test(L) && !x.refused, got: { L: L.slice(0, 600), refused: x.refused } }; } },
+      return { ok: /اصلاح شد/.test(L) && !/پرسش بود|انجام نشد|فرقی نداشت/.test(L) && /۵۴(?: میلیون)? ⇒ ۶۰/.test(L) /* دورِ ۳۰ (B30·D8): به مقیاسِ خودش */ && /۹۲ ⇒ ۹۸/.test(L) && /۱۱۵ ⇒ ۱۲۱/.test(L) && !/۱۲ ⇒/.test(L) && !x.refused, got: { L: L.slice(0, 600), refused: x.refused } }; } },
   // D27-24 (s37 ✏️ «۴ ⇒ ۵، ۴۴۵۷۶ ⇒ ۵۴۵۷۶»): «۱۸ ⇒ ۱۴٫۴، ۷۲ ⇒ ۷۱» — ۱۸ جمعِ رقم‌های ۹۴۵۷۲ (هم‌رقمیِ «۴» در «۴+۵+۷+۲»)، ۷۲ از «بر ۴»
   D_s37: { fx: 'D_s37', upto: 41, name: 'D27-24 s37 ✏️: the digits she left untouched in the same bubble («۴+۵+۷+۲=۱۸», «بر ۴») are not the edited digit — no «۱۸ ⇒ …», no «۷۲ ⇒ ۷۱», no invented number at all',
     base: '«۱۸ ⇒ ۱۴٫۴، ۷۲ ⇒ ۷۱»',
