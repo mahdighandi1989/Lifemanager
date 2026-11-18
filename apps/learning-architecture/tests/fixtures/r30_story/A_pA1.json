@@ -1,0 +1,632 @@
+{
+"from": "round30A/pA1",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام. معلممون یه سؤال داده: ثابت کنید برای هر عددِ اولِ p بزرگ‌تر از ۳، عددِ p^2 − 1 بر ۲۴ بخش‌پذیره. امتحان کردم: p=5 ⇒ ۲۴، p=7 ⇒ ۴۸، p=11 ⇒ ۱۲۰. همه‌ش درمیاد ولی نمی‌دونم چطور ثابتش کنم.",
+"c": 1
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='2010-04-18';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()",
+"c": 2
+},
+{
+"say": "آره، ثبتش کن. می‌خوام قدم به قدم برم.",
+"c": 3
+},
+{
+"eval": "(()=>{F(\"lpOne\",\"می‌خوام ثابت کنم مربعِ هر عددِ اولِ بزرگ‌تر از ۳ منهای یک همیشه بر ۲۴ بخش‌پذیره.\");F(\"lpWhy\",\"تکلیفِ ریاضیه و می‌خوام بفهمم چرا همیشه درمیاد، نه فقط برای چند عدد.\");return C(\".lp-onesave\")+\" \"+TT()})()",
+"c": 4
+},
+{
+"eval": "(()=>{F(\"lpUnk\",\"عددِ p^2 − 1 بر ۲۴ بخش‌پذیر است\");F(\"lpD_d1\",\"p عددِ اول است\");F(\"lpD_d2\",\"p بزرگ‌تر از ۳ است\");F(\"lpCond\",\"p^2 − 1 بر ۸ بخش‌پذیر است\\np^2 − 1 بر ۳ بخش‌پذیر است\");F(\"lpRel\",\"اول و بزرگ‌تر از ۳ بودن یعنی p فرد است و بر ۳ بخش‌پذیر نیست\");S(\"lpSuff\",\"کافی است\");F(\"lpSuffW\",\"برای p=2 و p=3 درنمیاد، پس شرطِ بزرگ‌تر از ۳ لازمه؛ با همین دو فرض فکر کنم کافیه\");F(\"lpGuess\",\"حکم درسته؛ برای همهٔ اول‌های بزرگ‌تر از ۳ درمیاد\");S(\"lpConf\",\"80\");F(\"lpTest\",\"p=13 رو هم امتحان کنم: ۱۶۸ = ۲۴ × ۷؛ اگه یه اولی پیدا بشه که درنیاد، رد میشه\");S(\"lpIfRef\",\"حدس را کنار می‌گذارم یا اصلاحش می‌کنم\");S(\"lpGWant\",\"yes\");return C(\".lp-usave\")+\" \"+TT()})()",
+"c": 5
+},
+{
+"eval": "(()=>{F(\"lpGContra\",\"یه عددِ اولِ بزرگ‌تر از ۳ که p^2 − 1 ـش بر ۲۴ بخش‌پذیر نباشه\");const sw=document.getElementById(\"lpSoftWhy\");if(sw)F(\"lpSoftWhy\",\"«بر ۲۴ بخش‌پذیره» فقط حکمِ مسئله است که نوشتم، نه دلیل؛ دلیلش رو هنوز ندارم\");let r=C(\".lp-usave\");return r+\" \"+TT()})()",
+"c": 6
+},
+{
+"eval": "(()=>{const sw=document.getElementById(\"lpSoftWhy\");if(sw&&!sw.value){F(\"lpSoftWhy\",\"«بر ۲۴ بخش‌پذیره» فقط حکمِ مسئله است که نوشتم، نه دلیل؛ دلیلش رو هنوز ندارم\");return C(\".lp-usave\")+\" \"+TT()}return \"nosoft\"})()",
+"c": 7
+},
+{
+"say": "کارتِ فهم رو پر کردم: باید نشون بدم p^2 − 1 هم بر ۸ بخش‌پذیره هم بر ۳. ولی با خودِ p^2 − 1 نمی‌دونم چی کار کنم؛ p^2 رو که نمی‌شه کاریش کرد، منهای یک هم که هست… گیر کردم.",
+"c": 8
+},
+{
+"eval": "(()=>{C(\".sv-g2\");return TT()})()",
+"c": 9
+},
+{
+"say": "p^2 − 1 یعنی یه عدد ضربدر خودش منهای یک. مثلاً ۲۵ − ۱ = ۲۴ و ۴۹ − ۱ = ۴۸. ولی نمی‌دونم چطوری اینو یه جور دیگه بنویسم که بخش‌پذیریش معلوم بشه. هیچی به ذهنم نمی‌رسه.",
+"c": 10
+},
+{
+"say": "لم؟ نمی‌دونم… از اتحادها فقط (a+b)^2 = a^2 + 2ab + b^2 یادمه. ولی اینجا منهاست و توان دو فقط روی p ـه، یک که توان نداره. نمی‌دونم ربطش چیه.",
+"c": 11
+},
+{
+"eval": "APP.liveAll().map(r=>r.p.id).join(\" \")",
+"c": 12
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');return 'ok'})()",
+"c": 13
+},
+{
+"eval": "APP.go('lprob','pb_l_mvaqm01yxcq')",
+"c": 14
+},
+{
+"say": "x² − 9؟ نه… شاید (x−3)^2؟ نه، اون می‌شه x² − 6x + 9. نمی‌دونم، این رو بلد نیستم.",
+"c": 15
+},
+{
+"say": "y² − 16 = (y − 4)(y − 4)؟",
+"c": 16
+},
+{
+"say": "m² − 1 = (m − 1)(m + 1). یکی منها، یکی به‌اضافه! پس p² − 1 هم همینه: (p − 1)(p + 1).",
+"c": 17
+},
+{
+"eval": "APP.liveAll().map(r=>r.p.id).join(\" \")",
+"c": 18
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;const i=t.indexOf('اکنون:');return t.slice(i,i+900)})()",
+"c": 19
+},
+{
+"eval": "(()=>{const g=[...document.querySelectorAll('.rt-pt')];const x=g[4];if(!x)return 'NO PT of '+g.length;x.dispatchEvent(new MouseEvent('mouseenter'));const t=document.querySelector('.rt-tip');t&&t.scrollIntoView({block:'center'});return g.length+' pts | '+x.getAttribute('aria-label')+' || TIP: '+(t?t.innerText:'')})()",
+"c": 20
+},
+{
+"eval": "APP.go('lprob','pb_l_mvaqm01yxcq')",
+"c": 21
+},
+{
+"say": "p فرده، پس p − 1 و p + 1 دو تا عددِ زوجِ پشتِ سرِ هم‌اند؛ یکی‌شون حتماً بر ۴ بخش‌پذیره و اون یکی بر ۲، پس ضربشون بر ۸. برای ۳: از سه عددِ پشتِ سرِ هم p − 1، p، p + 1 یکی بر ۳ بخش‌پذیره؛ p نیست چون اوله و بزرگ‌تر از ۳، پس یکی از p − 1 یا p + 1. ۸ و ۳ هم‌اول‌اند، پس بر ۲۴! ثابت شد؟",
+"c": 22
+},
+{
+"say": "آره: از دو زوجِ پشتِ سرِ هم، یکی از دو تا ضربِ ۴ ـه چون زوج‌ها یکی در میون مضربِ ۴ ان (۲، ۴، ۶، ۸…). برای p=۵: ۴ و ۶؛ p=۷: ۶ و ۸. همه درسته. الان «✅ حل شد» رو می‌زنم.",
+"c": 23
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.className+\"|\"+b.innerText.slice(0,40)).filter(x=>/حل شد|اثبات|بازنگری/.test(x));return b.join(\" ;; \")})()",
+"c": 24
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.className+\"|\"+b.innerText.slice(0,40)).filter(x=>/حل شد|اثبات|بازنگری/.test(x));return b.join(\" ;; \")})()",
+"c": 25
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm01yxcq\");return APP.state.sub+\" | \"+MT(\"❔\",400)+\"\\n\"+BL().split(\" | \").filter(x=>/lp-/.test(x)).join(\" | \")})()",
+"c": 26
+},
+{
+"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvaqm01yxcq\",\"plan\");return FL().split(\"\\n\").filter(x=>/^lp/.test(x)&&!/GK/.test(x)).join(\"\\n\").slice(0,2000)+\"\\nBTN:\"+BL().split(\" | \").filter(x=>/^lp|sv/.test(x)).join(\" | \")})()",
+"c": 27
+},
+{
+"eval": "(()=>{F(\"lpPlan\",\"نخست p^2 − 1 را به (p − 1)(p + 1) تجزیه می‌کنم (اتحادِ مزدوج که خودم ساختم)، سپس بخش‌پذیری بر ۸ را از دو زوجِ پشت‌سرهم و بر ۳ را از سه عددِ پشت‌سرهم نشان می‌دهم.\");S(\"lpPU_a_d1\",\"use\");F(\"lpPU_w_d1\",\"چون p اول است بر ۳ بخش‌پذیر نیست، پس p − 1 یا p + 1 بر ۳ می‌رود\");S(\"lpPU_a_d2\",\"use\");F(\"lpPU_w_d2\",\"بزرگ‌تر از ۳ یعنی p فرد است و خودِ ۳ نیست\");S(\"lpMv\",\"mv_decompose\");F(\"lpMvWhy\",\"حکم را به بر ۸ و بر ۳ شکستم\");C(\".lp-mvadd\");const r=C(\".lp-plansave\");return r+\" \"+TT()+\" | sub=\"+APP.state.sub})()",
+"c": 28
+},
+{
+"eval": "FL().split(\"\\n\").filter(x=>/^lp/.test(x)&&!/GK/.test(x)).join(\"\\n\").slice(0,1800)+\"\\nBTN:\"+BL().split(\" | \").filter(x=>/^lp/.test(x)).join(\" | \")",
+"c": 29
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const st=[[\"p^2 − 1 = (p − 1)(p + 1)\",\"با باز کردنِ (p − 1)(p + 1) = p^2 + p − p − 1 = p^2 − 1\",\"اتحادِ مزدوج که با ضربِ جمله‌به‌جمله ساختم\",[]],[\"(p − 1)(p + 1) بر ۸ بخش‌پذیر است\",\"p فرد است پس p − 1 و p + 1 دو زوجِ پشت‌سرهم‌اند؛ یکی از آن‌ها بر ۴ می‌رود و دیگری بر ۲، پس حاصل‌ضرب بر ۸\",\"p بزرگ‌تر از ۳ و اول ⇒ فرد\",[\"lpSD_d2\",\"lpSC_0\"]],[\"(p − 1)(p + 1) بر ۳ بخش‌پذیر است و پس بر ۲۴\",\"از سه عددِ پشت‌سرهمِ p − 1، p، p + 1 یکی بر ۳ می‌رود؛ p اول و بزرگ‌تر از ۳ است پس بر ۳ نمی‌رود؛ ۸ و ۳ نسبت به هم اول‌اند\",\"p اول است\",[\"lpSD_d1\",\"lpSC_1\"]]];const out=[];for(const s of st){F(\"lpStep\",s[0]);S(\"lpClear\",\"بله\");F(\"lpProof\",s[1]);F(\"lpPrem\",s[2]);for(const id of s[3]){const e=document.getElementById(id);if(e&&!e.checked)e.click();}out.push(C(\".lp-stepsave\")+\":\"+TT());await w(400);}return out.join(\" || \")})()",
+"c": 30
+},
+{
+"eval": "(()=>{C(\".lp-solved\");return TT()+\" | sub=\"+APP.state.sub+\"\\n\"+FL(\"lpB\").split(\"\\n\").slice(0,30).join(\"\\n\")})()",
+"c": 31
+},
+{
+"eval": "[...document.getElementById(\"lpBBest\").options].map(o=>o.value+\"=\"+o.textContent.slice(0,110)).join(\"\\n\")",
+"c": 32
+},
+{
+"eval": "(()=>{S(\"lpBWant\",\"same\");F(\"lpBChk\",\"با p=13 وارسی کردم: ۱۶۸ = ۱۲ × ۱۴ و ۱۶۸ = ۲۴ × ۷\");S(\"lpBRes\",\"نتیجه سالم ماند\");S(\"lpBCP_0\",\"yes\");S(\"lpBCP_1\",\"yes\");F(\"lpBOther\",\"شاید با باقی‌ماندهٔ p بر ۶ (۱ یا ۵) هم بشه\");F(\"lpBGlance\",\"p^2 − 1 = (p − 1)(p + 1): دو زوجِ پشت‌سرهم ⇒ بر ۸، یکی از سه عددِ پشت‌سرهم ⇒ بر ۳\");F(\"lpBWorked\",\"وقتی اتحاد رو بلد نبودم، با ضربِ جمله‌به‌جمله خودم ساختمش؛ از این به بعد هر جا مربعی منهای مربعی دیدم تجزیه‌اش می‌کنم\");S(\"lpBEquiv\",\"no\");S(\"lpBHyp\",\"all\");S(\"lpBConcl\",\"same\");F(\"lpBDef\",\"«بخش‌پذیر بر ۲۴» یعنی ۲۴ عاملِ آن است؛ از ۸ × ۳ و اول بودنِ ۸ و ۳ نسبت به هم استفاده کردم\");S(\"lpBBest\",\"chat:6\");F(\"lpBUse\",\"تجزیهٔ a^2 − b^2 به (a − b)(a + b) رو جاهای دیگه هم به کار می‌برم، مثلاً برای ۹۹ × ۱۰۱\");F(\"lpBTaste\",\"بخشی که اتحاد رو خودم ساختم رو دوست داشتم؛ گیر کردنِ طولانی رو نه\");S(\"lpBHit\",\"درست بود\");const b=document.querySelector(\".lp-lbsave\");if(b)b.click();return TT()+\" | \"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm01yxcq\"))})()",
+"c": 33
+},
+{
+"eval": "[...document.getElementById(\"lpBRes\").options].map(o=>o.value+\"=\"+o.textContent).join(\" | \")+\" VAL=\"+document.getElementById(\"lpBRes\").value+\" | \"+FL(\"lpBDef|lpBRet|lpBTo\")",
+"c": 34
+},
+{
+"eval": "(()=>{F(\"lpBDef\",\"\");const b=document.querySelector(\".lp-lbsave\");b.click();return TT()+\" | \"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm01yxcq\").label)})()",
+"c": 35
+},
+{
+"eval": "[\"lpBEquiv\",\"lpBHyp\",\"lpBConcl\"].map(id=>id+\": \"+[...document.getElementById(id).options].map(o=>o.value+\"=\"+o.textContent).join(\" | \")).join(\"\\n\")",
+"c": 36
+},
+{
+"eval": "(()=>{S(\"lpBEquiv\",\"eq\");F(\"lpBDef\",\"«بخش‌پذیر بر ۲۴» یعنی ۲۴ عاملِ آن است؛ از ۸ × ۳ و اول بودنِ ۸ و ۳ نسبت به هم استفاده کردم\");const b=document.querySelector(\".lp-lbsave\");b.click();return TT()+\" | \"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm01yxcq\").label)})()",
+"c": 37
+},
+{
+"eval": "FL(\"lpBUse|lpBTaste|lpBHit|lpBBest|lpBNew$|lpBWorked|lpBChk\")",
+"c": 38
+},
+{
+"eval": "(()=>{S(\"lpBBest\",\"chat:6\");F(\"lpBUse\",\"تجزیهٔ a^2 − b^2 به (a − b)(a + b) رو جاهای دیگه هم به کار می‌برم، مثلاً برای حسابِ ذهنیِ ۹۹ × ۱۰۱\");F(\"lpBTaste\",\"بخشی که اتحاد رو خودم ساختم رو دوست داشتم؛ گیر کردنِ طولانی رو نه\");S(\"lpBHit\",\"درست بود\");F(\"lpBNew\",\"ثابت کن برای هر عددِ فردِ n، عددِ n^2 − 1 بر ۸ بخش‌پذیره\");const ns=document.getElementById(\"lpBNewS\");if(ns)S(\"lpBNewS\",\"method\");F(\"lpBNewW\",\"همون تجزیهٔ (n − 1)(n + 1) و دو زوجِ پشت‌سرهم\");const b=document.querySelector(\".lp-lbsave\");b.click();return TT()+\" | \"+JSON.stringify(APP.liveClosure(\"pb_l_mvaqm01yxcq\").label)})()",
+"c": 39
+},
+{
+"eval": "[...document.getElementById(\"lpBBest\").options].map(o=>o.value+\"=\"+o.textContent.slice(0,160)).join(\"\\n\")+\"\\nUSE=\"+document.getElementById(\"lpBUse\").value.slice(0,60)+\"\\nTASTE=\"+document.getElementById(\"lpBTaste\").value.slice(0,60)+\"\\nNEW=\"+document.getElementById(\"lpBNew\").value.slice(0,60)",
+"c": 40
+},
+{
+"eval": "(()=>{S(\"lpBBest\",\"chat:4\");F(\"lpBTaste\",\"این‌که وسطِ کار معلوم شد دقیقاً چی بلد نیستم و همون رو یاد گرفتم و برگشتم رو دوست داشتم؛ گیر کردنِ اولش رو نه\");F(\"lpBWorked\",\"وقتی گفتم بلد نیستم، اسمِ دقیقِ چیزی که کم داشتم گفته شد و با شکلِ مربعِ بریده یادش گرفتم؛ دفعهٔ بعد زودتر می‌گم کجا رو بلد نیستم\");const b=document.querySelector(\".lp-lbsave\");b.click();return TT()+\" | \"+JSON.stringify(APP.liveClosure(APP.liveAll()[0].p.id).label)})()",
+"c": 41
+},
+{
+"eval": "(()=>{APP.go(\"prereq\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"تجزیهٔ تفاضل\");return t.slice(Math.max(0,i-600),i+900)})()",
+"c": 42
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 43
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"طرح‌ریزی\\t\");const j=t.indexOf(\"علتِ هر گیر\");return t.slice(i,i+1200)+\"\\n----\\n\"+t.slice(j,j+1500)})()",
+"c": 44
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 45
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 46
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 47
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 48
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 49
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 50
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 51
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 52
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 53
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 54
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 55
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltdsmwnxc');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 56
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 57
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 58
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 59
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t})()",
+"c": 60
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t})()",
+"c": 61
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 62
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 63
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 64
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 65
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 66
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt42171ih');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 67
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 68
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 69
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 70
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t})()",
+"c": 71
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t})()",
+"c": 72
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 73
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 74
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 75
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 76
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 77
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqm1uqij9te');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 78
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 79
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 80
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 81
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t})()",
+"c": 82
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t})()",
+"c": 83
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 84
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({age:APP.AGE.age(),reg:s.coach&&s.coach.reg,sys:s.msgs.filter(m=>m.role==\"sys\").map(m=>m.text.slice(0,130))})})()",
+"c": 85
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 86
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 87
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 88
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 89
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltlz5h3se');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 90
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 91
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 92
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 93
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t})()",
+"c": 94
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t})()",
+"c": 95
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 96
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 97
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 98
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 99
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 100
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlswsyklxu');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 101
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 102
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 103
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 104
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t})()",
+"c": 105
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t})()",
+"c": 106
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 107
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 108
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 109
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 110
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 111
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt5uln73h');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 112
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 113
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 114
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 115
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t})()",
+"c": 116
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t})()",
+"c": 117
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 118
+},
+{
+"say": "برای خودم چند تا دیگه هم امتحان کردم: ۵² − ۱ = ۲۴، ۷² − ۱ = ۴۸ و ۹² − ۱ = ۸۱؛ همه بر ۸ بخش‌پذیرن. (n − 1)(n + 1) هم همون n² − 1 ـه.",
+"c": 119
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 120
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 121
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 122
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 123
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlti5evvnu');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 124
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 125
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 126
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 127
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t})()",
+"c": 128
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t})()",
+"c": 129
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 130
+},
+{
+"say": "آره ۸۰ میشه. یکی دیگه: ۱۱² − ۱ = ۱۲۰ و ۱۲۰ ÷ ۸ = ۱۵، هیچی نمی‌مونه. ۸۰ ÷ ۸ = ۱۰ و ۲ تا می‌مونه.",
+"c": 131
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 132
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 133
+},
+{
+"c": 134
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 135
+},
+{
+"c": 136
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 137
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsz1oxsz6');try{CT('^کلِ گفت‌وگو')}catch(e){};return new Promise(r=>setTimeout(()=>{const t=document.getElementById('main').innerText;r(t.slice(Math.max(0,t.indexOf('📜'))))},700))})()",
+"c": 138
+},
+{
+"c": 139
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 140
+},
+{
+"c": 141
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 142
+},
+{
+"c": 143
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 144
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm01yxcq');const t=document.getElementById('main').innerText;return t})()",
+"c": 145
+},
+{
+"c": 146
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqoheeyqd');const t=document.getElementById('main').innerText;return t})()",
+"c": 147
+},
+{
+"c": 148
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 149
+},
+{
+"c": 150
+},
+{
+"c": 151,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"این‌که برای $p=5$، $7$ و $11$ درمی‌آید حدس را محتمل‌تر می‌کند، ولی هنوز برهان نیست. اگر بخواهی قدم‌به‌قدم بری، می‌شود آن را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت کرد. چرا برای هر حالت — در حالت‌هایی که امتحان کردی، کدام ویژگیِ p کار را درست کرد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"ثبتش می‌کنم؛ صفحه‌اش باز می‌شود و قدم‌به‌قدم همان‌جا جلو می‌رویم. سه حالتی که امتحان کردی درست درآمد — گامِ بعدیِ تو چیست، و پیش از برداشتنش فکر می‌کنی چه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"p^2 − 1 بر ۲۴ برای هر اولِ بزرگ‌تر از ۳\", \"statement\": \"ثابت کنید برای هر عددِ اولِ p بزرگ‌تر از ۳، عددِ p^2 − 1 بر ۲۴ بخش‌پذیره.\", \"nat\": \"objective\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"این‌که حکم را به «بر ۸» و «بر ۳» شکستی گامِ خوبی است. گامِ بعدیِ تو چیست، و پیش از برداشتنش فکر می‌کنی چه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"c\"], \"ans\": [\"u3\"], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"نمونه‌های ۲۴ و ۴۸ را خودت درآوردی. از حکم به عقب برو: حکمِ ساده‌تری (لم) می‌شناسی که بخش‌پذیریِ p^2 − 1 از آن لازم بیاید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"این‌که ببینی (a+b)² این‌جا جور درنمی‌آید درست است — این گام چیزِ دیگری لازم دارد: «تجزیهٔ تفاضلِ دو مربع»، یعنی نوشتنِ یک «مربع منهای مربع» به شکلِ ضربِ دو پرانتز؛ گامی که آن را می‌خواهد نوشتنِ p² − 1 به شکلِ ضرب است تا بخش‌پذیری‌اش دیده شود. اول یک وارسیِ کوتاه: x² − 9 را می‌توانی به شکلِ ضربِ دو پرانتز بنویسی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq\": {\"concept\": \"تجزیهٔ تفاضلِ دو مربع\", \"step\": \"نوشتنِ p² − 1 به شکلِ ضرب تا بخش‌پذیری بر ۸ و ۳ دیده شود\", \"quote\": \"از اتحادها فقط (a+b)^2 = a^2 + 2ab + b^2 یادمه\", \"q\": \"x² − 9 را می‌توانی به شکلِ ضربِ دو پرانتز بنویسی؟\", \"topic\": \"اتحادهای جبری\"}}]}",
+"{\"reply\": \"درست دیدی که $(x-3)^2$ نیست. این همان «تجزیهٔ تفاضلِ دو مربع» است: هر «مربع منهای مربع» برابر است با (تفاضل)×(مجموع)، یعنی $a^2-b^2=(a-b)(a+b)$. مثال: $25-9=16$ و $(5-3)(5+3)=2\\\\times8=16$. حالا خودت امتحان کن: $y^2-16$ را به شکلِ ضربِ دو پرانتز بنویس.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"missing\", \"quote\": \"این رو بلد نیستم\"}}]}",
+"{\"reply\": \"نزدیک بودی، ولی $(y-4)(y-4)$ همان $(y-4)^2$ است که $-8y$ هم دارد. از راهِ شکل ببین: یک مربعِ $y\\\\times y$ را در نظر بگیر و از گوشه‌اش مربعِ $4\\\\times4$ را ببُر؛ باقی‌مانده را می‌شود به یک مستطیل با ضلع‌های $(y-4)$ و $(y+4)$ چید — یکی تفاضل، یکی مجموع. یک امتحانِ تازه: $m^2-1$ را به شکلِ ضربِ دو پرانتز بنویس.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq1\", \"mastery\": \"no\", \"quote\": \"y² − 16 = (y − 4)(y − 4)؟\"}}]}",
+"{\"reply\": \"درست: $m^2-1=(m-1)(m+1)$ — و خودت همان را روی مسئله هم به کار بردی. برگردیم به مسئلهٔ اصلی (p² − 1 بر ۲۴ برای هر اولِ بزرگ‌تر از ۳)، گامِ «نوشتنِ p² − 1 به شکلِ ضرب تا بخش‌پذیری بر ۸ و ۳ دیده شود»: آن را برداشتی، $p^2-1=(p-1)(p+1)$. حالا از فرض: وقتی p اول و بزرگ‌تر از ۳ است، $p-1$ و $p+1$ چه جور عددهایی‌اند که بخش‌پذیری بر ۸ را نشان بدهند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq1\", \"mastery\": \"yes\", \"quote\": \"m² − 1 = (m − 1)(m + 1)\"}, \"learned\": {\"concept\": \"تجزیهٔ تفاضلِ دو مربع\", \"quote\": \"یکی منها، یکی به‌اضافه!\"}}]}",
+"{\"reply\": \"برهانت را خودت ساختی: $(p-1)(p+1)$ با دو زوجِ پشتِ سرِ هم بر ۸، و با سه عددِ پشتِ سرِ هم بر ۳. «ثابت شد» را من نمی‌گویم — هر گام را خودت وارسی کن: روشن می‌بینی که «یکی از دو زوجِ پشتِ سرِ هم بر ۴ بخش‌پذیر است» برای هر p درست است؟ (بعد در صفحه «✅ حل شد» و بازنگری.)\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"result\"], \"result\": \"پس بر ۲۴\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"وارسیِ خودت روشن است: زوج‌ها یکی در میان مضربِ ۴ اند، و نمونه‌های p=۵ و p=۷ هم جور درآمد. «✅ حل شد» را خودت در صفحه بزن؛ بازنگریِ صفحه با تو جلو می‌رود.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"check\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"check\": {\"msgs\": [\"از دو زوجِ پشتِ سرِ هم، یکی از دو تا ضربِ ۴ ـه چون زوج‌ها یکی در میون مضربِ ۴ ان\"]}}]}",
+"{\"reply\": \"۵² − ۱ و ۷² − ۱ درست‌اند؛ ۹² − ۱ را یک بار دیگر خودت حساب کن. اگر درستش را بیابی، باز هم بر ۸ بخش‌پذیر است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"l\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۱۲۰ و ۱۵ درست‌اند. «۸۰ ÷ ۸ = ۱۰ و ۲ تا می‌مونه» را دوباره ببین. حالا با تجزیهٔ (n − 1)(n + 1) می‌توانی بگویی چرا برای هر عددِ فرد بر ۸ بخش‌پذیر است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"سلام. معلممون یه سؤال داده: ثابت کنید برای هر عددِ اولِ p بزرگ‌تر از ۳، عددِ p^2 − 1 بر ۲۴ بخش‌پذیره. امتحان کردم: p=5 ⇒ ۲۴، p=7 ⇒ ۴۸، p=11 ⇒ ۱۲۰. همه‌ش درمیاد ولی نمی‌دونم چطور ثابتش کنم.",
+"آره، ثبتش کن. می‌خوام قدم به قدم برم.",
+"کارتِ فهم رو پر کردم: باید نشون بدم p^2 − 1 هم بر ۸ بخش‌پذیره هم بر ۳. ولی با خودِ p^2 − 1 نمی‌دونم چی کار کنم؛ p^2 رو که نمی‌شه کاریش کرد، منهای یک هم که هست… گیر کردم.",
+"p^2 − 1 یعنی یه عدد ضربدر خودش منهای یک. مثلاً ۲۵ − ۱ = ۲۴ و ۴۹ − ۱ = ۴۸. ولی نمی‌دونم چطوری اینو یه جور دیگه بنویسم که بخش‌پذیریش معلوم بشه. هیچی به ذهنم نمی‌رسه.",
+"لم؟ نمی‌دونم… از اتحادها فقط (a+b)^2 = a^2 + 2ab + b^2 یادمه. ولی اینجا منهاست و توان دو فقط روی p ـه، یک که توان نداره. نمی‌دونم ربطش چیه.",
+"x² − 9؟ نه… شاید (x−3)^2؟ نه، اون می‌شه x² − 6x + 9. نمی‌دونم، این رو بلد نیستم.",
+"y² − 16 = (y − 4)(y − 4)؟",
+"m² − 1 = (m − 1)(m + 1). یکی منها، یکی به‌اضافه! پس p² − 1 هم همینه: (p − 1)(p + 1).",
+"p فرده، پس p − 1 و p + 1 دو تا عددِ زوجِ پشتِ سرِ هم‌اند؛ یکی‌شون حتماً بر ۴ بخش‌پذیره و اون یکی بر ۲، پس ضربشون بر ۸. برای ۳: از سه عددِ پشتِ سرِ هم p − 1، p، p + 1 یکی بر ۳ بخش‌پذیره؛ p نیست چون اوله و بزرگ‌تر از ۳، پس یکی از p − 1 یا p +",
+"آره: از دو زوجِ پشتِ سرِ هم، یکی از دو تا ضربِ ۴ ـه چون زوج‌ها یکی در میون مضربِ ۴ ان (۲، ۴، ۶، ۸…). برای p=۵: ۴ و ۶؛ p=۷: ۶ و ۸. همه درسته. الان «✅ حل شد» رو می‌زنم.",
+"برای خودم چند تا دیگه هم امتحان کردم: ۵² − ۱ = ۲۴، ۷² − ۱ = ۴۸ و ۹² − ۱ = ۸۱؛ همه بر ۸ بخش‌پذیرن. (n − 1)(n + 1) هم همون n² − 1 ـه.",
+"آره ۸۰ میشه. یکی دیگه: ۱۱² − ۱ = ۱۲۰ و ۱۲۰ ÷ ۸ = ۱۵، هیچی نمی‌مونه. ۸۰ ÷ ۸ = ۱۰ و ۲ تا می‌مونه."
+]
+}

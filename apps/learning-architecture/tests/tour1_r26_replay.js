@@ -60,6 +60,7 @@ async function replay(browser, name, opt) {
       if (cmd.reload) { await boot(); await settle(); }
     } catch (e) { r = 'ERR ' + String(e.message || e).slice(0, 300); }
     await sync(); log.push({ c: c + 1, k: Object.keys(cmd).join('+'), r: typeof r === 'string' ? r.slice(0, 200) : '' });
+    if (opt.after) { try { await opt.after(p, c + 1, cmd, calls); } catch (e) { } }   // دورِ ۳۰ (C179): بازپخشِ کلِ سناریو — عکسِ هر نوبت
   }
   /* نوبتِ تازه با جوابِ دلخواه (برای بدلِ منفیِ همان سناریو) */
   const turn = async (text, reply) => { extra.push(typeof reply === 'string' ? reply : JSON.stringify(Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, reply || {}))); const n0 = calls.length;

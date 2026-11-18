@@ -60743,7 +60743,10 @@ APP.goFromURL = function (q) {
       .map(function (x) { return txt(x).replace(/[.،,]+$/, ""); }).filter(function (x) { return toks(x).length >= 1 && x.length >= 2; }).slice(0, 8);
   };
   ST.planPieces = planPieces; ST.dataOf = dataOf; ST.condOf = condOf;
-  function sentences(t) { return String(t || "").split(/(?<=[.؟?…]|(?<![A-Za-z)])!)\s+|\n+/).map(txt).filter(Boolean); }   // دورِ ۲۵ (classify P6، A25-12-b): «n! حداکثر …» یک جمله است
+  /* دورِ ۳۰ (story F15، A30-8 s03 p17–p19): «…» ِ درونِ یک رشتهٔ حساب («۱ + ۲ + … + ۲۰ = ۲۱۰») پایانِ جمله نیست — پیش‌تر جمله از آن‌جا می‌شکست، 📜 تکه‌های
+     «+ ۲۰ = ۲۱۰ و ۱ + ۲ + …» را «نسنجیده» می‌زد و ✗ ِ «۱ + … + ۱۰ = ۵۰» (که موتور و مربی دیدند) در نمای او نبود. «…» فقط وقتی میانِ دو عملگر/عدد ِ یک رشته است
+     نمی‌شکند؛ «… ۲۲ … هیچی جور نمیشه» (پیش و پسش واژه) همان پایانِ جمله می‌ماند (هم‌شکلِ منفی، s08 p1). */
+  function sentences(t) { return String(t || "").split(/(?<=[.؟?]|(?<![+\-−×÷*\/=,،]\s*)…(?!\s*[+\-−×÷*\/=])|(?<![A-Za-z)])!)\s+|\n+/).map(txt).filter(Boolean); }   // دورِ ۲۵ (classify P6، A25-12-b): «n! حداکثر …» یک جمله است
   /* مجهول به حرفِ خودش: جمله‌ای از پیامش که بیشترین هم‌واژگی را با صورتِ همین مسئله دارد — نه جملهٔ کناری («ولی خب، ۵ منهای ۳ چرا نمیشه؟»)؛ بی صورت ⇒ همان unkPhrase ِ a27 */
   /* دورِ ۲۴ (R2، C24-11، D24-12): مجهول هرگز پرسشِ متا دربارهٔ سامانه/دستیار («… از کجا آوردی؟ یه قاعده‌ست تو سامانه؟»)، تلاش/طرح («فکر کردم دورش سه تا مثلث…»)،
      کمبودِ دانسته («مساحتِ مثلث رو نمی‌دونم») یا ترتیبِ کار («اول می‌خوام بفهمم…») نیست. نشانهٔ صریحِ مجهول («دنبالِ اینم که…»، «می‌خوام بدونم…»، «یعنی: …») مقدم است؛
@@ -60756,7 +60759,19 @@ APP.goFromURL = function (q) {
      برچسبِ خودِ او («مجهول:»، «داده‌ها:»، «شرط:») خوانده نمی‌شد — «مجهول:» با دونقطه نشانهٔ مجهول نبود و جمله‌ای که بیشترین واژهٔ مشترک با صورت داشت (همان «داده‌ها») برنده می‌شد.
      جملهٔ برچسب‌خوردهٔ «داده/شرط/فرض» هرگز مجهول نیست؛ «مجهول: X» خودِ X است. */
   var LABELD26 = /^\s*(?:داده(?:‌ها)?|شرط(?:‌ها)?|فرض(?:‌ها)?|معلوم(?:‌ها)?)\s*[:：]/;
-  function unkOf(t, stmt, whole) {
+  /* دورِ ۳۰ (story، D25-8 — هشت اجرای oD1*): مقصدِ 🧭 خودِ جملهٔ او بود، با برچسبِ آغازینش و فعلِ خواستن: «یه جمله: می‌خوام بدونم «مادرم قرصِ امروزش رو برداشته
+     یا نه»، فقط از روی وزنِ قرص‌دون، بی دوربین». ریشه: unkOf جملهٔ نشانه‌دار (UNKMARK24) را همان‌طور برمی‌گرداند — برچسبی که جوابِ پرسشِ خودِ صفحه است
+     («کلِ مسئله را در یک جمله…» ⇐ «یه جمله: …») و «می‌خوام بدونم» که نشانهٔ مجهول است نه خودِ مجهول، در مقصد می‌ماندند. حالا هستهٔ مجهول:
+       • برچسبِ کوتاهِ آغازِ جمله («یه جمله:»، «خلاصه:»، «مجهول:» — تا سه واژه، بی عدد) برداشته می‌شود؛
+       • «می‌خوام بدونم/بفهمم/ببینم «X»» ⇒ خودِ X (نقلِ داخلِ گیومه همان چیزی است که می‌خواهد بداند)؛ قیدهای پس از آن («فقط از روی وزن، بی دوربین») شرط‌اند و جدا ثبت می‌شوند.
+     هم‌شکلِ منفی (C136): جمله‌ای بی برچسب و بی گیومه («می‌خوام بدونم چند تا بخرم») همان می‌ماند؛ «داده‌ها: …»/«شرط: …» هرگز مجهول نبود و نیست (LABELD26). */
+  var ULBL30 = /^\s*((?:[^\s:：«»0-9۰-۹]+\s*){1,3})[:：]\s+/, UQ30 = /می[‌\s]?خوا(?:م|هم|یم)\s*(?:بدونم|بدانم|ببینم|بفهمم|بدونیم|بفهمیم)\s*(?:که\s*)?«([^»]{4,})»/;
+  function unkCore30(x) { var t = txt(x), m = ULBL30.exec(t); if (m && toks(t.slice(m[0].length)).length >= 1) t = t.slice(m[0].length);
+    var q = UQ30.exec(t); if (q && toks(q[1]).length >= 2) t = txt(q[1]); return t; }
+  ST.unkCore30 = unkCore30;
+  function unkOf(t, stmt, whole) { var u = unkOfR29(t, stmt, whole); return u ? unkCore30(u) : u; }
+  ST.unkOf30 = unkOf; ST.unkOfR29 = function (t, stmt, whole) { return unkOfR29(t, stmt, whole); };   // ST.unkOfR29: نسخهٔ پیشین (برای سنجشِ هم‌شکل‌ها)
+  function unkOfR29(t, stmt, whole) {
     var Qs = (String(t || "").match(/«[^»]{6,}»/g) || []).map(function (x) { return txt(x.slice(1, -1)); });
     var base = toks(stmt), S0 = sentences(t).concat(Qs).map(function (x) { return x.replace(/^(?:یعنی|پس|خب|خوب|آره|بله)\s*[:：،]?\s*/, ""); }).filter(function (x) { return toks(x).length >= 2 && !(whole && nz(whole).indexOf(nz(x)) >= 0) && !WHOLE_RE.test(" " + x) && !METAQ24.test(x) && !NOTUNK24.test(x) && !LABELD26.test(x); });
     var mk = S0.filter(function (x) { return UNKMARK24.test(x); })[0] || sentences(t).filter(function (x) { return OWNQ_S24.test(x) && !METAQ24.test(x); }).pop(); if (mk) return mk.replace(/^\s*مجهول(?:م|ش|مون)?\s*[:：]\s*/, "").replace(/[.!…]+$/, "");   // پرسشِ اول‌شخصِ خودش («چند تا بخرم؟») هم نشانهٔ مجهول است
@@ -60995,7 +61010,21 @@ APP.goFromURL = function (q) {
   var REM29 = /[0-9۰-۹][0-9۰-۹.٫,٬\/]*(?:\s+[^\s0-9۰-۹،,.]+){0,3}?\s+(?:(?:کم|اضافه|زیاد)\s*(?:میاد|می[‌\s]?آد|می[‌\s]?آید|میاره|می[‌\s]?مونه)|(?:باقی\s*)?می[‌\s]?مونه|(?:باقی\s*)?میمونه)(?![آ-ی])/;
   function clauseSpans29(q) { var o = [], re = /[،؛;!؟?\n]|\.(?![0-9۰-۹])|,\s/g, m, a = 0; while ((m = re.exec(q))) { o.push({ a: a, b: m.index }); a = m.index + m[0].length; } o.push({ a: a, b: q.length });
     return o.map(function (x) { var t = q.slice(x.a, x.b), l = t.length - t.replace(/^\s+/, "").length; return { a: x.a + l, b: x.a + txt(t).length + l, t: txt(t) }; }).filter(function (x) { return x.t && /[0-9۰-۹]/.test(x.t); }); }
-  function claim29(t) { if (/[؟?]\s*$/.test(t)) return false; if (REM29.test(t)) return true; var m = CLM29.exec(t); if (!m) return false; var pre = t.slice(0, m.index); return /[0-9۰-۹]/.test(pre) || OPW29.test(" " + pre); }
+  /* دورِ ۳۰ (story F15، C30-1 s24 p2 «a_1 = 1، a_2 = 2، a_3 = 4»؛ A30-9 s03 p17 «اگه 2x + 3 = 11 باشه x = 4»، p18 «دستورِ n(n+1)/2 = ۵۰۵۰»): «=» ای که سمتِ چپش متغیر دارد
+     (حرفِ لاتینِ تک — a_2، x، 2x، n(n+1)) تعریف یا معادله است، نه ادعای حسابیِ عددی — پیش‌تر رقمِ زیرنویس («a_2») یا ضریب («2x») پیش از «=» آن را «ادعای حساب» می‌کرد و
+     📜 «؟ نسنجیده» می‌زد، درحالی‌که دفترِ کارِ پیشین همان بند را ✓ داشت (دو داور، C139). حالا بندی که همهٔ «=» هایش چنین‌اند ادعا نیست؛ سنجشِ موتور (ck) اگر چیزی خواند
+     همان می‌ماند (این دروازه فقط «نسنجیده» ِ الگو را برمی‌دارد). هم‌شکلِ منفی (C136): «۲۰ m × ۳ = ۶۰» (واحد پس از عدد و فاصله) و «π × ۲² = ۱۲٫۵۶» ادعای حساب‌اند. */
+  var VAR30 = /(?:^|[^A-Za-z])(?:[A-Za-z](?:_\(?[0-9A-Za-z+\-−]+\)?|\([^()]{0,12}\))?)(?![A-Za-z])/;
+  function algebra30(t) { var T = String(t || ""), parts = T.split("="); if (parts.length < 2) return false;
+    for (var i = 0; i < parts.length - 1; i++) { var lhs = parts[i].split(/[،,:؛]|\s(?:و|اگه|اگر|پس|یعنی|که)\s/).pop().replace(/[0-9۰-۹][0-9۰-۹.٫]*\s+[A-Za-z]{1,3}(?![A-Za-z])/g, " 0").replace(/\(mod[^)]*\)/g, " ");
+      if (!VAR30.test(lhs)) return false;
+      /* سمتِ راست یک جمله‌ی ساده است (عدد یا نامِ متغیر): «a_2 = 2»، «x = 4»، «n(n+1)/2 = ۵۰۵۰»؛ اتحادِ نمادینِ چندجمله‌ای («[n/2^k] = a_k + 2a_{k+1} + …») ادعاست و «نسنجیده» اش (C107) می‌ماند */
+      var rhs30 = parts[i + 1].split(/[،,:؛]|\s(?:و|با|اگه|اگر|پس|یعنی|که|باشه|باشد)\s/)[0], noNum30 = function (x) { return !/[0-9۰-۹]/.test(String(x).replace(/_\{[^}]*\}|_\([^)]*\)|_[0-9A-Za-z۰-۹]+/g, "")); };
+      if (noNum30(lhs) && noNum30(rhs30) && VAR30.test(rhs30)) continue;   // رابطهٔ تعریفی میانِ نام‌ها («a_n = a_(n−1) + a_(n−2) + a_(n−3)») — هیچ عددی برای سنجیدن ندارد
+      if (!/^\s*[\-−]?(?:[0-9۰-۹][0-9۰-۹.٫]*|[A-Za-z](?:_\(?[0-9A-Za-z+\-−]+\)?)?)(?!\s*[+\-−×÷*\/^²³√(\[])(?:\s|$|[،,.؛])/.test(parts[i + 1])) return false; }
+    return true; }
+  ST.algebra30 = algebra30;
+  function claim29(t) { if (/[؟?]\s*$/.test(t)) return false; if (REM29.test(t)) return true; var m = CLM29.exec(t); if (!m) return false; if (m[0].indexOf("=") >= 0 && algebra30(t) && !/(?:^|[\s،,])(?:میشه|می[‌\s]?شه|می[‌\s]?شود|درمیاد)\s/.test(t)) return false; var pre = t.slice(0, m.index); return /[0-9۰-۹]/.test(pre) || OPW29.test(" " + pre); }
   function unreadClaims29(q, off, ck) {
     var C0 = (ck || []).concat((ck && ck.unread) || []); var cov = function (A0, B0) { return C0.some(function (c) { return c && c.pos != null && c.pe != null && c.pos < B0 && c.pe > A0; }); };
     if (C0.some(function (c) { return c && (c.pos == null || c.pe == null); })) return [];   // سنجشی بی جایگاه ⇒ این دروازه چیزی نمی‌افزاید (رفتارِ پیشین)
@@ -62584,11 +62613,11 @@ APP.goFromURL = function (q) {
     var se = S.get(rid.sess), C = (se && se.coach) || {}, E = storyOf(se || {}, String(C.pk || "c:0")), st = ST.stmtOfSess(se);
     if (E.unk && txt(E.unk.t)) return clip(E.unk.t, 100);
     /* دورِ ۲۶ (Q6): خواسته‌ای که خودش با نشانهٔ صریح گفت («دنبالِ اینم که …»، «حل‌شدن یعنی …») مقدم بر جملهٔ پرسشیِ صورت است */
-    var iu26 = E.items.filter(function (x) { return x.k === "u" && UNKMARK24.test(x.t); }).pop(); if (iu26) return clip(iu26.t, 100);
+    var iu26 = E.items.filter(function (x) { return x.k === "u" && UNKMARK24.test(x.t); }).pop(); if (iu26) return clip(unkCore30(iu26.t), 100);   // دورِ ۳۰ (D25-8): هستهٔ مجهول، نه برچسب و فعلِ خواستن (سطرهای ذخیره‌شدهٔ پیشین هم)
     var q2 = qSentence(st); if (q2) return clip(q2, 100);
     /* مجهولِ به حرفِ خودش فقط اگر به صورتِ همین مسئله می‌خورد — جملهٔ کناری («ولی خب ۵ منهای ۳ چرا نمیشه») مقصد نیست */
     var ub = C.unkBy && C.pk ? txt(C.unkBy[C.pk]) : "", bt = toks(st); if (ub && toks(ub).filter(function (w) { return hit(w, bt); }).length >= Math.max(1, Math.ceil(toks(ub).length / 2))) return clip(ub, 100);
-    var iu = E.items.filter(function (x) { return x.k === "u"; }).pop(); if (iu && !METHODQ26.test(iu.t)) return clip(iu.t, 100);
+    var iu = E.items.filter(function (x) { return x.k === "u"; }).pop(); if (iu && !METHODQ26.test(iu.t)) return clip(unkCore30(iu.t), 100);
     var g26 = /[؟?]/.test(st) ? goalSentence26(String(C.stmtRaw24 || st)) : ""; if (g26) return clip(g26, 100);   // فقط وقتی صورت پرسشی داشت که پرسشِ روش بود و کنار رفت
     return "خواستهٔ مسئله";
   };

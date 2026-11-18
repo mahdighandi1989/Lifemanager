@@ -1,0 +1,184 @@
+{
+"from": "round30C/aC4",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه؛ قرصِ قند روزی ۳ تا، بسته‌هاش ۶۰ تایی. دخترم هر بار که داروهام تموم میشه از کرج میاد و می‌بره‌م داروخونه. می‌خوام یه جوری بخرم که هر دو با هم تموم بشن تا دخترم کمتر به زحمت بیفته. فکر کنم اگه از هر کدوم یه بسته بگیرم با هم تموم میشن دیگه، نه؟",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';APP.clock.dev=true;localStorage.setItem('lla.dev','1');'ok'",
+"c": 1
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(300);const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value=\"۱۳۲۴/۰۷/۳۱\";i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();await W(400);const e=c.querySelector('.age-err');return 'typed='+\"۱۳۲۴/۰۷/۳۱\"+' err='+(e?e.textContent:'')+' | birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+!!document.querySelector('.age-ask')})()",
+"c": 2
+},
+{
+"c": 3
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(300);const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value=\"1324/05/10\";i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();await W(400);const e=c.querySelector('.age-err');return 'typed='+\"1324/05/10\"+' err='+(e?e.textContent:'')+' | birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+!!document.querySelector('.age-ask')})()",
+"c": 4
+},
+{
+"eval": "(()=>'birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' said='+JSON.stringify((APP.S.settings().profile||{}).ageSaid||null)+' sys='+JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys'&&/تولد/.test(m.text)).map(m=>m.text)))()",
+"c": 5
+},
+{
+"say": "امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰ روز. نه، با هم تموم نمیشن! یکی ۱۵ روزه یکی ۲۰ روز. پس چی کار کنم؟ اینو ثبتش کنید که گم نشه.",
+"c": 6
+},
+{
+"c": 7
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 8
+},
+{
+"c": 9
+},
+{
+"say": "من متولدِ ۱۰ مرداد ۲۴ ام؛ مدرسه خیلی وقت پیش بود. یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی یادم نیست چطوری حساب می‌شد. عینکمم ضعیفه، لطفاً کوتاه بنویسید.",
+"c": 10
+},
+{
+"eval": "(()=>'birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' said='+JSON.stringify((APP.S.settings().profile||{}).ageSaid||null)+' sys='+JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys'&&/تولد/.test(m.text)).map(m=>m.text)))()",
+"c": 11
+},
+{
+"c": 12
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 13
+},
+{
+"c": 14
+},
+{
+"say": "زنگِ دو روزه: روزِ ۲، ۴، ۶. سه روزه: روزِ ۳، ۶. پس روزِ ۶ با هم میزنن! یعنی باید ضرب‌هاشو بنویسم تا به یه عدد مشترک برسم؟",
+"c": 15
+},
+{
+"say": "ضرب‌های ۱۵: ۱۵، ۳۰، ۴۵، ۶۰. ضرب‌های ۲۰: ۲۰، ۴۰، ۶۰. پس ۶۰ روز! یعنی از قرصِ فشار ۴ بسته (۶۰ ÷ ۱۵) و از قرصِ قند ۳ بسته (۶۰ ÷ ۲۰).",
+"c": 16
+},
+{
+"c": 17
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1500);const t=document.querySelector('#main').innerText;const i=t.indexOf('از گفت‌وگو');return 'phase='+APP.livePhase(p)+' story='+(APP.liveStoryPhase?APP.liveStoryPhase(p):'?')+' || '+(i>=0?t.slice(Math.max(0,i-300),i+1500):'NO «از گفت‌وگو»')+' || HEAD '+t.slice(0,1500)})()",
+"c": 18
+},
+{
+"say": "وارسی کردم: ۴ بستهٔ ۳۰ تایی میشه ۱۲۰ قرص، روزی ۲ تا، ۶۰ روز. ۳ بستهٔ ۶۰ تایی میشه ۱۸۰ قرص، روزی ۳ تا، ۶۰ روز. درسته. دخترم اولِ آذر میاد؛ همون روز ۴ تا و ۳ تا می‌خریم.",
+"c": 19
+},
+{
+"c": 20
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 21
+},
+{
+"c": 22
+},
+{
+"say": "یاد گرفتم اول ببینم هر بسته چند روز کار می‌کنه، بعد ضرب‌هاشو بنویسم تا به روزِ مشترک برسم. اگه دکتر قرصِ سومی هم داد، همین کارو می‌کنم.",
+"c": 23
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-11-22')+' pid='+p})()",
+"c": 24
+},
+{
+"c": 25,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 26
+},
+{
+"c": 27
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1500);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2000)})()",
+"c": 28
+},
+{
+"say": "سلام. امروز اولِ آذره. با دخترم رفتیم، ۴ بسته قرصِ فشار و ۳ بسته قرصِ قند خریدیم. دو ماه دیگه با هم تموم میشن.",
+"c": 29
+},
+{
+"c": 30
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 31
+},
+{
+"c": 32
+},
+{
+"c": 33
+},
+{
+"c": 34
+},
+{
+"c": 35
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('mind');await W(1800);const t=document.querySelector('#main').innerText;const out=[];let i=-1;for(const m of t.matchAll(/هنجار|هم‌سن|گروه‌های سنی|سن: |علت|ضعیف‌ترین|پیش‌نیاز ·/g)){if(m.index-i>250){out.push(t.slice(Math.max(0,m.index-150),m.index+350));i=m.index;}}return out.join(' ⟂ ').slice(0,4000)})()",
+"c": 36
+},
+{
+"c": 37
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1200);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2500)})()",
+"c": 38
+},
+{
+"c": 39
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();APP.go('dossier',s.id);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 40
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 41
+},
+{
+"c": 42
+},
+{
+"c": 43,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"سلام. خواسته‌تان روشن است: طوری بخرید که هر دو دارو با هم تمام شوند و دخترتان کمتر به زحمت بیفتد. «از هر کدام یک بسته» هنوز حدس است: چطور می‌آزماییدش — هر بسته چند روز دوام می‌آورد؟\", \"title\": \"خریدِ قرص‌ها که با هم تمام شوند\", \"pinned\": \"خریدِ دو دارو طوری که با هم تمام شوند\", \"memory\": \"کاربر: سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه / دستیار: سلام. خواسته‌تان روشن است: طوری بخرید که هر دو دارو با هم تمام شوند و \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\", \"u\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"فکر کنم اگه از هر کدوم یه بسته بگیرم با هم تموم میشن دیگه\", \"q\": \"چطور می‌آزماییدش — هر بسته چند روز دوام می‌آورد؟\"}}]}",
+"{\"reply\": \"خودتان آزمودید و دیدید: ۱۵ روز و ۲۰ روز، پس یک بسته از هر کدام با هم تمام نمی‌شود. در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم که گم نشود. اگر از هر دارو چند بسته بگیرید، روزی که هر دو با هم تمام می‌شوند چه ویژگی‌ای باید داشته باشد؟\", \"title\": \"خریدِ قرص‌ها که با هم تمام شوند\", \"pinned\": \"خریدِ دو دارو طوری که با هم تمام شوند\", \"memory\": \"کاربر: سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه / دستیار: سلام. خواسته‌تان روشن است: طوری بخرید که هر دو دارو با هم تمام شوند و  / کاربر: امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰  / دستیار: خودتان آزمودید و دیدید: ۱۵ روز و ۲۰ روز، پس یک بسته از هر کدام با هم ت\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"خریدِ قرصِ فشار و قند که با هم تمام شوند\", \"statement\": \"دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه؛ قرصِ قند روزی ۳ تا، بسته‌هاش ۶۰ تایی. می‌خوام یه جوری بخرم که هر دو با هم تموم بشن تا دخترم کمتر به زحمت بیفته. قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰ روز.\", \"nat\": \"practical\"}, {\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"یکی ۱۵ روزه یکی ۲۰ روز\", \"register\": \"شما\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}}]}",
+"{\"reply\": \"کوتاه می‌نویسم. همان «ک.م.م» این‌جا لازم است و با شمردن پیدا می‌شود: مضرب‌های ۱۵ را بنویسید (۱۵، ۳۰، ۴۵، …) — کدام‌یک مضربِ ۲۰ هم هست؟\", \"title\": \"خریدِ قرص‌ها که با هم تمام شوند\", \"pinned\": \"خریدِ دو دارو طوری که با هم تمام شوند\", \"memory\": \"کاربر: سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه / دستیار: سلام. خواسته‌تان روشن است: طوری بخرید که هر دو دارو با هم تمام شوند و  / کاربر: امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰  / دستیار: خودتان آزمودید و دیدید: ۱۵ روز و ۲۰ روز، پس یک بسته از هر کدام با هم ت / کاربر: من متولدِ ۱۰ مرداد ۲۴ ام؛ مدرسه خیلی وقت پیش بود. یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی ی / دستیار: کوتاه می‌نویسم. همان «ک.م.م» این‌جا لازم است و با شمردن پیدا می‌شود: م\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"۱۰ مرداد ۲۴\"}, {\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq\": {\"concept\": \"کوچک‌ترین مضربِ مشترک (ک.م.م)\", \"step\": \"پیدا کردنِ روزی که هر دو دارو با هم تمام می‌شوند\", \"quote\": \"یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی یادم نیست چطوری حساب می‌شد\", \"q\": \"مضرب‌های ۱۵ را بنویسید (۱۵، ۳۰، ۴۵، …) — کدام‌یک مضربِ ۲۰ هم هست؟\", \"topic\": \"مضرب و مقسوم‌علیه\"}}]}",
+"{\"reply\": \"بله، همین است: مضرب‌ها را می‌نویسید تا به اولین عددِ مشترک برسید. برگردیم به مسئلهٔ اصلی، گامِ پیدا کردنِ روزی که هر دو دارو با هم تمام می‌شوند: حالا همان گام را چطور برمی‌دارید؟\", \"title\": \"خریدِ قرص‌ها که با هم تمام شوند\", \"pinned\": \"خریدِ دو دارو طوری که با هم تمام شوند\", \"memory\": \"کاربر: سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه / دستیار: سلام. خواسته‌تان روشن است: طوری بخرید که هر دو دارو با هم تمام شوند و  / کاربر: امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰  / دستیار: خودتان آزمودید و دیدید: ۱۵ روز و ۲۰ روز، پس یک بسته از هر کدام با هم ت / کاربر: من متولدِ ۱۰ مرداد ۲۴ ام؛ مدرسه خیلی وقت پیش بود. یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی ی / دستیار: کوتاه می‌نویسم. همان «ک.م.م» این‌جا لازم است و با شمردن پیدا می‌شود: م / کاربر: زنگِ دو روزه: روزِ ۲، ۴، ۶. سه روزه: روزِ ۳، ۶. پس روزِ ۶ با هم میزنن! یعنی باید ضرب‌هاشو  / دستیار: بله، همین است: مضرب‌ها را می‌نویسید تا به اولین عددِ مشترک برسید. برگر\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"had\", \"mastery\": \"yes\", \"quote\": \"روزِ ۶ با هم میزنن! یعنی باید ضرب‌هاشو بنویسم تا به یه عدد مشترک برسم؟\"}}]}",
+"{\"reply\": \"راهتان روشن است: اولین عددِ مشترکِ دو فهرست ۶۰ است. پیش از بستن، با شمردنِ خودِ قرص‌ها وارسی می‌کنید که ۴ بستهٔ فشار و ۳ بستهٔ قند هر دو درست روزِ ۶۰ تمام می‌شوند؟\", \"title\": \"خریدِ قرص‌ها که با هم تمام شوند\", \"pinned\": \"خریدِ دو دارو طوری که با هم تمام شوند\", \"memory\": \"کاربر: سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه / دستیار: سلام. خواسته‌تان روشن است: طوری بخرید که هر دو دارو با هم تمام شوند و  / کاربر: امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰  / دستیار: خودتان آزمودید و دیدید: ۱۵ روز و ۲۰ روز، پس یک بسته از هر کدام با هم ت / کاربر: من متولدِ ۱۰ مرداد ۲۴ ام؛ مدرسه خیلی وقت پیش بود. یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی ی / دستیار: کوتاه می‌نویسم. همان «ک.م.م» این‌جا لازم است و با شمردن پیدا می‌شود: م / کاربر: زنگِ دو روزه: روزِ ۲، ۴، ۶. سه روزه: روزِ ۳، ۶. پس روزِ ۶ با هم میزنن! یعنی باید ضرب‌هاشو  / دستیار: بله، همین است: مضرب‌ها را می‌نویسید تا به اولین عددِ مشترک برسید. برگر / کاربر: ضرب‌های ۱۵: ۱۵، ۳۰، ۴۵، ۶۰. ضرب‌های ۲۰: ۲۰، ۴۰، ۶۰. پس ۶۰ روز! یعنی از قرصِ فشار ۴ بسته (۶ / دستیار: راهتان روشن است: اولین عددِ مشترکِ دو فهرست ۶۰ است. پیش از بستن، با شم\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"result\"], \"ans\": [\"u0\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"پس ۶۰ روز! یعنی از قرصِ فشار ۴ بسته (۶۰ ÷ ۱۵) و از قرصِ قند ۳ بسته (۶۰ ÷ ۲۰)\", \"step\": {\"step\": \"پیدا کردنِ روزی که هر دو دارو با هم تمام می‌شوند\", \"done\": \"yes\", \"what\": \"ضرب‌های ۱۵: ۱۵، ۳۰، ۴۵، ۶۰. ضرب‌های ۲۰: ۲۰، ۴۰، ۶۰. پس ۶۰ روز!\", \"match\": \"yes\"}}]}",
+"{\"reply\": \"وارسی‌تان کامل است: هر دو شمارش به ۶۰ روز می‌رسد. خرید را برای اولِ آذر، روزی که دخترتان می‌آید، یادداشت می‌کنم؛ بعد از خرید در صفحه «✅ حل شد» را بزنید و بازنگری را همان‌جا بنویسید.\", \"title\": \"خریدِ قرص‌ها که با هم تمام شوند\", \"pinned\": \"خریدِ دو دارو طوری که با هم تمام شوند\", \"memory\": \"کاربر: سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه / دستیار: سلام. خواسته‌تان روشن است: طوری بخرید که هر دو دارو با هم تمام شوند و  / کاربر: امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰  / دستیار: خودتان آزمودید و دیدید: ۱۵ روز و ۲۰ روز، پس یک بسته از هر کدام با هم ت / کاربر: من متولدِ ۱۰ مرداد ۲۴ ام؛ مدرسه خیلی وقت پیش بود. یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی ی / دستیار: کوتاه می‌نویسم. همان «ک.م.م» این‌جا لازم است و با شمردن پیدا می‌شود: م / کاربر: زنگِ دو روزه: روزِ ۲، ۴، ۶. سه روزه: روزِ ۳، ۶. پس روزِ ۶ با هم میزنن! یعنی باید ضرب‌هاشو  / دستیار: بله، همین است: مضرب‌ها را می‌نویسید تا به اولین عددِ مشترک برسید. برگر / کاربر: ضرب‌های ۱۵: ۱۵، ۳۰، ۴۵، ۶۰. ضرب‌های ۲۰: ۲۰، ۴۰، ۶۰. پس ۶۰ روز! یعنی از قرصِ فشار ۴ بسته (۶ / دستیار: راهتان روشن است: اولین عددِ مشترکِ دو فهرست ۶۰ است. پیش از بستن، با شم / کاربر: وارسی کردم: ۴ بستهٔ ۳۰ تایی میشه ۱۲۰ قرص، روزی ۲ تا، ۶۰ روز. ۳ بستهٔ ۶۰ تایی میشه ۱۸۰ قرص، / دستیار: وارسی‌تان کامل است: هر دو شمارش به ۶۰ روز می‌رسد. خرید را برای اولِ آذ\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"۴ بستهٔ ۳۰ تایی میشه ۱۲۰ قرص، روزی ۲ تا، ۶۰ روز. ۳ بستهٔ ۶۰ تایی میشه ۱۸۰ قرص، روزی ۳ تا، ۶۰ روز. درسته\", \"check\": {\"msgs\": [\"۴ بستهٔ ۳۰ تایی میشه ۱۲۰ قرص، روزی ۲ تا، ۶۰ روز. ۳ بستهٔ ۶۰ تایی میشه ۱۸۰ قرص، روزی ۳ تا، ۶۰ روز. درسته\"]}, \"plan\": {\"text\": \"دخترم اولِ آذر میاد؛ همون روز ۴ تا و ۳ تا می‌خریم\", \"when\": \"2026-11-22\"}, \"register\": \"شما\"}]}",
+"{\"reply\": \"درسِ خوبی است و برای قرصِ سوم هم همین راه کار می‌کند. پیگیریِ خریدِ اولِ آذر می‌تواند در «امروز» بیاید؛ اگر موافقید بگویید تا بگذارمش.\", \"title\": \"خریدِ قرص‌ها که با هم تمام شوند\", \"pinned\": \"خریدِ دو دارو طوری که با هم تمام شوند\", \"memory\": \"کاربر: سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه / دستیار: سلام. خواسته‌تان روشن است: طوری بخرید که هر دو دارو با هم تمام شوند و  / کاربر: امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰  / دستیار: خودتان آزمودید و دیدید: ۱۵ روز و ۲۰ روز، پس یک بسته از هر کدام با هم ت / کاربر: من متولدِ ۱۰ مرداد ۲۴ ام؛ مدرسه خیلی وقت پیش بود. یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی ی / دستیار: کوتاه می‌نویسم. همان «ک.م.م» این‌جا لازم است و با شمردن پیدا می‌شود: م / کاربر: زنگِ دو روزه: روزِ ۲، ۴، ۶. سه روزه: روزِ ۳، ۶. پس روزِ ۶ با هم میزنن! یعنی باید ضرب‌هاشو  / دستیار: بله، همین است: مضرب‌ها را می‌نویسید تا به اولین عددِ مشترک برسید. برگر / کاربر: ضرب‌های ۱۵: ۱۵، ۳۰، ۴۵، ۶۰. ضرب‌های ۲۰: ۲۰، ۴۰، ۶۰. پس ۶۰ روز! یعنی از قرصِ فشار ۴ بسته (۶ / دستیار: راهتان روشن است: اولین عددِ مشترکِ دو فهرست ۶۰ است. پیش از بستن، با شم / کاربر: وارسی کردم: ۴ بستهٔ ۳۰ تایی میشه ۱۲۰ قرص، روزی ۲ تا، ۶۰ روز. ۳ بستهٔ ۶۰ تایی میشه ۱۸۰ قرص، / دستیار: وارسی‌تان کامل است: هر دو شمارش به ۶۰ روز می‌رسد. خرید را برای اولِ آذ / کاربر: یاد گرفتم اول ببینم هر بسته چند روز کار می‌کنه، بعد ضرب‌هاشو بنویسم تا به روزِ مشترک برسم. / دستیار: درسِ خوبی است و برای قرصِ سوم هم همین راه کار می‌کند. پیگیریِ خریدِ او\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"سلام؛ خرید همان‌طور که حساب کرده بودید انجام شد. حالا در صفحه «✅ حل شد» را بزنید و درسی را که گفتید (اول روزِ هر بسته، بعد مضرب‌ها تا روزِ مشترک) در بازنگری بنویسید.\", \"title\": \"خریدِ قرص‌ها که با هم تمام شوند\", \"pinned\": \"خریدِ دو دارو طوری که با هم تمام شوند\", \"memory\": \"کاربر: امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰  / دستیار: خودتان آزمودید و دیدید: ۱۵ روز و ۲۰ روز، پس یک بسته از هر کدام با هم ت / کاربر: من متولدِ ۱۰ مرداد ۲۴ ام؛ مدرسه خیلی وقت پیش بود. یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی ی / دستیار: کوتاه می‌نویسم. همان «ک.م.م» این‌جا لازم است و با شمردن پیدا می‌شود: م / کاربر: زنگِ دو روزه: روزِ ۲، ۴، ۶. سه روزه: روزِ ۳، ۶. پس روزِ ۶ با هم میزنن! یعنی باید ضرب‌هاشو  / دستیار: بله، همین است: مضرب‌ها را می‌نویسید تا به اولین عددِ مشترک برسید. برگر / کاربر: ضرب‌های ۱۵: ۱۵، ۳۰، ۴۵، ۶۰. ضرب‌های ۲۰: ۲۰، ۴۰، ۶۰. پس ۶۰ روز! یعنی از قرصِ فشار ۴ بسته (۶ / دستیار: راهتان روشن است: اولین عددِ مشترکِ دو فهرست ۶۰ است. پیش از بستن، با شم / کاربر: وارسی کردم: ۴ بستهٔ ۳۰ تایی میشه ۱۲۰ قرص، روزی ۲ تا، ۶۰ روز. ۳ بستهٔ ۶۰ تایی میشه ۱۸۰ قرص، / دستیار: وارسی‌تان کامل است: هر دو شمارش به ۶۰ روز می‌رسد. خرید را برای اولِ آذ / کاربر: یاد گرفتم اول ببینم هر بسته چند روز کار می‌کنه، بعد ضرب‌هاشو بنویسم تا به روزِ مشترک برسم. / دستیار: درسِ خوبی است و برای قرصِ سوم هم همین راه کار می‌کند. پیگیریِ خریدِ او / کاربر: سلام. امروز اولِ آذره. با دخترم رفتیم، ۴ بسته قرصِ فشار و ۳ بسته قرصِ قند خریدیم. دو ماه د / دستیار: سلام؛ خرید همان‌طور که حساب کرده بودید انجام شد. حالا در صفحه «✅ حل شد\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan_done\": {\"id\": \"pl1\", \"done\": true}, \"result\": \"۴ بسته قرصِ فشار و ۳ بسته قرصِ قند خریدیم. دو ماه دیگه با هم تموم میشن\", \"step\": {\"step\": \"خریدِ ۴ بسته قرصِ فشار و ۳ بسته قرصِ قند\", \"done\": \"yes\", \"what\": \"با دخترم رفتیم، ۴ بسته قرصِ فشار و ۳ بسته قرصِ قند خریدیم\", \"match\": \"yes\"}}]}"
+],
+"keys": [
+"سلام. من بازنشستهٔ راه‌آهنم. دو جور قرص می‌خورم: قرصِ فشار روزی ۲ تا، که بسته‌هاش ۳۰ تاییه؛ قرصِ قند روزی ۳ تا، بسته‌هاش ۶۰ تایی. دخترم هر بار که داروهام تموم میشه از کرج میاد و می‌بره‌م داروخونه. می‌خوام یه جوری بخرم که هر دو با هم تموم بش",
+"امتحان کنم... قرصِ فشار ۳۰ تا، روزی ۲ تا، میشه ۱۵ روز. قرصِ قند ۶۰ تا، روزی ۳ تا، میشه ۲۰ روز. نه، با هم تموم نمیشن! یکی ۱۵ روزه یکی ۲۰ روز. پس چی کار کنم؟ اینو ثبتش کنید که گم نشه.",
+"من متولدِ ۱۰ مرداد ۲۴ ام؛ مدرسه خیلی وقت پیش بود. یادمه یه چیزی بود به اسمِ «ک.م.م»، ولی یادم نیست چطوری حساب می‌شد. عینکمم ضعیفه، لطفاً کوتاه بنویسید.",
+"زنگِ دو روزه: روزِ ۲، ۴، ۶. سه روزه: روزِ ۳، ۶. پس روزِ ۶ با هم میزنن! یعنی باید ضرب‌هاشو بنویسم تا به یه عدد مشترک برسم؟",
+"ضرب‌های ۱۵: ۱۵، ۳۰، ۴۵، ۶۰. ضرب‌های ۲۰: ۲۰، ۴۰، ۶۰. پس ۶۰ روز! یعنی از قرصِ فشار ۴ بسته (۶۰ ÷ ۱۵) و از قرصِ قند ۳ بسته (۶۰ ÷ ۲۰).",
+"وارسی کردم: ۴ بستهٔ ۳۰ تایی میشه ۱۲۰ قرص، روزی ۲ تا، ۶۰ روز. ۳ بستهٔ ۶۰ تایی میشه ۱۸۰ قرص، روزی ۳ تا، ۶۰ روز. درسته. دخترم اولِ آذر میاد؛ همون روز ۴ تا و ۳ تا می‌خریم.",
+"یاد گرفتم اول ببینم هر بسته چند روز کار می‌کنه، بعد ضرب‌هاشو بنویسم تا به روزِ مشترک برسم. اگه دکتر قرصِ سومی هم داد، همین کارو می‌کنم.",
+"سلام. امروز اولِ آذره. با دخترم رفتیم، ۴ بسته قرصِ فشار و ۳ بسته قرصِ قند خریدیم. دو ماه دیگه با هم تموم میشن."
+]
+}
