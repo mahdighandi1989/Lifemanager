@@ -885,6 +885,9 @@
   /* دفترِ ساختهٔ صفحه از پیامِ خودش، وقتی صفحه «کارِ پیشین» را خواست و مدل prior نداد. گام = «گام N: …» ِ خودش (دست‌کم دو برچسب)، وگرنه هر بندی که موتور حسابش را خواند
      (ST.arithClauses — همان یک داور؛ تکهٔ کارِ دیگری کنار). حکم: ✗ اگر موتور نادرست خواند؛ ✓ فقط وقتی همهٔ بندهای گام حسابِ خوانده و درست‌اند؛ وگرنه «نسنجیده» (مرزِ صادقانه:
      درستیِ گامِ غیرعددی داوریِ مربی است). بی گامِ حسابی یا شماره‌دار ⇒ هیچ دفتری («۸ تا پنجره، هر کدوم ۳ متر پارچه» داده است، نه کار — tD3 c11). */
+  /* نمونهٔ آزموده («مثلاً ۲۵ − ۱ = ۲۴ و ۴۹ − ۱ = ۴۸» در پیامِ گیر — r22 pA1 p4) گامِ کار نیست (A25-4): بندِ حسابِ جمله‌ای که با «مثلاً / برای نمونه / فرض کن / اگه» آمده دفتر نمی‌سازد */
+  var EX30 = /(?:^|[\s،,(])(?:مثلاً|مثلا|مثل[‌\s]?اً|برای\s*(?:مثال|نمونه)|به[‌\s]?عنوانِ?\s*مثال|فرض\s*کن|فرضاً|اگه|اگر)(?![آ-ی])/;
+  function sentOf30(T, i) { var a = 0, b = T.length, re = /[.!?؟؛\n]/g, m; while ((m = re.exec(T))) { if (m.index < i) a = m.index + 1; else { b = m.index; break; } } return T.slice(a, b); }
   function pagePrior30(s, ut, um) {
     var T = String(ut || ""), OW = []; try { OW = ST.otherWorks29(T) || []; } catch (e) { OW = []; }
     var inOw = function (a, b) { return OW.some(function (o) { return a < o.to && b > o.from; }); };
@@ -897,7 +900,7 @@
     else { var AC = null; try { AC = ST.arithClauses(T); } catch (e) { AC = null; }
       ((AC && AC.clauses) || []).forEach(function (c) { if (!c.claim || !(c.checks || []).length || inOw(c.a, c.b)) return; var q = c.t, lab = /^([^:：«»\n]{1,60})[:：]\s*/.exec(q);
         if (lab && META30.test(lab[1]) && /[0-9۰-۹]/.test(q.slice(lab[0].length))) q = q.slice(lab[0].length); q = txt(q).replace(/^(?:ولی|اما|و)\s+/, "");
-        if (q && !TEST25.test(q)) P.push({ step: clip(q, 80), quote: q, verdict: c.mark === "bad" ? "wrong" : c.mark === "ok" ? "ok" : "unchecked" }); }); }
+        if (q && !TEST25.test(q) && !EX30.test(sentOf30(T, c.a))) P.push({ step: clip(q, 80), quote: q, verdict: c.mark === "bad" ? "wrong" : c.mark === "ok" ? "ok" : "unchecked" }); }); }
     if (!P.length) return null;
     var rep = priorOf(s, { prior: P }, um); if (rep) rep.steps.forEach(function (x) { x.page30 = true; }); return rep;
   }
