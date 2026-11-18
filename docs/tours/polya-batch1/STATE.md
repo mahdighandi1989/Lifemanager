@@ -368,3 +368,4 @@
 - 2026-11-18: C178 corpora done (F2 79, F6 132, F8 85 entries; 90 failed in R30) → T/corpus30 + durable copy docs/tours/polya-batch1/corpus30/; its 12 questions ruled C189–C200; arith/correction/dates fixers notified. F6-075 (C19) added to TAIL_dates.
 
 - 2026-11-18 — OWNER: pause after round 30 closes (fixers → merge30 → gate → main → RUNNER31/LAUNCH31 written + pushed). Do NOT launch round-31 runners; on «ادامه بده» launch them from LAUNCH31.
+- 2026-11-18 — FIX30 correction DONE (head 3791e819, worktree-agent-a6cce3b0212081b00): F8 root cause (digit-by-digit reader) fixed; tail 3/4 (U38 open); corpus F8 10/85 green; 31 suites green; side effect tD1 p8 false «۱۸ میلیون» ask open → carry to R31. Report on branch reports/fix30/correction.md. Others resumed after container restart.
