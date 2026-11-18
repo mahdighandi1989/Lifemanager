@@ -39754,7 +39754,11 @@ APP.goFromURL = function (q) {
   /* دورِ ۲۹ (D29-26 arD2 «چراغ ۱۵ متره» ⇒ «چراغ ۱۲ متر»): وقتی پیشین و تازه فقط در عدد فرق دارند (پسوندِ «ـه/است» جزوِ داده نیست) فقط رقم‌ها عوض می‌شوند — نقلِ او بیرون از عدد بایت‌به‌بایت */
   function numOnly29(o, n) { o = String(o); n = String(n); var D0 = /[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g, a = o.match(D0) || [], b = n.match(D0) || []; if (a.length !== 1 || b.length !== 1) return n;
     var cut = function (t, d) { return t.replace(d, "#").replace(/[\s‌]*[،,:؛.]+[\s‌]*$/, "").replace(/[\s‌]*(?:ـ?ه|است|هست|اند|ان)[\s‌]*$/, "").replace(/[\s‌]+/g, " ").trim(); };
-    return cut(o, a[0]) === cut(n, b[0]) ? o.replace(a[0], b[0]) : n; }
+    if (cut(o, a[0]) === cut(n, b[0])) return o.replace(a[0], b[0]);
+    /* دورِ ۳۰ (correction، C30-5/C142 «۱۸ تان» ⇐ «۱۶ تا میشن» ⇒ «دخترم ۱۶ تا میشن مهمون»): واژه‌های تازهٔ مقدارِ درست که فعل/رابطه‌اند («میشن»، «می‌خورن»، «تان»، «ـه») جزوِ مقدار نیستند —
+       فقط رقم عوض می‌شود؛ واژهٔ معنادارِ تازه («۱۶ تا بزرگسال») همان رفتارِ پیشین */
+    var W = function (t, d) { return cut(t, d).replace("#", " ").split(/[\s‌]+/).filter(Boolean); }, Wo = W(o, a[0]), extra = W(n, b[0]).filter(function (w) { return Wo.indexOf(w) < 0; });
+    return extra.length && extra.every(function (w) { return /^(?:می|نمی)/.test(w) || /^(?:تا|تان|تاست|است|هست|هستن|بود|بودن|شد|شدن|میشن|میشه|ه|ـه|ست|ان)$/.test(w); }) ? o.replace(a[0], b[0]) : n; }
   function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
   function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
   var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
@@ -40032,6 +40036,9 @@ APP.goFromURL = function (q) {
     /* دورِ ۲۸ (R2، C88؛ D28-12 tD1 «۵ متر نیست، ۵٫۵ متره» بی old ِ مدل ⇒ «۴ متر» جایگزین شد): عددی که خودش نام برد («X نیست، Y» / «Y نه X») مقدارِ پیشین است —
        اگر در آن پیام نیست، صفحه می‌پرسد کدام عدد (هرگز عددِ دیگری از همان جمله) */
     for (var j = 0; j <= M.indexOf(src); j++) if (M[j] && M[j].role === "user") n++;
+    /* دورِ ۳۰ (correction — یک خواننده؛ C30-5 «۱۸ تان» ⇐ «۱۶ تا میشن»): مقدارِ درستی که همان تکه است با فعل/رابطهٔ جملهٔ اصلاح («میشن»، «می‌خورن»، «ـه») همان تکه با رقمِ تازه است —
+       فعلِ جملهٔ اصلاح به متنِ صورت/رکورد نمی‌رود («دخترم ۱۶ تا میشن مهمون») */
+    try { var nf30 = numOnly29(txtOf(x.old).trim() || frag, fix); if (nf30 !== fix && (nf30.match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []).length === 1) fix = nf30; } catch (e30) { }
     return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, key: key, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um), edit: edit, rests: A.liveRestsOf ? A.liveRestsOf(x.rests) : null, srcSess: xsS ? xsS.id : "" };
   }
   AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
@@ -50854,7 +50861,10 @@ APP.goFromURL = function (q) {
     var Q30 = opt.qual30 || null;
     /* بندِ همان عدد (تا ویرگول) شمارهٔ دیگری از همان نام را بگوید ⇒ کمیتِ دیگری است («گلدونِ آخر ۱۶ / ۴»)؛ و وقتی داده در نوشتهٔ او برای «هر <نام>» آمده («هر میز ۷ برش») جمله‌ای که آن نام را
        ندارد هم‌رقمِ دیگری است («۱۸ + ۷ = ۲۵» ِ مهمان‌ها). فهرستِ قدها («(۴ + ۸ + …) / ۵») بی نام همان داده می‌ماند (A s07، جایگاهِ عضو در فهرست). */
-    var each30 = Q30 ? RC.some(function (rc) { return new RegExp("(?:^|[\\s‌،,:])هر[\\s‌]+" + Q30.stem + "[آ-ی]{0,3}(?:ِ|‌ی)?[\\s‌]+[^.؛;،,\\n]{0,12}?[0-9۰-۹]").test(rc.t) && rc.O.some(function (q) { return pairs.some(function (p0) { return veq(p0.a, q.v); }); }); }) : false;
+    /* خانهٔ داده: بندی که نام را با «هر» یا با همان شماره کنارِ مقدارِ پیشین دارد («هر میز ۷ برش»، «اتاقِ دوم ۳ در ۵») — آن وقت هم‌رقمِ جمله‌ای که آن نام را ندارد کمیتِ دیگری است
+       («۴۲ × ۳ = ۱۲۶» ِ نوه، «۱۸ + ۷» ِ مهمان‌ها) */
+    var each30 = Q30 ? RC.some(function (rc) { var re = new RegExp("(?:(?:^|[\\s‌،,:])هر[\\s‌]+" + Q30.stem + "[آ-ی]{0,3}|" + Q30.stem + "[آ-ی]{0,3}(?:ِ|‌ی)?[\\s‌]+" + Q30.ord + "(?:ی)?)(?![آ-ی])[^.؛;،,\\n]{0,14}?([0-9۰-۹]+(?:[.٫][0-9۰-۹]+)?)", "g"), m;
+        while ((m = re.exec(rc.t))) { var v = parseFloat(nz(m[1]).replace("٫", ".")); if (pairs.some(function (p0) { return veq(p0.a, v); })) return true; } return false; }) : false;
     if (Q30) occ.forEach(function (o) { if (!o.root || o.root.st !== "old") return; var T = RC[o.ri].t, SN = sents25(T), z = SN[o.sent] || [0, T.length], st = T.slice(z[0], z[1]);
       var c0 = z[0], c1 = z[1]; for (var q0 = o.s - 1; q0 >= z[0]; q0--) if (/[،,؛;]/.test(T.charAt(q0))) { c0 = q0 + 1; break; } for (var q1 = o.e; q1 < z[1]; q1++) if (/[،,؛;]/.test(T.charAt(q1))) { c1 = q1; break; }
       var cl = T.slice(c0, c1), nm = new RegExp("(?:^|[^آ-ی])" + Q30.stem).test(cl), nmS = new RegExp("(?:^|[^آ-ی])" + Q30.stem).test(st);

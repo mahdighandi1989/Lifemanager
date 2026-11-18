@@ -4780,7 +4780,10 @@
     var Q30 = opt.qual30 || null;
     /* بندِ همان عدد (تا ویرگول) شمارهٔ دیگری از همان نام را بگوید ⇒ کمیتِ دیگری است («گلدونِ آخر ۱۶ / ۴»)؛ و وقتی داده در نوشتهٔ او برای «هر <نام>» آمده («هر میز ۷ برش») جمله‌ای که آن نام را
        ندارد هم‌رقمِ دیگری است («۱۸ + ۷ = ۲۵» ِ مهمان‌ها). فهرستِ قدها («(۴ + ۸ + …) / ۵») بی نام همان داده می‌ماند (A s07، جایگاهِ عضو در فهرست). */
-    var each30 = Q30 ? RC.some(function (rc) { return new RegExp("(?:^|[\\s‌،,:])هر[\\s‌]+" + Q30.stem + "[آ-ی]{0,3}(?:ِ|‌ی)?[\\s‌]+[^.؛;،,\\n]{0,12}?[0-9۰-۹]").test(rc.t) && rc.O.some(function (q) { return pairs.some(function (p0) { return veq(p0.a, q.v); }); }); }) : false;
+    /* خانهٔ داده: بندی که نام را با «هر» یا با همان شماره کنارِ مقدارِ پیشین دارد («هر میز ۷ برش»، «اتاقِ دوم ۳ در ۵») — آن وقت هم‌رقمِ جمله‌ای که آن نام را ندارد کمیتِ دیگری است
+       («۴۲ × ۳ = ۱۲۶» ِ نوه، «۱۸ + ۷» ِ مهمان‌ها) */
+    var each30 = Q30 ? RC.some(function (rc) { var re = new RegExp("(?:(?:^|[\\s‌،,:])هر[\\s‌]+" + Q30.stem + "[آ-ی]{0,3}|" + Q30.stem + "[آ-ی]{0,3}(?:ِ|‌ی)?[\\s‌]+" + Q30.ord + "(?:ی)?)(?![آ-ی])[^.؛;،,\\n]{0,14}?([0-9۰-۹]+(?:[.٫][0-9۰-۹]+)?)", "g"), m;
+        while ((m = re.exec(rc.t))) { var v = parseFloat(nz(m[1]).replace("٫", ".")); if (pairs.some(function (p0) { return veq(p0.a, v); })) return true; } return false; }) : false;
     if (Q30) occ.forEach(function (o) { if (!o.root || o.root.st !== "old") return; var T = RC[o.ri].t, SN = sents25(T), z = SN[o.sent] || [0, T.length], st = T.slice(z[0], z[1]);
       var c0 = z[0], c1 = z[1]; for (var q0 = o.s - 1; q0 >= z[0]; q0--) if (/[،,؛;]/.test(T.charAt(q0))) { c0 = q0 + 1; break; } for (var q1 = o.e; q1 < z[1]; q1++) if (/[،,؛;]/.test(T.charAt(q1))) { c1 = q1; break; }
       var cl = T.slice(c0, c1), nm = new RegExp("(?:^|[^آ-ی])" + Q30.stem).test(cl), nmS = new RegExp("(?:^|[^آ-ی])" + Q30.stem).test(st);
