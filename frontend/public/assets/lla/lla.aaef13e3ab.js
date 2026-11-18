@@ -60844,7 +60844,11 @@ APP.goFromURL = function (q) {
       var m = /^l:(.+)$/.exec(pk); if (m) return "L:" + m[1];
       var lv = ""; try { lv = ST.lived26 ? ST.lived26(se, pk) : ""; } catch (e) { } if (lv) return "L:" + lv;
       var P = (C.probs26 || {})[pk];
-      if (P && txt(P.stmt)) { var same = ""; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { if (!same && r && r.sess === se.id && sameProb26(P.stmt, r.p.statement)) same = r.p.id; }); } catch (e) { } return same ? "L:" + same : pk; }   // همان صورت که بعدتر در 🔭 ثبت شد (حتی اگر pk در این میان عوض شد)
+      /* دورِ ۳۰ (story، C26-1 s21 «مسئلهٔ ۲ از ۲» برای یک مسئله): مسئلهٔ زنده‌ای که مدل از همین گفت‌وگو ساخت (live_new) رکوردش sess ندارد — فقط در lprobLog ِ همین سشن است؛
+         پس همان صورت (sameProb26) با آن جفت نمی‌شد و پیامِ آغاز «مسئلهٔ ۱» ِ جدا می‌ماند. حالا مسئله‌های زندهٔ این سشن = sess ِ رکورد یا lprobLog/lprob ِ همین سشن.
+         هم‌شکلِ منفی: صورتِ دیگری (sameProb26 نادرست) همان مسئلهٔ جدا می‌ماند. */
+      var mineL30 = function (r) { return r && (r.sess === se.id || se.lprob === r.p.id || (se.lprobLog || []).some(function (e) { return e && e.p === r.p.id; })); };
+      if (P && txt(P.stmt)) { var same = ""; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { if (!same && mineL30(r) && sameProb26(P.stmt, r.p.statement)) same = r.p.id; }); } catch (e) { } return same ? "L:" + same : pk; }   // همان صورت که بعدتر در 🔭 ثبت شد (حتی اگر pk در این میان عوض شد)
       if (pk === String(C.pk || "") && txt(C.stmt)) { try { if (!(AS.notProblem && AS.notProblem(String(C.stmtRaw24 || C.stmt)))) return pk; } catch (e) { return pk; } return ""; }
       if (!C.probs26) { var w = ST.pkWindow(se, pk), f = U.filter(function (x) { return String(x.at || "") >= String(w.from || "") && String(x.at || "") < String(w.to || "~"); })[0];   // سشنِ پیش از دورِ ۲۶ (بی فهرست): نخستین پیامِ پنجره مسئله‌ای می‌گوید؟
         try { if (f && AS.notProblem && !AS.notProblem(String(f.text || "")) && storyOf(se, pk).items.length) return pk; } catch (e) { } }
