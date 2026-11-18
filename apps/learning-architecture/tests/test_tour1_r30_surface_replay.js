@@ -3,7 +3,7 @@
 //  جواب‌های دورِ ۳۰ — برگه‌ها و حوزه‌ها گامِ fixture اند). ساعتِ صفحه همان ساعتِ اجرا (fx.t0)؛ هیچ تاریخی در انتظارها نیست. opt.quiesce: هر گام تا پایانِ گذرِ برگه‌ها.
 //  loop: B tB1 (B30·D3 + U59 — «نه» سپس پس‌گرفتن ⇒ همان ابزار، برگه بسته؛ برچسبِ «نه» ِ او «تشخیصِ برگه» نیست) · A tA1 (A30-23 — پس‌گرفتنِ «نه» با نقل پس از بستنِ مسئله)
 //  B30·D1: B s12 (نوارِ 🧭 «خودتان») · F13: A s06 (A30-1) · A26-19: A pA3 · A26-25 (C185): A aA2 · C26-18 (C186): C tC1 · C26-23/24: C aC2 · B26·D12: B bp3 · B26·D16: B aB1
-//  D26-40: D aD3 · D25-17: D arD2 · B24·D16/C30-6: B s17 (یک پیکان) · C28-21: C tC1 · D28-10: D oD1e (مقصدِ 🧭)
+//  D26-40: D aD3 · D25-17: D arD2 · B24·D16/C30-6: B s17 (یک پیکان) · C28-21: C tC1 · D28-10: D oD1e (مقصدِ 🧭) · C26-39: C s27
 // LLA_FILE = ساختِ دیگر (برای قرمز بودن روی BASE30)؛ ONLY=tB1,s12,...
 const { chromium } = require('playwright');
 const path = require('path');
@@ -72,6 +72,9 @@ const DIR = path.join(__dirname, 'fixtures', 'r30_surface');
     chk(/<bdi dir="ltr"[^>]*>[^<]*√\(h² \+ d²\)/.test(t), 'D25-17 arD2 s1 (page): the formula in the session pin is an LTR isolate :: ' + t.slice(0, 300)); return {}; });
   await run('s17', 'B_s17', 999, async (r) => { const t = await view(r.p, 'dossier', await livePid(r.p)), bad = (t.match(/[^\n]*⇐[^\n]*→[^\n]*/g) || []);
     chk(!bad.length, 'B24·D16 s17 (page): no history line carries both arrows :: ' + bad.slice(0, 2).join(' ‖ ').slice(0, 300)); return { n: bad.length }; });
+
+  await run('s27', 'C_s27', 12, async (r) => { const t = await r.p.evaluate(async () => { APP.ASSIST.toggle(false); APP.go('lprob', window.__PID || APP.state.arg); await new Promise(r => setTimeout(r, 1000)); const e = document.querySelector('.lp-win'); return e ? e.innerText : ''; });
+    chk(t && !/ثابتش کرد/.test(t) && !/^✓/.test(t) && /نسنجید/.test(t), 'C26-39 s27 p4 (page): a written proof is not «✓ ثابتش کردید» — the page did not check it :: ' + t.slice(0, 200)); return {}; });
 
   console.log(JSON.stringify(info));
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exit(1); }
