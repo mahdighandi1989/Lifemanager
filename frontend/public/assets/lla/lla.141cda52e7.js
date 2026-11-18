@@ -37207,7 +37207,10 @@ APP.goFromURL = function (q) {
     var teach = !!o.teach, has = {}, list = [];
     var add = function (id, on, q) { if (!on) return; var m = { id: id, q: q }; has[id] = m; list.push(m); };
     var attempt = attemptSeen(x.s, mt, teach, !!o.isIntro), only = ONLY_ANS_RE.test(mt) && !attempt;
-    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt);
+    /* دورِ ۳۰ (story، B24·D15 bp1 p11 «x²−9 = (x−3)(x+3). درسته؟ با ضرب پرانتز هم چک کردم، …»): «درسته؟» پس از وارسیِ گزارش‌شدهٔ خودش در همان پیام ادعای محلِ بحث نیست —
+       پرسشِ «ثابتش می‌کنی یا ردش؟» وارسیِ او را نادیده می‌گرفت (همان قاعدهٔ guessWhy ِ دورِ ۲۴، CHECKED24، این‌جا هم). هم‌شکلِ منفی: وارسی‌ای که شکست گزارش کرد یا گیر است ⇒ همان ادعا. */
+    var ot30 = faDigits(ownText(mt)), chk30 = CHECKED24.test(ot30) && !CASES_FAIL.test(ot30.replace(CHECKED24, " ")) && !STUCK_RE.test(ot30);
+    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt) && !chk30;
     /* دورِ ۲۵ (P1، DECISIONS_R25): پیامِ آغازینِ کارِ پیشین ⇒ نقطهٔ ازسرگیری؛ ردِ حکم ⇒ دوباره‌سنجی با شاهد — بالاتر از «اول کل»، آزمونِ حدس و «خودت فکر می‌کنی چرا؟»
        (A25-1، B25·D2/D3، C25-12/13، D25-6؛ خوانش از a45 A.STORY.priorTurn) */
     var pw25 = x.prior && /^(?:open|dispute|again|undo|which)$/.test(x.prior.id) ? x.prior : null;   // دورِ ۲۶ (Q4): پس گرفتنِ رد و «کدام گام؟» هم پرسشِ نوبتِ دفترند
