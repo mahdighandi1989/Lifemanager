@@ -412,7 +412,7 @@
        با همان جملهٔ «برای خودش» ِ ST.arithNote (عددِ درستِ ✗ لو نمی‌رود)؛ سطری که حسابی ندارد نشانی نمی‌گیرد */
     var mk27 = markOf27(it, um); if (mk27) lines = lines.concat([mk27]);
     /* دورِ ۲۸ (C96/C125): دادهٔ او با منبعش — «فروشنده گفت ۱۲٪» دادهٔ مسئلهٔ اوست، نه «کارِ دیگری» */
-    if (it.k === "d" && um) { var ds28 = ""; try { ds28 = ST.dataSrc28(um.text, it.t); } catch (e) { } if (ds28) lines = lines.concat(["منبع: به گفتهٔ «" + ds28 + "»"]); }
+    if (it.k === "d" && um) { var ds28 = ""; try { ds28 = it.src30 || ST.dataSrc28(um.text, it.t); } catch (e) { } if (ds28) lines = lines.concat(["منبع: به گفتهٔ «" + ds28 + "»"]); }
     var src = um ? { sess: s.id, mid: mid(um), text: um.text, at: um.at || "", title: s.title || "" } : null;
     try { A.EVLOG.add(Object.assign(pid ? { pid: pid } : { sess: s.id }, { id: "st23_" + key.replace(/[^\w]/g, "_") + "_" + it.k + "_" + it.n, k: EV_K[it.k], at: it.at, title: title27(it), lines: lines, out: "", src: src, by: "coach" })); } catch (e) { }
   }
@@ -485,6 +485,14 @@
     return { who: A0.who, from: from, to: to, text: txt(T.slice(from, to)) };
   }
   /* منبعِ یک داده (C96): «فروشنده گفت ۱۲٪»، «استادم میگه …» — نامِ نسبت اگر جملهٔ همین داده آن را به گوینده‌ای نسبت می‌دهد و آن گفته کارِ دیگری نیست */
+  /* دورِ ۳۰ (C188): «X گفت (که) <کاری که او بکند>» — توصیهٔ دیگری به او. خروجی { who, t } (t = بندِ توصیه، بایت‌به‌بایت) یا null. فعلِ التزامیِ اول‌شخص («بگیرم/بخرم/برم/نذارم»)
+     نشانِ توصیه به اوست؛ گفته‌ای با حساب یا عدد مالِ مسیرِ C96 است (کارِ دیگری/منبعِ داده)، و پرسش توصیه نیست. */
+  ST.advice30 = function (ut) { var T = String(ut || ""), re = new RegExp("(?:^|[\\s،,.:«(])(" + WHO27 + ")(?:\\s+[^\\s.!؟?،:]{1,14}){0,2}?\\s+(?:گفت|گفته|می[‌\\s]?گه|میگه|پیشنهاد\\s*(?:داد|داده|کرد)|توصیه\\s*(?:کرد|کرده))\\s+(?:که\\s+)?([^.!؟?\\n]{6,})", "g"), m;
+    while ((m = re.exec(T))) { var t = txt(m[2].split(/\s+(?:ولی|اما|ولیکن)\s|،\s*(?:به\s*نظرم|ولی|اما)\s/)[0]).replace(/[.!…]+$/, ""), end = T.slice(m.index + m[0].length).replace(/^\s+/, "").charAt(0);
+      if (/[؟?]/.test(end) || /[0-9۰-۹]/.test(t) || /[=×÷«]/.test(t) || /(?:^|\s)(?:شاید|ممکنه)(?![آ-ی])/.test(t)) continue;   // نقلِ گیومه‌دار و «شاید …» توصیهٔ کاری نیست
+      if (!/(?:^|\s)(?:ب[آ-ی‌]{1,12}م|ن(?:گیرم|خرم|رم|زنم|ذارم|کنم|بندم|دم))(?![آ-ی‌])/.test(t)) continue;
+      return { who: m[1], t: t }; }
+    return null; };
   ST.dataSrc28 = function (ut, d) { var T = String(ut || ""), i = d ? T.indexOf(String(d).replace(/…$/, "").slice(0, 16)) : -1;
     var A0 = attr28(T).filter(function (x) { return x.say && !x.other && /[0-9۰-۹]/.test(x.after) && (i < 0 || (i >= x.sent.a && i < x.sent.b)); })[0]; return A0 ? A0.who : ""; };
   /* q (نقلِ نتیجهٔ مدل) درونِ تکهٔ دیگری است؛ بی q: هیچ عددی بیرون از آن تکه نیست */
@@ -565,6 +573,10 @@
         }
       }
     }
+    /* دورِ ۳۰ (story، C188 — D27-33 arD2 p12 «داداشم علی گفت کابل رو از مغازهٔ حسن آقا بگیرم، اونجا ارزون‌تره» بی هیچ رد): توصیهٔ کسِ دیگری به او دادهٔ مسئلهٔ اوست با منبعش،
+       نه «کارِ دیگری» و نه هیچ — پیش‌تر فقط وقتی مدل «d» می‌گفت و عددی بود خوانده می‌شد. نقل بایت‌به‌بایت (C55)؛ منبع با نسبت، نه نام (C22/C38/C57).
+       هم‌شکلِ منفی: برنامهٔ خودش («خودم از مغازه می‌گیرم») مالِ خودش است؛ «داداشم گفت ۳ × ۵ = ۱۵» کارِ دیگری است (C96، OW). */
+    try { var adv30 = corr ? null : ST.advice30(ut); if (adv30 && !inOW29(OWS29, ut.indexOf(adv30.t)) && !I.some(function (x) { return nz(x.t).indexOf(nz(adv30.t).slice(0, 30)) >= 0; })) I.push({ k: "d", t: clip(adv30.t, 200), src30: adv30.who }); } catch (e30) { }
     /* دورِ ۲۵ (P1، D25-7 — pwD1 «… به نظرم این دیگه حل شد»): پیامی که هم جوابِ کل را می‌گوید و هم «حل شد»؛ a27 «نتیجه» را به‌خاطرِ ادعای «حل شد» از said برمی‌دارد،
        ولی نقلِ نتیجهٔ مدل در همین پیام هست و نشانهٔ جوابِ کل دارد ⇒ در داستان می‌ماند (وگرنه صفحه نمی‌داند در گفت‌وگو حل شده و قابِ فهم را دوباره می‌خواهد) */
     if (so && real && !corr && said.indexOf("result") < 0 && !I.some(function (x) { return x.k === "res"; })) { var rt5 = txtOf(a.result);

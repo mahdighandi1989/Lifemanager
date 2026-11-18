@@ -38,6 +38,16 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   K.U_C30_1_neg = async () => { const m = [await mk('۴ × ۵ = ۲۰ و ۲۰ − ۳ = ۱۸'), await mk('اون‌وقت [n/2^k] = a_k + 2a_{k+1} + … میشه'), await mk('π × ۲² = ۱۲٫۵۶')];
     return [/✗/.test(m[0]) && /✓/.test(m[2]) && !/^حسابِ صفحه: ✓/.test(m[1]), J(m)]; };
 
+  /* ---------- C184 (A26-9 pA1 p3): بندِ «کافی/زائد/متناقض» یک پرسش با «یا» ---------- */
+  K.U_A26_9 = async () => { const x = await ev(() => [APP.ASSIST.tutorQuestions.und.qs.filter(q => /کافی است/.test(q))[0], APP.ASSIST.oneQ25(APP.ASSIST.tutorQuestions.und.qs.filter(q => /کافی است/.test(q))[0])]);
+    return [x[0] === 'آیا شرط برای تعیینِ مجهول کافی است، یا زائد، یا متناقض؟' && x[1] === x[0] && (x[0].match(/؟/g) || []).length === 1, J(x)]; };
+
+  /* ---------- C188 (D27-33 arD2 p12): توصیهٔ دیگری دادهٔ اوست با منبع ---------- */
+  K.U_D27_33 = async () => { const x = await ev(() => APP.STORY.advice30('داداشم علی گفت کابل رو از مغازهٔ حسن آقا بگیرم، اونجا ارزون‌تره.'));
+    return [x && x.who === 'داداشم' && x.t === 'کابل رو از مغازهٔ حسن آقا بگیرم، اونجا ارزون‌تره', J(x)]; };
+  K.U_D27_33_neg = async () => { const x = await ev(() => ['خودم از مغازه می‌گیرم، اونجا ارزون‌تره.', 'معلممون گفت یه قضیه‌ای هست برای مثلث‌ها ولی من اون جلسه نبودم.', 'استادم می‌گه شاید مسئله‌ی کلی‌تر رو ببینم.', 'داداشم گفت ۳ × ۵ = ۱۵ میشه.', 'استادم هم گفت «اشتباه کردی که سایت رو اول کشیدی»، ولی به نظرم برای من شروعِ درستی بود.'].map(t => APP.STORY.advice30(t)));
+    return [x.every(v => v === null), J(x)]; };
+
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 1200)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   console.log(JSON.stringify(info));
