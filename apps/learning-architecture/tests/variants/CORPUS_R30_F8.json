@@ -1,0 +1,1211 @@
+[
+ {
+  "id": "F8-001",
+  "family": "F8",
+  "src": "round30C/s23 p14",
+  "context": "Cake problem: statement «قالب گرد ۲۰ سانتی… مستطیل ۲۵ در ۳۵» with 35 already corrected to 30 (p9); her line «۳۵ تقسیم بر ۲۰، یعنی ۱.۷۵ برابر» (proposal after p9: ۱٫۷۵ ⇒ ۱٫۵). The baking time «۳۵ دقیقه» was edited to «۴۰» (p6) — a different quantity.",
+  "sentence": "یه اصلاحِ دیگه: قطرِ قالبِ گردِ مادرم ۲۰ نیست، ۲۲ سانته.",
+  "expected": "Statement and title 20 ⇒ 22 (history). Her «۱.۷۵» line is stale; exact proposal from the stored expression with EVERY current datum (C89): 30 ÷ 22 = 15/11 = «۱ و ۴ یازدهم ≈ ۱٫۳۶» (C161). Never «≈ ۱٫۸۱۸۲» (40 ÷ 22 borrows the baking-time 40, a different quantity, C66/C143).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C161",
+   "C66",
+   "C143"
+  ],
+  "verdict_in_round30": "failed (C29-14 CHANGED: «۱٫۷۵ ⇒ ≈ ۱٫۸۱۸۲»)"
+ },
+ {
+  "id": "F8-002",
+  "family": "F8",
+  "src": "round30C/s23 p16",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Statement «۱۲ تا مهمون».",
+  "sentence": "ببخشید، مهمونا ۱۲ تا نیستن، ۱۵ تان.",
+  "expected": "Plural «نیستن» is a correction (C142/C48): 12 ⇒ 15 in the statement; steps 1, 2 stale with exact proposals: 24 ⇒ 30 (15 × 2), 3 ⇒ 3.75 (30 ÷ 8 = «۳ و ۳ چهارم» exact decimal 3.75).",
+  "ruling": [
+   "C142",
+   "C48",
+   "C47",
+   "C89"
+  ],
+  "verdict_in_round30": "held (stale marks); proposals not shown in the reply"
+ },
+ {
+  "id": "F8-003",
+  "family": "F8",
+  "src": "round30C/s23 p17",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». After 12 ⇒ 15: proposals 24 ⇒ 30, 3 ⇒ 3.75 (bases current).",
+  "sentence": "آره، همون ۳۰ درسته.",
+  "expected": "Accepts the current proposal: step 1 value 30 accepted (her text kept; accepted value recorded, C68); its dependant step 2 gets the C47 proposal 3 ⇒ 3.75 (still shown).",
+  "ruling": [
+   "C68",
+   "C87",
+   "C47"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-004",
+  "family": "F8",
+  "src": "round30C/s23 p18",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Guests 15; step 1 accepted 30.",
+  "sentence": "یه اصلاحِ دیگه: هر کیک ۸ تیکه نمیشه، ۱۰ تیکه میشه.",
+  "expected": "«X نمیشه، Y میشه» (C142): 8 ⇒ 10. Step 2 stale; exact proposal 30 ÷ 10 = 3 (cakes).",
+  "ruling": [
+   "C142",
+   "C89"
+  ],
+  "verdict_in_round30": "held (stale); proposal shown later as 2.4 (wrong)"
+ },
+ {
+  "id": "F8-005",
+  "family": "F8",
+  "src": "round30C/s23 p19",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Guests 15, pieces/cake now 10. The earlier proposal «3 ⇒ 3.75» was built on 8.",
+  "sentence": "آره، همون ۳٫۷۵ درسته.",
+  "expected": "Acceptance of a proposal whose base is stale: no rewrite; the page names the stale base and its current value («روی ۸ ِ کهنه ساخته شده — الان ۱۰ است») and gives the current exact proposal 30 ÷ 10 = 3 (C87/C111/C89).",
+  "ruling": [
+   "C87",
+   "C111",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (C30-4: current proposal «۳ ⇒ ۲٫۴» used 24 of 12 guests)"
+ },
+ {
+  "id": "F8-006",
+  "family": "F8",
+  "src": "round30C/s23 p20",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Guests 15 (second correction of the same datum), pieces 10.",
+  "sentence": "ببخشید، مهمونا ۱۵ تا هم نیستن، ۱۸ تان.",
+  "expected": "Second correction of the same datum replaces the first, both in history (C142). Step 1 stale: 30 ⇒ 36 (18 × 2); step 2: 3 ⇒ 3.6 (36 ÷ 10).",
+  "ruling": [
+   "C142",
+   "C89",
+   "C47"
+  ],
+  "verdict_in_round30": "failed (C30-2: only the statement changed)"
+ },
+ {
+  "id": "F8-007",
+  "family": "F8",
+  "src": "round30C/s23 p21",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Guests 18; statement says «هر کدوم ۲ تیکه کیک می‌خورن».",
+  "sentence": "یه اصلاحِ دیگه: هر کدوم ۲ تیکه نمی‌خورن، ۳ تیکه می‌خورن.",
+  "expected": "A correction (negated verb + affirmed verb, C142 shape): statement «۲ تیکه» ⇒ «۳ تیکه»; step 1: 18 × 3 = 54; step 2: 54 ÷ 10 = 5.4.",
+  "ruling": [
+   "C142",
+   "C48",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (C30-3: «چیزی عوض نشد»)"
+ },
+ {
+  "id": "F8-008",
+  "family": "F8",
+  "src": "round30C/s23 p22",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Guests 18, 3 pieces each, 10 per cake. No proposal «36» is current (36 = 18 × 2 rests on the replaced «۲ تیکه»).",
+  "sentence": "آره، همون ۳۶ درسته.",
+  "expected": "The page names the stale base («روی ۲ تیکه ِ کهنه — الان ۳») and gives the current exact proposal 54 (step 1) — no rewrite to 36 (C87/C111).",
+  "ruling": [
+   "C87",
+   "C111",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (no page line)"
+ },
+ {
+  "id": "F8-009",
+  "family": "F8",
+  "src": "round30C/s23 p23",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Guests 18, 3 pieces, 10 per cake.",
+  "sentence": "مهمونا ۱۸ تا نمیشن، ۱۶ تا میشن.",
+  "expected": "Plural «نمیشن/میشن» = C142's «X نمیشه، Y میشه»: 18 ⇒ 16 (history keeps 12 ⇒ 15 ⇒ 18 ⇒ 16). Step 1: 16 × 3 = 48; step 2: 48 ÷ 10 = 4.8.",
+  "ruling": [
+   "C142",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (C30-5: «نشانهٔ اصلاح نبود»)"
+ },
+ {
+  "id": "F8-010",
+  "family": "F8",
+  "src": "round30C/s23 p24",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Guests 16, 3 pieces, 10 per cake.",
+  "sentence": "هر کیک ۱۰ تیکه نیست، ۹ تیکه‌ست.",
+  "expected": "10 ⇒ 9; step 2: 48 ÷ 9 = 16/3 = «۵ و ۱ سوم ≈ ۵٫۳۳» (C161).",
+  "ruling": [
+   "C88",
+   "C142",
+   "C161"
+  ],
+  "verdict_in_round30": "failed (C30-2: «چیزی برای عوض کردن نبود»)"
+ },
+ {
+  "id": "F8-011",
+  "family": "F8",
+  "src": "round30C/s23 p25",
+  "context": "round30C/s23 (party problem, separate record): prior ledger step 1 «۱۲ × ۲ = ۲۴ تیکه», step 2 «۲۴ ÷ ۸ = ۳ کیک». Pieces per cake just corrected 10 ⇒ 9.",
+  "sentence": "نه ببخشید، همون ۱۰ تیکه درست بود.",
+  "expected": "Take-back (C160/C5): 10 returns with history; the 9-based proposal (5 1/3) is marked superseded; step 2 proposal 48 ÷ 10 = 4.8.",
+  "ruling": [
+   "C160",
+   "C5"
+  ],
+  "verdict_in_round30": "failed (C30-16 shape: «چیزی برای عوض کردن نبود»)"
+ },
+ {
+  "id": "F8-012",
+  "family": "F8",
+  "src": "round30C/s23 p26–p27",
+  "context": "Chat-only record «جشن از ساعتِ ۴ تا ۶ ـه.»",
+  "sentence": "منظورم از ۵ تا ۷ بود، نه از ۴ تا ۶.",
+  "expected": "A range is replaced as one unit: «از ۴ تا ۶» ⇒ «از ۵ تا ۷» with one history line (C143); no dependants.",
+  "ruling": [
+   "C143",
+   "C48"
+  ],
+  "verdict_in_round30": "unknown (no page line shown)"
+ },
+ {
+  "id": "F8-013",
+  "family": "F8",
+  "src": "round30C/pwC1 p27",
+  "context": "Farm irrigation; statement «نیازِ آبیِ روزانه … حدود ۵ میلی‌متره»; volume 100 computed from it; separate cost/loan line «۱۱۵ − ۷۰ = ۴۵ = ۳ × ۱۵».",
+  "sentence": "یه اصلاحِ دیگه: نیازِ آبیِ روزانه تو تابستون ۵ میلی‌متر نبود، ۶ میلی‌متره.",
+  "expected": "5 ⇒ 6 mm; only quantities recorded as built from it are stale (volume 100 ⇒ 150 per the page's stored relation). The cost/loan line is not built on mm ⇒ never «دیگر برقرار نیست» (C47/C66).",
+  "ruling": [
+   "C88",
+   "C47",
+   "C66",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (C29-10 half: false dependency on the loan line)"
+ },
+ {
+  "id": "F8-014",
+  "family": "F8",
+  "src": "round30C/pwC1 p28",
+  "context": "Proposal 100 ⇒ 150 (base current).",
+  "sentence": "آره، همون ۱۵۰ درسته.",
+  "expected": "Accepted value recorded (C68); her text kept.",
+  "ruling": [
+   "C68"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F8-015",
+  "family": "F8",
+  "src": "round30C/pwC1 p31",
+  "context": "Panel price corrected 4.5 ⇒ 5: proposal 54 ⇒ 60 (12 × 5). Costs chain: 54 + 38 = 92, + 23 = 115, 115/3 = 38.33, 115 − 70 = 45 = 3 × 15 (نفری ۱۵).",
+  "sentence": "و برای هزینه‌ها: آره، همون ۶۰ میلیون درسته.",
+  "expected": "Accept 60 (C68); dependants get exact proposals: 92 ⇒ 98; 115 ⇒ 121; 38.33 ⇒ 121/3 = «۴۰ و ۱ سوم ≈ ۴۰٫۳۳» (C161); 45 ⇒ 51; «نفری ۱۵» ⇒ 17 (51 ÷ 3).",
+  "ruling": [
+   "C68",
+   "C47",
+   "C89",
+   "C161",
+   "C162"
+  ],
+  "verdict_in_round30": "failed (no fraction; «نفری ۱۵ ⇒ ۱۷» missing)"
+ },
+ {
+  "id": "F8-016",
+  "family": "F8",
+  "src": "round30C/pwC1 p32",
+  "context": "Area corrected before (2 ⇒ 2.5); now 2.5 in the statement. Recorded: volume 100 (area × mm), panels 54 (12 × 4.5/5), head loss 12, pump head 52, loan line «نفری ۱۵».",
+  "sentence": "یه اصلاحِ دیگه: مساحتِ باغ ۲٫۵ هکتار نبود، ۳ هکتاره.",
+  "expected": "2.5 ⇒ 3 ha (history keeps the earlier value). Only area-built numbers are stale: volume ⇒ 3 ha × 6 mm = 30,000 m² × 0.006 m = 180 m³ (100 ⇒ 180). Panels 54, head loss 12, pump head 52 and «۱۵» are NOT area-dependent ⇒ no proposals (C47/C66/C89). The base is named «۲٫۵ هکتار», not «۲».",
+  "ruling": [
+   "C88",
+   "C47",
+   "C66",
+   "C89",
+   "C142"
+  ],
+  "verdict_in_round30": "failed (C30-15)"
+ },
+ {
+  "id": "F8-017",
+  "family": "F8",
+  "src": "round30C/pwC1 p35–p37",
+  "context": "Chat-only record (brother's tank, separate problem): «پمپِ مخزنِ برادرم ساعتی ۱۲ متر مکعب می‌کشه: ۱۶۰ ÷ ۱۲ ≈ ۱۳٫۳ ساعت».",
+  "sentence": "پمپش ۱۲ نیست، ۹ متر مکعب در ساعته.",
+  "expected": "12 ⇒ 9 in the record; the time line is stale with exact proposal 160 ÷ 9 = «۱۷ و ۷ نهم ≈ ۱۷٫۷۸» ساعت (C161, C89 chat-only).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C161",
+   "C87"
+  ],
+  "verdict_in_round30": "failed (C30-9: text only)"
+ },
+ {
+  "id": "F8-018",
+  "family": "F8",
+  "src": "round30C/pwC1 p38",
+  "context": "After 12 ⇒ 9, the correct proposal would be 17 7/9 ≈ 17.78 (base current).",
+  "sentence": "آره، همون ۱۷٫۷۸ درسته.",
+  "expected": "If the proposal was shown: accepted (C68), recorded as ≈ 17.78 (exact 17 7/9). If no proposal was shown, the page re-checks 160 ÷ 9 and records her value as a correct rounded fix (C9/C8).",
+  "ruling": [
+   "C68",
+   "C9",
+   "C8"
+  ],
+  "verdict_in_round30": "unknown (no proposal was shown)"
+ },
+ {
+  "id": "F8-019",
+  "family": "F8",
+  "src": "round30C/pwC1 p39–p40",
+  "context": "Chat-only: «هزینهٔ پنل‌ها ۶۰ میلیون، حملش با کامیون ۴ میلیون و ۲۰۰: ۶۰ میلیون + ۴ میلیون و ۲۰۰ = ۶۴ میلیون و ۲۰۰».",
+  "sentence": "کامیون ۴ میلیون و ۲۰۰ نیست، ۴ میلیون و ۵۰۰.",
+  "expected": "Compound amount replaced as a whole: «۴ میلیون و ۲۰۰» ⇒ «۴ میلیون و ۵۰۰» (history shows the whole amount, not «۲۰۰ ⇒ ۵۰۰»); sum stale: 64,200 ⇒ 64,500 هزار («۶۴ میلیون و ۵۰۰»).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C45",
+   "C102"
+  ],
+  "verdict_in_round30": "failed (C30-9: «۵۰۰: ⇐ ۲۰۰:» only)"
+ },
+ {
+  "id": "F8-020",
+  "family": "F8",
+  "src": "round30C/pwC1 p41",
+  "context": "Truck just corrected 4,200 ⇒ 4,500; proposal 64,200 ⇒ 64,500.",
+  "sentence": "نه ببخشید، همون ۴ میلیون و ۲۰۰ درست بود.",
+  "expected": "Take-back (C160): 4 M 200 returns with history; the 64,500 proposal is superseded; the sum 64 M 200 is current again (✓).",
+  "ruling": [
+   "C160",
+   "C5"
+  ],
+  "verdict_in_round30": "failed (C30-16: nothing changed)"
+ },
+ {
+  "id": "F8-021",
+  "family": "F8",
+  "src": "round30C/aC3 p47–p48",
+  "context": "Chat-only: «کامیون ۴ میلیون و ۲۰۰ + کارگر ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰. از ۸ میلیونی که کنار گذاشتم، ۲ میلیون و ۳۰۰ می‌مونه.»",
+  "sentence": "ببخشید، کامیون ۴ میلیون و ۲۰۰ نیست، ۴ میلیون و ۵۰۰.",
+  "expected": "4 M 200 ⇒ 4 M 500 (whole amount). Sum stale: 5,700 ⇒ 6,000 («۶ میلیون»); remainder clause is a C162 dependant: 2,300 ⇒ 2,000 («۲ میلیون»). Her text is never rewritten (C164).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C162",
+   "C164",
+   "C45"
+  ],
+  "verdict_in_round30": "failed (C30-9: text only)"
+ },
+ {
+  "id": "F8-022",
+  "family": "F8",
+  "src": "round30C/aC3 p49–p50",
+  "context": "Chat-only: «اتاقِ اول ۱۲ متره، اتاقِ دوم ۱۰ متر: ۱۲ + ۱۰ = ۲۲ متر فرش».",
+  "sentence": "اتاقِ دوم ۱۰ نیست، ۱۴ متره.",
+  "expected": "Named quantity «اتاقِ دوم»: 10 ⇒ 14; sum stale 22 ⇒ 26. «اتاقِ اول ۱۲» untouched (C143).",
+  "ruling": [
+   "C143",
+   "C89"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F8-023",
+  "family": "F8",
+  "src": "round30B/nB3 p9",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). Statement «مهمون‌ها ۲۵ نفرن».",
+  "sentence": "یه اصلاح: مهمون‌ها ۲۵ نفر نیستن، ۲۷ نفرن.",
+  "expected": "25 ⇒ 27. Stale with exact proposals in her scale (C45): step 1 «۸ میلیون ⇒ ۸ میلیون و ۶۴۰» (27 × 320); step 3 ⇒ «۱۱ میلیون و ۴۰»; step 4 ⇒ «۹۶۰ هزار»; hall share 96 ⇒ «۸۸ و ۸ نهم ≈ ۸۸٫۸۹ هزار» (C161). The slices result «۵۰ منهای ۴۲ میشه ۸» is NOT built on 25 ⇒ never stale (C47/C66).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C45",
+   "C161",
+   "C47",
+   "C66"
+  ],
+  "verdict_in_round30": "failed (B30·D8: «۸ ⇒ ۸٫۶۴», no fraction, step 3/4 without values, false slices dependency)"
+ },
+ {
+  "id": "F8-024",
+  "family": "F8",
+  "src": "round30B/nB3 p10",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). Guests just corrected 25 ⇒ 27.",
+  "sentence": "ببخشید باز اصلاح: ۲۷ هم نمیشه، ۲۸ نفر میشه.",
+  "expected": "Second correction of the same datum (C142), history 25 ⇒ 27 ⇒ 28. Step 1 ⇒ «۸ میلیون و ۹۶۰»; step 3 ⇒ «۱۱ میلیون و ۳۶۰»; step 4 ⇒ «۶۴۰ هزار»; hall share ⇒ «۸۵ و ۵ هفتم ≈ ۸۵٫۷۱ هزار».",
+  "ruling": [
+   "C142",
+   "C89",
+   "C45",
+   "C161"
+  ],
+  "verdict_in_round30": "failed (B30·D8: decimals without fraction, «۸ ⇒ ۸٫۹۶» not in her scale)"
+ },
+ {
+  "id": "F8-025",
+  "family": "F8",
+  "src": "round30B/nB3 p11",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). Guests now 28; the proposal «۸ میلیون و ۶۴۰» was built on 27.",
+  "sentence": "آره، همون ۸ میلیون و ۶۴۰ برای غذا درسته.",
+  "expected": "No rewrite: the page matches her amount to its own 27-based proposal and names the stale base («روی ۲۷ ِ کهنه — الان ۲۸») with the current exact proposal «۸ میلیون و ۹۶۰» (C87/C111).",
+  "ruling": [
+   "C87",
+   "C111"
+  ],
+  "verdict_in_round30": "failed (B30·D9: no page line)"
+ },
+ {
+  "id": "F8-026",
+  "family": "F8",
+  "src": "round30B/nB3 p12",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). Guests 28.",
+  "sentence": "یه اصلاحِ دیگه: غذا نفری ۳۲۰ نیست، ۳۵۰ هزاره.",
+  "expected": "320 ⇒ 350 هزار. With every current datum (C89): step 1 ⇒ «۹ میلیون و ۸۰۰» (28 × 350); step 3 ⇒ «۱۲ میلیون و ۲۰۰»; step 4 ⇒ 12,000 − 12,200 = −200 هزار (her line said money LEFT; the exact value is a 200 هزار shortfall).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C45"
+  ],
+  "verdict_in_round30": "failed (B30·D8: «۸ ⇒ ۹٫۸» not in her scale)"
+ },
+ {
+  "id": "F8-027",
+  "family": "F8",
+  "src": "round30B/nB3 p13",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). Guests 28 (history 25 ⇒ 27 ⇒ 28); food 350.",
+  "sentence": "نه ببخشید، همون ۲۷ درست بود؛ یکی از خاله‌ها نمیاد.",
+  "expected": "«همون N درست بود» take-back (C160): 27 returns with history; proposals built on 28 superseded. Current: step 1 «۹ میلیون و ۴۵۰» (27 × 350); step 3 «۱۱ میلیون و ۸۵۰»; step 4 «۱۵۰ هزار»; hall share «۸۸ و ۸ نهم ≈ ۸۸٫۸۹».",
+  "ruling": [
+   "C160",
+   "C5",
+   "C89",
+   "C45",
+   "C161"
+  ],
+  "verdict_in_round30": "held for the take-back (values not in her scale / no fraction: B30·D8)"
+ },
+ {
+  "id": "F8-028",
+  "family": "F8",
+  "src": "round30B/nB3 p14",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). Guests 27, food 350.",
+  "sentence": "سالن ۲ میلیون و ۴۰۰ نیست، ۲ میلیون و ۷۰۰ ـه.",
+  "expected": "Whole compound amount replaced (history «۲ میلیون و ۷۰۰ ⇐ ۲ میلیون و ۴۰۰», never the bare «۷۰۰ ـه»). Dependants with every current datum: step 2 datum ⇒ 2 M 700; step 3 ⇒ «۱۲ میلیون و ۱۵۰» (9,450 + 2,700); step 4 ⇒ −150 هزار (150 هزار short); hall share «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» ⇒ 2,700 ÷ 27 = «۱۰۰ هزار». Discount line: see the needs_ruling.",
+  "ruling": [
+   "C88",
+   "C89",
+   "C47",
+   "C45"
+  ],
+  "verdict_in_round30": "failed (B30·D7: no dependant marked)",
+  "needs_ruling": "The aunt's line «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» stores 240 as a bare number (10 % was in the sentence but not in the expression). C47 says the proposal is the exact recomputation of the STORED expression ⇒ 2,700 − 240 = «۲ میلیون و ۴۶۰»; the runner (B30·D7) expected 10 % re-derived ⇒ «۲ میلیون و ۴۳۰». Which?"
+ },
+ {
+  "id": "F8-029",
+  "family": "F8",
+  "src": "round30B/nB3 p15",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). Chat: «کیک بسته به طرح از ۹۰۰ هزار تا ۱ میلیون و ۱۰۰ ـه؛ من گرون‌ترش رو حساب کردم.»",
+  "sentence": "قیمتِ کیک از ۹۰۰ هزار تا ۱ میلیون و ۱۰۰ نیست، از ۱ میلیون تا ۱ میلیون و ۳۰۰ ـه.",
+  "expected": "The range is replaced as one unit with one history line (C143). The cake-and-flowers sum uses the separate datum «کیک ۱ میلیون و ۱۰۰» ⇒ equal digits are not dependency (C47/C66): no proposal unless recorded.",
+  "ruling": [
+   "C143",
+   "C47",
+   "C66"
+  ],
+  "verdict_in_round30": "failed («چیزی ثبت نشده بود»)"
+ },
+ {
+  "id": "F8-030",
+  "family": "F8",
+  "src": "round30B/nB3 p17",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). «۶ میز، هر میز ۷ برش، ۶ × ۷ = ۴۲ تا برش» and «۵۰ منهای ۴۲ میشه ۸»; unrelated 7s: guest list «۱۸ + ۷ = ۲۵».",
+  "sentence": "یه اصلاحِ دیگه: میزِ دوم ۸ برش می‌خواد، نه ۷.",
+  "expected": "Binds only to the named quantity «میزِ دوم» (C143): guest list 25, hall share 96 and the ledger steps 1, 3, 4 are NOT stale. Never «۴۲ ⇒ ۴۸» (that changes all six tables).",
+  "ruling": [
+   "C143",
+   "C47",
+   "C66",
+   "C89",
+   "C162"
+  ],
+  "verdict_in_round30": "failed (B30·D6)",
+  "needs_ruling": "The stored expression «۶ × ۷» has no per-table structure. Is the page to propose 5 × 7 + 8 = 43 (and the slices remainder 50 − 43 = 7, C162), as the runner expected, or mark «۴۲» stale and ask without a number (C47: no stored expression for the split)?"
+ },
+ {
+  "id": "F8-031",
+  "family": "F8",
+  "src": "round30B/nB3 p19",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). Current: guests 27, food 350, hall 2 M 700.",
+  "sentence": "برگردیم به مهمونی: با ۲۷ نفر و نفری ۳۵۰ هزار، ۲۷ × ۳۵۰ هزار = ۹ میلیون و ۴۵۰. با سالنِ ۲ میلیون و ۷۰۰ میشه ۱۲ میلیون و ۱۵۰، یعنی ۱۵۰ هزار کم دارم.",
+  "expected": "NEGATIVE look-alike for the correction reader: no correction marker ⇒ nothing is replaced; her new lines are judged ✓ (9,450; 12,150; 150 short against the 12 M budget, C156).",
+  "ruling": [
+   "C142",
+   "C138",
+   "C156"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F8-032",
+  "family": "F8",
+  "src": "round29B/nB2 p7",
+  "context": "round29B/nB2 (replayed in round30B/nB2): steps 1 «کامیون ۴ میلیون و ۲۰۰ + کارگر ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰», 2 «۳۰ × ۱۵ = ۴۵۰ هزار», 3 «۵ میلیون و ۷۰۰ + ۴۵۰ هزار = ۶ میلیون و ۱۵۰», 4 (fixed) «۸ میلیون منهای ۶ میلیون و ۱۵۰ = ۱ میلیون و ۸۵۰». Chat: painter wage «۱ میلیون و ۲۰۰», hourly truck «۲ × ۶۰۰ هزار = ۱ میلیون و ۲۰۰». ",
+  "sentence": "یه اصلاح: کارتن‌ها ۱۵ هزار نیست، ۱۸ هزاره.",
+  "expected": "15 ⇒ 18 هزار. Step 2 ⇒ 540 هزار; step 3 ⇒ «۶ میلیون و ۲۴۰»; step 4 ⇒ «۱ میلیون و ۷۶۰».",
+  "ruling": [
+   "C88",
+   "C89",
+   "C45"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-033",
+  "family": "F8",
+  "src": "round29B/nB2 p8",
+  "context": "round29B/nB2 (replayed in round30B/nB2): steps 1 «کامیون ۴ میلیون و ۲۰۰ + کارگر ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰», 2 «۳۰ × ۱۵ = ۴۵۰ هزار», 3 «۵ میلیون و ۷۰۰ + ۴۵۰ هزار = ۶ میلیون و ۱۵۰», 4 (fixed) «۸ میلیون منهای ۶ میلیون و ۱۵۰ = ۱ میلیون و ۸۵۰». Chat: painter wage «۱ میلیون و ۲۰۰», hourly truck «۲ × ۶۰۰ هزار = ۱ میلیون و ۲۰۰». Cartons just corrected 15 ⇒ 18.",
+  "sentence": "ببخشید باز اصلاح: ۱۸ هم نه، ۲۰ هزار تومنه.",
+  "expected": "Second correction (C142): 15 ⇒ 18 ⇒ 20. Step 2 ⇒ 600 هزار (30 × 20); step 3 ⇒ «۶ میلیون و ۳۰۰»; step 4 ⇒ «۱ میلیون و ۷۰۰». No false «۶ ⇒ ۶٫۴»/«۳۰ ⇒ ۳۲» (ratio scaling is never a proposal, C89).",
+  "ruling": [
+   "C142",
+   "C89"
+  ],
+  "verdict_in_round30": "unknown (round 29: «۴۵۰ ⇒ ۴۸۰», false dependants)"
+ },
+ {
+  "id": "F8-034",
+  "family": "F8",
+  "src": "round29B/nB2 p9",
+  "context": "round29B/nB2 (replayed in round30B/nB2): steps 1 «کامیون ۴ میلیون و ۲۰۰ + کارگر ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰», 2 «۳۰ × ۱۵ = ۴۵۰ هزار», 3 «۵ میلیون و ۷۰۰ + ۴۵۰ هزار = ۶ میلیون و ۱۵۰», 4 (fixed) «۸ میلیون منهای ۶ میلیون و ۱۵۰ = ۱ میلیون و ۸۵۰». Chat: painter wage «۱ میلیون و ۲۰۰», hourly truck «۲ × ۶۰۰ هزار = ۱ میلیون و ۲۰۰». Cartons now 20; the 540 proposal was built on 18.",
+  "sentence": "آره، همون ۵۴۰ هزار درسته.",
+  "expected": "Stale base named («روی ۱۸ هزار ِ کهنه — الان ۲۰ هزار»), current exact proposal «۴۵۰ ⇒ ۶۰۰»; no rewrite (C87/C111).",
+  "ruling": [
+   "C87",
+   "C111"
+  ],
+  "verdict_in_round30": "held (round 30 nB2 shows «۴۵۰ ⇒ ۶۰۰»)"
+ },
+ {
+  "id": "F8-035",
+  "family": "F8",
+  "src": "round29B/nB2 p10",
+  "context": "round29B/nB2 (replayed in round30B/nB2): steps 1 «کامیون ۴ میلیون و ۲۰۰ + کارگر ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰», 2 «۳۰ × ۱۵ = ۴۵۰ هزار», 3 «۵ میلیون و ۷۰۰ + ۴۵۰ هزار = ۶ میلیون و ۱۵۰», 4 (fixed) «۸ میلیون منهای ۶ میلیون و ۱۵۰ = ۱ میلیون و ۸۵۰». Chat: painter wage «۱ میلیون و ۲۰۰», hourly truck «۲ × ۶۰۰ هزار = ۱ میلیون و ۲۰۰». Cartons 20.",
+  "sentence": "آهان راست میگی، ۳۰ × ۲۰ = ۶۰۰ هزار. کامیون هم ۴ میلیون و ۲۰۰ نیست، ۴ میلیون و ۵۰۰ ـه.",
+  "expected": "Her own fix of step 2 applied (C8, ✓). Truck 4 M 200 ⇒ 4 M 500 changes only the truck amount (C88): step 1 ⇒ «۶ میلیون»; step 3 ⇒ «۶ میلیون و ۶۰۰»; step 4 ⇒ «۱ میلیون و ۴۰۰». The painter wage «۱ میلیون و ۲۰۰» and the hourly-truck «۲ × ۶۰۰ هزار = ۱ میلیون و ۲۰۰» only share the token «۲۰۰» ⇒ no «این‌جا هم عوض شود؟», not stale (C47/C66/C88).",
+  "ruling": [
+   "C8",
+   "C88",
+   "C47",
+   "C66",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (B29·D14 still in round 30)"
+ },
+ {
+  "id": "F8-036",
+  "family": "F8",
+  "src": "round30D/tD3 p11 (s22)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». ",
+  "sentence": "پارچه متری ۱۸۵ نیست، ۱۹۰ ـه.",
+  "expected": "185 ⇒ 190 (statement + step 2 datum). Stale with exact proposals: step 2 ⇒ «۱۵ میلیون و ۹۶۰» (84 × 190); step 4 ⇒ 20 − 15.96 = «۴ میلیون و ۴۰»; step 5 shortfall ⇒ 5,040 − 4,040 = «۱ میلیون» (C162).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C162",
+   "C164",
+   "C45"
+  ],
+  "verdict_in_round30": "failed (D30-6: «چیزی در صفحه ثبت نشده بود»)"
+ },
+ {
+  "id": "F8-037",
+  "family": "F8",
+  "src": "round30D/tD3 p12 (s23)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Price just corrected 185 ⇒ 190.",
+  "sentence": "نه ببخشید، ۱۹۰ هم نیست، ۱۹۵ ـه.",
+  "expected": "Second correction (C142), history 185 ⇒ 190 ⇒ 195. Step 2 ⇒ «۱۶ میلیون و ۳۸۰» (84 × 195); step 4 ⇒ «۳ میلیون و ۶۲۰»; step 5 shortfall ⇒ «۱ میلیون و ۴۲۰» (5,040 − 3,620).",
+  "ruling": [
+   "C142",
+   "C89",
+   "C162"
+  ],
+  "verdict_in_round30": "failed (D30-6: «۱۹۵ ⇐ ۱۹۰» on a value never recorded, no proposals)"
+ },
+ {
+  "id": "F8-038",
+  "family": "F8",
+  "src": "round30D/tD3 p13 (s24)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Price now 195; a 190-based value «۱۵ میلیون و ۹۶۰» would have been the earlier proposal.",
+  "sentence": "آره، همون ۱۵ میلیون و ۹۶۰ درسته.",
+  "expected": "No rewrite; the page names the stale base («روی ۱۹۰ ِ کهنه — الان ۱۹۵») and gives the current exact proposal «۱۶ میلیون و ۳۸۰» (C87/C111). Never filed as «داده».",
+  "ruling": [
+   "C87",
+   "C111",
+   "C149"
+  ],
+  "verdict_in_round30": "failed (D30-6: no page line, filed «داده»)"
+ },
+ {
+  "id": "F8-039",
+  "family": "F8",
+  "src": "round30D/tD3 p14 (s25)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Price 195.",
+  "sentence": "دستمزدِ هر روپوش ۱۲۰ نمیشه، ۱۳۰ میشه.",
+  "expected": "«X نمیشه، Y میشه» (C142): 120 ⇒ 130. Step 5: 42 × 130 = 5,460 هزار (5040 ⇒ 5460); shortfall clause ⇒ 5,460 − 3,620 = «۱ میلیون و ۸۴۰» (C162, with the current 195 price).",
+  "ruling": [
+   "C142",
+   "C89",
+   "C162"
+  ],
+  "verdict_in_round30": "held for 5040 ⇒ 5460; shortfall proposal missing"
+ },
+ {
+  "id": "F8-040",
+  "family": "F8",
+  "src": "round30D/tD3 p15 (s26)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Wage just corrected 120 ⇒ 130.",
+  "sentence": "نه، همون ۱۲۰ درست بود.",
+  "expected": "Take-back (C160): 120 returns with history; the 5,460 proposal superseded; step 5 product current again (5,040 ✓) but its shortfall remains stale from the price correction (⇒ «۱ میلیون و ۴۲۰»).",
+  "ruling": [
+   "C160",
+   "C5",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (D30-11: step 5 still «کهنه … به ۱۳۰»)"
+ },
+ {
+  "id": "F8-041",
+  "family": "F8",
+  "src": "round30D/tD3 p16–p17 (s29)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Chat-only: «چرخِ خیاطیِ دوم رو قسطی می‌خرم: ۴ میلیون و ۲۰۰ ÷ ۶ = ۷۰۰ هزار قسطِ هر ماه».",
+  "sentence": "چرخ ۴ میلیون و ۲۰۰ نیست، ۴ میلیون و ۵۰۰ ـه.",
+  "expected": "Whole amount replaced in the record; her line stays her text (C164) and is marked stale with exact proposal 700 ⇒ 750 هزار (4,500 ÷ 6). Never rewritten to «۴ میلیون و ۵۰۰ ÷ ۶ = ۷۰۰ هزار» and never ✗.",
+  "ruling": [
+   "C164",
+   "C88",
+   "C89",
+   "C86"
+  ],
+  "verdict_in_round30": "failed (D30-7)"
+ },
+ {
+  "id": "F8-042",
+  "family": "F8",
+  "src": "round30D/tD3 p18–p19 (s31)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Chat: «۸۴ متر پارچه رو تو ۶ توپ می‌گیرم: ۸۴ ÷ ۶ = ۱۴ متر هر توپ».",
+  "sentence": "۶ توپ نیست، ۹ توپه.",
+  "expected": "6 ⇒ 9; proposal 14 ⇒ 84 ÷ 9 = «۹ و ۱ سوم ≈ ۹٫۳۳» (C161).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C161"
+  ],
+  "verdict_in_round30": "failed (D30-10: «≈ ۹٫۳۳» only)"
+ },
+ {
+  "id": "F8-043",
+  "family": "F8",
+  "src": "round30D/tD3 p20–p21 (s33)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Chat: «اتاقِ اول ۳ در ۴ = ۱۲ متر، اتاقِ دوم ۳ در ۵ = ۱۵ متر». Other 3s: brother's «۴۲ × ۳ = ۱۲۶», mother's «۱۲ × ۱۵ = ۱۸۰ هزار».",
+  "sentence": "عرضِ اتاقِ دوم ۳ نیست، ۳٫۵ ـه.",
+  "expected": "Only the named quantity (C143): «اتاقِ دوم» 15 ⇒ 3.5 × 5 = 17.5. Room 1 (12), the brother's 126 and the mother's 180 are NOT stale.",
+  "ruling": [
+   "C143",
+   "C47",
+   "C66"
+  ],
+  "verdict_in_round30": "failed (D30-8)"
+ },
+ {
+  "id": "F8-044",
+  "family": "F8",
+  "src": "round30D/tD3 p20, p22 (s34)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Chat: «نخ هم قیمتش از ۸۰ تا ۹۰ هزاره».",
+  "sentence": "قیمتِ نخ از ۸۰ تا ۹۰ نیست، از ۹۰ تا ۱۰۰ ـه.",
+  "expected": "Range replaced as one unit: «از ۸۰ تا ۹۰» ⇒ «از ۹۰ تا ۱۰۰» (C143); never «تا ۹۰ ⇐ تا ۹۰».",
+  "ruling": [
+   "C143"
+  ],
+  "verdict_in_round30": "failed (D30-9)"
+ },
+ {
+  "id": "F8-045",
+  "family": "F8",
+  "src": "round30D/tD3 p23 (s35)",
+  "context": "round30D/tD3 (42 gowns): ledger step 2 «۸۴ × ۱۸۵ هزار = ۱۵ میلیون و ۵۴۰ هزار», step 4 «۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه», step 5 «۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم». Statement holds «پارچه متری ۱۸۵ هزار». Chat: «تا امروز ۳۵ تا روپوش برش زدم، از ۴۲ تا ۸ تا کم دارم».",
+  "sentence": "۳۵ تا نبود، ۳۶ تا روپوش برش زده بودم.",
+  "expected": "«X نبود، Y» (C142): 35 ⇒ 36; the shortfall clause is a C162 dependant: exact 42 − 36 = 6 (her «۸ تا کم دارم» stale ⇒ 6).",
+  "ruling": [
+   "C142",
+   "C162",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (D30-11: no proposal)"
+ },
+ {
+  "id": "F8-046",
+  "family": "F8",
+  "src": "round29D/tD1 p2",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». ",
+  "sentence": "اگه پرت ۱۰ درصد نباشه چی؟ آهان، اصلاً فروشنده پرت رو ۱۲ درصد گفته بود، نه ۱۰.",
+  "expected": "Hypothetical to the coach; the fact is a correction (C74/C48): 10 % ⇒ 12 % (source «فروشنده», C96). Step 2 ⇒ 20 × 1.12 = 22.4; step 3 ⇒ 22.4 × 850 = «۱۹ میلیون و ۴۰»; step 5 ⇒ 19.04 + 3 = «۲۲ میلیون و ۴۰», shortfall ⇒ «۴ میلیون و ۴۰». «با ۱۰ درصد پرت» is a datum: never a 🎯 (C148).",
+  "ruling": [
+   "C74",
+   "C48",
+   "C96",
+   "C89",
+   "C148",
+   "C45"
+  ],
+  "verdict_in_round30": "unknown (round 29 also made a false 🎯 from «۱۰ درصد»)"
+ },
+ {
+  "id": "F8-047",
+  "family": "F8",
+  "src": "round29D/tD1 p3",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». Proposal 22 ⇒ 22.4 (base current).",
+  "sentence": "آره، همون ۲۲٫۴ درسته.",
+  "expected": "Accept (C68): step 2 value 22.4; its dependants get exact proposals, not «بی عدد»: step 3 ⇒ «۱۹ میلیون و ۴۰», step 5 ⇒ «۲۲ میلیون و ۴۰» / shortfall «۴ میلیون و ۴۰» (C47: stored expressions exist).",
+  "ruling": [
+   "C68",
+   "C47",
+   "C89"
+  ],
+  "verdict_in_round30": "unknown (round 29: «گامِ ۳ (بی عدد)»)"
+ },
+ {
+  "id": "F8-048",
+  "family": "F8",
+  "src": "round29D/tD1 p5",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». Loss 12 % accepted.",
+  "sentence": "راستی طولِ پذیرایی رو اشتباه گفتم: ۵ متر نیست، ۵٫۵ متره.",
+  "expected": "Length 5 ⇒ 5.5 (not the width 4, C143). With every current datum: step 1 ⇒ 22; step 2 ⇒ 22 × 1.12 = 24.64; step 3 ⇒ 24.64 × 850 = «۲۰ میلیون و ۹۴۴»; step 4 ⇒ 22 × 150 = «۳۳۰۰ هزار»; step 5 ⇒ «۲۴ میلیون و ۲۴۴», shortfall «۶ میلیون و ۲۴۴».",
+  "ruling": [
+   "C88",
+   "C143",
+   "C89",
+   "C45"
+  ],
+  "verdict_in_round30": "unknown (round 28 replaced the width; round 29 «۲۲ ⇒ ۲۴٫۲» used the stale 1.1)"
+ },
+ {
+  "id": "F8-049",
+  "family": "F8",
+  "src": "round29D/tD1 p6",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». ",
+  "sentence": "نه، اون ۱۹ میلیون و ۴۰ نیست؛ قیمت رو باید دوباره از فروشنده بپرسم.",
+  "expected": "«X نیست» about a page proposal, not her record: no datum changes (C88: X is not in her record); the proposal stays unaccepted (acceptance needs her yes, C68).",
+  "ruling": [
+   "C88",
+   "C68"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F8-050",
+  "family": "F8",
+  "src": "round29D/tD1 p7",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». Current proposal for step 4: 3,000 ⇒ 3,300 (22 × 150). «۴۱۲۵» (27.5 × 150) belongs to no current proposal.",
+  "sentence": "آره، همون ۴۱۲۵ درسته.",
+  "expected": "Not applied: 4,125 is not the page's current exact recomputation (C11/C87); the page shows its current proposal 3,300.",
+  "ruling": [
+   "C11",
+   "C87",
+   "C111"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-051",
+  "family": "F8",
+  "src": "round29D/tD1 p8",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». ",
+  "sentence": "نه، ۲۷٫۵ نیست. منظورم طول بود: ۵٫۵ متر در ۴ متر میشه ۲۲ مترمربع.",
+  "expected": "«۲۷٫۵» is a page value, not in her record ⇒ no replacement of her data (C88); her line «۵٫۵ متر در ۴ متر میشه ۲۲» ✓ (C41). Never «گام ۵٫۵: جمع».",
+  "ruling": [
+   "C88",
+   "C41",
+   "C55"
+  ],
+  "verdict_in_round30": "unknown (round 29 corrupted the statement)"
+ },
+ {
+  "id": "F8-052",
+  "family": "F8",
+  "src": "round29D/tD1 p26",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». Chat: «قرنیز … ۱۸ × ۱۶۰ = ۲ میلیون و ۸۸۰», «نصبِ قرنیز هم ۱۸ × ۱۵۰ هزار = ۲ میلیون و ۶۰۰».",
+  "sentence": "قیمتِ قرنیز متری ۱۶۰ نیست، ۱۷۰ ـه.",
+  "expected": "160 ⇒ 170; proposal «۲ میلیون و ۸۸۰ ⇒ ۳ میلیون و ۶۰» (18 × 170).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C45"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-053",
+  "family": "F8",
+  "src": "round29D/tD1 p27",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». Skirting price just 160 ⇒ 170.",
+  "sentence": "نه ببخشید، ۱۷۰ هم نیست، ۱۸۰ ـه.",
+  "expected": "Second correction (C142), history 160 ⇒ 170 ⇒ 180; proposal ⇒ «۳ میلیون و ۲۴۰».",
+  "ruling": [
+   "C142",
+   "C89"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-054",
+  "family": "F8",
+  "src": "round29D/tD1 p28",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». Price now 180; «۳ میلیون و ۶۰» was built on 170.",
+  "sentence": "آره، همون ۳ میلیون و ۶۰ درسته.",
+  "expected": "Stale base named («روی ۱۷۰ ِ کهنه — الان ۱۸۰»), current «۳ میلیون و ۲۴۰»; no rewrite (C87/C111).",
+  "ruling": [
+   "C87",
+   "C111"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-055",
+  "family": "F8",
+  "src": "round29D/tD1 p29",
+  "context": "round28D/tD1 & round29D/tD1 (replayed in round30D/tD1): step 1 «۵ متر در ۴ متر = ۲۰», step 2 «با ۱۰ درصد پرت، ۲۰ × ۱٫۱ = ۲۲», step 3 «۲۲ × ۸۵۰ هزار = ۱۸ میلیون و ۷۰۰», step 4 «۲۰ × ۱۵۰ = ۳۰۰۰ هزار», step 5 «۱۸٫۷ + ۳ = ۲۲٫۷ … ۴ میلیون و ۷۰۰ کم دارم». Step 4 «دستمزدِ نصب متری ۱۵۰ هزار: ۲۰ × ۱۵۰ = ۳۰۰۰ هزار»; also «نصبِ قرنیز هم ۱۸ × ۱۵۰ هزار» and unrelated «۱۸ تا کارتن … ۶ تا می‌مونه».",
+  "sentence": "دستمزدِ نصب متری ۱۵۰ نیست، ۱۸۰ هزاره.",
+  "expected": "Binds to the quantity her words name («دستمزدِ نصب متری» = step 4, C143): step 4 ⇒ (current area) × 180, i.e. 22 × 180 = «۳۹۶۰ هزار» after the 5.5 correction; step 5 gets its exact proposal. The cartons remainder «۶ تا می‌مونه» and any 18/2 numbers are NOT stale. If the page cannot tell step 4 from the skirting install, it asks which (C143).",
+  "ruling": [
+   "C143",
+   "C88",
+   "C89",
+   "C47",
+   "C66"
+  ],
+  "verdict_in_round30": "unknown (round 29 listed false dependants «۱۸ ⇒ ۱۵، ۶ ⇒ ۵»)"
+ },
+ {
+  "id": "F8-056",
+  "family": "F8",
+  "src": "round29D/tD1 p30–p31",
+  "context": "Separate car problem: «هر ۱۰۰ کیلومتر ۸ لیتر، پس ۴ × ۸ = ۳۲ لیتر …، ۳۲ × ۳ = ۹۶ هزار تومن».",
+  "sentence": "۸ لیتر نیست، ۹ لیتره.",
+  "expected": "8 ⇒ 9; 32 ⇒ 36, 96 ⇒ 108 هزار.",
+  "ruling": [
+   "C88",
+   "C89"
+  ],
+  "verdict_in_round30": "held (round 29)"
+ },
+ {
+  "id": "F8-057",
+  "family": "F8",
+  "src": "round29D/tD1 p32",
+  "context": "Proposals 32 ⇒ 36, 96 ⇒ 108.",
+  "sentence": "آره، همون ۳۶ درسته.",
+  "expected": "Accept 36 (C68); dependant «۹۶ ⇒ ۱۰۸» still proposed.",
+  "ruling": [
+   "C68"
+  ],
+  "verdict_in_round30": "held (round 29)"
+ },
+ {
+  "id": "F8-058",
+  "family": "F8",
+  "src": "round30A/s04 p13",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». ",
+  "sentence": "اشتباه گفتم: ما ۵ نفر وارثیم نه ۴ نفر — مادرم هم سهم داره.",
+  "expected": "4 ⇒ 5; proposals 2.75 ⇒ 2.2, 2750 ⇒ 2200, 275 ⇒ 220.",
+  "ruling": [
+   "C48",
+   "C89"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F8-059",
+  "family": "F8",
+  "src": "round30A/s04 p16",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs now 5; her new line «۱۱ / ۵ = ۲٫۲ میلیارد».",
+  "sentence": "ببخشید، باز اشتباه از من بود: مادرم وارث نیست، سندِ خونه فقط به اسمِ بابام و ما چهار تا بچه‌ست — پس ۴ نفریم نه ۵.",
+  "expected": "Back to 4 (C142/C160, history 4 ⇒ 5 ⇒ 4); 5-based proposals superseded; her «۱۱ / ۵ = ۲٫۲» line stale ⇒ 2.75. The question goes to the coach (C48).",
+  "ruling": [
+   "C142",
+   "C160",
+   "C48",
+   "C89"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F8-060",
+  "family": "F8",
+  "src": "round30A/s04 p17",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs 4.",
+  "sentence": "یعنی دوباره ۱۱ / ۴ = ۲٫۷۵ میلیارد، و قسطِ برادرم ۲٫۷۵ میلیارد تقسیم بر ۱۰ = ۲۷۵ میلیون.",
+  "expected": "NEGATIVE look-alike («دوباره» is not a correction marker): nothing replaced; both lines judged ✓ (2.75; 0.275 bn = 275 M, C23).",
+  "ruling": [
+   "C142",
+   "C23",
+   "C138"
+  ],
+  "verdict_in_round30": "held (no correction; marks unknown)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F8-061",
+  "family": "F8",
+  "src": "round30A/s04 p18",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs 4; her p17 lines on 4.",
+  "sentence": "وکیل زنگ زد: مادرم هم توی سند هست، پس ۵ نفریم نه ۴.",
+  "expected": "4 ⇒ 5 (datum with source «وکیل», C96). Stale with proposals: 2.75 ⇒ 2.2, 2750 ⇒ 2200, 275 ⇒ 220 (incl. her p17 lines).",
+  "ruling": [
+   "C48",
+   "C96",
+   "C89"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F8-062",
+  "family": "F8",
+  "src": "round30A/s04 p19",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Proposal 2.75 ⇒ 2.2 (base current 5).",
+  "sentence": "آره، همون ۲٫۲ درسته.",
+  "expected": "Accepted (C68); still stale: 2750 ⇒ 2200, 275 ⇒ 220.",
+  "ruling": [
+   "C68"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F8-063",
+  "family": "F8",
+  "src": "round30A/s04 p20",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Open proposal 275 ⇒ 220 (installment).",
+  "sentence": "نه، ۲۲۰ نیست؛ قسط رو هنوز با برادرم نبستیم.",
+  "expected": "A refusal of a page proposal, not a correction of her record: nothing changes; the proposal stays unaccepted (C68/C88).",
+  "ruling": [
+   "C68",
+   "C88"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F8-064",
+  "family": "F8",
+  "src": "round30A/s04 p21",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs 5; house 11 bn.",
+  "sentence": "ای وای، باز یکی جا افتاد: خاله‌م هم سهم داره، پس ۶ نفریم نه ۵.",
+  "expected": "5 ⇒ 6; proposals with exact fractions (C161): 11 ÷ 6 = «۱ و ۵ ششم ≈ ۱٫۸۳» میلیارد; 11,000 ÷ 6 = «۱۸۳۳ و ۱ سوم ≈ ۱۸۳۳٫۳۳» میلیون; ÷ 10 = «۱۸۳ و ۱ سوم ≈ ۱۸۳٫۳۳».",
+  "ruling": [
+   "C48",
+   "C89",
+   "C161"
+  ],
+  "verdict_in_round30": "failed (A30-24: «≈ ۱٫۸۳۳۳» without the fraction)"
+ },
+ {
+  "id": "F8-065",
+  "family": "F8",
+  "src": "round30A/s04 p22",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs just corrected 5 ⇒ 6.",
+  "sentence": "یعنی تعدادِ وارث‌ها ۶ تاست، نه ۵ — همون عددی که گفتم وکیل تأیید کرد رو درست کن.",
+  "expected": "The same correction restated: no new history line and no new proposals (C173).",
+  "ruling": [
+   "C173"
+  ],
+  "verdict_in_round30": "unknown (page repeated the list)"
+ },
+ {
+  "id": "F8-066",
+  "family": "F8",
+  "src": "round30A/s04 p23",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs 6; the old proposal «۲٫۲ ⇒ ۲٫۷۵» was built on 4.",
+  "sentence": "باشه ولش کن. اون پیشنهادِ قبلی که گفتی ۲٫۷۵ — آره، همون ۲٫۷۵ درسته.",
+  "expected": "Stale base named («روی ۴ نفر ِ کهنه — الان ۶ نفر»), current exact proposal 11 ÷ 6 = «۱ و ۵ ششم ≈ ۱٫۸۳»; nothing rewritten (C87/C111/C161).",
+  "ruling": [
+   "C87",
+   "C111",
+   "C161"
+  ],
+  "verdict_in_round30": "held (fraction missing)"
+ },
+ {
+  "id": "F8-067",
+  "family": "F8",
+  "src": "round30A/s04 p24",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs 6.",
+  "sentence": "یه اصلاحِ دیگه: قیمتِ خونه ۱۱ میلیارد نیست، ۱۲ میلیارده؛ کارشناس امروز گفت.",
+  "expected": "11 ⇒ 12 bn (base named «۱۱ میلیارد», not «۸»). With heirs 6: share 12 ÷ 6 = 2 bn; 2000 M; installment 200 M. No «۲ ⇒ ۳» (nothing yields 3).",
+  "ruling": [
+   "C88",
+   "C89",
+   "C111"
+  ],
+  "verdict_in_round30": "failed (A30-10: base named «۸ میلیارد», «۲ ⇒ ۳»)"
+ },
+ {
+  "id": "F8-068",
+  "family": "F8",
+  "src": "round30A/s04 p25",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs 6 (history 4 ⇒ 5 ⇒ 4 ⇒ 5 ⇒ 6); house 12 bn.",
+  "sentence": "نه، اشتباه شد؛ خاله‌م سهم نداره. همون ۵ نفر درست بود.",
+  "expected": "Take-back (C160): 5 returns with history; 6-based proposals superseded. Current: 12 ÷ 5 = 2.4 bn; 2400 M; 240 M.",
+  "ruling": [
+   "C160",
+   "C5",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (A30-11: not recognised as a take-back; values right)"
+ },
+ {
+  "id": "F8-069",
+  "family": "F8",
+  "src": "round30A/s04 p26",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». Heirs 5, house 12. The proposal «۲٫۲ ⇒ ۲» was built on 6 heirs (now withdrawn).",
+  "sentence": "اون پیشنهادِ قبلی که گفت ۲ میلیارد — آره، همون ۲ درسته.",
+  "expected": "Not accepted as is: the page names the stale base («روی ۶ نفر ِ کهنه — الان ۵») and gives the current exact proposal 2.4 (C87/C111/C160).",
+  "ruling": [
+   "C87",
+   "C111",
+   "C160"
+  ],
+  "verdict_in_round30": "failed (A30-10: accepted)"
+ },
+ {
+  "id": "F8-070",
+  "family": "F8",
+  "src": "round30A/s04 p27",
+  "context": "round30A/s04 (inheritance; house 11 bn after p6): «۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد …، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط». House 12 bn, heirs 5.",
+  "sentence": "۱۲ تقسیم بر ۵ میشه ۲٫۴. ولی کارشناس دقیق‌ترش رو گفت: ۱۲ میلیارد نه، از ۱۱٫۵ تا ۱۲٫۵ میلیارد.",
+  "expected": "«۱۲ تقسیم بر ۵ میشه ۲٫۴» ✓.",
+  "ruling": [
+   "C143",
+   "C48",
+   "C89"
+  ],
+  "verdict_in_round30": "failed (A30-11: no effect)",
+  "needs_ruling": "A point value replaced by a RANGE («۱۲ میلیارد نه، از ۱۱٫۵ تا ۱۲٫۵»). C143 covers replacing a range as a unit, not a value becoming a range. Should the page propose range dependants (share 2.3 to 2.5 bn, 11.5/5 and 12.5/5), mark them stale and ask, or keep 12?"
+ },
+ {
+  "id": "F8-071",
+  "family": "F8",
+  "src": "round30A/s02 p20–p23",
+  "context": "Chat-only (written twice, same meaning, p20 and p21): «بنزین ۴ میلیون و ۲۰۰ + عوارض ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰». Also p22 «۴ میلیون و ۲۰۰ − ۲۰۰ = ۴ میلیون هم برای تعمیر» (another quantity).",
+  "sentence": "آره ۱۲ درصد بود. یه اصلاح: بنزین ۴ میلیون و ۲۰۰ نبود، ۴ میلیون و ۵۰۰ بود.",
+  "expected": "«X نبود، Y بود» (C142) on the named quantity «بنزین» (C143): both copies change with one history line (C110); sum stale 5 M 700 ⇒ «۶ میلیون». The repair line «۴ میلیون و ۲۰۰ − ۲۰۰» is a different quantity ⇒ untouched. «آره ۱۲ درصد بود» is her fix of «۳ × ۴ = ۱۰ درصد» (C8/C86, ✓ 12).",
+  "ruling": [
+   "C142",
+   "C143",
+   "C110",
+   "C89",
+   "C8"
+  ],
+  "verdict_in_round30": "failed (A30-7: not read)"
+ },
+ {
+  "id": "F8-072",
+  "family": "F8",
+  "src": "round30A/s02 p24",
+  "context": "Fuel corrected to 4 M 500 (if read). «۵ میلیون و ۹۰۰» appears nowhere in her record.",
+  "sentence": "آره: ۴ میلیون و ۵۰۰ + ۱ میلیون و ۵۰۰ = ۶ میلیون. نه، ۵ میلیون و ۹۰۰ نمیشه، ۶ میلیون میشه.",
+  "expected": "Her sum ✓ (thousands reading, C102). «۵ میلیون و ۹۰۰ نمیشه، ۶ میلیون میشه»: X does not occur in her record ⇒ the page asks which number she means; nothing is replaced (C88).",
+  "ruling": [
+   "C102",
+   "C88",
+   "C142"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-073",
+  "family": "F8",
+  "src": "round30A/s02 p19",
+  "context": "Her line «توی دفترم نوشتم ۲ میلیون و ۸۰۰ ÷ ۲ = ۱۴۰۰».",
+  "sentence": "منظورم ۲ میلیون و ۸۰۰ هزار بود، پس ۱۴۰۰ هزار تومن.",
+  "expected": "Clarification of her own scale: «۱۴۰۰ هزار» = 1 M 400 ⇒ ✓ (C15/C45); the line's earlier mark moves to history (C86).",
+  "ruling": [
+   "C15",
+   "C45",
+   "C86"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-074",
+  "family": "F8",
+  "src": "round30A/s07 p12",
+  "context": "Statement heights «۴، ۸، ۱۳، ۱۵، ۱۶» (after ✏️ and 17 ⇒ 16). Her p11 lines: «(۴ + ۸ + ۱۳ + ۱۵ + ۱۶) / ۵ = ۱۱٫۲», «۱۶ / ۴ = ۴ برابرِ اولیه», «۱۳ − ۸ = ۴».",
+  "sentence": "یه اصلاح: گلدانِ دوم ۸ سانت نیست، ۹ سانته. گلدانِ سوم هم ۱۳ بود که درسته.",
+  "expected": "Named quantity «گلدانِ دوم» 8 ⇒ 9 (C143). Dependants by recorded expression only: mean ⇒ 57/5 = 11.4; «۱۳ − ۸» line stale with recomputation 13 − 9 = 4 (equals her written 4; her text is not rewritten, C164). «۱۶ / ۴ = ۴» is not built on 8 ⇒ untouched; never ratio scaling «۱۶ ⇒ ۱۸، ۴ ⇒ ۴٫۵» (C89). «گلدانِ سوم هم ۱۳ بود که درسته» confirms, changes nothing.",
+  "ruling": [
+   "C143",
+   "C89",
+   "C47",
+   "C164"
+  ],
+  "verdict_in_round30": "failed (A30-16)"
+ },
+ {
+  "id": "F8-075",
+  "family": "F8",
+  "src": "round30A/s07 p10",
+  "context": "Statement heights «… ۱۵، ۱۷ سانت».",
+  "sentence": "یه اشتباهِ دیگه: قدِ گلدونِ ۱۰ ساعته ۱۷ نبود، ۱۶ بود. حالا آخرین تفاضل چی میشه؟",
+  "expected": "Correction + question (C48): 17 ⇒ 16 (statement, graph point); the question goes to the coach.",
+  "ruling": [
+   "C48",
+   "C142"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F8-076",
+  "family": "F8",
+  "src": "round30A/s01 p18",
+  "context": "Her line «اجارهٔ یک سال هم ۱۸ میلیون × ۱۲ = ۲۱۶ هزار».",
+  "sentence": "آهان، ۲۱۶ میلیون، هزار رو اشتباه نوشتم.",
+  "expected": "Her fix of the scale word: «۲۱۶ هزار» ⇒ «۲۱۶ میلیون», now ✓ (C8/C86, C23).",
+  "ruling": [
+   "C8",
+   "C86",
+   "C23"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F8-077",
+  "family": "F8",
+  "src": "round30D/s35 p15",
+  "context": "Chat record: «طرحِ سوم رو باید کتبی به شورایاری بدم تا تصویبش کنن.»",
+  "sentence": "یه چیز دیگه هم اشتباه گفتم: طرح رو باید به شهرداریِ منطقه بدم، نه شورایاری.",
+  "expected": "«Y، نه X» (C48) on a word: «شورایاری» ⇒ «شهرداریِ منطقه» in the record that holds it, with history. If no record holds it, the page says so — never claims a change.",
+  "ruling": [
+   "C48",
+   "C88"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-078",
+  "family": "F8",
+  "src": "round28A/pwA1 p18",
+  "context": "Proof ledger, step 6 holds «n/2».",
+  "sentence": "اگه گامِ ۲ غلط باشه چی؟ کلِ اثبات خراب میشه؟ آهان یه چیز: تو گامِ ۶ منظورم n/2 نبود، درستش (n−1)/2 ـه.",
+  "expected": "The hypothetical goes to the coach (C46); «X نبود، Y» on step 6 is a correction (C74/C142): n/2 ⇒ (n−1)/2, history kept; symbolic ⇒ no numeric proposals.",
+  "ruling": [
+   "C46",
+   "C74",
+   "C142"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-079",
+  "family": "F8",
+  "src": "round28B/nB1 p7",
+  "context": "Proposal 20 ⇒ 20.83 (current); her dependant line «۲۲٫۸۳».",
+  "sentence": "آره، همون ۲۰٫۸۳ درسته. ولی ۲۲٫۸۳ نه، ۲۲٫۸۳ نیست — ۱۰ درصدِ ۲۰٫۸۳ میشه ۲٫۰۸، پس ۲۲٫۹۱.",
+  "expected": "Accept 20.83 (C68). Her own fix of the dependant: «۱۰ درصدِ ۲۰٫۸۳ میشه ۲٫۰۸» ✓ (2.083 → 2.08, C9); «۲۲٫۹۱» ✓ (20.83 + 2.08); applied (C8), old value in history.",
+  "ruling": [
+   "C68",
+   "C8",
+   "C9"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F8-080",
+  "family": "F8",
+  "src": "round28B/nB1 p16",
+  "context": "Open 🎯 «۲۳ تا مصرف بشه …» at 70 %.",
+  "sentence": "راستش پیش‌بینیِ ۲۳ تا رو الان ۶۰ درصد مطمئنم، نه ۷۰.",
+  "expected": "NEGATIVE look-alike: «N، نه M» on a confidence updates the 🎯 to 60 % with history (C77/C90); no datum or ledger correction.",
+  "ruling": [
+   "C77",
+   "C90",
+   "C136"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F8-081",
+  "family": "F8",
+  "src": "round28B/dB1 p13",
+  "context": "Open 🎯 on «میانگینِ ۱۳» at 70 %.",
+  "sentence": "نه، هنوز آزمون رو نگرفتم. ۶۵ درصد. میانگینِ ۱۳ رو هم الان ۸۰ درصد مطمئنم، نه ۷۰.",
+  "expected": "NEGATIVE: the 🎯 is updated 70 ⇒ 80 with history (C77); «نه، هنوز …» is not a correction; «۶۵ درصد.» answers the page's «چند درصد؟» if one is pending (C122).",
+  "ruling": [
+   "C77",
+   "C122",
+   "C136"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F8-082",
+  "family": "F8",
+  "src": "round30C/pwC1 p26",
+  "context": "A tool reply was offered for her step.",
+  "sentence": "نه، این همون چیزی نیست که برای آبیاری با آبِ شور می‌خواستم.",
+  "expected": "NEGATIVE: a «نه … نیست» about a tool fit, no number ⇒ no correction of any datum (loop path).",
+  "ruling": [
+   "C88",
+   "C136",
+   "C5"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F8-083",
+  "family": "F8",
+  "src": "round30C/pwC1 p29",
+  "context": "Context of «۳۰۰» not established in the evidence read.",
+  "sentence": "نه، ۳۰۰ نیست.",
+  "expected": null,
+  "ruling": [
+   "C88",
+   "C71"
+  ],
+  "verdict_in_round30": "unknown",
+  "needs_ruling": "«X نیست» with no replacement Y: C88 asks which number only when X is absent; there is no ruling for a bare negation of a present value with no new value (cf. C71 for days: ask). Should the page mark X disputed and ask for the value?"
+ },
+ {
+  "id": "F8-084",
+  "family": "F8",
+  "src": "round26A/s02 p8 (replayed later rounds)",
+  "context": "Statement «… ۱.۶ ارتفاع»; solved with sqrt(3.67² + 1.6²) ≈ 4.005.",
+  "sentence": "یه اصلاح دربارهٔ همون لوله: اولش گفتم ارتفاعِ بار ۱.۶ـه؛ امروز دوباره با متر اندازه گرفتم — ۱۶۰ سانت نبود، ۱۵۰ سانته.",
+  "expected": "Unit conversion is part of the value: 1.6 m (= 160 cm) ⇒ 1.5 m; the solved verdict and «حل شد» reopen; the diagonal proposal √(3.2² + 1.8² + 1.5²) = √15.73 ≈ 3.97 (C67).",
+  "ruling": [
+   "C88",
+   "C67",
+   "C89"
+  ],
+  "verdict_in_round30": "held (round 30 shows the change)"
+ },
+ {
+  "id": "F8-085",
+  "family": "F8",
+  "src": "round30B/nB3 p6 → p15",
+  "context": "round30B/nB3 (party, budget 12 M): prior ledger step 1 «۲۵ × ۳۲۰ هزار = ۸ میلیون», step 2 hall «۲ میلیون و ۴۰۰», step 3 «۸ میلیون + ۲ میلیون و ۴۰۰ = ۱۰ میلیون و ۴۰۰», step 4 «… = ۱ میلیون و ۶۰۰» (her fix). Chat: «۲ میلیون و ۴۰۰ ÷ ۲۵ = ۹۶ هزار» (hall share), «۵۰ منهای ۴۲ میشه ۸» (slices), «۱۸ + ۷ = ۲۵ نفر» (guest list), «۲ میلیون و ۴۰۰ منهای ۲۴۰ هزار = ۲ میلیون و ۱۶۰» (aunt's 10 % discount). ",
+  "sentence": "کیک بسته به طرح از ۹۰۰ هزار تا ۱ میلیون و ۱۰۰ ـه؛ من گرون‌ترش رو حساب کردم.",
+  "expected": "NEGATIVE look-alike: a range stated as a datum, no correction marker ⇒ recorded as a datum; nothing replaced.",
+  "ruling": [
+   "C142",
+   "C143"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ }
+]

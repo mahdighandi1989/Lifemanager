@@ -4161,6 +4161,12 @@
   /* دورِ ۲۹ (R2 correction، C142؛ C29-13 s23 «یه اصلاحِ دیگه: هر کیک ۸ تیکه نمیشه، ۱۰ تیکه میشه» رد شد): «X نمیشه/نمیاد، Y میشه/میاد» (با عددِ تازه پس از ویرگول) و «یه اصلاحِ (دیگه):» هم اصلاح‌اند.
      منفی‌ها (بانکِ R29 #84، #91): «… نمیشه مساوی تقسیم کرد» (بی مقدارِ تازه) و «یه اصلاحِ دیگه هم بکنم؟» (بی دونقطه) اصلاح نیستند. */
   CORR20 = new RegExp(CORR20.source + "|(?:^|[\\s،,.:])(?:یه|یک)[\\s‌]*اصلاحِ?(?:[\\s‌]*(?:دیگه|دیگر|دیگهٔ?|کوچیک|کوچک))?[\\s‌]*[:：]|نمی[\\s‌]*(?:شه|شود|یاد|آید|اد)[\\s‌]*[،,][^.!؟?\\n]{0,40}?[0-9۰-۹][^.!؟?\\n]{0,30}?می[\\s‌]*(?:شه|شود|یاد|آید|اد)(?![آ-ی])");
+  /* دورِ ۳۰ (correction، F8 «یک خوانندهٔ اصلاح»؛ C30-5 «مهمونا ۱۸ تا نمیشن، ۱۶ تا میشن»، C30-3 «۲ تیکه نمی‌خورن، ۳ تیکه می‌خورن»): ریشه — C142 فقط صورت‌های «نمیشه/نمیاد» را
+     نام برده بود و هر صرفِ دیگرِ همان قالب (جمع، فعلِ دیگر، بی «می») بیرون می‌ماند. قالبِ کلی: فعلِ منفی، ویرگول، عددِ تازه، و **همان** فعل مثبت («نمی‌X…، N … می‌X…» / «نX…، N … X…»)
+     — یک قاعده برای همهٔ صرف‌ها؛ عددِ پیشین در بندِ منفی است. منفی‌ها: بی عددِ پیشین («سارا نمیاد، ۴ نفر میان»)، بی عددِ تازه پس از ویرگول، یا فعلِ دیگری در بندِ دوم («۲ تا نمی‌خورن، ۳ تا رو می‌برن») اصلاح نیست. */
+  var CORR_PAIR30 = /[0-9۰-۹][^.!؟?\n،,]{0,30}?(?:^|[\s‌])ن(?:می[\s‌]*)?(?<v30>[آ-ی]{1,6}?)(?:ن|ند|ه|د|م|یم|ی|ید|ست)?[\s‌]*[،,][^.!؟?\n]{0,40}?[0-9۰-۹][^.!؟?\n]{0,30}?(?:^|[\s‌])(?:می[\s‌]*)?\k<v30>(?:ن|ند|ه|د|م|یم|ی|ید|ست)?(?![آ-ی])/;
+  AS.CORR_PAIR30 = CORR_PAIR30;
+  CORR20 = new RegExp(CORR20.source + "|" + CORR_PAIR30.source);
   AS.CORR_RE20 = CORR20;
   /* دلیلِ رد به زبانِ ساده (سطرِ سامانه برای خودش) */
   function plainErr20(e) { e = String(e || "");
@@ -4684,7 +4690,7 @@
     if (!Object.keys(pids).length && !R.edit && typeof A.liveRetractSessApply === "function") { try { var ls22 = A.liveRetractSessApply(s.id, R.srcId, { frag: R.frag, fix: R.fix, old: R.old, key: R.key || "", cur: cu });
       (ls22.changed || []).forEach(function (c) { var o0 = typeof c.old === "string" ? c.old : "", n0 = typeof c["new"] === "string" ? c["new"] : ""; chS.push({ rec: String(c.label || c.rec || "رکورد"), old: clip(plainTx(o0), 160), "new": clip(plainTx(n0), 160), why: !String(c.why || "").trim() || /^اصلاح شد ⇐ «/.test(String(c.why)) ? why23 : String(c.why) }); ch.push(o0 || n0 ? chLine20(String(c.label || c.rec || "رکورد"), o0, n0) : String(c.label || "")); }); } catch (e) { console.warn(e); } }
     /* دورِ ۲۶ (Q2، C26-37 s23 p6 «یعنی ۱۰۰ دقیقه»، بانکِ R26 #52): مسئلهٔ گفت‌وگو (بی رکوردِ زنده) هم فهرستِ «عددهای حساب‌شده از …» ِ خودش را دارد — همان موتور، روی نوشته‌های همین سشن */
-    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId, cm: R.curId || "", mAt: (R.src && R.src.at) || "", cAt: (R.cur && R.cur.at) || "" });   // دورِ ۲۹ (C89/C142): پیامِ اصلاح‌کننده و زمان‌ها برای ثبتِ اصلاح
+    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId, cm: R.curId || "", cur30: (R.cur && R.cur.text) || "", mAt: (R.src && R.src.at) || "", cAt: (R.cur && R.cur.at) || "" });   // دورِ ۲۹ (C89/C142): پیامِ اصلاح‌کننده و زمان‌ها برای ثبتِ اصلاح
       if (ss26 && !chS.some(function (c) { return c.rec === ss26.label; })) { chS.push({ rec: ss26.label, old: ss26.old, "new": ss26["new"], why: ss26.why }); ch.push(ss26.label + ": «" + ss26.old + "» — " + ss26["new"]); } } catch (e) { console.warn(e); } }
     /* دفترِ کارها: خودِ اصلاح یک کارِ تاریخ‌دار است (برای پرونده و کارنامه) */
     C.acts20 = (C.acts20 || []).concat([{ at: nowIso(), kind: "correction", sess: s.id, msg: R.curId, from: R.srcId, key: R.key || R.what, old: clip(R.frag, 160), "new": clip(R.fix, 160), changed: ch.length, edit: !!R.edit }]).slice(-80);
