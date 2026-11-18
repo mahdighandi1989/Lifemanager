@@ -58802,7 +58802,10 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
   /* دورِ ۳۰ (B30·D1 s12): بریدنِ متنی که «…» ِ درونی دارد («جدول امروز: «پایتخت کشوری که رودخانه‌ی …») گیومهٔ باز را بی‌جفت می‌گذاشت؛ گیومهٔ بیرونیِ سطر
      («🧭 «…» — مبدأ: …») آن را می‌بست و خودش باز می‌ماند ⇒ گذرگاهِ ضمیر (a27 outMap25) همهٔ باقیِ سطر را «درونِ نقلِ او» می‌خواند و «فقط بازنگریِ خودت» برای کاربرِ
      «شما» تبدیل نمی‌شد. بریده هر «» را که درونِ خودش باز مانده می‌بندد (پس از «…»). */
-  function clip(t, n) { var s = txt(t); if (s.length <= n) return s; var c = s.slice(0, n - 1), d = 0; for (var i = 0; i < c.length; i++) { var ch = c.charAt(i); if (ch === "«") d++; else if (ch === "»" && d > 0) d--; } return c + "…" + (d > 0 ? new Array(d + 1).join("»") : ""); }
+  /* (C179 — A tA1 c68: پاره‌ای که خودش با «…» ِ نیمه آغاز می‌شود — «X» و «Y» از names.join — نباید »‌ِ اضافه بگیرد: فقط گیومه‌ای بسته می‌شود که **درونِ همین بریده** باز شد
+     و در متنِ کامل بسته بود؛ شمارشِ خالص، نه عمقِ از-صفر) */
+  function net30(x) { var d = 0; for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); if (ch === "«") d++; else if (ch === "»") d--; } return d; }
+  function clip(t, n) { var s = txt(t); if (s.length <= n) return s; var c = s.slice(0, n - 1), k = net30(c) - Math.max(0, net30(s)); return c + "…" + (k > 0 ? new Array(k + 1).join("»") : ""); }
   function noq(t) { return String(t == null ? "" : t).replace(/[«»]/g, ""); }
   function isUser(m) { return !!m && m.role === "user" && !/^\[(?:سامانه|اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی)/.test(String(m.text || "")); }
   function lastUser(s) { var M = (s && s.msgs) || []; for (var i = M.length - 1; i >= 0; i--) if (isUser(M[i])) return M[i]; return null; }
