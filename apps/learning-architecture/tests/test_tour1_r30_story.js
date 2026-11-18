@@ -52,6 +52,13 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   K.U_A30_19 = async () => { const x = await ev(() => [APP.STORY.otherWorks29('اینا رو هم نوه‌ی همسایه‌مون نوشته: ۹ × ۹ = ۸۱ و ۱۰۰ − ۳۷ = ۶۳.').map(o => o.who), APP.STORY.otherWorks29('دوستِ علی حساب کرد: ۹ × ۹ = ۸۱.').map(o => o.who)]);
     return [x[0][0] === 'نوه‌ی همسایه‌مون' && !/علی/.test(J(x[1])), J(x)]; };
 
+  /* ---------- C26-40 (s28 p4): مسئلهٔ خودساخته/بیدارشده که نردبانِ فهمش عمداً پرسیده نمی‌شود «پایانِ نردبان» نیست؛ هم‌شکلِ منفی: همهٔ پله‌ها پرسیده ⇒ پایان ---------- */
+  K.U_C26_40 = async () => { const x = await ev(() => { APP.S.loaded = true; const r = APP.liveCreate('دو بچه، سه‌شنبه', 'دو بچه، حداقل یکی پسری است که سه‌شنبه به دنیا آمده؛ احتمالِ دو پسر؟', 'find', { by: 'user' }); const pid = r.p.id;
+      const rec = APP.S.get('eprob_' + pid); rec.woke = true; APP.S.put(rec); const a = APP.liveCoach(pid, {}); const Q = APP.ASSIST.tutorQuestions.und.qs;
+      const r2 = APP.liveCreate('مسئلهٔ دیگر', 'یه مسئلهٔ واقعی که باید ببینم چی میشه.', 'find', { by: 'user' }); const b2 = APP.liveCoach(r2.p.id, { asked: Q.concat(['کل مسئله را در یک جمله بگو']) });
+      return { woke: [a.ph, a.q, a.ladderEnd], all: [b2.ph, b2.q, b2.ladderEnd] }; });
+    return [x.woke[2] === false && x.all[2] === true, J(x)]; };
+
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 1200)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   console.log(JSON.stringify(info));

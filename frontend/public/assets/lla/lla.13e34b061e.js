@@ -47895,7 +47895,9 @@ APP.goFromURL = function (q) {
     if (K && R && (stuckT || !R.st)) R.q = q;
     var c0Put = false; if (c0Mark && o.turn && !sysT && q && q === pageQ) { if (c0Mark.A[q] !== c0Mark.k) { c0Mark.A[q] = c0Mark.k; if (c0Mark.T && c0Mark.t) c0Mark.T[q] = c0Mark.t; } c0Put = true; }
     if ((K && JSON.stringify([L.stk || null, L.ckHold || null]) !== R0) || c0Put || lad25Put) { try { S.put(pg); } catch (e) { } }
-    return { ph: ph, Q: Q, q: q, src: src, pageQ: pageQ, card: card, cardWhy: SC[0] ? SC[0].why : pageQ ? "page" : "", rung: rung, ladderEnd: !!Q.length && !q, stuckN: stuckN };
+    /* دورِ ۳۰ (story، C26-40 s28 p4 «نردبانِ پرسش‌های این مرحله تمام شد» در نخستین نوبتِ مسئلهٔ تازه): مسئلهٔ خودساخته/بیدارشده که نردبانِ فهمش عمداً پرسیده نمی‌شود (own25none) نردبانی را
+       «تمام» نکرده — هنوز آغاز نشده است. پایانِ نردبان فقط وقتی پله‌ای از همین نردبان واقعاً پرسیده شده و دیگری نمانده. */
+    return { ph: ph, Q: Q, q: q, src: src, pageQ: pageQ, card: card, cardWhy: SC[0] ? SC[0].why : pageQ ? "page" : "", rung: rung, ladderEnd: !!Q.length && !q && !own25none, stuckN: stuckN };
   }
   /* دورِ ۱۰ (J1، s38 p1): «فقط جواب رو بگو» بی تلاشِ دیدنی (نه در همین پیام، نه طرح/گامی در صفحه) ⇒ کارِ همین نوبت با بالاترین اولویت (پولیا: پیش از
      نخستین سرنخ، تلاشِ خودش را بشنو) — opts.turn.onlyAns (بولی، از مربی) بر الگوی متنیِ همین‌جا مقدم است؛ امضای پیشین بی آن هم کار می‌کند */
