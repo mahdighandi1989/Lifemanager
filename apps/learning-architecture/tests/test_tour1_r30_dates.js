@@ -188,6 +188,13 @@ const T0 = Date.parse('2026-11-16T10:00:00+03:30');
       await __say(__wn(o.t) + ' درسته، ' + __dm(o.t) + '.'); o.pend2 = __pend(); o.w = __when(/جلسهٔ ساختمون/); return o; });
     X('N6-1 plan: یک پرسشِ «کدام یکی؟» با هر دو؛ پاسخ ⇒ همان روز، بی ردیفِ مانده', r.pend.length === 1 && r.l.some(x => /کدام یکی؟/.test(x)) && r.w === r.t && !r.pend2.length, r); });
 
+  /* F6-037 (dB3 p1): «… اینم بگم: فردا بانک.» و F6-102 (aC3 p66): «… قبضِ برق رو میدم و به مستأجرم زنگ می‌زنم …» ⇒ دو کار */
+  await run('F6-037/102', async () => { await fresh(0);
+    const r = await E(async () => { const o = { d1: __D(1) }; await __say('سلام. آزمونِ ارتقای شغلیم نزدیکه و اکسلش برام سخته. اینم بگم: فردا بانک.'); o.p = __pend();
+      await __say('باشه.'); await __say('پس‌فردا قبضِ برق رو میدم و به مستأجرم زنگ می‌زنم اجاره رو بگیرم.'); o.p2 = __pend(); return o; });
+    X('F6-037: «اینم بگم: فردا بانک.» ⇒ پرسشِ D+1', r.p.some(x => /فردا بانک/.test(x.what) && x.date === r.d1), r);
+    X('F6-102: دو کار ⇒ دو پرسش', r.p2.filter(x => /قبضِ برق/.test(x.what) && !/مستأجر/.test(x.what)).length === 1 && r.p2.filter(x => /مستأجر/.test(x.what)).length === 1, r); });
+
   try { await b.close(); } catch (e) { }
   const ks = Object.keys(res); console.log(JSON.stringify({ cases: ks.length, ok: ks.filter(k => res[k]).length, red: ks.filter(k => !res[k]) }));
   if (errors.length) { console.log('ERRORS (' + errors.length + '):\n' + errors.join('\n')); process.exit(1); }
