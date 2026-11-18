@@ -1,0 +1,578 @@
+{
+"from": "round30A/tA1 (steps: r28 A_tA1x — the same runner script with sheets/areas as fixture steps — plus the runner's r30 p21 at c129; replies/keys: round30A/tA1/ai)",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n\n;(function(){try{var L=JSON.parse(localStorage.getItem('__areas28')||'[]');if(!L.length||!window.SYS_TERR)return;L.forEach(function(a){var S0=(window.SYS_TERR.systems||[]).filter(function(x){return x.id===a._s;})[0];if(!S0)return;var G=(S0.groups||[]).filter(function(g){return g.id===a._g;})[0]||S0.groups[0];var o=Object.assign({},a);delete o._s;delete o._g;if(!(G.areas||[]).some(function(x){return x.id===o.id;}))(G.areas=G.areas||[]).push(o);});}catch(e){}})();\n",
+"steps": [
+{
+"say": "سلام. یه ایده دارم: یه کیتِ آبیاریِ قطره‌ایِ خورشیدی برای باغچهٔ پدر و مادرم تو روستا، که وقتی ده روز می‌رن مسافرت، ۱۲ تا درختچه و ۱۰ تا گلدون خشک نشن. می‌خوام خودم بسازمش و اگه خوب شد چند تا هم بفروشم. نمی‌دونم از کجا شروع کنم.",
+"c": 1
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.value='1990-07-15';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()})()",
+"c": 2
+},
+{
+"say": "آره ثبتش کن. کلش اینه: یه سامانهٔ خودکار که ده روز بدونِ برق شهری، هر روز به هر درختچه و گلدون آبِ کافی بده و خراب نشه.",
+"c": 3
+},
+{
+"say": "بخش‌ها: ۱) هر درختچه روزی چقدر آب می‌خواد — فکر کنم ۲ لیتر، گلدون‌ها نیم لیتر؛ اینو می‌تونم بپرسم یا اندازه بگیرم. ۲) مخزن چقدر باشه — بلدم حساب کنم. ۳) پمپِ ۱۲ ولتی روزی چند دقیقه روشن باشه — بلدم اگه دبیِ پمپ رو بدونم. ۴) پنل و باتری چقدر — یه کم بلدم. ۵) سیم‌کشیِ ۱۲ ولت و پمپ کنارِ آب تو حیاط، زیرِ بارون، ایمنه؟ اینو اصلاً نمی‌دونم چطور بسنجم. ۶) اگه بخوام بفروشم، کسی قبلاً همینو ساخته یا ثبت اختراع کرده؟ اینم نمی‌دونم از کجا بفهمم.",
+"c": 4
+},
+{
+"eval": "(()=>{const pid=APP.liveAll()[0].p.id;APP.go(\"lprob\",pid);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"۱۰۱\");const j=t.indexOf(\"برگه\");return \"has101=\"+(i>=0)+\" | \"+(i>=0?t.slice(i-200,i+200):\"\")+\" || barg=\"+(j>=0?t.slice(j-100,j+150):\"\")})()",
+"c": 5
+},
+{
+"eval": "APP.go(\"whole\")",
+"c": 6
+},
+{
+"say": "از بابام پرسیدم: تابستون هر درختچه رو هر ۵ روز یه سطلِ ۱۰ لیتری آب می‌ده، یعنی روزی ۲ لیتر — پس حدسم برای درختچه درست بود. گلدون‌ها رو هر روز یه لیوان می‌ده، حدودِ ۲۵۰ سی‌سی، پس نیم لیتر زیاد بود.",
+"c": 7
+},
+{
+"say": "هر روز: ۱۲ × ۲ = ۲۴ لیتر برای درختچه‌ها، ۱۰ × ۰٫۲۵ = ۲٫۵ برای گلدون‌ها، یعنی ۲۶٫۵ لیتر. ده روز: ۲۶۵ لیتر. یه مخزنِ ۳۰۰ لیتری می‌ذارم که جا داشته باشه. پمپِ ۱۲ ولتِ ارزون دبیش دقیقه‌ای ۲ لیتره، پس روزی حدودِ ۱۳ دقیقه روشن باشه. مصرفش ۱ آمپره، یعنی ۱۲ وات؛ ۱۳ دقیقه می‌شه حدودِ ۳ وات‌ساعت در روز. یه پنلِ ۱۰ واتی با ۴ ساعت آفتاب روزی ۴۰ وات‌ساعت می‌ده، خیلی بیشتر. یه باتریِ ۷ آمپرساعتی هم برای روزای ابری. درسته؟",
+"c": 8
+},
+{
+"say": "پمپ رو با یه باتری تو سطل روشن کردم و یه دقیقه آبش رو تو پارچِ مدرج ریختم: ۱٫۶ لیتر شد، نه ۲. پس روزی حدودِ ۱۷ دقیقه. بقیه‌ش هنوز جور درمیاد. حالا اون بخشِ ۶: اگه بخوام بفروشمش، چطوری بفهمم کسی قبلاً همینو ساخته یا ثبت اختراع کرده؟",
+"c": 9
+},
+{
+"say": "هر دو رو؛ ولی اول این‌که کسی همینو می‌فروشه یا نه، چون اگه هست شاید اصلاً نسازم.",
+"c": 10
+},
+{
+"say": "اگه زیرِ دو میلیون باشه و ده روز آب بده، نمی‌سازم. حالا یه جمع‌بندی بده: کدوم بخشا تموم شد، کدوما منتظره و منتظرِ چی؟",
+"c": 11
+},
+{
+"eval": "APP.liveAll()[0].p.id",
+"c": 12
+},
+{
+"eval": "JSON.stringify(APP.PRE.sysAll().map(x=>({sc:x.sc.pid||x.sc.sess,id:x.e.id,n:x.e.number,st:x.e.state,step:x.e.step,stepBy:x.e.stepBy})))",
+"c": 13
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 14
+},
+{
+"eval": "(()=>{APP.go('lprob','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;const i=t.indexOf('منتظر');return i<0?'NO منتظر':t.slice(Math.max(0,i-200),i+500)})()",
+"c": 15
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;const i=t.indexOf('اکنون:');return t.slice(i,i+1200)})()",
+"c": 16
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;const out=[];let i=-1;while((i=t.indexOf('منتظر',i+1))>=0&&out.length<6)out.push(t.slice(Math.max(0,i-120),i+200).replace(/\\n/g,' / '));return out.join('\\n')})()",
+"c": 17
+},
+{
+"eval": "APP.today()+\" | \"+JSON.stringify(APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.step||x.e.stepName||\"\",(x.e.ruled||[]).join(\",\")]))",
+"c": 18
+},
+{
+"reload": true,
+"c": 19
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return \"swept\"})()",
+"c": 20
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-2).map(c=>c.reason).join(\" || \"),x.e.ask?x.e.ask.fa:\"\"]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-3),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/برگه|ابزار/.test(t))},null,0)",
+"c": 21
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+101];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #101: این نیاز را حوزهٔ «خطر، عدم‌قطعیت و ابهام» (dc_risk_uncertainty) در قلمروِ تصمیم پوشش می‌دهد؛ از همان استفاده شود. چیزِ تازه‌ای ساخته نشد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 22
+},
+{
+"eval": "APP.go('today')",
+"c": 22
+},
+{
+"reload": true,
+"c": 23
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return \"swept\"})()",
+"c": 24
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-2).map(c=>c.reason).join(\" || \"),x.e.ask?x.e.ask.fa:\"\"]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-3),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/برگه|ابزار/.test(t))},null,0)",
+"c": 25
+},
+{
+"reload": true,
+"c": 26
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+101];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #101: حوزهٔ dc_risk_uncertainty به‌روز شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 27
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return \"swept\"})()",
+"c": 27
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-2).map(c=>c.reason).join(\" || \"),x.e.ask?x.e.ask.fa:\"\"]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-3),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/برگه|ابزار/.test(t))},null,0)",
+"c": 28
+},
+{
+"eval": "APP.go('today')",
+"c": 29
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+102];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #102: حوزهٔ pr_analogy_transfer به‌روز شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 30
+},
+{
+"reload": true,
+"c": 30
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return \"swept\"})()",
+"c": 31
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-2).map(c=>c.reason).join(\" || \"),x.e.ask?x.e.ask.fa:\"\"]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-3),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/برگه|ابزار/.test(t))},null,0)",
+"c": 32
+},
+{
+"eval": "APP.go('today')",
+"c": 33
+},
+{
+"reload": true,
+"c": 34
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+102];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #102: چند ابزار و چند مسئله تغییر کرد و به‌روز شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 35
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return \"swept\"})()",
+"c": 35
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-2).map(c=>c.reason).join(\" || \"),x.e.ask?x.e.ask.fa:\"\"]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-3),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/برگه|ابزار/.test(t))},null,0)",
+"c": 36
+},
+{
+"eval": "APP.go('today')",
+"c": 37
+},
+{
+"reload": true,
+"c": 38
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return \"swept\"})()",
+"c": 39
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+102];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #102: نمای farm به‌روز شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 40
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-2).map(c=>c.reason).join(\" || \"),x.e.ask?x.e.ask.fa:\"\"]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-3),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/برگه|ابزار/.test(t))},null,0)",
+"c": 40
+},
+{
+"eval": "APP.go('today')",
+"c": 41
+},
+{
+"reload": true,
+"c": 42
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return \"swept\"})()",
+"c": 43
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-2).map(c=>c.reason).join(\" || \"),x.e.ask?x.e.ask.fa:\"\"]),msgs:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-3),due:(APP.dueList()||[]).map(x=>x.txt).filter(t=>/برگه|ابزار/.test(t))},null,0)",
+"c": 44
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+102];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #102: نمای «قلمروِ سامانه‌ها» (sterr) به‌روز شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 45
+},
+{
+"eval": "APP.go('today')",
+"c": 45
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm1ang5f\")",
+"c": 46
+},
+{
+"say": "دیدم جوابی که زیرِ برگهٔ ایمنی اومد به کارم نمیاد. به هر حال خودم یه راه دیگه پیدا کردم: از پسرعموم که برق‌کاره پرسیدم؛ گفت یه فیوزِ ۵ آمپری کنارِ قطبِ باتری بذارم، همهٔ اتصال‌ها رو تو جعبهٔ ضدآب IP65 ببرم و کابل‌ها رو از مسیرِ آب دور کنم. ایمنی رو این‌طوری حل کردم.",
+"c": 47
+},
+{
+"eval": "JSON.stringify(APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.otherQuote||\"\",x.e.how||\"\"]))",
+"c": 48
+},
+{
+"eval": "JSON.stringify(APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.otherQuote||\"\"]))",
+"c": 49
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+102];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #102: ساخته شد — یک حوزهٔ تازه در «قلمروِ سامانه‌ها»، بخشِ حلِ مسئله و استدلال، برای کمبودِ سامانه‌ای که دستیار ثبت کرده بود.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 50
+},
+{
+"eval": "(()=>{const m=APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-2).map(m=>(m.role||m.k||\"\")+\": \"+(m.text||\"\").slice(0,300));const e=APP.PRE.sysAll()[0].e;return JSON.stringify({m,e:{state:e.state,done:e.done,other:e.otherQuote,keys:Object.keys(e)},due:(APP.dueList()||[]).map(x=>x.txt)})})()",
+"c": 50
+},
+{
+"eval": "localStorage.setItem('__areas28', \"[{\\\"claims\\\": [{\\\"basis_fa\\\": \\\"مرورِ کوندا بر شواهدِ آزمایشی؛ از پایه‌های تکرارشدهٔ روان‌شناسیِ اجتماعی، اندازهٔ اثر بسته به حوزه.\\\", \\\"fa\\\": \\\"انگیزه برای رسیدن به نتیجه‌ای خاص، با جهت‌دادن به جست‌وجو و ارزیابیِ شاهد، نتیجه‌گیری را سوگیر می‌کند، ولی در قیدِ آن‌چه بتوان توجیه کرد.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"kunda1990\\\"]}], \\\"desc_fa\\\": \\\"پیش از سیم‌کشیِ ۱۲ ولت، پمپ و باتری در جای مرطوب: فیوز، جعبهٔ ضدآب، مسیرِ کابل و آزمونِ گرم‌شدن.\\\", \\\"en\\\": \\\"DIY build safety: low-voltage wiring and batteries near water\\\", \\\"fa\\\": \\\"ایمنیِ ساختِ خانگی: برقِ ولتاژ پایین و باتری کنارِ آب\\\", \\\"gap_fa\\\": \\\"فهرستِ وارسیِ ایمنی برای ساختِ خانگی هنوز ابزارِ جدا ندارد.\\\", \\\"id\\\": \\\"sp_diy_build_safety\\\", \\\"key_questions_fa\\\": [\\\"فیوز کجا و چند آمپر باشد؟\\\", \\\"اتصال‌ها در جعبهٔ ضدآب‌اند و کابل از مسیرِ آب دور است؟\\\", \\\"پس از یک ساعت کار، باتری و اتصال‌ها گرم می‌شوند؟\\\"], \\\"src\\\": [\\\"kunda1990\\\"], \\\"tools\\\": [\\\"kfam:F7\\\", \\\"tech:25\\\"], \\\"_g\\\": \\\"g_problem_solver\\\", \\\"_s\\\": \\\"s_problem\\\"}, {\\\"claims\\\": [{\\\"basis_fa\\\": \\\"مرورِ کوندا بر شواهدِ آزمایشی؛ از پایه‌های تکرارشدهٔ روان‌شناسیِ اجتماعی، اندازهٔ اثر بسته به حوزه.\\\", \\\"fa\\\": \\\"انگیزه برای رسیدن به نتیجه‌ای خاص، با جهت‌دادن به جست‌وجو و ارزیابیِ شاهد، نتیجه‌گیری را سوگیر می‌کند، ولی در قیدِ آن‌چه بتوان توجیه کرد.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"kunda1990\\\"]}], \\\"desc_fa\\\": \\\"پیش از فروختن یا ثبت کردنِ یک ساخته: آیا کسی همین را ساخته، می‌فروشد یا ثبتِ اختراع کرده است — جست‌وجوی سابقه در پایگاه‌های ثبتِ اختراع و بازار، و داوریِ نو بودن.\\\", \\\"en\\\": \\\"Prior-art search and patenting\\\", \\\"fa\\\": \\\"جست‌وجوی سابقه و ثبتِ اختراع\\\", \\\"gap_fa\\\": \\\"راهنمای گام‌به‌گامِ ثبتِ اختراع در ایران هنوز نیست.\\\", \\\"id\\\": \\\"sp_prior_art_search\\\", \\\"key_questions_fa\\\": [\\\"کسی همین را می‌فروشد — با چه قیمت و کارایی؟\\\", \\\"در پایگاه‌های ثبتِ اختراع (مثلِ Google Patents) با کدام واژه‌ها سابقه را می‌جویی؟\\\", \\\"چه چیزِ طرحِ تو نو است که در سابقه نیست؟\\\"], \\\"src\\\": [\\\"kunda1990\\\"], \\\"tools\\\": [\\\"kfam:F7\\\", \\\"tech:25\\\"], \\\"_g\\\": \\\"g_problem_solver\\\", \\\"_s\\\": \\\"s_problem\\\"}]\");'areas'",
+"c": 51
+},
+{
+"reload": true,
+"c": 51
+},
+{
+"eval": "JSON.stringify({url:location.pathname.slice(-60),areas:APP.SYST.areas().length,live:APP.liveAll().length,sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).map(c=>c.reason).join(\" || \")])})",
+"c": 52
+},
+{
+"eval": "(()=>{APP.go(\"today\");return (APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")+\"\\nMSGS:\"+APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23)).map(m=>m.text).slice(-2).join(\"\\n\")})()",
+"c": 53
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm1ang5f\")",
+"c": 54
+},
+{
+"say": "امروز یه ساعت روشنش گذاشتم: باتری فقط ولرم شد، داخلِ جعبه خشک بود و فیوز هم سالم. ایمنی اوکیه. ولی اون ابزاری که برای ثبتِ اختراع اومد رو نگاه کردم — نه، همون نیست که می‌خواستم.",
+"c": 55
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,(x.e.checks||[]).slice(-1).map(c=>c.reason).join(\"\")]),due:(APP.dueList()||[]).map(x=>x.txt),last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-3).map(m=>(m.text||\"\").slice(0,260))})",
+"c": 56
+},
+{
+"eval": "localStorage.setItem('__areas28', \"[{\\\"claims\\\": [{\\\"basis_fa\\\": \\\"مرورِ کوندا بر شواهدِ آزمایشی؛ از پایه‌های تکرارشدهٔ روان‌شناسیِ اجتماعی، اندازهٔ اثر بسته به حوزه.\\\", \\\"fa\\\": \\\"انگیزه برای رسیدن به نتیجه‌ای خاص، با جهت‌دادن به جست‌وجو و ارزیابیِ شاهد، نتیجه‌گیری را سوگیر می‌کند، ولی در قیدِ آن‌چه بتوان توجیه کرد.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"kunda1990\\\"]}], \\\"desc_fa\\\": \\\"پیش از سیم‌کشیِ ۱۲ ولت، پمپ و باتری در جای مرطوب: فیوز، جعبهٔ ضدآب، مسیرِ کابل و آزمونِ گرم‌شدن.\\\", \\\"en\\\": \\\"DIY build safety: low-voltage wiring and batteries near water\\\", \\\"fa\\\": \\\"ایمنیِ ساختِ خانگی: برقِ ولتاژ پایین و باتری کنارِ آب\\\", \\\"gap_fa\\\": \\\"فهرستِ وارسیِ ایمنی برای ساختِ خانگی هنوز ابزارِ جدا ندارد.\\\", \\\"id\\\": \\\"sp_diy_build_safety\\\", \\\"key_questions_fa\\\": [\\\"فیوز کجا و چند آمپر باشد؟\\\", \\\"اتصال‌ها در جعبهٔ ضدآب‌اند و کابل از مسیرِ آب دور است؟\\\", \\\"پس از یک ساعت کار، باتری و اتصال‌ها گرم می‌شوند؟\\\"], \\\"src\\\": [\\\"kunda1990\\\"], \\\"tools\\\": [\\\"kfam:F7\\\", \\\"tech:25\\\"], \\\"_g\\\": \\\"g_problem_solver\\\", \\\"_s\\\": \\\"s_problem\\\"}, {\\\"claims\\\": [{\\\"basis_fa\\\": \\\"مرورِ کوندا بر شواهدِ آزمایشی؛ از پایه‌های تکرارشدهٔ روان‌شناسیِ اجتماعی، اندازهٔ اثر بسته به حوزه.\\\", \\\"fa\\\": \\\"انگیزه برای رسیدن به نتیجه‌ای خاص، با جهت‌دادن به جست‌وجو و ارزیابیِ شاهد، نتیجه‌گیری را سوگیر می‌کند، ولی در قیدِ آن‌چه بتوان توجیه کرد.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"kunda1990\\\"]}], \\\"desc_fa\\\": \\\"پیش از فروختن یا ثبت کردنِ یک ساخته: آیا کسی همین را ساخته، می‌فروشد یا ثبتِ اختراع کرده است — جست‌وجوی سابقه در پایگاه‌های ثبتِ اختراع و بازار، و داوریِ نو بودن.\\\", \\\"en\\\": \\\"Prior-art search and patenting\\\", \\\"fa\\\": \\\"جست‌وجوی سابقه و ثبتِ اختراع\\\", \\\"gap_fa\\\": \\\"راهنمای گام‌به‌گامِ ثبتِ اختراع در ایران هنوز نیست.\\\", \\\"id\\\": \\\"sp_prior_art_search\\\", \\\"key_questions_fa\\\": [\\\"کسی همین را می‌فروشد — با چه قیمت و کارایی؟\\\", \\\"در پایگاه‌های ثبتِ اختراع (مثلِ Google Patents) با کدام واژه‌ها سابقه را می‌جویی؟\\\", \\\"چه چیزِ طرحِ تو نو است که در سابقه نیست؟\\\"], \\\"src\\\": [\\\"kunda1990\\\"], \\\"tools\\\": [\\\"kfam:F7\\\", \\\"tech:25\\\"], \\\"_g\\\": \\\"g_problem_solver\\\", \\\"_s\\\": \\\"s_problem\\\"}, {\\\"claims\\\": [{\\\"basis_fa\\\": \\\"مرورِ کوندا بر شواهدِ آزمایشی؛ از پایه‌های تکرارشدهٔ روان‌شناسیِ اجتماعی، اندازهٔ اثر بسته به حوزه.\\\", \\\"fa\\\": \\\"انگیزه برای رسیدن به نتیجه‌ای خاص، با جهت‌دادن به جست‌وجو و ارزیابیِ شاهد، نتیجه‌گیری را سوگیر می‌کند، ولی در قیدِ آن‌چه بتوان توجیه کرد.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"kunda1990\\\"]}], \\\"desc_fa\\\": \\\"پیش از فروختن یا ثبت کردنِ یک ساخته: آیا کسی همین را ساخته، می‌فروشد یا ثبتِ اختراع کرده است — جست‌وجوی سابقه در پایگاه‌های ثبتِ اختراع و بازار، و داوریِ نو بودن.\\\", \\\"en\\\": \\\"Patenting and prior-art search\\\", \\\"fa\\\": \\\"ثبتِ اختراع و جست‌وجوی سابقه\\\", \\\"gap_fa\\\": \\\"راهنمای گام‌به‌گامِ ثبتِ اختراع در ایران هنوز نیست.\\\", \\\"id\\\": \\\"sp_patent_novelty_check\\\", \\\"key_questions_fa\\\": [\\\"کسی همین را می‌فروشد — با چه قیمت و کارایی؟\\\", \\\"در پایگاه‌های ثبتِ اختراع (مثلِ Google Patents) با کدام واژه‌ها سابقه را می‌جویی؟\\\", \\\"چه چیزِ طرحِ تو نو است که در سابقه نیست؟\\\"], \\\"src\\\": [\\\"kunda1990\\\"], \\\"tools\\\": [\\\"kfam:F7\\\", \\\"tech:25\\\"], \\\"_g\\\": \\\"g_problem_solver\\\", \\\"_s\\\": \\\"s_problem\\\"}, {\\\"claims\\\": [{\\\"basis_fa\\\": \\\"مرورِ کوندا بر شواهدِ آزمایشی؛ از پایه‌های تکرارشدهٔ روان‌شناسیِ اجتماعی، اندازهٔ اثر بسته به حوزه.\\\", \\\"fa\\\": \\\"انگیزه برای رسیدن به نتیجه‌ای خاص، با جهت‌دادن به جست‌وجو و ارزیابیِ شاهد، نتیجه‌گیری را سوگیر می‌کند، ولی در قیدِ آن‌چه بتوان توجیه کرد.\\\", \\\"kind\\\": \\\"empirical\\\", \\\"src\\\": [\\\"kunda1990\\\"]}], \\\"desc_fa\\\": \\\"پیش از فروختن یا ثبت کردنِ یک ساخته: آیا کسی همین را ساخته، می‌فروشد یا ثبتِ اختراع کرده است — جست‌وجوی سابقه در پایگاه‌های ثبتِ اختراع و بازار، و داوریِ نو بودن.\\\", \\\"en\\\": \\\"Patenting and prior-art search\\\", \\\"fa\\\": \\\"ثبتِ اختراع و جست‌وجوی سابقه\\\", \\\"gap_fa\\\": \\\"راهنمای گام‌به‌گامِ ثبتِ اختراع در ایران هنوز نیست.\\\", \\\"id\\\": \\\"sp_patent_landscape\\\", \\\"key_questions_fa\\\": [\\\"کسی همین را می‌فروشد — با چه قیمت و کارایی؟\\\", \\\"در پایگاه‌های ثبتِ اختراع (مثلِ Google Patents) با کدام واژه‌ها سابقه را می‌جویی؟\\\", \\\"چه چیزِ طرحِ تو نو است که در سابقه نیست؟\\\"], \\\"src\\\": [\\\"kunda1990\\\"], \\\"tools\\\": [\\\"kfam:F7\\\", \\\"tech:25\\\"], \\\"_g\\\": \\\"g_problem_solver\\\", \\\"_s\\\": \\\"s_problem\\\"}]\");'areas'",
+"c": 57
+},
+{
+"reload": true,
+"c": 57
+},
+{
+"eval": "(()=>{APP.PRE.sysSweep(true);return JSON.stringify({areas:APP.SYST.areas().length,sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).slice(-1).map(c=>c.reason).join(\"\"),x.e.ask?x.e.ask:\"\"]).slice(1),due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")),last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-1).map(m=>(m.text||\"\").slice(0,600))})})()",
+"c": 58
+},
+{
+"say": "نه، اینم نیست.",
+"c": 59
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+102];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #102: ساخته شد؛ قلمروِ حلِ مسئله به‌روز شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 60
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,(x.e.checks||[]).slice(-1).map(c=>c.reason).join(\"\").slice(0,300),x.e.ask?x.e.ask.id:\"\"]).slice(1),due:(APP.dueList()||[]).map(x=>x.txt)})",
+"c": 60
+},
+{
+"say": "ببخشید، اشتباه گفتم. دوباره نگاه کردم — همون بود؛ پرسش‌هاش همونیه که برای ثبتِ اختراع لازم داشتم.",
+"c": 61
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,(x.e.tool||{}).fa||\"\",(x.e.checks||[]).slice(-1).map(c=>c.reason).join(\"\").slice(0,300)]).slice(1),due:(APP.dueList()||[]).map(x=>x.txt),pend:((APP.S.get(\"pre22\")||{}).sysPend||[]).map(x=>x.number)})",
+"c": 62
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm1ang5f\")",
+"c": 63
+},
+{
+"say": "با پرسش‌های همون حوزه گشتم: تو Google Patents با «solar drip irrigation kit» و «آبیاری قطره‌ای خورشیدی» چند تا ثبتِ قدیمی هست، پس طرحِ سادهٔ من نو نیست و ثبتش نمی‌کنم. تو بازار هم کیتِ آماده دو و نیم میلیونه و فقط هفت روز آب می‌ده — از معیارم بدتره. پس خودم می‌سازمش، فقط برای پدر و مادرم، نه برای فروش. فکر کنم کل مسئله حل شد.",
+"c": 64
+},
+{
+"say": "درسم: ایدهٔ بزرگ رو به تکه‌های کوچیک بشکنم، هر تکه‌ای رو که می‌شه با یه آزمونِ ساده بسنجم (مثلِ پارچِ مدرج برای پمپ)، و برای تکه‌هایی که بلد نیستم از اول بپرسم کسی قبلاً ساخته یا نه. بیشتر از همه اون پرسشِ «با کدام معیار می‌گی نمی‌سازم؟» کمکم کرد. این جور مسئله‌های ساختنی رو دوست دارم.",
+"c": 65
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 66
+},
+{
+"eval": "(()=>{const s=(window.__sheets||{})['sh'+102];if(!s)return 'NOSHEET';s.notes.push({id:'r'+s.notes.length,by:'routine',at:(APP.nowISO?APP.nowISO():new Date().toISOString()),text:\"پاسخ به برگهٔ دستیار #102: ساخته شد؛ قلمروِ حلِ مسئله دوباره به‌روز شد.\"});s.status='answered';APP.render();return 'note'})()",
+"c": 67
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 67
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 68
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvb9w95jmymh5');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 69
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 70
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 71
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 72
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t})()",
+"c": 73
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 74
+},
+{
+"eval": "JSON.stringify({last:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs).slice(-3).map(m=>(m.text||\"\").slice(0,220)),pr:APP.S.all(\"eprob\",r=>r&&r.p).map(r=>[r.p.id,r.p.title,r.p.status||r.status,r.live?1:0]),due:(APP.dueList()||[]).map(x=>x.txt.slice(0,120))})",
+"c": 75
+},
+{
+"say": "یه تکهٔ دیگه هم مونده: زمستون که کیت بیرونه، باتری‌ش رو تو سرما چطور نگه دارم که خراب نشه؟ اینو اصلاً بلد نیستم و این‌جا هم چیزی براش ندیدم.",
+"c": 76
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.step||\"\"]),pend:((APP.S.get(\"pre22\")||{}).sysPend||[]).map(x=>x.number)})",
+"c": 77
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.step||\"\"]),pend:((APP.S.get(\"pre22\")||{}).sysPend||[]).map(x=>x.number)})",
+"c": 78
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 79
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 80
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 81
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvb9w9kre90wn');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 82
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 83
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 84
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 85
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t})()",
+"c": 86
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 87
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqm1ang5f\");const t=document.getElementById(\"main\").innerText;const L=t.split(\"\\n\").filter(l=>/منتظر|⏸|برگهٔ #|شکست|گیر/.test(l)).map(l=>l.slice(0,230));APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const m=document.getElementById(\"main\").innerText;const i=m.indexOf(\"فهمِ مسئله\");return L.join(\"\\n\")+\"\\nMIND: \"+m.slice(i,i+500)+\"\\nDUE: \"+(APP.dueList()||[]).map(x=>x.txt.slice(0,140)).join(\" / \")})()",
+"c": 88
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 89
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 90
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 91
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltc4jdbgf');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 92
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 93
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 94
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 95
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t})()",
+"c": 96
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 97
+},
+{
+"eval": "JSON.stringify({sys:APP.PRE.sysAll().map(x=>[x.e.number,x.e.state,x.e.how||\"\",(x.e.checks||[]).map(c=>(c.verdict||c.v||\"\")+\":\"+(c.reason||\"\").slice(0,110))]),k23:APP.S.all(\"achat\",x=>x&&x.msgs).flatMap(s=>s.msgs.filter(m=>m.k23||/🛎|❓|برگه/.test(m.role==\"sys\"?m.text:\"\")).map(m=>m.text.slice(0,200))),due:(APP.dueList()||[]).map(x=>x.txt.slice(0,150)).filter(t=>/برگه|ابزار|❓|🛎/.test(t))})",
+"c": 98
+},
+{
+"eval": "(()=>{const o=[];APP.PRE.sysAll().forEach(x=>{o.push(\"SHEET \"+x.e.number+\" \"+x.e.state+\" \"+(x.e.how||\"\"));(x.e.checks||[]).forEach(c=>o.push(\"   \"+(c.verdict||c.v||\"\")+\": \"+(c.reason||\"\").slice(0,120).replace(/\\n/g,\" \")))});o.push(\"---CHAT\");APP.S.all(\"achat\",x=>x&&x.msgs).forEach(s=>s.msgs.forEach(m=>{if(m.role==\"sys\"&&/🛎|❓|برگه|ابزار/.test(m.text))o.push(\"  \"+m.text.slice(0,180).replace(/\\n/g,\" \"))}));o.push(\"---DUE\");(APP.dueList()||[]).forEach(x=>{if(/برگه|ابزار|❓|🛎/.test(x.txt))o.push(\"  \"+x.txt.slice(0,150))});return o.join(\" ¶ \")})()",
+"c": 99
+},
+{
+"eval": "(()=>{const x=APP.PRE.sysAll().find(x=>x.e.number==102);const c=x.e.checks||[];return c.slice(-3).map(c=>JSON.stringify(c).slice(0,700)).join(\" ¶ \")+\" ¶ STATE \"+JSON.stringify({st:x.e.state,how:x.e.how,ask:x.e.ask})})()",
+"c": 100
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 101
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 102
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 103
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsyjfmqc7');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 104
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 105
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 106
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 107
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t})()",
+"c": 108
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 109
+},
+{
+"eval": "(()=>{const all=APP.S.all(\"achat\",x=>x&&x.msgs);let o=[];for(const s of all)for(const m of s.msgs)if(m.role==\"sys\"&&/❓|ابزار|منتظر|برگه|رسید|هم‌امتیاز/.test(m.text))o.push(m.text.slice(0,260));return o.join(\"\\n\")+\"\\n--DUE\\n\"+DUE()})()",
+"c": 110
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 111
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 112
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 114
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt0yrwi4h');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 115
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 117
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 119
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 121
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm1ang5f');const t=document.getElementById('main').innerText;return t})()",
+"c": 122
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 124
+},
+{
+"say": "یه چیز رو پس می‌گیرم: اون «نه، همون نیست» که برای ابزارِ ثبتِ اختراع گفتم اشتباه بود؛ همون بود و جواب داد. یه حسابِ دیگه هم: پمپ دقیقه‌ای ۱٫۶ لیتره، پس ۱٫۶ × ۸ = ۱۴ لیتر در ۸ دقیقه؛ دو تا باتریِ ۱۲ ولتی هم ۱۲ × ۲ = ۲۴ ولت.",
+"c": 129
+}
+],
+"replies": [
+"{\"reply\": \"ایدهٔ ساختنی و روشنی است. اگر بخواهی، آن را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت می‌کنم تا تکه‌هایش گم نشود. پیش از هر جزئیات: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"کیتِ آبیاریِ قطره‌ایِ خورشیدی\", \"memory\": \"سعید می‌خواهد کیتِ آبیاریِ قطره‌ایِ خورشیدی برای باغچهٔ پدر و مادرش (۱۲ درختچه، ۱۰ گلدان، ده روز) بسازد و شاید بفروشد؛ نمی‌داند از کجا شروع کند؛ ثبت در 🔭 را پیشنهاد کردم؛ پرسیدم کل را در یک جمله بگوید.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\"}]}",
+"{\"reply\": \"مسئله را برای ثبت در «🔭 مسئله‌های من» فرستادم. کل را روشن گفتی: ده روز، بی برقِ شهری، آبِ کافی برای هر درختچه و گلدان، و خراب نشود. حالا جزءها: این کار از چه تکه‌هایی ساخته می‌شود — کدام را بلدی و کدام را نه؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"کیتِ آبیاریِ قطره‌ایِ خورشیدی\", \"statement\": \"یه سامانهٔ خودکار که ده روز بدونِ برق شهری، هر روز به هر درختچه و گلدون آبِ کافی بده و خراب نشه (۱۲ درختچه و ۱۰ گلدون در باغچهٔ پدر و مادرم)؛ خودم بسازمش و اگه خوب شد چند تا هم بفروشم.\", \"nat\": \"practical\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u0\", \"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\"}]}",
+"{\"reply\": \"شش تکه را روشن جدا کردی و گفتی کدام را بلدی. برای تکهٔ ۵ (ایمنیِ سیم‌کشیِ ۱۲ ولت و پمپ کنارِ آب) در این صفحه ابزاری ندیدم؛ برای ثبتِ کمبود بررسی می‌کنم و آن تکه تا آمدنِ جواب منتظر می‌ماند — بقیه را جلو می‌بریم. دربارهٔ تکهٔ ۱: «فکر کنم ۲ لیتر» حدس است — چطور می‌آزمایی‌اش، کدام شاهد می‌تواند ردش کند؟\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"gap\": {\"title\": \"ایمنیِ ساختِ خانگی: برقِ ولتاژ پایین و پمپ کنارِ آب\", \"area\": \"sys-territory\", \"kind\": \"build\", \"step\": \"۵ ایمنی: سیم‌کشیِ ۱۲ ولت و پمپ کنارِ آب، زیرِ باران\", \"abstract\": \"کسی که چیزی را خودش می‌سازد و در آن برقِ ولتاژ پایین، باتری یا پمپ کنارِ آب است، باید بتواند ایمنیِ ساخته‌اش را پیش از کار انداختن بسنجد؛ همین نیاز در هر ساختِ خانگیِ برقی هست.\", \"missing\": \"حوزه‌ای در «قلمروِ سامانه‌ها» (حلِ مسئله) برای وارسیِ ایمنیِ ساختِ خانگی: فیوز، جعبهٔ ضدآب، مسیرِ کابل، آزمونِ گرم‌شدن — با پرسش‌های کلیدی و منبعِ معتبر.\", \"where\": \"قلمروِ سامانه‌ها ← s_problem (حلِ مسئله)\", \"how\": \"یک حوزهٔ تازه با پرسش‌های وارسی و گزاره‌های مستند؛ دستیار در گامِ ایمنیِ مسئلهٔ ساختنی به آن ارجاع بدهد.\", \"relations\": \"مسئلهٔ زندهٔ «کیتِ آبیاریِ قطره‌ایِ خورشیدی»، گامِ ۵\", \"docs\": \"apps/learning-architecture/territory/maps/s_problem.json\", \"why_area\": \"نقشهٔ حوزه‌های حلِ مسئله در sys-territory نگه‌داری می‌شود و این یک حوزهٔ ناموجود است.\", \"why_not\": \"dc_risk_uncertainty (خطر و عدم‌قطعیت در تصمیم) دربارهٔ انتخاب زیرِ احتمال است، نه وارسیِ ایمنیِ فنیِ یک ساخته؛ dc_premortem_redteam فقط شکست‌های ممکن را فهرست می‌کند و معیارِ فنی نمی‌دهد.\", \"evidence\": \"در فهرستِ حوزه‌های s_problem و s_decision هیچ حوزه‌ای برای ایمنیِ ساخت/برق/آب نیست؛ حرفِ خودش: «اینو اصلاً نمی‌دونم چطور بسنجم».\", \"confidence\": 0.82}, \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"guess\": {\"text\": \"فکر کنم ۲ لیتر، گلدون‌ها نیم لیتر\", \"q\": \"چطور می‌آزمایی‌اش، کدام شاهد می‌تواند ردش کند؟\"}, \"plan\": {\"text\": \"شش بخشِ کیت\", \"steps\": [\"هر درختچه روزی چقدر آب می‌خواد\", \"مخزن چقدر باشه\", \"پمپِ ۱۲ ولتی روزی چند دقیقه روشن باشه\", \"پنل و باتری چقدر\", \"سیم‌کشیِ ۱۲ ولت و پمپ کنارِ آب تو حیاط، زیرِ بارون، ایمنه؟\", \"اگه بخوام بفروشم، کسی قبلاً همینو ساخته یا ثبت اختراع کرده؟\"]}}]}",
+"{\"agree\": true, \"area\": \"sys-territory\", \"kind\": \"build\", \"dup_of\": null, \"reason\": \"در نقشهٔ حوزه‌های حلِ مسئله و تصمیم حوزه‌ای برای وارسیِ ایمنیِ فنیِ یک ساختهٔ خانگی نیست؛ dc_risk_uncertainty دربارهٔ انتخاب زیرِ احتمال است و این نیاز را نمی‌پوشاند. برگهٔ بازی هم همین را نمی‌گوید.\", \"fix\": {}, \"actions\": []}",
+"{\"reply\": \"حدست را با شاهدِ بیرونی آزمودی: برای درختچه تأیید شد (هر ۵ روز ۱۰ لیتر = روزی ۲ لیتر) و برای گلدان رد شد (۲۵۰ سی‌سی، نه نیم لیتر). روشن می‌بینی که گامِ بعد به خواسته نزدیکت می‌کند — به کدام داده تکیه دارد، و واحدها در دو سوی حساب یکی است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}, \"plan_done\": {\"id\": \"1\", \"done\": true}}]}",
+"{\"reply\": \"دو حسابی که نوشتی (۱۲ × ۲ = ۲۴ و ۱۰ × ۰٫۲۵ = ۲٫۵) می‌خواند؛ دربارهٔ درستیِ کلِ طرح من حکم نمی‌دهم — داورش واقعیت است. دبیِ «دقیقه‌ای ۲ لیتر» از برچسبِ پمپ است یا خودت اندازه گرفته‌ای؟ پیش از گامِ واقعی: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [\"e2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"result\": \"روزی ۲۶٫۵ لیتر؛ ده روز ۲۶۵ لیتر؛ مخزنِ ۳۰۰ لیتری؛ پمپ روزی حدودِ ۱۳ دقیقه؛ پنلِ ۱۰ واتی و باتریِ ۷ آمپرساعتی\"}]}",
+"{\"reply\": \"دو حسابی که نوشتی (۱۲ × ۲ = ۲۴ و ۱۰ × ۰٫۲۵ = ۲٫۵) می‌خواند؛ دربارهٔ درستیِ کلِ طرح من حکم نمی‌دهم — داورش واقعیت است، و دبیِ «دقیقه‌ای ۲ لیتر» هنوز عددِ برچسب است، نه اندازهٔ خودت. پیش از گامِ واقعی: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [\"e2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"result\": \"روزی ۲۶٫۵ لیتر؛ ده روز ۲۶۵ لیتر؛ مخزنِ ۳۰۰ لیتری؛ پمپ روزی حدودِ ۱۳ دقیقه؛ پنلِ ۱۰ واتی و باتریِ ۷ آمپرساعتی\"}]}",
+"{\"reply\": \"خودت اندازه گرفتی و دبی را از ۲ به ۱٫۶ لیتر در دقیقه درست کردی؛ پس «روزی ۱۳ دقیقه» و «۳ وات‌ساعت» که روی عددِ ۲ بنا شده بودند کهنه‌اند. برای تکهٔ ۶ (کسی پیش‌تر همین را ساخته یا ثبت کرده؟) در این صفحه ابزاری ندیدم؛ برای ثبتِ کمبود بررسی می‌کنم و آن تکه هم منتظر می‌ماند. دادهٔ دیگری لازم است — چه چیزی را باید بپرسی، بسنجی یا پیدا کنی تا خواسته معین شود؟\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"gap\": {\"title\": \"جست‌وجوی سابقه: کسی پیش‌تر همین را ساخته یا ثبتِ اختراع کرده؟\", \"area\": \"sys-territory\", \"kind\": \"build\", \"step\": \"۶-ب ثبتِ اختراع: کسی قبلاً همین را ساخته یا ثبت کرده؟\", \"abstract\": \"کسی که ایده‌ای را می‌خواهد بسازد یا بفروشد باید بتواند بفهمد پیش‌تر ساخته، فروخته یا ثبتِ اختراع شده یا نه؛ این نیاز در هر مسئلهٔ ساختنی و هر ایدهٔ تازه هست.\", \"missing\": \"حوزه‌ای در «قلمروِ سامانه‌ها» (حلِ مسئله) برای جست‌وجوی سابقه و ثبتِ اختراع: کجا بگردد، با چه واژه‌هایی، و «نیافتن» چه زمانی شاهدِ «نبودن» است.\", \"where\": \"قلمروِ سامانه‌ها ← s_problem (حلِ مسئله)\", \"how\": \"یک حوزهٔ تازه با پرسش‌های کلیدی و گزاره‌های مستند؛ دستیار در گامِ «پیش‌تر ساخته شده؟» به آن ارجاع بدهد.\", \"relations\": \"مسئلهٔ زندهٔ «کیتِ آبیاریِ قطره‌ایِ خورشیدی»، گامِ ۶\", \"docs\": \"apps/learning-architecture/territory/maps/s_problem.json\", \"why_area\": \"نقشهٔ حوزه‌های حلِ مسئله در sys-territory نگه‌داری می‌شود و این حوزه در آن نیست.\", \"why_not\": \"pr_analogy_transfer (قیاس و انتقال) دربارهٔ استفاده از مسئلهٔ خویشاوندِ حل‌شده در حلِ خودِ اوست، نه جست‌وجوی بیرونیِ محصول و ثبتِ اختراع؛ pr_hypothesis_testing آزمونِ فرضیه را می‌گوید، نه این‌که کجا و چطور سابقه را بگردد.\", \"evidence\": \"در فهرستِ حوزه‌های s_problem هیچ حوزه‌ای برای جست‌وجوی سابقه/ثبتِ اختراع نیست؛ حرفِ خودش: «اینم نمی‌دونم از کجا بفهمم».\", \"confidence\": 0.8}, \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\", \"d\"], \"ans\": [\"e4\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"retract\": {\"msg\": \"پمپِ ۱۲ ولتِ ارزون دبیش دقیقه‌ای ۲ لیتره، پس روزی حدودِ ۱۳ دقیقه روشن باشه\", \"key\": \"datum:دبیِ پمپ\", \"what\": \"fact\", \"fix\": \"دقیقه‌ای ۱٫۶ لیتر\", \"old\": \"دقیقه‌ای ۲ لیتر\", \"rests\": [\"روزی حدودِ ۱۳ دقیقه\", \"حدودِ ۳ وات‌ساعت در روز\"]}, \"result\": \"دبیِ اندازه‌گرفته ۱٫۶ لیتر در دقیقه؛ پمپ روزی حدودِ ۱۷ دقیقه\"}]}",
+"{\"reply\": \"خودت اندازه گرفتی و دبی را از ۲ به ۱٫۶ لیتر در دقیقه درست کردی؛ پس «روزی ۱۳ دقیقه» و «۳ وات‌ساعت» که روی عددِ ۲ بنا شده بودند کهنه‌اند. برای تکهٔ ۶ (سابقهٔ ساخت و ثبتِ اختراع) در این صفحه ابزاری ندیدم؛ برای ثبتِ کمبود بررسی می‌کنم و آن تکه هم منتظر می‌ماند. دادهٔ دیگری لازم است — چه چیزی را باید بپرسی، بسنجی یا پیدا کنی تا خواسته معین شود؟\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"gap\": {\"title\": \"جست‌وجوی سابقه: کسی پیش‌تر همین را ساخته یا ثبتِ اختراع کرده؟\", \"area\": \"sys-territory\", \"kind\": \"build\", \"step\": \"۶-ب ثبتِ اختراع: کسی قبلاً همین را ساخته یا ثبت کرده؟\", \"abstract\": \"کسی که ایده‌ای را می‌خواهد بسازد یا بفروشد باید بتواند بفهمد پیش‌تر ساخته، فروخته یا ثبتِ اختراع شده یا نه؛ این نیاز در هر مسئلهٔ ساختنی و هر ایدهٔ تازه هست.\", \"missing\": \"حوزه‌ای در «قلمروِ سامانه‌ها» (حلِ مسئله) برای جست‌وجوی سابقه و ثبتِ اختراع: کجا بگردد، با چه واژه‌هایی، و «نیافتن» چه زمانی شاهدِ «نبودن» است.\", \"where\": \"قلمروِ سامانه‌ها ← s_problem (حلِ مسئله)\", \"how\": \"یک حوزهٔ تازه با پرسش‌های کلیدی و گزاره‌های مستند؛ دستیار در گامِ «پیش‌تر ساخته شده؟» به آن ارجاع بدهد.\", \"relations\": \"مسئلهٔ زندهٔ «کیتِ آبیاریِ قطره‌ایِ خورشیدی»، گامِ ۶\", \"docs\": \"apps/learning-architecture/territory/maps/s_problem.json\", \"why_area\": \"نقشهٔ حوزه‌های حلِ مسئله در sys-territory نگه‌داری می‌شود و این حوزه در آن نیست.\", \"why_not\": \"pr_analogy_transfer (قیاس و انتقال) دربارهٔ استفاده از مسئلهٔ خویشاوندِ حل‌شده در حلِ خودِ اوست، نه جست‌وجوی بیرونیِ محصول و ثبتِ اختراع؛ pr_hypothesis_testing آزمونِ فرضیه را می‌گوید، نه این‌که کجا و چطور سابقه را بگردد.\", \"evidence\": \"در فهرستِ حوزه‌های s_problem هیچ حوزه‌ای برای جست‌وجوی سابقه/ثبتِ اختراع نیست؛ حرفِ خودش: «اینم نمی‌دونم از کجا بفهمم».\", \"confidence\": 0.8}, \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\", \"d\"], \"ans\": [\"e4\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"retract\": {\"msg\": \"پمپِ ۱۲ ولتِ ارزون دبیش دقیقه‌ای ۲ لیتره، پس روزی حدودِ ۱۳ دقیقه روشن باشه\", \"key\": \"datum:دبیِ پمپ\", \"what\": \"fact\", \"fix\": \"دقیقه‌ای ۱٫۶ لیتر\", \"old\": \"دقیقه‌ای ۲ لیتر\", \"rests\": [\"روزی حدودِ ۱۳ دقیقه\", \"حدودِ ۳ وات‌ساعت در روز\"]}, \"result\": \"دبیِ اندازه‌گرفته ۱٫۶ لیتر در دقیقه؛ پمپ روزی حدودِ ۱۷ دقیقه\"}]}",
+"{\"agree\": true, \"area\": \"sys-territory\", \"kind\": \"build\", \"dup_of\": null, \"reason\": \"در نقشهٔ حوزه‌های حلِ مسئله حوزه‌ای برای جست‌وجوی سابقه و ثبتِ اختراع نیست؛ برگهٔ #۱۰۱ دربارهٔ ایمنیِ ساخت است و همین را نمی‌گوید.\", \"fix\": {}, \"actions\": []}",
+"{\"reply\": \"پس اول «کسی همین را می‌فروشد؟» — این را خودت می‌توانی در بازار بگردی؛ بخشِ ثبتِ اختراع منتظرِ برگهٔ #۱۰۲ می‌ماند. یادت باشد اصلاحِ دبی (۱٫۶ به جای ۲) در صفحه ثبت نشد، چون پیامت با پرسش تمام شد؛ اگر می‌خواهی بماند، جدا بگو. پیش از گامِ واقعی: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [\"e6\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\"}]}",
+"{\"reply\": \"جمع‌بندی: تمام‌شده — ۱) آبِ هر درختچه و گلدان (از پدرت پرسیدی: ۲ لیتر و ۲۵۰ سی‌سی)، ۲) مخزن (۲۶۵ لیتر ⇒ مخزنِ ۳۰۰ لیتری)، ۳) زمانِ پمپ (با دبیِ اندازه‌گرفتهٔ ۱٫۶، روزی حدودِ ۱۷ دقیقه). حساب‌شده ولی هنوز نیازموده — ۴) پنلِ ۱۰ واتی و باتریِ ۷ آمپرساعتی. منتظر — ۵) ایمنیِ سیم‌کشی و پمپ کنارِ آب، منتظرِ برگهٔ #۱۰۱؛ ۶) ثبتِ اختراع، منتظرِ برگهٔ #۱۰۲. گشتنِ بازار با خودت است و معیارت را هم گفتی: زیرِ دو میلیون و ده روز آب ⇒ نمی‌سازی. کی انجامش می‌دهی؟ روزش را بگو.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [\"e1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\"}]}",
+"{\"reply\": \"پس برای تکهٔ ایمنی از راهِ دیگری رفتی: از برق‌کار پرسیدی و سه کار گرفتی — فیوزِ ۵ آمپری کنارِ قطبِ باتری، اتصال‌ها در جعبهٔ ضدآبِ IP65، کابل‌ها دور از مسیرِ آب. این گفتهٔ اوست؛ داورش آزمونِ خودِ ساخته است. پیش از گامِ واقعی: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"sys_done\": {\"sheet\": 101, \"quote\": \"خودم یه راه دیگه پیدا کردم: از پسرعموم که برق‌کاره پرسیدم\"}}]}",
+"{\"reply\": \"آزمونِ یک‌ساعته را خودت کردی: باتری فقط ولرم، داخلِ جعبه خشک، فیوز سالم — تکهٔ ایمنی با شاهدِ خودت بسته شد. و حرفت را پذیرفتم: آن ابزار همان نیست که گامِ ثبتِ اختراع می‌خواست؛ اعلامِ «ابزارِ لازم آمد» نادرست بود. آن گام دوباره منتظرِ برگهٔ #۱۰۲ می‌ماند و بقیهٔ کار ادامه دارد. آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت — و این فاصله دربارهٔ فهمت چه می‌گوید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"result\": \"آزمونِ یک‌ساعته: باتری فقط ولرم، داخلِ جعبه خشک، فیوز سالم\", \"sys_fit\": {\"sheet\": 102, \"fit\": false, \"quote\": \"نه، همون نیست که می‌خواستم\"}}]}",
+"{\"reply\": \"باشد — گفتی این هم همان نیست؛ پس گامِ ثبتِ اختراع منتظر می‌ماند و بقیهٔ کار ادامه دارد. آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت — و این فاصله دربارهٔ فهمت چه می‌گوید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"sys_fit\": {\"sheet\": 102, \"fit\": false, \"quote\": \"نه، اینم نیست.\"}}]}",
+"{\"reply\": \"اشکالی ندارد — حرفِ تازه‌ات را ثبت می‌کنم: همان بود. پس گامِ ثبتِ اختراع را از سر می‌گیریم، با پرسش‌های همان حوزه. دادهٔ دیگری لازم است — چه چیزی را باید بپرسی، بسنجی یا پیدا کنی تا خواسته معین شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"sys_fit\": {\"sheet\": 102, \"fit\": true, \"quote\": \"اشتباه گفتم. دوباره نگاه کردم — همون بود\"}}]}",
+"{\"reply\": \"با پرسش‌های همان حوزه گشتی و دو شاهد آوردی: ثبت‌های قدیمی هست ⇒ طرحِ ساده‌ات نو نیست و ثبتش نمی‌کنی؛ کیتِ بازار دو و نیم میلیون و هفت‌روزه است ⇒ با معیارِ خودت (زیرِ دو میلیون و ده روز) رد شد، پس می‌سازی، فقط برای پدر و مادرت. یک چیز هنوز فقط حساب شده و آزموده نشده: پنل و باتری در ده روزِ واقعی. از این مسئله چه درسی برای مسئله‌های بعدی برمی‌داری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [\"e6\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"result\": \"ثبت‌های قدیمی هست ⇒ ثبت نمی‌کنم؛ کیتِ بازار ۲٫۵ میلیون و هفت‌روزه ⇒ خودم می‌سازم، فقط برای پدر و مادرم\"}]}",
+"{\"reply\": \"درست را به قلمِ خودت ثبت می‌کنم: بشکن، هر تکه را با آزمونِ ساده بسنج، و برای تکه‌هایی که بلد نیستی از اول بپرس کسی ساخته یا نه. پرسشی که بیشتر کمکت کرد و سلیقه‌ات را هم گفتی. یادت باشد پنل و باتری هنوز در ده روزِ واقعی آزموده نشده.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\", \"taste\": {\"text\": \"این جور مسئله‌های ساختنی رو دوست دارم\"}, \"check\": {\"msgs\": [\"پمپ رو با یه باتری تو سطل روشن کردم و یه دقیقه آبش رو تو پارچِ مدرج ریختم\", \"امروز یه ساعت روشنش گذاشتم: باتری فقط ولرم شد\"]}}, {\"do\": \"chat_solved\", \"title\": \"کیتِ آبیاریِ قطره‌ایِ خورشیدی\", \"statement\": \"یه سامانهٔ خودکار که ده روز بدونِ برق شهری، هر روز به هر درختچه و گلدون آبِ کافی بده و خراب نشه.\", \"kind\": \"find\", \"lesson\": \"ایدهٔ بزرگ رو به تکه‌های کوچیک بشکنم، هر تکه‌ای رو که می‌شه با یه آزمونِ ساده بسنجم (مثلِ پارچِ مدرج برای پمپ)، و برای تکه‌هایی که بلد نیستم از اول بپرسم کسی قبلاً ساخته یا نه\", \"check\": \"پمپ رو با یه باتری تو سطل روشن کردم و یه دقیقه آبش رو تو پارچِ مدرج ریختم: ۱٫۶ لیتر شد\", \"bestQ\": \"با کدام معیار می‌گی نمی‌سازم؟\", \"taste\": \"این جور مسئله‌های ساختنی رو دوست دارم\"}]}",
+"{\"reply\": \"این تکهٔ تازه‌ای از همان کیت است و برایش در این صفحه ابزاری ندیدم؛ برای ثبتِ کمبود بررسی می‌کنم و این تکه منتظر می‌ماند. به مجهول نگاه کن: دقیقاً چه می‌خواهی — «خراب نشدنِ باتری» چه شکلی است و با چه عدد یا واحدی سنجیده می‌شود؟\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"gap\": {\"title\": \"نگه‌داریِ باتری و ساختهٔ خانگی در سرما\", \"area\": \"sys-territory\", \"kind\": \"build\", \"step\": \"۷ نگه‌داریِ باتری در سرمای زمستان\", \"abstract\": \"کسی که ساخته‌ای برقی را بیرون از خانه نگه می‌دارد باید بداند سرما با باتری چه می‌کند و چطور نگهش دارد؛ این نیاز در هر ساختهٔ خانگیِ بیرونی هست.\", \"missing\": \"حوزه‌ای در «قلمروِ سامانه‌ها» (حلِ مسئله) برای نگه‌داری و دوامِ ساخته در شرایطِ محیطی (سرما، رطوبت): پرسش‌های کلیدی و منبعِ معتبر.\", \"where\": \"قلمروِ سامانه‌ها ← s_problem (حلِ مسئله)\", \"how\": \"یک حوزهٔ تازه با پرسش‌های وارسی و گزاره‌های مستند.\", \"relations\": \"مسئلهٔ «کیتِ آبیاریِ قطره‌ایِ خورشیدی»، تکهٔ تازه پس از بستن\", \"docs\": \"apps/learning-architecture/territory/maps/s_problem.json\", \"why_area\": \"نقشهٔ حوزه‌های حلِ مسئله در sys-territory نگه‌داری می‌شود و این حوزه در آن نیست.\", \"why_not\": \"dc_risk_uncertainty دربارهٔ انتخاب زیرِ احتمال است، نه نگه‌داریِ فنی؛ pr_hypothesis_testing آزمونِ فرضیه را می‌گوید، نه دانشِ نگه‌داریِ باتری را.\", \"evidence\": \"در فهرستِ حوزه‌ها چیزی برای نگه‌داری/دوام/سرما نیست؛ حرفِ خودش: «اینو اصلاً بلد نیستم و این‌جا هم چیزی براش ندیدم».\", \"confidence\": 0.8}, \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"register\": \"تو\"}]}",
+"{\"agree\": true, \"area\": \"sys-territory\", \"kind\": \"build\", \"dup_of\": null, \"reason\": \"در نقشهٔ حوزه‌های حلِ مسئله حوزه‌ای برای نگه‌داری و دوامِ ساخته در سرما نیست؛ برگه‌های #۱۰۱ و #۱۰۲ چیزِ دیگری می‌گویند.\", \"fix\": {}, \"actions\": []}",
+"{\"reply\": \"باشه، پس ابزارِ ثبتِ اختراع همان بود. ۱۲ × ۲ = ۲۴ ولت درست است؛ «۱٫۶ × ۸ = ۱۴» را یک بار دیگر خودت بزن. با دبیِ درست، مخزنِ ۲۰ لیتری چند دقیقه کار می‌کند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}"
+],
+"keys": [
+"سلام. یه ایده دارم: یه کیتِ آبیاریِ قطره‌ایِ خورشیدی برای باغچهٔ پدر و مادرم تو روستا، که وقتی ده روز می‌رن مسافرت، ۱۲ تا درختچه و ۱۰ تا گلدون خشک نشن. می‌خوام خودم بسازمش و اگه خوب شد چند تا هم بفروشم. نمی‌دونم از کجا شروع کنم.",
+"آره ثبتش کن. کلش اینه: یه سامانهٔ خودکار که ده روز بدونِ برق شهری، هر روز به هر درختچه و گلدون آبِ کافی بده و خراب نشه.",
+"بخش‌ها: ۱) هر درختچه روزی چقدر آب می‌خواد — فکر کنم ۲ لیتر، گلدون‌ها نیم لیتر؛ اینو می‌تونم بپرسم یا اندازه بگیرم. ۲) مخزن چقدر باشه — بلدم حساب کنم. ۳) پمپِ ۱۲ ولتی روزی چند دقیقه روشن باشه — بلدم اگه دبیِ پمپ رو بدونم. ۴) پنل و باتری چقدر",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"از بابام پرسیدم: تابستون هر درختچه رو هر ۵ روز یه سطلِ ۱۰ لیتری آب می‌ده، یعنی روزی ۲ لیتر — پس حدسم برای درختچه درست بود. گلدون‌ها رو هر روز یه لیوان می‌ده، حدودِ ۲۵۰ سی‌سی، پس نیم لیتر زیاد بود.",
+"هر روز: ۱۲ × ۲ = ۲۴ لیتر برای درختچه‌ها، ۱۰ × ۰٫۲۵ = ۲٫۵ برای گلدون‌ها، یعنی ۲۶٫۵ لیتر. ده روز: ۲۶۵ لیتر. یه مخزنِ ۳۰۰ لیتری می‌ذارم که جا داشته باشه. پمپِ ۱۲ ولتِ ارزون دبیش دقیقه‌ای ۲ لیتره، پس روزی حدودِ ۱۳ دقیقه روشن باشه. مصرفش ۱ آمپره",
+"هر روز: ۱۲ × ۲ = ۲۴ لیتر برای درختچه‌ها، ۱۰ × ۰٫۲۵ = ۲٫۵ برای گلدون‌ها، یعنی ۲۶٫۵ لیتر. ده روز: ۲۶۵ لیتر. یه مخزنِ ۳۰۰ لیتری می‌ذارم که جا داشته باشه. پمپِ ۱۲ ولتِ ارزون دبیش دقیقه‌ای ۲ لیتره، پس روزی حدودِ ۱۳ دقیقه روشن باشه. مصرفش ۱ آمپره",
+"پمپ رو با یه باتری تو سطل روشن کردم و یه دقیقه آبش رو تو پارچِ مدرج ریختم: ۱٫۶ لیتر شد، نه ۲. پس روزی حدودِ ۱۷ دقیقه. بقیه‌ش هنوز جور درمیاد. حالا اون بخشِ ۶: اگه بخوام بفروشمش، چطوری بفهمم کسی قبلاً همینو ساخته یا ثبت اختراع کرده؟",
+"پمپ رو با یه باتری تو سطل روشن کردم و یه دقیقه آبش رو تو پارچِ مدرج ریختم: ۱٫۶ لیتر شد، نه ۲. پس روزی حدودِ ۱۷ دقیقه. بقیه‌ش هنوز جور درمیاد. حالا اون بخشِ ۶: اگه بخوام بفروشمش، چطوری بفهمم کسی قبلاً همینو ساخته یا ثبت اختراع کرده؟\n\n[سامانه",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"هر دو رو؛ ولی اول این‌که کسی همینو می‌فروشه یا نه، چون اگه هست شاید اصلاً نسازم.",
+"اگه زیرِ دو میلیون باشه و ده روز آب بده، نمی‌سازم. حالا یه جمع‌بندی بده: کدوم بخشا تموم شد، کدوما منتظره و منتظرِ چی؟",
+"دیدم جوابی که زیرِ برگهٔ ایمنی اومد به کارم نمیاد. به هر حال خودم یه راه دیگه پیدا کردم: از پسرعموم که برق‌کاره پرسیدم؛ گفت یه فیوزِ ۵ آمپری کنارِ قطبِ باتری بذارم، همهٔ اتصال‌ها رو تو جعبهٔ ضدآب IP65 ببرم و کابل‌ها رو از مسیرِ آب دور کنم. ",
+"امروز یه ساعت روشنش گذاشتم: باتری فقط ولرم شد، داخلِ جعبه خشک بود و فیوز هم سالم. ایمنی اوکیه. ولی اون ابزاری که برای ثبتِ اختراع اومد رو نگاه کردم — نه، همون نیست که می‌خواستم.",
+"نه، اینم نیست.",
+"ببخشید، اشتباه گفتم. دوباره نگاه کردم — همون بود؛ پرسش‌هاش همونیه که برای ثبتِ اختراع لازم داشتم.",
+"با پرسش‌های همون حوزه گشتم: تو Google Patents با «solar drip irrigation kit» و «آبیاری قطره‌ای خورشیدی» چند تا ثبتِ قدیمی هست، پس طرحِ سادهٔ من نو نیست و ثبتش نمی‌کنم. تو بازار هم کیتِ آماده دو و نیم میلیونه و فقط هفت روز آب می‌ده — از معیا",
+"درسم: ایدهٔ بزرگ رو به تکه‌های کوچیک بشکنم، هر تکه‌ای رو که می‌شه با یه آزمونِ ساده بسنجم (مثلِ پارچِ مدرج برای پمپ)، و برای تکه‌هایی که بلد نیستم از اول بپرسم کسی قبلاً ساخته یا نه. بیشتر از همه اون پرسشِ «با کدام معیار می‌گی نمی‌سازم؟» کم",
+"یه تکهٔ دیگه هم مونده: زمستون که کیت بیرونه، باتری‌ش رو تو سرما چطور نگه دارم که خراب نشه؟ اینو اصلاً بلد نیستم و این‌جا هم چیزی براش ندیدم.",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"یه چیز رو پس می‌گیرم: اون «نه، همون نیست» که برای ابزارِ ثبتِ اختراع گفتم اشتباه بود؛ همون بود و جواب داد. یه حسابِ دیگه هم: پمپ دقیقه‌ای ۱٫۶ لیتره، پس ۱٫۶ × ۸ = ۱۴ لیتر در ۸ دقیقه؛ دو تا باتریِ ۱۲ ولتی هم ۱۲ × ۲ = ۲۴ ولت."
+]
+}

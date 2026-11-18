@@ -53632,10 +53632,11 @@ APP.goFromURL = function (q) {
     return { id: e ? e.id : "" };
   };
   /* دورِ ۲۸ (C95، D28-18 tD1 / C28-23 s24 «اصلاح شد ⇐ «—» → «جابه‌جا شد ⇒ …»»): جابه‌جایی اصلاح نیست — سطرِ تاریخچه برچسبِ خودش را دارد (x.lab) */
-  function mvHistFa27(H) { return (H || []).map(function (x) { return { at: x.at, lab: x.back ? "برگشت به «" + titleOf27(x.back) + "»" : "جابه‌جا شد ⇒ «" + titleOf27(x.to) + "»", old: "", new: "", why: "" }; }); }
+  /* دورِ ۳۰ (C30-6، #294 — یک قراردادِ پیکان): جابه‌جایی «از «…» به «…»» / «جابه‌جا شد به «…»» بی پیکان نوشته می‌شود؛ تنها پیکانِ تاریخچه همان «تازه» (اصلاح شد ⇐ «پیشین») است. */
+  function mvHistFa27(H) { return (H || []).map(function (x) { return { at: x.at, lab: x.back ? "برگشت به «" + titleOf27(x.back) + "»" : "جابه‌جا شد به «" + titleOf27(x.to) + "»", old: "", new: "", why: "" }; }); }
   function mvView27(pid, e, r) {
     var H = mvHist27(e);
-    if (e.moved) return Object.assign(e, { withdrawn: true, wdLab: "جابه‌جا شد", out: "جابه‌جا شد ⇒ «" + titleOf27(e.moved.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)", hist: H, btns: [] });
+    if (e.moved) return Object.assign(e, { withdrawn: true, wdLab: "جابه‌جا شد", out: "جابه‌جا شد به «" + titleOf27(e.moved.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)", hist: H, btns: [] });
     if (e.undone) return Object.assign(e, { withdrawn: true, wdLab: "برگشت", out: "برگشت به «" + titleOf27(e.mvFrom.pid) + "» (جابه‌جایی پس گرفته شد)", hist: H, btns: [] });
     if (e.mvFrom) return Object.assign(e, { out: (e.out ? e.out + " · " : "") + "از «" + titleOf27(e.mvFrom.pid) + "» جابه‌جا شد (به گفتهٔ خودت)", hist: H,
       btns: [{ label: "↩ برگرداندنِ این سطر به «" + clip(titleOf27(e.mvFrom.pid), 40) + "»", cls: "lp-dunmv", go: function () { A.dossierUnmove27(pid, e.id); A.go("dossier", pid); } }] });
@@ -53868,7 +53869,9 @@ APP.goFromURL = function (q) {
       o.push("### " + (hm(e.at) ? hm(e.at) + " — " : "") + e.title + (e.from ? " (" + e.from + ")" : "") + (e.withdrawn ? " — " + (e.wdLab || "پس گرفته شد") : ""));
       evLines(e).forEach(function (l) { o.push("- " + plain(l)); });
       if (e.out) o.push("- سرانجام: " + plain(e.out));
-      (e.hist || []).forEach(function (x) { if (x.lab) { o.push("- " + plain(x.lab) + (x.at ? " (" + A.fdate(day(x.at)) + ")" : "")); return; } o.push("- اصلاح شد ⇐ «" + plain(typeof x.old === "string" ? hv(x.old) : A.dossierVal(x.old)) + "» → «" + plain(typeof x.new === "string" || x.new == null ? hv(x.new, true) : A.dossierVal(x.new)) + "»" + (x.at ? " (" + A.fdate(day(x.at)) + ")" : "")); });
+      /* دورِ ۳۰ (B24·D16 / A30-12 / C30-6 — یک قراردادِ پیکان، R24/R27 R6): سطرِ تاریخچه دو پیکانِ ناهم‌سو داشت («اصلاح شد ⇐ «پیشین» → «تازه»») در حالی که همهٔ صفحه
+           «تازه» (اصلاح شد ⇐ «پیشین») می‌نویسد (a27 chLine20، corrPush، حباب). همهٔ نماهای تاریخچه (Markdown، HTML، DOM، نشانِ حباب) همان یک ریخت را دارند. */
+      (e.hist || []).forEach(function (x) { if (x.lab) { o.push("- " + plain(x.lab) + (x.at ? " (" + A.fdate(day(x.at)) + ")" : "")); return; } o.push("- «" + plain(typeof x.new === "string" || x.new == null ? hv(x.new, true) : A.dossierVal(x.new)) + "» (اصلاح شد ⇐ «" + plain(typeof x.old === "string" ? hv(x.old) : A.dossierVal(x.old)) + "»)" + (x.at ? " (" + A.fdate(day(x.at)) + ")" : "")); });
       if (e.src && e.src.unknown) o.push("- منبع: نامعلوم");
       if (e.src && e.src.text) o.push("- از پیامِ گفت‌وگو: «" + plain(clip(e.src.text, 200)) + "» (سشن " + e.src.sess + ")");
       (e.mind || []).forEach(function (m) { o.push("- کارنامهٔ ذهن: " + m.row + " " + (m.sign || "") + (m.withdrawn ? " (پس گرفته شد)" : "")); });
@@ -53883,7 +53886,7 @@ APP.goFromURL = function (q) {
       o.push("<section data-ev=\"" + e.k + "\"><h3" + (e.withdrawn ? " class=\"w\"" : "") + ">" + esc((hm(e.at) ? hm(e.at) + " — " : "") + e.title + (e.from ? " (" + e.from + ")" : "") + (e.withdrawn ? " — " + (e.wdLab || "پس گرفته شد") : "")) + "</h3><ul>");
       evLines(e).forEach(function (l) { o.push("<li>" + htm(l) + "</li>"); });
       if (e.out) o.push("<li>سرانجام: " + htm(e.out) + "</li>");
-      (e.hist || []).forEach(function (x) { if (x.lab) { o.push("<li class=\"h\">" + esc(x.lab) + "</li>"); return; } o.push("<li class=\"h\">اصلاح شد ⇐ «" + htm(typeof x.old === "string" ? hv(x.old) : A.dossierVal(x.old)) + "» → «" + htm(typeof x.new === "string" || x.new == null ? hv(x.new, true) : A.dossierVal(x.new)) + "»</li>"); });
+      (e.hist || []).forEach(function (x) { if (x.lab) { o.push("<li class=\"h\">" + esc(x.lab) + "</li>"); return; } o.push("<li class=\"h\">«" + htm(typeof x.new === "string" || x.new == null ? hv(x.new, true) : A.dossierVal(x.new)) + "» (اصلاح شد ⇐ «" + htm(typeof x.old === "string" ? hv(x.old) : A.dossierVal(x.old)) + "»)</li>"); });
       if (e.src && e.src.text) o.push("<li class=\"h\">از پیامِ گفت‌وگو: «" + htm(clip(e.src.text, 200)) + "»</li>");
       (e.mind || []).forEach(function (m) { o.push("<li class=\"h\">کارنامهٔ ذهن: " + esc(m.row + " " + (m.sign || "") + (m.withdrawn ? " (پس گرفته شد)" : "")) + "</li>"); });
       o.push("</ul></section>"); });
@@ -53930,7 +53933,7 @@ APP.goFromURL = function (q) {
         evLines(e).length ? h("ul", { class: "small" }, evLines(e).map(function (l) { return h("li", {}, mx(l)); })) : null,
         e.out ? h("p", { class: "small lp-dout" }, "سرانجام: ", mx(e.out)) : null,
         e.ask28 ? h("p", { class: "small lp-dmvask", role: "status" }, e.ask28) : null,
-        (e.hist || []).length ? h("ul", { class: "small muted lp-dhist" }, e.hist.map(function (x) { if (x.lab) return h("li", { class: "lp-dmvh" }, x.lab + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); return h("li", {}, "اصلاح شد ⇐ «", mx(typeof x.old === "string" ? hv(x.old) : x.old && x.old.done ? (DONE_FA[x.old.done] || x.old.done) + (x.old.what ? " — " + x.old.what : "") : A.dossierVal(x.old)), "» → «", mx(typeof x.new === "string" || x.new == null ? hv(x.new, true) : x.new.done ? (DONE_FA[x.new.done] || x.new.done) : A.dossierVal(x.new)), "»" + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); })) : null,
+        (e.hist || []).length ? h("ul", { class: "small muted lp-dhist" }, e.hist.map(function (x) { if (x.lab) return h("li", { class: "lp-dmvh" }, x.lab + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); return h("li", {}, "«", mx(typeof x.new === "string" || x.new == null ? hv(x.new, true) : x.new.done ? (DONE_FA[x.new.done] || x.new.done) : A.dossierVal(x.new)), "» (اصلاح شد ⇐ «", mx(typeof x.old === "string" ? hv(x.old) : x.old && x.old.done ? (DONE_FA[x.old.done] || x.old.done) + (x.old.what ? " — " + x.old.what : "") : A.dossierVal(x.old)), "»)" + (x.at ? " · " + A.fdate(day(x.at)) + " " + hm(x.at) : "")); })) : null,
         e.src && e.src.unknown ? h("p", { class: "small muted lp-dsrc" }, "منبع: نامعلوم (پیامی که این از آن آمد پیدا نشد)") : e.src && e.src.text ? h("p", { class: "small muted lp-dsrc" }, "از پیامِ گفت‌وگو: «", mx(clip(e.src.text, 200)), "» ", h("button", { class: "linkish small", type: "button", onclick: function () { openSess(e.src.sess); } }, "💬 باز کردنِ سشن")) : null,
         (e.btns || []).length ? h("p", { class: "row gap wrap small" }, e.btns.map(function (b0) { return h("button", { class: "btn ghost sm " + (b0.cls || "lp-dnewp"), type: "button", onclick: b0.go }, b0.label); })) : null,
         (e.btnsMore || []).length ? h("details", { class: "small lp-dmvmore" }, h("summary", {}, "↪ این سطر مالِ مسئلهٔ دیگری است…"), h("p", { class: "row gap wrap small" }, e.btnsMore.map(function (b0) { return h("button", { class: "btn ghost sm " + (b0.cls || "lp-dmv"), type: "button", onclick: b0.go }, b0.label); }))) : null,
@@ -54027,7 +54030,7 @@ APP.goFromURL = function (q) {
       /* دورِ ۲۱ (R3h، B·D13 s19): حبابی که در گفت‌وگو یا با ✏️ اصلاح شد نشان دارد — «پیشین ⇐ درست» */
       /* دورِ ۲۲ (P3، B·D16 s19): نشانِ حباب با نتیجهٔ صفحه یکی است — اصلاحِ گفت‌وگو که هیچ رکوردی را عوض نکرد «اصلاح شد» نمی‌خورد، فقط «گفتی … — رکوردی از آن ثبت نشده بود» */
       if ((m.corr || []).length) wrap.appendChild(h("span", { class: "muted as-corr" }, (m.corr || []).map(function (x, i) { var none = x.chat && !x.n && !(x.pids || []).length;
-        return [i ? " · " : "", none ? "گفتی «" : "اصلاح شد ⇐ «", mx(x.frag), "» → «", mx(x.fix), "»", none ? " — رکوردی از آن ثبت نشده بود" : x.chat ? " (از گفت‌وگو)" : ""]; })));
+        return none ? [i ? " · " : "", "گفتی «", mx(x.frag), "» → «", mx(x.fix), "» — رکوردی از آن ثبت نشده بود"] : [i ? " · " : "", "«", mx(x.fix), "» (اصلاح شد ⇐ «", mx(x.frag), "»)", x.chat ? " (از گفت‌وگو)" : ""]; })));
       if (ED && ED.sid === s.id && ED.mid === mid) {
         var id = "asEd_" + String(mid).replace(/[^A-Za-z0-9]/g, "");
         var ta = h("textarea", { id: id, class: "as-edtx", rows: 2, dir: "auto", "aria-label": "متنِ درستِ این پیام" }); ta.value = ED.text; ta.addEventListener("input", function () { ED.text = ta.value; });
@@ -54106,7 +54109,7 @@ APP.goFromURL = function (q) {
     try { (A.liveAll ? A.liveAll() : S.all("eprob", function (r) { return r && r.live && r.p; })).forEach(function (r) { if (r && r.p && !isTest(r)) push(r.p.id, true); }); } catch (e) { }
     return out;
   }
-  function mvH28(m) { var o = [{ at: m.at, lab: "جابه‌جا شد: از «" + titleOf28(m.from) + "» ⇒ «" + titleOf28(m.to) + "»" + (m.step ? " (گامِ " + fa(m.step) + ")" : "") }]; if (m.undone) o.push({ at: m.undone.at, lab: "برگشت به «" + titleOf28(m.from) + "»" }); return o; }
+  function mvH28(m) { var o = [{ at: m.at, lab: "جابه‌جا شد: از «" + titleOf28(m.from) + "» به «" + titleOf28(m.to) + "»" + (m.step ? " (گامِ " + fa(m.step) + ")" : "") }]; if (m.undone) o.push({ at: m.undone.at, lab: "برگشت به «" + titleOf28(m.from) + "»" }); return o; }
   var MVB29 = "";
   A.dossierMove28 = function (from, e, to, step) {
     if (!from || !to || from === to || !e) return null; var own = mvOwn28(from); if (!own) return null;
@@ -54144,14 +54147,14 @@ APP.goFromURL = function (q) {
     D.events.forEach(function (e) {
       var k = key28(e), mine = out.filter(function (m) { return m.key === k; });
       if (mine.length) { e.hist = (e.hist || []).concat([].concat.apply([], mine.map(mvH28))); var act = mine.filter(function (m) { return !m.undone; }).pop();
-        if (act) { e.withdrawn = true; e.wdLab = "جابه‌جا شد"; e.out = "جابه‌جا شد ⇒ «" + titleOf28(act.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)"; e.btns = []; return; } }
+        if (act) { e.withdrawn = true; e.wdLab = "جابه‌جا شد"; e.out = "جابه‌جا شد به «" + titleOf28(act.to) + "» (به گفتهٔ خودت؛ سطر این‌جا در تاریخچه می‌ماند)"; e.btns = []; return; } }
       if (NOMV28[e.k] || e.withdrawn || e.mvFrom || e.mv28 || !(evLines(e).length || e.title)) return;
       var ds = dests(); if (!ds.length) return;
       var sn = e.k === "cprior" ? evLines(e).map(stepN28).filter(function (n, i, X) { return n && X.indexOf(n) === i; }) : [];
       if (sn.length) { var gone = {}; out.forEach(function (m) { if (m.step && !m.undone) gone[m.step] = m; });
         /* دورِ ۲۹ (C172): گامی که ماند ولی پایه‌اش رفت («فقط همین») — کنارش «پایه‌اش به ⟨مسئله⟩ رفت»؛ برگرداندن (undone) این را هم برمی‌دارد */
         var left29 = {}; Object.keys(gone).forEach(function (x) { var g = gone[x]; deps28(e, +x, me).forEach(function (d) { if (!gone[d] && !left29[d]) left29[d] = g; }); });
-        e.lines = (e.lines || []).map(function (l) { var n = stepN28(l), g = n && gone[n], b = n && left29[n]; return g ? l + " — جابه‌جا شد ⇒ «" + titleOf28(g.to) + "»" : b ? l + " — پایه‌اش (گامِ " + fa(b.step) + ") به «" + titleOf28(b.to) + "» رفت" : l; });
+        e.lines = (e.lines || []).map(function (l) { var n = stepN28(l), g = n && gone[n], b = n && left29[n]; return g ? l + " — جابه‌جا شد به «" + titleOf28(g.to) + "»" : b ? l + " — پایه‌اش (گامِ " + fa(b.step) + ") به «" + titleOf28(b.to) + "» رفت" : l; });
         sn = sn.filter(function (n) { return !gone[n]; }); }
       var q = ASK28[me]; if (q && q.ev === k && sn.length) { var tq = clip(titleOf28(q.to), 40);
         e.ask28 = "گامِ " + fa(q.step) + " وابسته دارد: " + q.deps.map(function (n) { return "گامِ " + fa(n); }).join("، ") + " — آن‌ها هم به «" + tq + "» بروند؟";
@@ -58752,7 +58755,10 @@ APP.goFromURL = function (q) {
   var PRE = A.PRE = A.PRE || {};
   function nowIso() { return A.nowISO(); }
   function txt(t) { return String(t == null ? "" : t).replace(/\s+/g, " ").trim(); }
-  function clip(t, n) { var s = txt(t); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+  /* دورِ ۳۰ (B30·D1 s12): بریدنِ متنی که «…» ِ درونی دارد («جدول امروز: «پایتخت کشوری که رودخانه‌ی …») گیومهٔ باز را بی‌جفت می‌گذاشت؛ گیومهٔ بیرونیِ سطر
+     («🧭 «…» — مبدأ: …») آن را می‌بست و خودش باز می‌ماند ⇒ گذرگاهِ ضمیر (a27 outMap25) همهٔ باقیِ سطر را «درونِ نقلِ او» می‌خواند و «فقط بازنگریِ خودت» برای کاربرِ
+     «شما» تبدیل نمی‌شد. بریده هر «» را که درونِ خودش باز مانده می‌بندد (پس از «…»). */
+  function clip(t, n) { var s = txt(t); if (s.length <= n) return s; var c = s.slice(0, n - 1), d = 0; for (var i = 0; i < c.length; i++) { var ch = c.charAt(i); if (ch === "«") d++; else if (ch === "»" && d > 0) d--; } return c + "…" + (d > 0 ? new Array(d + 1).join("»") : ""); }
   function noq(t) { return String(t == null ? "" : t).replace(/[«»]/g, ""); }
   function isUser(m) { return !!m && m.role === "user" && !/^\[(?:سامانه|اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی)/.test(String(m.text || "")); }
   function lastUser(s) { var M = (s && s.msgs) || []; for (var i = M.length - 1; i >= 0; i--) if (isUser(M[i])) return M[i]; return null; }
@@ -60078,6 +60084,11 @@ APP.goFromURL = function (q) {
       if (!rep || e.state !== "wait") return;
       var st = String(rep.status || ""), RN = replyNotes(rep), done = e.readNotes || [];
       if (!/^(?:answered|approved|closed|resolved|done|rejected|wontfix|open|filed)$/.test(st)) return;
+      /* دورِ ۳۰ (B30·D3 tB1 c20→c22): جوابی که پیش از یادداشتِ «نه» ِ خودِ او زیرِ برگه بود دوباره داوری نمی‌شود. رسیدن از ثبت‌گاه (sysLocal) جوابِ روتینی را که
+         همان ساختن را خبر می‌داد «ناخوانده» می‌گذاشت؛ پس از «نه» ِ او (گام دوباره منتظر) همان یادداشتِ کهنه سنجیده می‌شد و «⚠️ … جواب نداد» با دلیل‌های نادرست
+         می‌ساخت. یادداشتِ «نه» ِ او درخواستِ جوابِ تازه از روتین است ⇒ فقط جواب‌های **پس از** آن جواب‌اند (ترتیبِ یادداشت‌ها، نه ساعت). */
+      var AN = (rep.notes || []), cut = -1; if (e.backBy) AN.forEach(function (n, i) { var t = txt(n && n.text); if (PAGE_NOTE.test(t) && /وارسیِ برگه/.test(t) && /(?:خودش گفت|به گفتهٔ خودش)[^\n]{0,40}همان/.test(t)) cut = i; });
+      if (cut >= 0) RN.forEach(function (n, i) { var k = String(n.id || n.at || ("i" + i)); if (AN.indexOf(n) < cut && done.indexOf(k) < 0) done = done.concat([k]); });
       var NEW = RN.filter(function (n, i) { return done.indexOf(String(n.id || n.at || ("i" + i))) < 0; });
       if (!NEW.length) {
         /* دورِ ۲۶ (بانکِ R26 #192): برگه‌ای که **بی هیچ جوابِ تازه‌ای** بسته یا بایگانی شد (تیکِ دستی، بستنِ روتین) در حالی که گام هنوز منتظرش است — پیش‌تر بی‌صدا:
@@ -60128,10 +60139,17 @@ APP.goFromURL = function (q) {
         return;
       }
       markRead();
-      var nm = C0.slice(0, 3).map(function (it) { return "«" + clip(it.fa, 50) + "»" + (RL.indexOf(it.id) >= 0 ? " (تشخیصِ افتراقیِ برگه همین را کنار گذاشته بود)" : ""); }).join("، ");
+      /* دورِ ۳۰ (B30·D3): برچسبِ هر نامزدِ کنارگذاشته از **همان کسی** است که کنارش گذاشت — «نه» ِ او «تشخیصِ افتراقیِ برگه» نیست، و «هیچ واژهٔ مشترکی ندارد»
+         فقط دربارهٔ همان نامزدی گفته می‌شود که سنجیده شد (نه دربارهٔ فهرستی که نامزدِ ردشدهٔ خودِ او هم در آن است) */
+      var whoR = function (it) { return (e.ruled || []).indexOf(it.id) >= 0 ? "ruled" : (e.rejected || []).indexOf(it.id) >= 0 ? "her" : (e.passed || []).indexOf(it.id) >= 0 ? "passed" : ""; };
+      var labR = { ruled: " (تشخیصِ افتراقیِ برگه همین را کنار گذاشته بود)", her: " (به گفتهٔ خودش همان نبود)", passed: " (از میانِ هم‌امتیازها برگزیده نشد)", "": "" };
+      var nm = C0.slice(0, 3).map(function (it) { return "«" + clip(it.fa, 50) + "»" + labR[whoR(it)]; }).join("، ");
       var why = (C0.length ? "آنچه آمد (" + nm + ")" : unR.length ? "جوابِ روتین فقط «" + unR.slice(0, 3).join("»، «") + "» را نام برد که تشخیصِ افتراقیِ برگه کنار گذاشته بود و" : "جوابِ روتین («" + clip(last.text || "", 140) + "») چیزی برای این گام نساخت و") + " نیازِ گامِ «" + clip(e.step, 80) + "» را جواب نمی‌دهد" + (C.length ? " — واژهٔ کاملِ مشترکِ کافی با «" + clip(needText(e), 120) + "» ندارد" : "");
       var allR = C0.length && C0.every(function (it) { return RL.indexOf(it.id) >= 0; });
-      var herWhy = C0.length ? "آنچه آمد " + C0.slice(0, 3).map(function (it) { return "«" + clip(it.fa, 50) + "»"; }).join("، ") + " است" + (allR ? " که خودِ برگه از اول کنار گذاشته بود" : herShare(r.best))
+      var q3 = function (L) { return L.slice(0, 3).map(function (it) { return "«" + clip(it.fa, 50) + "»"; }).join("، "); }, Cher = C0.filter(function (it) { return whoR(it) === "her"; });
+      var Crul = C0.filter(function (it) { return whoR(it) === "ruled"; }), Cnew = C0.filter(function (it) { return RL.indexOf(it.id) < 0; });
+      var herWhy = C0.length ? (!Cher.length ? "آنچه آمد " + q3(C0) + " است" + (allR ? " که خودِ برگه از اول کنار گذاشته بود" : herShare(r.best))
+          : [q3(Cher) + " را " + (shE(e) ? "خودتان گفتید" : "خودت گفتی") + " همان نیست", Crul.length ? q3(Crul) + " را خودِ برگه از اول کنار گذاشته بود" : "", Cnew.length ? "آنچه تازه آمد " + q3(Cnew) + " است" + herShare(r.best) : ""].filter(Boolean).join("؛ "))
         : unR.length ? "جواب فقط «" + unR.slice(0, 3).join("»، «") + "» را نام برد که خودِ برگه از اول کنار گذاشته بود"
         : "جواب هیچ نما یا حوزه‌ای را که برای این گام ساخته شده باشد نام نبرد";
       mismatch(o, e, C0, why, false, herWhy);
@@ -60346,6 +60364,7 @@ APP.goFromURL = function (q) {
     if (pa) evOut(o.sc, e, pa.evk || "ask", OT.length ? "جواب: هیچ‌کدام همان نیست" : "جواب: همان نیست");
     if (was !== "wait") { evOut(o.sc, e, e.backK || "back", "پس گرفته شد — به گفتهٔ خودش همان نبود"); if (was === "resumed") evOut(o.sc, e, e.resK || "resume", "پس گرفته شد — به گفتهٔ خودش آن ابزار همان نبود"); }
     e.backBy = { at: nowIso(), id: it.id, fa: OT.length ? clip(names.join("» و «"), 160) : clip(it.fa, 80), q: clip(span || "", 200), was: was, key: curMsgKey() }; e.lastRej = { it: it, sn: sn || 0, alts: OT };
+    (e.rejHist = e.rejHist || []).push({ it: { kind: it.kind, id: it.id, fa: clip(it.fa, 80), go: it.go, text: clip(it.text || "", 600) }, sn: sn || 0, alts: OT.length, q: clip(span || "", 200), was: was, at: nowIso() });
     mismatch(o, e, [it].concat(OT), "«" + names.join("» و «") + "» — " + (byQuote ? "به گفتهٔ خودش" : "خودش گفت") + (OT.length ? " هیچ‌کدام" : "") + " همان چیزی نیست که گامِ «" + clip(e.step, 80) + "» لازم داشت" + (span ? " («" + clip(span, 160) + "»)" : "") + "؛ آن نیاز هنوز جواب نگرفته" + (was !== "wait" ? " (پیش‌تر «رسید» اعلام شده بود — پس گرفته شد)" : ""), true,
       was !== "wait" ? "«" + clip(it.fa, 50) + "» را «رسید» اعلام کرده بودم و نادرست بود" : "");
     stepsSync(e);
@@ -60450,9 +60469,28 @@ APP.goFromURL = function (q) {
     if (e.sheet) { e.openBy = e.openBy || nowIso(); e.closeNote = "[دستیار · حلقهٔ قلمرو — «نه» پس گرفته شد]\nکاربر گفت اشتباه کرده بود: «" + clip(it.fa, 80) + "» همان چیزی است که گامِ «" + e.step + "» لازم داشت" + (span ? " («" + clip(span, 200) + "»)" : "") + ". یادداشتِ پیشینِ «همان نیست» دیگر برقرار نیست؛ این گام دیگر منتظرِ این برگه نیست."; }
     e.ask = { sn: sn }; arrive(o, e, it, "ask", []);
   }
+  /* دورِ ۳۰ (A30-23 tA1 p21): «نه» ای که با نقل پس گرفته شد وقتی مسئله پیش‌تر بسته شده بود (مدخلِ moot) — مسئله بسته می‌ماند (C36)، ولی حرفِ او ثبت می‌شود و
+     برگه‌ای که دیگر هیچ گامی منتظرش نیست با یادداشتِ همان پس‌گرفتن و تأییدِ خودِ او بسته می‌شود (R27 R7: پس‌گرفتنِ «نه» برگه را می‌بندد). */
+  function mootBack(o, e, H, span) {
+    var it = H.it; e.rejected = (e.rejected || []).filter(function (id) { return id !== it.id; });
+    (e.checks = e.checks || []).push({ at: nowIso(), ok: null, undo: true, item: it.kind + ":" + it.id, reason: "«نه» ِ پیشین را پس گرفت" + (span ? " («" + clip(span, 120) + "»)" : "") + " — مسئله پیش‌تر بسته شده بود" });
+    e.mootTool = { kind: it.kind, id: it.id, fa: clip(it.fa, 80), go: it.go, at: nowIso(), by: "her" }; e.mootAck = nowIso();
+    swEv(o.sc, e, "undo", "↩ «نه» پس گرفته شد: «" + clip(it.fa, 60) + "» همان بود", ["گامی که منتظرش بود: «" + clip(e.step, 120) + "»"].concat(span ? ["از حرفِ " + (shE(e) ? "خودتان" : "خودت") + ": «" + clip(span, 200) + "»"] : []).concat(["مسئله پیش‌تر بسته شده بود و بسته می‌ماند"]), "برگه بسته شد", "undo" + (e.checks || []).filter(function (c) { return c.undo; }).length);
+    var closed = false;
+    if (e.sheet) { e.openBy = e.openBy || nowIso(); e.closeNote = "[دستیار · حلقهٔ قلمرو — «نه» پس گرفته شد]\nکاربر گفت اشتباه کرده بود: «" + clip(it.fa, 80) + "» همان چیزی بود که گامِ «" + e.step + "» لازم داشت" + (span ? " («" + clip(span, 200) + "»)" : "") + ". مسئله پیش‌تر بسته شده بود؛ یادداشتِ پیشینِ «همان نیست» دیگر برقرار نیست و هیچ گامی منتظرِ این برگه نیست."; closed = sheetClose(o, e, it, true); }
+    sysMsg(e, "↩ پس‌گرفتنِ «نه» ثبت شد: «" + clip(it.fa, 60) + "» همان ابزارِ گامِ «" + clip(e.step, 70) + "» بود. مسئله پیش‌تر بسته شده بود و بسته می‌ماند" + (closed ? "؛ زیرِ برگهٔ " + nn(e) + " نوشتم و برگه را بستم." : "."));
+    stepsSync(e); o.put();
+  }
   var REOPEN_T = /(?:^|[\s‌،,])(?:باز(?:ش|ـش)?[\s‌]*(?:کن|کنید|کنیم)|دوباره[\s‌]+باز(?:ش)?[\s‌]*(?:کن|کنید|کنیم))(?=$|[\s‌،,.!])/;
   var TAKE_BACK = /(?:اشتباه(?:ی)?|غلط)[^.؟?\n]{0,30}(?:گفتم|کردم|زدم|بود)[^؟?\n]{0,30}(?:همون|همان|همین)(?:ه|[\s‌]*است|[\s‌]*بود)|نه[،,\s‌]+(?:همون|همان)[\s‌]*بود/;
-  function backNow(e) { var c = (e.checks || [])[(e.checks || []).length - 1]; return !!(e && e.state === "wait" && !e.ask && e.backBy && c && c.mismatch && c.byHer); }
+  /* دورِ ۳۰ (B30·D3 tB1 c21–c23؛ C20 / R27 R7): «نه» ِ او آخرین حکمِ **خودِ او** است تا وقتی چیزی (رسیدن، پرسش، پس‌گرفتن) جایش را بگیرد. وارسیِ صفحه
+     (گذرِ برگه پس از «نه»: mismatch بی byHer) حکمِ او نیست و پس‌گرفتنِ «نه» را نمی‌بندد — پیش‌تر یک گذرِ تازه که پس از «نه» آمد آخرین سطرِ checks می‌شد و
+     «اشتباهی گفتم نه؛ همون بود» دیگر خوانده نمی‌شد (مسئله بی ابزار بسته شد). */
+  function backNow(e) {
+    if (!(e && e.state === "wait" && !e.ask && e.backBy)) return false; var C = e.checks || [], since = String(e.backBy.at || "");
+    for (var i = C.length - 1; i >= 0; i--) { var c = C[i]; if (c && c.mismatch && !c.byHer && String(c.at || "") >= since) continue; return !!(c && c.mismatch && c.byHer); }
+    return false;
+  }
   PRE.sysBackNow = backNow;
   /* ردِ جورشدن به معنا (نه فقط «نه» ِ آغازِ پیام): «همون نیست»، «ربطی نداره»، «به کارِ گامِ سوم نمیاد»، «جوابِ … رو نمیده» — در بندی که پرسش نیست */
   var NOFIT = /(?:^|[\s‌«،,])(?:همون|همان|اون|آن|این)[\s‌]*(?:چیزی[\s‌]*)?نیست(?=[\s‌]*(?:$|[.،؛!»]|که[\s‌]*(?:لازم|می[‌\s]?خوا|دنبال|گفتم|باید)))|ربط(?:ی)?[\s‌]*(?:به[^.،؛!؟?\n]{0,50})?[\s‌]*(?:نداره|ندارد)|به[\s‌]*(?:کار|درد)(?:م|ِ)?(?:[\s‌]+[^.،؛!؟?\n]{0,50}?)?[\s‌]*(?:نمیاد|نمی[‌\s]?آید|نمی[‌\s]?خوره|نمی[‌\s]?خورد)|جواب(?:م|ش|ِ)?(?:[\s‌]+[^.،؛!؟?\n]{0,40}?)?[\s‌]*(?:رو|را)?[\s‌]*نمی[‌\s]?(?:ده|دهد)|کمک(?:ی|م)?[\s‌]*(?:به[^.،؛!؟?\n]{0,40})?[\s‌]*نمی[‌\s]?کن(?:ه|د)|(?:^|[\s‌«،,])(?:اون|آن|این)[\s‌]+(?:یه|یک)?[\s‌]*چیزِ?[\s‌]+(?:دیگه|دیگر)(?:[\s‌]*(?:ست|است|ه))?(?=[\s‌]*(?:$|[.،؛!»]))/;   // دورِ ۲۷ (بانکِ R27 #284): «اون یه چیزِ دیگه‌ست»
@@ -60499,7 +60537,20 @@ APP.goFromURL = function (q) {
     try { var o0 = { sc: sc, X: X, put: function () { var R0 = store(sc); if (R0) R0.put(); } }; if (sysLocal(o0)) dirty = true; } catch (e) { }
     /* دورِ ۲۴ (R1): جوابِ او به پرسشِ «همان است؟» در آغازِ همین پیام */
     var oS = { sc: sc, X: X, put: function () { var R0 = store(sc); if (R0) R0.put(); } }, nf = noFitSpan(m);
-    try { Y.forEach(function (e) {
+    /* دورِ ۳۰ (A30-23 tA1 p21؛ R27 R7): پس‌گرفتنِ «نه» ای که **با نقلِ خودش** نشانش داد («اون «نه، همون نیست» که … گفتم اشتباه بود؛ همون بود») — حتی وقتی
+       پس از آن «نه» صفحه پرسشِ تازه‌ای (❓ ِ گره) پرسیده است. پیش‌تر فقط آخرین «نه» و فقط بی پرسشِ باز پس گرفته می‌شد؛ نقلِ او پرسشِ باز را جوابِ «نه» می‌کرد (یا
+       هیچ) و برگه باز می‌ماند. نقل باید در متنِ همان «نه» ِ ثبت‌شده باشد و آن «نه» یک ابزارِ تنها را رد کرده باشد (نه «هیچ‌کدام» ِ گره) ⇒ همان ابزار با تأییدِ خودش
+       می‌رسد، پرسشِ باز سرانجامِ «لازم نشد» می‌گیرد و برگه با همان یادداشت بسته می‌شود. بی نقل یا نقلی که با هیچ «نه» ای نمی‌خواند ⇒ رفتارِ پیشین. */
+    var QB = [];
+    try { if (TAKE_BACK.test(m) && !/[؟?]\s*$/.test(m)) { var QS = (String(m).match(/«[^»]{3,80}»/g) || []).map(function (x) { return zk(x.slice(1, -1)); }).filter(function (x) { return x.trim().length >= 3; });
+      /* همهٔ دفترهای حلقه (نه فقط دفترِ کانونِ این نوبت): پیامِ پس‌گرفتن شاید خودش مسئلهٔ گفت‌وگوی تازه‌ای بسازد (A30-23: همان پیام حساب هم داشت) */
+      if (QS.length) sysStores().forEach(function (o2) { var oQ = o2.X === X ? oS : o2; (o2.X.sys || []).forEach(function (e) { if ((e.state !== "wait" && e.state !== "moot") || backNow(e) || (e.sess && s && e.sess !== s.id)) return;
+        var H = (e.rejHist || []).filter(function (h) { return !h.alts && !h.done && h.it && h.it.id && QS.some(function (q) { return zk(h.q).indexOf(q) >= 0; }); }).slice(-1)[0]; if (!H) return; H.done = nowIso();
+        if (e.state === "moot") { mootBack(oQ, e, H, clip(m, 160)); QB.push(e); dirty = true; return; }
+        if (e.ask) { evOut(oQ.sc, e, e.ask.evk || "ask", "لازم نشد — «نه» ِ پیشینش را با نقل پس گرفت"); delete e.ask; }
+        e.lastRej = { it: H.it, sn: H.sn || 0, alts: [] }; e.backBy = e.backBy || { at: H.at, id: H.it.id, fa: H.it.fa, q: H.q, was: H.was, key: "" };
+        takeBack(oQ, e, clip(m, 160)); QB.push(e); dirty = true; }); }); } } catch (e) { }
+    try { Y.forEach(function (e) { if (QB.indexOf(e) >= 0) return;
       /* دورِ ۲۷ (C54): ❓ ِ نشان‌داده‌شده که مربی هنوز نپرسیده — فقط جوابِ «با نام» (shownNamed) */
       if (e.state === "wait" && e.ask && !e.ask.key) { var sn0 = shownNamed(e, um);
         if (!sn0 && askLast(e, s, um) && !/[؟?]\s*$/.test(String(m || "").trim())) { var y0 = FIT_YES.test(m), n0 = !y0 && (!!nf || (FIT_NO.test(m) && rawW(m).length <= 3));   // «نه، فردا نمی‌تونم …» دربارهٔ چیزِ دیگر است، نه جوابِ ❓

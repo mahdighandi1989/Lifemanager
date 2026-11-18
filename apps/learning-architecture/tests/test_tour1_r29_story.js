@@ -134,7 +134,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     const ok1 = /گامِ ۱[^¦]*جابه‌جا شد/.test(pr) && /گامِ ۲[^¦]*پایه‌اش \(گامِ ۱\) به «قفسه/.test(pr);
     await p.evaluate((P) => { APP.go('dossier', P); const b = document.querySelector('#main .lp-dunmv'); if (b) b.click(); }, P);
     const pr2 = (await EV(Q)).filter(e => e.k === 'cprior').map(e => e.l.join(' ¦ ')).join(' ‖ ');
-    return [ok1 && !/پایه‌اش|جابه‌جا شد ⇒/.test(pr2), J({ pr, pr2 })]; };
+    return [ok1 && !/پایه‌اش|جابه‌جا شد (?:⇒|به)/.test(pr2), J({ pr, pr2 })]; };
   bankE[241] = async () => { const [P, Q] = await LED('گام‌ها: ۲ × (۵ + ۴) = ۱۸. ۱۸ × ۱۶۰ = ۲۸۸۰. ۲۸۸۰ + ۶۰۰ = ۳۴۸۰.', [{ step: 'محیط', quote: '۲ × (۵ + ۴) = ۱۸', verdict: 'ok' }, { step: 'ضرب', quote: '۱۸ × ۱۶۰ = ۲۸۸۰', verdict: 'ok' }, { step: 'جمع', quote: '۲۸۸۰ + ۶۰۰ = ۳۴۸۰', verdict: 'ok' }]);
     const r = await stepBtn(Q, '۱'); if (!r || !/گامِ ۲/.test(r.ask) || !/گامِ ۳/.test(r.ask)) return [false, J(r)]; await opt(Q, 'lp-dmvall');
     const mv = await p.evaluate((P) => __ev(P).filter(e => e.mv && !e.wd).length, P);
@@ -173,3 +173,4 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   console.log(errors.length ? 'ERRORS(' + errors.length + '):\n' + errors.join('\n') : 'NO ERRORS');
   await b.close(); process.exit(errors.length ? 1 : 0);
 })();
+// دورِ ۳۰ (surface، C30-6 / #294 — یک قراردادِ پیکان): جابه‌جایی حالا «جابه‌جا شد به «…»» نوشته می‌شود (بی ⇒)؛ انتظارهای «جابه‌جا شد ⇒» هر دو ریخت را می‌پذیرند.

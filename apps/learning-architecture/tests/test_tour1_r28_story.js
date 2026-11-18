@@ -71,7 +71,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     /* دورِ ۲۹ (C124 در سطحِ صفحه، a45 ST.stepDeps29): گامِ ۲ «۱۵۰ × ۱۲» بر دادهٔ گامِ ۱ بناست ⇒ وابستهٔ آن است و صفحه می‌پرسد؛ «فقط گامِ ۱» همان جابه‌جاییِ پیشین است */
     await p.evaluate((A) => { APP.go('dossier', A); const b = document.querySelector('#main .lp-dmvone'); if (b) b.click(); }, A);
     const R = await p.evaluate(([A, B]) => { const a = APP.dossier(A), b = APP.dossier(B); return { a: a.events.filter(e => e.k === 'cprior').map(e => e.lines.join(' ¦ ')), b: b.events.filter(e => e.mv28).map(e => ({ t: e.title, l: e.lines, out: e.out, h: (e.hist || []).map(x => [x.lab || '', String(x.at || '').slice(0, 10)]), un: (e.btns || []).map(x => x.cls) })), today: APP.today() }; }, [A, B]);
-    const ok = okB && hit && R.a.some(l => /گامِ ۱[^¦]*— جابه‌جا شد ⇒ «خریدِ کاشی»/.test(l)) && R.b.length === 1 && /هر دور ۱۵۰ ثانیه/.test(R.b[0].l[0]) && /از «تمرینِ دوچرخه» جابه‌جا شد/.test(R.b[0].out) && R.b[0].un.indexOf('lp-dunmv') >= 0
+    const ok = okB && hit && R.a.some(l => /گامِ ۱[^¦]*— جابه‌جا شد (?:⇒|به) «خریدِ کاشی»/.test(l)) && R.b.length === 1 && /هر دور ۱۵۰ ثانیه/.test(R.b[0].l[0]) && /از «تمرینِ دوچرخه» جابه‌جا شد/.test(R.b[0].out) && R.b[0].un.indexOf('lp-dunmv') >= 0
       && R.b[0].h.length === 1 && /^جابه‌جا شد/.test(R.b[0].h[0][0]) && R.b[0].h[0][1] === R.today;
     return [ok, J({ st, fc, hit, R })]; };
   K.C95_label_undo = async () => { const [A, B] = await two();
@@ -153,3 +153,4 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   console.log(errors.length ? 'ERRORS(' + errors.length + '):\n' + errors.join('\n') : 'NO ERRORS');
   await b.close(); process.exit(errors.length ? 1 : 0);
 })();
+// دورِ ۳۰ (surface، C30-6 / #294 — یک قراردادِ پیکان): جابه‌جایی حالا «جابه‌جا شد به «…»» نوشته می‌شود (بی ⇒)؛ انتظارهای «جابه‌جا شد ⇒» هر دو ریخت را می‌پذیرند.

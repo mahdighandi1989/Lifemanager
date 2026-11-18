@@ -48,7 +48,10 @@ async function replay(browser, name, opt) {
         note: async (id, text) => { const s = __sheets[id]; if (s) { s.notes.push({ id: 'o' + Date.now(), by: 'owner', at: new Date().toISOString(), text }); if (s.status === 'answered' || s.status === 'approved') s.status = 'open'; } window.__save28(); return { ok: true }; },
         status: async (id, st) => { if (st !== 'open' && st !== 'approved') throw new Error('422'); if (__sheets[id]) __sheets[id].status = st; window.__save28(); return { ok: true }; },
         remind: async () => ({ ok: true }), unremind: async () => ({ ok: true }), mail: async () => ({ status: 'sent' }) };
+      /* دورِ ۳۰ (surface): شمارشِ فراخوان‌های در جریانِ میزبانِ برگه‌ها — opt.quiesce پس از هر گام صبر می‌کند تا گذرِ برگه‌ها تمام شود (بازپخش دیگر به سرعتِ ماشین بسته نیست) */
+      window.__pend28 = 0; ['sheet', 'sheets', 'note', 'status', 'report'].forEach(k => { const f = APP.HOST[k]; APP.HOST[k] = async function () { window.__pend28++; try { return await f.apply(this, arguments); } finally { window.__pend28--; } }; });
       APP.callAI = ask; APP.render(); }); };
+  const quiet = async () => { if (!opt.quiesce) return; let ok = 0; for (let i = 0; i < 80 && ok < 3; i++) { const n = await p.evaluate(() => window.__pend28 || 0).catch(() => 0); ok = n ? 0 : ok + 1; await wait(100); } };
   const settle = async () => { try { await p.waitForFunction(() => !(window.APP && APP.ASSIST && APP.ASSIST.busy && APP.ASSIST.busy()), null, { timeout: 15000 }); } catch (e) { } await wait(120); };
   await boot();
   const N = opt.uptoC ? fx.steps.filter(x => (x.c || 0) <= opt.uptoC).length : Math.min(opt.upto || fx.steps.length, fx.steps.length), log = [];
@@ -65,7 +68,7 @@ async function replay(browser, name, opt) {
       if (cmd.fill) { await p.fill(cmd.fill[0], cmd.fill[1], { timeout: 8000 }); await wait(300); await settle(); }
       if (cmd.reload) { await boot(); await settle(); }
     } catch (e) { r = 'ERR ' + String(e.message || e).slice(0, 300); }
-    await sync(); log.push({ c: c + 1, k: Object.keys(cmd).join('+'), r: typeof r === 'string' ? r.slice(0, 200) : '' });
+    await quiet(); await sync(); log.push({ c: c + 1, k: Object.keys(cmd).join('+'), r: typeof r === 'string' ? r.slice(0, 200) : '' });
   }
   /* نوبتِ تازه با جوابِ دلخواه (برای بدلِ منفیِ همان سناریو) */
   const turn = async (text, reply) => { extra.push(typeof reply === 'string' ? reply : JSON.stringify(Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, reply || {}))); const n0 = calls.length;
