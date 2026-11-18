@@ -4033,7 +4033,7 @@
     /* دورِ ۳۰ (correction، C30-5/C142 «۱۸ تان» ⇐ «۱۶ تا میشن» ⇒ «دخترم ۱۶ تا میشن مهمون»): واژه‌های تازهٔ مقدارِ درست که فعل/رابطه‌اند («میشن»، «می‌خورن»، «تان»، «ـه») جزوِ مقدار نیستند —
        فقط رقم عوض می‌شود؛ واژهٔ معنادارِ تازه («۱۶ تا بزرگسال») همان رفتارِ پیشین */
     var W = function (t, d) { return cut(t, d).replace("#", " ").split(/[\s‌]+/).filter(Boolean); }, Wo = W(o, a[0]), extra = W(n, b[0]).filter(function (w) { return Wo.indexOf(w) < 0; });
-    return extra.length && extra.every(function (w) { return /^(?:می|نمی)/.test(w) || /^(?:تا|تان|تاست|است|هست|هستن|بود|بودن|شد|شدن|میشن|میشه|ه|ـه|ست|ان)$/.test(w); }) ? o.replace(a[0], b[0]) : n; }
+    return extra.length && extra.every(function (w) { return (/^(?:می|نمی)/.test(w) && !/^(?:میلی|میلیون|میلیارد|میلیار)/.test(w)) ||   /* «میلیون/میلی‌متر» بزرگی/یکاست، نه فعل (R28 story C86_neg_stillwrong) */ /^(?:تا|تان|تاست|است|هست|هستن|بود|بودن|شد|شدن|میشن|میشه|ه|ـه|ست|ان)$/.test(w); }) ? o.replace(a[0], b[0]) : n; }
   function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
   function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
   var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
@@ -4642,7 +4642,9 @@
        (what = ans/result) و هر جای مقدارِ پیشین در صورتِ گفت‌وگو جایگاهِ حاصل دارد (پس از «میشه/پس/=…» — همان خوانندهٔ موتورِ کهنگی، A.liveAnn25)، صورت همان نوشتهٔ اوست و دست نمی‌خورد؛
        نتیجه در ثبتِ خودش (حدس/دفتر) درست می‌شود. دادهٔ صورت («۶ ثانیه»، «۱۲۲۴») هرگز با این راه عوض نمی‌شد. */
     var res30 = false; try { if (C.stmt && /^(?:ans|result|res|answer)$/i.test(String(R.what || "")) && A.liveAnn25) { var ov30 = (A.liveNumOccs ? A.liveNumOccs(String((D21 && D21.o) || R.frag || "")) : []).map(function (x) { return x.v; });
-        var AO30 = A.liveAnn25(C.stmt).filter(function (x) { return ov30.some(function (v) { return Math.abs(v - x.v) < 1e-9; }); }); res30 = AO30.length > 0 && AO30.every(function (x) { return x.mark && !x.opnd; }); } } catch (e30) { res30 = false; }
+        var AO30 = A.liveAnn25(C.stmt).filter(function (x) { return ov30.some(function (v) { return Math.abs(v - x.v) < 1e-9; }); }); res30 = AO30.length > 0 && AO30.every(function (x) { return x.mark && !x.opnd; });
+        /* فقط وقتی صورت دادهٔ دیگری هم دارد («۶ ثانیه»، «۱۲۲۴») — صورتی که خودش فقط جوابِ اوست («جواب نهایی ۸۹ است»؛ بانکِ R19b #15.4/#17.71) همان رکوردِ جواب است و عوض می‌شود */
+        if (res30) res30 = A.liveAnn25(C.stmt).some(function (x) { return !x.word && !x.struct && !ov30.some(function (v) { return Math.abs(v - x.v) < 1e-9; }) && !(x.mark && !x.opnd); }); } } catch (e30) { res30 = false; }
     if (C.stmt && !res30 && (hasFrag(R.src.text, String(C.stmt).slice(0, 40)) || stBy29) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
       /* دورِ ۲۳ (Q4، B·D4 s19): جایگزینیِ درجایی که ترتیبِ واژه‌ها را وارونه می‌کند («عروسی ۱۵ اسفنده برادرم مونده») نه — صورتِ گفت‌وگو همان می‌ماند و جملهٔ اصلاحِ خودش کنارش */
       if (sv != null && sv !== C.stmt && D21 && A.liveGrowGarble && A.liveGrowGarble(C.stmt, D21)) { var fs23 = (A.liveFragSent ? A.liveFragSent(ownText(cu), R.fix) : "") || R.fix; sv = String(C.stmt).replace(/[\s.!]+$/, "") + " (اصلاحِ خودم: " + String(fs23).trim().replace(/[.!]+$/, "") + ")."; }
