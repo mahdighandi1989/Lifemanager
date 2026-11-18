@@ -37238,17 +37238,13 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     var teach = !!o.teach, has = {}, list = [];
     var add = function (id, on, q) { if (!on) return; var m = { id: id, q: q }; has[id] = m; list.push(m); };
     var attempt = attemptSeen(x.s, mt, teach, !!o.isIntro), only = ONLY_ANS_RE.test(mt) && !attempt;
-<<<<<<< HEAD
     /* دورِ ۳۰ (story، B24·D15 bp1 p11 «x²−9 = (x−3)(x+3). درسته؟ با ضرب پرانتز هم چک کردم، …»): «درسته؟» پس از وارسیِ گزارش‌شدهٔ خودش در همان پیام ادعای محلِ بحث نیست —
        پرسشِ «ثابتش می‌کنی یا ردش؟» وارسیِ او را نادیده می‌گرفت (همان قاعدهٔ guessWhy ِ دورِ ۲۴، CHECKED24، این‌جا هم). هم‌شکلِ منفی: وارسی‌ای که شکست گزارش کرد یا گیر است ⇒ همان ادعا. */
     var ot30 = faDigits(ownText(mt)), chk30 = CHECKED24.test(ot30) && !CASES_FAIL.test(ot30.replace(CHECKED24, " ")) && !STUCK_RE.test(ot30);
-    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt) && !chk30;
-=======
     /* دورِ ۳۰ (surface، C26-23/C26-24 aC2 p1–p2): «بازنگری دقیقاً یعنی چی؟» پرسش از **روشِ خودِ صفحه** است (نامِ یکی از چهار مرحلهٔ پولیا)، نه واژهٔ کلیدیِ مسئلهٔ او ⇒
        نه «به تعریف‌ها برگرد» (A038)؛ و حدسِ خودش دربارهٔ معنای همان مرحله («یعنی دوباره چک کنم که درسته؟») ادعای محلِ بحث نیست ⇒ نه «ثابتش کن یا ردش کن». */
     var mterm30 = defAsk(mt) ? ((/([آ-ی‌]{2,}(?:\s*(?:ِ|‌ی)?\s*[آ-ی‌]{2,})?)\s*(?:دقیقاً|دقیقا|اصلاً|اصلا|واقعاً|واقعا)?\s*یعنی\s*(?:چی|چه)\s*[؟?]/.exec(ownText(mt)) || [])[1] || defWord(mt)) : "", meth30 = METHT30.test(String(mterm30 || "").replace(/[\s‌]*(?:دقیقاً|دقیقا|اصلاً|اصلا|واقعاً|واقعا)[\s‌]*$/, "").trim()), mguess30 = METHG30.test(ownText(mt));
-    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt) && !mguess30;
->>>>>>> worktree-agent-a389210af1fb5a751
+    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt) && !chk30 && !mguess30;   // دورِ ۳۰ ادغام: story (chk30) + surface (mguess30)
     /* دورِ ۲۵ (P1، DECISIONS_R25): پیامِ آغازینِ کارِ پیشین ⇒ نقطهٔ ازسرگیری؛ ردِ حکم ⇒ دوباره‌سنجی با شاهد — بالاتر از «اول کل»، آزمونِ حدس و «خودت فکر می‌کنی چرا؟»
        (A25-1، B25·D2/D3، C25-12/13، D25-6؛ خوانش از a45 A.STORY.priorTurn) */
     var pw25 = x.prior && /^(?:open|dispute|again|undo|which)$/.test(x.prior.id) ? x.prior : null;   // دورِ ۲۶ (Q4): پس گرفتنِ رد و «کدام گام؟» هم پرسشِ نوبتِ دفترند
@@ -40105,11 +40101,9 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     /* دورِ ۲۸ (R2، C88؛ D28-12 tD1 «۵ متر نیست، ۵٫۵ متره» بی old ِ مدل ⇒ «۴ متر» جایگزین شد): عددی که خودش نام برد («X نیست، Y» / «Y نه X») مقدارِ پیشین است —
        اگر در آن پیام نیست، صفحه می‌پرسد کدام عدد (هرگز عددِ دیگری از همان جمله) */
     for (var j = 0; j <= M.indexOf(src); j++) if (M[j] && M[j].role === "user") n++;
-<<<<<<< HEAD
     /* دورِ ۳۰ (correction — یک خواننده؛ C30-5 «۱۸ تان» ⇐ «۱۶ تا میشن»): مقدارِ درستی که همان تکه است با فعل/رابطهٔ جملهٔ اصلاح («میشن»، «می‌خورن»، «ـه») همان تکه با رقمِ تازه است —
        فعلِ جملهٔ اصلاح به متنِ صورت/رکورد نمی‌رود («دخترم ۱۶ تا میشن مهمون») */
     try { var nf30 = numOnly29(txtOf(x.old).trim() || frag, fix); if (nf30 !== fix && (nf30.match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []).length === 1) fix = nf30; } catch (e30) { }
-=======
     /* دورِ ۳۰ (A25-21 s09 p16، C88): «درست»ِ گزارش‌شده گاهی واژهٔ پیش از «نادرست» در پیامِ او و فعلِ ربطِ جملهٔ اصلاح را هم دارد (old «۱۵ آذر»، fix «تا ۲۰ آذره» در
        «باید تا ۱۵ آذر قیمت…») و جایگزینی «باید تا تا ۲۰ آذره قیمت…» می‌ساخت. نقلِ او بیرون از تکهٔ جایگزین‌شده دست نمی‌خورد: واژه‌های آغازِ fix که همان واژه‌های پیش از old
        در پیامِ اوست، و «ـه/است/ست» ِ پایانِ fix وقتی پس از old در پیامِ او چنین فعلی نیست، کنار می‌روند. */
@@ -40119,7 +40113,6 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
           var f30 = fw30.slice(cut).join(" "), post30 = T30.slice(k30 + o30.length);
           if (!/^(?:‌?ه|‌?ست| ?است|‌?اِ?)(?![آ-ی])/.test(post30) && /[^\s‌](?:‌?ه|‌?ست)$/.test(f30) && !/ه$/.test(o30)) { var g30 = f30.replace(/‌?(?:ه|ست)$/, ""); if (/[0-9۰-۹]\s*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)$/.test(g30)) f30 = g30; }   /* فقط روزِ تقویمی («۲۰ آذره» ⇒ «۲۰ آذر»)؛ «۱۸۰ متره» دست نمی‌خورد (بانکِ R23 #94) */
           if (f30 && f30 !== fix) fix = f30; } } } catch (e30) { }
->>>>>>> worktree-agent-a5e93703fb247d84e
     return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, key: key, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um), edit: edit, rests: A.liveRestsOf ? A.liveRestsOf(x.rests) : null, srcSess: xsS ? xsS.id : "" };
   }
   AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
