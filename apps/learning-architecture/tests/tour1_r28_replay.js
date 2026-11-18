@@ -68,7 +68,8 @@ async function replay(browser, name, opt) {
       if (cmd.fill) { await p.fill(cmd.fill[0], cmd.fill[1], { timeout: 8000 }); await wait(300); await settle(); }
       if (cmd.reload) { await boot(); await settle(); }
     } catch (e) { r = 'ERR ' + String(e.message || e).slice(0, 300); }
-    await quiet(); await sync(); log.push({ c: c + 1, k: Object.keys(cmd).join('+'), r: typeof r === 'string' ? r.slice(0, 200) : '' });
+    await quiet(); await sync(); if (opt.onStep) { try { await opt.onStep(c + 1, cmd, p); } catch (e) { } }   // دورِ ۳۰ (surface، C179): عکسِ هر گام برای مقایسهٔ همهٔ سناریو
+    log.push({ c: c + 1, k: Object.keys(cmd).join('+'), r: typeof r === 'string' ? r.slice(0, 200) : '' });
   }
   /* نوبتِ تازه با جوابِ دلخواه (برای بدلِ منفیِ همان سناریو) */
   const turn = async (text, reply) => { extra.push(typeof reply === 'string' ? reply : JSON.stringify(Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, reply || {}))); const n0 = calls.length;
