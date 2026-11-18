@@ -111,7 +111,7 @@ The pass bar is unchanged. Nothing above lowers it.
 
 ## Round-30 tail (C177 list (b))
 The 58 ids that hold 49 scenarios are mapped to owners in `reports/fix30/tail_triage.md` (independent triage, evidence path per id).
-Top blockers: D25-8 (13 runs), D28-10 (11), B24·D16 (9), C28-21 (4), D26-28 (4), A30-9 (3), B27·D7 (3), U26 (3), B28·D15 (3), C26-18 (3).
+Top blockers (C177 owners in FIX30 «TAIL»): D25-8 (13 runs), D28-10 (11), B24·D16 (9), C28-21 (4), D26-28 (4), A30-9 (3), B27·D7 (3), U26 (3), B28·D15 (3), C26-18 (3).
 
 ## Owner bank (round-30 verdicts, summary)
 | Group | Exist | Partial | Missing |
@@ -127,3 +127,26 @@ The runners' new owner-like questions go to the bank as 98+.
 arith (F2 + S1 C30-7 + tail) · correction (F8 + tail) · prior (F17 + F11 prior side + tail) · dates (F6 + C181/C182 + tail) · forecast (F4 + tail) · story (F15, F10, F11 story side + tail) · surface (F13, loop, B30·D1 + tail incl. B24·D16, D28-10).
 
 Merge order: arith ⇒ prior ⇒ correction ⇒ story ⇒ forecast ⇒ dates ⇒ surface. The families' tests are re-run after each merge, and the full gate once on the whole merge.
+
+## Clarifications after the tail triage (C183–C188; C136 look-alikes named)
+- **C183 (A23-8).** The glued «کههمهٔ» is the text dump joining SVG `<tspan>` lines (a44_route l.743–745) — not a page defect. The rest is:
+  once a verified result answers the stated unknown, the 🧭 destination says «پیدا شد: <result>» and names the next stage (بازنگری);
+  it never keeps the unknown as if still sought. Look-alike: before verification (a guess, or a result the page could not check) the
+  destination keeps the unknown. Owner: story.
+- **C184 (A26-9).** Pólya's item is ONE question with alternatives; it is shown as one question joined by «یا»: «آیا شرط برای تعیینِ مجهول
+  کافی است، یا زائد، یا متناقض؟». Source fidelity and «one question per turn» both hold. Look-alike: two genuinely different questions
+  in one turn stay a defect. Owner: story.
+- **C185 (A26-25).** The weakest-phase probability is the axiomatic Beta and stays (no conventional numbers). Its basis must be honest:
+  only verdicts OF that phase count, a correct verified look-back is a success of بازنگری (never a failure), and the card shows the
+  count it rests on beside the figure («بر پایهٔ N داوری»). If the count is then right and the figure follows, it is not a defect.
+  Owner: surface.
+- **C186 (C26-18, D26-28 — the model reports, the page validates).** The page never needs the model to recognise her answer to the page's
+  own question: if the model omits `prereq_res`, her next message that answers a pending diagnostic question marks it answered (it is
+  never asked again verbatim; the verdict line says the coach gave no judgement). `chkVerdict` looks for her check in HER messages itself;
+  «شاید … سنجیده نشد» only when her messages contain no check. Look-alike: a new question of hers after the diagnostic is not an answer.
+  Owners: surface (C26-18), story (D26-28).
+- **C187 (D27-29).** Removed from «Not built carried»: the practice prompt shows the schedule ladder that R27 R8 designed. Owner: dates
+  (owner of the a41 practice schedule, also D26-42 and D26-47).
+- **C188 (D27-33).** «داداشم علی گفت کابل رو از مغازهٔ حسن آقا بگیرم» is advice from another person: a datum with its source («به گفتهٔ
+  برادرت: …», names per C22/C38/C57), never silently dropped. Look-alike: her own plan «خودم از مغازه می‌گیرم» is hers. Owner: story.
+- Method questions «بازنگری دقیقاً یعنی چی؟» (C26-23, C26-24) are questions about the page's method: surface (system-question path).

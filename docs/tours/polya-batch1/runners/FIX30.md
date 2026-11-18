@@ -90,3 +90,15 @@ Final reply: commits, root causes (file:line), tests, bank results with reasons,
   closes the sheet); B30·D1 regression (strip register follows her register); B24·D16 / A30-12 / C30-6 history arrows one direction
   (holds 9 B runs); B30·D23 (C117 rule in the registry, rule block printed once); the C89 registry line (oC1) — a44 sys*, a26 post-check
   and page-built prompt blocks (NOT AS.SYS), a27 routing, a43, a29 labels.
+
+## TAIL lists (C177; evidence, source function and ruling per id in reports/fix30/tail_triage.md; rulings C183–C188 in DECISIONS_R30)
+- TAIL_arith: A30-2, A30-9 (the «یکی/هیچی می‌مونه» half; its s03 «mod» half is story), U26.
+- TAIL_story: A23-8 (C183), A23-19, A26-9 (C184), A26-29, A29-19, A30-18, A30-19, B24·D15, B24·D18, B25·D24, B27·D7, B28·D13, C22-11,
+  C26-1, C26-30, C26-40, C30-1, D25-8 (with surface's D28-10: both must land for the 8 oD1* runs), D25-16, D26-28 (C186), D27-33 (C188),
+  A30-9 s03 «mod» half.
+- TAIL_prior: A30-21, A30-22, C27-3.
+- TAIL_correction: B28·D15 (the pwB1 duplicate-proposal shape), D26-43, D26-50, U38.
+- TAIL_dates: A25-21, A26-30, D26-1, D26-42, D26-47 (S2), D27-29 (C187), D29-24, D30-4 (C181).
+- TAIL_forecast: none in the tail — your F4 list is long; finish it.
+- TAIL_surface: A26-19, A26-25 (C185), A30-1, B24·D16, B26·D12, B26·D16, B30·D1, B30·D3, C26-18 (C186), C26-23, C26-24, C26-33 (S2),
+  C26-39, C28-21, D25-17 (check first that the reversed formula is the real rendering, not text extraction), D26-36, D26-40, D28-10, U59.
