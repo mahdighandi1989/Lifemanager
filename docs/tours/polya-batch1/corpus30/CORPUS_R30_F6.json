@@ -1,0 +1,1766 @@
+[
+ {
+  "id": "F6-001",
+  "family": "F6",
+  "src": "round30A/s01 p15",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). No open asks. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "تا جمعه امضاش می‌کنم.",
+  "expected": "Said on a Wednesday ⇒ the first Friday after today: ask «جمعه ۱۳ آذر ۱۴۰۵ — درست است؟» (C12, C1). Nothing booked yet.",
+  "ruling": [
+   "C1",
+   "C12"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-002",
+  "family": "F6",
+  "src": "round30A/s01 p16",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Newest pending ask: «تا جمعه امضاش می‌کنم» — Fri 13 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "باشه، جمعه پیگیری کن.",
+  "expected": "A yes (with its own matching day) ⇒ book 📌 13 Azar for the signing (C49/C72).",
+  "ruling": [
+   "C49",
+   "C72"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-003",
+  "family": "F6",
+  "src": "round30A/s01 p18",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Booked: signing Fri 13 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "راستی امضا رو جمعهٔ بعد بذار، این جمعه صاحبخونه نیست.",
+  "expected": "«این جمعه» is negated (never offered, C51/C181) ⇒ «جمعهٔ بعد» has one reading: ask «جمعه ۲۰ آذر ۱۴۰۵ (به‌جای ۱۳ آذر) — درست است؟»; the 13 Azar booking is replaced (history), never kept. No two-date C32 question because one reading is negated.",
+  "ruling": [
+   "C51",
+   "C181",
+   "C32",
+   "C58",
+   "C48"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-004",
+  "family": "F6",
+  "src": "round30A/s01 p20",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا به بنگاه زنگ می‌زنم که متنِ قرارداد رو آماده کنه.",
+  "expected": "Ask «پنجشنبه ۱۲ آذر ۱۴۰۵ — درست است؟» (C12).",
+  "ruling": [
+   "C12",
+   "C49"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-005",
+  "family": "F6",
+  "src": "round30A/s01 p21",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending: بنگاه call 12 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "پس‌فردا هم کلید رو تحویل می‌گیرم.",
+  "expected": "New ask «جمعه ۱۳ آذر — درست است؟»; the older ask stays pending (it is not booked by a later yes, C49).",
+  "ruling": [
+   "C12",
+   "C49"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-006",
+  "family": "F6",
+  "src": "round30A/s01 p22",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending: بنگاه 12 Azar (older), key 13 Azar (newest). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره",
+  "expected": "Bare yes ⇒ books only the newest ask: 📌 key 13 Azar. The بنگاه ask stays pending (C49).",
+  "ruling": [
+   "C49"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-007",
+  "family": "F6",
+  "src": "round30A/s01 p23",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending: بنگاه 12 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "برای ودیعه هم باید برم بانک؛ پنجشنبه نه، شنبه می‌رم.",
+  "expected": "Thursday is negated: never booked or offered (C51/C181). Ask the bank act on «شنبه ۱۴ آذر ۱۴۰۵ — درست است؟».",
+  "ruling": [
+   "C51",
+   "C181",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-008",
+  "family": "F6",
+  "src": "round30A/s01 p24",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending: bank (deposit) Sat 14 Azar (newest); بنگاه call Thu 12 Azar (older). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "نه، زنگِ بنگاه همون پنجشنبه‌ست؛ فقط بانک شنبه‌ست.",
+  "expected": "She restates each day for its own act (C92/C145): book 📌 بنگاه call 12 Azar and 📌 bank Sat 14 Azar (restating the asked day = consent, C49). The bank row is never moved to Thursday (C51/C181).",
+  "ruling": [
+   "C49",
+   "C92",
+   "C145",
+   "C51",
+   "C181"
+  ],
+  "verdict_in_round30": "failed (page re-dated the bank row «پنجشنبه نه، شنبه می‌رم» to Thu 12 Azar)"
+ },
+ {
+  "id": "F6-009",
+  "family": "F6",
+  "src": "round30A/s01 p25",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Booked: key 13 Azar (from «پس‌فردا»). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «پس‌فردا» ⇐ «یکشنبه» — متنِ درستِ پیامم: «یکشنبه هم کلید رو تحویل می‌گیرم.»",
+  "expected": "✏️ re-derives from the day the sentence was said (Wed 11 Azar): Sunday 15 Azar; ask once «یکشنبه ۱۵ آذر (به‌جای ۱۳ آذر) — درست است؟»; the old row is «replaced», never «تاریخی ثبت نشد» (C58/C93).",
+  "ruling": [
+   "C58",
+   "C93",
+   "C144"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-010",
+  "family": "F6",
+  "src": "round30A/s01 p26",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending ✏️ ask: key Sun 15 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، یکشنبه",
+  "expected": "Book 📌 key 15 Azar (C49/C72).",
+  "ruling": [
+   "C49",
+   "C72"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-011",
+  "family": "F6",
+  "src": "round30A/s01 p27",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Booked key 15 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «یکشنبه» ⇐ «دیروز» — متنِ درستِ پیامم: «دیروز هم کلید رو تحویل می‌گیرم.»",
+  "expected": "A plan whose day lands in the past ⇒ «این روز (۱۰ آذر) گذشته — کدام روز؟»; the 15 Azar booking is kept until she answers (C93/C116).",
+  "ruling": [
+   "C93",
+   "C116"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-012",
+  "family": "F6",
+  "src": "round30A/s01 p28",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "اجارهٔ ماهِ اول رو سرِ برج واریز می‌کنم.",
+  "expected": "«سرِ برج» = day 1 of the next Jalali month ⇒ ask «سه‌شنبه ۱ دی ۱۴۰۵ — درست است؟» (C50).",
+  "ruling": [
+   "C50"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-013",
+  "family": "F6",
+  "src": "round30A/s01 p29",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "قبضِ آب رو هم اولِ ماه می‌دم.",
+  "expected": "«اولِ ماه» (not said on day 1) = «سرِ برج» ⇒ ask «۱ دی ۱۴۰۵ — درست است؟» (C70).",
+  "ruling": [
+   "C70",
+   "C50"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-014",
+  "family": "F6",
+  "src": "round30A/s01 p30",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آخرِ سال هم بیمهٔ خونه رو تمدید می‌کنم.",
+  "expected": "Last day of Esfand 1405 ⇒ ask «شنبه ۲۹ اسفند ۱۴۰۵ — درست است؟» (C50).",
+  "ruling": [
+   "C50"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-015",
+  "family": "F6",
+  "src": "round30A/s01 p31",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "عید می‌ریم خونهٔ مادرم.",
+  "expected": "«عید» = the coming 1 Farvardin ⇒ ask «یکشنبه ۱ فروردین ۱۴۰۶ — درست است؟» (C50/C115).",
+  "ruling": [
+   "C50",
+   "C115"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-016",
+  "family": "F6",
+  "src": "round30A/s01 p32",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "بعد از عید هم وسایلِ انباری رو جابه‌جا می‌کنم.",
+  "expected": "«بعد از عید» ⇒ «کدام روز؟» anchored on 1 Farvardin 1406, with no suggested day (C50/C92).",
+  "ruling": [
+   "C50",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-017",
+  "family": "F6",
+  "src": "round30A/s01 p33",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "وسطِ ماه یه سر به خونهٔ قبلی می‌زنم که کنتور رو ببینم.",
+  "expected": "«وسطِ ماه» ⇒ «کدام روز؟» with no suggested day and no number (C114/C70/C92).",
+  "ruling": [
+   "C114",
+   "C70",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-018",
+  "family": "F6",
+  "src": "round30A/s01 p34",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آخرِ سالِ تحصیلی هم کارم سبک‌تر میشه؛ اون موقع اسباب‌کشیِ اصلی رو انجام می‌دیم.",
+  "expected": "Not a calendar fact ⇒ «کدام روز؟», no number proposed (C70).",
+  "ruling": [
+   "C70",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-019",
+  "family": "F6",
+  "src": "round30A/s01 p35",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Newest pending: «آخرِ سالِ تحصیلی … — کدام روز؟» (no suggested day). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره",
+  "expected": "A bare yes cannot answer a «کدام روز؟» row: nothing is booked; the row is answered only by an explicit day (C92).",
+  "ruling": [
+   "C92",
+   "C49"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-020",
+  "family": "F6",
+  "src": "round30A/s01 p36",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending: «وسطِ ماه … کنتور … — کدام روز؟». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "وسطِ ماه یعنی حدودِ ۱۵ دی؛ همون موقع کنتور رو می‌بینم.",
+  "expected": "She gave the day herself ⇒ book 📌 15 Dey 1405 with no extra question, labelled «از حرفِ خودت: حدودِ ۱۵ دی» (C133).",
+  "ruling": [
+   "C133"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-021",
+  "family": "F6",
+  "src": "round30A/s01 p39",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending: insurance call 12 Azar (newest). Open call plans: بنگاه 12 Azar. Booked signing (Fri 20 Azar). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره درسته. راستی همین الان به صاحبخونه زنگ زدم و قرارِ امضا رو گذاشتم.",
+  "expected": "«آره درسته» books the insurance call 12 Azar (C49). «به صاحبخونه زنگ زدم» names an act with no open plan ⇒ a past-act 📜 line only; it closes neither open call (it names neither) nor the signing plan (C182/C166/C94).",
+  "ruling": [
+   "C49",
+   "C182",
+   "C166",
+   "C94"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-022",
+  "family": "F6",
+  "src": "round30A/s01 p40",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Two open call plans: بنگاه (12 Azar), بیمه (12 Azar). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "زنگ زدم.",
+  "expected": "«کدام؟» naming both calls; nothing closes until she answers (C117).",
+  "ruling": [
+   "C117"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-023",
+  "family": "F6",
+  "src": "round30A/s01 p41",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending «کدام؟» (بنگاه / بیمه). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "به بنگاه. گفت متن آماده‌ست. ماهِ دیگه هم رنگ‌کاریِ اتاقِ پسرم رو شروع می‌کنم.",
+  "expected": "Closes the بنگاه call «انجام شد» (C117/C94); the insurance call stays open. «ماهِ دیگه» ⇒ «کدام روز؟» with no suggested day (C92).",
+  "ruling": [
+   "C117",
+   "C94",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-024",
+  "family": "F6",
+  "src": "round30A/s01 p42",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Old row «پنجشنبه نه، شنبه می‌رم» (bank for the deposit) still carries the negated Thursday from p24. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا میرم بانک و پس‌فردا هم میرم دفترخونه برای امضا. امروز خسته‌ام، همین‌ها بسه.",
+  "expected": "Two acts, two asks (C92/C144): bank «پنجشنبه ۱۲ آذر», notary «جمعه ۱۳ آذر» — «… درست است؟». «امروز خسته‌ام» moves nothing and books nothing (C147).",
+  "ruling": [
+   "C12",
+   "C92",
+   "C144",
+   "C147"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-025",
+  "family": "F6",
+  "src": "round30A/s01 p43",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Asks open under the page's last reply: bank Thu 12 Azar, notary Fri 13 Azar. Older row «پنجشنبه نه، شنبه می‌رم» carries the negated Thursday. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، فردا و پس‌فردا.",
+  "expected": "Books only the asks open in that turn, in order: ⏰/📌 bank 12 Azar and notary 13 Azar (C145/C181). The old «پنجشنبه نه، شنبه» row is never booked on Thursday; a row carrying the negated day is withdrawn, not confirmed (C181).",
+  "ruling": [
+   "C145",
+   "C181",
+   "C49",
+   "C51"
+  ],
+  "verdict_in_round30": "failed (A30-3: booked «پنجشنبه نه، شنبه می‌رم» on 12 Azar)"
+ },
+ {
+  "id": "F6-026",
+  "family": "F6",
+  "src": "round30A/s01 p44",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Open: ⏰ «فردا میرم بانک» (12 Azar). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "شناسنامه و کارت ملی. راستی ۲۰ آبان رفتم بانک و حسابِ ودیعه رو باز کردم.",
+  "expected": "Past act with a past day ⇒ one 📜 line «کارِ گذشته — ۲۰ آبان»; it asks nothing and never closes the FUTURE ⏰ «فردا میرم بانک», which stays open (C182 named look-alike, C146/C166).",
+  "ruling": [
+   "C182",
+   "C146",
+   "C166"
+  ],
+  "verdict_in_round30": "failed (A30-6: ⏰ closed silently, no 📜 line)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-027",
+  "family": "F6",
+  "src": "round30A/s01 p45",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "از روزِ امضا. نسخهٔ مامانم رو هم پس‌فردا تو داروخونه تمدید می‌کنم. فردا هم به تعمیرکار زنگ می‌زنم.",
+  "expected": "Two acts, two rows: pharmacy «جمعه ۱۳ آذر», repairman call «پنجشنبه ۱۲ آذر» — «… درست است؟» (C92). «از روزِ امضا» answers the coach (no date).",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-028",
+  "family": "F6",
+  "src": "round30A/s01 p46",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Open call plans: insurance (booked 12 Azar), repairman (pending ask 12 Azar). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "زنگ زدم.",
+  "expected": "«کدام؟» naming both; nothing closes (C117).",
+  "ruling": [
+   "C117"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-029",
+  "family": "F6",
+  "src": "round30A/s01 p47",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending «کدام؟». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "به تعمیرکار. گفت خودش زنگ می‌زنه.",
+  "expected": "Closes the repairman call; its pending date ask lapses (act reported done, C49). «گفت خودش زنگ می‌زنه» is another person's act ⇒ no ask (C19).",
+  "ruling": [
+   "C117",
+   "C49",
+   "C19"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-030",
+  "family": "F6",
+  "src": "round30A/s01 p49",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Open: insurance call 12 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سه‌شنبه‌ی هفته‌ی بعد، ۲۰ آذر، جلسهٔ ساختمون می‌رم.",
+  "expected": "Weekday and date disagree (next week's Tuesday = 17 Azar; 20 Azar is a Friday) ⇒ ONE question «کدام یکی؟» naming both (سه‌شنبه ۱۷ آذر / جمعه ۲۰ آذر); never two independent «… درست است؟» rows.",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "failed (A30-4: two rows, no «کدام یکی؟»)",
+  "note": "The «کدام یکی؟» form is the R30 F6 S3 expectation (dates Not-done 1); rests on the principle «where the text does not decide, the page asks»."
+ },
+ {
+  "id": "F6-031",
+  "family": "F6",
+  "src": "round30A/s01 p49",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Booked insurance call Thu 12 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "بیمه رو بعداً.",
+  "expected": null,
+  "ruling": [
+   "C92",
+   "C49"
+  ],
+  "verdict_in_round30": "unknown",
+  "needs_ruling": "«بیمه رو بعداً» postpones a booked call without a day. Does the booking stay (nothing changes until a day is given), or is it withdrawn into a «کدام روز؟» row (C92)? No ruling covers a postponement without a day."
+ },
+ {
+  "id": "F6-032",
+  "family": "F6",
+  "src": "round30A/s01 p50",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). Pending «کدام یکی؟» for the building meeting (17 / 20 Azar). Booked bank 12 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سه‌شنبه درسته، ۱۷ آذر. فردا بانک.",
+  "expected": "Books the meeting on Tue 17 Azar and withdraws the 20 Azar reading (no row left asking it). «فردا بانک.» restates the already-booked 12 Azar bank plan ⇒ no second record and no new ask (C52/C173/C49).",
+  "ruling": [
+   "C49",
+   "C72",
+   "C52",
+   "C173"
+  ],
+  "verdict_in_round30": "failed (A30-4: the rejected 20 Azar row stays pending)"
+ },
+ {
+  "id": "F6-033",
+  "family": "F6",
+  "src": "round30A/s01 p51",
+  "context": "round30A/s01; page clock Wednesday 11 Azar 1405 (her «فردا» = Thu 12 Azar). p42 message («فردا میرم بانک و پس‌فردا هم میرم دفترخونه …») booked bank 12 Azar, notary 13 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «پس‌فردا» ⇐ «شنبه» — متنِ درستِ پیامم: «فردا میرم بانک و شنبه هم میرم دفترخونه برای امضا. امروز خسته‌ام، همین‌ها بسه.»",
+  "expected": "Only the notary act changes: Saturday 14 Azar from the day said (Wed 11 Azar), asked once (C58/C93); the bank act from the same message is untouched (C144).",
+  "ruling": [
+   "C144",
+   "C58",
+   "C93"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-034",
+  "family": "F6",
+  "src": "round30A/s01 p53",
+  "context": "round30A/s01; page clock Tuesday 1 Dey 1405 («امروز اولِ دیه»). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سلام، امروز اولِ دیه. سرِ برج اجارهٔ این ماه رو واریز می‌کنم، قسطِ وام رو هم سرِ برج می‌دم.",
+  "expected": "Two acts, each its own ask (C92/C144). Said on day 1 ⇒ each «سرِ برج» is two days: «امروز، سه‌شنبه ۱ دی ۱۴۰۵، یا پنجشنبه ۱ بهمن ۱۴۰۵؟» (C70/C176) — one ask for the rent, one for the loan installment.",
+  "ruling": [
+   "C70",
+   "C176",
+   "C92",
+   "C144"
+  ],
+  "verdict_in_round30": "failed (A30-5: the installment got no ask)"
+ },
+ {
+  "id": "F6-035",
+  "family": "F6",
+  "src": "round30A/s01 p54",
+  "context": "round30A/s01, 1 Dey. Pending: rent «۱ دی یا ۱ بهمن؟». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، هر دو.",
+  "expected": "Confirms both acts are wanted but chooses no reading ⇒ the page asks «کدام؟» for each act, nothing booked silently (C176).",
+  "ruling": [
+   "C176",
+   "C165"
+  ],
+  "verdict_in_round30": "held (for the rent row)"
+ },
+ {
+  "id": "F6-036",
+  "family": "F6",
+  "src": "round30A/s01 p55",
+  "context": "round30A/s01, 1 Dey. Pending: rent and installment «۱ دی یا ۱ بهمن؟». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سه‌شنبه، همین امروز. قسط رو هم امروز.",
+  "expected": "Rent booked Tue 1 Dey (her day). Installment booked 1 Dey («امروز», own clause, C147).",
+  "ruling": [
+   "C49",
+   "C72",
+   "C147"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-037",
+  "family": "F6",
+  "src": "round30B/dB3 p1",
+  "context": "round30B/dB3; page clock Sunday 3 Aban 1405. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آزمونِ ارتقای شغلیم ۱۵ آذره و بخشِ اکسلش برام سخته … اینم بگم: فردا بانک. پس‌فردا هم باید به بیمه زنگ بزنم که بیمه‌ی ماشین رو تمدید کنه.",
+  "expected": "Three rows: exam «یکشنبه ۱۵ آذر ۱۴۰۵», bank «دوشنبه ۴ آبان ۱۴۰۵» (the bare «فردا بانک.» is a plan, C12), insurance call «سه‌شنبه ۵ آبان ۱۴۰۵» — each «… درست است؟».",
+  "ruling": [
+   "C12",
+   "C34",
+   "C92"
+  ],
+  "verdict_in_round30": "failed (B30·D19: «فردا بانک.» never asked)"
+ },
+ {
+  "id": "F6-038",
+  "family": "F6",
+  "src": "round30B/dB3 p2",
+  "context": "round30B/dB3; Sunday 3 Aban. Rows pending under the last reply: exam 15 Azar, insurance 5 Aban (bank missing). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، فردا و پس‌فردا. ۱۵ آذر هم درسته. بیشتر تو تابع‌های جست‌وجو مثلِ VLOOKUP گیر می‌کنم.",
+  "expected": "Answers only asks open in that turn, in order (C145/C181): with the bank ask present, book bank 4 Aban, insurance 5 Aban; «۱۵ آذر هم درسته» books the exam 15 Azar (restated day). If the bank was never asked, «فردا» books nothing.",
+  "ruling": [
+   "C145",
+   "C181",
+   "C49"
+  ],
+  "verdict_in_round30": "held for exam and insurance"
+ },
+ {
+  "id": "F6-039",
+  "family": "F6",
+  "src": "round30B/dB3 p3",
+  "context": "round30B/dB3; Sunday 3 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "پیش‌بینیم: فکر کنم ۷۰ درصد تو آزمونِ نمونه‌ی پنجشنبه ۱۲ تا رو درست می‌زنم.",
+  "expected": "Forecast first (C152): 🎯 70 % with due date Thursday 7 Aban via the single confirm «موعدِ این پیش‌بینی … پنجشنبه ۷ آبان … است؟» (C132); no 📌 and no date-ask row.",
+  "ruling": [
+   "C132",
+   "C152"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-040",
+  "family": "F6",
+  "src": "round30B/dB3 p4",
+  "context": "round30B/dB3; Pending: the 🎯 due-date confirm (Thu 7 Aban). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، پنجشنبه درسته.",
+  "expected": "Confirms the 🎯 due date only (C49). The confirmation itself contains no forecast and no plan ⇒ it never spawns a new «🎯 موعدِ این پیش‌بینی «پنجشنبه درسته»» or a 📅 row, and is not filed as «بازنگری».",
+  "ruling": [
+   "C49",
+   "C152",
+   "C149"
+  ],
+  "verdict_in_round30": "failed (B30·D16)"
+ },
+ {
+  "id": "F6-041",
+  "family": "F6",
+  "src": "round30B/dB3 p7",
+  "context": "round30B/dB3; page clock Monday 4 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سلام، امروز دوشنبه‌ست و امروز خسته‌ام. باید به داروخونه هم زنگ بزنم که نسخه‌ی مامانم رو تمدید کنه.",
+  "expected": "«امروز خسته‌ام» moves nothing (C147). The pharmacy call has no day: no invented date (C12).",
+  "ruling": [
+   "C147",
+   "C12"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-042",
+  "family": "F6",
+  "src": "round30B/dB3 p8",
+  "context": "round30B/dB3; Monday 4 Aban. Open call plans: insurance (5 Aban), pharmacy (no day). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "زنگ زدم.",
+  "expected": "«کدام؟» naming both calls; nothing closes until she answers (C117).",
+  "ruling": [
+   "C117"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-043",
+  "family": "F6",
+  "src": "round30B/dB3 p9",
+  "context": "round30B/dB3; Monday 4 Aban. Pending «کدام؟»; insurance booked Tue 5 Aban (= tomorrow); bank plan booked 4 Aban if asked. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "به داروخونه. بیمه بمونه برای فردا. بانک هم امروز رفتم.",
+  "expected": "Pharmacy call closed. «بیمه بمونه برای فردا»: already booked for tomorrow ⇒ nothing changes, nothing asked (C167). «بانک هم امروز رفتم» closes the bank plan (past tense of its verb, C94). No arithmetic line.",
+  "ruling": [
+   "C117",
+   "C167",
+   "C94"
+  ],
+  "verdict_in_round30": "held (coach); page lines unknown"
+ },
+ {
+  "id": "F6-044",
+  "family": "F6",
+  "src": "round30B/dB3 p10",
+  "context": "round30B/dB3; ✏️ of the p1 message (said Sun 3 Aban); insurance booked 5 Aban; exam 15 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «پس‌فردا» ⇐ «پنجشنبه» — متنِ درستِ پیامم: «… اینم بگم: فردا بانک. پنجشنبه هم باید به بیمه زنگ بزنم که بیمه‌ی ماشین رو تمدید کنه.»",
+  "expected": "Only the insurance act changes: Thursday 7 Aban from the day said, asked once «(به‌جای ۵ آبان)» (C58/C93); bank and exam untouched (C144).",
+  "ruling": [
+   "C58",
+   "C93",
+   "C144"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-045",
+  "family": "F6",
+  "src": "round30B/dB3 p11",
+  "context": "round30B/dB3; Pending ✏️ ask: insurance Thu 7 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سه‌شنبه، ۱۲ آبان.",
+  "expected": "Her own day wins (C72/C145): Tuesday 12 Aban (weekday and date agree) — confirmed once with its date, then booked.",
+  "ruling": [
+   "C72",
+   "C145"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-046",
+  "family": "F6",
+  "src": "round30B/dB3 p12",
+  "context": "round30B/dB3; page clock Thursday 7 Aban. Insurance call: pending re-date ask (12 Aban). Open 🎯 «… پنجشنبه ۱۲ تا رو درست می‌زنم». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سلام، امروز پنجشنبه‌ست. آزمونِ نمونه رو دادم: ۱۲ تا درست شد! به بیمه هم زنگ زدم و تمدید شد.",
+  "expected": "The 🎯 settles «شد» (12 = 12, C91). «به بیمه هم زنگ زدم» closes the insurance call (C94); its open re-date ask lapses (act reported done, C49) — never «پرسشِ تاریخ بی‌جواب ماند … در «امروز» به‌شکلِ پرسش می‌ماند».",
+  "ruling": [
+   "C94",
+   "C49",
+   "C91"
+  ],
+  "verdict_in_round30": "failed (B30·D18)"
+ },
+ {
+  "id": "F6-047",
+  "family": "F6",
+  "src": "round30B/dB3 p13",
+  "context": "round30B/dB3; Thursday 7 Aban. Pending: 🎯 due confirm «نمونه‌ی شنبه ۱۶ آبان …». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، ۱۶ آبان. اون یکی موعد نداره، هر وقت شد.",
+  "expected": "Books the 🎯 due 16 Aban (C49/C132). «اون یکی موعد نداره» ⇒ the other forecast stays without due date; no date row.",
+  "ruling": [
+   "C49",
+   "C132"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-048",
+  "family": "F6",
+  "src": "round30B/dB3 p14",
+  "context": "round30B/dB3; page clock Saturday 9 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "شنبه‌ست. جدولِ محوری رو یاد گرفتم ولی نمودارها نه. فردا بانک.",
+  "expected": "«فردا بانک.» ⇒ ask «یکشنبه ۱۰ آبان ۱۴۰۵ — درست است؟» (C12). (The 🎯 part is F4: two forecasts, one «شد», one «نشد».)",
+  "ruling": [
+   "C12"
+  ],
+  "verdict_in_round30": "failed (B30·D19: never asked)"
+ },
+ {
+  "id": "F6-049",
+  "family": "F6",
+  "src": "round30B/dB3 p20",
+  "context": "round30B/dB3; A «فردا بانک» plan may be open (p14). Clock mid-Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سلام. ۲۰ آبان رفتم بانک و قسطِ وام رو دادم.",
+  "expected": "Past act with a past day ⇒ one 📜 line «کارِ گذشته — ۲۰ آبان» (one clause, two verbs: «رفتم بانک و قسطِ وام رو دادم»), no plan row, no ask; it never closes a FUTURE bank plan (C182/C166).",
+  "ruling": [
+   "C182",
+   "C166",
+   "C146"
+  ],
+  "verdict_in_round30": "failed (B30·D21: no line)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-050",
+  "family": "F6",
+  "src": "round30B/dB3 p20",
+  "context": "round30B/dB3; Said in Aban 1405. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "کلاسِ پیشرفته‌ی اکسل دو دوره داره، اولیش ۱ اردیبهشت.",
+  "expected": null,
+  "ruling": [
+   "C19",
+   "C12",
+   "C34"
+  ],
+  "verdict_in_round30": "unknown (no ask)",
+  "needs_ruling": "A course's schedule («اولیش ۱ اردیبهشت») with no commitment verb of hers: is it «another person's schedule» (C19: no ask) or her own plan date (C12: ask «چهارشنبه ۱ اردیبهشت ۱۴۰۶ — درست است؟», the nearest future 1 Ordibehesht)? The runner (B30·D22) expected an ask."
+ },
+ {
+  "id": "F6-051",
+  "family": "F6",
+  "src": "round30B/dB3 p21",
+  "context": "round30B/dB3; page clock Sunday 1 Azar 1405. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سلام، امروز اولِ آذره. سرِ برج باید اجاره رو بدم و قسطِ بیمه‌ی عمر رو هم بدم.",
+  "expected": "Two acts ⇒ two records/asks (C92/C144). Said on day 1 ⇒ each: «امروز، یکشنبه ۱ آذر، یا سه‌شنبه ۱ دی؟» (C70/C176).",
+  "ruling": [
+   "C70",
+   "C176",
+   "C92",
+   "C144"
+  ],
+  "verdict_in_round30": "failed (B30·D25: one joint record)"
+ },
+ {
+  "id": "F6-052",
+  "family": "F6",
+  "src": "round30B/dB3 p22",
+  "context": "round30B/dB3; 1 Azar. Pending: the «سرِ برج» day-1 asks. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، هر دو.",
+  "expected": "Confirms both acts are wanted; chooses no reading ⇒ «کدام؟» per act (C176). Nothing booked silently.",
+  "ruling": [
+   "C176",
+   "C165"
+  ],
+  "verdict_in_round30": "failed (B30·D25: one joint ask)"
+ },
+ {
+  "id": "F6-053",
+  "family": "F6",
+  "src": "round30B/dB3 p24",
+  "context": "round30B/dB3; Clock in the week before 24 Azar (next week's Tuesday = 24 Azar; 26 Azar is a Thursday). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "جلسه‌ی مرورِ بعد از آزمون با همکارم افتاد سه‌شنبه‌ی هفته‌ی بعد، ۲۶ آذر.",
+  "expected": "Weekday and date disagree ⇒ one «کدام یکی؟» naming «سه‌شنبه ۲۴ آذر» and «پنجشنبه ۲۶ آذر»; never a silent «پنجشنبه ۲۶ آذر … درست است؟».",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "failed (B30·D20)",
+  "note": "Same basis as the A s01 p49 entry."
+ },
+ {
+  "id": "F6-054",
+  "family": "F6",
+  "src": "round30D/tD4 p2",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "یه روز باید برم داروخونه نسخه‌م رو تمدید کنم.",
+  "expected": "No day in her sentence ⇒ no date is invented and nothing is booked (C12). (Whether to ask «کدام روز؟» is not required by any ruling.)",
+  "ruling": [
+   "C12"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-055",
+  "family": "F6",
+  "src": "round30D/tD4 p3",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "پس‌فردا هم بیمهٔ ماشین رو تمدید می‌کنم.",
+  "expected": "Ask «سه‌شنبه ۳ آذر ۱۴۰۵ — درست است؟» (C12).",
+  "ruling": [
+   "C12"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-056",
+  "family": "F6",
+  "src": "round30D/tD4 p4",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405. Pending: insurance 3 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "امروز خسته‌ام.",
+  "expected": "A mood sentence moves no plan and books nothing (C147); the insurance ask stays pending.",
+  "ruling": [
+   "C147"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-057",
+  "family": "F6",
+  "src": "round30D/tD4 p5",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا بانک.",
+  "expected": "Ask «دوشنبه ۲ آذر ۱۴۰۵ — درست است؟» (C12).",
+  "ruling": [
+   "C12"
+  ],
+  "verdict_in_round30": "held (contrast B30·D19, C30-14)"
+ },
+ {
+  "id": "F6-058",
+  "family": "F6",
+  "src": "round30D/tD4 p7",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405. Pending: bank 2 Azar (newest), insurance 3 Azar (older, still open). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، فردا و پس‌فردا.",
+  "expected": "Both asks open ⇒ booked in order: bank 2 Azar, insurance 3 Azar (C145/C181).",
+  "ruling": [
+   "C145",
+   "C181"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-059",
+  "family": "F6",
+  "src": "round30D/tD4 p8",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "قسطِ وام رو سرِ برج میدم و قبضِ آب رو هم سرِ برج.",
+  "expected": "Two acts, two asks; said on day 1 ⇒ each «امروز ۱ آذر یا سه‌شنبه ۱ دی؟» (C70/C176/C92/C144).",
+  "ruling": [
+   "C70",
+   "C176",
+   "C92",
+   "C144"
+  ],
+  "verdict_in_round30": "failed (D30-12: one joint row)"
+ },
+ {
+  "id": "F6-060",
+  "family": "F6",
+  "src": "round30D/tD4 p9",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405. Pending «سرِ برج» day-1 ask(s). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، هر دو.",
+  "expected": "«کدام؟» per act; nothing booked silently (C176).",
+  "ruling": [
+   "C176"
+  ],
+  "verdict_in_round30": "held (for the joint row)"
+ },
+ {
+  "id": "F6-061",
+  "family": "F6",
+  "src": "round30D/tD4 p10",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا می‌رم آرایشگاه و پس‌فردا خیاطی.",
+  "expected": "Two asks: hairdresser «۲ آذر», tailor «۳ آذر» (C92).",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-062",
+  "family": "F6",
+  "src": "round30D/tD4 p11",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405. Pending: hairdresser 2 Azar, tailor 3 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، هر دو.",
+  "expected": "Books both, in order (C165).",
+  "ruling": [
+   "C165"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-063",
+  "family": "F6",
+  "src": "round30D/tD4 p13",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405. Undated intents: call the AC repairman («یه روز … زنگ بزنم»), call the grandchild's school («یه روز …»). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "زنگ زدم.",
+  "expected": null,
+  "ruling": [
+   "C117",
+   "C12"
+  ],
+  "verdict_in_round30": "unknown (page said nothing)",
+  "needs_ruling": "Are undated intents («یه روز باید … زنگ بزنم») open call plans for C117? If yes, «کدام؟» naming both; if not, nothing to close and no question."
+ },
+ {
+  "id": "F6-064",
+  "family": "F6",
+  "src": "round30D/tD4 p14",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا می‌رم آزمایشگاه و پنجشنبه دندون‌پزشکی.",
+  "expected": "Two asks: lab «دوشنبه ۲ آذر», dentist «پنجشنبه ۵ آذر» (C92).",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-065",
+  "family": "F6",
+  "src": "round30D/tD4 p15",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405. Pending asks: lab 2 Azar, dentist 5 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «پنجشنبه» ⇐ «جمعه» — متنِ درستِ پیامم: «فردا می‌رم آزمایشگاه و جمعه دندون‌پزشکی.»",
+  "expected": "Only the dentist act changes: «جمعه ۶ آذر (به‌جای ۵ آذر)», asked once; the lab ask stays exactly as it was (C144/C58).",
+  "ruling": [
+   "C144",
+   "C58"
+  ],
+  "verdict_in_round30": "failed (D30-17: the lab ask was removed)"
+ },
+ {
+  "id": "F6-066",
+  "family": "F6",
+  "src": "round30D/tD4 p16",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405. No open post-office plan. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "۲۰ آبان رفتم اداره‌ی پست و بسته رو فرستادم.",
+  "expected": "One 📜 line «کارِ گذشته — ۲۰ آبان»; no plan row, no ask (C166/C182).",
+  "ruling": [
+   "C166",
+   "C182"
+  ],
+  "verdict_in_round30": "failed (D30-16: no line)"
+ },
+ {
+  "id": "F6-067",
+  "family": "F6",
+  "src": "round30D/tD4 p17",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سه‌شنبه‌ی هفته‌ی بعد، ۱۲ آذر، می‌رم دکترِ چشم.",
+  "expected": "Next week's Tuesday = 10 Azar; 12 Azar is a Thursday ⇒ one «کدام یکی؟» naming «سه‌شنبه ۱۰ آذر» and «پنجشنبه ۱۲ آذر».",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "failed (D30-13: two «درست است؟» rows)"
+ },
+ {
+  "id": "F6-068",
+  "family": "F6",
+  "src": "round30D/tD4 p18",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "با ۲۰٪ تخفیف، کولرِ نو ۲۵ میلیون میشه ۲۰ میلیون. برای پرده‌ها با ۱۰ درصد پرت ۸ × ۱٫۱ = ۸٫۸ متر پارچه لازمه.",
+  "expected": "NEGATIVE: no date, no plan, no 🎯 (data, C148).",
+  "ruling": [
+   "C148",
+   "C136"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-069",
+  "family": "F6",
+  "src": "round30D/tD4 p19",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فکر کنم ۷۰ درصد تعمیرکار تا پنجشنبه کولر رو درست می‌کنه.",
+  "expected": "Forecast first: 🎯 70 %, due Thursday 5 Azar via the single confirm; no 📌 and no date-ask row (C132/C152).",
+  "ruling": [
+   "C132",
+   "C152"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-070",
+  "family": "F6",
+  "src": "round30D/tD4 p20",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "شاید ۴۰٪ تا آخرِ آذر بیمه ارزون‌تر بشه.",
+  "expected": "🎯 40 % due «دوشنبه ۳۰ آذر ۱۴۰۵» (C171) via the single confirm; no plan row.",
+  "ruling": [
+   "C171",
+   "C132",
+   "C170"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-071",
+  "family": "F6",
+  "src": "round30D/tD4 p22",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "۶۰ درصد فکر می‌کنم دیروز بانک تعطیل بوده.",
+  "expected": "A past fact: no 🎯 (C170) and no date ask («دیروز», C19).",
+  "ruling": [
+   "C170",
+   "C19"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-072",
+  "family": "F6",
+  "src": "round30D/tD4 p25",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405. Open 🎯 «تعمیرکار تا پنجشنبه کولر رو درست می‌کنه». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "تعمیرکار پنجشنبه اومد و کولر رو درست کرد. قبضِ گاز هم ۲۸۰ هزار اومد.",
+  "expected": "Settles the 🎯s (C91); another person's past act ⇒ no date ask (C19).",
+  "ruling": [
+   "C91",
+   "C19"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-073",
+  "family": "F6",
+  "src": "round30D/tD4 p28",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "اگه در جوابِ پرسشِ روز بگم «پس‌فردا صبح انجامش میدم»، ثبت میشه؟",
+  "expected": "A hypothetical question about the page: nothing booked or asked (C35/C99).",
+  "ruling": [
+   "C35",
+   "C99"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-074",
+  "family": "F6",
+  "src": "round30D/tD4 p29",
+  "context": "round30D/tD4; page clock Sunday 1 Azar 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "کلاسِ خیاطیِ نوه‌م سه جلسه‌ست، اولیش ۱ اردیبهشت.",
+  "expected": "Another person's schedule ⇒ no ask (C19/C34).",
+  "ruling": [
+   "C19",
+   "C34"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-075",
+  "family": "F6",
+  "src": "round30D/tD2 p1",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "ماهِ دیگه باید اسباب‌کشی کنم و می‌خوام برنامه‌ش رو درست بچینم که هیچی جا نمونه.",
+  "expected": "«ماهِ دیگه» ⇒ «کدام روز؟» with no suggested day (C92).",
+  "ruling": [
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-076",
+  "family": "F6",
+  "src": "round30D/tD2 p2",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا با شرکتِ باربری تماس می‌گیرم، پس‌فردا هم کارتن‌ها رو می‌خرم.",
+  "expected": "Two rows: «۲۶ آبان», «۲۷ آبان» — «… درست است؟».",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-077",
+  "family": "F6",
+  "src": "round30D/tD2 p3",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405. Newest ask (one question with two rows): 26 / 27 Aban; older idiom row «ماهِ بعد — کدام روز؟». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "باشه.",
+  "expected": "Books the newest ask's rows (26, 27 Aban); the older «کدام روز؟» row is not answered by a yes (C49/C92).",
+  "ruling": [
+   "C49",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-078",
+  "family": "F6",
+  "src": "round30D/tD2 p4",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "پنجشنبه نه، شنبه می‌رم بنگاه که قرارداد رو تسویه کنم.",
+  "expected": "Thursday never booked/offered; ask «شنبه ۳۰ آبان — درست است؟» (C51/C181).",
+  "ruling": [
+   "C51",
+   "C181"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-079",
+  "family": "F6",
+  "src": "round30D/tD2 p5",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405. Pending: Saturday 30 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "بله.",
+  "expected": "Book 📌 30 Aban (C49).",
+  "ruling": [
+   "C49"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-080",
+  "family": "F6",
+  "src": "round30D/tD2 p6",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "قسطِ آخرِ اجاره رو سرِ برج می‌دم، ودیعه رو صاحبخونه آخرِ سال پس میده، و رنگ‌کاریِ خونهٔ تازه بعد از عید.",
+  "expected": "Rent: «یکشنبه ۱ آذر ۱۴۰۵ — درست است؟» (C50). «ودیعه رو صاحبخونه … پس میده» is another person's act ⇒ NO ask (C19/C34). «بعد از عید» ⇒ «کدام روز؟» anchored on 1 Farvardin 1406, no suggested day (C50/C92).",
+  "ruling": [
+   "C50",
+   "C19",
+   "C34",
+   "C92"
+  ],
+  "verdict_in_round30": "failed (page asked «ودیعه … — شنبه ۲۹ اسفند»)"
+ },
+ {
+  "id": "F6-081",
+  "family": "F6",
+  "src": "round30D/tD2 p7",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "اولِ ماه هم گاز رو قطع می‌کنم. عید که شد میریم خونهٔ مادرم. وسطِ ماه کارگر میاد و دخترم آخرِ سالِ تحصیلی مدرسه‌ش رو عوض می‌کنه.",
+  "expected": "Gas: «۱ آذر» ask (C70). Eid: «۱ فروردین ۱۴۰۶» ask (C50/C115). «وسطِ ماه کارگر میاد» and «دخترم … مدرسه‌ش رو عوض می‌کنه» are other people's acts ⇒ no ask (C19).",
+  "ruling": [
+   "C70",
+   "C50",
+   "C115",
+   "C19"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-082",
+  "family": "F6",
+  "src": "round30D/tD2 p20",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405. Booked bank-agency settlement Sat 30 Aban (from p4, said 25 Aban). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «شنبه» ⇐ «یکشنبه» — متنِ درستِ پیامم: «پنجشنبه نه، یکشنبه می‌رم بنگاه که قرارداد رو تسویه کنم.»",
+  "expected": "Re-derived from the day said: Sunday 1 Azar «(به‌جای ۳۰ آبان)», asked once; the old booking is «replaced» (C58). Thursday still never offered (C51).",
+  "ruling": [
+   "C58",
+   "C51",
+   "C93"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-083",
+  "family": "F6",
+  "src": "round30D/tD2 p21",
+  "context": "round30D/tD2; page clock Monday 25 Aban 1405. Booked: cartons 27 Aban (from «پس‌فردا»); clock now after 25 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «پس‌فردا» ⇐ «۲۴ آبان» — متنِ درستِ پیامم: «فردا با شرکتِ باربری تماس می‌گیرم، ۲۴ آبان هم کارتن‌ها رو می‌خرم.»",
+  "expected": "A plan day in the past ⇒ «این روز (۲۴ آبان) گذشته — کدام روز؟»; the 27 Aban booking is kept until she answers (C93); the carrier call is untouched (C144).",
+  "ruling": [
+   "C93",
+   "C144"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-084",
+  "family": "F6",
+  "src": "round30D/tD2 p26",
+  "context": "round30D/tD2; page clock Sunday 1 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا به شرکتِ گاز زنگ می‌زنم، پس‌فردا هم به مدرسهٔ دخترم زنگ می‌زنم.",
+  "expected": "Two asks: gas call «۲ آذر», school call «۳ آذر».",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-085",
+  "family": "F6",
+  "src": "round30D/tD2 p27",
+  "context": "round30D/tD2, 1 Azar. Two call asks pending (2, 3 Azar). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "زنگ زدم.",
+  "expected": "«کدام؟» naming both; nothing closes (C117).",
+  "ruling": [
+   "C117"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-086",
+  "family": "F6",
+  "src": "round30D/tD2 p28",
+  "context": "round30D/tD2, 1 Azar. Pending «کدام؟» + date asks 2 / 3 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "۲ آذر و ۳ آذر درسته.",
+  "expected": "Books both dates by restatement (C49/C145).",
+  "ruling": [
+   "C49",
+   "C145"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-087",
+  "family": "F6",
+  "src": "round30D/tD2 p31",
+  "context": "round30D/tD2. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "وسطِ ماهِ دیگه، یعنی حدودِ ۱۵ دی، فرش‌ها رو می‌دم قالیشویی.",
+  "expected": "Book 15 Dey with her words, no extra question (C133).",
+  "ruling": [
+   "C133"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-088",
+  "family": "F6",
+  "src": "round30D/tD2 p33",
+  "context": "round30D/tD2. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "احتمالش ۴۰ درصده که جمعه بارون بیاد و بار زدن عقب بیفته.",
+  "expected": "🎯 due Friday via the single confirm; no 📌, no date-ask row (C132/C152).",
+  "ruling": [
+   "C132",
+   "C152"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-089",
+  "family": "F6",
+  "src": "round30D/s35 p5",
+  "context": "round30D/s35 (and round29D/s35); page clock before 9 Aban 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "مهلتش هم ۱۵ آبانه.",
+  "expected": "Her own deadline (C34) ⇒ ask «جمعه ۱۵ آبان ۱۴۰۵ — درست است؟».",
+  "ruling": [
+   "C34",
+   "C12"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-090",
+  "family": "F6",
+  "src": "round30D/s35 p9",
+  "context": "round30D/s35 (and round29D/s35); page clock before 9 Aban 1405.  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "شنبه با مسئولای کوچه‌ها جلسه می‌ذارم تا هر کدوم کیسه‌های جدا رو تحویل بگیرن.",
+  "expected": "Ask «شنبه ۹ آبان ۱۴۰۵ — درست است؟».",
+  "ruling": [
+   "C12"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-091",
+  "family": "F6",
+  "src": "round30D/s35 p10",
+  "context": "round30D/s35 (and round29D/s35); page clock before 9 Aban 1405. Pending: the meeting ask, Saturday 9 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "نه، شنبه نه — یکشنبه؛ شنبه مسجد مراسم داره.",
+  "expected": "Saturday is never booked; the Saturday ask is withdrawn; Sunday 10 Aban is asked or booked like any day she states (C181/C51/C72) — e.g. «یکشنبه ۱۰ آبان (به‌جای ۹ آبان) — درست است؟». Never a 📌 on 9 Aban.",
+  "ruling": [
+   "C181",
+   "C51",
+   "C72",
+   "C49"
+  ],
+  "verdict_in_round30": "failed (D30-4 regression: 📌 «یکشنبه …» booked on 9 Aban; round 29 asked 10 Aban correctly)"
+ },
+ {
+  "id": "F6-092",
+  "family": "F6",
+  "src": "round30D/s35 p14",
+  "context": "round30D/s35 (and round29D/s35); page clock before 9 Aban 1405. Pending (unanswered) deadline ask «۱۵ آبان». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "راستی مهلتِ شورایاری رو اشتباه گفتم: ۲۰ آبانه، نه ۱۵ آبان.",
+  "expected": "Correction «X، نه Y» (C48) of the pending deadline: re-ask «چهارشنبه ۲۰ آبان (به‌جای ۱۵ آبان) — درست است؟»; the 15 Aban ask is closed as replaced (C58).",
+  "ruling": [
+   "C48",
+   "C58"
+  ],
+  "verdict_in_round30": "held (date); the extra «چیزی در صفحه ثبت نشده بود» is noise"
+ },
+ {
+  "id": "F6-093",
+  "family": "F6",
+  "src": "round30C/aC3 p57",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا به خواهرم زنگ می‌زنم. پس‌فردا هم به پسرم زنگ می‌زنم.",
+  "expected": "Two asks: «یکشنبه ۸ آذر», «دوشنبه ۹ آذر».",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-094",
+  "family": "F6",
+  "src": "round30C/aC3 p58",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65). Pending: 8 / 9 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، فردا و پس‌فردا.",
+  "expected": "Books both in order (C145).",
+  "ruling": [
+   "C145"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-095",
+  "family": "F6",
+  "src": "round30C/aC3 p59",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65). Open call plans: doctor («فردا به دکترم زنگ می‌زنم»), bank («شنبه هم به بانک زنگ می‌زنم»), sister (8 Azar), son (9 Azar). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "زنگ زدم.",
+  "expected": "«کدام؟» naming every open call plan; nothing closes until she answers (C117).",
+  "ruling": [
+   "C117"
+  ],
+  "verdict_in_round30": "unknown (page named three; the son's call was missing)"
+ },
+ {
+  "id": "F6-096",
+  "family": "F6",
+  "src": "round30C/aC3 p60",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "امروز خسته‌ام، حال ندارم.",
+  "expected": "Nothing moves or closes (C147).",
+  "ruling": [
+   "C147"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-097",
+  "family": "F6",
+  "src": "round30C/aC3 p61",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65). Open: «شنبه هم به بانک زنگ می‌زنم برای وام». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "۲۰ آبان رفتم بانک و قبضِ آب رو دادم.",
+  "expected": "One 📜 line «کارِ گذشته — ۲۰ آبان»; the future bank call stays open; no ask (C182/C166).",
+  "ruling": [
+   "C182",
+   "C166"
+  ],
+  "verdict_in_round30": "unknown (no page line shown)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-098",
+  "family": "F6",
+  "src": "round30C/aC3 p62",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سه‌شنبه می‌رم آزمایشگاه، چهارشنبه هم می‌رم بازار.",
+  "expected": "Two asks: lab «سه‌شنبه ۱۰ آذر», bazaar «چهارشنبه ۱۱ آذر».",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-099",
+  "family": "F6",
+  "src": "round30C/aC3 p63",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65). Rows: lab 10 Azar, bazaar 11 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «سه‌شنبه» ⇐ «پنجشنبه» — متنِ درستِ پیامم: «پنجشنبه می‌رم آزمایشگاه، چهارشنبه هم می‌رم بازار.»",
+  "expected": "Only the lab changes: «پنجشنبه ۱۲ آذر (به‌جای ۱۰ آذر)», asked once; bazaar untouched (C144/C58).",
+  "ruling": [
+   "C144",
+   "C58"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-100",
+  "family": "F6",
+  "src": "round30C/aC3 p64",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "یکشنبه‌ی هفته‌ی بعد، ۱۸ آذر، می‌رم دندون‌پزشکی.",
+  "expected": "Next week's Sunday = 15 Azar; 18 Azar is a Wednesday ⇒ one «کدام یکی؟» naming both.",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "failed (C30-10)"
+ },
+ {
+  "id": "F6-101",
+  "family": "F6",
+  "src": "round30C/aC3 p65",
+  "context": "round30C/aC3; page clock Saturday 7 Azar 1405 (p57–p65).  Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا بانک.",
+  "expected": "Ask «یکشنبه ۸ آذر — درست است؟» (C12).",
+  "ruling": [
+   "C12"
+  ],
+  "verdict_in_round30": "failed (C30-14)"
+ },
+ {
+  "id": "F6-102",
+  "family": "F6",
+  "src": "round30C/aC3 p66",
+  "context": "round30C/aC3; page clock Tuesday 1 Dey 1405. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سلام. سرِ برج قبضِ برق رو میدم و به مستأجرم زنگ می‌زنم اجاره رو بگیرم.",
+  "expected": "Two acts ⇒ two asks, each «امروز ۱ دی یا پنجشنبه ۱ بهمن؟» (C70/C176/C92/C144).",
+  "ruling": [
+   "C70",
+   "C176",
+   "C92",
+   "C144"
+  ],
+  "verdict_in_round30": "failed (one joint ask)"
+ },
+ {
+  "id": "F6-103",
+  "family": "F6",
+  "src": "round30C/aC3 p67",
+  "context": "round30C/aC3, 1 Dey. Pending day-1 ask(s). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، هر دو.",
+  "expected": "«کدام؟» per act (C176).",
+  "ruling": [
+   "C176"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-104",
+  "family": "F6",
+  "src": "round29C/aC3 p37–p39 (replayed in round 30)",
+  "context": "Clock in Aban/Azar 1405; plan «یه برنامه: دوشنبه می‌رم داروخونه …» booked on her yes. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «دوشنبه» ⇐ «۲ آذر» — متنِ درستِ پیامم: «یه برنامه: ۲ آذر می‌رم داروخونه دفترچه‌م رو تمدید کنم.»",
+  "expected": "Re-derive «۲ آذر» from the day the sentence was said: if 2 Azar 1405 is still ahead ⇒ ask it once (C58); if it has passed ⇒ C93's «این روز گذشته — کدام روز؟». Never 2 Azar of the next year (C147).",
+  "ruling": [
+   "C58",
+   "C93",
+   "C116",
+   "C147"
+  ],
+  "verdict_in_round30": "unknown (round 29 booked next year)"
+ },
+ {
+  "id": "F6-105",
+  "family": "F6",
+  "src": "round29C/aC3 p42",
+  "context": "Open pharmacy ask; clock mid-Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "پسفردا می‌رم بیمه رو تمدید کنم؛ امروز صبح فرمش رو پر کردم.",
+  "expected": "«پسفردا» answers only the insurance act in its own clause (ask its date); it never books the pharmacy ask (C147). «امروز صبح فرمش رو پر کردم» is a past act, no ask.",
+  "ruling": [
+   "C147",
+   "C92",
+   "C19"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-106",
+  "family": "F6",
+  "src": "round30A/s10 p10",
+  "context": "round30A/s10; page clock Friday 8 Aban 1405. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "با میزهای چهارنفره شمردم و چیدمان درومد. تا جمعه چیدمانِ نهایی رو برای خواهرم می‌فرستم.",
+  "expected": "«تا جمعه» said ON a Friday ⇒ ask once «همین امروز یا جمعهٔ بعد (۱۵ آبان)؟» (C1).",
+  "ruling": [
+   "C1"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-107",
+  "family": "F6",
+  "src": "round30A/s10 p11",
+  "context": "round30A/s10, Friday 8 Aban. Pending C1 question. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "جمعهٔ بعد.",
+  "expected": "Book 📌 Friday 15 Aban.",
+  "ruling": [
+   "C1",
+   "C49"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-108",
+  "family": "F6",
+  "src": "round30A/s10 p13",
+  "context": "round30A/s10, Friday 8 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "فردا لیستِ مهمونا رو می‌فرستم و پس‌فردا کیک رو سفارش میدم.",
+  "expected": "Two asks: «شنبه ۹ آبان», «یکشنبه ۱۰ آبان».",
+  "ruling": [
+   "C12",
+   "C92"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-109",
+  "family": "F6",
+  "src": "round30A/s10 p14",
+  "context": "round30A/s10. Pending 9 / 10 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، هر دو.",
+  "expected": "Books both in order (C165).",
+  "ruling": [
+   "C165"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-110",
+  "family": "F6",
+  "src": "round30A/s10 p15",
+  "context": "round30A/s10, same day (Fri 8 Aban). List booked Sat 9 Aban (= tomorrow). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "دوازده نفر. لیست بمونه برای فردا.",
+  "expected": "Already booked for tomorrow ⇒ nothing changes, nothing asked (C167). If said on 9 Aban instead, the list moves to 10 Aban with history.",
+  "ruling": [
+   "C167"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-111",
+  "family": "F6",
+  "src": "round30A/s10 p7",
+  "context": "round30A/s10; «جمعه دوباره … می‌شمرم» asked for Fri 8 Aban (said earlier that week). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "[اصلاحِ پیامِ قبلی] «جمعه» ⇐ «پنجشنبه» — متنِ درستِ پیامم: «پنجشنبه دوباره با میزهای چهارنفره می‌شمرم ببینم هنوز ناممکنه یا نه.»",
+  "expected": "Re-derived from the day said: «پنجشنبه ۷ آبان (به‌جای ۸ آبان)», asked once (C58).",
+  "ruling": [
+   "C58",
+   "C93"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-112",
+  "family": "F6",
+  "src": "round30A/s04 p7",
+  "context": "round30A/s04; clock before 7 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "باشه. تصمیم گرفتم پنجشنبه یه جلسهٔ کوتاه با خواهر و برادرم بذارم.",
+  "expected": "Ask «پنجشنبه ۷ آبان — درست است؟».",
+  "ruling": [
+   "C12"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-113",
+  "family": "F6",
+  "src": "round30A/s04 p8",
+  "context": "round30A/s04. Pending: Thursday 7 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "ببخشید، اشتباه گفتم: جلسه رو شنبه می‌ذارم، نه پنجشنبه — پنجشنبه برادرم سرِ کاره.",
+  "expected": "Correction «Y، نه X» (C48): Thursday withdrawn and never offered (C51); ask «شنبه ۹ آبان (به‌جای ۷ آبان) — درست است؟».",
+  "ruling": [
+   "C48",
+   "C51",
+   "C181"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-114",
+  "family": "F6",
+  "src": "round30A/s04 p9",
+  "context": "round30A/s04. Pending: meeting Saturday 9 Aban. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "راستش اشتباه کردم که دیروز سرِ برادرم داد زدم؛ امروز زنگ زدم و ازش عذرخواهی کردم.",
+  "expected": "Past acts, no ask; «زنگ زدم» closes no plan (no open call plan matches) and the meeting plan stays pending (C182/C94/C19).",
+  "ruling": [
+   "C182",
+   "C94",
+   "C19"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-115",
+  "family": "F6",
+  "src": "round30A/s07 p11",
+  "context": "round30A/s07; page clock after 30 Aban (early Azar). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "اندازه‌گیریِ بعدی ۳۰ آبانه.",
+  "expected": "A plan day already past ⇒ «این روز (۳۰ آبان) گذشته — کدام روز؟» (C93/C116); never next year.",
+  "ruling": [
+   "C93",
+   "C116",
+   "C147"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-116",
+  "family": "F6",
+  "src": "round30A/s07 p12",
+  "context": "round30A/s07. Pending past-day ask «اندازه‌گیری … — کدام روز؟». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "یه اصلاح: گلدانِ دوم ۸ سانت نیست، ۹ سانته. گلدانِ سوم هم ۱۳ بود که درسته.",
+  "expected": "No day in it ⇒ the past-day ask stays open; it is answered only by an explicit day, never closed by «تاریخ درسته/نه» wording (C92/C93).",
+  "ruling": [
+   "C92",
+   "C93"
+  ],
+  "verdict_in_round30": "failed (A30-17)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-117",
+  "family": "F6",
+  "src": "round30A/s07 p6",
+  "context": "round30A/s07. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "اون پیش‌بینی همون گلدانِ ۲۴ ساعت بود؛ برگ‌هاش ۱۰ روز پیش، ۲۳ آبان، زرد شد — درست درومد.",
+  "expected": "A past fact (C19): no date ask; the practice session is dated 23 Aban (her day).",
+  "ruling": [
+   "C19"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F6-118",
+  "family": "F6",
+  "src": "round30A/s02 p11",
+  "context": "round30A/s02; clock before 12 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "بارگیری هم ۱۴۰۵/۹/۱۲ ـه و نمرهٔ آزمونِ گواهینامه‌م ۱۸ از ۲۰ شد.",
+  "expected": "Ask «پنجشنبه ۱۲ آذر ۱۴۰۵ — درست است؟» for the loading; «۱۸ از ۲۰ شد» is past ⇒ no ask.",
+  "ruling": [
+   "C12",
+   "C19"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F6-119",
+  "family": "F6",
+  "src": "round30A/s03 p20",
+  "context": "round30A/s03; clock in Aban/Azar 1405. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "مسابقهٔ المپیاد سه مرحله‌ست، اولیش ۱ اردیبهشته و تا اون موقع تمرین می‌کنم.",
+  "expected": null,
+  "ruling": [
+   "C19",
+   "C34"
+  ],
+  "verdict_in_round30": "unknown",
+  "needs_ruling": "The contest date is the organiser's schedule (C19: no ask), but «تا اون موقع تمرین می‌کنم» makes it the deadline of her own action (C34: ask «چهارشنبه ۱ اردیبهشت ۱۴۰۶ — درست است؟»). Which rule wins?"
+ },
+ {
+  "id": "F6-120",
+  "family": "F6",
+  "src": "round29D/tD1 p14 (replayed in round30D/tD1)",
+  "context": "Parquet; clock in Azar 1405. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "نصب قراره ۱۴۰۵/۹/۲۰ باشه.",
+  "expected": "Ask «جمعه ۲۰ آذر ۱۴۰۵ — درست است؟» (C12).",
+  "ruling": [
+   "C12"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-121",
+  "family": "F6",
+  "src": "round29D/tD1 p15 (replayed in round30D/tD1)",
+  "context": "Parquet; clock in Azar 1405. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "۸۰ درصد مطمئنم پارکت تا آخرِ آذر نصب میشه.",
+  "expected": "🎯 80 % due «دوشنبه ۳۰ آذر» via the single 🎯 confirm (C171/C132/C152); NOT a 📅 plan ask «… در «امروز» بیاید؛ درست است؟».",
+  "ruling": [
+   "C171",
+   "C132",
+   "C152"
+  ],
+  "verdict_in_round30": "unknown (round 29 made a plan ask)"
+ },
+ {
+  "id": "F6-122",
+  "family": "F6",
+  "src": "round29B/dB2 p1",
+  "context": "round29B/dB2. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آزمونِ آیلتسم وسطِ ماهِ دیگه‌ست … پنجشنبه هم با استادم جلسه دارم.",
+  "expected": "«وسطِ ماهِ دیگه» ⇒ «کدام روز؟» with no suggested day (C114/C92); Thursday meeting ⇒ ask its date.",
+  "ruling": [
+   "C114",
+   "C92",
+   "C12"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-123",
+  "family": "F6",
+  "src": "round29B/dB2 p2",
+  "context": "round29B/dB2. Pending: Thursday meeting; idiom row for the exam. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، پنجشنبه درسته. آزمون هم: وسطِ ماهِ دیگه یعنی حدودِ ۱۵ دی.",
+  "expected": "Books Thursday; exam booked 15 Dey with her words, no extra question (C133).",
+  "ruling": [
+   "C49",
+   "C133"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-124",
+  "family": "F6",
+  "src": "round29B/dB2 p5",
+  "context": "round29B/dB2. A date row was made from «آزمونِ آزمایشیِ شنبه» inside a forecast. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "نه، اون تاریخ رو نمی‌خوام؛ شنبه آزمونِ آزمایشیه و فقط نمره‌ش رو پیش‌بینی کردم.",
+  "expected": "The date row is withdrawn; the weekday stays only as the 🎯 due date (C132/C152).",
+  "ruling": [
+   "C132",
+   "C152",
+   "C49"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-125",
+  "family": "F6",
+  "src": "round29B/dB2 p8",
+  "context": "round29B/dB2. Pending: bank call «فردا», landlord call «پس‌فردا». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "آره، فردا و پس‌فردا. نشانه‌ش اینه که استادم دیگه نگه «پرش داری». امروز هم یه ایمیل به استادم می‌زنم که جلسه‌ی پنجشنبه رو تأیید کنه.",
+  "expected": "Books both calls in order (C145). «امروز هم یه ایمیل … می‌زنم» is a new plan for today ⇒ its own ask (C12); it is not booked by this yes.",
+  "ruling": [
+   "C145",
+   "C12",
+   "C49"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-126",
+  "family": "F6",
+  "src": "round29B/dB2 p10",
+  "context": "round29B/dB2; clock Tuesday. Pending «کدام؟» (bank / landlord); landlord booked for today. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "به بانک. صاحب‌خونه بمونه برای فردا. ایمیلِ استاد رو هم دیروز زدم.",
+  "expected": "Bank call closed. Landlord call booked on another day than tomorrow ⇒ moved to tomorrow with history (C167). «ایمیلِ استاد رو هم دیروز زدم» closes the email plan (C94).",
+  "ruling": [
+   "C117",
+   "C167",
+   "C94"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-127",
+  "family": "F6",
+  "src": "round29B/dB2 p12",
+  "context": "round29B/dB2. Pending ✏️ past-day ask for the meeting. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "سه‌شنبه‌ی هفته‌ی بعد، ۱۰ آذر. وسطِ ماه هم کارگر میاد برای تعمیرِ بخاری.",
+  "expected": "Books Tuesday 10 Azar (weekday and date agree; answer to the ✏️ ask, C145). «وسطِ ماه هم کارگر میاد» is another person's act ⇒ no ask (C19).",
+  "ruling": [
+   "C145",
+   "C19"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-128",
+  "family": "F6",
+  "src": "round26B/oB1 p38",
+  "context": "Pending ask for a Friday report; a Thursday row also pending. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "جمعه‌ی بعد، همون ۲۲ آبان. اون پنجشنبه هم قرار نیست؛ گزارشِ هفته‌ی گذشته بود.",
+  "expected": "Books Friday 22 Aban (weekday and date agree). The Thursday row is withdrawn: a past report, not a plan (C19/C94).",
+  "ruling": [
+   "C49",
+   "C19"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-129",
+  "family": "F6",
+  "src": "round26D/s34 p4",
+  "context": "Pending ask: «فردا صبح ۲۰ دقیقه» (sketch). Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "نه ببخشید، اشتباه گفتم: فردا صبح کلاس دارم. منظورم پس‌فردا صبح بود، همون ۲۰ دقیقه.",
+  "expected": "«فردا» withdrawn, never booked (C51/C181); ask «پس‌فردا» (C48).",
+  "ruling": [
+   "C48",
+   "C51",
+   "C181"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-130",
+  "family": "F6",
+  "src": "round26D/s34 p5",
+  "context": "Pending ask: «پس‌فردا». Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "ثبتش کردم. پس‌فردا صبح انجامش میدم.",
+  "expected": "Restating the asked day = consent ⇒ book (C49).",
+  "ruling": [
+   "C49"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-131",
+  "family": "F6",
+  "src": "round26C/s22 p22",
+  "context": "A deadline booked on a Thursday. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "یه اصلاح: اول گفتم مهلت گزارش تا پنجشنبه‌ست — اشتباه گفتم، تا شنبه‌ست.",
+  "expected": "A bare weekday replacing a booked weekday ⇒ the Saturday nearest to the replaced Thursday date (two days after it), asked once (C134 amended); never «the first Saturday after today» unless that is the same day.",
+  "ruling": [
+   "C134",
+   "C58",
+   "C48"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F6-132",
+  "family": "F6",
+  "src": "round26A/s09 p16",
+  "context": "Pending/booked deadline 15 Azar. Calendar used: 1 Aban 1405 = Friday; 1 Azar 1405 = Sunday; 1 Dey 1405 = Tuesday; 1 Bahman 1405 = Thursday; 29 Esfand 1405 = Saturday; 1 Farvardin 1406 = Sunday; 1 Ordibehesht 1406 = Wednesday.",
+  "sentence": "یه اصلاح: اولش گفتم «تا ۱۵ آذر» باید قیمت رو اعلام کنم — اشتباه گفتم، تا ۲۰ آذره.",
+  "expected": "Re-ask «جمعه ۲۰ آذر (به‌جای ۱۵ آذر) — درست است؟»; the 15 Azar row is replaced (C48/C58).",
+  "ruling": [
+   "C48",
+   "C58",
+   "C34"
+  ],
+  "verdict_in_round30": "unknown"
+ }
+]
