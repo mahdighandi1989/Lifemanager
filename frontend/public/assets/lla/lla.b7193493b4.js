@@ -62518,10 +62518,17 @@ APP.goFromURL = function (q) {
       /* دورِ ۲۷ (story R6، C30؛ B27·D15 oB1 «برگردیم به مسئله‌ی بیداری ساعت ۶» وقتی کانون همان بیداری بود ⇒ صفحه به «شام» بست): نامی که به مسئلهٔ کنونی بیشتر می‌خورد
          جابه‌جایی نیست؛ برابر ⇒ صفحه می‌پرسد (کنونی + بهترینِ دیگر)، هرگز حدس نمی‌زند */
       if (f.strong && me > mx) return null;
+      /* دورِ ۳۰ (story F11، A30-18 s08 p12 «برگردیم به معمای ساعت‌شنیِ ۷ و ۱۱ برای ۱۵ دقیقه: …» با دو مسئلهٔ «ساعت‌شنی» ⇒ «کدام؟» و پیام بی‌سطر ماند): واژه‌های نام برابر بودند
+         و عددهای نام («۷ و ۱۱»، «۱۵») شمرده نمی‌شدند. برابریِ واژه‌ها را عددهای همان نام می‌شکنند: مسئله‌ای که عددهای نام در عنوان/صورتش هست و دیگری هیچ‌کدام را ندارد ⇒ همان.
+         هم‌شکلِ منفی: نامی بی عدد، یا عددی که در هر دو هست ⇒ همان پرسشِ «کدام؟» (C21، هرگز حدس). */
+      var nT30 = numsOf(f.tail), byN30 = function (L) { if (!nT30.length) return null; var sc30 = L.map(function (x) { var X = numsOf(x.title + " " + x.stmt); return { p: x, n: nT30.filter(function (v) { return X.indexOf(v) >= 0; }).length }; }), m30 = Math.max.apply(null, [0].concat(sc30.map(function (z) { return z.n; }))), b30 = sc30.filter(function (z) { return z.n === m30 && m30 > 0; });
+        return b30.length === 1 && sc30.every(function (z) { return z === b30[0] || z.n === 0; }) ? b30[0].p : null; };
+      if (me === mx) { var tieL30 = P.filter(function (x) { return x.id === cur || others.some(function (z) { return z.p === x && z.n === mx; }); }), w30 = byN30(tieL30); if (w30) { if (w30.id === cur) return null; return { to: w30, frame: f }; } }
       if (f.strong && me && me === mx) { var cpe = P.filter(function (x) { return x.id === cur; })[0]; return { ask: (cpe ? [cpe] : []).concat(others.filter(function (z) { return z.n === mx; }).map(function (z) { return z.p; })), frame: f }; }
       if (f.bare || f.about) { var byT0 = others.filter(function (z) { var X = toks(z.p.title); return W.some(function (w) { return w.length >= 3 && hit26(w, X); }); }); if (!byT0.length) continue; }   // بی قابِ صریح، فقط واژهٔ عنوان   // بی «برگردیم»، واژه‌ای که به مسئلهٔ کنونی هم می‌خورد نام‌بردنِ دیگری نیست
       var best = others.filter(function (z) { return z.n === mx; }).map(function (z) { return z.p; });
       if (best.length === 1) return { to: best[0], frame: f };
+      var bn30 = byN30(best); if (bn30) return { to: bn30, frame: f };   // دورِ ۳۰ (A30-18): عددهای نام برابریِ واژه‌ها را می‌شکنند
       /* عنوان مقدم بر صورت: «مسئلهٔ تاس» ⇐ مسئله‌ای که عنوانش تاس دارد، نه هر صورتی که تاس را نام برد */
       var byT = best.filter(function (x) { var X = toks(x.title); return W.some(function (w) { return w.length >= 3 && hit26(w, X); }); }); if (byT.length === 1) return { to: byT[0], frame: f };
       return { ask: best, frame: f };
