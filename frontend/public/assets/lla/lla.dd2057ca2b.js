@@ -63787,6 +63787,7 @@ APP.goFromURL = function (q) {
       /* C108 (دورِ ۲۸): جملهٔ «M تا می‌مونه» جدا سنجیده می‌شود فقط وقتی کلّ را خودش در همین پیام پیش از حساب گفته («۲۰ تا مداد … ۶ و ۶ و ۶ میشه ۱۸، ۲ تا می‌مونه»):
          واپسین «N تا» ِ پیش از حساب که از نتیجه بزرگ‌تر است. وگرنه سطری نمی‌گیرد */
       /* دورِ ۲۹ (C141): این شاخه جای خود را به remains29 (پایین، همهٔ عمل‌ها و شکلِ روایی) داد — قرنطینه پشتِ ST.arithC108R28On (هیچ‌جا روشن نمی‌شود) */
+      c.sv30 = tkS && !tkS.pct && !tkS.cst ? tkS : null;   // دورِ ۳۰: عددِ نتیجهٔ خودِ او (با واژهٔ مقیاسش) — کلِ بعدی در مقیاسِ خودش (remains30)
       c.v29 = L0.alts ? L0.alts[0] : L0.v; c.sub29 = !L0.alts && !L0.run && L0.adds >= 1 && !L0.muls && !L0.divs && !L0.par && /−/.test(L0.t) && !/\+/.test(L0.t) || !!(L0.wop && /−/.test(L0.t));
       if (ST.arithC108R28On && remCl && R.single && pt(R.v) && R.v.lo.d === ONE) { var T84 = tokens(t), p84 = segs[i - 1].at + L0.a, tot = null;
         for (var q84 = 0; q84 + 1 < T84.length && T84[q84].b <= p84; q84++) { var x84t = T84[q84]; if (x84t.k === "n" && x84t.int && !x84t.mag && T84[q84 + 1].k === "w" && T84[q84 + 1].t === "تا" && cmp(x84t.v, R.v.lo) > 0) tot = x84t; }
@@ -63889,9 +63890,12 @@ APP.goFromURL = function (q) {
     return C.pk ? "" : String(C.stmt || "");   // سشنِ بی شمارهٔ مسئله (کهنه/آزمون): همان صورتِ تنها
   }
   ST.arithFocusStmt = focusStmt30;
-  function stmt29(t) {
+  function stmt29(t, wide) {   // wide (دورِ ۳۰، remains30): مبلغِ با واژهٔ مقیاس («بودجه‌م ۱۲ میلیونه») هم کل است — با خوانش‌هایش (tk)
     var st = focusStmt30();
     if (!st.trim()) return []; var tt = normM(st).t; if (t.indexOf(tt) >= 0) return []; var T = tokens(tt), o = [];
+    if (wide) T = T.map(function (x, k) { var nw = T[k + 1], mg = x.k === "n" && !x.mag && !x.cm && !x.pct && nw && nw.k === "w" ? /^(هزار|میلیون|میلیارد)ه$/.exec(nw.t) : null;   // «بودجه‌م ۱۲ میلیونه»
+      if (mg) { var g = mg[1] === "هزار" ? 3 : mg[1] === "میلیون" ? 6 : 9, v = mul(x.v, F(p10(g))); return Object.assign({}, x, { v: v, int: true, tk30: Object.assign({}, x, { v: v, mag: g, int: false }) }); }
+      return x.k === "n" && !x.pct && !x.cst && (x.mag || x.cm) && x.v.d === ONE ? Object.assign({}, x, { int: true, mag: 0, cm: 0, tk30: x }) : x; });
     /* C180: عددِ حسابِ درونِ صورت (عملوند یا حاصل، «داداشم حساب کرد ۳ × ۴۰۰ = ۱۲۰۰») و نرخِ «هر بسته ۱۲ تا» / «هر کدوم ۴۰۰» کلِ لازم/موجود نیست */
     var SP = []; try { var ck0 = run(tt, {}, null, null); SP = ck0.concat(ck0.unread || []).map(function (c) { return [c.pos, c.pe]; }); } catch (e3) { SP = []; }
     var inSp = function (p) { return SP.some(function (x) { return x[0] <= p && p < x[1]; }); };
@@ -63900,7 +63904,8 @@ APP.goFromURL = function (q) {
       if (pw2 === "هر" || (RATE29.test(pw2) && !pw)) return;
       if (RATE29.test(pw) || (T[k + 1] && T[k + 1].k === "o") || (T[k - 1] && T[k - 1].k === "o")) return;
       var nx = T[k + 1] && T[k + 1].k === "w" ? (T[k + 1].t === "تا" && T[k + 2] && T[k + 2].k === "w" ? T[k + 2].t : T[k + 1].t !== "تا" ? T[k + 1].t : "") : "";
-      o.push({ v: x.v, raw: x.raw, a: -1e9 + k, w: nx.replace(/[ِٔ]+$/, "") }); });
+      if (wide && /^(?:سالگی|ساله|سالمه|سالشه|سالش)/.test(nx)) return;   // سنِ کسی کلِ لازم/موجود نیست
+      o.push({ v: x.v, raw: x.raw, a: -1e9 + k, w: nx.replace(/[ِٔ]+$/, ""), tk: x.tk30 || x }); });
     return o;
   }
   function rs29(a) { return a.d === ONE ? String(a.n) : num(a).toString(); }
@@ -63961,6 +63966,131 @@ APP.goFromURL = function (q) {
       put(rs29(big.v) + " − " + rs29(small.v), sub(big.v, small.v));
     });
   }
+  /* ---------- دورِ ۳۰ (C180، C141، C156، C191؛ F2: C30-13، D30-5، A30-2، A30-9، B30·D11 — remains30؛ remains29 قرنطینه پشتِ ST.arithRem29On) ----------
+     ریشه‌ها در remains29: (۱) فقط فعل‌های «می‌مونه / کم میاد / اضافه میاد» — «کم دارم»، «برام موند»، «هیچی نمی‌مونه»، «یکی می‌مونه» و «۴ تا هم برای فردا می‌مونه»
+     بی سطر یا زیرِ ✓ ِ جمله می‌ماندند؛ (۲) مبلغ («۲ میلیون و ۵۰۰ کم دارم»، «۷۵۰ هزار برام موند») فقط «نسنجیده» می‌گرفت و عددهای مرکب هرگز کل نبودند؛
+     (۳) «از ۴۲ تا ۸ تا کم دارم» — «از N» ِ پیش از عدد کل خوانده نمی‌شد؛ (۴) روایی با دو عدد فقط وقتی نقشِ «داشتم/لازمه» روشن بود.
+     قاعده (همه از متنِ خودِ او یا صورتِ مسئلهٔ کانون، C180):
+       • هر عدد با خوانش‌هایش: «N میلیون و M» ⇒ [M هزار، M واحد] (C102)؛ عددِ تنها در پیامی با مبلغِ میلیونی ⇒ [هزار، واحد] (C154)؛ داوری با خوانشِ یکدست (همه نخست، یا همه دوم)؛
+         فقط خوانشِ درهم ⇒ «نسنجیده»، هرگز حدس؛ ✗ با مقدار در مقیاسِ خودش؛
+       • کل‌ها: «از N» ِ همان بند؛ عددهای جمله؛ نتیجه‌های درستِ پیشینِ همین پیام؛ صورتِ مسئلهٔ کانون. چند کلِ ممکن که حکمِ یکسان نمی‌دهند ⇒ «نسنجیده» (C191)؛
+       • روایی: دو عدد در جمله ⇒ نقشِ «داشتم/لازمه» اگر هست، وگرنه بزرگ‌تر منهای کوچک‌تر (برای «کم/اضافه» اندازهٔ فاصله به نقش بسته نیست)؛ یک عدد ⇒ با نتیجهٔ درستِ جملهٔ
+         درست پیش از آن («… = ۵ میلیون و ۷۰۰. از ۸ میلیونی که کنار گذاشتم، ۲ میلیون و ۳۰۰ می‌مونه»)؛ «N تا X ِ M» (دو لپ‌تاپِ ۱ میلیون و ۸۰۰) ⇒ N × M (C41)؛
+       • «هیچی نمی‌مونه» = ۰ (پس از تقسیمِ بی‌باقی‌مانده هم)، «یکی می‌مونه» = ۱ (C60). «همون N می‌مونه» و «N تا کم میشه» بندِ باقی نیستند (C192). */
+  var VERB30 = /(?<![آ-ی‌])(باقی[‌\s]?می[‌\s]?مونه|باقی[‌\s]?می[‌\s]?ماند|باقی[‌\s]?میمونه|باقی[‌\s]?نمی[‌\s]?مونه|باقی[‌\s]?نمی[‌\s]?ماند|اضافه\s*می[‌\s]?مونه|اضافه\s*میمونه|می[‌\s]?مونه|میمونه|می[‌\s]?ماند|باقی[‌\s]?موند|باقی[‌\s]?ماند|نمی[‌\s]?مونه|نمیمونه|نمی[‌\s]?ماند|نموند|نماند|موند|ماند|کم\s*میاد|کم\s*می[‌\s]?آید|کم\s*میاره|کم\s*دار(?:م|یم|ه|ند|ن|ی)|اضافه\s*میاد|اضافه\s*می[‌\s]?آید|زیاد\s*میاد)(?![آ-ی‌])/g;
+  var FIL30 = "(?:(?:برام|برامون|براش|براشون|واسم|واسمون|برای\\s+[^\\s\\d،,.؛:!?؟]+|واسه\\s+[^\\s\\d،,.؛:!?؟]+)\\s*)?";
+  var PRE30 = new RegExp("(?:(?:^|[^\\d.])از\\s*(\\d+)\\s*(?:تا\\s*)?(?:[^\\s\\d،,.؛:!?؟]+\\s*)?[،,]?\\s*)?(\\d+(?:\\.\\d+)?|یکی|هیچی|هیچ\\s*چیزی?|چیزی)\\s*((?:(?:هزار|میلیون|میلیارد|تومن|تومان|ریال)(?![آ-ی])\\s*)*)(?:تا\\s*)?(?:([^\\s\\d،,.؛:!?؟]+)\\s*)?(?:(?!هم(?![آ-ی]))[^\\s\\d،,.؛:!?؟]+\\s+(?=(?:هم\\s*)?$))?(?:هم\\s*)?(?:از\\s*(\\d+)\\s*(?:تا\\s*)?)?" + FIL30 + "(?:هم\\s*)?$", "d");
+  function remains30(t, all, out, U) {
+    var T = tokens(t), sts = [], m; VERB30.lastIndex = 0;
+    var tokAt = function (p) { for (var k = 0; k < T.length; k++) if (T[k].k === "n" && T[k].a <= p && p < T[k].b) return k; return -1; };
+    while ((m = VERB30.exec(t))) {
+      var v0 = m.index, verb = m[1].replace(/\s+/g, " "), neg = /^(?:باقی[‌\s]?)?ن(?:می|مو|ما)/.test(m[1]), w0 = Math.max(0, v0 - 90), pm = PRE30.exec(t.slice(w0, v0)); if (!pm) continue;
+      var g2 = pm[2], ga = w0 + pm.indices[2][0], isD = /^\d/.test(g2), zero = /^(?:هیچ|چیزی)/.test(g2);
+      if (zero !== neg || (!isD && !zero && g2 !== "یکی")) continue;   // «۵ تا نمی‌مونه» / «هیچی می‌مونه» بندِ باقی نیست
+      var tk = null, a = ga, nb = ga + g2.length; if (isD) { var k0 = tokAt(ga); if (k0 < 0) continue; tk = T[k0]; a = tk.a; nb = tk.b; if (tk.pct || tk.cst || /[:\/]/.test(t[tk.a - 1] || "")) continue; }   // «تا ۱۰:۳۰ روشن موند» ساعت است
+      var pw0 = (/([^\s\d]+)\s*$/.exec(t.slice(Math.max(0, a - 20), a)) || [])[1] || "";
+      var sA = a; while (sA > 0 && !/[.!?؟\n؛]/.test(t[sA - 1])) sA--; if (/مطمئن|احتمال|شانس|فکر\s*کنم/.test(t.slice(sA, v0)) && /\d\s*(?:%|درصد)/.test(t.slice(sA, v0))) continue;   // پیش‌بینی (🎯، C90/C152)، نه بندِ باقی
+      if (/^(?:همون|همان|هنوز|ماه|روز|سال|هفته|ساعت|گام|مرحله|سطر|شماره|ردیف)$/.test(pw0) || (pw0 === "از" && !pm[1])) continue;   // C192، C136
+      var u4 = pm[4] || ""; if ((/^(?:ب|ن)[آ-ی]+(?:م|یم|ید|ند)$/.test(u4) && !/^(?:برام|برامون|براشون|بنام)$/.test(u4)) || /^(?:می|نمی)[‌]?[آ-ی]+(?:م|یم|ید|ند)$/.test(u4)) continue;   // «۷۰ میلیون بگیریم می‌مونه ۱۱۵ − ۷۰»: فعل میانِ عدد و «می‌مونه» ⇒ بندِ باقی نیست
+      var w = u4 && !/^(?:تا|هم|هم‌|و|از|اضافه|رو|را|که)$/.test(u4) && !/^(?:می|نمی)/.test(u4) && !/^(?:ب|ن)[آ-ی]+(?:م|یم|ید|ند)$/.test(u4) ? u4.replace(/[ِٔ]+$/, "") : "";
+      var kd = /^کم/.test(verb) ? "short" : /^(?:اضافه|زیاد)/.test(verb) && !/مون|میمونه/.test(verb) ? "sur" : "rem", of = pm[1] || pm[5];
+      sts.push({ a: a, nb: nb, e: v0 + m[0].length, raw: zero ? "0" : g2 === "یکی" ? "1" : g2, tk: tk, nv: zero ? F(Z) : g2 === "یکی" ? F(ONE) : null, zero: zero, w: w, kd: kd, verb: verb, of: of ? dec(of) : null });
+    }
+    if (!sts.length) return;
+    var K3 = F(B(1000)), money = false;
+    /* «۸ میلیونی»، «۱۲ میلیونه» — واژهٔ مقیاس با پسوند هم مقیاس است (فقط در این خواننده) */
+    T = T.map(function (x, k) { var nw = T[k + 1], mg = x.k === "n" && !x.mag && !x.cm && !x.pct && x.v.d === ONE && nw && nw.k === "w" ? /^(هزار|میلیون|میلیارد)(?:ه|ی|یه)$/.exec(nw.t) : null;
+      if (!mg) return x; var g = mg[1] === "هزار" ? 3 : mg[1] === "میلیون" ? 6 : 9; return Object.assign({}, x, { v: mul(x.v, F(p10(g))), mag: g, int: false, b: nw.b }); });
+    var rdT = function (x) { if (!x || x.pct || x.cst) return null; var r; if (x.alt) r = [x.alt, x.v]; else if (money && !x.mag && !x.cm && x.v.d === ONE && String(x.raw).indexOf(".") < 0) r = [mul(x.v, K3), x.v]; else r = [x.v]; r.sc = !!(x.mag || x.cm); return r; };
+    var inChk = function (p) { return all.some(function (c) { return c.pos <= p && p < c.pe; }) || U.some(function (u) { return u.pos <= p && p < u.pe; }); };
+    var isSt = function (p) { return sts.some(function (x) { return x.a <= p && p < x.nb; }); };
+    var cands = function (from, to) {
+      var o = []; for (var k = 0; k < T.length; k++) { var x = T[k]; if (x.k !== "n" || x.a < from || x.b > to || x.pct || x.cst || x.v.d !== ONE || inChk(x.a) || isSt(x.a)) continue;
+        if (!x.int && !x.mag && !x.cm) continue;
+        var pw = T[k - 1] && T[k - 1].k === "w" ? T[k - 1].t.replace(/[ِٔ]+$/, "") : "", pw2 = T[k - 2] && T[k - 2].k === "w" ? T[k - 2].t.replace(/[ِٔ]+$/, "") : "", nx1 = T[k + 1], nx2 = T[k + 2], nx3 = T[k + 3];
+        var allOf = pw === "هر" && nx1 && nx1.t === "تا" && nx2 && nx2.k === "w" && /^(?:رو|را)$/.test(nx2.t);   // «هر ۳۰ تا رو چیدیم» = همهٔ ۳۰ تا، نه نرخ
+        if (!allOf && (RATE29.test(pw) || (RATE29.test(pw2) && pw === "") || pw2 === "هر")) continue;   // «هر روپوش ۱۲۰ هزار» نرخ است
+        /* C41: «۲ تا لپ‌تاپِ ۱ میلیون و ۸۰۰» ⇒ ۲ × مبلغ */
+        if (x.int && !x.mag && nx1 && nx1.k === "w" && nx1.t === "تا" && nx2 && nx2.k === "w" && nx3 && nx3.k === "n" && (nx3.mag || nx3.cm) && !nx3.pct && !inChk(nx3.a)) {
+          var r3 = rdT(nx3); if (r3) { var r4 = r3.map(function (v) { return mul(v, x.v); }); r4.sc = true; o.push({ rd: r4, v: r4[0], a: x.a, w: "", tail: "", prod: true }); k += 3; continue; } }
+        if (nx1 && nx1.k === "w" && nx1.t === "تا" && nx2 && nx2.k === "n" && pw !== "از") continue;
+        if (nx1 && nx1.k === "o") continue;
+        var nx = T.slice(k + 1, k + 4).filter(function (z) { return z.k === "w" && z.t !== "تا"; })[0], tail = t.slice(x.b, (T.slice(k + 1).filter(function (z) { return z.k === "n" || (z.k === "p" && /[،,.؛!?؟\n]/.test(z.t)); })[0] || { a: t.length }).a);
+        var rd = rdT(x); if (!rd) continue;
+        o.push({ rd: rd, v: rd[0], raw: x.raw, a: x.a, w: nx && nx1 && (nx1 === nx || (nx1.t === "تا" && nx2 === nx)) ? nx.t.replace(/[ِٔ]+$/, "") : "", tail: tail }); }
+      return o; };
+    /* نتیجهٔ حسابِ خودش: عددِ نوشته‌اش با واژهٔ مقیاسش (C108/C109: بندِ بعدی با عددِ خودِ او سنجیده می‌شود)، وگرنه مقدارِ حساب */
+    var resRd = function (c) { var x = c.sv30; if (x && !x.pct && (x.mag || x.cm || !c.ok || money)) { var r = rdT(x); if (r) return r; } return c.ok && c.v29 && pt(c.v29) ? [c.v29.lo] : null; };
+    var sentA = function (p) { var q = p; while (q > 0 && !/[.!?؟\n؛]/.test(t[q - 1])) q--; return q; };
+    var pick = function (A, i) { return A[Math.min(i, A.length - 1)]; };
+    var resOf = function (c) { return c && !c.ask && !c.conv && !c.other && c.kind !== "remc" && !c.rem29 && c.v29 && pt(c.v29); };
+    sts.forEach(function (st) {
+      if (inChk(st.a)) return; var s0 = sentA(st.a);
+      var E = null; all.forEach(function (c) { if (c.pe <= st.a && (c.pos >= s0 || st.of) && (!E || c.pe > E.pe)) E = c; });
+      /* مبلغِ میلیونی در همین جمله (یا حسابِ پیش از آن) ⇒ عددِ تنها دو خوانش دارد (C154) */
+      var mA = E ? Math.min(s0, E.pos) : s0; money = T.some(function (x) { return x.k === "n" && !x.pct && x.a >= mA && x.b <= st.e && ((x.mag || 0) >= 6 || x.cm); });
+      var N = st.nv ? [st.nv] : rdT(st.tk); if (!N) return;
+      var none = function (why) { U.push({ text: pretty(t.slice(st.a, st.e)), why: why, pos: st.a, pe: st.e, cut: st.a, rem29: st.kd }); };
+      /* داوریِ «کل − دیگری» با خوانشِ یکدست؛ Qs: کل‌های ممکن (C191: حکم‌های ناهم‌سان ⇒ نسنجیده) */
+      var judge = function (Qs, H, exprF) {
+        var V = Qs.map(function (Q) {
+          var r = [0, 1].map(function (i) { var q = pick(Q, i), h = pick(H, i), n = pick(N, i), d = cmp(q, h) >= 0 ? sub(q, h) : sub(h, q); return { q: q, h: h, d: d, ok: cmp(d, n) === 0 }; });
+          if (r[0].ok) return { ok: true, r: r[0] }; if (r[1].ok) return { ok: true, r: r[1] };
+          for (var i = 0; i < 8; i++) { var q = pick(Q, i & 1), h = pick(H, (i >> 1) & 1), n = pick(N, (i >> 2) & 1), d = cmp(q, h) >= 0 ? sub(q, h) : sub(h, q); if (cmp(d, n) === 0) return { mixed: true }; }
+          return { ok: false, r: r[0] }; });
+        if (V.some(function (x) { return x.mixed; })) { none("خوانشِ مبلغ‌ها (هزار یا واحد) روشن نیست"); return; }
+        if (V.length > 1 && !V.every(function (x) { return x.ok === V[0].ok && (x.ok || cmp(x.r.d, V[0].r.d) === 0); })) { none("چند کلِ ممکن در متنش هست و حکمِ یکسان نمی‌دهند"); return; }
+        var sc = money || N.sc || H.sc || Qs.some(function (Q) { return Q.sc; });
+        var fmtA = function (v) { if (sc && v.d === ONE && v.n >= B(1000)) { var s = fmtCmApx(iv(v), 9); if (s) return s; } return v.d === ONE ? String(v.n) : rs29(v); };
+        var R = V[0].r, big = cmp(R.q, R.h) >= 0 ? R.q : R.h, sm = big === R.q ? R.h : R.q;
+        out.push({ expr: exprF ? exprF(R) : fmtA(big) + " − " + fmtA(sm), said: st.raw, saidT: pretty(t.slice(st.a, st.e)), val: num(R.d), valT: sc ? fmtA(R.d).replace(/^\d+$/, function (x) { return fa(x); }) : fmtF(R.d),
+          ok: V[0].ok, kind: "remc", rem29: st.kd, pos: st.a, pe: st.e, sx: false }); };
+      var uniq = function (C) { var seen = {}, Qs = []; C.slice().reverse().forEach(function (x) { var key = String(x.v.n) + "/" + String(x.v.d); if (!seen[key]) { seen[key] = 1; Qs.push(x.rd); } }); return Qs; };
+      var ofRd = st.of ? (money ? [mul(st.of, K3), st.of] : [st.of]) : null;
+      if (E) {
+        if (E.kind === "remc" || E.conv || E.rem29) return;
+        if (E.ask || !E.v29 || !pt(E.v29) || (!E.ok && !(E.sv30 && !E.sv30.pct))) { none("حسابِ پیش از آن خودش " + (E.ask ? "هنوز روشن نیست" : "نمی‌خواند") + " — باقی/کم را صفحه نسنجید"); return; }
+        var Hr = resRd(E); if (!Hr) { none("حسابِ پیش از آن خودش روشن نیست"); return; } var hv = Hr[0];
+        if (E.sub29 && (st.kd === "rem" || st.zero)) { judge([Hr], [F(Z)], function () { return E.expr; }); return; }
+        if (/\//.test(E.expr) && E.sx) return;   // باقی‌ماندهٔ تقسیم که در خودِ حساب خوانده شد
+        if (!E.ok) { none("حسابِ پیش از آن خودش نمی‌خواند — باقی/کم را صفحه نسنجید"); return; }
+        if (st.zero && /\//.test(E.expr) && E.kind !== "floor" && E.v29.lo.d === ONE) { judge([[F(Z)]], [F(Z)], function () { return "باقی‌ماندهٔ " + E.expr; }); return; }   // «۱۲۰ ÷ ۸ = ۱۵، هیچی نمی‌مونه»
+        var opV = (String(E.expr).match(/\d+(?:\.\d+)?/g) || []).map(function (x) { return dec(x); }).filter(Boolean);
+        var okC = function (x) { return (!st.w || x.w === st.w) && (st.zero || cmp(x.v, hv) !== 0) && !opV.some(function (o) { return cmp(o, x.v) === 0; }) && (st.kd !== "rem" || cmp(x.v, hv) >= 0); };
+        if (ofRd) { judge([ofRd], Hr); return; }
+        var C0 = cands(E.pe, st.a).filter(okC);   // میانِ حساب و بند (همان جمله)
+        if (!C0.length) C0 = cands(s0, E.pos).filter(okC);   // پیش از حساب در همان جمله
+        if (!C0.length && !st.w) {   // متنِ پیشینِ همین پیام: نزدیک‌ترین نتیجهٔ حسابِ خودش؛ وگرنه عددهای نزدیک‌ترین جملهٔ پیشین
+          var Pz = null; all.forEach(function (c) { if (c !== E && c.ok && resOf(c) && c.pe <= s0 && (!Pz || c.pe > Pz.pe)) Pz = c; });
+          var Pr0 = Pz ? resRd(Pz) : null; if (Pr0) { var pc = { rd: Pr0, v: Pr0[0], a: Pz.pos, w: "" }; if (okC(pc)) C0 = [pc]; } }
+        if (!C0.length && s0 > 0) { var q0 = s0 - 1, CP = []; while (q0 > 0 && !CP.length) { var s1 = sentA(q0); CP = cands(s1, q0).filter(okC); q0 = s1 - 1; } C0 = CP; }
+        if (!C0.length) C0 = stmt29(t, true).map(function (x) { var r = rdT(x.tk) || [x.v]; return { rd: r, v: r[0], a: x.a, w: x.w }; }).filter(okC);
+        if (!C0.length) { none("کلِ لازم یا موجود در متنش نیست"); return; }
+        judge(uniq(C0), Hr); return;
+      }
+      /* روایی (بی حساب در جمله) */
+      var pre = t.slice(s0, st.a), fc = /\d/.exec(pre);
+      if (fc && /(?:=|＝|میشه|می[‌\s]?شه|می[‌\s]?شود|(?:^|\s)شد)\s*\d/.test(pre.slice(fc.index + 1))) { none("حسابِ پیش از آن را صفحه نخواند — باقی/کم را صفحه نسنجید"); return; }   // «با سالنِ … میشه ۱۲ میلیون و ۱۵۰، یعنی ۱۵۰ هزار کم دارم»
+      var C1 = cands(s0, st.a);
+      /* C149: «آخ، ۴۵ − ۳۰ = ۱۵. پس فقط ۱۵ دقیقه بحث می‌مونه» — بی عددِ دیگر، همان نتیجهٔ حسابِ جملهٔ درست پیش از آن را بازمی‌گوید ⇒ یک گزاره با همان حساب؛ عددِ دیگر ⇒ نسنجیده (هرگز ✗) */
+      if (!C1.length && !ofRd && !st.zero) { var P0 = null; all.forEach(function (c) { if (c.pe <= s0 && c.ok && resOf(c) && (!P0 || c.pe > P0.pe)) P0 = c; });
+        var P0r = P0 && !/\d/.test(t.slice(P0.pe, s0)) ? resRd(P0) : null;
+        if (P0r && P0r.some(function (v) { return N.some(function (n) { return cmp(v, n) === 0; }); })) { judge([P0r], [F(Z)], function () { return P0.expr; }); return; } }
+      if (ofRd) { var oth = C1.filter(function (x) { return cmp(x.v, st.of) !== 0 && !(x.rd.length > 1 && cmp(x.rd[1], st.of) === 0); }); if (oth.length !== 1) { none("کلِ لازم یا موجود در جمله‌اش روشن نیست"); return; } judge([ofRd], oth[0].rd); return; }
+      if (C1.length === 1) {   // یک عدد + نتیجهٔ حسابِ خودش در جملهٔ درست پیش از آن (بی عددی میانشان)
+        var P = null; all.forEach(function (c) { if (c.pe <= s0 && resOf(c) && (!P || c.pe > P.pe)) P = c; });
+        if (P && !/\d/.test(t.slice(P.pe, s0))) { var Pr = resRd(P); if (Pr) { judge([C1[0].rd], Pr); return; } }
+        none("کلِ لازم یا موجود در جمله‌اش روشن نیست"); return; }
+      if (C1.length !== 2) { none("کلِ لازم یا موجود در جمله‌اش روشن نیست"); return; }
+      if (st.w && C1.some(function (x) { return x.w && x.w !== st.w && !x.prod; })) { none("واحدِ عددها با واحدِ بند یکی نیست — کدام کل است روشن نیست"); return; }   // «۶ متر خریدم … ۳ قواره درآمد و ۱۵ سانت اضافه ماند»
+      var nd = C1.map(function (x) { return NEED29.test(x.tail || ""); }), hvM = C1.map(function (x) { return HAVE29.test(x.tail || "") && !NEED29.test(x.tail || ""); }), big, small;
+      if (st.kd === "rem") { var hi = hvM[0] && !hvM[1] ? 0 : hvM[1] && !hvM[0] ? 1 : cmp(C1[0].v, C1[1].v) >= 0 ? 0 : 1; big = C1[hi]; small = C1[1 - hi]; }
+      else { var ni = nd[0] && !nd[1] ? 0 : nd[1] && !nd[0] ? 1 : -1;
+        if (ni < 0) { big = cmp(C1[0].v, C1[1].v) >= 0 ? C1[0] : C1[1]; small = big === C1[0] ? C1[1] : C1[0]; }
+        else if (st.kd === "short") { big = C1[ni]; small = C1[1 - ni]; } else { big = C1[1 - ni]; small = C1[ni]; } }
+      judge([big.rd], small.rd);
+    });
+  }
   /* دورِ ۲۹ (A29-3، s06 p9؛ C138): «نصفش (هم) میشه N»، «دو برابرش میشه N» — عملی روی نتیجهٔ حسابِ درستِ پیش از آن در همان جمله. عدد به ترتیبِ C102 خوانده می‌شود
      (نخست «M هزار»). حسابِ پیشینِ نادرست/نامعلوم یا بی حسابِ پیشین ⇒ «نسنجیده»، هرگز حدس */
   var OFW29 = [[/^(?:نصفش|نصفِ?\s*(?:اون|این)|نیمش)$/, 1, 2, "نصفِ"], [/^(?:ثلثش|یه\s*سومش|یک\s*سومش)$/, 1, 3, "یک‌سومِ"], [/^(?:ربعش|یه\s*چهارمش|یک\s*چهارمش)$/, 1, 4, "یک‌چهارمِ"],
@@ -63974,6 +64104,9 @@ APP.goFromURL = function (q) {
       T = T || tokens(t); var tk = T.filter(function (x) { return x.k === "n" && x.a === pn; })[0]; if (!tk || tk.pct) continue;
       var s0 = m.index; while (s0 > 0 && !/[.!?؟\n؛]/.test(t[s0 - 1])) s0--;
       var E = null; all.forEach(function (c) { if (c.pe <= m.index && c.pos >= s0 && !/\d/.test(t.slice(c.pe, m.index)) && (!E || c.pe > E.pe)) E = c; });
+      /* دورِ ۳۰ (C189، F2-005): «۸۴ متر پارچه، نصفش میشه ۴۲» — مقدارِ تنهای همان جمله (بیرون از هر حساب) هم مرجعِ «نصفش» است؛ دو مقدار یا بیشتر ⇒ نسنجیده (هرگز انتخاب) */
+      if (!E && !all.some(function (c) { return c.pe <= m.index && c.pos >= s0; })) { var Q9 = T.filter(function (x) { return x.k === "n" && x.a >= s0 && x.b <= m.index && !x.pct && !x.cst; });
+        if (Q9.length === 1) E = { ok: true, v29: iv(Q9[0].v), said: Q9[0].raw, saidT: pretty(t.slice(Q9[0].a, Q9[0].b)), kind: "qty30" }; }
       if (!E || !E.ok || E.ask || !E.v29 || !pt(E.v29) || E.kind === "remc") { U.push({ text: pretty(t.slice(m.index, tk.b)), why: "حسابی که «" + w + "» به آن برمی‌گردد " + (E ? "خودش روشن نیست" : "در همین جمله نیست"), pos: m.index, pe: tk.b, cut: m.index }); continue; }
       var tg = mul(E.v29.lo, F(B(f[1]), B(f[2]))), rd = [tk.alt, tk.v].filter(Boolean), hit = rd.filter(function (v) { return cmp(v, tg) === 0; })[0];
       if (!hit && tg.d !== ONE) { var tl = tolSaid(tk, false); hit = rd.filter(function (v) { return near(iv(tg), v, tl, false); })[0]; }
@@ -63986,7 +64119,7 @@ APP.goFromURL = function (q) {
     var out = [], un = [], U = [];
     try { chains(t, reg, out, note, CU, U); } catch (e) { console.warn(e); }
     try { units(t.replace(/＝/g, "="), un, note); } catch (e2) { console.warn(e2); }
-    try { remains29(t, out.concat(un), out, U); } catch (e4) { console.warn(e4); }
+    try { if (ST.arithRem29On) remains29(t, out.concat(un), out, U); else remains30(t, out.concat(un), out, U); } catch (e4) { console.warn(e4); }   // دورِ ۳۰: remains29 قرنطینه
     try { ofPrev29(t, out.concat(un), out, U); } catch (e5) { console.warn(e5); }
     /* خواننده‌ٔ واحد (تبدیل، جمعِ ناهم‌واحد) بر خوانشِ «فقط عدد» ِ همان سطر مقدم است */
     out = out.filter(function (c) { return !(c.uw && un.some(function (u) { return u.pos < c.pe && c.pos < u.pe; })); }).concat(un).sort(function (a, b) { return a.pos - b.pos; });

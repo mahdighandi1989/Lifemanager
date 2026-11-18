@@ -73,6 +73,63 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     for (const [t, re, mk, tag] of keep) { r = await AC(t); chk(clMark(r, re) === mk, 'C136 look-alike ' + tag + ' keeps «' + mk + '» :: ' + J(r)); }
   });
 
+  // ================= corpus — C178: CORPUS_R30_F2.json، هر ۷۹ ورودی =================
+  //  انتظارِ موتور برای هر ورودی از «expected» ِ خودِ آن (و حکم‌های C189–C192): [الگوی متنِ بند، نشان] یا یک بررسیِ دیگر.
+  //  OUT: بخشی از «expected» که کارِ موتورِ حساب نیست (دفترِ گام C8/C86، 🎯، تاریخ) — جدا گزارش می‌شود، هرگز بی‌صدا رد نمی‌شود.
+  //  KNOWN: ورودی‌ای که این دور برآورده نشد، با دلیل (همان در گزارشِ arith) — آزمون فقط «هرگز ✗» ِ آن را نگه می‌دارد.
+  await section('corpus', async () => {
+    const CORPUS = JSON.parse(fs.readFileSync(path.join(__dirname, 'variants', 'CORPUS_R30_F2.json'), 'utf8'));
+    const T = path.join(__dirname, 'fixtures', 'r30_arith', 'corpus_ctx.json'), CTXS = JSON.parse(fs.readFileSync(T, 'utf8'));   // پیامِ کاملِ هر ورودی از ai/pN.json ِ دونده (فقط خواندن)
+    const DAFTAR = '«سه تا دفتر داریم، هر کدوم ۴۰۰ تومن. روی هم چند تومن میشه؟» داداشم حساب کرد ۳ × ۴۰۰ = ۱۲۰۰.';
+    const PACKS = 'می‌خوایم بستهٔ تیله بخریم. فروشنده گفت ۱۲ درصد تخفیف میده. هر بسته ۱۲ تا تیله داره. ۵ تا بسته چند تا تیله میشه؟';
+    const PARTY = 'برای تولدِ ۶۰ سالگیِ مامانم یه مهمونی می‌گیرم؛ بودجه‌م ۱۲ میلیونه و می‌خوام ببینم برای کیک و گل پول می‌مونه یا نه.';
+    const remLine = (r) => r.lines.some(l => /(?:می‌مونه|میمونه|موند|ماند|کم دار|کم میا|اضافه میا)/.test(l));
+    const noBad = (r) => !r.lines.some(l => /^✗/.test(l));
+    const EXP = {
+      '001': [[/۶ × ۷ = ۴۲/, 'ok'], [/از ۵۰ تا ۷ تا می‌مونه/, 'bad']], '002': [[/۴٫۴۶ میلیون می‌مونه/, 'ok']], '003': [[/۴۲ × ۱۲۰/, 'ok'], [/۵۸۰ هزار کم دارم/, 'ok']],
+      '004': [[/۴۲ × ۰٫۵/, 'ok'], [/۸ متر اضافه میاد/, 'bad']], '005': [[/نصفش میشه ۴۲/, 'ok']], '006': [[/نصفش میشه ۲۰/, 'unread']],
+      '007': (r) => r.lines.length === 0, '008': [[/۱۲۶ ÷ ۴/, 'ok']], '009': [[/۸ تا کم دارم/, 'bad']], '010': [[/هیچی نمی‌مونه/, 'ok']], '011': [[/۴ تا هم برای فردا/, 'ok']],
+      '012': [[/۶ × ۷ = ۴۲/, 'ok'], [/از ۵۰ تا ۸ تا می‌مونه/, 'ok']], '013': [[/۱۸ − ۱۵ = ۳/, 'ok'], [/^۳ تا می‌مونه/, 'ok']],
+      '014': { stmt: DAFTAR, x: [[/۸ \+ ۶ = ۱۴/, 'ok'], [/۲ تا می‌مونه/, 'unread']] }, '015': [[/۲۵ ÷ ۴ = ۶، ۱ تا/, 'ok'], [/۲۹ ÷ ۴/, 'bad']], '016': [[/۲ تا کم میاد/, 'ok']],
+      '017': [[/از ۵۰ تا ۷ تا می‌مونه/, 'bad']], '018': { stmt: PACKS, x: [[/۵ × ۴ = ۲۰/, 'ok'], [/۸ تا اضافه میاد/, 'unread']] }, '019': [[/۶ تا کم دارم/, 'ok'], [/۶ تا کم میاد/, 'bad']],
+      '020': [[/۱۲ − ۱۲ = ۰/, 'ok'], [/هیچی نمی‌مونه/, 'ok'], [/۴ تا هم برای فردا/, 'ok']], '021': [[/۱۵ هزار تومن می‌مونه/, 'ok']], '022': [[/۷ تا می‌مونه/, 'bad']],
+      '023': [[/= ۵ میلیون و ۷۰۰/, 'ok'], [/۲ میلیون و ۳۰۰ می‌مونه/, 'ok']], '024': [[/۲ میلیون و ۵۰۰ کم دارم/, 'ok']], '025': [[/۷۵۰ هزار برام موند/, 'bad']],
+      '026': [[/۶ × ۷ = ۴۲/, 'ok'], [/از ۵۰ تا ۷ تا می‌مونه/, 'bad']], '027': [[/۱۲ بطری × ۱٫۵/, 'ok'], [/۸ لیتر اضافه میاد/, 'unread']], '028': [[/۲ کیلو × ۴۸۰/, 'ok'], [/نصفش میشه ۴۸۰/, 'ok']],
+      '029': [[/میشه ۱ میلیون و ۳۰۰/, 'unread']], '030': [[/۵۰ منهای ۴۲ میشه ۸/, 'ok'], [/۸ تا برش می‌مونه/, 'ok']], '031': [[/= ۱ میلیون و ۷۰۰/, 'ok'], [/۱۰۰ هزار کم دارم/, 'ok']],
+      '032': [[/هیچی نمی‌مونه/, 'ok'], [/۴ تا هم برای فردا/, 'ok']], '033': [[/۳ کیلو کم دارم/, 'bad']],
+      '034': { stmt: PARTY, known: 'C27-22 guard: «با سالنِ ۲ میلیون و ۷۰۰ میشه ۱۲ میلیون و ۱۵۰» (ezafe label after «با», across «.») is not read by the chain reader, so the shortage is «؟ نسنجیده», never ✗', x: (r) => noBad(r) && /^unread/.test(clMark(r, /۱۵۰ هزار کم دارم/)) },
+      '035': [[/۵۰ ÷ ۴/, 'ok'], [/۲۳ ÷ ۵/, 'bad']], '036': [[/۴ تا کم میاد/, 'ok']], '037': [[/۲ میلیون و ۸۵۰/, 'bad']], '038': [[/۱ میلیون و ۲۰۰ \+/, 'bad'], [/۵۷۰ هزار کم میارم/, 'ok']],
+      '039': [[/هزینه‌ها میشه/, 'ok'], [/۸ میلیون منهای ۶ میلیون و ۶۰۰/, 'ok']], '040': [[/۶ × ۷ = ۴۲/, 'ok'], [/۷ تا می‌مونه/, 'bad']],
+      '041': (r) => clMark(r, /نصفش میشه ۱۲۰۰/) === 'ok' && !remLine(r) && !r.lines.some(l => /m = 10|۳۷٪/.test(l)), '042': { out: 'C8/C86: her fix of the previous turn\'s ✗ is the ledger/correction path (prior, correction)', x: [[/۸ تا می‌مونه/, 'unread']] },
+      '043': [[/۴ × ۲۵۰/, 'ok'], [/۸ گیگ اضافه میاد/, 'unread']], '044': [[/۶۰۰ کم دارم/, 'ok']], '045': [[/۵۰۰ می‌مونه/, 'bad']], '046': [[/هیچی نمی‌مونه/, 'ok'], [/۴ تا هم برای فردا/, 'ok']],
+      '047': [[/۴۰۰ می‌مونه/, 'unread']], '048': [[/نصفش هم میشه ۳۰۰/, 'unread']], '049': [[/۵ میلیون و ۴۰۰ −/, 'ok'], [/نصفش هم میشه/, 'bad']],
+      '050': [[/۷ × ۲ = ۱۴/, 'ok'], [/۱ لیتر کم میاد/, 'ok'], [/۱۱ \+ ۱۱ = ۲۲/, 'ok'], [/۸ لیتر اضافه میاد/, 'bad']],
+      '051': { out: 'C8/C86: her fix «آره ۷ لیتر اضافه میاد» of the previous turn\'s ✗ is the ledger/correction path (prior, correction)', x: [[/۷ لیتر اضافه میاد/, 'unread']] },
+      '052': [[/۳ × ۳ = ۹/, 'ok'], [/یکی می‌مونه/, 'ok'], [/۱۲ ÷ ۵/, 'bad']], '053': [[/۱۲۰ ÷ ۸ = ۱۵/, 'ok'], [/هیچی نمی‌مونه/, 'ok'], [/۸۰ ÷ ۸/, 'bad']],
+      '054': [[/۶ و ۶ و ۶/, 'ok'], [/هیچی نمی‌مونه/, 'ok'], [/۴ و ۴ و ۴ و ۴/, 'ok'], [/۳ تا کم میاد/, 'bad']], '055': [[/۴۸ − ۳۰ = ۱۸/, 'ok'], [/۵ و ۵ و ۵/, 'ok'], [/۳ تا می‌مونه/, 'ok']],
+      '056': [[/۱۲ تقسیم بر ۴/, 'ok'], [/هیچی نمی‌مونه/, 'ok']], '057': [[/۲۴ ÷ ۵/, 'ok'], [/۱۹ ÷ ۳/, 'bad']], '058': [[/۳ × ۴ = ۱۲/, 'ok'], [/۱۴ ÷ ۴/, 'ok'], [/۱۴ − ۱۲ = ۳/, 'bad']],
+      '059': [[/۶ × ۵ = ۳۰/, 'ok'], [/۴۵ − ۳۰ = ۲۵/, 'bad']], '060': [[/۴۵ − ۳۰ = ۱۵/, 'ok'], [/۱۵ دقیقه بحث می‌مونه/, 'ok']], '061': [[/۴۵ − ۴۰ = ۵/, 'ok'], [/۴۵ − ۲۸ = ۱۸/, 'bad']],
+      '062': [[/۶۰ − ۱۸ − ۱۲/, 'ok']], '063': [[/۴ میلیون و ۲۰۰ − ۲۰۰/, 'ok']], '064': [[/^۶ تا می‌مونه/, 'ok'], [/۳ تا می‌مونه/, 'unread']],   // C191
+      '065': [[/۲۵ ÷ ۴/, 'ok'], [/۲۶ ÷ ۴/, 'bad']], '066': [[/۴ تا کم میاد/, 'ok'], [/۶ تا کم میاد/, 'bad']], '067': [[/۱۸٫۷ \+ ۳/, 'bad'], [/۴ میلیون و ۷۰۰ کم دارم/, 'ok']],
+      '068': [[/۵۰۰ − ۳۵۰ = ۱۶۰/, 'bad']], '069': [[/۱۸۰ − ۶۰ − ۲۲.۵/, 'ok']], '070': (r) => clMark(r, /۱۱۵ − ۷۰ = ۴۵/) === 'ok' && !remLine(r),
+      '071': (r) => clMark(r, /۱۰۰ منهای ۹۴/) === 'ok' && !remLine(r) && noBad(r),   // C192
+      '072': (r) => r.lines.length === 0, '073': (r) => r.lines.length === 0, '074': (r) => r.lines.length === 0, '075': (r) => !remLine(r) && noBad(r),
+      '076': { out: 'the 🎯 itself is forecast\'s (C90/C152)', x: (r) => !remLine(r) && noBad(r) }, '077': { out: 'the C120 question is forecast\'s', x: (r) => r.lines.length === 0 },
+      '078': { out: 'settling the 🎯 is forecast\'s (C91)', x: (r) => noBad(r) }, '079': (r) => noBad(r) && !remLine(r),
+    };
+    let pass = 0; const known = [], outs = [];
+    for (const e of CORPUS) {
+      const k = e.id.replace(/^F2-/, ''), X = EXP[k]; if (!X) { chk(false, 'corpus ' + e.id + ': no expectation encoded'); continue; }
+      const spec = Array.isArray(X) || typeof X === 'function' ? { x: X } : X;
+      await CTX(spec.stmt ? { stmt: spec.stmt } : {});
+      const r = await AC(e.sentence, CTXS[e.id] || '');
+      const ok = typeof spec.x === 'function' ? spec.x(r) : spec.x.every(([re, mk]) => clMark(r, re) === mk);
+      chk(ok, 'corpus ' + e.id + ' (' + e.src + ') «' + e.sentence.slice(0, 90) + '» expected: ' + String(e.expected).slice(0, 160) + ' :: ' + J(r));
+      if (ok) pass++; if (spec.known) known.push(e.id + ': ' + spec.known); if (spec.out) outs.push(e.id + ': ' + spec.out);
+    }
+    info.corpus = pass + '/' + CORPUS.length; info.known = known; info.outOfEngine = outs;
+  });
+
   console.log('info: ' + JSON.stringify(info));
   if (errors.length) { console.log('ERRORS (' + errors.length + '):\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
   await b.close();

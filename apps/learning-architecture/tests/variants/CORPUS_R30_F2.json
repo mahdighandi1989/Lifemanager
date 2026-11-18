@@ -1,0 +1,1108 @@
+[
+ {
+  "id": "F2-001",
+  "family": "F2",
+  "src": "round30D/tD3 p1 (s2, opening, prior)",
+  "context": "Opening message with five numbered steps; no earlier record.",
+  "sentence": "گام ۳: دکمه: ۶ × ۷ = ۴۲ دکمه برای ۶ تا روپوشِ اول، از ۵۰ تا ۷ تا می‌مونه.",
+  "expected": "Two statements (C85/C109): «۶ × ۷ = ۴۲» ✓; remainder clause read against the 50 in the same sentence: 50 − 42 = 8 ⇒ ✗ beside «از ۵۰ تا ۷ تا می‌مونه» (the ✗ does not reveal 8, C29). Ledger step 3 carries ✗; never a sentence-wide ✓.",
+  "ruling": [
+   "C85",
+   "C108",
+   "C109",
+   "C141",
+   "C180",
+   "C138",
+   "C29"
+  ],
+  "verdict_in_round30": "held (step 3 ✗, findings tD3 p1)"
+ },
+ {
+  "id": "F2-002",
+  "family": "F2",
+  "src": "round30D/tD3 p1 (s2)",
+  "context": "Same opening; step 4 is in the same message.",
+  "sentence": "گام ۴: ۲۰ میلیون دارم، ۲۰ − ۱۵٫۵۴ = ۴٫۴۶ میلیون می‌مونه برای نخ و دستمزد.",
+  "expected": "«۲۰ − ۱۵٫۵۴ = ۴٫۴۶» ✓ (exact 4.46); the trailing «می‌مونه» restates the result, no second claim, one 📜 line (C149).",
+  "ruling": [
+   "C141",
+   "C149"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F2-003",
+  "family": "F2",
+  "src": "round30D/tD3 p1 (s2)",
+  "context": "Same opening; step 4 says «۴٫۴۶ میلیون می‌مونه برای نخ و دستمزد» in the same message.",
+  "sentence": "گام ۵: دستمزدِ هر روپوش ۱۲۰ هزار، ۴۲ × ۱۲۰ = ۵۰۴۰ هزار، پس ۵۸۰ هزار کم دارم.",
+  "expected": "«۴۲ × ۱۲۰ = ۵۰۴۰» ✓; «۵۸۰ هزار کم دارم» read against need 5,040 هزار and have 4,460 هزار (both in her same message): 5,040 − 4,460 = 580 ⇒ ✓.",
+  "ruling": [
+   "C141",
+   "C156",
+   "C180"
+  ],
+  "verdict_in_round30": "held"
+ },
+ {
+  "id": "F2-004",
+  "family": "F2",
+  "src": "round30D/tD3 p3 (s4)",
+  "context": "Live problem «روپوش‌های مدرسه». No earlier total for the lining.",
+  "sentence": "آستر: ۴۲ × ۰٫۵ = ۲۱ متر لازمه؛ رولِ آستر ۳۰ متره، پس ۸ متر اضافه میاد.",
+  "expected": "«۴۲ × ۰٫۵ = ۲۱» ✓; «۸ متر اضافه میاد» read against have 30 and need 21 in the same sentence: 30 − 21 = 9 ⇒ ✗. Not «نسنجیده» (both numbers are in the sentence).",
+  "ruling": [
+   "C141",
+   "C180",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (D30-5: «نسنجیده»)"
+ },
+ {
+  "id": "F2-005",
+  "family": "F2",
+  "src": "round30D/tD3 p3 (s4)",
+  "context": "Same message; «۸۴ متر پارچه» is the immediately preceding quantity, not an equation result.",
+  "sentence": "۸۴ متر پارچه، نصفش میشه ۴۲ متر که این هفته می‌خرم.",
+  "expected": null,
+  "ruling": [
+   "C157",
+   "C138"
+  ],
+  "verdict_in_round30": "unknown (coach said correct)",
+  "needs_ruling": "C157 reads «نصفش» only when its antecedent is «the immediately preceding RESULT in the same message». Here the antecedent is a stated quantity («۸۴ متر پارچه»), not a computed result. Read (84/2 = 42 ✓) or «؟ نسنجیده»? Either way never a sentence-wide ✓ and never glued to the remainder clause."
+ },
+ {
+  "id": "F2-006",
+  "family": "F2",
+  "src": "round30D/tD3 p4 (s5)",
+  "context": "Same problem; previous message ended with «نصفش میشه ۴۲ متر».",
+  "sentence": "نصفش میشه ۲۰ تا که با چرخِ دوم می‌دوزم.",
+  "expected": "No antecedent result in this message ⇒ «؟ نسنجیده» beside the clause (C157). Never ✓/✗, never silent.",
+  "ruling": [
+   "C157",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (D30-5: no «؟ نسنجیده»)"
+ },
+ {
+  "id": "F2-007",
+  "family": "F2",
+  "src": "round30D/tD3 p4 (s5)",
+  "context": "Same message as above.",
+  "sentence": "سایزها: s = 12، m = 10، l = 20 تا. پارسال یعنی ۳۷٪ مشتری‌ها دوباره سفارش دادن. فروشنده گفت ماهِ بعد پارچه ۱۲٪ گرون میشه.",
+  "expected": "NEGATIVE look-alike for the remainder reader: no remainder/need-have clause ⇒ no remainder line. «m = 10» is a definition (no ✓/✗); «۳۷٪» and «۱۲٪ گرون میشه» are data (C148/C169; source «فروشنده» per C96/C125).",
+  "ruling": [
+   "C136",
+   "C148",
+   "C169",
+   "C96"
+  ],
+  "verdict_in_round30": "held (N4 look-alikes without «نسنجیده»)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-008",
+  "family": "F2",
+  "src": "round30D/tD3 p6 (s7)",
+  "context": "Six lines her brother wrote; another person is the doer.",
+  "sentence": "۱۲۶ ÷ ۴ = ۳۱ و ۲ تا می‌مونه",
+  "expected": "«کارِ دیگری — از زبانِ [برادر]» (C57/C125). Checked as a division with remainder: 126 = 4 × 31 + 2 ⇒ ✓ (the remainder clause is part of the division statement, judged with its own operands).",
+  "ruling": [
+   "C57",
+   "C125",
+   "C141",
+   "C108"
+  ],
+  "verdict_in_round30": "held (T29 PASS)"
+ },
+ {
+  "id": "F2-009",
+  "family": "F2",
+  "src": "round30D/tD3 p7 (s9)",
+  "context": "Order of 42 gowns (recorded statement). Same sentence: «تا امروز ۳۵ تا روپوش برش زدم».",
+  "sentence": "تا امروز ۳۵ تا روپوش برش زدم، از ۴۲ تا ۸ تا کم دارم.",
+  "expected": "Need/have both in the sentence: 42 − 35 = 7 ⇒ ✗ beside «۸ تا کم دارم». Never filed as «داده» without a mark.",
+  "ruling": [
+   "C141",
+   "C156",
+   "C180",
+   "C149"
+  ],
+  "verdict_in_round30": "failed (D30-5: filed «داده» with no mark)"
+ },
+ {
+  "id": "F2-010",
+  "family": "F2",
+  "src": "round30D/tD3 p7 (s9)",
+  "context": "Same message.",
+  "sentence": "دکمه: ۶۰ تا خریدم، ۶۰ تا لازمه، هیچی نمی‌مونه.",
+  "expected": "«هیچی نمی‌مونه» = remainder 0 read against have 60 and need 60 in the same sentence ⇒ ✓ (60 − 60 = 0). A 📜 line with its own mark; never silent.",
+  "ruling": [
+   "C141",
+   "C108",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (D30-5: silent)"
+ },
+ {
+  "id": "F2-011",
+  "family": "F2",
+  "src": "round30D/tD3 p7 (s9)",
+  "context": "Same message.",
+  "sentence": "امروز ۱۰ تا از ۱۴ تا یقه رو دوختم، ۴ تا هم برای فردا می‌مونه.",
+  "expected": "Remainder clause: 14 − 10 = 4 ⇒ ✓ with its own mark. «برای فردا» here is part of a remainder, NOT a plan: no date ask (C19/C147).",
+  "ruling": [
+   "C141",
+   "C108",
+   "C147"
+  ],
+  "verdict_in_round30": "failed (D30-5: silent)"
+ },
+ {
+  "id": "F2-012",
+  "family": "F2",
+  "src": "round30D/tD3 p10 (s21)",
+  "context": "Ledger step 3 currently ✗ («از ۵۰ تا ۷ تا می‌مونه»).",
+  "sentence": "برگردیم به روپوش‌ها. گامِ ۳ رو درست کنم: ۶ × ۷ = ۴۲، پس از ۵۰ تا ۸ تا می‌مونه.",
+  "expected": "Her fix of step 3 is applied (page check agrees, C8): step 3 now ✓ (6 × 7 = 42; 50 − 42 = 8); the old ✗ moves to that step's history (C86). The step stores only the computation, not the lead-in «برگردیم … درست کنم».",
+  "ruling": [
+   "C8",
+   "C86",
+   "C141"
+  ],
+  "verdict_in_round30": "held for the mark (step text stored whole: D30-2, F17)"
+ },
+ {
+  "id": "F2-013",
+  "family": "F2",
+  "src": "round30C/aC1 p21",
+  "context": "Child scenario; no recorded total for marbles in the statement.",
+  "sentence": "سلام! امروز با تیله‌ها بازی کردیم. ۱۸ تا تیله داشتیم، ۱۵ تا دادیم به دوستم: ۱۸ − ۱۵ = ۳، ۳ تا می‌مونه.",
+  "expected": "Two statements, both ✓: «۱۸ − ۱۵ = ۳» and «۳ تا می‌مونه» (18 − 15 = 3). Never «۱۵ − ۳».",
+  "ruling": [
+   "C141",
+   "C85",
+   "C109"
+  ],
+  "verdict_in_round30": "held (r29 S1 FIXED)"
+ },
+ {
+  "id": "F2-014",
+  "family": "F2",
+  "src": "round30C/aC1 p22",
+  "context": "Several turns earlier the brother's «۳ × ۴۰۰ = ۱۲۰۰» was recorded as «کارِ دیگری»; the live problem's statement holds no total for this clause.",
+  "sentence": "بعدش ۸ + ۶ = ۱۴ و ۲ تا می‌مونه برای داداشم.",
+  "expected": "NEGATIVE look-alike (named in C180): «۸ + ۶ = ۱۴» ✓; «۲ تا می‌مونه» has no total in the sentence or in the live statement ⇒ «؟ نسنجیده» in 📜 and to the coach. Never ✗, never «۱۲۰۰ − ۱۴».",
+  "ruling": [
+   "C180",
+   "C85",
+   "C109",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (C30-7 S1: coach told ✗ «۱۲۰۰ − ۱۴ … ۱۱۸۶»)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-015",
+  "family": "F2",
+  "src": "round30C/aC1 p23",
+  "context": "Same child; the totals are in the sentence.",
+  "sentence": "۲۵ تا تیله رو بین ۴ نفر پخش کردیم: ۲۵ ÷ ۴ = ۶، ۱ تا می‌مونه. ۲۹ تا رو هم بین ۴ نفر: ۲۹ ÷ ۴ = ۶، ۳ تا می‌مونه.",
+  "expected": "First: division with remainder 25 = 4 × 6 + 1 ⇒ ✓ (no C25 rounding question when the remainder is stated). Second: 29 = 4 × 7 + 1; «۶، ۳ تا می‌مونه» ⇒ 4 × 6 + 3 = 27 ≠ 29 ⇒ ✗ (the ✗ does not reveal 7 r 1).",
+  "ruling": [
+   "C141",
+   "C108",
+   "C25",
+   "C29"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-016",
+  "family": "F2",
+  "src": "round30C/aC1 p24",
+  "context": "Totals in the sentence.",
+  "sentence": "اگه بخوایم به ۴ نفر نفری ۸ تا بدیم، ۴ × ۸ = ۳۲، ولی ۳۰ تا داریم، ۲ تا کم میاد.",
+  "expected": "«۴ × ۸ = ۳۲» ✓; «۲ تا کم میاد» read against need 32, have 30: 32 − 30 = 2 ⇒ ✓.",
+  "ruling": [
+   "C141",
+   "C180"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-017",
+  "family": "F2",
+  "src": "round30C/aC1 p32",
+  "context": "New day; total 50 in the sentence.",
+  "sentence": "سلام! امروز ۶ تا بسته شکلات خریدیم، هر بسته ۷ تا: ۶ × ۷ = ۴۲، از ۵۰ تا ۷ تا می‌مونه.",
+  "expected": "Positive of C180: «۶ × ۷ = ۴۲» ✓; «از ۵۰ تا ۷ تا می‌مونه» ✗ (exact 8, not revealed).",
+  "ruling": [
+   "C180",
+   "C141",
+   "C29"
+  ],
+  "verdict_in_round30": "held (coach line ✗ without the number)"
+ },
+ {
+  "id": "F2-018",
+  "family": "F2",
+  "src": "round30C/aC1 p33",
+  "context": "Earlier in the conversation «۱۲» appears in marble packs; the live statement holds no need/have for this clause.",
+  "sentence": "۵ تا جعبه آب‌نبات داریم، هر کدوم ۴ تا: ۵ × ۴ = ۲۰ تا، پس ۸ تا اضافه میاد.",
+  "expected": "NEGATIVE look-alike (named in C180): «۵ × ۴ = ۲۰» ✓; «۸ تا اضافه میاد» ⇒ «؟ نسنجیده» (no need in the sentence or the statement). Never ✓ «۲۰ − ۱۲ = ۸».",
+  "ruling": [
+   "C180",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (C30-7 S1: ✓ «۲۰ − ۱۲ = ۸» in 📜 and coach)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-019",
+  "family": "F2",
+  "src": "round30C/aC1 p37",
+  "context": "Totals in the sentence.",
+  "sentence": "۲۰ تا تیله لازمه، ۱۴ تا دارم، ۶ تا کم دارم. برای مسابقه هم ۳۰ تا لازمه، ۲۵ تا داریم، ۶ تا کم میاد.",
+  "expected": "Clause 1: 20 − 14 = 6 ⇒ ✓ (own 📜 line). Clause 2: 30 − 25 = 5 ⇒ ✗ beside «۶ تا کم میاد». One mark per clause.",
+  "ruling": [
+   "C141",
+   "C138",
+   "C149"
+  ],
+  "verdict_in_round30": "failed (C30-8: «۶ تا کم دارم» no line)"
+ },
+ {
+  "id": "F2-020",
+  "family": "F2",
+  "src": "round30C/aC1 p38",
+  "context": "Totals in the sentence.",
+  "sentence": "۱۲ تا کیک داشتیم، ۱۲ تا رو خوردیم: ۱۲ − ۱۲ = ۰، هیچی نمی‌مونه. ۱۴ تا شکلات هم داشتیم، ۱۰ تا رو امروز خوردیم، ۴ تا هم برای فردا می‌مونه.",
+  "expected": "«۱۲ − ۱۲ = ۰» ✓ and «هیچی نمی‌مونه» ✓ (0); «۴ تا هم برای فردا می‌مونه» ✓ (14 − 10 = 4) with its own mark — never a sentence-wide ✓ over an unread clause. «برای فردا» is not a plan (no date ask).",
+  "ruling": [
+   "C141",
+   "C138",
+   "C147"
+  ],
+  "verdict_in_round30": "failed (C30-8: «۴ تا … برای فردا» under a sentence-wide ✓)"
+ },
+ {
+  "id": "F2-021",
+  "family": "F2",
+  "src": "round30C/aC1 p39",
+  "context": "Money remainder, all numbers in the sentence.",
+  "sentence": "۵۰ هزار تومن پول توجیبی داشتم، ۳۵ هزار تومن دادم کتاب، ۱۵ هزار تومن می‌مونه.",
+  "expected": "50 هزار − 35 هزار = 15 هزار ⇒ ✓ (scale «هزار» and «تومن» consistent, C15).",
+  "ruling": [
+   "C141",
+   "C15",
+   "C180"
+  ],
+  "verdict_in_round30": "failed (C30-8: «نسنجیده»)"
+ },
+ {
+  "id": "F2-022",
+  "family": "F2",
+  "src": "round30C/s29 p17",
+  "context": "Pond problem; total 50 in the sentence.",
+  "sentence": "برای لبهٔ حوض: ۶ × ۷ = ۴۲ آجر، از ۵۰ تا آجر ۷ تا می‌مونه.",
+  "expected": "«۶ × ۷ = ۴۲» ✓; «۷ تا می‌مونه» ✗ (exact 8).",
+  "ruling": [
+   "C141",
+   "C180"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-023",
+  "family": "F2",
+  "src": "round30C/aC3 p47",
+  "context": "Chat-only record; total 8 M and the spend are in the same message.",
+  "sentence": "سلام. اسباب‌کشیِ پسرم: کامیون ۴ میلیون و ۲۰۰ + کارگر ۱ میلیون و ۵۰۰ = ۵ میلیون و ۷۰۰. از ۸ میلیونی که کنار گذاشتم، ۲ میلیون و ۳۰۰ می‌مونه.",
+  "expected": "Sum ✓ under the thousands reading (C102); «۲ میلیون و ۳۰۰ می‌مونه» read against 8 M (same sentence) and the preceding result 5 M 700 (same message): 8,000 − 5,700 = 2,300 هزار ⇒ ✓.",
+  "ruling": [
+   "C102",
+   "C141",
+   "C180"
+  ],
+  "verdict_in_round30": "failed (C30-8: «نسنجیده»)"
+ },
+ {
+  "id": "F2-024",
+  "family": "F2",
+  "src": "round30C/aC3 p53",
+  "context": "Money need/have in the sentence.",
+  "sentence": "برای یخچال ۱۸ میلیون لازمه، ۱۵ میلیون و ۵۰۰ دارم، ۲ میلیون و ۵۰۰ کم دارم.",
+  "expected": "18,000 − 15,500 = 2,500 هزار ⇒ ✓ (thousands reading, C102/C154).",
+  "ruling": [
+   "C141",
+   "C102",
+   "C154"
+  ],
+  "verdict_in_round30": "failed (C30-13: no line)"
+ },
+ {
+  "id": "F2-025",
+  "family": "F2",
+  "src": "round30C/aC3 p53",
+  "context": "Same message.",
+  "sentence": "از ۲ میلیون هم ۱ میلیون و ۳۵۰ دادم بازار، ۷۵۰ هزار برام موند.",
+  "expected": "Past-tense money remainder «برام موند»: 2,000 − 1,350 = 650 هزار ⇒ ✗ beside «۷۵۰ هزار برام موند» (no number revealed). Never silent.",
+  "ruling": [
+   "C141",
+   "C102",
+   "C29"
+  ],
+  "verdict_in_round30": "failed (C30-13: silent)"
+ },
+ {
+  "id": "F2-026",
+  "family": "F2",
+  "src": "round30B/nB3 p2",
+  "context": "Party budget; ledger step 4 fixed in this message.",
+  "sentence": "کیک: ۶ میز، هر میز ۷ برش، ۶ × ۷ = ۴۲ تا برش؛ کیک ۵۰ برش داره، پس از ۵۰ تا ۷ تا می‌مونه.",
+  "expected": "«۶ × ۷ = ۴۲» ✓; remainder against 50 in the sentence: 50 − 42 = 8 ⇒ ✗. Never «۵۰ − ۵۰».",
+  "ruling": [
+   "C141",
+   "C180",
+   "C29"
+  ],
+  "verdict_in_round30": "failed (B30·D10: coach told «۵۰ − ۵۰ … ۰»)"
+ },
+ {
+  "id": "F2-027",
+  "family": "F2",
+  "src": "round30B/nB3 p2",
+  "context": "Same message; no need for drinks is stated anywhere.",
+  "sentence": "نوشابه: ۱۲ بطری × ۱٫۵ لیتر = ۱۸ لیتر، پس ۸ لیتر اضافه میاد.",
+  "expected": "«۱۲ × ۱٫۵ = ۱۸» ✓; «۸ لیتر اضافه میاد» has no need in the sentence or statement ⇒ «؟ نسنجیده».",
+  "ruling": [
+   "C180",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (B30·D10: no mark)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-028",
+  "family": "F2",
+  "src": "round30B/nB3 p2",
+  "context": "Same message; «۹۶۰ هزار» is the immediately preceding result.",
+  "sentence": "شیرینی ۲ کیلو × ۴۸۰ هزار = ۹۶۰ هزار، نصفش میشه ۴۸۰ هزار که خاله‌م میده.",
+  "expected": "«۲ × ۴۸۰ هزار = ۹۶۰ هزار» ✓; «نصفش میشه ۴۸۰ هزار» read (antecedent = preceding result) ⇒ ✓.",
+  "ruling": [
+   "C157",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (B30·D10: no line)"
+ },
+ {
+  "id": "F2-029",
+  "family": "F2",
+  "src": "round30B/nB3 p2",
+  "context": "Same message; «نصفش» follows the shirini result, not the hall.",
+  "sentence": "سالن هم گفتن نصفش رو الان بدین، میشه ۱ میلیون و ۳۰۰.",
+  "expected": "Antecedent is not the immediately preceding result ⇒ «؟ نسنجیده» beside the clause. Never silent, never ✓.",
+  "ruling": [
+   "C157",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (B30·D10: no line)"
+ },
+ {
+  "id": "F2-030",
+  "family": "F2",
+  "src": "round30B/nB3 p6",
+  "context": "Recorded: step 4 now «۱ میلیون و ۶۰۰» left for cake and flowers.",
+  "sentence": "آره، ۵۰ منهای ۴۲ میشه ۸، پس ۸ تا برش می‌مونه.",
+  "expected": "«۵۰ منهای ۴۲ میشه ۸» ✓ and «۸ تا برش می‌مونه» ✓ (two statements, C141). Her fix replaces the ✗ of the slices clause (C86).",
+  "ruling": [
+   "C141",
+   "C86"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-031",
+  "family": "F2",
+  "src": "round30B/nB3 p6",
+  "context": "Same message; «۱ میلیون و ۷۰۰» is the preceding result, «۱ میلیون و ۶۰۰» the money left (her text).",
+  "sentence": "کیک ۱ میلیون و ۱۰۰، گل ۶۰۰ هزار؛ ۱ میلیون و ۱۰۰ + ۶۰۰ هزار = ۱ میلیون و ۷۰۰. از ۱ میلیون و ۶۰۰، ۱۰۰ هزار کم دارم.",
+  "expected": "Sum ✓ (1,100 + 600 = 1,700 هزار); «۱۰۰ هزار کم دارم» read against need 1,700 and have 1,600 (both in her message): 1,700 − 1,600 = 100 ⇒ ✓.",
+  "ruling": [
+   "C141",
+   "C102",
+   "C154"
+  ],
+  "verdict_in_round30": "failed (B30·D11: unread)"
+ },
+ {
+  "id": "F2-032",
+  "family": "F2",
+  "src": "round30B/nB3 p7",
+  "context": "Totals in each clause.",
+  "sentence": "۳۰ تا ظرفِ یه‌بار مصرف خریدم و هر ۳۰ تا رو چیدیم، هیچی نمی‌مونه. ۱۰ تا فشفشه داشتیم، ۶ تا رو برای کیک گذاشتیم، ۴ تا هم برای فردا می‌مونه.",
+  "expected": "«هیچی نمی‌مونه» ✓ (30 − 30 = 0); «۴ تا هم برای فردا می‌مونه» ✓ (10 − 6 = 4), each its own mark; neither filed «داده»; «برای فردا» books nothing.",
+  "ruling": [
+   "C141",
+   "C138",
+   "C149",
+   "C147"
+  ],
+  "verdict_in_round30": "failed (B30·D11)"
+ },
+ {
+  "id": "F2-033",
+  "family": "F2",
+  "src": "round30B/nB3 p7",
+  "context": "Same message.",
+  "sentence": "میوه ۵ کیلو لازمه و ۳ کیلو داریم، پس ۳ کیلو کم دارم.",
+  "expected": "5 − 3 = 2 ⇒ ✗ beside «۳ کیلو کم دارم»; never «داده».",
+  "ruling": [
+   "C141",
+   "C149"
+  ],
+  "verdict_in_round30": "failed (B30·D11: «داده», no ✗)"
+ },
+ {
+  "id": "F2-034",
+  "family": "F2",
+  "src": "round30B/nB3 p19",
+  "context": "Recorded statement: «بودجه‌م ۱۲ میلیونه». Guests back to 27, food 350 هزار, hall 2 M 700.",
+  "sentence": "برگردیم به مهمونی: با ۲۷ نفر و نفری ۳۵۰ هزار، ۲۷ × ۳۵۰ هزار = ۹ میلیون و ۴۵۰. با سالنِ ۲ میلیون و ۷۰۰ میشه ۱۲ میلیون و ۱۵۰، یعنی ۱۵۰ هزار کم دارم.",
+  "expected": "«۲۷ × ۳۵۰ هزار = ۹ میلیون و ۴۵۰» ✓ (9,450 هزار); «… میشه ۱۲ میلیون و ۱۵۰» ✓ (9,450 + 2,700); «۱۵۰ هزار کم دارم» read against the recorded budget 12 M (C156): 12,150 − 12,000 = 150 ⇒ ✓.",
+  "ruling": [
+   "C156",
+   "C180",
+   "C141",
+   "C157"
+  ],
+  "verdict_in_round30": "failed (B30·D11: «نسنجیده»)"
+ },
+ {
+  "id": "F2-035",
+  "family": "F2",
+  "src": "round30B/nB2 p4 (=round29B/nB2 p4)",
+  "context": "Moving-house budget; totals in each clause.",
+  "sentence": "۵۰ تا لیوان رو ۴ تا ۴ تا بسته‌بندی کردم: ۵۰ ÷ ۴ = ۱۲ بسته و ۲ تا می‌مونه. ۲۳ تا بشقاب رو ۵ تا ۵ تا: ۲۳ ÷ ۵ = ۴ بسته و ۲ تا می‌مونه.",
+  "expected": "50 = 4 × 12 + 2 ⇒ ✓; 23 = 5 × 4 + 3 ⇒ «۴ بسته و ۲ تا» ✗ (exact remainder 3, not revealed).",
+  "ruling": [
+   "C141",
+   "C108",
+   "C29"
+  ],
+  "verdict_in_round30": "held (findings nB2: ✓ / ✗)"
+ },
+ {
+  "id": "F2-036",
+  "family": "F2",
+  "src": "round30B/nB2 p4",
+  "context": "Same message.",
+  "sentence": "۳۰ تا کارتن لازمه و ۲۶ تا پُرشون کردیم، پس ۴ تا کم میاد.",
+  "expected": "30 − 26 = 4 ⇒ ✓ with its own 📜 line and mark (not only inside the «کارِ تو در گفت‌وگو» umbrella).",
+  "ruling": [
+   "C141",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (B29·D10 still: ✓ to the coach, no 📜 line)"
+ },
+ {
+  "id": "F2-037",
+  "family": "F2",
+  "src": "round29B/nB2 p1 (also round30B/nB2 p1)",
+  "context": "Opening with steps.",
+  "sentence": "بودجه‌م ۸ میلیونه، پس ۸ میلیون منهای ۶ میلیون و ۱۵۰ = ۲ میلیون و ۸۵۰ برای رنگ می‌مونه.",
+  "expected": "8,000 − 6,150 = 1,850 هزار ⇒ ✗ (thousands reading; units reading 7,993,850 does not give it either ⇒ ✗ with C103 naming).",
+  "ruling": [
+   "C102",
+   "C103",
+   "C141"
+  ],
+  "verdict_in_round30": "held (coach ✗)"
+ },
+ {
+  "id": "F2-038",
+  "family": "F2",
+  "src": "round29B/nB2 p3",
+  "context": "Her money left is «۱ میلیون و ۸۵۰» (her fixed step 4); need is the sum in the same message.",
+  "sentence": "روی هم ۱ میلیون و ۲۰۰ + ۱ میلیون و ۱۲۰ = ۲ میلیون و ۴۲۰. یعنی ۲ میلیون و ۴۲۰ منهای ۱ میلیون و ۸۵۰ = ۵۷۰ هزار کم میارم.",
+  "expected": "«۱ میلیون و ۲۰۰ + ۱ میلیون و ۱۲۰ = ۲ میلیون و ۴۲۰» ✗ (exact 2,320 هزار). The subtraction «۲ میلیون و ۴۲۰ منهای ۱ میلیون و ۸۵۰ = ۵۷۰ هزار» is its own statement with her own operands (C108) ⇒ ✓ (2,420 − 1,850 = 570); «کم میارم» restates it. The coach may name that it rests on the wrong sum (with the exact sum the shortage is 470 هزار).",
+  "ruling": [
+   "C108",
+   "C141",
+   "C102"
+  ],
+  "verdict_in_round30": "unknown",
+  "note": "Arithmetic checked: 1,200 + 1,120 = 2,320 (she wrote 2,420)."
+ },
+ {
+  "id": "F2-039",
+  "family": "F2",
+  "src": "round30B/nB2 p14",
+  "context": "Truck corrected to 4 M 500, cartons 600 هزار.",
+  "sentence": "هزینه‌ها میشه ۴ میلیون و ۵۰۰ + ۱ میلیون و ۵۰۰ + ۶۰۰ هزار = ۶ میلیون و ۶۰۰، پس ۸ میلیون منهای ۶ میلیون و ۶۰۰ = ۱ میلیون و ۴۰۰ برای رنگ می‌مونه.",
+  "expected": "Sum ✓ (6,600 هزار); «۸ میلیون منهای ۶ میلیون و ۶۰۰ = ۱ میلیون و ۴۰۰» ✓; the trailing «می‌مونه» restates it (one line).",
+  "ruling": [
+   "C102",
+   "C141",
+   "C149"
+  ],
+  "verdict_in_round30": "held (coach ✓)"
+ },
+ {
+  "id": "F2-040",
+  "family": "F2",
+  "src": "round30A/s06 p10",
+  "context": "Server problem; total 50 licences in the sentence.",
+  "sentence": "۷ تا سرور داریم، هر کدوم ۶ تا worker، ۶ × ۷ = ۴۲ worker، از ۵۰ تا لایسنسی که داریم ۷ تا می‌مونه.",
+  "expected": "«۶ × ۷ = ۴۲» ✓; «۷ تا می‌مونه» ✗ (50 − 42 = 8). Latin «worker» may be quoted (her word, C128).",
+  "ruling": [
+   "C141",
+   "C180",
+   "C128"
+  ],
+  "verdict_in_round30": "held (coach ✗)"
+ },
+ {
+  "id": "F2-041",
+  "family": "F2",
+  "src": "round30A/s06 p10",
+  "context": "Same message.",
+  "sentence": "هر worker دقیقه‌ای ۳ × ۸۰۰ = ۲۴۰۰ پیام می‌گیره، نصفش میشه ۱۲۰۰. تو کانفیگ m = 10 گذاشتم و پیکِ شب یعنی ۳۷٪ ترافیکِ روز.",
+  "expected": "«۳ × ۸۰۰ = ۲۴۰۰» ✓; «نصفش میشه ۱۲۰۰» ✓ (C157, preceding result). NEGATIVE look-alikes: «m = 10» and «۳۷٪» are data, no remainder line, no «نسنجیده».",
+  "ruling": [
+   "C157",
+   "C136",
+   "C148"
+  ],
+  "verdict_in_round30": "held",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-042",
+  "family": "F2",
+  "src": "round30A/s06 p11",
+  "context": "Previous turn: «از ۵۰ تا … ۷ تا می‌مونه» ✗.",
+  "sentence": "آره ۸ تا می‌مونه، ببخشید.",
+  "expected": "Her fix of the earlier remainder: the page re-checks (50 − 42 = 8) and the line's mark becomes ✓, the old ✗ kept in history (C8/C86). Not a new arithmetic claim with operands.",
+  "ruling": [
+   "C8",
+   "C86"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-043",
+  "family": "F2",
+  "src": "round30A/s06 p11",
+  "context": "Same message; no total RAM is stated anywhere.",
+  "sentence": "۴ × ۲۵۰ = ۱۰۰۰ مگ رم برای هر نود، پس ۸ گیگ اضافه میاد.",
+  "expected": "«۴ × ۲۵۰ = ۱۰۰۰» ✓; «۸ گیگ اضافه میاد» ⇒ «؟ نسنجیده» (no total in sentence or statement).",
+  "ruling": [
+   "C180",
+   "C138"
+  ],
+  "verdict_in_round30": "held (coach: «صفحه نسنجید»)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-044",
+  "family": "F2",
+  "src": "round30A/s06 p11",
+  "context": "Same message; all amounts in the sentence.",
+  "sentence": "بودجه‌مون ۲ میلیون و ۵۰۰ هست، سرورِ تازه ۳ میلیون و ۱۰۰ میشه، ۶۰۰ کم دارم.",
+  "expected": "Need 3,100, have 2,500 (thousands reading; the bare «۶۰۰» read in the same scale, C154): 600 ⇒ ✓.",
+  "ruling": [
+   "C141",
+   "C154",
+   "C102"
+  ],
+  "verdict_in_round30": "failed (A30-2: no line)"
+ },
+ {
+  "id": "F2-045",
+  "family": "F2",
+  "src": "round30A/s06 p11",
+  "context": "Same message.",
+  "sentence": "۴ میلیون داشتم، ۲ تا لپ‌تاپِ ۱ میلیون و ۸۰۰ خریدم، ۵۰۰ می‌مونه.",
+  "expected": "«۲ تا لپ‌تاپِ ۱ میلیون و ۸۰۰» = 2 × 1,800 = 3,600 (C41); 4,000 − 3,600 = 400 هزار ⇒ ✗ beside «۵۰۰ می‌مونه».",
+  "ruling": [
+   "C141",
+   "C41",
+   "C154"
+  ],
+  "verdict_in_round30": "failed (A30-2: absent from 📜)"
+ },
+ {
+  "id": "F2-046",
+  "family": "F2",
+  "src": "round30A/s06 p11",
+  "context": "Same message.",
+  "sentence": "۱۲ تا تیکت داشتیم، ۱۲ تاش رو بستم، هیچی نمی‌مونه. ۱۰ تا تست نوشتم، ۶ تاش امروز اجرا شد، ۴ تا هم برای فردا می‌مونه.",
+  "expected": "«هیچی نمی‌مونه» ✓ (0); «۴ تا هم برای فردا می‌مونه» ✓ (10 − 6); each its own mark; no date ask.",
+  "ruling": [
+   "C141",
+   "C138",
+   "C147"
+  ],
+  "verdict_in_round30": "failed (A30-2: no line)"
+ },
+ {
+  "id": "F2-047",
+  "family": "F2",
+  "src": "round30A/s06 p13",
+  "context": "The 4 M total was said in an EARLIER turn (p11), not in this message and not in the live problem's statement.",
+  "sentence": "لپ‌تاپ‌ها روی هم ۳ میلیون و ۶۰۰ شد، پس ۴۰۰ می‌مونه.",
+  "expected": null,
+  "ruling": [
+   "C180",
+   "C8",
+   "C86"
+  ],
+  "verdict_in_round30": "unknown (coach said correct)",
+  "needs_ruling": "C180 allows a total only from the same sentence or the live statement, «never an earlier turn's arithmetic». Is an earlier turn's DATUM («۴ میلیون داشتم», p11) also excluded (⇒ «؟ نسنجیده»), or may the page read 4,000 − 3,600 = 400 ✓ when this message is her fix of that earlier ✗ line (C8/C86)?"
+ },
+ {
+  "id": "F2-048",
+  "family": "F2",
+  "src": "round30A/s06 p13",
+  "context": "Same message; no antecedent result.",
+  "sentence": "راستی نصفش هم میشه ۳۰۰ تا.",
+  "expected": "No antecedent ⇒ «؟ نسنجیده» (C157).",
+  "ruling": [
+   "C157"
+  ],
+  "verdict_in_round30": "held (coach: «صفحه نسنجید»)"
+ },
+ {
+  "id": "F2-049",
+  "family": "F2",
+  "src": "round30A/s06 p9",
+  "context": "Queue capacity in the sentence.",
+  "sentence": "ظرفیتِ صف ۵ میلیون و ۴۰۰ پیامه، پس ۵ میلیون و ۴۰۰ − ۲ میلیون و ۸۸۰ = ۲ میلیون و ۵۲۰ جا می‌مونه، نصفش هم میشه ۱ میلیون و ۳۰۰.",
+  "expected": "Subtraction ✓ (thousands, no question, C102); «جا می‌مونه» restates it; «نصفش … ۱ میلیون و ۳۰۰» ✗ (exact 1,260 هزار; C157 antecedent = preceding result).",
+  "ruling": [
+   "C102",
+   "C157",
+   "C141"
+  ],
+  "verdict_in_round30": "held (findings s06 p9 PASS)"
+ },
+ {
+  "id": "F2-050",
+  "family": "F2",
+  "src": "round30A/s08 p11",
+  "context": "Jug puzzle: target 15 litres in the sentence.",
+  "sentence": "برای ۱۵ لیتر یه راهِ دیگه هم امتحان کردم: ۷ × ۲ = ۱۴، پس ۱ لیتر کم میاد. با پارچِ ۱۱، ۱۱ + ۱۱ = ۲۲، پس ۸ لیتر اضافه میاد.",
+  "expected": "«۷ × ۲ = ۱۴» ✓; «۱ لیتر کم میاد» ✓ (15 − 14); «۱۱ + ۱۱ = ۲۲» ✓; «۸ لیتر اضافه میاد» ✗ (22 − 15 = 7). Clause by clause in 📜.",
+  "ruling": [
+   "C141",
+   "C180",
+   "C138"
+  ],
+  "verdict_in_round30": "held (findings s08 p11 PASS)"
+ },
+ {
+  "id": "F2-051",
+  "family": "F2",
+  "src": "round30A/s08 p12",
+  "context": "Previous: «۸ لیتر اضافه میاد» ✗.",
+  "sentence": "آره ۷ لیتر اضافه میاد.",
+  "expected": "Her fix accepted (22 − 15 = 7): the line becomes ✓, the ✗ moves to history (C8/C86).",
+  "ruling": [
+   "C8",
+   "C86"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-052",
+  "family": "F2",
+  "src": "round30A/s03 p20",
+  "context": "Totals in the sentence.",
+  "sentence": "۱۰ نقطه رو سه‌تا سه‌تا گروه کنم، ۳ × ۳ = ۹، یکی می‌مونه. ۱۲ نقطه رو پنج‌تا پنج‌تا کنم، ۱۲ ÷ ۵ = ۲ و ۳ تا می‌مونه.",
+  "expected": "«۳ × ۳ = ۹» ✓; «یکی می‌مونه» (word number = 1, C60) ✓ (10 − 9), its own mark; «۱۲ ÷ ۵ = ۲ و ۳ تا» ✗ (12 = 5 × 2 + 2).",
+  "ruling": [
+   "C141",
+   "C60",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (A30-9: «یکی می‌مونه» under a sentence-wide ✓)"
+ },
+ {
+  "id": "F2-053",
+  "family": "F2",
+  "src": "round30A/pA1 p12",
+  "context": "Totals in the sentence.",
+  "sentence": "یکی دیگه: ۱۱² − ۱ = ۱۲۰ و ۱۲۰ ÷ ۸ = ۱۵، هیچی نمی‌مونه. ۸۰ ÷ ۸ = ۱۰ و ۲ تا می‌مونه.",
+  "expected": "«۱۱² − ۱ = ۱۲۰» ✓, «۱۲۰ ÷ ۸ = ۱۵» ✓, «هیچی نمی‌مونه» ✓ (120 = 8 × 15); «۸۰ ÷ ۸ = ۱۰ و ۲ تا می‌مونه» ✗ (80 = 8 × 10, remainder 0).",
+  "ruling": [
+   "C141",
+   "C138"
+  ],
+  "verdict_in_round30": "failed (A30-9 lists pA1 p12)"
+ },
+ {
+  "id": "F2-054",
+  "family": "F2",
+  "src": "round30A/pwA2 p12",
+  "context": "Child reading plan; «۱۸ صفحه مونده» in the same message.",
+  "sentence": "۱۸ صفحه مونده. اگه روزی ۶ تا بخونم، ۶ و ۶ و ۶ میشه ۱۸، هیچی نمی‌مونه. اگه روزی ۴ تا بخونم، ۴ و ۴ و ۴ و ۴ میشه ۱۶، ۳ تا کم میاد.",
+  "expected": "«۶ و ۶ و ۶ میشه ۱۸» ✓ (C28); «هیچی نمی‌مونه» ✓; «۴ و ۴ و ۴ و ۴ میشه ۱۶» ✓; «۳ تا کم میاد» ✗ (18 − 16 = 2). Clause by clause.",
+  "ruling": [
+   "C28",
+   "C141",
+   "C138"
+  ],
+  "verdict_in_round30": "held for ✗ (findings pwA2 p12); «هیچی نمی‌مونه» unread per A30-9"
+ },
+ {
+  "id": "F2-055",
+  "family": "F2",
+  "src": "round30A/pwA2 p10",
+  "context": "Book of 48 pages, 30 read.",
+  "sentence": "مونده ۴۸ − ۳۰ = ۱۸. روزی ۵ تا: ۵ و ۵ و ۵ میشه ۱۵، ۳ تا می‌مونه، پس ۴ روز.",
+  "expected": "«۴۸ − ۳۰ = ۱۸» ✓; «۵ و ۵ و ۵ میشه ۱۵» ✓; «۳ تا می‌مونه» ✓ (18 − 15). «پس ۴ روز» has no operator: outside the reader (C17).",
+  "ruling": [
+   "C141",
+   "C28",
+   "C17"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-056",
+  "family": "F2",
+  "src": "round30A/pwA2 p5",
+  "context": "Child; 12 in the sentence.",
+  "sentence": "۱۲ تقسیم بر ۴ میشه ۳ تا ۴ تا، هیچی نمی‌مونه، پس ۳ روز.",
+  "expected": "12 ÷ 4 = 3 ✓; «هیچی نمی‌مونه» ✓ (12 = 3 × 4).",
+  "ruling": [
+   "C141"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-057",
+  "family": "F2",
+  "src": "round30A/aA1 p12",
+  "context": "Totals in the sentence.",
+  "sentence": "اگه ۲۴ تا شیرینی بین ۵ نفر باشه، ۲۴ ÷ ۵ = ۴ و ۴ تا می‌مونه. اگه ۱۹ تا بین ۳ نفر باشه، ۱۹ ÷ ۳ = ۶ و ۲ تا می‌مونه.",
+  "expected": "24 = 5 × 4 + 4 ⇒ ✓; 19 = 3 × 6 + 1 ⇒ «۶ و ۲ تا» ✗.",
+  "ruling": [
+   "C141",
+   "C108"
+  ],
+  "verdict_in_round30": "held (findings aA1 p12 PASS)"
+ },
+ {
+  "id": "F2-058",
+  "family": "F2",
+  "src": "round30A/s10 p12",
+  "context": "Seating side calculation.",
+  "sentence": "یه حسابِ کناری: ۳ × ۴ = ۱۲ صندلی داریم. اگه ۲ مهمونِ دیگه بیان ۱۴ نفریم، ۱۴ ÷ ۴ = ۳ و ۲ تا می‌مونه، پس ۴ تا میز لازمه؛ یعنی ۱۴ − ۱۲ = ۳ نفر اضافه داریم.",
+  "expected": "«۳ × ۴ = ۱۲» ✓; «۱۴ ÷ ۴ = ۳ و ۲ تا می‌مونه» ✓; «۱۴ − ۱۲ = ۳» ✗ (2) — the «اضافه داریم» form is the same clause, one mark. «اگه ۲ مهمونِ دیگه بیان» is a hypothetical frame, not a plan.",
+  "ruling": [
+   "C141",
+   "C138",
+   "C35"
+  ],
+  "verdict_in_round30": "held (findings s10 PASS)"
+ },
+ {
+  "id": "F2-059",
+  "family": "F2",
+  "src": "round30A/oA1 p20",
+  "context": "A separate third problem; 45 in the sentence.",
+  "sentence": "حساب کردم: ۶ × ۵ = ۳۰، پس ۴۵ − ۳۰ = ۲۵ دقیقه بحث می‌مونه.",
+  "expected": "«۶ × ۵ = ۳۰» ✓; «۴۵ − ۳۰ = ۲۵» ✗ (15).",
+  "ruling": [
+   "C141"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-060",
+  "family": "F2",
+  "src": "round30A/oA1 p21",
+  "context": "Previous line ✗.",
+  "sentence": "آخ، ۴۵ − ۳۰ = ۱۵. پس فقط ۱۵ دقیقه بحث می‌مونه؛ همین کافیه، این یکی حل شد.",
+  "expected": "Her fix ✓ (C8/C86); the remainder restates 15 (one line, C149).",
+  "ruling": [
+   "C8",
+   "C86",
+   "C149"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-061",
+  "family": "F2",
+  "src": "round30A/oA1 p37",
+  "context": "A separate problem with three numbered steps.",
+  "sentence": "گام ۲: پس ۴۵ − ۴۰ = ۵ دقیقه برای بحث می‌مونه. گام ۳: اگه هر گزارش ۷ دقیقه بشه، ۴ × ۷ = ۲۸ و ۴۵ − ۲۸ = ۱۸ دقیقه بحث.",
+  "expected": "Step 2 ✓ (5); step 3: «۴ × ۷ = ۲۸» ✓, «۴۵ − ۲۸ = ۱۸» ✗ (17).",
+  "ruling": [
+   "C141",
+   "C138"
+  ],
+  "verdict_in_round30": "held (findings oA1 p37)"
+ },
+ {
+  "id": "F2-062",
+  "family": "F2",
+  "src": "round30A/s01 p55",
+  "context": "Income 60 M in the recorded statement; rent 18 M, installment 12 M.",
+  "sentence": "بعد از اجاره و ۱۲ میلیون قسط، ۶۰ − ۱۸ − ۱۲ = ۳۰ میلیون می‌مونه.",
+  "expected": "Chain 60 − 18 − 12 = 30 ⇒ ✓ (one line).",
+  "ruling": [
+   "C141"
+  ],
+  "verdict_in_round30": "held (findings s01 p55 PASS)"
+ },
+ {
+  "id": "F2-063",
+  "family": "F2",
+  "src": "round30A/s02 p22",
+  "context": "Chat record of trip costs.",
+  "sentence": "۴ میلیون و ۲۰۰ − ۲۰۰ = ۴ میلیون هم برای تعمیر می‌مونه.",
+  "expected": "Bare «۲۰۰» beside «N میلیون و M» read in thousands (C154): 4,200 − 200 = 4,000 ⇒ ✓ with no question.",
+  "ruling": [
+   "C154",
+   "C102",
+   "C141"
+  ],
+  "verdict_in_round30": "held (coach ✓)"
+ },
+ {
+  "id": "F2-064",
+  "family": "F2",
+  "src": "round30D/tD1 p23 (=round29D/tD1 p23)",
+  "context": "Parquet cartons; several totals in the same sentence (18 had, 12 opened, 6 left).",
+  "sentence": "۱۸ تا کارتن داشتیم، ۱۲ تا رو باز کردیم، ۶ تا می‌مونه. ۴ + ۵ = ۹ تا کارتن برای اتاقِ خواب، و ۳ تا می‌مونه.",
+  "expected": null,
+  "ruling": [
+   "C180",
+   "C141",
+   "C109"
+  ],
+  "verdict_in_round30": "held per runner (✓)",
+  "needs_ruling": "First clause 18 − 12 = 6 ⇒ ✓ (decided). For «۴ + ۵ = ۹ … و ۳ تا می‌مونه» the sentence holds several candidate totals (18, 12, 6). The round-30 runner judged ✓ (12 − 9 = 3, PASS). Does C180 allow choosing among several totals of the same sentence, or must the page give «؟ نسنجیده» when the total is not unique?"
+ },
+ {
+  "id": "F2-065",
+  "family": "F2",
+  "src": "round30D/tD1 p23",
+  "context": "Same message.",
+  "sentence": "۲۵ ÷ ۴ = ۶، ۱ تا می‌مونه. ۲۶ ÷ ۴ = ۶ و ۳ تا می‌مونه.",
+  "expected": "25 = 4 × 6 + 1 ⇒ ✓; 26 = 4 × 6 + 2 ⇒ ✗.",
+  "ruling": [
+   "C141",
+   "C108"
+  ],
+  "verdict_in_round30": "held (findings tD1 T22)"
+ },
+ {
+  "id": "F2-066",
+  "family": "F2",
+  "src": "round30D/tD1 p23",
+  "context": "Same message.",
+  "sentence": "۲۰ تا بسته چسب لازمه، ۱۶ تا داریم، ۴ تا کم میاد. ۳۰ تا قرنیز لازمه، ۲۵ تا داریم، ۶ تا کم میاد.",
+  "expected": "20 − 16 = 4 ⇒ ✓; 30 − 25 = 5 ⇒ ✗ beside «۶ تا کم میاد».",
+  "ruling": [
+   "C141",
+   "C138"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-067",
+  "family": "F2",
+  "src": "round30D/tD1 p1 (=round28D/tD1 p1)",
+  "context": "Opening with six steps; step 5 sum is wrong (18.7 + 3 = 21.7).",
+  "sentence": "گام ۵: جمع ۱۸٫۷ + ۳ = ۲۲٫۷ میلیون؛ پس‌اندازم ۱۸ میلیونه، پس ۴ میلیون و ۷۰۰ کم دارم.",
+  "expected": "«۱۸٫۷ + ۳ = ۲۲٫۷» ✗ (21.7). «۴ میلیون و ۷۰۰ کم دارم» is its own statement with her own operands (22.7 − 18 = 4.7 ⇒ consistent with her text, C108/C109) — never glued to the sum; the coach names that it rests on the wrong sum.",
+  "ruling": [
+   "C108",
+   "C109",
+   "C141",
+   "C85"
+  ],
+  "verdict_in_round30": "held (coach: «بر همان تکیه دارد»)"
+ },
+ {
+  "id": "F2-068",
+  "family": "F2",
+  "src": "round30D/arD1 p7",
+  "context": "Bill of 500 in the sentence.",
+  "sentence": "از قبضِ ۵۰۰ تایی ۵۰۰ − ۳۵۰ = ۱۶۰ می‌مونه.",
+  "expected": "«۵۰۰ − ۳۵۰ = ۱۶۰» ✗ (150); «می‌مونه» restates it (one line).",
+  "ruling": [
+   "C141",
+   "C149"
+  ],
+  "verdict_in_round30": "unknown"
+ },
+ {
+  "id": "F2-069",
+  "family": "F2",
+  "src": "round26C/aC3 p5 (also round30C/aC3 p5)",
+  "context": "Income 180, savings 60, medicine 22.52 (her sum).",
+  "sentence": "پس می‌مونه ۱۸۰ − ۶۰ − ۲۲.۵ = حدود ۹۷.۵ میلیون برای بقیهٔ خرج‌ها، یعنی ماهی ۹.۷.",
+  "expected": "180 − 60 − 22.5 = 97.5 exactly ⇒ ✓ («حدود» changes nothing when exact, C9/C16). «یعنی ماهی ۹.۷» has no operator ⇒ outside the reader (C17).",
+  "ruling": [
+   "C141",
+   "C9",
+   "C16",
+   "C17"
+  ],
+  "verdict_in_round30": "unknown (round 26 page said it did not match — wrong)"
+ },
+ {
+  "id": "F2-070",
+  "family": "F2",
+  "src": "round26C/pwC1 p15 (also round30C/pwC1 p14)",
+  "context": "Costs in the same message.",
+  "sentence": "اگه وام ۷۰ میلیون بگیریم می‌مونه ۱۱۵ − ۷۰ = ۴۵ = ۳ × ۱۵، یعنی نفری ۱۵.",
+  "expected": "«۱۱۵ − ۷۰ = ۴۵» ✓; «۴۵ = ۳ × ۱۵» ✓.",
+  "ruling": [
+   "C141"
+  ],
+  "verdict_in_round30": "held (coach ✓)"
+ },
+ {
+  "id": "F2-071",
+  "family": "F2",
+  "src": "round30B/aB4 p4",
+  "context": "Chickens and rabbits: 35 heads, 100 legs (statement).",
+  "sentence": "اگه یه خرگوش رو بکنم مرغ، سرها همون ۳۵ می‌مونه ولی پاها ۲ تا کم میشه. ۱۰۰ منهای ۹۴ میشه ۶، پس ۳ تا خرگوش باید مرغ بشن: ۲۳ مرغ و ۱۲ خرگوش.",
+  "expected": null,
+  "ruling": [
+   "C85",
+   "C141",
+   "C136"
+  ],
+  "verdict_in_round30": "unknown",
+  "needs_ruling": "«سرها همون ۳۵ می‌مونه» states an invariant («stays 35»), not a remainder, and «۲ تا کم میشه» is a change per swap, not a shortage. Are these outside the remainder reader (no line), or C85 clauses to be judged? (Decided part: «۱۰۰ منهای ۹۴ میشه ۶» ✓.)"
+ },
+ {
+  "id": "F2-072",
+  "family": "F2",
+  "src": "round30A/s10 p15",
+  "context": "«فردا لیستِ مهمونا رو می‌فرستم» booked for tomorrow.",
+  "sentence": "دوازده نفر. لیست بمونه برای فردا.",
+  "expected": "NEGATIVE look-alike: «بمونه برای فردا» is a plan move, not a remainder ⇒ no arithmetic line. Date: the list is already booked for tomorrow ⇒ nothing changes, nothing asked (C167). «دوازده نفر» is a datum (word number).",
+  "ruling": [
+   "C136",
+   "C167",
+   "C60"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-073",
+  "family": "F2",
+  "src": "round30B/dB3 p9",
+  "context": "Insurance call booked for tomorrow.",
+  "sentence": "به داروخونه. بیمه بمونه برای فردا. بانک هم امروز رفتم.",
+  "expected": "NEGATIVE: no remainder line. Dates per C167/C94 (see F6 corpus).",
+  "ruling": [
+   "C136",
+   "C167",
+   "C94"
+  ],
+  "verdict_in_round30": "held (no arithmetic line)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-074",
+  "family": "F2",
+  "src": "round30A/pA2 p5",
+  "context": "Shoe sale problem.",
+  "sentence": "درسم اینه که وقتی دو تا درصد پشتِ سرِ هم میاد، دومی از مقدارِ جدید حساب میشه و همدیگه رو خنثی نمی‌کنن — برای قیمت‌گذاری‌های بعدی یادم می‌مونه.",
+  "expected": "NEGATIVE: «یادم می‌مونه» is memory, no number ⇒ no remainder line, no «نسنجیده».",
+  "ruling": [
+   "C136",
+   "C17"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-075",
+  "family": "F2",
+  "src": "round30B/aB1 p2 (=round26B/aB1 p2)",
+  "context": "Bus problem: 178 children, 42 per bus.",
+  "sentence": "من ۱۷۸ رو تقسیم بر ۴۲ کردم، شد ۴ و یه چیزی باقی موند.",
+  "expected": "NEGATIVE: «یه چیزی باقی موند» claims no number ⇒ no remainder mark. «۱۷۸ تقسیم بر ۴۲ … شد ۴» is a division with an integer result 4 = truncation of 4.238… and she signals a remainder ⇒ not ✗ (C25 question allowed, or read as quotient-with-remainder 178 = 42 × 4 + 10).",
+  "ruling": [
+   "C136",
+   "C25",
+   "C141"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-076",
+  "family": "F2",
+  "src": "round30D/tD4 p23",
+  "context": "Forecast sentence; no open 🎯 about cloth.",
+  "sentence": "۷۰ درصد مطمئنم حدودِ ۶٫۵ متر پارچه اضافه میاد.",
+  "expected": "NEGATIVE: a forecast (C90/C152) ⇒ one 🎯 «حدودِ ۶٫۵ متر پارچه اضافه میاد» (70 %), never a remainder line, never «داده».",
+  "ruling": [
+   "C136",
+   "C90",
+   "C152",
+   "C149"
+  ],
+  "verdict_in_round30": "held (🎯 made)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-077",
+  "family": "F2",
+  "src": "round30D/tD4 p26",
+  "context": "Open 🎯 «حدودِ ۶٫۵ متر پارچه اضافه میاد» (70 %).",
+  "sentence": "۷ متر پارچه اضافه اومد.",
+  "expected": "NEGATIVE: an outcome report ⇒ the page asks «این ۷ «حدودِ ۶٫۵» حساب می‌شود؟» (C120) with Persian «۶٫۵»; no remainder line.",
+  "ruling": [
+   "C120",
+   "C91",
+   "C136"
+  ],
+  "verdict_in_round30": "held for the ask (Latin point: D30-14, F4)",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-078",
+  "family": "F2",
+  "src": "round28B/nB1 p17",
+  "context": "Open 🎯 «۲۳ تا مصرف بشه و یکی بمونه» (90 %).",
+  "sentence": "سلام، امروز شنبه‌ست و نصب تموم شد! تا ساعتِ ۴ عصر تموم شد، ۲۳ کارتن مصرف شد و یکی موند. یه کاشی هم شکست.",
+  "expected": "NEGATIVE: outcome report that settles the 🎯 «۲۳ تا مصرف بشه و یکی بمونه» ⇒ «شد» (C91, numbers equal). «یکی موند» has no stated total in the sentence ⇒ if read as a remainder at all, «؟ نسنجیده» (C180), never ✗.",
+  "ruling": [
+   "C91",
+   "C180",
+   "C136"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ },
+ {
+  "id": "F2-079",
+  "family": "F2",
+  "src": "round30A/s02 p22",
+  "context": "Same message as the repair remainder.",
+  "sentence": "لاستیک‌ها با ۲۰٪ تخفیف ۳ میلیون میشه ۲ میلیون و ۴۰۰، ولی بار ۱۰ درصد پرت داره.",
+  "expected": "NEGATIVE look-alike: «با ۲۰٪ تخفیف» and «۱۰ درصد پرت» are data (C148), no 🎯 and no remainder line. «۳ میلیون … میشه ۲ میلیون و ۴۰۰» = 3,000 × 0.8 = 2,400 ⇒ ✓ if read.",
+  "ruling": [
+   "C148",
+   "C136"
+  ],
+  "verdict_in_round30": "unknown",
+  "negative_lookalike": true
+ }
+]
