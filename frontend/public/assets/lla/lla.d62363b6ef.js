@@ -61115,6 +61115,12 @@ APP.goFromURL = function (q) {
   var MINEV28 = /(?:^|[\s،,.])(?:(?:ولی|اما)\s+)?(?:من|خودم)(?![آ-ی])|(?:گذاشتم|کردم|گرفتم|نوشتم|رسیدم|درآوردم|شمردم|دیدم|زدم|خریدم|ساختم)(?![آ-ی])/;
   function sentAt28(T, i) { var a = 0, b = T.length, m; SENT28.lastIndex = 0; while ((m = SENT28.exec(T))) { if (m.index < i) a = m.index + 1; else { b = m.index + 1; break; } } return { a: a, b: b }; }
   var PASS29 = /(?:[،,]\s*|\s)(?:پس|بنابراین|در\s*نتیجه)(?![آ-ی])/;
+  /* دورِ ۳۰ (story، A30-19 s09 p23 «از زبانِ «نوه‌ی»» برای «نوه‌ی همسایه‌مون نوشته»): نسبتِ اضافه‌دار («نوه‌ی …»، «دوستِ …»، «پسرِ …») کامل نیست — واژهٔ بعد، اگر خودش
+     نسبت/نقش است («همسایه‌مون»، «داداشم»)، بخشی از همان گوینده است. واژه‌ای که نسبت نیست (نام یا فعل) افزوده نمی‌شود (C22/C38 — نام هرگز). */
+  var WHOW30 = new RegExp("^" + WHO27 + "$");
+  function whoX30(T, m) { var w = String(m[1] || ""), at = m.index + String(m[0]).indexOf(w) + w.length; if (!/(?:ِ|ٔ|‌ی)$/.test(w)) return w;
+    var nx = /^\s+([^\s.!؟?،,:«»]+)/.exec(String(T).slice(at)); return nx && WHOW30.test(nx[1]) ? w + " " + nx[1] : w; }
+  ST.whoX30 = whoX30;
   function attr28(ut) { var T = String(ut || ""), m, out = []; OTHER28.lastIndex = 0;
     while ((m = OTHER28.exec(T))) { var mid0 = m[2] || "", end = m.index + m[0].length, se = sentAt28(T, end - 1), after = T.slice(end, se.b), cut29 = -1;
       /* دورِ ۲۹ (C125، C29-4 aC1 p29، B29·D12 nB2): «X گفت <داده>، پس <حساب>» — استنتاجِ پس از «پس / بنابراین / در نتیجه» کارِ خودِ اوست؛ گفتهٔ X تا همان‌جاست */
@@ -61123,7 +61129,7 @@ APP.goFromURL = function (q) {
       if (m[3] && /^کرد$/.test(m[3]) && !/حساب|ضرب|جمع|تقسیم/.test(mid0)) continue;   // «داداشم فقط نگاه کرد: …» نسبتِ حساب نیست (بانکِ R28 #207)
       if (/(?:^|[\s،,.])(?:خودم|من)\s+[^.!؟?]{0,20}(?:حساب\s*کردم|نوشتم|درآوردم|شمردم)(?![آ-ی])/.test(T.slice(se.a, m.index))) continue;   // «خودم حساب کردم، داداشم …» — کارِ خودش
       var calc = !!m[3], claim = CALCX28.test(after) || CLAIM28.test(after);
-      out.push({ who: m[1], at: m.index, end: end, sent: se, calc: calc, claim: claim, other: (calc && /[0-9۰-۹]/.test(T.slice(end, T.length))) || (!calc && claim), say: !calc, after: after, cut: cut29 }); }
+      out.push({ who: whoX30(T, m), at: m.index, end: end, sent: se, calc: calc, claim: claim, other: (calc && /[0-9۰-۹]/.test(T.slice(end, T.length))) || (!calc && claim), say: !calc, after: after, cut: cut29 }); }
     return out; }
   ST.otherWork27 = function (ut) {
     var T = String(ut || ""), A0 = attr28(T).filter(function (x) { return x.other; })[0]; if (!A0) return null; return span29(T, A0); };

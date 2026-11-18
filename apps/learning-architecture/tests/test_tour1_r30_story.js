@@ -48,6 +48,10 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   K.U_D27_33_neg = async () => { const x = await ev(() => ['خودم از مغازه می‌گیرم، اونجا ارزون‌تره.', 'معلممون گفت یه قضیه‌ای هست برای مثلث‌ها ولی من اون جلسه نبودم.', 'استادم می‌گه شاید مسئله‌ی کلی‌تر رو ببینم.', 'داداشم گفت ۳ × ۵ = ۱۵ میشه.', 'استادم هم گفت «اشتباه کردی که سایت رو اول کشیدی»، ولی به نظرم برای من شروعِ درستی بود.'].map(t => APP.STORY.advice30(t)));
     return [x.every(v => v === null), J(x)]; };
 
+  /* ---------- A30-19 (s09 p23): گویندهٔ اضافه‌دار کامل — «نوه‌ی همسایه‌مون»؛ هم‌شکلِ منفی: نام هرگز افزوده نمی‌شود ---------- */
+  K.U_A30_19 = async () => { const x = await ev(() => [APP.STORY.otherWorks29('اینا رو هم نوه‌ی همسایه‌مون نوشته: ۹ × ۹ = ۸۱ و ۱۰۰ − ۳۷ = ۶۳.').map(o => o.who), APP.STORY.otherWorks29('دوستِ علی حساب کرد: ۹ × ۹ = ۸۱.').map(o => o.who)]);
+    return [x[0][0] === 'نوه‌ی همسایه‌مون' && !/علی/.test(J(x[1])), J(x)]; };
+
   for (const k of Object.keys(K)) { if (process.env.ONLY && !process.env.ONLY.split(',').some(o => k.indexOf(o) === 0)) continue; info.n++;
     try { const r = await K[k](); if (r[0]) info.ok++; else errors.push(k + ' ⇒ ' + String(r[1]).slice(0, 1200)); } catch (e) { errors.push(k + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
   console.log(JSON.stringify(info));
