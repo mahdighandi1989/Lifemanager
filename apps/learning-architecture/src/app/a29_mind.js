@@ -726,11 +726,22 @@
       })));
   }
   M.techList = techList;
+  /* دورِ ۳۰ (forecast؛ A30-15 s05 p39 «کالیبراسیون فقط ۳ پیش‌بینیِ تمرینِ T24 را می‌شمارد، نه ۹ پیش‌بینیِ داوری‌شدهٔ گفت‌وگو»): 🎯 های داوری‌شدهٔ گفت‌وگو و دفتر در بُعدها و
+     «پیش‌بینی‌های رویداد» شمرده می‌شدند، ولی سطرِ کالیبراسیونِ این بخش فقط می‌گفت «… فقط آن‌جا شمرده می‌شود» — کالیبراسیونِ خودِ دفترِ 🎯 (شمار، طرفِ محتمل‌تر، Brier) کنارش
+     نام برده می‌شود تا ببیند داوری‌اش کجا نشست. همان برآوردِ A.PSY.forecastEst (A3/A4)؛ عددِ تازه‌ای ساخته نمی‌شود */
+  function fcLedger30() { try {
+      var F = S.all("fcast", function (x) { return !x.sample && x.p != null && !x.est && (x.outcome === "شد" || x.outcome === "نشد"); }); if (!F.length || !A.PSY || !A.PSY.forecastEst) return null;
+      var e = A.PSY.forecastEst(F.map(function (x) { return { p: x.p / 100, ok: x.outcome === "شد", at: x.outcomeAt || x.due }; })), br = A.fcastBrier ? A.fcastBrier(F) : null;
+      return h("div", { class: "mind-fc-cal small", "data-n": String(F.length) }, h("b", {}, "کالیبراسیونِ 🎯 دفترِ پیش‌بینی (گفت‌وگو و دفتر): "),
+        fa(F.length) + " پیش‌بینیِ داوری‌شده" + (br ? " · Brier " + fa(String(br.brier).replace(/(\d)\.(\d)/, "$1٫$2")) : "") + (e && e.dirN ? " · طرفِ محتمل‌تر " + fa(e.hit) + " بار از " + fa(e.dirN) + " رخ داد" : "") + " — همین‌ها در ستونِ «پیش‌بینی‌ها» ِ بُعدها و «پیش‌بینی‌های رویداد» شمرده شده‌اند.");
+    } catch (e) { return null; } }
+  M.fcLedger30 = fcLedger30;
   function techSection() {
     var W = M.techWork(), dimFa = {}; M.dims().forEach(function (d) { dimFa[d.id] = d.fa; });
     var sec = h("section", { class: "card mind-tech", dir: "rtl", "data-n": String(W.acts.length), "data-cal": String(W.cal.n) }, h("h2", {}, "🏋 کارِ تکنیک‌ها"),
       h("p", { class: "small muted" }, "پرونده‌های تمرین، برگه‌های کامل‌شده، جدول‌های کالیبراسیونِ برگه‌ها، چرخهٔ ۱-۳-۷ و برگهٔ سفیدِ هفتگی — هر نشست یک بار، تکرارِ همان روز یک سطر؛ پیش‌نویس، کارِ پس‌گرفته و پیش‌بینیِ داوری‌نشده شمرده نمی‌شوند. روبریک خودسنجی است، نه اندازه. «" + UNMAPPED + "» یعنی کارنامه نگاشتی از این تکنیک به بُعدهای بالا ندارد و نمی‌سازد؛ پس این کارها فقط این‌جا می‌آیند و عددهای بُعدها را جابه‌جا نمی‌کنند."));
-    if (!W.rows.length && !W.cal.n) { sec.appendChild(h("p", { class: "small muted mind-tech-empty" }, "هنوز کارِ تکنیکیِ کامل‌شده‌ای نیست.")); return sec; }
+    var fl30 = fcLedger30();
+    if (!W.rows.length && !W.cal.n) { sec.appendChild(h("p", { class: "small muted mind-tech-empty" }, "هنوز کارِ تکنیکیِ کامل‌شده‌ای نیست.")); if (fl30) sec.appendChild(fl30); return sec; }
     sec.appendChild(h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small mind-techtable" },
       h("thead", {}, h("tr", {}, ["تکنیک و موضوع", "نشست‌ها (روزهای جدا)", "اندازه (نخست ← آخر)", "بُعد", "از کجا"].map(function (x) { return h("th", {}, x); }))),
       h("tbody", {}, W.rows.map(function (R) {
@@ -747,6 +758,7 @@
     if (C.n) sec.appendChild(h("div", { class: "mind-tech-cal", "data-n": String(C.n), "data-brier": C.brier.toFixed(4) },
       h("b", {}, "کالیبراسیونِ برگه‌ها و تمرین‌ها: "), fa(C.n) + " پیش‌بینیِ داوری‌شده · Brier " + fa(C.brier.toFixed(3)) + " · درست " + pf0(100 * C.hit) + " در برابرِ میانگینِ اطمینانِ " + pf0(100 * C.meanP) + " (" + (C.meanP > C.hit ? "بیش‌اطمینانی " : C.meanP < C.hit ? "کم‌اطمینانی " : "") + sgn(100 * (C.meanP - C.hit)) + " واحد) — " + UNMAPPED + "؛ پیش‌بینی‌ای که همان پیش‌بینیِ دفترِ 🎯 است فقط آن‌جا شمرده می‌شود.",
       techList(C.acts.map(function (c) { return { id: c.id, at: c.at, ok: c.ok, fa: c.fa, go: c.go, src: "cal", kind: "cal" }; }), "techcal")));
+    if (fl30) sec.appendChild(fl30);
     if (W.gaps.length) sec.appendChild(h("div", { class: "mind-tech-gaps", "data-n": String(W.gaps.length) }, h("b", {}, "پیش‌بینی از یادگیریِ خودت در برابرِ واقعی: "), techList(W.gaps, "techgap")));
     return sec;
   }

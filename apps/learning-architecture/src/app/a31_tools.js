@@ -68,6 +68,7 @@
   };
 
   /* ---------- 🎯 دفترِ پیش‌بینی ---------- */
+  /* دورِ ۳۰ (forecast؛ N5، C30 «Brier = ۰.۲۴۹»): Brier با ممیزِ فارسی («۰٫۲۴۹») — fa فقط رقم‌ها را برمی‌گرداند */
   A.fcastBrier = function (list) { var r = (list || S.all("fcast")).filter(function (x) { return x.outcome === "شد" || x.outcome === "نشد"; }); if (!r.length) return null; var s = 0; r.forEach(function (x) { var p = num(x.p) / 100; s += Math.pow(p - (x.outcome === "شد" ? 1 : 0), 2); }); return { n: r.length, brier: Math.round(1000 * s / r.length) / 1000 }; };
   A.V.fcast = function () {
     /* دورِ ۲۹ (forecast R5، C152): موعدِ خوانده‌شده از حرفِ خودش که تأییدش باز است (a41 PR.predPendDue29) */
@@ -97,7 +98,7 @@
           jd ? h("label", { class: "small muted" }, "تغییرِ داوری: ") : null,
           h("select", { "aria-label": "نتیجهٔ «" + x.q + "»", onchange: function (e) { x.outcome = e.target.value; x.outcomeAt = A.nowISO(); S.put(x); A.render(); } }, ["", "شد", "نشد"].map(function (o) { return h("option", { value: o, selected: (x.outcome || "") === o ? true : null }, o || (jd ? "— دوباره باز —" : "— هنوز —")); })));
     };
-    root.appendChild(h("section", { class: "card" }, h("h2", {}, "پیش‌بینی‌ها (" + fa(all.length) + ")" + (br ? " · Brier = " + fa(br.brier) + " از " + fa(br.n) + " نتیجه" : "")),
+    root.appendChild(h("section", { class: "card" }, h("h2", {}, "پیش‌بینی‌ها (" + fa(all.length) + ")" + (br ? " · Brier = " + fa(String(br.brier).replace(/(\d)\.(\d)/, "$1٫$2")) + " از " + fa(br.n) + " نتیجه" : "")),
       all.length ? h("div", {}, h("h3", { class: "fc-open-h" }, "باز (" + fa(openL.length) + ")"), openL.length ? h("ul", { class: "plain fc-openl" }, openL.map(row)) : h("p", { class: "small muted" }, "پیش‌بینیِ بازی نمانده."),
         doneL.length ? h("h3", { class: "fc-done-h" }, "داوری‌شده (" + fa(doneL.length) + ")") : null, doneL.length ? h("ul", { class: "plain fc-donel" }, doneL.map(row)) : null) : h("p", { class: "small muted" }, "هنوز پیش‌بینی‌ای ثبت نشده.")));
     return root;
