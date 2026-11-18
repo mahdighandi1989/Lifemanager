@@ -1833,8 +1833,16 @@
   var WHEREIN29 = /کجای[\s‌]*(?:این[\s‌]*)?(?:پرونده|دفتر|کارنامه|صفحه|نقشه|سامانه|امروز)(?:‌?م|‌?ام|‌?مون)?[\s‌]*(?:ببینم|ببینمش|پیداش|پیدا[\s‌]*کنم|هست|ثبت|می[‌\s]?بینم)/;
   /* بانکِ R26 #245 «چطور از همین صفحه برای کنکورم برنامه بریزم؟»: کارِ خودِ او (اول‌شخص) با کمکِ صفحه، مسئلهٔ اوست — نامِ صفحه نهادِ پرسش نیست */
   var OWNACT29 = /(?:بریزم|بچینم|بنویسم|بسازم|حل[\s‌]*کنم|حلش[\s‌]*کنم|بخونم|بخوانم|برسم|بگیرم|بفروشم|بخرم)[\s‌]*[؟?]\s*$/;
+  /* دورِ ۳۰ (surface، F13 — A30-1 s06 p14 «وقتی تو پرونده کنارِ کلِ جمله‌م ✓ میاد، از کجا بدونم کدوم تکه‌ش رو صفحه سنجیده؟» «مسئلهٔ ۲ از ۲» شد): «صفحه» ِ بی‌اضافه
+     (نه «صفحهٔ …»، نه «یه/۴۸ صفحه») وقتی **نهادِ کارِ خودِ صفحه** است — سنجیدن، حساب‌کردن، نگه‌داشتن، درست/غلط خواندن، ثبت‌کردن، زدنِ نشان — یا وقتی خطا/تقصیر/✓✗
+     به صفحه نسبت داده می‌شود، پرسش دربارهٔ خودِ سامانه است. «صفحه پرسید …» (نقلِ پرسشِ صفحه دربارهٔ مسئلهٔ او: «صفحه پرسید شرط کافی بود؟») بیرون است.
+     نمونه‌های واقعی (C136، رونوشت‌های ۲۹/۳۰): «صفحه اینو یه قرار برای من حساب نمی‌کنه؟» (29C s28)، «این ✗ ها خطای صفحه‌ست یا من؟» (29D arD1)، «صفحه هر کدوم رو جدا نگه
+     داشته …؟» (29D pwD1)، «اگه صفحه یه حسابِ درستم رو غلط بخونه، … تقصیرِ صفحه‌ست نه من؟» (30D tD3) — درون؛ «صفحه پرسید شرط کافی بود؟» (29D s37)، «یه صفحه ۱۰×۱۰ …» — بیرون. */
+  var PAGEAG30 = /(?:^|[\s‌«(،:])صفحه(?![آ-یءٔ‌ِ])[^؟?.!]{0,40}?(?:سنجید|سنجیده|(?:ن?می[‌\s]?)سنج|حساب[\s‌]*(?:ن?می[‌\s]?)?(?:کنه|کند|کرد|کرده)|نگه[\s‌]*(?:ن?می[‌\s]?)?(?:داره|دارد|داشته|داشت)|(?:غلط|درست|اشتباه)[\s‌]*(?:بخونه|بخواند|خوند|خونده|خوانده|(?:ن?می[‌\s]?)(?:خونه|خواند))|ثبت[\s‌]*(?:ن?می[‌\s]?)?(?:کنه|کند|کرد|کرده)|(?:ن?می[‌\s]?)زنه|زده)(?![آ-ی])/;
+  var PAGEFAULT30 = /(?:خطا(?:ی|ی‌)?|تقصیر)(?:ِ)?[\s‌]*(?:از[\s‌]*)?صفحه(?:‌?ست|ه)?(?![آ-یءٔ‌ِ])|(?:خطا|تقصیر|اشتباه)[^؟?]{0,20}از[\s‌]*صفحه(?:‌?ست|ه)?(?![آ-یءٔ‌ِ])|[✓✗][\s‌]*(?:ِ|ی)?[\s‌]*(?:صفحه)(?![آ-یءٔ‌ِ])/;
   function sysQ29(q) { var x = faDigits(q); if (/[0-9]/.test(x) || /[=<>≤≥×÷]/.test(x) || OWNACT29.test(q)) return false;
     if (SYSNAME29.test(q) || SYSAPP29.test(q) || WHEREIN29.test(q)) return true;
+    if (PAGEAG30.test(q) || PAGEFAULT30.test(q)) return true;
     if (FACET29.test(q) || FACET2P29.test(q)) return true;
     return SHOW29.test(q) && ARTEF29.test(q) && MYWORK29.test(q); }
   AS.sysQ28 = sysQ28; AS.sysQ29 = sysQ29;
@@ -3176,7 +3184,7 @@
         nd.__r26 = out; nd.nodeValue = out; });
     } catch (e) { } }
   AS.regDom26 = regDom26;
-  if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); } catch (e) { } return r; }; A.render._reg26 = true;
+  if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); regDom26(document.querySelector("nav.side")); } catch (e) { } return r; }; A.render._reg26 = true;   // دورِ ۳۰ (surface، D26-40 aD3 «تو کجای آنی»، «از کجا شروع کنی»، «برای یادگرفتنِ خودت»): منوی کناری هم متنِ ایستای صفحه است
     try { if (typeof MutationObserver !== "undefined") { var mo26 = new MutationObserver(function (ms) { try { var seen = []; ms.forEach(function (m) { var el = m.target && m.target.nodeType === 3 ? m.target.parentNode : m.target; var mn = el && el.closest ? el.closest("#main") : null; if (mn && seen.indexOf(mn) < 0) seen.push(mn); }); seen.forEach(regDom26); } catch (e) { } });
       var arm26 = function () { var mn = document.getElementById("main"); if (mn) mo26.observe(mn, { childList: true, subtree: true, characterData: true }); else setTimeout(arm26, 300); }; arm26(); } } catch (e) { } }
   AS.sysRaw25 = function (m) { return m && m.text0 != null && m.text === m.textR ? m.text0 : (m ? m.text : ""); };

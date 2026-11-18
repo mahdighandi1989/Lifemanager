@@ -23886,7 +23886,7 @@ APP.goFromURL = function (q) {
       var last = A.trail[A.trail.length - 1];
       bar.appendChild(h("div", { class: "trailrow" },
         h("button", { class: "btn sm backbtn", onclick: function () { A.back(); }, title: "دقیقاً به همان صفحه و همان جای اسکرول برمی‌گردی" },
-          "↩ برگرد به «" + last.label + "»"),
+          "↩ برگرد به " + A.qLab30(last.label)),
         last.ctx ? h("span", { class: "small muted fromctx" }, "از بخشِ «" + last.ctx + "» آمدی") : null,
         A.trail.length > 1 ? h("details", { class: "trailall" }, h("summary", { class: "small" }, "مسیری که آمدی (" + A.fa(A.trail.length) + " قدم)"),
           h("ol", { class: "small" }, A.trail.map(function (e, i) {
@@ -23902,11 +23902,13 @@ APP.goFromURL = function (q) {
       m.insertBefore(crumbs(), m.firstChild);
       if (A.trail.length) {
         var last = A.trail[A.trail.length - 1];
-        m.appendChild(h("button", { class: "backfab", title: "برگرد به «" + last.label + "»", "aria-label": "برگرد به «" + last.label + "»", onclick: function () { A.back(); } }, "↩ برگرد"));
+        m.appendChild(h("button", { class: "backfab", title: "برگرد به " + A.qLab30(last.label), "aria-label": "برگرد به " + A.qLab30(last.label), onclick: function () { A.back(); } }, "↩ برگرد"));
       }
     } catch (e) { console.error(e); }
   };
 })(APP);
+/* دورِ ۳۰ (surface، C28-21 tC1 «↩ برگرد به ««هشدارِ یخ‌زدگی …»»»): نامِ صفحه‌ای که خودش در «…» است دوباره در گیومه نمی‌رود — یک جفت گیومه، نه دو */
+APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^«»]*(?:«[^«»]*»[^«»]*)*»$/.test(l) ? l : "«" + l + "»"; };
 /* ===== دورهٔ گام‌به‌گام: از صفر تا آخر =====
    چرا (مالک ۲۰۲۶-۱۰-۱۱): «وارد یه اقیانوس شدم، اون هم از وسطش» — کتابخانهٔ مرجع جای کلاسِ درس نیست. این دوره همان ۴۵ تکنیک
    را به ترتیبِ برنامهٔ ۸ هفته‌ای (C.CURRICULUM) یکی‌یکی و با یک الگوی ثابت جلو می‌برد، روی **یک موضوعِ واقعیِ خودت**:
@@ -37613,8 +37615,16 @@ APP.goFromURL = function (q) {
   var WHEREIN29 = /کجای[\s‌]*(?:این[\s‌]*)?(?:پرونده|دفتر|کارنامه|صفحه|نقشه|سامانه|امروز)(?:‌?م|‌?ام|‌?مون)?[\s‌]*(?:ببینم|ببینمش|پیداش|پیدا[\s‌]*کنم|هست|ثبت|می[‌\s]?بینم)/;
   /* بانکِ R26 #245 «چطور از همین صفحه برای کنکورم برنامه بریزم؟»: کارِ خودِ او (اول‌شخص) با کمکِ صفحه، مسئلهٔ اوست — نامِ صفحه نهادِ پرسش نیست */
   var OWNACT29 = /(?:بریزم|بچینم|بنویسم|بسازم|حل[\s‌]*کنم|حلش[\s‌]*کنم|بخونم|بخوانم|برسم|بگیرم|بفروشم|بخرم)[\s‌]*[؟?]\s*$/;
+  /* دورِ ۳۰ (surface، F13 — A30-1 s06 p14 «وقتی تو پرونده کنارِ کلِ جمله‌م ✓ میاد، از کجا بدونم کدوم تکه‌ش رو صفحه سنجیده؟» «مسئلهٔ ۲ از ۲» شد): «صفحه» ِ بی‌اضافه
+     (نه «صفحهٔ …»، نه «یه/۴۸ صفحه») وقتی **نهادِ کارِ خودِ صفحه** است — سنجیدن، حساب‌کردن، نگه‌داشتن، درست/غلط خواندن، ثبت‌کردن، زدنِ نشان — یا وقتی خطا/تقصیر/✓✗
+     به صفحه نسبت داده می‌شود، پرسش دربارهٔ خودِ سامانه است. «صفحه پرسید …» (نقلِ پرسشِ صفحه دربارهٔ مسئلهٔ او: «صفحه پرسید شرط کافی بود؟») بیرون است.
+     نمونه‌های واقعی (C136، رونوشت‌های ۲۹/۳۰): «صفحه اینو یه قرار برای من حساب نمی‌کنه؟» (29C s28)، «این ✗ ها خطای صفحه‌ست یا من؟» (29D arD1)، «صفحه هر کدوم رو جدا نگه
+     داشته …؟» (29D pwD1)، «اگه صفحه یه حسابِ درستم رو غلط بخونه، … تقصیرِ صفحه‌ست نه من؟» (30D tD3) — درون؛ «صفحه پرسید شرط کافی بود؟» (29D s37)، «یه صفحه ۱۰×۱۰ …» — بیرون. */
+  var PAGEAG30 = /(?:^|[\s‌«(،:])صفحه(?![آ-یءٔ‌ِ])[^؟?.!]{0,40}?(?:سنجید|سنجیده|(?:ن?می[‌\s]?)سنج|حساب[\s‌]*(?:ن?می[‌\s]?)?(?:کنه|کند|کرد|کرده)|نگه[\s‌]*(?:ن?می[‌\s]?)?(?:داره|دارد|داشته|داشت)|(?:غلط|درست|اشتباه)[\s‌]*(?:بخونه|بخواند|خوند|خونده|خوانده|(?:ن?می[‌\s]?)(?:خونه|خواند))|ثبت[\s‌]*(?:ن?می[‌\s]?)?(?:کنه|کند|کرد|کرده)|(?:ن?می[‌\s]?)زنه|زده)(?![آ-ی])/;
+  var PAGEFAULT30 = /(?:خطا(?:ی|ی‌)?|تقصیر)(?:ِ)?[\s‌]*(?:از[\s‌]*)?صفحه(?:‌?ست|ه)?(?![آ-یءٔ‌ِ])|(?:خطا|تقصیر|اشتباه)[^؟?]{0,20}از[\s‌]*صفحه(?:‌?ست|ه)?(?![آ-یءٔ‌ِ])|[✓✗][\s‌]*(?:ِ|ی)?[\s‌]*(?:صفحه)(?![آ-یءٔ‌ِ])/;
   function sysQ29(q) { var x = faDigits(q); if (/[0-9]/.test(x) || /[=<>≤≥×÷]/.test(x) || OWNACT29.test(q)) return false;
     if (SYSNAME29.test(q) || SYSAPP29.test(q) || WHEREIN29.test(q)) return true;
+    if (PAGEAG30.test(q) || PAGEFAULT30.test(q)) return true;
     if (FACET29.test(q) || FACET2P29.test(q)) return true;
     return SHOW29.test(q) && ARTEF29.test(q) && MYWORK29.test(q); }
   AS.sysQ28 = sysQ28; AS.sysQ29 = sysQ29;
@@ -38956,7 +38966,7 @@ APP.goFromURL = function (q) {
         nd.__r26 = out; nd.nodeValue = out; });
     } catch (e) { } }
   AS.regDom26 = regDom26;
-  if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); } catch (e) { } return r; }; A.render._reg26 = true;
+  if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); regDom26(document.querySelector("nav.side")); } catch (e) { } return r; }; A.render._reg26 = true;   // دورِ ۳۰ (surface، D26-40 aD3 «تو کجای آنی»، «از کجا شروع کنی»، «برای یادگرفتنِ خودت»): منوی کناری هم متنِ ایستای صفحه است
     try { if (typeof MutationObserver !== "undefined") { var mo26 = new MutationObserver(function (ms) { try { var seen = []; ms.forEach(function (m) { var el = m.target && m.target.nodeType === 3 ? m.target.parentNode : m.target; var mn = el && el.closest ? el.closest("#main") : null; if (mn && seen.indexOf(mn) < 0) seen.push(mn); }); seen.forEach(regDom26); } catch (e) { } });
       var arm26 = function () { var mn = document.getElementById("main"); if (mn) mo26.observe(mn, { childList: true, subtree: true, characterData: true }); else setTimeout(arm26, 300); }; arm26(); } } catch (e) { } }
   AS.sysRaw25 = function (m) { return m && m.text0 != null && m.text === m.textR ? m.text0 : (m ? m.text : ""); };
@@ -56105,7 +56115,7 @@ APP.goFromURL = function (q) {
       if (a.hyp && a.list === "ambiguities") { var hp = a.p == null ? null : numOk(a.p, said); if (a.p != null && hp == null) return "مورد به‌روز نشد: احتمالِ «" + a.p + "» در حرفش نبود — عدد از خودمان نمی‌سازیم"; PR.hypSet(x.id, a.hyp, hp, why); did.push("فرضیهٔ «" + clip(a.hyp, 30) + "»" + (hp != null ? " " + fa(hp) + "٪" : "")); }
       else if (a.p != null && a.list === "ambiguities") { var pv = numOk(a.p, said); if (pv == null) return "مورد به‌روز نشد: احتمالِ «" + a.p + "» در حرفش نبود"; PR.ambUpdate(x.id, pv, why); did.push("احتمال " + fa(pv) + "٪"); }
       if (a.share != null && a.list === "pareto") { var sv = numOk(a.share, said); if (sv == null) return "مورد به‌روز نشد: سهمِ «" + a.share + "» در حرفش نبود"; PR.paretoShare(itemTitle(x), sv); did.push("سهم " + fa(sv) + "٪" + (PR.paretoSum().over ? " (⚠ سهم‌ها روی هم " + fa(PR.paretoSum().sum) + "٪ — بیش از ۱۰۰٪)" : "")); }
-      if (a.verdict && a.list === "claims") { var rc = a.recheck ? recheckOf(a.recheck, said) : { d: "" }; if (rc.err) return "مورد به‌روز نشد: " + rc.err; PR.claimResult(x.id, a.result || a.quote, a.verdict, null, rc.d); did.push("حکم: " + a.verdict + (rc.d ? " · بررسیِ دوباره " + fdate(rc.d) : " · تاریخِ بررسیِ دوباره را بپرس")); }
+      if (a.verdict && a.list === "claims") { var rc = a.recheck ? recheckOf(a.recheck, said) : { d: "" }; if (rc.err) return "مورد به‌روز نشد: " + rc.err; PR.claimResult(x.id, a.result || a.quote, a.verdict, null, rc.d); did.push("حکم: " + a.verdict + (rc.d ? " · بررسیِ دوباره " + fdate(rc.d) : " · تاریخِ بررسیِ دوباره هنوز گفته نشده — از او بپرس (recheck)")); }   // دورِ ۳۰ (surface، D26-36 s32): دستورِ «بپرس» فقط برای مدل است — بندِ «— … (recheck)» را a27 forHer27 از حبابِ او برمی‌دارد (قراردادِ D27-25)
       else if (a.recheck && a.list === "claims") { var rc2 = recheckOf(a.recheck, said); if (rc2.err) return "مورد به‌روز نشد: " + rc2.err; x.recheck = rc2.d; x.needDate = false; if (x.decidedAt) x.recheck2 = true; listSave(F.c); did.push("بررسیِ دوباره " + fdate(rc2.d)); }
       if (a.how === "reopen") { PR.itemReopen(a.list, x.id, why); did.push("دوباره باز شد"); }
       else if (a.how && CLOSE_FA[a.how]) { PR.itemClose(a.list, x.id, why, null, a.how); did.push(CLOSE_FA[a.how]); }
@@ -58667,6 +58677,11 @@ APP.goFromURL = function (q) {
        ضمیرش را AS.regSys هنگامِ نقش بستن می‌گذارد («تولدتان» برای «شما» و سالمند). */
     G.confirmLine = function (iso) { return "✓ تاریخِ تولدت ثبت شد: " + G.faDate(iso) + " — سن هر بار از همین تاریخ حساب می‌شود."; };
     G.confirmed = function (s, iso) { return !!s && (s.msgs || []).some(function (m) { return m && m.role === "sys" && m.birth === iso; }); };
+    /* دورِ ۳۰ (surface، B26·D16 aB1 p9 «مامانم گفت اینم بگم: من ۳۰ اردیبهشت ۹۶ به دنیا اومدم» — تاریخ از پیش ثبت و تأییدشده بود): همان تاریخ دوباره گفته شد ⇒ صفحه
+       خاموش نمی‌ماند؛ یک سطر برای همان پیام که می‌گوید از پیش ثبت است و چیزی عوض نشد (حرفِ او دیده شد). */
+    G.sameOnce = function (s, iso) { if (!s || !iso) return false; var M = s.msgs || [], u = null; for (var i = M.length - 1; i >= 0; i--) { if (M[i] && M[i].role === "user") { u = M[i]; break; } }
+      var k = u ? String(u.at || u.text || "") : ""; if (!k || M.some(function (m) { return m && m.role === "sys" && m.birthSame === k; })) return false;
+      M.push({ role: "sys", at: new Date().toISOString(), birthSame: k, text: "✓ همین تاریخِ تولدت از پیش ثبت است: " + G.faDate(iso) + " — چیزی عوض نشد." }); s.msgs = M; try { S.put(s); } catch (e) { } return true; };
     G.confirmOnce = function (s, iso) { if (!s || !iso || G.confirmed(s, iso)) return false; s.msgs = s.msgs || []; s.msgs.push({ role: "sys", at: new Date().toISOString(), birth: iso, text: G.confirmLine(iso) }); s.ageAsk = "given"; try { S.put(s); } catch (e) { } return true; };
     /* تاریخی که صفحه خودش از آخرین پیامِ او خواند (همان OWN_BIRTH ِ fromChat) — کنشِ مدل هرگز آن را بازنویسی نمی‌کند (B24·D7) */
     G.pageParse = function (s) { var M = (s && s.msgs) || [], u = null; for (var i = M.length - 1; i >= 0; i--) { if (M[i] && M[i].role === "user") { u = M[i]; break; } }
@@ -58681,8 +58696,8 @@ APP.goFromURL = function (q) {
       if (!r) return "تاریخِ تولد ثبت نشد: تاریخ را نشناختم — همان‌طور که گفت بفرست (مثلاً «۲۰ اردیبهشت ۱۳۳۸»).";
       if (r.need) return "تاریخِ تولد ثبت نشد: روز (" + fa(r.jd) + " " + JM[r.jm - 1] + ") هست، سال نیست — سنی که گفت را با \"age\" بفرست.";
       if (r.err) return "تاریخِ تولد ثبت نشد: " + r.err;
-      if (G.birth() !== r.iso) { var w = G.setBirthInfo(r.iso); if (!w.iso) return "تاریخِ تولد ثبت نشد: " + (w.err || ""); }
-      if (s) { G.confirmOnce(s, r.iso); return ""; }
+      var was30 = G.birth(); if (was30 !== r.iso) { var w = G.setBirthInfo(r.iso); if (!w.iso) return "تاریخِ تولد ثبت نشد: " + (w.err || ""); }
+      if (s) { if (!G.confirmOnce(s, r.iso) && was30 === r.iso) G.sameOnce(s, r.iso); return ""; }
       return RE.test(d) ? "" : G.confirmLine(r.iso);   // بی سشن: قراردادِ پیشین — ISO ⇒ "" (test_age_sync)؛ تاریخِ گفته‌شده ⇒ همان یک سطرِ شمسی
     };
     G.fromChat = function (s, msg) {
@@ -58690,14 +58705,14 @@ APP.goFromURL = function (q) {
       var x = normTx(t), age = G.ageSaid(t), st = S.settings(), pr = st.profile = st.profile || {}, out = null;
       if (OWN_BIRTH.test(x)) {
         var r = G.parse(t, { age: age });
-        if (r && r.iso) { var w = G.setBirthInfo(t, { age: age }); if (w.iso) out = { saved: w.iso }; }
+        if (r && r.iso) { var was30 = G.birth(); var w = G.setBirthInfo(t, { age: age }); if (w.iso) out = { saved: w.iso, same: was30 === w.iso }; }
         else if (r && r.need && !G.birth()) { pr.birthMD = { jm: r.jm, jd: r.jd, at: A.today() }; S.saveSettings(st); out = { need: true }; }
       }
       if (!out && age != null && !G.birth()) {
         var md = pr.birthMD; if (md && md.jm) { var w2 = G.setBirthInfo(fa(md.jd) + " " + JM[md.jm - 1], { age: age }); if (w2.iso) out = { saved: w2.iso }; }
         if (!out) { pr.ageSaid = { age: age, on: A.today() }; S.saveSettings(st); out = { age: age }; }
       }
-      if (out && out.saved && s) G.confirmOnce(s, out.saved);
+      if (out && out.saved && s && !G.confirmOnce(s, out.saved) && out.same) G.sameOnce(s, out.saved);
       return out;
     };
     AS.promptHooks = AS.promptHooks || [];
