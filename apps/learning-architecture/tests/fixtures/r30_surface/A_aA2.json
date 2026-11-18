@@ -1,0 +1,596 @@
+{
+"from": "round30A/aA2",
+"t0": "2026-10-28T10:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "سلام. امروز سر کلاس با استقرا ثابت کردم که 1+3+5+...+(2n-1) = n^2. معلم گفت درسته. ولی حس می‌کنم نفهمیدم چرا «مربع» درمیاد. اثبات رو دارم ولی چرا رو نه. می‌خوام دوباره بهش نگاه کنم.",
+"c": 1
+},
+{
+"eval": "(()=>{const c=document.querySelector('.age-ask');if(!c)return 'NOCARD';const i=c.querySelector('.age-in');i.focus();i.value='۳۱ بهمن ۸۸';i.dispatchEvent(new Event('input',{bubbles:true}));c.querySelector('.btn.sm:not(.ghost)').click();const c2=document.querySelector('.age-ask');return 'INVALID AGE='+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' | card='+(c2?c2.innerText.slice(-160):'GONE')})()",
+"c": 2
+},
+{
+"say": "فقط جبرش جوره. (n+1)^2 − n^2 رو باز کردم شد 2n+1، درسته، ولی «نمی‌بینمش». راستی اون کادرِ تاریخ تولد رو زدم قبول نکرد، من ۱۹ بهمن ۸۸ به دنیا اومدم.",
+"c": 3
+},
+{
+"eval": "\"AGE \"+APP.AGE.birth()+\" age=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)",
+"c": 4
+},
+{
+"eval": "(()=>{APP.go('mind');const m=document.getElementById('main');const i=[...m.querySelectorAll('input')].find(i=>(i.getAttribute('aria-label')||'').includes('تاریخِ تولد'));if(!i)return 'NOFIELD';i.scrollIntoView({block:'center'});i.value='1388/11/19';i.dispatchEvent(new Event('input',{bubbles:true}));i.dispatchEvent(new Event('change',{bubbles:true}));const b=i.parentElement.querySelector('button');if(b)b.click();return 'LATIN birth='+APP.AGE.birth()+' age='+APP.AGE.age()+' val='+i.value})()",
+"c": 5
+},
+{
+"eval": "APP.go('whole')",
+"c": 6
+},
+{
+"say": "آهااان! هر بار یه L دورِ مربعِ قبلی می‌ذارم: ۱ تا، بعد ۳ تا دورش می‌شه ۲×۲، بعد ۵ تا می‌شه ۳×۳. اون L یه ردیفِ n تایی، یه ستونِ n تایی و یه کاشیِ گوشه‌ست: n+n+1 = 2n+1. پس هر عدد فرد یه L ـه و Lها مربع رو بزرگ می‌کنن. حالا می‌بینمش!",
+"c": 7
+},
+{
+"say": "اول ۲ کاشی، بعد ۴ تا اضافه کنم… ۱×۲ می‌شه ۲×۳ بعد ۳×۴. مستطیل می‌شه! پس 2+4+…+2n = n(n+1). تازه چون هر عدد زوج دو برابرِ یه عدده، 1+2+…+n نصفِ اینه: n(n+1)/2. این همون فرمولِ جمعِ گاوسه که حفظش بودیم! باحاله که از یه شکل دراومد.",
+"c": 8
+},
+{
+"say": "پایه یعنی n=1: یه کاشیِ تنها، مربعِ ۱×۱. فرضِ استقرا یعنی فرض کنم تا n مربعِ n×n دارم، بعد Lِ بعدی رو اضافه می‌کنم. پس شکل همون استقراست! درسی که گرفتم: اگه یه فرمول رو فقط با جبر ثابت کردم، یه شکل براش بکشم که «چرا»ش رو ببینم. بیشتر از همه اون سؤال که گفتی با کاشی بچین کمکم کرد. از این جور مسئله‌ها که شکل دارن خیلی خوشم میاد. می‌شه یه جوری یادم بمونه؟ چند روز دیگه ازم بپرس ببینم یادمه یا نه.",
+"c": 9
+},
+{
+"clock": "2026-10-17",
+"c": 10
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 11
+},
+{
+"eval": "APP.go(\"whole\")",
+"c": 12
+},
+{
+"say": "برگهٔ سفیدِ امروز رو بی‌نگاه نوشتم: هر عدد فرد یه L دورِ مربعِ قبلیه — ردیفِ n تایی، ستونِ n تایی، یه کاشیِ گوشه — پایه کاشیِ تنهاست و L همون گامِ استقرا. کامل یادم بود.",
+"c": 13
+},
+{
+"clock": "2026-10-20",
+"c": 14
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 15
+},
+{
+"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))",
+"c": 16
+},
+{
+"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))",
+"c": 17
+},
+{
+"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))",
+"c": 18
+},
+{
+"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))",
+"c": 19
+},
+{
+"eval": "(()=>{APP.go(\"practice\",\"prc_mvry1v29cy3wn\");const m=document.getElementById(\"main\");return m.innerText.slice(0,2500)+\"\\nINPUTS:\"+[...m.querySelectorAll(\"input,textarea,select,button\")].map(e=>(e.id||\"\")+\"/\"+(e.getAttribute(\"aria-label\")||e.placeholder||e.innerText||\"\").slice(0,40)).join(\" | \")})()",
+"c": 20
+},
+{
+"eval": "(()=>{const m=document.getElementById(\"main\");const q=s=>[...m.querySelectorAll(\"input,textarea,select\")].find(e=>(e.getAttribute(\"aria-label\")||e.placeholder||\"\").includes(s));const set=(e,v)=>{e.value=v;e.dispatchEvent(new Event(\"input\",{bubbles:true}));e.dispatchEvent(new Event(\"change\",{bubbles:true}))};set(q(\"چه کردی\"),\"بی‌نگاه: L رو یادم بود ولی نتونستم بگم چرا L دقیقاً 2n+1 کاشیه؛ ردیف و ستون رو قاطی کردم\");set(q(\"درصدِ بازیابی\"),\"50\");const s=q(\"نتیجهٔ جلسه\");const o=[...s.options].map(o=>o.value+\":\"+o.text);const no=[...s.options].find(o=>/نشد/.test(o.text));set(s,no.value);return o.join(\" | \")})()",
+"c": 21
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].find(b=>/ثبتِ جلسهٔ امروز/.test(b.innerText));b.click();const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جلسه‌ها\");return t.slice(i-500,i+700)})()",
+"c": 22
+},
+{
+"eval": "(()=>{const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"موعدِ بعد\");return t.slice(i,i+1200)})()",
+"c": 23
+},
+{
+"clock": "2026-10-21",
+"c": 24
+},
+{
+"eval": "APP.go(\"whole\")",
+"c": 25
+},
+{
+"say": "بازیابیِ امروز: دوباره بی‌نگاه نوشتم. L یعنی ردیفِ n تایی + ستونِ n تایی + کاشیِ گوشه = 2n+1، و n^2 + 2n+1 = (n+1)^2. این بار درست و کامل.",
+"c": 26
+},
+{
+"clock": "2026-10-23",
+"c": 27
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 28
+},
+{
+"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))",
+"c": 29
+},
+{
+"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))",
+"c": 30
+},
+{
+"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))",
+"c": 31
+},
+{
+"eval": "JSON.stringify((APP.PR&&APP.PR.all?APP.PR.all():[]).slice().sort((a,b)=>String(a.at||a.created||'').localeCompare(String(b.at||b.created||''))).map(c=>c.id))",
+"c": 32
+},
+{
+"eval": "(()=>{APP.go(\"practice\",\"prc_mvry1v29cy3wn\");const m=document.getElementById(\"main\");const q=s=>[...m.querySelectorAll(\"input,textarea,select\")].find(e=>(e.getAttribute(\"aria-label\")||e.placeholder||\"\").includes(s));const set=(e,v)=>{e.value=v;e.dispatchEvent(new Event(\"input\",{bubbles:true}));e.dispatchEvent(new Event(\"change\",{bubbles:true}))};set(q(\"چه کردی\"),\"بی‌نگاه: L، پایه و گام، و کاربست برای 2+4+…+2n = n(n+1)\");set(q(\"درصدِ بازیابی\"),\"100\");set(q(\"نتیجهٔ جلسه\"),\"1\");[...m.querySelectorAll(\"button\")].find(b=>/ثبتِ جلسهٔ امروز/.test(b.innerText)).click();const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"موعدِ بعد:\");return t.slice(i,i+200)})()",
+"c": 33
+},
+{
+"clock": "2026-10-28",
+"c": 34
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 35
+},
+{
+"eval": "APP.go(\"whole\")",
+"c": 36
+},
+{
+"say": "برگهٔ روزِ ۷ رو هم بی‌نگاه نوشتم، یه روز دیرتر: هر فرد یه L ـه، 2n+1 = n + n + 1، پایه کاشیِ تنها، گام L بعدی؛ و همین روش برای زوج‌ها مستطیل n(n+1) می‌ده. کامل.",
+"c": 37
+},
+{
+"say": "نوشت ثبت نشد! ثبتش کن دیگه، امروز بی‌نگاه کامل یادم بود.",
+"c": 38
+},
+{
+"eval": "(()=>{APP.go(\"psy_item\");const m=document.getElementById(\"main\");const r=[...m.querySelectorAll(\"input[type=radio]\")];if(!r.length)return \"NO ITEM\";r[2].click();const t=[...m.querySelectorAll(\"input\")].find(e=>e.type===\"text\"||e.type===\"number\");if(t){t.value=\"70\";t.dispatchEvent(new Event(\"input\",{bubbles:true}))};[...m.querySelectorAll(\"button\")].find(b=>/ثبتِ پاسخ/.test(b.innerText)).click();APP.go(\"mind\");const x=document.getElementById(\"main\").innerText;const i=x.indexOf(\"استدلالِ سیال\\tمسئله\");return x.slice(i,i+400)})()",
+"c": 39
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 40
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 41
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 42
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 43
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvb7r61sf2m87');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 44
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 45
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 46
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 47
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t})()",
+"c": 48
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 49
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 50
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 51
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 52
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvb7r3qibkiiv');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 53
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 54
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 55
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 56
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t})()",
+"c": 57
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 58
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 59
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 60
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 61
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvb7r44pny6yy');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 62
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 63
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 64
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 65
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t})()",
+"c": 66
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 67
+},
+{
+"eval": "(()=>{const c=APP.PR.all()[0];APP.go(\"practice\",c.id);const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"جلسه‌ها\");return JSON.stringify({st:c.state||c.status,stable:c.stable||c.stableAt,ses:(c.sessions||c.log||[]).map(x=>[x.d||x.date||x.at,x.ok,x.pct,x.by||x.src])})+\"\\n\"+t.slice(t.indexOf(\"تثبیت\"),t.indexOf(\"تثبیت\")+700)})()",
+"c": 68
+},
+{
+"eval": "(()=>{const c=APP.PR.all()[0];return APP.today()+\" \"+JSON.stringify({n:APP.PR.all().length,st:c.state||c.status,keys:Object.keys(c).join(\",\"),ses:(c.sessions||c.log||c.ses||[]).map(x=>[x.d||x.date||x.at,x.ok,x.pct,x.by||x.src])})})()",
+"c": 69
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 70
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 71
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 72
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltiulpp94');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 73
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 74
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 75
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 76
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t})()",
+"c": 77
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 78
+},
+{
+"eval": "JSON.stringify({t:APP.today(),pr:APP.PR.all().map(c=>({id:c.id,tid:c.tid,st:c.state||c.st,next:c.next||c.due,n:(c.sessions||c.log||[]).length,last:(c.sessions||c.log||[]).slice(-3).map(x=>[x.date||x.at,x.ok,x.pct])}))})",
+"c": 79
+},
+{
+"clock": "2026-10-29",
+"c": 80
+},
+{
+"eval": "APP.PR.all()[0].id",
+"c": 81
+},
+{
+"say": "امروز برهانِ کاشی‌های L رو بی‌نگاه نوشتم، همه‌ش یادم بود.",
+"c": 82
+},
+{
+"eval": "JSON.stringify({t:APP.today(),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-1).map(m=>m.text.slice(0,350)),c:APP.PR.all().map(c=>({st:c.state,next:c.next,n:(c.sessions||[]).length})),due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\").slice(0,160)).filter(x=>/🧪|تمرین/.test(x))})",
+"c": 83
+},
+{
+"eval": "APP.today()",
+"c": 84
+},
+{
+"clock": "2026-11-04",
+"c": 85
+},
+{
+"eval": "JSON.stringify({t:APP.today(),due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\").slice(0,200)).filter(x=>/🧪|تمرین|بازیابی/.test(x))})",
+"c": 86
+},
+{
+"eval": "JSON.stringify({due:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\").slice(0,120)),pr:APP.PR.all().map(c=>JSON.stringify(c).slice(0,600))})",
+"c": 87
+},
+{
+"say": "دیر شد ببخشید. امروز بی‌نگاه نوشتم ولی یادم نیومد چرا کاشیِ گوشه لازمه — نتونستم کامل کنم.",
+"c": 88
+},
+{
+"clock": "2026-11-05",
+"c": 89
+},
+{
+"say": "امروز دوباره نوشتم، این بار کاشیِ گوشه هم یادم بود: 2n+1 = n + n + 1. کامل.",
+"c": 90
+},
+{
+"clock": "2026-11-07",
+"c": 91
+},
+{
+"say": "روزِ ۳: بی‌نگاه نوشتم، کامل بود.",
+"c": 92
+},
+{
+"clock": "2026-11-11",
+"c": 93
+},
+{
+"say": "روزِ ۷: این بار باز گامِ استقرا رو قاطی کردم، نیمه‌کاره موند.",
+"c": 94
+},
+{
+"eval": "(()=>{APP.go(\"mind\");const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"کارِ تکنیک\");return t.slice(i,i+700)})()",
+"c": 95
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>d.open=true);const t=document.getElementById(\"main\").innerText;return (t.match(/.{0,80}(تمرین بازیابی|T41|۴۱).{0,200}/g)||[]).slice(0,4).join(\" ¦ \")})()",
+"c": 96
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 97
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 98
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 99
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvry17if7cuex');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 100
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 101
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 102
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 103
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t})()",
+"c": 104
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 105
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 106
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 107
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 108
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvry17ihoeymv');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 109
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 110
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 111
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 112
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t})()",
+"c": 113
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 114
+},
+{
+"say": "یه چک دیگه: ۱ + ۳ + ۵ + ۷ = ۱۶ = ۴²، ۲ + ۴ + ۶ + ۸ = ۲۰ = ۴ × ۵، و ۱ + ۳ + … + ۱۹ = ۹۰.",
+"c": 115
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 116
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 117
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 118
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvry177oevqgm');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 119
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 120
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 121
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 122
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t})()",
+"c": 123
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 124
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 125
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 126
+},
+{
+"c": 127
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 128
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvry17f8n3swg');try{CT('^کلِ گفت‌وگو')}catch(e){};return new Promise(r=>setTimeout(()=>{const t=document.getElementById('main').innerText;r(t.slice(Math.max(0,t.indexOf('📜'))))},700))})()",
+"c": 129
+},
+{
+"c": 130
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 131
+},
+{
+"c": 132
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 133
+},
+{
+"c": 134
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 135
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvry1v20hzu');const t=document.getElementById('main').innerText;return t})()",
+"c": 136
+},
+{
+"c": 137
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 138
+},
+{
+"c": 139
+},
+{
+"c": 140,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"برهان را داری و حالا دنبالِ «چرا» هستی — این خودش بازنگری است، مهم‌ترین بخشِ کار. در گامِ استقرایت از n به n+1 دقیقاً چه چیزی اضافه شد — می‌توانی همان را در یک نگاه ببینی؟\", \"title\": \"چرا جمعِ فردها مربع است\", \"memory\": \"با استقرا ثابت کرده 1+3+…+(2n−1)=n² ولی «چرا مربع» را نمی‌بیند؛ بازنگری؛ پرسیدم در گامِ استقرا چه اضافه شد و آیا در یک نگاه می‌بیندش.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"proof\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"تاریخِ تولدت را همان‌طور که گفتی برای ثبت فرستادم. جبر جور است ولی «دیده» نمی‌شود — پس شکل بکش: اگر n² را با کاشی‌های کوچک به شکلِ یک مربعِ n×n بچینی، آن 2n+1 کاشیِ تازه را کجای مربعِ قبلی می‌گذاری تا مربعِ بعدی ساخته شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"۱۹ بهمن ۸۸\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"خودت دیدی‌اش: هر عددِ فرد یک L است — ردیفِ n تایی، ستونِ n تایی و کاشیِ گوشه — و همان 2n+1 ِ جبرت حالا شکل دارد. اگر همین نگاه را کلی‌تر کنی، مثلاً برای جمع‌های دیگر، چه چیزی آشکار می‌شود که در این حالتِ خاص پنهان بود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"هر عدد فرد یه L ـه و Lها مربع رو بزرگ می‌کنن\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"روشت را به مسئلهٔ تازه بردی: زوج‌ها مستطیلِ n در (n+1) می‌سازند و نصفش همان جمعِ 1 تا n است. (صفحه «۱×۲ می‌شه ۲×۳» را حساب خوانده و با آن هم‌خوان ندیده؛ اگر منظورت اندازهٔ مستطیل‌ها بود، همان است که نوشتی.) حالا برگرد به برهانِ کلاس: پایه و گامِ استقرا هر کدام کجای این شکل‌اند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"result\": \"2+4+…+2n = n(n+1)\", \"ans\": [\"b7\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"شکل و برهان را خودت یکی کردی: پایه کاشیِ تنهاست و گامِ استقرا همان L ِ بعدی. مسئله، درست، پرسشِ سودمند و سلیقه‌ات را ثبت می‌کنم، و چون خودت خواستی، پروندهٔ «تمرینِ بازیابیِ فعال» را برای همین موضوع باز می‌کنم تا چند روز دیگر بی‌نگاه بنویسی‌اش و صفحه بپرسد یادت مانده یا نه.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"چرا جمعِ فردها مربع است\", \"statement\": \"با استقرا ثابت کردم که 1+3+5+...+(2n-1) = n^2؛ می‌خواهم ببینم چرا «مربع» درمی‌آید.\", \"kind\": \"prove\", \"lesson\": \"اگه یه فرمول رو فقط با جبر ثابت کردم، یه شکل براش بکشم که «چرا»ش رو ببینم\", \"check\": \"پایه یعنی n=1: یه کاشیِ تنها، مربعِ ۱×۱. فرضِ استقرا یعنی فرض کنم تا n مربعِ n×n دارم، بعد Lِ بعدی رو اضافه می‌کنم\", \"bestQ\": \"اون سؤال که گفتی با کاشی بچین\", \"taste\": \"از این جور مسئله‌ها که شکل دارن خیلی خوشم میاد\"}, {\"do\": \"start_practice\", \"tid\": 41, \"topic\": \"چرا جمعِ فردها مربع است\", \"consent\": {\"quote\": \"چند روز دیگه ازم بپرس ببینم یادمه یا نه\", \"kind\": \"request\"}}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"check\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\", \"taste\": {\"text\": \"از این جور مسئله‌ها که شکل دارن خیلی خوشم میاد\"}}]}",
+"{\"reply\": \"گزارشِ امروز را برای پروندهٔ تمرینت فرستادم؛ صفحه نتیجه و موعدِ بعد را نشان می‌دهد. بی‌نگاه و کامل نوشتی — کدام تکه‌اش اول به ذهنت آمد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvry1v29cy3wn\", \"what\": \"برگهٔ سفید: چرا جمعِ فردها مربع است، بی‌نگاه\", \"pct\": 100, \"ok\": true, \"quote\": \"برگهٔ سفیدِ امروز رو بی‌نگاه نوشتم: هر عدد فرد یه L دورِ مربعِ قبلیه — ردیفِ n تایی، ستونِ n تایی، یه کاشیِ گوشه — پایه کاشیِ تنهاست و L همون گامِ استقرا. کامل یادم بود\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"این گزارش را هم برای پروندهٔ تمرینت فرستادم؛ صفحه نتیجه را نشان می‌دهد. این بار چه چیزی باعث شد بخشِ جاافتادهٔ دفعهٔ پیش سرِ جایش بیاید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvry1v29cy3wn\", \"what\": \"بازیابیِ بی‌نگاه: L = ردیف + ستون + گوشه = 2n+1\", \"pct\": 100, \"ok\": true, \"quote\": \"بازیابیِ امروز: دوباره بی‌نگاه نوشتم. L یعنی ردیفِ n تایی + ستونِ n تایی + کاشیِ گوشه = 2n+1، و n^2 + 2n+1 = (n+1)^2. این بار درست و کامل\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"گزارشِ روزِ ۷ را هم — با یک روز دیرکرد — برای پروندهٔ تمرینت فرستادم؛ صفحه نتیجه را نشان می‌دهد. این بار کاربست برای زوج‌ها را هم خودت آوردی؛ همین روش را کجای دیگر می‌توانی به کار ببری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvry1v29cy3wn\", \"what\": \"برگهٔ روزِ ۷، بی‌نگاه، یک روز دیرتر\", \"pct\": 100, \"ok\": true, \"quote\": \"برگهٔ روزِ ۷ رو هم بی‌نگاه نوشتم، یه روز دیرتر: هر فرد یه L ـه، 2n+1 = n + n + 1، پایه کاشیِ تنها، گام L بعدی؛ و همین روش برای زوج‌ها مستطیل n(n+1) می‌ده. کامل\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"ثبت شده: صفحه زیرِ پیامِ قبلی‌ات نوشته «جلسهٔ ۶ آبان ۱۴۰۵ … ثبت شد (درست)» و موعدِ بعد را ۱۳ آبان گذاشته — برای همین دوباره نمی‌فرستمش که دو بار شمرده نشود. در پروندهٔ تمرینت هم همین را می‌بینی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"تو\"}]}",
+"{\"reply\": \"جلسهٔ امروزت را برای پروندهٔ تمرینت فرستادم؛ صفحه نتیجه را نشان می‌دهد. کدام تکه‌اش اول به ذهنت آمد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvry1v29cy3wn\", \"what\": \"بازیابیِ بی‌نگاهِ برهانِ کاشی\", \"ok\": true, \"quote\": \"امروز برهانِ کاشی‌های L رو بی‌نگاه نوشتم، همه‌ش یادم بود\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"این بار تکهٔ کاشیِ گوشه یادت نیامد — همین را برای پروندهٔ تمرینت فرستادم. بدونِ نگاه: ردیف و ستون هر کدام n تا؛ آن یکی کاشی کجای L می‌نشیند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvry1v29cy3wn\", \"what\": \"بازیابیِ روزِ ۳، دیرتر\", \"ok\": false, \"quote\": \"امروز بی‌نگاه نوشتم ولی یادم نیومد چرا کاشیِ گوشه لازمه — نتونستم کامل کنم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"این بار کامل — برای پروندهٔ تمرینت فرستادم. چه چیزی باعث شد این بار گوشه یادت بماند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvry1v29cy3wn\", \"what\": \"بازیابی پس از فراموشی\", \"ok\": true, \"quote\": \"امروز دوباره نوشتم، این بار کاشیِ گوشه هم یادم بود: 2n+1 = n + n + 1. کامل.\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"روزِ ۳ هم کامل — فرستادم. این بار برهان را از کدام سر شروع کردی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvry1v29cy3wn\", \"what\": \"بازیابیِ روزِ ۳\", \"ok\": true, \"quote\": \"روزِ ۳: بی‌نگاه نوشتم، کامل بود.\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"روزِ ۷ نیمه‌کاره ماند — همین را هم برای پروندهٔ تمرینت فرستادم. گامِ استقرا کجا قاطی شد: پایه یا رفتن از n به n+1؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvry1v29cy3wn\", \"what\": \"بازیابیِ روزِ ۷\", \"ok\": false, \"quote\": \"روزِ ۷: این بار باز گامِ استقرا رو قاطی کردم، نیمه‌کاره موند.\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"چهار حسابِ اول درست‌اند؛ جمعِ فردها تا ۱۹ را یک بار دیگر با همان قاعدهٔ مربع بسنج — چند تا عدد است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"l\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"سلام. امروز سر کلاس با استقرا ثابت کردم که 1+3+5+...+(2n-1) = n^2. معلم گفت درسته. ولی حس می‌کنم نفهمیدم چرا «مربع» درمیاد. اثبات رو دارم ولی چرا رو نه. می‌خوام دوباره بهش نگاه کنم.",
+"فقط جبرش جوره. (n+1)^2 − n^2 رو باز کردم شد 2n+1، درسته، ولی «نمی‌بینمش». راستی اون کادرِ تاریخ تولد رو زدم قبول نکرد، من ۱۹ بهمن ۸۸ به دنیا اومدم.",
+"آهااان! هر بار یه L دورِ مربعِ قبلی می‌ذارم: ۱ تا، بعد ۳ تا دورش می‌شه ۲×۲، بعد ۵ تا می‌شه ۳×۳. اون L یه ردیفِ n تایی، یه ستونِ n تایی و یه کاشیِ گوشه‌ست: n+n+1 = 2n+1. پس هر عدد فرد یه L ـه و Lها مربع رو بزرگ می‌کنن. حالا می‌بینمش!",
+"اول ۲ کاشی، بعد ۴ تا اضافه کنم… ۱×۲ می‌شه ۲×۳ بعد ۳×۴. مستطیل می‌شه! پس 2+4+…+2n = n(n+1). تازه چون هر عدد زوج دو برابرِ یه عدده، 1+2+…+n نصفِ اینه: n(n+1)/2. این همون فرمولِ جمعِ گاوسه که حفظش بودیم! باحاله که از یه شکل دراومد.",
+"پایه یعنی n=1: یه کاشیِ تنها، مربعِ ۱×۱. فرضِ استقرا یعنی فرض کنم تا n مربعِ n×n دارم، بعد Lِ بعدی رو اضافه می‌کنم. پس شکل همون استقراست! درسی که گرفتم: اگه یه فرمول رو فقط با جبر ثابت کردم، یه شکل براش بکشم که «چرا»ش رو ببینم. بیشتر از همه",
+"برگهٔ سفیدِ امروز رو بی‌نگاه نوشتم: هر عدد فرد یه L دورِ مربعِ قبلیه — ردیفِ n تایی، ستونِ n تایی، یه کاشیِ گوشه — پایه کاشیِ تنهاست و L همون گامِ استقرا. کامل یادم بود.",
+"بازیابیِ امروز: دوباره بی‌نگاه نوشتم. L یعنی ردیفِ n تایی + ستونِ n تایی + کاشیِ گوشه = 2n+1، و n^2 + 2n+1 = (n+1)^2. این بار درست و کامل.",
+"برگهٔ روزِ ۷ رو هم بی‌نگاه نوشتم، یه روز دیرتر: هر فرد یه L ـه، 2n+1 = n + n + 1، پایه کاشیِ تنها، گام L بعدی؛ و همین روش برای زوج‌ها مستطیل n(n+1) می‌ده. کامل.",
+"نوشت ثبت نشد! ثبتش کن دیگه، امروز بی‌نگاه کامل یادم بود.",
+"امروز برهانِ کاشی‌های L رو بی‌نگاه نوشتم، همه‌ش یادم بود.",
+"دیر شد ببخشید. امروز بی‌نگاه نوشتم ولی یادم نیومد چرا کاشیِ گوشه لازمه — نتونستم کامل کنم.",
+"امروز دوباره نوشتم، این بار کاشیِ گوشه هم یادم بود: 2n+1 = n + n + 1. کامل.",
+"روزِ ۳: بی‌نگاه نوشتم، کامل بود.",
+"روزِ ۷: این بار باز گامِ استقرا رو قاطی کردم، نیمه‌کاره موند.",
+"یه چک دیگه: ۱ + ۳ + ۵ + ۷ = ۱۶ = ۴²، ۲ + ۴ + ۶ + ۸ = ۲۰ = ۴ × ۵، و ۱ + ۳ + … + ۱۹ = ۹۰."
+]
+}

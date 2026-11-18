@@ -1,0 +1,157 @@
+{
+"from": "round30B/bp3",
+"t0": "2026-10-25T09:00:00",
+"base": 0,
+"inject": "(()=>{if(window.__RD)return;const RD=Date;window.__RD=RD;window.__off=0;function D(...a){if(!new.target)return new RD(RD.now()+window.__off).toString();return a.length?new RD(...a):new RD(RD.now()+window.__off)}D.prototype=RD.prototype;D.now=()=>RD.now()+window.__off;D.UTC=RD.UTC;D.parse=RD.parse;window.Date=D;window.__adv=(d)=>{window.__off+=d*864e5;try{APP.render()}catch(e){};return new D().toISOString()};})();\nwindow.__fx={set(sel,v){const e=typeof sel==='string'?document.querySelector(sel):sel;if(!e)return 'NOEL '+sel;const pr=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(pr,'value').set.call(e,v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'},\nbtn(re,root){const b=[...(root?document.querySelector(root):document).querySelectorAll('button')].filter(b=>b.getClientRects().length).find(b=>re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,60)},\nfields(){return [...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>e.getClientRects().length).map(e=>(e.id||e.name||'?')+'|'+e.type+'|'+(e.getAttribute('aria-label')||e.placeholder||'').slice(0,70)+'|'+String(e.value).slice(0,40))},\nbtns(){return [...document.querySelectorAll('#main button')].filter(b=>b.getClientRects().length).map(b=>b.textContent.trim().slice(0,50))},\nmain(n){return document.getElementById('main').innerText.slice(0,n||3000)}};'fx'\n",
+"steps": [
+{
+"say": "سلام! یه سؤال از کتاب: «نردبانی به طول ۵ متر به دیوار تکیه داده شده و پایه‌اش ۳ متر از دیوار فاصله داره. نردبان تا چه ارتفاعی از دیوار بالا میره؟ و مساحت مثلثی که نردبان و دیوار و زمین درست می‌کنن چقدره؟» من گفتم ارتفاع میشه ۵ منهای ۳، یعنی ۲ متر. ولی جواب آخر کتاب ۴ئه. نمی‌فهمم چرا.",
+"c": 1
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await w(700);const i=document.querySelector('.age-ask .age-in');if(!i)return 'NOCARD age='+APP.AGE.age();i.scrollIntoView({block:'center'});const st=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;st.call(i,\"2012-01-25\");i.dispatchEvent(new Event('input',{bubbles:true}));await w(300);[...document.querySelectorAll('.age-ask button')].find(b=>b.textContent.trim()==='ثبت').click();await w(700);const m=document.querySelector('.age-ask .bad');return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' err='+(m?m.textContent:'')+' card='+!!document.querySelector('.age-ask')})()",
+"c": 2
+},
+{
+"say": "یه نردبون کج به دیوار تکیه داده، می‌خوایم بدونیم سرش تا کجای دیوار میرسه و اون مثلثه چقدر مساحت داره. ولی خب، ۵ منهای ۳ چرا نمیشه؟",
+"c": 3
+},
+{
+"say": "نمی‌دونم... شاید چون نردبون کجه؟ اگه صاف بود ۵ میشد. ولی کج که هست، چطوری حساب کنم؟ معلممون گفت یه قضیه‌ای هست برای مثلث‌ها ولی من اون جلسه نبودم.",
+"c": 4
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let o={};try{const sc=APP.PRE.scope(s);o.stack=APP.PRE.all(sc);o.rec=APP.PRE.rec(sc)}catch(e){o.err=String(e)}try{o.causes=APP.MIND.phases().causes;o.pre=APP.MIND.phases().prereq}catch(e){o.merr=String(e)}return JSON.stringify(o).slice(0,4000)})()",
+"c": 5
+},
+{
+"say": "اسمشو شنیدم ولی نمی‌دونم چی میگه. یه چیزی با مربع ضلع‌ها بود؟",
+"c": 6
+},
+{
+"say": "۹×۹ = ۸۱، ۱۲×۱۲ = ۱۴۴، جمعشون ۲۲۵. پس وتر ۲۲۵ متره؟ یه کم زیاده...",
+"c": 7
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt.rt-p-det\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"INSIDE-NESTED\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 8
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 9
+},
+{
+"say": "۸؟ چون ۱۶ تقسیم بر ۲ میشه ۸.",
+"c": 10
+},
+{
+"say": "۶! چون ۶ × ۶ میشه ۳۶. پس جذر ۳۶ میشه ۶.",
+"c": 11
+},
+{
+"say": "۲۲۵ بود، جذرش... ۱۵ × ۱۵ = ۲۲۵. پس وتر ۱۵!",
+"c": 12
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt.rt-p-rejoin\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"AFTER-RETURN\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 13
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 14
+},
+{
+"say": "۵ × ۵ = ۲۵، ۳ × ۳ = ۹. دیوار یکی از اون دو ضلعه، پس ۲۵ منهای ۹ = ۱۶، جذرش ۴. دیوار ۴ متره! همون جواب کتاب. حالا مساحت مثلث: ۳ × ۴ = ۱۲ متر مربع؟",
+"c": 15
+},
+{
+"say": "کشیدم. قطر مستطیل رو دقیقاً نصف می‌کنه! پس مثلث نصف مستطیله: ۱۲ تقسیم بر ۲ میشه ۶. پس مساحت مثلث نصف قاعده ضرب در ارتفاعه؟ برای یه مثلث ۸ و ۵ هم میشه ۲۰.",
+"c": 16
+},
+{
+"say": "روی کاغذ شطرنجی یه مثلث ۳ و ۴ کشیدم و ضلع کجش رو با خط‌کش اندازه گرفتم، دقیقاً ۵ خونه شد! پس درسته. درسی که گرفتم: اگه یه قضیه رو بلد نیستم، اسمش رو بپرسم و اول همونو یاد بگیرم؛ و مساحت مربع با خود ضلع فرق داره.",
+"c": 17
+},
+{
+"say": "همون پرسش تشخیصی که گفتی مربعِ ۱۶ خونه‌ای ضلعش چنده؛ اونجا فهمیدم مساحت با ضلع فرق داره. راستی، این سه تا چیزی که بلد نبودم — فیثاغورس، جذر، مساحت مثلث — رو می‌خوام یه جا داشته باشم که بعداً تمرینشون کنم که یادم نره.",
+"c": 18
+},
+{
+"say": "شمردن خونه‌ها و ساختن مساحت از مستطیل رو دوست داشتم. اینکه اسم قضیه رو همون اول گفتی خیلی کمک کرد؛ قبلش فکر می‌کردم شاید خنگم که نمی‌فهمم.",
+"c": 19
+},
+{
+"say": "سلام! امروز برگه‌ی سفید رو از حافظه نوشتم: فیثاغورس و مساحت مثلث رو درست نوشتم، ولی جذر ۸۱ رو ۸ گفتم که غلطه، ۹ میشه. یعنی دوتا از سه تا.",
+"eval0": "__adv(1);1",
+"c": 20
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 21
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let o={};try{const sc=APP.PRE.scope(s);o.stack=APP.PRE.all(sc);o.rec=APP.PRE.rec(sc)}catch(e){o.err=String(e)}try{o.causes=APP.MIND.phases().causes;o.pre=APP.MIND.phases().prereq}catch(e){o.merr=String(e)}return JSON.stringify(o).slice(0,4000)})()",
+"c": 22
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"mind\",null,null);await w(1000);document.querySelectorAll('#main details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});await w(400);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 23
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"prereq\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 24
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt.rt-dest\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"FINAL\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 25
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"practice\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 26
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",APP.ASSIST.cur().id,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 27
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);__adv(2);APP.go('today');await w(1200);window.scrollTo(0,0);return APP.today()+' :: '+document.getElementById('main').innerText.split('\\n').filter(l=>/فیثاغورس|جذر|بازیابی|🧪|نردبان|🧩/.test(l)).join(' ¦ ')})()",
+"c": 28
+},
+{
+"c": 29,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"این‌که جوابت با کتاب نخواند و دنبالِ «چرا» هستی خیلی خوب است. پیش از عددها، کل را ببینیم: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"نردبان و دیوار\", \"pinned\": \"نردبانِ ۵ متری، پایه ۳ متر از دیوار: ارتفاع روی دیوار و مساحتِ مثلث\", \"memory\": \"سارا؛ مسئلهٔ نردبان (۵ متر، پایه ۳ متر از دیوار): ارتفاع و مساحتِ مثلث. خودش ۵−۳=۲ گفت، کتاب ۴. پرسیدم کلِ مسئله در یک جمله.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"فهمِ مسئله: کل در یک جمله\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"ارتفاع میشه ۵ منهای ۳، یعنی ۲ متر\"}]}",
+"{\"reply\": \"کل را خوب گفتی: سرِ نردبان تا کجای دیوار می‌رسد، و مساحتِ آن مثلث. دربارهٔ ۵ منهای ۳: خودت فکر می‌کنی چرا جوابِ کتاب با آن فرق دارد؟\", \"pinned\": \"نردبانِ ۵ متری، پایه ۳ متر از دیوار: ارتفاع روی دیوار و مساحتِ مثلث\", \"memory\": \"کل را گفت (ارتفاعِ سرِ نردبان و مساحتِ مثلث). پرسید چرا ۵−۳ نمی‌شود؛ حدسِ خودش را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"فهمِ مسئله\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\"], \"ans\": [\"u0\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"قضیه‌ای که معلمت گفت «قضیهٔ فیثاغورس» است: در مثلثی که یک زاویه‌اش قائمه است، ضلع‌ها رابطهٔ ثابتی دارند — و همین گامِ تو (پیدا کردنِ ارتفاعِ سرِ نردبان روی دیوار از ۵ و ۳) دقیقاً آن را لازم دارد. اول ببینیم از آن چه می‌دانی: اسمش را قبلاً شنیده بودی یا یادت هست دربارهٔ کدام ضلع‌های مثلث چیزی می‌گوید؟\", \"memory\": \"جلسهٔ فیثاغورس را غایب بوده؛ ۵−۳ را به‌جای ارتفاع گفته بود. پیش‌نیاز: قضیهٔ فیثاغورس؛ پرسشِ تشخیصی پرسیده شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq\": {\"concept\": \"قضیهٔ فیثاغورس (مثلثِ قائم‌الزاویه: مربعِ وتر = مجموعِ مربع‌های دو ضلعِ دیگر)\", \"step\": \"پیدا کردنِ ارتفاعِ سرِ نردبان روی دیوار از طولِ نردبان (۵) و فاصلهٔ پایه (۳)\", \"quote\": \"معلممون گفت یه قضیه‌ای هست برای مثلث‌ها ولی من اون جلسه نبودم\", \"q\": \"اسمِ فیثاغورس را شنیده‌ای یا می‌دانی دربارهٔ کدام ضلع‌ها چیزی می‌گوید؟\", \"topic\": \"هندسهٔ مثلث\"}}]}",
+"{\"reply\": \"پس از اول، فقط همان‌قدر که این گام لازم دارد. «قضیهٔ فیثاغورس»: در مثلثی که یک زاویه‌اش قائمه (۹۰ درجه) است، اگر روی هر ضلع یک مربع بکشی، مساحتِ مربعِ روی ضلعِ کج — «وتر»، روبه‌روی زاویهٔ قائمه — برابر است با جمعِ مساحتِ دو مربعِ دیگر: a² + b² = c². مثال: دو ضلعِ ۶ و ۸ ⇒ ۳۶ + ۶۴ = ۱۰۰ خانه روی وتر. حالا خودت: در مثلثی قائم که دو ضلعِ کنارِ زاویهٔ قائمه‌اش ۹ و ۱۲ است، طولِ وتر چند است؟\", \"memory\": \"تشخیص: اسم را شنیده، محتوا را نه (missing). قضیه را با مثالِ ۶-۸ یاد دادم؛ پرسشِ تسلط: ۹ و ۱۲.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"missing\", \"quote\": \"اسمشو شنیدم ولی نمی‌دونم چی میگه\"}}]}",
+"{\"reply\": \"قضیه را درست به کار بردی: ۸۱ + ۱۴۴ = ۲۲۵. ولی ۲۲۵ مساحتِ مربعِ روی وتر است، نه خودِ وتر — برای رسیدن از مساحتِ مربع به ضلعش یک چیزِ دیگر لازم است: «جذر» (ضلعِ مربعی که مساحتش را می‌دانی). اول ببینیم آن را داری: مربعی که ۱۶ خانه دارد، ضلعش چند خانه است؟\", \"memory\": \"فیثاغورس را درست به کار برد (۲۲۵) ولی مساحتِ مربع را با ضلع یکی گرفت. پیش‌نیازِ تو‌در‌تو: جذر (والد pq1).\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq\": {\"concept\": \"جذر: ضلعِ مربعی که مساحتش معلوم است\", \"step\": \"رسیدن از مساحتِ مربعِ روی وتر به طولِ وتر\", \"quote\": \"پس وتر ۲۲۵ متره؟\", \"q\": \"مربعی که ۱۶ خانه دارد، ضلعش چند خانه است؟\", \"parent\": \"pq1\", \"topic\": \"توان و ریشه\"}, \"prior\": [{\"step\": \"مربع‌ها\", \"quote\": \"۹×۹ = ۸۱، ۱۲×۱۲ = ۱۴۴، جمعشون ۲۲۵\", \"verdict\": \"ok\", \"why\": \"درست\"}, {\"step\": \"وتر\", \"quote\": \"پس وتر ۲۲۵ متره؟\", \"verdict\": \"wrong\", \"why\": \"۲۲۵ مساحتِ مربعِ روی وتر است، نه خودِ وتر\", \"dep\": [1]}]}]}",
+"{\"reply\": \"این یکی را «جذر» می‌گویند: عددی که ضرب در خودش، مساحتِ مربع را بدهد — یعنی ضلعِ مربع. ۱۶ خانه را مربعی بچین: ۴ ردیفِ ۴تایی می‌شود، پس ضلعش ۴ است، چون ۴ × ۴ = ۱۶ (نه نصفِ ۱۶). می‌نویسیم √16 = 4. حالا خودت: مربعی که ۳۶ خانه دارد، ضلعش چند است؟\", \"memory\": \"تشخیص: جذر را با نصف کردن یکی گرفت (missing). جذر را با چیدنِ ۱۶ خانه یاد دادم؛ پرسشِ تسلط: ۳۶.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq2\", \"diag\": \"missing\", \"quote\": \"۸؟ چون ۱۶ تقسیم بر ۲ میشه ۸.\"}}]}",
+"{\"reply\": \"درست — √36 = 6، و خودت با ۶ × ۶ وارسی‌اش کردی. برگردیم به پیش‌نیازِ قضیهٔ فیثاغورس، همان‌جا که برای پیدا کردنِ ارتفاعِ سرِ نردبان یادش می‌گرفتی: حالا که جذر را داری، وترِ آن مثلثِ قائم با ضلع‌های ۹ و ۱۲ چند است؟\", \"memory\": \"تسلطِ جذر: √36=6 (با ۶×۶). برگشت به فیثاغورس (pq1) برای مثالِ ۹ و ۱۲.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq2\", \"mastery\": \"yes\", \"quote\": \"۶! چون ۶ × ۶ میشه ۳۶. پس جذر ۳۶ میشه ۶.\"}, \"prior\": [{\"step\": \"جذر\", \"quote\": \"۶ × ۶ میشه ۳۶. پس جذر ۳۶ میشه ۶\", \"verdict\": \"ok\", \"why\": \"درست\"}]}]}",
+"{\"reply\": \"درست — ۸۱ + ۱۴۴ = ۲۲۵ و √225 = 15؛ فیثاغورس و جذر را با هم به کار بردی. برگردیم به مسئلهٔ اصلیِ نردبان، به همان گامی که منتظر مانده بود: پیدا کردنِ ارتفاعِ سرِ نردبان روی دیوار با نردبانِ ۵ متری و فاصلهٔ ۳ متریِ پایه. حالا که قضیهٔ فیثاغورس را داری، همان گام را چطور برمی‌داری؟\", \"memory\": \"تسلطِ فیثاغورس: وترِ ۹ و ۱۲ را ۱۵ گفت (با جذر). برگشت به گامِ ارتفاعِ نردبان.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq1\", \"mastery\": \"yes\", \"quote\": \"۲۲۵ بود، جذرش... ۱۵ × ۱۵ = ۲۲۵. پس وتر ۱۵!\"}, \"prior\": [{\"step\": \"جذرِ ۲۲۵\", \"quote\": \"۱۵ × ۱۵ = ۲۲۵. پس وتر ۱۵\", \"verdict\": \"ok\", \"why\": \"درست\"}]}]}",
+"{\"reply\": \"ارتفاع را خودت با فیثاغورس و جذر پیدا کردی: ۴ متر، همان جوابِ کتاب. برای مساحت یک چیزِ دیگر لازم است: «مساحتِ مثلث» — ۳ × ۴ مساحتِ مستطیلی است که ضلع‌هایش ۳ و ۴ است، نه مثلث. اول ببینیم آن را داری: مستطیلی ۳ در ۴ بکش و قطرش را هم بکش؛ مثلثت چه تکه‌ای از آن مستطیل است؟\", \"memory\": \"ارتفاع ۴ متر (درست، بی‌کمک). مساحتِ مثلث را ۳×۴ گفت: پیش‌نیازِ تازه (pq3) برای مجهولِ دوم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq\": {\"concept\": \"مساحتِ مثلث = نصفِ قاعده × ارتفاع\", \"step\": \"پیدا کردنِ مساحتِ مثلثِ نردبان، دیوار و زمین\", \"quote\": \"حالا مساحت مثلث: ۳ × ۴ = ۱۲ متر مربع؟\", \"q\": \"مستطیلی ۳ در ۴ بکش و قطرش را بکش؛ مثلثت چه تکه‌ای از مستطیل است؟\", \"topic\": \"مساحتِ شکل‌ها\"}, \"prior\": [{\"step\": \"ضلعِ دیوار\", \"quote\": \"۲۵ منهای ۹ = ۱۶، جذرش ۴. دیوار ۴ متره\", \"verdict\": \"ok\", \"why\": \"درست\"}, {\"step\": \"مساحتِ مثلث\", \"quote\": \"۳ × ۴ = ۱۲ متر مربع؟\", \"verdict\": \"wrong\", \"why\": \"این مساحتِ مستطیل است؛ مثلث نصفِ آن است\"}]}]}",
+"{\"reply\": \"مساحتِ مثلث را خودت از مستطیل ساختی (نصفِ قاعده × ارتفاع) و با مثالِ ۸ و ۵ هم آزمودی — و همان گامِ منتظر را هم برداشتی: مساحتِ مثلثِ نردبان ۶ متر مربع. حالا هر دو مجهول را داری: ارتفاع ۴ متر و مساحت ۶ متر مربع. می‌توانی ارتفاع را از راهِ دیگری وارسی کنی — مثلاً با شمردنِ خانه‌های مربع‌ها روی کاغذِ شطرنجی؟\", \"memory\": \"مساحتِ مثلث را خودش ساخت (نصفِ مستطیل) و با ۸×۵ آزمود (mastery). هر دو مجهول: ۴ متر و ۶ متر مربع. پرسشِ وارسی.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq3\", \"diag\": \"missing\", \"mastery\": \"yes\", \"quote\": \"پس مساحت مثلث نصف قاعده ضرب در ارتفاعه؟ برای یه مثلث ۸ و ۵ هم میشه ۲۰.\"}, \"prior\": [{\"step\": \"نصفِ مستطیل\", \"quote\": \"۱۲ تقسیم بر ۲ میشه ۶\", \"verdict\": \"ok\", \"why\": \"درست\"}, {\"step\": \"نمونهٔ دیگر\", \"quote\": \"برای یه مثلث ۸ و ۵ هم میشه ۲۰\", \"verdict\": \"ok\", \"why\": \"درست\"}]}]}",
+"{\"reply\": \"وارسیِ مستقلِ خوبی بود: خط‌کش همان ۵ را داد. درست را هم به قلمِ خودت ثبت کردم. از پرسش‌هایی که این‌جا پرسیدم، کدام بیشتر کمکت کرد؟\", \"pinned\": \"نردبانِ ۵ متری، پایه ۳ متر از دیوار: ارتفاع و مساحتِ مثلث\", \"memory\": \"وارسی با کاغذِ شطرنجی (۵ خانه). درس ثبت شد؛ chat_solved فرستاده شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری\", \"s\": \"done\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"نردبان: ارتفاع و مساحتِ مثلث\", \"statement\": \"نردبانی به طول ۵ متر به دیوار تکیه داده شده و پایه‌اش ۳ متر از دیوار فاصله داره. نردبان تا چه ارتفاعی از دیوار بالا میره؟ و مساحت مثلثی که نردبان و دیوار و زمین درست می‌کنن چقدره؟\", \"kind\": \"find\", \"lesson\": \"اگه یه قضیه رو بلد نیستم، اسمش رو بپرسم و اول همونو یاد بگیرم؛ و مساحت مربع با خود ضلع فرق داره.\", \"check\": \"روی کاغذ شطرنجی یه مثلث ۳ و ۴ کشیدم و ضلع کجش رو با خط‌کش اندازه گرفتم، دقیقاً ۵ خونه شد\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [\"b3\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"check\": {\"msgs\": [\"ضلع کجش رو با خط‌کش اندازه گرفتم، دقیقاً ۵ خونه شد\"]}, \"learned\": {\"concept\": \"قضیهٔ فیثاغورس (مثلثِ قائم‌الزاویه: مربعِ وتر = مجموعِ مربع‌های دو ضلعِ دیگر)\", \"quote\": \"مساحت مربع با خود ضلع فرق داره\"}, \"prior\": [{\"step\": \"وارسی با کاغذِ شطرنجی\", \"quote\": \"ضلع کجش رو با خط‌کش اندازه گرفتم، دقیقاً ۵ خونه شد\", \"verdict\": \"ok\", \"why\": \"وارسیِ درست\"}]}]}",
+"{\"reply\": \"ثبت شد که همان پرسشِ تشخیصیِ «مربعِ ۱۶ خانه‌ای» بیشتر کمک کرد. برای سه چیزِ تازه یک پروندهٔ تمرینِ بازیابی (برگهٔ سفید از حافظه) درخواست کردم؛ زمان‌بندی‌اش را خودِ پرونده از متنِ تکنیک می‌گیرد و صفحه نتیجه را نشان می‌دهد. این نوع مسئله برایت چطور بود — کدام بخشش را دوست داشتی و کدامش را نه؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"تمرینِ فیثاغورس، جذر، مساحتِ مثلث\", \"s\": \"now\", \"view\": \"practice\"}], \"actions\": [{\"do\": \"chat_lookback\", \"pid\": \"pb_l_mvnix8ke5pj\", \"bestQ\": \"همون پرسش تشخیصی که گفتی مربعِ ۱۶ خونه‌ای ضلعش چنده\"}, {\"do\": \"start_practice\", \"tid\": 41, \"topic\": \"فیثاغورس، جذر و مساحتِ مثلث\", \"consent\": {\"quote\": \"می‌خوام یه جا داشته باشم که بعداً تمرینشون کنم که یادم نره\", \"kind\": \"request\"}}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"سلیقه‌ات را ثبت کردم. دربارهٔ «خنگم»: گیرِ تو از سه چیزِ مشخص بود که سرِ کلاس نبودی یا نخوانده بودی — قضیهٔ فیثاغورس، جذر و مساحتِ مثلث — و هر سه را همین‌جا یاد گرفتی و خودت به کار بردی؛ مساحت را حتی خودت از مستطیل ساختی.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری\", \"s\": \"done\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"chat_lookback\", \"pid\": \"pb_l_mvnix8ke5pj\", \"taste\": \"شمردن خونه‌ها و ساختن مساحت از مستطیل رو دوست داشتم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [\"b5\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"taste\": {\"text\": \"شمردن خونه‌ها و ساختن مساحت از مستطیل رو دوست داشتم\"}}]}",
+"{\"reply\": \"جلسهٔ امروزِ برگهٔ سفید را برای پرونده فرستادم؛ صفحه نتیجه و موعدِ بعد را می‌گوید. دو از سه، و اشتباهِ جذر را هم خودت پیدا کردی. برای جذر: کدام مربع‌های کامل را از حفظ داری که با آن‌ها جذر را بسنجی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"پروندهٔ تمرینِ بازیابی\", \"s\": \"now\", \"view\": \"practice\"}], \"actions\": [{\"do\": \"practice_log\", \"prc\": \"prc_mvnixcjqdk749\", \"what\": \"برگهٔ سفید از حافظه: فیثاغورس و مساحتِ مثلث درست؛ جذرِ ۸۱ را ۸ گفت (درستش ۹)\", \"quote\": \"فیثاغورس و مساحت مثلث رو درست نوشتم، ولی جذر ۸۱ رو ۸ گفتم که غلطه، ۹ میشه. یعنی دوتا از سه تا\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"سلام! یه سؤال از کتاب: «نردبانی به طول ۵ متر به دیوار تکیه داده شده و پایه‌اش ۳ متر از دیوار فاصله داره. نردبان تا چه ارتفاعی از دیوار بالا میره؟ و مساحت مثلثی که نردبان و دیوار و زمین درست می‌کنن چقدره؟» من گفتم ارتفاع میشه ۵ منهای ۳، یعنی",
+"یه نردبون کج به دیوار تکیه داده، می‌خوایم بدونیم سرش تا کجای دیوار میرسه و اون مثلثه چقدر مساحت داره. ولی خب، ۵ منهای ۳ چرا نمیشه؟",
+"نمی‌دونم... شاید چون نردبون کجه؟ اگه صاف بود ۵ میشد. ولی کج که هست، چطوری حساب کنم؟ معلممون گفت یه قضیه‌ای هست برای مثلث‌ها ولی من اون جلسه نبودم.",
+"اسمشو شنیدم ولی نمی‌دونم چی میگه. یه چیزی با مربع ضلع‌ها بود؟",
+"۹×۹ = ۸۱، ۱۲×۱۲ = ۱۴۴، جمعشون ۲۲۵. پس وتر ۲۲۵ متره؟ یه کم زیاده...",
+"۸؟ چون ۱۶ تقسیم بر ۲ میشه ۸.",
+"۶! چون ۶ × ۶ میشه ۳۶. پس جذر ۳۶ میشه ۶.",
+"۲۲۵ بود، جذرش... ۱۵ × ۱۵ = ۲۲۵. پس وتر ۱۵!",
+"۵ × ۵ = ۲۵، ۳ × ۳ = ۹. دیوار یکی از اون دو ضلعه، پس ۲۵ منهای ۹ = ۱۶، جذرش ۴. دیوار ۴ متره! همون جواب کتاب. حالا مساحت مثلث: ۳ × ۴ = ۱۲ متر مربع؟",
+"کشیدم. قطر مستطیل رو دقیقاً نصف می‌کنه! پس مثلث نصف مستطیله: ۱۲ تقسیم بر ۲ میشه ۶. پس مساحت مثلث نصف قاعده ضرب در ارتفاعه؟ برای یه مثلث ۸ و ۵ هم میشه ۲۰.",
+"روی کاغذ شطرنجی یه مثلث ۳ و ۴ کشیدم و ضلع کجش رو با خط‌کش اندازه گرفتم، دقیقاً ۵ خونه شد! پس درسته. درسی که گرفتم: اگه یه قضیه رو بلد نیستم، اسمش رو بپرسم و اول همونو یاد بگیرم؛ و مساحت مربع با خود ضلع فرق داره.",
+"همون پرسش تشخیصی که گفتی مربعِ ۱۶ خونه‌ای ضلعش چنده؛ اونجا فهمیدم مساحت با ضلع فرق داره. راستی، این سه تا چیزی که بلد نبودم — فیثاغورس، جذر، مساحت مثلث — رو می‌خوام یه جا داشته باشم که بعداً تمرینشون کنم که یادم نره.",
+"شمردن خونه‌ها و ساختن مساحت از مستطیل رو دوست داشتم. اینکه اسم قضیه رو همون اول گفتی خیلی کمک کرد؛ قبلش فکر می‌کردم شاید خنگم که نمی‌فهمم.",
+"سلام! امروز برگه‌ی سفید رو از حافظه نوشتم: فیثاغورس و مساحت مثلث رو درست نوشتم، ولی جذر ۸۱ رو ۸ گفتم که غلطه، ۹ میشه. یعنی دوتا از سه تا."
+]
+}

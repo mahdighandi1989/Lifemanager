@@ -274,6 +274,9 @@
     notes.push("«" + clip(e.concept, 40) + "» آموخته شد — برگشت به " + bk);
     evlog(sc, e, "preok", "🧩 آموخته شد: «" + clip(e.concept, 60) + "»", ["وارسیِ تسلط: «" + clip(q, 200) + "»"].concat(e.selfMade ? ["خودش ساخت — از پرسشِ تشخیصی"] : []), "برگشت به " + bk, um, s);
     try { s.msgs.push({ role: "sys", at: nowIso(), text: "🧩 «" + clip(e.concept, 60) + "» آموخته شد (پیشرفت، نه ضعف) — برگشت به " + bk + "." }); } catch (er) { }
+    /* دورِ ۳۰ (surface، A26-19 pA3): پدری که با فرزندش آموخته شد (casc، فراخوانِ بازگشتیِ همین تابع) در رکوردِ «🧩 نقشهٔ پیش‌نیازها» همگام نمی‌شد — فراخواننده فقط
+       فرزند را همگام می‌کرد؛ 📜 «🧩 آموخته شد: «قضیهٔ فیثاغورس»» می‌گفت و کارنامه «در حالِ یاد گرفتن: «قضیهٔ فیثاغورس»». هر آموخته‌شدن همان دم همگام می‌شود. */
+    try { syncItem(sc, e); } catch (er) { }
   }
   PRE.report = function (s, a) {
     var um = lastUser(s); if (!um || !a) return "";
@@ -430,9 +433,21 @@
     L.push(CTX + "پیش‌نیازِ تشخیص‌داده‌شده: " + O.map(function (e) { return "«" + noq(clip(e.concept, 60)) + "»"; }).join("، ") + " — نامش را صریح بگو؛ فقط به اندازه‌ای که همین گام لازم دارد (نه فرمول‌ها و برهان‌های دیگرِ همان موضوع).");
     return L;
   }
+  /* دورِ ۳۰ (surface، C186 — C26-18 tC1/tC1t/pC1 p6: پرسشِ تشخیصیِ «نقطهٔ شبنم» پس از جوابِ p5 دوباره «پرسشِ این نوبت» شد): مدل prereq_res را نداد و صفحه منتظرِ گزارشِ
+     مدل ماند. صفحه خودش می‌خواند: نخستین پیامِ او پس از پرسیده‌شدنِ پرسشِ تشخیصی (e.asked) که خودش پرسش نیست، جوابِ همان پرسش است ⇒ «جواب گرفت؛ مربی حکمی نداد»
+     (سطرِ 📜) و پرسش دیگر هرگز همان‌طور دوباره پرسیده نمی‌شود. پرسشِ تازهٔ او پس از پرسشِ تشخیصی جواب نیست (C186 look-alike). */
+  function ansNJ30(s, sc, X, um) {
+    var e = topOf(X); if (!e || e.state !== "diag" || !e.asked || e.ansNJ) return false; var M = (s && s.msgs) || [], k0 = mid(um), a = null;
+    for (var i = 0; i < M.length; i++) { var m = M[i]; if (!isUser(m) || String(m.at || "") <= String(e.asked) || (k0 && mid(m) === k0)) continue; if (/[؟?]\s*$/.test(String(m.text || "").trim())) continue; a = m; break; }
+    if (!a) return false;
+    e.ansNJ = { q: clip(a.text, 300), at: a.at || nowIso(), key: mid(a) }; if (!e.diagAns) { e.diagAns = clip(a.text, 400); e.diagAt = a.at || nowIso(); }
+    evlog(sc, e, "prediag", "🧩 پرسشِ تشخیصی: «" + clip(e.concept, 60) + "»", ["پاسخِ تو: «" + clip(a.text, 200) + "»"], "جواب داد — مربی حکمی نداد (بود یا نبود گزارش نشد)", a, s);
+    try { syncItem(sc, e); } catch (er) { } return true;
+  }
   function directive(sc, X) {
     var e = topOf(X); if (!e) return "";
     var back = restate(sc, X, e);
+    if (e.state === "diag" && e.ansNJ) return "- **پرسشِ این نوبت همین است:** او به پرسشِ تشخیصیِ «" + noq(clip(e.concept, 60)) + "» پیش‌تر جواب داد («" + noq(clip(e.ansNJ.q, 120)) + "») و حکمی گزارش نشد — آن پرسش را دوباره نپرس. اگر همین پیام یا آن جواب نشان می‌دهد مفهوم را دارد یا ساخت: {\"do\":\"coach_state\",\"prereq_res\":{\"id\":\"" + e.id + "\",\"diag\":\"had\",\"quote\":\"عینِ حرفش در همین پیام\"}} ⇒ «" + noq(back) + "»؛ اگر نشان می‌دهد ندارد: \"diag\":\"missing\" ⇒ فقط به اندازهٔ گامِ «" + noq(clip(e.step, 60)) + "» یاد بده و **یک** پرسشِ تسلط با مثالِ تازه بپرس.";
     if (e.state !== "teach") return "- **پرسشِ این نوبت همین است:** " + (e.q ? "پرسشِ تشخیصیِ «" + noq(clip(e.concept, 60)) + "» («" + noq(e.q) + "»)." : "پرسشِ تشخیصیِ کوتاهِ «" + noq(clip(e.concept, 60)) + "».") + " اگر همین پیام پاسخش است: {\"do\":\"coach_state\",\"prereq_res\":{\"id\":\"" + e.id + "\",\"diag\":\"missing|had\",\"quote\":\"عینِ پاسخش\"}} (اگر پاسخش نشان داد خودش ساختش، \"mastery\":\"yes\" هم بده). " +
       "missing ⇒ «" + noq(clip(e.concept, 60)) + "» را فقط به اندازهٔ گامِ «" + noq(clip(e.step, 60)) + "» یاد بده (کوتاه، با یک مثالِ کوچکِ غیرِ همین مسئله؛ نامش را صریح بگو) و **یک** پرسشِ تسلط با مثالِ تازه بپرس؛ had ⇒ «" + noq(back) + "». اگر پاسخ نداد، همان پرسشِ تشخیصی را کوتاه‌تر دوباره بپرس.";
     if (e.mastPending) return "- **پرسشِ این نوبت همین است:** «" + noq(clip(e.concept, 60)) + "» را پیش‌تر نشان داده بود («" + noq(clip(e.mastPending.q, 100)) + "») و پیش‌نیازِ درونی‌اش هم حالا بسته است؛ برگرد به همین پیش‌نیاز و بپرس گامِ «" + noq(clip(e.step, 60)) + "» را با آن تا آخر چطور برمی‌دارد. اگر همین پیام آن را برداشت: {\"do\":\"coach_state\",\"prereq_res\":{\"id\":\"" + e.id + "\",\"mastery\":\"yes\",\"quote\":\"عینِ حرفش\"}} ⇒ برگشت به «" + noq(restate(sc, X, e)) + "».";
@@ -471,7 +486,7 @@
     if (lr.length) L.push(CTX + "پیش‌نیازهایی که در همین مسئله آموخت (پیشرفت): " + lr.map(function (e) { return "«" + noq(clip(e.concept, 50)) + "»"; }).join("، ") + ".");
     if (PRE.ability(m)) L.push(abilityLine(s, m, O, lr));
     var busy = false;
-    if (O.length) { busy = true; L = L.concat(stackLines(sc, X)); L.push(directive(sc, X)); var tp = O[O.length - 1], k0 = mid(um); if (tp.state === "diag" && k0 && tp.dirKey !== k0) { tp.dirKey = k0; try { R.put(); } catch (e) { } } }
+    if (O.length) { busy = true; try { if (ansNJ30(s, sc, X, um)) R.put(); } catch (e30) { } L = L.concat(stackLines(sc, X)); L.push(directive(sc, X)); var tp = O[O.length - 1], k0 = mid(um); if (tp.state === "diag" && k0 && tp.dirKey !== k0) { tp.dirKey = k0; try { R.put(); } catch (e) { } } }
     else { var tq = turnQ(sc); if (tq && tq.st === "back") busy = true; if (tq && tq.st === "back") L.push("- **پرسشِ این نوبت همین است:** (برگشت از پیش‌نیاز) اگر پیامش همین گام را برداشت، همان را دنبال کن؛ وگرنه: «" + noq(tq.q) + "» — «گامِ بعدیِ تو چیست» یا «کلِ مسئله» را این نوبت نپرس."); }
     try { L = L.concat(sysLines(s, sc, X, m, busy)); } catch (e) { }   // دورِ ۲۳ (Q6): گام‌های منتظرِ برگه و نوبتِ از سر گرفتن
     return L.join("\n");
@@ -551,6 +566,11 @@
     try {
       var um = lastUser(s); if (!um || !PRE.ability(um.text)) return; var sc = PRE.scope(s) || lastScope(s), R = sc && store(sc); if (!R) return;
       var O = openOf(R.X), lr = R.X.st.filter(function (e) { return e && e.state === "learned"; }), gap = O.length ? O[O.length - 1] : lr.length ? lr[lr.length - 1] : null; if (!gap) return;
+      /* دورِ ۳۰ (surface، B26·D12 bp3 s19 «اینکه اسم قضیه رو همون اول گفتی خیلی کمک کرد؛ قبلش فکر می‌کردم شاید خنگم»): سطر آخرین پیش‌نیاز («مساحتِ مثلث») را نام می‌برد،
+         نه همان که خودش گفت. پیش‌نیازی که **جملهٔ همان برچسبِ خودش** نامش را می‌برد (واژه‌ای از نامِ مفهوم، ≥ ۳ حرف) مقدم است؛ وگرنه همان قاعدهٔ پیشین. */
+      try { var sent30 = (String(um.text || "").split(/[.!؟?\n]+/).filter(function (x) { return PRE.ability(x); })[0] || ""), sw30 = zk(sent30);
+        var nm30 = O.concat(lr).filter(function (e) { return e && e.concept && String(e.concept).split(/[\s‌=()،,]+/).map(function (w) { return zk(w).trim(); }).some(function (w) { return w.length >= 3 && sw30.indexOf(" " + w + " ") >= 0; }); });
+        if (nm30.length) gap = nm30[nm30.length - 1]; } catch (e30) { }
       var k = "ab|" + mid(um); if ((s.msgs || []).some(function (m) { return m && m.role === "sys" && m.k22 === k; })) return;
       var sh = shoma(s);
       s.msgs.push({ role: "sys", at: nowIso(), k22: k, text: "🧩 این کم‌هوشی نیست: گیر از نبودنِ «" + clip(gap.concept, 60) + "» در گامِ «" + clip(gap.step, 60) + "» بود — کمبودِ یک پیش‌نیازِ مشخص، نه " + (sh ? "استعدادِ شما" : "توانِ تو") + (gap.state === "learned" ? (sh ? "؛ که همین‌جا آموختید (پیشرفت)." : "؛ که همین‌جا آموختی (پیشرفت).") : "؛ که همین حالا با هم یادش می‌گیریم.") });

@@ -37171,6 +37171,11 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
      تلاشِ دیدنی = کارِ خودش در متنِ خودش (فرمول، رابطه با متغیر، طرح، حدس، حدسِ ردشده، یافته) — «گیر کردم»/«نیم ساعته موندم» تلاش را نشان نمی‌دهد. */
   var ONLY_Q = "خودت تا کجا رفتی و کجا ماندی؟", OPT_Q = "گزینه‌ات را با تک‌تکِ بخش‌های شرط بسنج — هر بخش را برآورده می‌کند؟",
     CLAIM_Q = "ثابتش می‌کنی یا با مثالِ نقض ردش می‌کنی — کدام را اول امتحان می‌کنی؟",
+    /* دورِ ۳۰ (C26-23/24): نامِ مرحله‌های روشِ خودِ صفحه؛ پرسشِ معنایشان پرسشِ روش است (پاسخ از فهرستِ خودِ همان مرحله) */
+    METHT30 = /^(?:بازنگری|بازبینی|وارسی|طرح(?:[‌\s]?ریزی)?|اجرای\s*طرح|فهمِ?\s*مسئله|فهمیدنِ?\s*مسئله)$/,
+    METHG30 = /(?:^|[\s.،])یعنی\s+(?:[^؟?.\n]{0,20}\s)?(?:چک|وارسی|بررسی|امتحان|نگاه|مرور)\s*(?:کنم|کنیم|بکنم)\s+(?:که|ببینم)[^؟?\n]{0,30}[؟?]/,
+    METH_Q30 = function (w) { return "«" + w + "» نامِ یکی از چهار مرحلهٔ کار است (پولیا) — معنایش را با پرسش‌های خودِ همین مرحله (فهرستِ بالا) کوتاه بگو، بی داوریِ حلِ او؛ بعد بپرس کدام را اول روی حلِ خودش انجام می‌دهد"; },
+    METHG_Q30 = "حدسش دربارهٔ معنای همین مرحله است، نه ادعایی دربارهٔ مسئله — بگو کدام بخشِ حدسش با پرسش‌های خودِ این مرحله (فهرستِ بالا) می‌خواند و کدام را هنوز نگفته؛ همان یکی را بپرس",
     REL_Q = "از نتیجه یا روشِ همان که بلدی، این‌جا می‌توانی استفاده کنی؟",
     PROOF_Q = "در حالت‌هایی که امتحان کردی، چه چیزی هست که نشدن را لازم می‌آورد — و برای هر حالتی، نه فقط این‌ها، برقرار می‌ماند؟",
     /* دورِ ۱۳ (M4، s38 p6 در برابرِ s11 p3): پرسشِ برهان تابعِ آن است که حالت‌های آزموده چه نشان دادند — «امتحان کردم درسته … چطور ثابت کنم» (حالت‌ها جواب دادند)
@@ -37207,7 +37212,10 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     var teach = !!o.teach, has = {}, list = [];
     var add = function (id, on, q) { if (!on) return; var m = { id: id, q: q }; has[id] = m; list.push(m); };
     var attempt = attemptSeen(x.s, mt, teach, !!o.isIntro), only = ONLY_ANS_RE.test(mt) && !attempt;
-    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt);
+    /* دورِ ۳۰ (surface، C26-23/C26-24 aC2 p1–p2): «بازنگری دقیقاً یعنی چی؟» پرسش از **روشِ خودِ صفحه** است (نامِ یکی از چهار مرحلهٔ پولیا)، نه واژهٔ کلیدیِ مسئلهٔ او ⇒
+       نه «به تعریف‌ها برگرد» (A038)؛ و حدسِ خودش دربارهٔ معنای همان مرحله («یعنی دوباره چک کنم که درسته؟») ادعای محلِ بحث نیست ⇒ نه «ثابتش کن یا ردش کن». */
+    var mterm30 = defAsk(mt) ? ((/([آ-ی‌]{2,}(?:\s*(?:ِ|‌ی)?\s*[آ-ی‌]{2,})?)\s*(?:دقیقاً|دقیقا|اصلاً|اصلا|واقعاً|واقعا)?\s*یعنی\s*(?:چی|چه)\s*[؟?]/.exec(ownText(mt)) || [])[1] || defWord(mt)) : "", meth30 = METHT30.test(String(mterm30 || "").replace(/[\s‌]*(?:دقیقاً|دقیقا|اصلاً|اصلا|واقعاً|واقعا)[\s‌]*$/, "").trim()), mguess30 = METHG30.test(ownText(mt));
+    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt) && !mguess30;
     /* دورِ ۲۵ (P1، DECISIONS_R25): پیامِ آغازینِ کارِ پیشین ⇒ نقطهٔ ازسرگیری؛ ردِ حکم ⇒ دوباره‌سنجی با شاهد — بالاتر از «اول کل»، آزمونِ حدس و «خودت فکر می‌کنی چرا؟»
        (A25-1، B25·D2/D3، C25-12/13، D25-6؛ خوانش از a45 A.STORY.priorTurn) */
     var pw25 = x.prior && /^(?:open|dispute|again|undo|which)$/.test(x.prior.id) ? x.prior : null;   // دورِ ۲۶ (Q4): پس گرفتنِ رد و «کدام گام؟» هم پرسشِ نوبتِ دفترند
@@ -37221,7 +37229,9 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     /* دورِ ۱۲ (L1، s11 p3): خودش آزمود («امتحان کردم، نشد») و برهان می‌خواهد ⇒ پرسشِ برهان (خانوادهٔ C145)، نه «چطور می‌آزمایی‌اش؟» */
     add("C145p", !x.hc && !o.guess && testedProof(mt), proofQ(mt));
     /* دورِ ۱۲ (L1، s13 p3، s27 p2): معنای واژهٔ کلیدی را می‌جوید (نامزدها/تردید) ⇒ «به تعریف‌ها برگرد» (A038) پرسشِ نوبت است */
-    add("A038", !o.guess && defAsk(mt), DEF_Q(defWord(mt)));
+    mterm30 = String(mterm30 || "").replace(/[\s‌]*(?:دقیقاً|دقیقا|اصلاً|اصلا|واقعاً|واقعا)[\s‌]*$/, "").trim();
+    add("M30", !o.guess && (meth30 || mguess30), meth30 ? METH_Q30(mterm30) : METHG_Q30);
+    add("A038", !o.guess && defAsk(mt) && !meth30, DEF_Q(defWord(mt)));
     add("check", opt, OPT_Q);
     add("claim", claim, CLAIM_Q);
     add("B231", !!x.refTurn, "از ردش چه آموختی و کدام فرضِ پنهان شکست؟");
@@ -37371,6 +37381,7 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     if (ph === "c" || ph === "p") L.push("- زمینه (نه پرسشِ دوم): سلیقه و درنگ (B14): در مکثی طبیعی، نه کنارِ پرسشِ این نوبت، جا دارد بداند تا این‌جا کدام بخشش را دوست دارد و کدام را نه " + (srcQ("C120") || "") + " (C120؛ و پس از تلاشِ خودش، حلِ نویسندگانِ خوب — C117)؛ اگر خسته یا گیر است، ایدهٔ خوب پس از تلاشِ جدی می‌آید — «بگذار ته‌نشین شود، بعد برگرد» (کارِ ناخودآگاه، D009: فقط مسئله‌ای ته‌نشین می‌شود که جدی رویش کار شده — کنار گذاشتنِ آگاهانه، نه رها کردن؛ وقتی برگشت، نخست همان «چه چیزی به ذهنت رسید») . حلِ نویسنده‌ای خوب را فقط پس از تلاشِ خودش.");
     if (ph === "b" && !a129) L.push("- بازنگری مهم‌ترین بخشِ کار است " + (srcQ("C115") || "") + " و هیچ مسئله‌ای کاملاً تمام نمی‌شود " + (srcQ("A138") || "") + ": «حل شد» را تأیید یا رد نکن؛ پرسشِ این نوبت یک پرسشِ بازنگری است (همان بالا). اگر بازنگری را بیهوده خواند، همین دو جمله را آرام بگو. زمینه (نه پرسشِ دوم): سلیقه " + (srcQ("C120") || "") + " — این‌که کدام بخشش را دوست داشت — و " + (srcQ("C117") || "تقلید و تمرین") + " — حلِ نویسنده‌ای خوب را بخواند و بعد بی‌نگاه بازسازی کند.");
     /* E8 (دورِ ۴): سطرهای همان مرحله از دفترِ پوششِ منبع (sources/polya_how_to_solve_it: A038/B052، A263/B188–B189، B162، C168) */
+    if (MO.has.M30) L.push((isWin("M30") ? "- **پرسشِ این نوبت همین است:** پرسشِ روش (دربارهٔ روشِ خودِ صفحه، نه مسئلهٔ تازه): " : "- زمینه (نه پرسشِ دوم): پرسشِ روش: ") + MO.has.M30.q + ".");
     if (MO.has.A038) L.push(isWin("A038") ? "- **پرسشِ این نوبت همین است:** معنای واژهٔ کلیدی را می‌جوید (نامزدها یا تردید) — این حدس نیست؛ به تعریف‌ها برگرد " + cite("A038") + "، بازگشت به تعریف خودش تغییرِ مسئله است " + cite("B052") + ": «" + MO.has.A038.q + "» — «درست است/نه» نگو و معنایی را جای او برنگزین."
       : "- زمینه (نه پرسشِ دوم): معنای واژهٔ کلیدی را می‌جوید — به تعریف‌ها برگرد " + cite("A038") + "؛ " + MO.ptr + ".");
     else if (ph === "u" || ph === "p") L.push(altOr("به تعریف‌ها برگرد " + (srcQ("A038") || "") + ": واژهٔ کلیدیِ مبهمِ صورت یا شرط — در مسئلهٔ زندگی هم («شریکِ جرم یعنی چه»، «موفق یعنی چه») — دقیقاً یعنی چه؛ بازگشت به تعریف خودش تغییرِ مسئله است " + (srcQ("B052") || "") + ".", " اگر واژه‌ای همین حالا مبهم است، همان پرسشِ نوبت را با معنای دقیقِ آن واژه همراه کن (نه پرسشی کنارش)."));
@@ -42043,6 +42054,7 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); tutOf(pg.tut, { id: pg.id, pid: pid0, title: pTitle(pid0) }); });
     /* RN2e: شناسهٔ کارهای زنده‌ای که پیامدشان در همین جدول شمرده می‌شود (گامِ بسته با پیامد) */
     var liveActs = {}, seenAct = {};
+    var lbDone30 = {}; S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""), B = (pg.solve || {}).b || {}; Object.keys(B).forEach(function (lv) { var b = B[lv]; if (!b || b.skip || b.superseded) return; var t = String(b.at || b.doneAt || ""); if (t && (b.verdict === "verified" || b.chkBy === "msgs" || b.own) && (!lbDone30[pid0] || t < lbDone30[pid0])) lbDone30[pid0] = t; }); });
     S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); (((pg.solve || {}).live || {}).steps || []).forEach(function (st) { var o = st && st.out; if (o && !o.auto && o.done && !wdOut(o)) liveActs["lstep:" + pid0 + ":" + st.id] = 1; }); });
     S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut, { id: c.id, title: c.title }); });
     S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut, { id: r.id }); });
@@ -42052,6 +42064,10 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
       /* تورِ پولیا (RN3c): رویدادِ «در انتظارِ» الگو (pend، بی گزارشِ مدل) شمرده نمی‌شود؛ (RN2e) هر کار یک بار — رویدادی که شناسه‌اش (act) همان گامِ ثبت‌شدهٔ
          مسئلهٔ زنده است کنار می‌رود (پیامد همان‌جا شمرده می‌شود)، و دو رویدادِ گفت‌وگو با یک شناسه و یک مرحله یکی‌اند */
       (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok" || e.src === "prior") || e.pend || e.wd) return;
+        /* دورِ ۳۰ (surface، C185 — A26-25 aA2 «بازنگری ۱ از ۴ · ۹۶٪»): فقط داوریِ **همان** مرحله در آن مرحله شمرده می‌شود. گیرِ گفت‌وگویی با ph «b» که **پس از** ثبتِ
+           بازنگریِ وارسی‌شدهٔ همان مسئله آمد («روزِ ۷: … گامِ استقرا رو قاطی کردم»، «امروز بی‌نگاه نوشتم ولی یادم نیومد») گزارشِ یادآوریِ تمرین است، نه بازنگریِ حل —
+           شکستِ بازنگری نیست (بازنگریِ درست و وارسی‌شده موفقیتِ آن مرحله است و همان‌جا شمرده شده). */
+        if (e.ph === "b" && !e.ok && e.pid && lbDone30[e.pid] && String(e.at || "") > lbDone30[e.pid]) return;
         /* دورِ ۲۵ (P1، A25-6/B25·D11/C25-18): گامِ کارِ پیشین — درست ⇒ به حسابِ خودش (اجرا +)؛ نادرست/ناقص ⇒ با علتِ خودش؛ اصلاحِ خودش ⇒ موفقیت. پیش‌تر رویدادِ src «prior» اصلاً خوانده نمی‌شد */
         /* دورِ ۲۶ (Q9، U24 s11 «− گامِ کارِ پیشین که درست نبود» برای گامِ «⚠️ ناقص»؛ بانکِ R26 #237): «درست نبود» فقط گامی است که دفترِ کارِ پیشین همین حالا «نادرست» می‌داند.
            گامِ ناقص یا فقط «وابسته» شکست نیست و در کارنامه «−» نمی‌گیرد (نه + و نه −). حکم از خودِ دفتر (A.STORY.priorFor) خوانده می‌شود، نه از رویداد. */
@@ -42163,7 +42179,7 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
           return h("tr", { "data-ph": X.id }, h("td", {}, X.fa), h("td", { class: "mind-php" }, pf(X.p) + " (" + fa(X.n) + ")"), h("td", {}, fa(X.k) + " از " + fa(X.n)), h("td", { class: "mind-phw" }, Q.weakest ? pf(X.pWeak) : "—"),
             h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return (Q.src[s] || srcFa26(s)) + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)", fromList(X.acts, "ph:" + X.id)));
         })))),
-      h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
+      h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + "، بر پایهٔ " + fa(((Q.rows || []).filter(function (X) { return X.id === Q.weakest.id; })[0] || {}).n || 0) + " داوریِ همین مرحله) از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
         : Q.n && Q.ranked >= 2 ? M.NO_DISTINCT + " (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای شکستی ندارد یا مرحله‌ها برابرند؛ «ضعیف‌ترین» فقط وقتی نام برده می‌شود که مرحله‌ای شکست دارد و از همهٔ مرحله‌های دیگر به‌روشنی پایین‌تر است."
         : Q.n ? "فقط یک مرحله داده دارد (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای «ضعیف‌ترین» نامیده نمی‌شود؛ مرحله‌های بی‌داده با پیشینِ ½ سنجیده نمی‌شوند." : "هنوز هیچ رویدادِ سنجیده‌ای نیست — هیچ مرحله‌ای رتبه نمی‌گیرد (نمی‌دانیم)."),
       causesSection(Q),
@@ -47412,9 +47428,13 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
   /* ---------- بردهای کوچک (تور ۱، s34؛ «موفقیت‌های کوچک را بجویید») — یک سطرِ مشخص، بی امتیاز ---------- */
   function win(L, kind, t) { (L.wins = L.wins || []).push({ at: nowISO(), d: A.today(), kind: kind, t: clip(t, 120) }); if (L.wins.length > 40) L.wins = L.wins.slice(-40); }
   var WIN_FA = { pred: "پیش‌بینی‌ات درست درآمد", datum: "یک داده به کار رفت", goal: "یک گام به مجهول نزدیک‌تر", proof: "گامی که ثابتش کردی", idea: "ایده‌ای که پس از کنار گذاشتن آمد", sub: "زیرهدفی که رسیدی" };
+  var WIN_PROOF30 = "گامی که برهانش را خودت نوشتی";
   function winLine(L) {
     var w = (L.wins || []).filter(function (x) { return x.d === A.today(); }); if (!w.length) return null;
     var x = w[w.length - 1];
+    /* دورِ ۳۰ (surface، C26-39 s27 p4 «✓ … ثابتش کردید: «پس آنچه مدل از هر واژه دارد …»»): «برهان» ِ گام نوشتهٔ خودِ اوست و صفحه درستی‌اش را نمی‌سنجد (C138) —
+       برد همان نوشتن است، نه «ثابت شد»؛ نشانِ ✓ (که در همه‌جای صفحه حکمِ سنجش است) برای آن نمی‌آید. */
+    if (x.kind === "proof") return h("p", { class: "small good lp-win" }, "✍ " + WIN_PROOF30 + ": «" + x.t + "» — این یک پیشرفتِ واقعی است، نه دلداری؛ درستیِ برهان را صفحه نسنجید.");
     return h("p", { class: "small good lp-win" }, "✓ " + WIN_FA[x.kind] + ": «" + x.t + "» — این یک پیشرفتِ واقعی است، نه دلداری.");
   }
 
@@ -59028,6 +59048,9 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     notes.push("«" + clip(e.concept, 40) + "» آموخته شد — برگشت به " + bk);
     evlog(sc, e, "preok", "🧩 آموخته شد: «" + clip(e.concept, 60) + "»", ["وارسیِ تسلط: «" + clip(q, 200) + "»"].concat(e.selfMade ? ["خودش ساخت — از پرسشِ تشخیصی"] : []), "برگشت به " + bk, um, s);
     try { s.msgs.push({ role: "sys", at: nowIso(), text: "🧩 «" + clip(e.concept, 60) + "» آموخته شد (پیشرفت، نه ضعف) — برگشت به " + bk + "." }); } catch (er) { }
+    /* دورِ ۳۰ (surface، A26-19 pA3): پدری که با فرزندش آموخته شد (casc، فراخوانِ بازگشتیِ همین تابع) در رکوردِ «🧩 نقشهٔ پیش‌نیازها» همگام نمی‌شد — فراخواننده فقط
+       فرزند را همگام می‌کرد؛ 📜 «🧩 آموخته شد: «قضیهٔ فیثاغورس»» می‌گفت و کارنامه «در حالِ یاد گرفتن: «قضیهٔ فیثاغورس»». هر آموخته‌شدن همان دم همگام می‌شود. */
+    try { syncItem(sc, e); } catch (er) { }
   }
   PRE.report = function (s, a) {
     var um = lastUser(s); if (!um || !a) return "";
@@ -59184,9 +59207,21 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     L.push(CTX + "پیش‌نیازِ تشخیص‌داده‌شده: " + O.map(function (e) { return "«" + noq(clip(e.concept, 60)) + "»"; }).join("، ") + " — نامش را صریح بگو؛ فقط به اندازه‌ای که همین گام لازم دارد (نه فرمول‌ها و برهان‌های دیگرِ همان موضوع).");
     return L;
   }
+  /* دورِ ۳۰ (surface، C186 — C26-18 tC1/tC1t/pC1 p6: پرسشِ تشخیصیِ «نقطهٔ شبنم» پس از جوابِ p5 دوباره «پرسشِ این نوبت» شد): مدل prereq_res را نداد و صفحه منتظرِ گزارشِ
+     مدل ماند. صفحه خودش می‌خواند: نخستین پیامِ او پس از پرسیده‌شدنِ پرسشِ تشخیصی (e.asked) که خودش پرسش نیست، جوابِ همان پرسش است ⇒ «جواب گرفت؛ مربی حکمی نداد»
+     (سطرِ 📜) و پرسش دیگر هرگز همان‌طور دوباره پرسیده نمی‌شود. پرسشِ تازهٔ او پس از پرسشِ تشخیصی جواب نیست (C186 look-alike). */
+  function ansNJ30(s, sc, X, um) {
+    var e = topOf(X); if (!e || e.state !== "diag" || !e.asked || e.ansNJ) return false; var M = (s && s.msgs) || [], k0 = mid(um), a = null;
+    for (var i = 0; i < M.length; i++) { var m = M[i]; if (!isUser(m) || String(m.at || "") <= String(e.asked) || (k0 && mid(m) === k0)) continue; if (/[؟?]\s*$/.test(String(m.text || "").trim())) continue; a = m; break; }
+    if (!a) return false;
+    e.ansNJ = { q: clip(a.text, 300), at: a.at || nowIso(), key: mid(a) }; if (!e.diagAns) { e.diagAns = clip(a.text, 400); e.diagAt = a.at || nowIso(); }
+    evlog(sc, e, "prediag", "🧩 پرسشِ تشخیصی: «" + clip(e.concept, 60) + "»", ["پاسخِ تو: «" + clip(a.text, 200) + "»"], "جواب داد — مربی حکمی نداد (بود یا نبود گزارش نشد)", a, s);
+    try { syncItem(sc, e); } catch (er) { } return true;
+  }
   function directive(sc, X) {
     var e = topOf(X); if (!e) return "";
     var back = restate(sc, X, e);
+    if (e.state === "diag" && e.ansNJ) return "- **پرسشِ این نوبت همین است:** او به پرسشِ تشخیصیِ «" + noq(clip(e.concept, 60)) + "» پیش‌تر جواب داد («" + noq(clip(e.ansNJ.q, 120)) + "») و حکمی گزارش نشد — آن پرسش را دوباره نپرس. اگر همین پیام یا آن جواب نشان می‌دهد مفهوم را دارد یا ساخت: {\"do\":\"coach_state\",\"prereq_res\":{\"id\":\"" + e.id + "\",\"diag\":\"had\",\"quote\":\"عینِ حرفش در همین پیام\"}} ⇒ «" + noq(back) + "»؛ اگر نشان می‌دهد ندارد: \"diag\":\"missing\" ⇒ فقط به اندازهٔ گامِ «" + noq(clip(e.step, 60)) + "» یاد بده و **یک** پرسشِ تسلط با مثالِ تازه بپرس.";
     if (e.state !== "teach") return "- **پرسشِ این نوبت همین است:** " + (e.q ? "پرسشِ تشخیصیِ «" + noq(clip(e.concept, 60)) + "» («" + noq(e.q) + "»)." : "پرسشِ تشخیصیِ کوتاهِ «" + noq(clip(e.concept, 60)) + "».") + " اگر همین پیام پاسخش است: {\"do\":\"coach_state\",\"prereq_res\":{\"id\":\"" + e.id + "\",\"diag\":\"missing|had\",\"quote\":\"عینِ پاسخش\"}} (اگر پاسخش نشان داد خودش ساختش، \"mastery\":\"yes\" هم بده). " +
       "missing ⇒ «" + noq(clip(e.concept, 60)) + "» را فقط به اندازهٔ گامِ «" + noq(clip(e.step, 60)) + "» یاد بده (کوتاه، با یک مثالِ کوچکِ غیرِ همین مسئله؛ نامش را صریح بگو) و **یک** پرسشِ تسلط با مثالِ تازه بپرس؛ had ⇒ «" + noq(back) + "». اگر پاسخ نداد، همان پرسشِ تشخیصی را کوتاه‌تر دوباره بپرس.";
     if (e.mastPending) return "- **پرسشِ این نوبت همین است:** «" + noq(clip(e.concept, 60)) + "» را پیش‌تر نشان داده بود («" + noq(clip(e.mastPending.q, 100)) + "») و پیش‌نیازِ درونی‌اش هم حالا بسته است؛ برگرد به همین پیش‌نیاز و بپرس گامِ «" + noq(clip(e.step, 60)) + "» را با آن تا آخر چطور برمی‌دارد. اگر همین پیام آن را برداشت: {\"do\":\"coach_state\",\"prereq_res\":{\"id\":\"" + e.id + "\",\"mastery\":\"yes\",\"quote\":\"عینِ حرفش\"}} ⇒ برگشت به «" + noq(restate(sc, X, e)) + "».";
@@ -59225,7 +59260,7 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     if (lr.length) L.push(CTX + "پیش‌نیازهایی که در همین مسئله آموخت (پیشرفت): " + lr.map(function (e) { return "«" + noq(clip(e.concept, 50)) + "»"; }).join("، ") + ".");
     if (PRE.ability(m)) L.push(abilityLine(s, m, O, lr));
     var busy = false;
-    if (O.length) { busy = true; L = L.concat(stackLines(sc, X)); L.push(directive(sc, X)); var tp = O[O.length - 1], k0 = mid(um); if (tp.state === "diag" && k0 && tp.dirKey !== k0) { tp.dirKey = k0; try { R.put(); } catch (e) { } } }
+    if (O.length) { busy = true; try { if (ansNJ30(s, sc, X, um)) R.put(); } catch (e30) { } L = L.concat(stackLines(sc, X)); L.push(directive(sc, X)); var tp = O[O.length - 1], k0 = mid(um); if (tp.state === "diag" && k0 && tp.dirKey !== k0) { tp.dirKey = k0; try { R.put(); } catch (e) { } } }
     else { var tq = turnQ(sc); if (tq && tq.st === "back") busy = true; if (tq && tq.st === "back") L.push("- **پرسشِ این نوبت همین است:** (برگشت از پیش‌نیاز) اگر پیامش همین گام را برداشت، همان را دنبال کن؛ وگرنه: «" + noq(tq.q) + "» — «گامِ بعدیِ تو چیست» یا «کلِ مسئله» را این نوبت نپرس."); }
     try { L = L.concat(sysLines(s, sc, X, m, busy)); } catch (e) { }   // دورِ ۲۳ (Q6): گام‌های منتظرِ برگه و نوبتِ از سر گرفتن
     return L.join("\n");
@@ -59305,6 +59340,11 @@ APP.qLab30 = function (l) { l = String(l == null ? "" : l).trim(); return /^«[^
     try {
       var um = lastUser(s); if (!um || !PRE.ability(um.text)) return; var sc = PRE.scope(s) || lastScope(s), R = sc && store(sc); if (!R) return;
       var O = openOf(R.X), lr = R.X.st.filter(function (e) { return e && e.state === "learned"; }), gap = O.length ? O[O.length - 1] : lr.length ? lr[lr.length - 1] : null; if (!gap) return;
+      /* دورِ ۳۰ (surface، B26·D12 bp3 s19 «اینکه اسم قضیه رو همون اول گفتی خیلی کمک کرد؛ قبلش فکر می‌کردم شاید خنگم»): سطر آخرین پیش‌نیاز («مساحتِ مثلث») را نام می‌برد،
+         نه همان که خودش گفت. پیش‌نیازی که **جملهٔ همان برچسبِ خودش** نامش را می‌برد (واژه‌ای از نامِ مفهوم، ≥ ۳ حرف) مقدم است؛ وگرنه همان قاعدهٔ پیشین. */
+      try { var sent30 = (String(um.text || "").split(/[.!؟?\n]+/).filter(function (x) { return PRE.ability(x); })[0] || ""), sw30 = zk(sent30);
+        var nm30 = O.concat(lr).filter(function (e) { return e && e.concept && String(e.concept).split(/[\s‌=()،,]+/).map(function (w) { return zk(w).trim(); }).some(function (w) { return w.length >= 3 && sw30.indexOf(" " + w + " ") >= 0; }); });
+        if (nm30.length) gap = nm30[nm30.length - 1]; } catch (e30) { }
       var k = "ab|" + mid(um); if ((s.msgs || []).some(function (m) { return m && m.role === "sys" && m.k22 === k; })) return;
       var sh = shoma(s);
       s.msgs.push({ role: "sys", at: nowIso(), k22: k, text: "🧩 این کم‌هوشی نیست: گیر از نبودنِ «" + clip(gap.concept, 60) + "» در گامِ «" + clip(gap.step, 60) + "» بود — کمبودِ یک پیش‌نیازِ مشخص، نه " + (sh ? "استعدادِ شما" : "توانِ تو") + (gap.state === "learned" ? (sh ? "؛ که همین‌جا آموختید (پیشرفت)." : "؛ که همین‌جا آموختی (پیشرفت).") : "؛ که همین حالا با هم یادش می‌گیریم.") });
