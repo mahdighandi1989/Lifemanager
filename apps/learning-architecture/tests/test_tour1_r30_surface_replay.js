@@ -15,7 +15,11 @@ const DIR = path.join(__dirname, 'fixtures', 'r30_surface');
   const run = async (name, fx, uptoC, fn, valid, tries) => { if (process.env.ONLY && !process.env.ONLY.split(',').includes(name)) return;
     let r = null; const b = await chromium.launch(); try { r = await replay(b, fx, { uptoC, dir: DIR, allEval: true, quiesce: true });
       /* بازپخشی که میزبانِ ساختگیِ برگه‌ها یا تاریخچهٔ همان اجرای دونده را بازنساخت (گذرِ برگه پیش/پس از بارگذاریِ دوباره) نامعتبر است، نه حکمِ صفحه — تا دو بار دوباره */
-      if (valid && !(await valid(r).catch(() => false)) && (tries || 0) < 2) { info[name + '_harnessRetry'] = (tries || 0) + 1; await r.close().catch(() => { }); await b.close(); return run(name, fx, uptoC, fn, valid, (tries || 0) + 1); }
+      /* merge30 gate (D aD3 under load): the harness's last «exit» reload sometimes came back with an EMPTY store (no session at all) — then the
+         page rightly shows the default «تو» and the check is no page verdict. Every run must still hold the scenario's sessions (generic validity). */
+      const base30 = async () => r.p.evaluate(() => APP.S.all('achat').some(s => (s.msgs || []).length > 0)).catch(() => false);
+      if ((!(await base30()) || (valid && !(await valid(r).catch(() => false)))) && (tries || 0) < 2) { info[name + '_harnessRetry'] = (tries || 0) + 1; await r.close().catch(() => { }); await b.close(); return run(name, fx, uptoC, fn, valid, (tries || 0) + 1); }
+      if (!(await base30())) { errors.push(name + ' — harness invalid: the replay lost the scenario store after ' + ((tries || 0) + 1) + ' tries (no page verdict)'); return; }
       info[name] = await fn(r); if (r.errors.length) errors.push(name + ' page errors: ' + r.errors.slice(0, 3).join(' | ')); }
     catch (e) { errors.push(name + ' — exception: ' + String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')); } finally { if (r) await r.close().catch(() => { }); await b.close(); } };
   const sysAll = (p) => p.evaluate(() => { const o = []; APP.S.all('achat').forEach(s => (s.msgs || []).forEach(m => { if (m.role === 'sys') o.push(String(m.text || '')); })); return o; });
