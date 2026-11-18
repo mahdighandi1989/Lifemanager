@@ -38,7 +38,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   chk(R.forHer && !/بپرس/.test(R.forHer) && /هنوز گفته نشده/.test(R.forHer), 'D26-36: the «ask» clause is for the model only :: ' + R.forHer);
   /* B26·D16: همان تاریخ دوباره ⇒ «از پیش ثبت است» (یک بار برای همان پیام) */
   const bd = await p.evaluate(() => { const G = APP.AGE, s = { id: 'achat_t30', type: 'achat', msgs: [{ role: 'user', at: '2026-10-25T09:00:00.000Z', text: 'من ۳۰ اردیبهشت ۹۶ به دنیا اومدم' }] };
-    APP.S.put(s); G.fromModel({ date: '۳۰ اردیبهشت ۹۶' }, s); s.msgs.push({ role: 'user', at: '2026-10-25T09:05:00.000Z', text: 'مامانم گفت اینم بگم: من ۳۰ اردیبهشت ۹۶ به دنیا اومدم.' });
+    APP.S.put(s); G.fromModel({ date: '۳۰ اردیبهشت ۹۶' }, s); G.fromModel({ date: '۳۰ اردیبهشت ۹۶' }, s);   /* منفیِ C179 (B s17 c4): همان پیامی که تاریخ را تازه ثبت کرد «از پیش ثبت است» نمی‌گیرد */
+    s.msgs.push({ role: 'user', at: '2026-10-25T09:05:00.000Z', text: 'مامانم گفت اینم بگم: من ۳۰ اردیبهشت ۹۶ به دنیا اومدم.' });
     G.fromModel({ date: '۳۰ اردیبهشت ۹۶' }, s); G.fromModel({ date: '۳۰ اردیبهشت ۹۶' }, s);
     return s.msgs.filter(m => m.role === 'sys').map(m => m.text); });
   chk(bd.length === 2 && /ثبت شد/.test(bd[0]) && /از پیش ثبت است/.test(bd[1]), 'B26·D16: the stored birth date said again gets one «از پیش ثبت است» line :: ' + JSON.stringify(bd));

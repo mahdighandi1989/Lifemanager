@@ -401,8 +401,9 @@
     G.confirmed = function (s, iso) { return !!s && (s.msgs || []).some(function (m) { return m && m.role === "sys" && m.birth === iso; }); };
     /* دورِ ۳۰ (surface، B26·D16 aB1 p9 «مامانم گفت اینم بگم: من ۳۰ اردیبهشت ۹۶ به دنیا اومدم» — تاریخ از پیش ثبت و تأییدشده بود): همان تاریخ دوباره گفته شد ⇒ صفحه
        خاموش نمی‌ماند؛ یک سطر برای همان پیام که می‌گوید از پیش ثبت است و چیزی عوض نشد (حرفِ او دیده شد). */
-    G.sameOnce = function (s, iso) { if (!s || !iso) return false; var M = s.msgs || [], u = null; for (var i = M.length - 1; i >= 0; i--) { if (M[i] && M[i].role === "user") { u = M[i]; break; } }
+    G.sameOnce = function (s, iso) { if (!s || !iso) return false; var M = s.msgs || [], u = null, ui = -1; for (var i = M.length - 1; i >= 0; i--) { if (M[i] && M[i].role === "user") { u = M[i]; ui = i; break; } }
       var k = u ? String(u.at || u.text || "") : ""; if (!k || M.some(function (m) { return m && m.role === "sys" && m.birthSame === k; })) return false;
+      if (M.slice(ui + 1).some(function (m) { return m && m.role === "sys" && m.birth === iso; })) return false;   // همین پیام آن را تازه ثبت کرد (صفحه از پیام خواند، بعد کنشِ مدل) — «از پیش» نیست (C179: s17 c4)
       M.push({ role: "sys", at: new Date().toISOString(), birthSame: k, text: "✓ همین تاریخِ تولدت از پیش ثبت است: " + G.faDate(iso) + " — چیزی عوض نشد." }); s.msgs = M; try { S.put(s); } catch (e) { } return true; };
     G.confirmOnce = function (s, iso) { if (!s || !iso || G.confirmed(s, iso)) return false; s.msgs = s.msgs || []; s.msgs.push({ role: "sys", at: new Date().toISOString(), birth: iso, text: G.confirmLine(iso) }); s.ageAsk = "given"; try { S.put(s); } catch (e) { } return true; };
     /* تاریخی که صفحه خودش از آخرین پیامِ او خواند (همان OWN_BIRTH ِ fromChat) — کنشِ مدل هرگز آن را بازنویسی نمی‌کند (B24·D7) */
