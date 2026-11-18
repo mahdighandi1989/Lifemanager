@@ -366,3 +366,5 @@
 - 2026-11-18: BASE30 = 5c7ce364 on main (main 701a52b1 backtest R41 + R30 briefs/decisions C177–C188 + tail triage). Launching 7 fixers (arith, prior, correction, story, forecast, dates, surface) in worktrees. Corpus builder still running → T/corpus30/.
 - 2026-11-18: 7 FIX30 fixers launched on BASE30 5c7ce364 in their own worktrees (arith WL164/PR161, prior 165/162, correction 166/163, story 167/164, forecast 168/165, dates 169/166, surface 170/167). If interrupted: resume each fixer from its last commit (worktree branches worktree-agent-*). Next: merge in order arith ⇒ prior ⇒ correction ⇒ story ⇒ forecast ⇒ dates ⇒ surface into merge30, gate, main, round 31 (RUNNER31 adds C177 tail arms + corpus replay).
 - 2026-11-18: C178 corpora done (F2 79, F6 132, F8 85 entries; 90 failed in R30) → T/corpus30 + durable copy docs/tours/polya-batch1/corpus30/; its 12 questions ruled C189–C200; arith/correction/dates fixers notified. F6-075 (C19) added to TAIL_dates.
+
+- 2026-11-18 — OWNER: pause after round 30 closes (fixers → merge30 → gate → main → RUNNER31/LAUNCH31 written + pushed). Do NOT launch round-31 runners; on «ادامه بده» launch them from LAUNCH31.
