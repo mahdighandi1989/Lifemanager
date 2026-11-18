@@ -596,7 +596,8 @@
        مسئلهٔ زندهٔ باز نیست (و مرحلهٔ آن را جلو نمی‌برد). اگر story همین پیام را مسئلهٔ تازه جدا کرد (split25 ⇒ pid تهی، کلیدِ تازه) دفتر مالِ همان است (splitNow28)؛ وگرنه صفحه چیزی در دفترِ زنده نمی‌نویسد. */
     var oth30 = false; try { oth30 = !!(old && pid && otherProb30(s, ut, pid)); } catch (e) { oth30 = false; } if (oth30) rep = null;
     var pa30 = (s.coach || {}).prAsk30, pg30 = false;
-    if (!old && !rep && pa30 && pa30.k === nz(ut).slice(0, 200)) { try { rep = pagePrior30(s, ut, um); } catch (e) { rep = null; } if (rep) { open0 = true; pg30 = true; rep.page30 = true; } }
+    var open30 = NEWP27.test(ut) || OTHERP30.test(ut) || splitNow28(s, ut) || !!(s.coach && s.coach.np28 && s.coach.np28 === mid(um));   // فقط گشایشِ مسئلهٔ تازه («یه مسئلهٔ دیگه دارم: …»)؛ «یه حساب دیگه هم کردم: …» (r29 story s06) افزودن به همان مسئله است و قراردادِ 📜 ِ story می‌ماند
+    if (!old && !rep && open30 && pa30 && pa30.k === nz(ut).slice(0, 200)) { try { rep = pagePrior30(s, ut, um); } catch (e) { rep = null; } if (rep) { open0 = true; pg30 = true; rep.page30 = true; } }
     if (!old) { if (!rep || !open0) return; var real = rep.steps.filter(function (x) { return !x.test; }); if (!real.length) return;   // حالت‌های آزموده دفتر نیستند (A25-4)
       old = rep; isNew = true; rep.steps.forEach(function (x) { delete x.mn; }); if (G.L) G.L.prior = old; else storyOf(s, key, true).prior = old; }
     else {
