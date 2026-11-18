@@ -14,6 +14,7 @@ updated_at: "2026-11-11T12:00:00Z"
 updated_at: "2026-10-18T20:00:00Z"
 updated_at: "2026-10-25T09:00:00Z"
 updated_at: "2026-11-15T20:00:00Z"
+updated_at: "2026-11-18T06:00:00Z"
 merged_from: []
 ---
 
@@ -497,3 +498,12 @@ A validator that reads part of an input must not stamp the whole input. The page
 
 ### How to Apply Elsewhere
 Any validation badge (✓/✗/score) must carry the scope it covers. When a checker returns positions, test coverage by span overlap, and render uncovered claims as «not checked» next to themselves rather than inheriting the badge of their neighbours. Derive relations (dependencies, ownership) from the stored model, never from strings the UI happens to print. Check every new rule against look-alike sentences from real transcripts before shipping it.
+
+## Update 2026-11-18 — a missing report is not an empty answer; "contains the new number" is not "redoes the step" (Pólya R30 «prior»)
+Three lessons from the prior-work ledger. (1) The page itself decided that a message carried worked steps and asked the model for a `prior` report; when the model omitted it, the page built nothing — the person's three numbered steps simply vanished. If the page is the judge that asked, the page must also be able to build the record from the message itself, validating only what it can (engine-read arithmetic ✓/✗, everything else "not checked"). (2) A stale step accepted as its "redo" any calculation that contained one of the new values: «۲۲ ÷ ۷ ≈ ۳ روز» replaced «۲۰ × ۱٫۱۲ = ۲۲٫۴» because 22 was the step's new input. A redo is the same computation: the step's new result, or the new input together with the step's own other operand. (3) A corrected step stored the whole message («نه، ۲۷٫۵ نیست. منظورم طول بود: …»); store the span that carries the claim, keep the whole text as provenance.
+
+### How to Apply Elsewhere
+- When the validator is also the component that requested a report, give it a fallback builder from raw input — absence of the report must degrade to "built by the page, partially checked", never to "nothing happened".
+- Match an update to a record by the record's own structure (same operation / same operands), never by sharing one token with it; write the negative look-alike (a new calculation that reuses the number) next to the positive.
+- Store the minimal claim span as the record's text and keep the full utterance separately; strip only meta lead-ins, keep item labels.
+- Attribution boundaries (another person's words) must be applied on every path that can write the user's record, not only on the main one.
