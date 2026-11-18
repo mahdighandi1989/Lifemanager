@@ -56967,13 +56967,17 @@ APP.goFromURL = function (q) {
       if (claimN27(y.text) === claimN27(o.raw) && claimN27(y.text).length >= 6) return { y: y, n: 99 };
       if (nN.some(function (k) { return oN.indexOf(k) < 0; })) return { y: y, n: 0 };
       var miss = A1.length - sh, n = sh + nsh + (o.notP != null && predPct(y) === o.notP ? 2 : 0);
-      var ok = (o.upd && (sh + nsh) >= 1 && n >= 2 && miss <= Math.max(1, Math.floor(A1.length * 0.3))) || (A1.length >= 2 && miss === 0 && sh >= 2);
+      /* دورِ ۳۰ (forecast؛ پیامدِ جانبیِ C30-20 در بازپخشِ pwC2 p57): «این ترم قبول میشم» همهٔ واژه‌هایش در «آزمونِ میان‌ترمِ بعدی رو قبول میشم» بود و همان 🎯 خوانده شد (۶۰ ⇒ ۸۰) —
+         بی نشانهٔ تازه‌کردن، همان پیامد یعنی دو سو: واژه‌های ویژهٔ ادعای پیشین هم بیشترشان در تازه باشند */
+      var missB = B1.filter(function (v) { return !UPDW28.test(v) && !A1.some(function (w) { return sameW(w, v) || sameW(stm28(w), stm28(v)) || (stm28(w) === stm28(v) && stm28(w).length >= 2); }); }).length;
+      var ok = (o.upd && (sh + nsh) >= 1 && n >= 2 && miss <= Math.max(1, Math.floor(A1.length * 0.3))) || (A1.length >= 2 && miss === 0 && sh >= 2 && (nsh >= 1 || missB <= Math.max(2, Math.floor(B1.length * 0.4))));
       return { y: y, n: ok ? n : 0 }; }).filter(function (z) { return z.n > 0; }).sort(function (a, b) { return b.n - a.n; });
     return sc.length && (sc.length === 1 || sc[0].n > sc[1].n) ? sc[0].y : null;
   }
   PR.same28 = same28;
   /* ---- سرانجام (C91) ---- */
-  var GEN28 = /^(?:شد|نشد|شدم|نشدم|بود|بودم|درصد|درصدی|درصدیم|مطمئن|مطمئنم|احتمال|احتمالش|پیش|بینی|بینیم|بینیِ|گفته|گفتم|درست|غلط|درومد|اومد|گرفتم|حدود|حدودِ|الان|خب|سلام|امروز|دیروز|اون|همون|همان|یکی|پس|ولی|اما|خبر|خوب)$/;
+  /* دورِ ۳۰ (پیامدِ جانبی در بازپخشِ dB3 p10: «جلسه‌ی رفعِ اشکال … افتاد سه‌شنبه‌ی هفته‌ی بعد» با «شنبه» ِ دو 🎯 «کدام؟» گرفت): نامِ روز زمانِ ادعاست، نه واژهٔ پیامد */
+  var GEN28 = /^(?:شنبه|یکشنبه|دوشنبه|سه|چهارشنبه|پنجشنبه|پنج|جمعه|فردا|هفته|هفتهٔ|هفته‌ی|بعد|بعدی|شد|نشد|شدم|نشدم|بود|بودم|درصد|درصدی|درصدیم|مطمئن|مطمئنم|احتمال|احتمالش|پیش|بینی|بینیم|بینیِ|گفته|گفتم|درست|غلط|درومد|اومد|گرفتم|حدود|حدودِ|الان|خب|سلام|امروز|دیروز|اون|همون|همان|یکی|پس|ولی|اما|خبر|خوب)$/;
   function kt28(t) { return stoks(strip28(t)).filter(function (w) { return !GEN28.test(w); }); }
   /* بندی که هرگز سرانجامِ 🎯 نیست: اصلاحِ حرفِ پیشین، اطمینانِ زمانی پیش از این پیش‌بینی، «هنوز … نه» */
   /* دورِ ۲۹ (forecast R5؛ بانکِ R29 #216، C142): «X نیست، Y» / «X نبود، Y بود» / «X نمیشه، Y میشه» اصلاحِ داده است — هرگز سرانجامِ 🎯 نیست و «شد یا نشد؟» نمی‌سازد */
@@ -57128,8 +57132,9 @@ APP.goFromURL = function (q) {
          پرسشِ «شد یا نشد؟ / حدودِ N حساب می‌شود؟» ِ صفحه به همان 🎯 ِ پرسیده می‌نشیند — مگر 🎯 ِ بازِ دیگری به‌روشنی بیشتر با همان جمله بخواند. پیش‌تر داوری فقط در آغازِ پیام پذیرفته می‌شد و
          صفحه میانِ همهٔ 🎯 ها «کدام؟» می‌پرسید */
       if (px && !res && Q.kind === "res") { var v30 = PR.predVerdictIn(t); if (v30 && !v30.weak) { var sc30 = score28(px, v30.sent), ot30 = all.filter(function (y) { return !y.out && y !== px && score28(y, v30.sent) > sc30; });
-        if ((sc30 > 0 || /(?:^|\s)(?:اون|این|همون|همان)\s*پیش[‌\s]?بینی/.test(dg(v30.sent))) && !ot30.length) res = v30.ok ? "شد" : "نشد"; } }
+        if ((sc30 > 0 || /(?:^|\s)(?:اون|این|همون|همان)\s*پیش[‌\s]?بینی/.test(dg(v30.sent))) && !ot30.length) { res = v30.ok ? "شد" : "نشد"; var vs30 = v30.sent; } } }
       if (px && res) { predApply26(s0, px, res, Q.kind === "res" ? t : Q.sent); sysLine25(s0, "🎯 " + predLab26(px) + " ⇐ " + res + " — به گفتهٔ خودت.");
+        if (vs30) t = t.replace(vs30, " ");   /* جملهٔ داوریِ همین 🎯 سرانجامِ 🎯 ِ دیگری نیست («… نشد، چون ۷ شد» ⇏ «ریدینگ ۷ میشه» شد) */
         /* دورِ ۲۷ (C53؛ A27-11 s05 p19 «رضا رو میگم، ۴۰ درصدیه. مال مدیر هم که گفتم شد.»): سرانجامِ روشنِ پیش‌بینیِ دیگری در همان پیام هم می‌نشیند */
         try { outcome28(s0, t, all.filter(function (y) { return !y.out && y !== px; }), true); } catch (e) { console.warn(e); } return px; }
       if (!PR.predVerdictIn(t) && !PR.predRefIn(t)) { sysLine25(s0, "🎯 پرسشِ داوری بی‌جواب ماند — چیزی داوری نشد؛ هر وقت گفتی «پیش‌بینیِ … شد/نشد» یا در «🎯 دفترِ پیش‌بینی» زدی، همان می‌نشیند.");
@@ -58310,14 +58315,15 @@ APP.goFromURL = function (q) {
           var tap = function (v, msg) { return function () { if (PR.dateResolve(se.id, pi, ii, v)) { if (A.toast) A.toast(msg); rer26(); } }; };
           /* دورِ ۲۷ (C49/C69): پرسشِ سرآمده (روزش گذشت، کارش انجام شد) بسته است — در «امروز» نه پرسش می‌ماند نه سطرِ «گذشت» (سطرِ «گذشت» ِ دورِ ۲۶ همین زیر مانده و فقط برای قلمی می‌آید که این قاعده سرآمده نداند) */
           if (lapsed27(se, it, P.d0)) return;
-          if (it.free) { items.push({ k: "dq", dq: se.id, txt: "📅 " + itemLine26(it, P.d0), sub: "روزش را خودت بنویس — تا ننویسی چیزی ثبت نمی‌شود · سشنِ «" + clip(se.title || se.pinned || "گفت‌وگو", 40) + "»", acts: [{ t: "کنار بگذار", cls: "dopt dq-no", fn: tap("no", "کنار رفت.") }], go: function () { try { localStorage.setItem("lla.assist.cur", se.id); } catch (e) { } if (AS.toggle) AS.toggle(true); } }); return; }
           /* دورِ ۳۰ (forecast؛ D30-3، C30-17): تأییدِ موعدِ 🎯 در «امروز» پرسشِ 🎯 است، نه «📅 … درست است؟» ِ برنامه */
           var sx30 = " · سشنِ «" + clip(se.title || se.pinned || "گفت‌وگو", 40) + "»";
+          if (it.pred && it.free) { items.push({ k: "dq", dq: se.id, txt: "🎯 موعدِ این پیش‌بینی " + itemLine26(it, P.d0), sub: "روزش را خودت بنویس — تا ننویسی پیش‌بینی بی موعد در «🎯 دفترِ پیش‌بینی» می‌ماند" + sx30, acts: [{ t: "بی موعد", cls: "dopt dq-no", fn: tap("no", "بی موعد ماند.") }], go: function () { try { localStorage.setItem("lla.assist.cur", se.id); } catch (e) { } if (AS.toggle) AS.toggle(true); } }); return; }
           if (it.pred && !it.free) { if (!it.amb && it.date < today()) { items.push({ k: "dq", dq: se.id, txt: "🎯 موعدِ پیشنهادیِ پیش‌بینیِ «" + clip(it.what, 70) + "» (" + fdate(it.date) + ") گذشت و تأیید نشده بود؛ پیش‌بینی بی موعد در دفتر است.", sub: "تأییدِ موعدِ 🎯 ِ بی‌جواب" + sx30, acts: [{ t: "کنار بگذار", cls: "dopt dq-no", fn: tap("no", "کنار رفت.") }] }); return; }
             items.push({ k: "dq", dq: se.id, txt: "🎯 موعدِ این پیش‌بینی " + itemLine26(it, P.d0) + (it.amb ? "؟" : " — هنوز تأیید نشده؛ درست است؟"), sub: "پیش‌بینیِ خودت در «🎯 دفترِ پیش‌بینی» — تا موعدش را تأیید نکنی بی موعد می‌ماند" + sx30,
               acts: it.amb ? [{ t: ambLab26(it, P.d0, 0), cls: "dopt dq-same", fn: tap(ambO26(it, P.d0)[0], "موعد ثبت شد.") }, { t: ambLab26(it, P.d0, 1), cls: "dopt dq-next", fn: tap(ambO26(it, P.d0)[1], "موعد ثبت شد.") }, { t: "بی موعد", cls: "dopt dq-no", fn: tap("no", "بی موعد ماند.") }]
                 : [{ t: "آره، همین", cls: "dopt dq-yes", fn: tap("yes", "موعد ثبت شد.") }, { t: "نه، بی موعد", cls: "dopt dq-no", fn: tap("no", "بی موعد ماند.") }],
               go: function () { try { localStorage.setItem("lla.assist.cur", se.id); } catch (e) { } if (AS.toggle) AS.toggle(true); } }); return; }
+          if (it.free) { items.push({ k: "dq", dq: se.id, txt: "📅 " + itemLine26(it, P.d0), sub: "روزش را خودت بنویس — تا ننویسی چیزی ثبت نمی‌شود · سشنِ «" + clip(se.title || se.pinned || "گفت‌وگو", 40) + "»", acts: [{ t: "کنار بگذار", cls: "dopt dq-no", fn: tap("no", "کنار رفت.") }], go: function () { try { localStorage.setItem("lla.assist.cur", se.id); } catch (e) { } if (AS.toggle) AS.toggle(true); } }); return; }
           if (!it.amb && it.date < today()) { items.push({ k: "dq", dq: se.id, txt: "📅 «" + clip(it.what, 70) + "» — " + fdate(it.date) + " گذشت و تأیید نشده بود؛ ثبت نشد.", sub: "پرسشِ تاریخِ بی‌جواب · سشنِ «" + clip(se.title || se.pinned || "گفت‌وگو", 40) + "»", acts: [{ t: "کنار بگذار", cls: "dopt dq-no", fn: tap("no", "کنار رفت.") }] }); return; }
           var acts = it.amb ? [{ t: ambLab26(it, P.d0, 0), cls: "dopt dq-same", fn: tap(ambO26(it, P.d0)[0], "ثبت شد.") }, { t: ambLab26(it, P.d0, 1), cls: "dopt dq-next", fn: tap(ambO26(it, P.d0)[1], "ثبت شد.") }, { t: "هیچ‌کدام", cls: "dopt dq-no", fn: tap("no", "باشد — ثبت نشد.") }]
             : [{ t: "آره، همین", cls: "dopt dq-yes", fn: tap("yes", "ثبت شد.") }, { t: "نه", cls: "dopt dq-no", fn: tap("no", "باشد — ثبت نشد.") }];
