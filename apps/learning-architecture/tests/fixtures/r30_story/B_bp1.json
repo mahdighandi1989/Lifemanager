@@ -1,0 +1,141 @@
+{
+"from": "round30B/bp1",
+"t0": "2026-10-25T09:00:00",
+"base": 0,
+"inject": "(()=>{if(window.__RD)return;const RD=Date;window.__RD=RD;window.__off=0;function D(...a){if(!new.target)return new RD(RD.now()+window.__off).toString();return a.length?new RD(...a):new RD(RD.now()+window.__off)}D.prototype=RD.prototype;D.now=()=>RD.now()+window.__off;D.UTC=RD.UTC;D.parse=RD.parse;window.Date=D;window.__adv=(d)=>{window.__off+=d*864e5;try{APP.render()}catch(e){};return new D().toISOString()};})();\nwindow.__fx={set(sel,v){const e=typeof sel==='string'?document.querySelector(sel):sel;if(!e)return 'NOEL '+sel;const pr=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(pr,'value').set.call(e,v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'},\nbtn(re,root){const b=[...(root?document.querySelector(root):document).querySelectorAll('button')].filter(b=>b.getClientRects().length).find(b=>re.test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked '+b.textContent.trim().slice(0,60)},\nfields(){return [...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>e.getClientRects().length).map(e=>(e.id||e.name||'?')+'|'+e.type+'|'+(e.getAttribute('aria-label')||e.placeholder||'').slice(0,70)+'|'+String(e.value).slice(0,40))},\nbtns(){return [...document.querySelectorAll('#main button')].filter(b=>b.getClientRects().length).map(b=>b.textContent.trim().slice(0,50))},\nmain(n){return document.getElementById('main').innerText.slice(0,n||3000)}};'fx'\n",
+"steps": [
+{
+"say": "سلام. معلممون یه تمرین داده: «ثابت کنید برای هر عدد فرد n، عدد n²−1 بر ۸ بخش‌پذیره». برای ۳ و ۵ و ۷ امتحان کردم: ۸، ۲۴، ۴۸ — همه بخش‌پذیرن. ولی نمی‌دونم چطوری برای همه‌ی عددها ثابت کنم.",
+"c": 1
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await w(700);const i=document.querySelector('.age-ask .age-in');if(!i)return 'NOCARD age='+APP.AGE.age();i.scrollIntoView({block:'center'});const st=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;st.call(i,\"2011-04-17\");i.dispatchEvent(new Event('input',{bubbles:true}));await w(300);[...document.querySelectorAll('.age-ask button')].find(b=>b.textContent.trim()==='ثبت').click();await w(700);const m=document.querySelector('.age-ask .bad');return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' err='+(m?m.textContent:'')+' card='+!!document.querySelector('.age-ask')})()",
+"c": 2
+},
+{
+"say": "نه، ندیدم. فقط می‌دونم n فرده. با n²−1 نمی‌دونم چیکار کنم، فقط می‌تونم عدد بذارم توش. یه جورایی گیرم.",
+"c": 3
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt.rt-now\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"BEFORE-DETOUR\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 4
+},
+{
+"say": "شکل دیگه؟ یعنی چی؟ ما تو کلاس فقط ضرب کردن پرانتزها رو خوندیم، مثل (a+b)². مربع منهای مربع رو نمی‌دونم چطوری میشه یه جور دیگه نوشت.",
+"c": 5
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let o={};try{const sc=APP.PRE.scope(s);o.stack=APP.PRE.all(sc);o.rec=APP.PRE.rec(sc)}catch(e){o.err=String(e)}try{o.causes=APP.MIND.phases().causes;o.pre=APP.MIND.phases().prereq}catch(e){o.merr=String(e)}return JSON.stringify(o).slice(0,4000)})()",
+"c": 6
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt.rt-p-det\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"INSIDE-DETOUR\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 7
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 8
+},
+{
+"say": "(x−1)(x+1) = x² + x − x − 1 = x² − 1. خب این ضربه، ولی من می‌خوام برعکسش کنم. یعنی هر «مربع منهای مربع» رو میشه این‌جوری نوشت؟ نمی‌دونستم.",
+"c": 9
+},
+{
+"say": "x² − 49 = (x − 7)(x + 7). با ضرب هم چک کردم: x² + 7x − 7x − 49. درسته!",
+"c": 10
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt.rt-p-rejoin\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"AFTER-RETURN\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 11
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);return 1})()",
+"c": 12
+},
+{
+"say": "پس n²−1 = (n−1)(n+1). حالا n فرده، پس n−1 و n+1 هر دو زوجن. دو تا زوج ضرب هم میشه بخش‌پذیر بر ۴. ولی ۸ از کجا میاد؟",
+"c": 13
+},
+{
+"say": "آهان! ۴، ۴، ۸ — همیشه یکی‌شون بر ۴ بخش‌پذیره! چون زوج‌ها یکی در میون مضرب ۴ان. پس یکی مضرب ۴ه و اون یکی مضرب ۲، ضربشون مضرب ۸ه. پس برای هر n فرد n²−1 بر ۸ بخش‌پذیره. حل شد!",
+"c": 14
+},
+{
+"say": "چون زوج‌ها دوتا دوتا جلو میرن: ۲، ۴، ۶، ۸، ... و مضرب‌های ۴ یکی در میون بین زوج‌هان. پس از هر دو زوج پشت سر هم، دقیقاً یکی مضرب ۴ه. درسی که گرفتم: وقتی «مربع منهای مربع» دیدم، به ضرب تجزیه‌ش کنم؛ و اگه یه ابزاری رو بلد نیستم، اول همونو یاد بگیرم بعد برگردم سر مسئله.",
+"c": 15
+},
+{
+"say": "همون که گفتی (x−1)(x+1) رو ضرب کنم؛ از اونجا دیدم برعکسش هم میشه و همه‌چی باز شد.",
+"c": 16
+},
+{
+"say": "اینکه خودم الگو رو پیدا کردم خیلی حال داد. ولی اولش که هیچی بلد نبودم با n²−1 چیکار کنم، حس بدی داشتم، فکر کردم خنگم.",
+"c": 17
+},
+{
+"say": "سلام! امروز تو تمرین‌های کتاب x²−9 بود، همون روش دیروز رو زدم: x²−9 = (x−3)(x+3). درسته؟ با ضرب پرانتز هم چک کردم، x² + 3x − 3x − 9 میشه.",
+"eval0": "__adv(1);1",
+"c": 18
+},
+{
+"say": "x=۵: ۲۵−۹=۱۶، و (۵−۳)(۵+۳) = ۲×۸ = ۱۶. یکیه!",
+"c": 19
+},
+{
+"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const V=Object.values(R);const o={};const c=(x,n)=>x==null?x:JSON.stringify(x).slice(0,n||300);\no.probs=V.filter(r=>r&&r.type==='eprob'&&r.live).map(r=>{const g=R['eprog_'+r.p.id]||{};const s=g.solve||{};const L=s.live||{};let cl=null;try{cl=APP.liveClosure(r.p.id)}catch(e){}let ph='';try{ph=APP.livePhase(r.p.id)}catch(e){}\nreturn {pid:r.p.id,phase:ph,stmt:c(r.p.statement,260),src:c(r.src||r.p.src,200),pfix:c(r.p.fixHist||r.fixHist),u1:c(s.u&&s.u[1],700),uDraft:c(L.uDraft,300),g1:c(s.g&&s.g[1],400),b1:c(s.b&&s.b[1]&&{use:s.b[1].use,chkHow:s.b[1].chkHow,verdict:s.b[1].verdict,fixHist:s.b[1].fixHist,verdictHist:s.b[1].verdictHist,superseded:s.b[1].superseded,src:s.b[1].src},700),lessons:c((s.lessons||[]).map(l=>({use:l.use,fixHist:l.fixHist,wd:l.wd,src:l.src})),500),chat:c(L.chat,300),plan:c(L.plan,400),steps:c((L.steps||[]).map(x=>({t:(x.t||x.text||'').slice(0,80),due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist,src:x.src,plan:x.plan})),1500),retracts:c(L.retracts,900),evlog:c((L.evlog||[]).map(e=>[e.k,e.at,e.title]),600),closure:cl&&(cl.label+' / '+cl.verdict)}});\no.sess=V.filter(r=>r&&r.type==='achat').map(s=>({id:s.id,lprob:s.lprob,retracts:c(s.retracts,700),coachRetr:c(s.coach&&s.coach.retracts,900),copyAsk:c(s.copyAsk||(s.se&&s.se.copyAsk),600),plans:c((s.plans||s.coach&&s.coach.plans||[]).map(q=>({id:q.id,text:q.text,when:q.when,state:q.state,done:q.done,corr:q.corr,src:q.src,step:q.step,will:q.will})),900),guesses:c(s.coach&&(s.coach.guesses||s.coach.guess),400),acts20:c(s.coach&&s.coach.acts20,400),prcs:s.prcs,evlog:c((s.evlog||[]).map(e=>[e.k,e.at,e.title]),500),last:(s.msgs||[]).slice(-5).map(m=>m.role+': '+(m.text||'').slice(0,260)+(m.textHist?' [HIST '+JSON.stringify(m.textHist).slice(0,240)+']':'')+(m.corr?' [CORR '+JSON.stringify(m.corr).slice(0,200)+']':''))}));\ntry{const P=APP.MIND.phases();o.mind=P.rows.map(r=>r.id+':'+r.k+'/'+r.n+' => '+(r.acts||[]).map(a=>(a.ok===true?'+':a.ok===false?'-':'o')+((a.wd||a.withdrawn)?'[WD]':'')+(a.fa||a.id||'').slice(0,70)).join(' | '))}catch(e){o.mind=String(e)}\ntry{o.weak=APP.MIND.phases().weakest||null}catch(e){}\ntry{o.cases=APP.PR.cases().map(x=>({id:x.id,tid:x.tid,subj:x.subj&&x.subj.t,state:x.state,due:x.due,reason:x.reason,stable:x.stable,stableOff:x.stableOff,sess:(x.sessions||[]).map(z=>[z.d,z.meas,z.ok,z.src,z.role])}))}catch(e){}\no.rem=(window.__rem||[]).slice(-5).map(r=>(r.key||'')+'@'+(r.due_date||r.due||'')+' '+(r.title||r.text||'').slice(0,70));\no.today=APP.today();\nreturn JSON.stringify(o,null,1)})()\n",
+"c": 20
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let o={};try{const sc=APP.PRE.scope(s);o.stack=APP.PRE.all(sc);o.rec=APP.PRE.rec(sc)}catch(e){o.err=String(e)}try{o.causes=APP.MIND.phases().causes;o.pre=APP.MIND.phases().prereq}catch(e){o.merr=String(e)}return JSON.stringify(o).slice(0,4000)})()",
+"c": 21
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"mind\",null,null);await w(1000);document.querySelectorAll('#main details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});await w(400);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 22
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"prereq\",null,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 23
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();let id='';try{const b=APP.ASSIST.boundLive?APP.ASSIST.boundLive(s):null;id=b&&b.pid?b.pid:(s.lprob&&APP.liveRec&&APP.liveRec(s.lprob)?s.lprob:s.id)}catch(e){id=s.id}APP.ASSIST.toggle(false);APP.go('route',id);await w(1200);const g=document.querySelector(\".rt-pt.rt-dest\")||document.querySelector('.rt-pt.rt-now')||document.querySelector('.rt-pt');if(g){g.dispatchEvent(new Event('mouseenter'));g.scrollIntoView({block:'center'});}await w(500);const t=document.querySelector('.rt-tip');let M={};try{M=APP.ROUTE.model(id)}catch(e){M={err:String(e)}}return \"FINAL\"+' id='+id+' TIP: '+(t&&!t.hidden?t.innerText:'(none)')+' ## M: '+JSON.stringify({pts:(M.pts||[]).map(p=>[p.cls,p.k,(p.title||'').slice(0,50)]),dets:(M.dets||[]).map(d=>[d.kind,d.concept,d.depth,d.open,d.rejoin]),backs:(M.backs||[]).length,now:M.nowFa,remain:M.remain,dest:M.dest}).slice(0,2500)})()",
+"c": 24
+},
+{
+"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(false);APP.go(\"dossier\",APP.ASSIST.cur().id,null);await w(1000);window.scrollTo(0,0);await w(300);return location.hash+' '+APP.state.view+' '+(APP.state.arg||'')})()",
+"c": 25
+},
+{
+"c": 26,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"فرض و حکم را خودت روشن گفتی و سه حالت را هم آزمودی — خوب شروعی است، ولی سه حالت هنوز برهان نیست. پیش‌تر مسئله‌ای دیده‌ای که در آن عبارتی مثلِ n²−1 بود و کاری با آن کردی؟\", \"title\": \"n²−1 بر ۸\", \"pinned\": \"اثبات: برای هر n فرد، n²−1 بر ۸ بخش‌پذیر است\", \"memory\": \"نگار، تمرینِ مدرسه: اثباتِ ۸ | n²−1 برای n فرد. حالت‌های ۳، ۵، ۷ را خودش آزمود (۸، ۲۴، ۴۸). پرسیدم مسئلهٔ مشابهی دیده؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"طرح: یافتنِ راهِ برهان\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"u\", \"d\"], \"ans\": [\"u1\", \"u4\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"register\": \"شما\"}]}",
+"{\"reply\": \"گیر کردن همین‌جا طبیعی است؛ عدد گذاشتن هم بی‌فایده نبود. از زاویهٔ دیگر: عبارتی شبیهِ n²−1 — مثلاً به شکلِ کلیِ «مربعِ یک چیز منهای مربعِ یک چیزِ دیگر» — را جایی دیده‌ای که به شکلِ دیگری نوشته شود؟\", \"pinned\": \"اثبات: برای هر n فرد، n²−1 بر ۸ بخش‌پذیر است\", \"memory\": \"مسئلهٔ مشابه ندیده؛ فقط می‌تواند عدد بگذارد؛ گیر در طرح. پرسشِ مسئلهٔ وابسته را از زاویهٔ «مربع منهای مربع» پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"طرح: یافتنِ راهِ برهان\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"این‌جا یک ابزارِ مشخص کم است، نه هوش: «تجزیهٔ تفاضلِ دو مربع» — نوشتنِ «مربع منهای مربع» به شکلِ ضربِ دو پرانتز. همین گامِ تو (نوشتنِ n²−1 به شکلِ ضرب) آن را لازم دارد. اول ببینیم چقدرش را داری: (x−1)(x+1) را همان‌طور که (a+b)² را باز می‌کنی، ضرب کن — چی میشه؟\", \"memory\": \"بلد است پرانتز را ضرب کند ((a+b)²)؛ نمی‌داند a²−b² را به ضرب برگرداند. پیش‌نیاز: تجزیهٔ تفاضلِ دو مربع؛ پرسشِ تشخیصی: ضربِ (x−1)(x+1).\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq\": {\"concept\": \"تجزیهٔ تفاضلِ دو مربع: a²−b² = (a−b)(a+b)\", \"step\": \"نوشتنِ n²−1 به شکلِ ضربِ دو عامل\", \"quote\": \"مربع منهای مربع رو نمی‌دونم چطوری میشه یه جور دیگه نوشت\", \"q\": \"(x−1)(x+1) را ضرب کن؛ چه می‌شود؟\", \"topic\": \"اتحادهای جبری\"}}]}",
+"{\"reply\": \"آره — همین «تجزیهٔ تفاضلِ دو مربع» است: هر «مربع منهای مربع» را می‌شود به شکلِ ضرب نوشت: a² − b² = (a − b)(a + b). یعنی همان ضربی که خودت باز کردی، برعکس خوانده می‌شود. مثال با عدد: ۲۵ − ۹ = (۵ − ۳)(۵ + ۳) = ۲ × ۸ = ۱۶. حالا خودت: x² − 49 را به شکلِ ضربِ دو پرانتز می‌نویسی؟\", \"memory\": \"تشخیص: ضرب را بلد است، برگرداندنِ a²−b² به ضرب را نه (missing). یاد دادم فقط همین اتحاد با یک مثالِ عددی؛ پرسشِ تسلط: x²−49.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq1\", \"diag\": \"missing\", \"quote\": \"یعنی هر «مربع منهای مربع» رو میشه این‌جوری نوشت؟ نمی‌دونستم.\"}}]}",
+"{\"reply\": \"درسته — و خودت هم با ضرب وارسی‌اش کردی. برگردیم به مسئلهٔ اصلی (برای هر n ِ فرد، n²−1 بر ۸ بخش‌پذیر است)، به همان گامی که منتظر مانده بود: نوشتنِ n²−1 به شکلِ ضربِ دو عامل. تا این‌جا سه حالتِ ۳، ۵ و ۷ (۸، ۲۴، ۴۸) را داری. حالا که تجزیهٔ تفاضلِ دو مربع را داری، همان گام را چطور برمی‌داری؟\", \"memory\": \"تسلط: x²−49=(x−7)(x+7) را درست نوشت و با ضرب وارسی کرد. برگشت به گامِ «n²−1 به شکلِ ضرب».\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq_res\": {\"id\": \"pq1\", \"mastery\": \"yes\", \"quote\": \"x² − 49 = (x − 7)(x + 7). با ضرب هم چک کردم\"}}]}",
+"{\"reply\": \"همان گامی که منتظر بود را خودت برداشتی: n²−1 = (n−1)(n+1)، و این‌که هر دو زوج‌اند هم درست است. برای ۸: به جفت‌های خودت نگاه کن — ۲ و ۴، ۴ و ۶، ۶ و ۸. در هر جفت از دو زوجِ پشتِ سرِ هم، یکی چه ویژگیِ دیگری دارد؟\", \"memory\": \"برگشت به خط: n²−1=(n−1)(n+1) را خودش نوشت؛ هر دو زوج ⇒ بخش‌پذیر بر ۴. برای ۸ به جفت‌های زوج اشاره کردم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prior\": [{\"step\": \"تجزیه\", \"quote\": \"n²−1 = (n−1)(n+1)\", \"verdict\": \"ok\", \"why\": \"تجزیهٔ تفاضلِ دو مربع درست است\"}, {\"step\": \"دو عاملِ زوج\", \"quote\": \"n فرده، پس n−1 و n+1 هر دو زوجن\", \"verdict\": \"ok\", \"why\": \"درست\"}, {\"step\": \"بخش‌پذیری بر ۴\", \"quote\": \"دو تا زوج ضرب هم میشه بخش‌پذیر بر ۴\", \"verdict\": \"ok\", \"why\": \"درست، ولی هنوز به ۸ نرسیده\", \"dep\": [2]}]}]}",
+"{\"reply\": \"برهان را خودت کامل کردی: $n^2-1=(n-1)(n+1)$، هر دو زوج، و یکی از دو زوجِ پشتِ سرِ هم مضربِ ۴. «حل شد» را خودت می‌سنجی، نه من: می‌توانی نقطهٔ حساسش را وارسی کنی — چرا از دو زوجِ پشتِ سرِ هم «همیشه» یکی مضربِ ۴ است، نه فقط در ۲ و ۴ و ۶ و ۸؟\", \"pinned\": \"اثبات: برای هر n فرد، n²−1 بر ۸ بخش‌پذیر است\", \"memory\": \"برهان را کامل کرد: n²−1=(n−1)(n+1)، دو زوجِ متوالی، یکی مضربِ ۴ ⇒ مضربِ ۸. پرسیدم نقطهٔ حساس (یکی از دو زوجِ متوالی همیشه مضربِ ۴) را وارسی کند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری: نقطهٔ حساس\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"پس برای هر n فرد n²−1 بر ۸ بخش‌پذیره\", \"prior\": [{\"step\": \"یکی مضربِ ۴\", \"quote\": \"همیشه یکی‌شون بر ۴ بخش‌پذیره! چون زوج‌ها یکی در میون مضرب ۴ان\", \"verdict\": \"ok\", \"why\": \"درست\"}, {\"step\": \"مضربِ ۸\", \"quote\": \"یکی مضرب ۴ه و اون یکی مضرب ۲، ضربشون مضرب ۸ه\", \"verdict\": \"ok\", \"why\": \"درست\", \"dep\": [1]}]}]}",
+"{\"reply\": \"نقطهٔ حساس را هم خودت روشن کردی، و درست را به قلمِ خودت ثبت کردم. از پرسش‌هایی که این‌جا پرسیدم، کدام بیشتر کمکت کرد؟\", \"pinned\": \"اثبات: برای هر n فرد، n²−1 بر ۸ بخش‌پذیر است\", \"memory\": \"حل شد و بازنگری کرد: زوج‌ها یکی‌درمیان مضربِ ۴. درس: «مربع منهای مربع» را به ضرب تجزیه کند؛ ابزارِ نابلد را اول یاد بگیرد و برگردد. chat_solved فرستاده شد.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری\", \"s\": \"done\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"n²−1 برای n فرد بر ۸ بخش‌پذیر است\", \"statement\": \"ثابت کنید برای هر عدد فرد n، عدد n²−1 بر ۸ بخش‌پذیره\", \"kind\": \"prove\", \"lesson\": \"وقتی «مربع منهای مربع» دیدم، به ضرب تجزیه‌ش کنم؛ و اگه یه ابزاری رو بلد نیستم، اول همونو یاد بگیرم بعد برگردم سر مسئله.\", \"check\": \"زوج‌ها دوتا دوتا جلو میرن: ۲، ۴، ۶، ۸، ... و مضرب‌های ۴ یکی در میون بین زوج‌هان. پس از هر دو زوج پشت سر هم، دقیقاً یکی مضرب ۴ه.\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [\"b2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"check\": {\"msgs\": [\"از هر دو زوج پشت سر هم، دقیقاً یکی مضرب ۴ه\"]}, \"learned\": {\"concept\": \"تجزیهٔ تفاضلِ دو مربع: a²−b² = (a−b)(a+b)\", \"quote\": \"وقتی «مربع منهای مربع» دیدم، به ضرب تجزیه‌ش کنم\"}, \"prior\": [{\"step\": \"چرا یکی در میان\", \"quote\": \"از هر دو زوج پشت سر هم، دقیقاً یکی مضرب ۴ه\", \"verdict\": \"ok\", \"why\": \"توجیهِ درست\"}]}]}",
+"{\"reply\": \"ثبت شد که همان پرسشِ تشخیصی — ضربِ (x−1)(x+1) — راه را باز کرد. این نوع مسئله برایت چطور بود — کدام بخشش را دوست داشتی و کدامش را نه؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری: سلیقه\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"chat_lookback\", \"pid\": \"pb_l_mvnix1pg2tz\", \"bestQ\": \"همون که گفتی (x−1)(x+1) رو ضرب کنم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"سلیقه‌ات را ثبت کردم. دربارهٔ «خنگم»: آن لحظه فقط یک ابزارِ مشخص را نداشتی — «تجزیهٔ تفاضلِ دو مربع» (a² − b² = (a − b)(a + b)) که سرِ کلاس نخوانده بودی. همان را در دو پیام یاد گرفتی، با x² − 49 آزمودی و بعد خودت برهان را تا آخر بردی؛ گیرِ اول از نبودِ ابزار بود، نه از توانت.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"بازنگری\", \"s\": \"done\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"chat_lookback\", \"pid\": \"pb_l_mvnix1pg2tz\", \"taste\": \"اینکه خودم الگو رو پیدا کردم خیلی حال داد. ولی اولش که هیچی بلد نبودم با n²−1 چیکار کنم، حس بدی داشتم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [\"b5\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"taste\": {\"text\": \"اینکه خودم الگو رو پیدا کردم خیلی حال داد\"}}]}",
+"{\"reply\": \"روشِ دیروز را خودت در جای تازه به کار بردی و با ضربِ پرانتز هم وارسی کردی. «درست است» را من نمی‌گویم: با یک حالتِ خاص هم می‌آزمایی‌اش — مثلاً x = ۵ در هر دو طرف؟\", \"pinned\": \"اثبات: برای هر n فرد، n²−1 بر ۸ بخش‌پذیر است\", \"memory\": \"روزِ بعد: x²−9=(x−3)(x+3) را خودش نوشت و با ضربِ پرانتز وارسی کرد (انتقالِ روش). پرسیدم حالتِ خاص x=5.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"به‌کار بردنِ روش در x²−9\", \"s\": \"now\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"x²−9 = (x−3)(x+3)\", \"check\": {\"msgs\": [\"با ضرب پرانتز هم چک کردم، x² + 3x − 3x − 9 میشه\"]}}]}",
+"{\"reply\": \"دو وارسیِ مستقل — ضربِ پرانتز و حالتِ x = ۵ — هر دو می‌خوانند. این همان ابزاری است که دیروز ساختی و امروز بی‌کمک به کار بردی.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [{\"t\": \"به‌کار بردنِ روش در x²−9\", \"s\": \"done\", \"view\": \"whole\"}], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [\"b1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"(۵−۳)(۵+۳) = ۲×۸ = ۱۶. یکیه!\"}]}"
+],
+"keys": [
+"سلام. معلممون یه تمرین داده: «ثابت کنید برای هر عدد فرد n، عدد n²−1 بر ۸ بخش‌پذیره». برای ۳ و ۵ و ۷ امتحان کردم: ۸، ۲۴، ۴۸ — همه بخش‌پذیرن. ولی نمی‌دونم چطوری برای همه‌ی عددها ثابت کنم.",
+"نه، ندیدم. فقط می‌دونم n فرده. با n²−1 نمی‌دونم چیکار کنم، فقط می‌تونم عدد بذارم توش. یه جورایی گیرم.",
+"شکل دیگه؟ یعنی چی؟ ما تو کلاس فقط ضرب کردن پرانتزها رو خوندیم، مثل (a+b)². مربع منهای مربع رو نمی‌دونم چطوری میشه یه جور دیگه نوشت.",
+"(x−1)(x+1) = x² + x − x − 1 = x² − 1. خب این ضربه، ولی من می‌خوام برعکسش کنم. یعنی هر «مربع منهای مربع» رو میشه این‌جوری نوشت؟ نمی‌دونستم.",
+"x² − 49 = (x − 7)(x + 7). با ضرب هم چک کردم: x² + 7x − 7x − 49. درسته!",
+"پس n²−1 = (n−1)(n+1). حالا n فرده، پس n−1 و n+1 هر دو زوجن. دو تا زوج ضرب هم میشه بخش‌پذیر بر ۴. ولی ۸ از کجا میاد؟",
+"آهان! ۴، ۴، ۸ — همیشه یکی‌شون بر ۴ بخش‌پذیره! چون زوج‌ها یکی در میون مضرب ۴ان. پس یکی مضرب ۴ه و اون یکی مضرب ۲، ضربشون مضرب ۸ه. پس برای هر n فرد n²−1 بر ۸ بخش‌پذیره. حل شد!",
+"چون زوج‌ها دوتا دوتا جلو میرن: ۲، ۴، ۶، ۸، ... و مضرب‌های ۴ یکی در میون بین زوج‌هان. پس از هر دو زوج پشت سر هم، دقیقاً یکی مضرب ۴ه. درسی که گرفتم: وقتی «مربع منهای مربع» دیدم، به ضرب تجزیه‌ش کنم؛ و اگه یه ابزاری رو بلد نیستم، اول همونو یاد ",
+"همون که گفتی (x−1)(x+1) رو ضرب کنم؛ از اونجا دیدم برعکسش هم میشه و همه‌چی باز شد.",
+"اینکه خودم الگو رو پیدا کردم خیلی حال داد. ولی اولش که هیچی بلد نبودم با n²−1 چیکار کنم، حس بدی داشتم، فکر کردم خنگم.",
+"سلام! امروز تو تمرین‌های کتاب x²−9 بود، همون روش دیروز رو زدم: x²−9 = (x−3)(x+3). درسته؟ با ضرب پرانتز هم چک کردم، x² + 3x − 3x − 9 میشه.",
+"x=۵: ۲۵−۹=۱۶، و (۵−۳)(۵+۳) = ۲×۸ = ۱۶. یکیه!"
+]
+}

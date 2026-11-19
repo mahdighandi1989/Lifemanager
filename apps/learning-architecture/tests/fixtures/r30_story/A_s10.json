@@ -1,0 +1,862 @@
+{
+"from": "round30A/s10",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "۹ نفر، سه تا میز سه‌نفره. قوانین: هر کدوم از سه تا عمه باید کنار دقیقاً یکی از سه تا پسرعمو باشن، هیچ دو پسرعمویی سر یه میز نباشن، و ... (۶ قانون دیگه). دو روزه جابه‌جا می‌کنم، ۱۰ تا چیدمان امتحان کردم، همیشه یه قانون نقض می‌شه. دارم اشتباه می‌کنم؟",
+"c": 1
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='1995-08-04';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()",
+"c": 2
+},
+{
+"say": "با عمه‌ها و پسرعموها تنها راحتم: یه چیدمان دارم که فقط یه قانون نقض می‌شه. شاید اصلاً ممکن نیست؟ باید بدونم بشه یا نه.",
+"c": 3
+},
+{
+"eval": "(()=>{window.__T=[];const o=APP.toast;if(!o.__w){APP.toast=function(m,k){window.__T.push((k||\"\")+\":\"+m);return o.apply(this,arguments)};APP.toast.__w=1}window.TT=()=>{const t=window.__T.slice(-3).join(\" || \");window.__T=[];return t};return 1})()",
+"c": 4
+},
+{
+"eval": "(()=>{APP.go('e_prob',null,'live');F('lpNewT','چیدمانِ ۹ مهمان');F('lpNewS','۹ نفر، سه میزِ سه‌نفره؛ هر عمه کنار دقیقاً یک پسرعمو، هیچ دو پسرعمو سر یک میز نه، و شش قانونِ دیگر. آیا چیدمانی هست که همهٔ قوانین را برآورد، یا ناممکن است؟');\nconst nat0=document.getElementById('lpNewNat').value;S('lpNewType','pod');const b=[...document.querySelectorAll('#main button')].find(b=>/ساختنِ مسئلهٔ حل‌نشده/.test(b.textContent));b.click();const p=APP.state.arg;\nF('lpOne','می‌خوام بدونم این قوانین با هم جور درمیان یا نه.');F('lpWhy','دو روزه وقت گذاشتم');C('.lp-onesave');\nreturn 'nat0='+nat0+' p='+p+' '+JSON.stringify(APP.liveKindInfo(p))+'\\nspatialSugg='+/شاید فضایی/.test(document.getElementById('main').innerText)+'\\n'+FL('lpSat|lpSuff|lpUnk|lpCond')})()\n",
+"c": 5
+},
+{
+"eval": "APP.state.arg",
+"c": 6
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,APP.liveKindInfo(r.p.id).kind,APP.liveKindInfo(r.p.id).type]))\n",
+"c": 7
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 8
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 9
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 10
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 11
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 12
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 13
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 14
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 15
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 16
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 17
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 18
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 19
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 20
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 21
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 22
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 23
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 24
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 25
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 26
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 27
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 28
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 29
+},
+{
+"eval": "(()=>{const p='pb_l_mvaqm4m3no2';C('.lp-dadd');const D=['۹ نفر شامل ۳ عمه و ۳ پسرعمو','سه میزِ سه‌نفره','هر عمه کنارِ دقیقاً یک پسرعمو؛ دو پسرعمو سر یک میز نه'];const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>F(id,D[i]||''));\nF('lpUnk','هیچ چیدمانی نیست که همهٔ قوانین را با هم برآورد');F('lpCond','هر عمه دقیقاً یک پسرعموی کناری\\nهیچ دو پسرعمو سر یک میز');S('lpSuff','کافی است');F('lpSuffW','قوانین کامل‌اند');\nF('lpGuess','ممکن نیست');S('lpConf','70');F('lpTest','پیدا کردنِ یک چیدمانِ درست');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','no');\nC('.lp-usave');C('.sv-g2');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).slice(-1).join('');return st()+' SUB:'+APP.state.sub})()\n",
+"c": 30
+},
+{
+"eval": "(()=>{S(\"lpSat\",\"unknown\");C(\".lp-usave\");C(\".sv-g2\");return TT()+\" SUB:\"+APP.state.sub+\"\\n\"+MT(\"۲) طرح\",900)+\"\\n###\"+MT(\"کدام بخش را شل\",300)})()",
+"c": 31
+},
+{
+"say": "فردا. یه چیزی گیجم کرده: اگه ممکن نیست، چرا باید فرض کنم که همهٔ قوانین برقرارن؟ ولی شمردم: هر عمه یه جفتِ کناری با پسرعمو می‌خواد، یعنی ۳ جفت، ولی با این قوانین سر هر میز حداکثر یه جفت جا میشه و…",
+"eval0": "(()=>{0;return 1})()",
+"clock": "2026-10-17",
+"c": 32
+},
+{
+"eval": "(()=>{const p='pb_l_mvaqm4m3no2';APP.go('lprob',p,'plan');S('lpMv','mv_contra');F('lpMvWhy','فرض می‌کنم چیدمانی هست و پیامدش را می‌شمارم');C('.lp-mvadd');S('lpMv','mv_auxiliary');F('lpMvWhy','کمیتِ کمکی: شمارِ جفت‌های کناریِ عمه-پسرعمو');C('.lp-mvadd');\nF('lpPlan','نخست فرض می‌کنم چیدمانی هست که همهٔ قوانین را برمی‌آورد، سپس جفت‌های لازم را با جفت‌های ممکن می‌شمارم و به تناقض می‌رسم.');\n[...document.querySelectorAll('[id^=lpPU_a_]')].forEach(e=>S(e.id,'use'));[...document.querySelectorAll('[id^=lpPU_w_]')].forEach(e=>F(e.id,'در شمارشِ جفت‌ها'));[...document.querySelectorAll('[id^=lpPC_]')].forEach(e=>{if(!e.checked)e.click()});C('.lp-plansave');\nconst S3=[['فرض: چیدمانی هست که همهٔ قوانین را برمی‌آورد','برهانِ خلف: فرضِ مخالفِ حکم'],['سه عمه هر کدام یک جفتِ کناری با پسرعمو لازم دارند: ۳ جفت','قانونِ اول'],['چون دو پسرعمو سر یک میز نیستند و قانون‌های دیگر، هر میز حداکثر یک جفت دارد؛ ولی عمه‌ها باید سر دو میز جمع شوند، پس حداکثر ۲ جفت: p_1 + p_2 + p_3 ≤ 2 < 3، تناقض','قانونِ دوم و شمارش']];\nwindow.__PV=[];S3.forEach(([t,pr])=>{F('lpStep',t);window.__PV.push([...document.querySelectorAll('#main .mx-prev')].map(e=>(getComputedStyle(e).display=='none'?'H ':'')+e.textContent.trim().slice(0,200)+' m='+e.querySelectorAll('math').length).join('|'));S('lpClear','بله');F('lpProof',pr);F('lpPrem',pr);[...document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]')].forEach(e=>{if(!e.checked)e.click()});C('.lp-stepsave')});\nC('.lp-solved');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).slice(-1).join('');\nreturn 'PV:'+window.__PV.join(' ## ')+' '+st()+' SUB:'+APP.state.sub+'\\n'+FL('lpB').split('\\n').filter(x=>/Dir|Ind|Hyp|Concl|Other|Unit|Lim|Sym/.test(x)).join('\\n')})()\n",
+"c": 33
+},
+{
+"say": "برای خانواده توضیح دادم، با «فرض کنیم ممکنه…» همه گیج شدن. چطوری بگم؟",
+"c": 34
+},
+{
+"eval": "window.__T=[];(()=>{const p='pb_l_mvaqm4m3no2';S('lpBWant','same');F('lpBChk','دوباره شمردم: سه جفت لازم، دو جفت ممکن');S('lpBRes','نتیجه سالم ماند');F('lpBOther','مستقیم: هر چیدمانی حداکثر دو جفتِ عمه-پسرعمو دارد، و قانون سه جفت می‌خواهد');F('lpBGlance','لازم ۳، ممکن ۲');F('lpBWorked','شمردن به‌جای امتحان');\nS('lpBHyp','all');S('lpBPod','proved');[...document.querySelectorAll('[id^=lpBCP_]')].forEach(x=>S(x.id,'yes'));S('lpBConcl','same');F('lpBDef','«کنار» یعنی سر یک میز و پهلوی هم');F('lpBDirect','مستقیم: در هر چیدمان، چون پسرعموها سر میزهای جدا هستند و عمه‌ها در دو میز، حداکثر دو جفت ساخته می‌شود؛ پس سه جفت ممکن نیست — بی فرضِ نادرست');\nS('lpBBest','0');F('lpBUse','هر جا امتحان‌ها همیشه یکی کم می‌آورند: بشمارم لازم و ممکن را');F('lpBTaste','شمردن را دوست داشتم');F('lpBNew','کدام قانون را با کمترین هزینه شل کنیم تا چیدمان شدنی شود؟');S('lpBNewS','cond');F('lpBNewW','همان قانون‌ها منهای یکی');S('lpBHit','درست بود');\nconst b=[...document.querySelectorAll('#main button')].find(b=>/ثبتِ بازنگری|ثبتِ بازنگری/.test(b.textContent));if(b)b.click();const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<300).slice(-1).join('');\nreturn TT()+'\\n'+st()+'\\n'+JSON.stringify(APP.liveClosure(p)).slice(0,200)+'\\nKIDS:'+JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveKindInfo(r.p.id).type,APP.liveKindInfo(r.p.id).spatial]))})()\n",
+"c": 35
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQs(r.p.id)]))\n",
+"c": 36
+},
+{
+"eval": "(()=>{const r=APP.liveAll()[0];const pid=r.p.id;const se=APP.S.all('achat',x=>x&&(x.lprob===pid||x.id===r.sess));const s=se[se.length-1];const before=APP.liveChatQs(pid).length;\nconst add=t=>{s.msgs.push({role:'user',text:'باشه، ادامه بدیم با همین مسئله',at:new Date().toISOString()});s.msgs.push({role:'ai',text:t,at:new Date().toISOString()});};\nadd('خوب پیش رفتی. پیش از رها کردنِ کلِ راه: کدام حلقه دقیقاً شکست؟ شاید فقط همان یکی باید عوض شود و بقیهٔ زنجیره درست است.');\nconst a=APP.liveChatQs(pid);\nadd('برهانی گفتی — از راهِ دیگری هم به همین حکم می‌رسی؟ وارسی‌اش کن: هر بخشِ فرض کجا به کار رفت و نتیجه دقیقاً همان حکم است؟ (بعد در صفحه «✅ حل شد» و بازنگری)');\nconst b=APP.liveChatQs(pid);\nadd('کدام حلقه دقیقاً شکست؟');\nconst c=APP.liveChatQs(pid);\ns.msgs.splice(s.msgs.length-6,6);\nreturn JSON.stringify({n:se.length,before,a:a.slice(before),b:b.slice(a.length),c:c.slice(b.length)})})()\n",
+"c": 37
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,r.p.created||r.created,r.sess,APP.liveChatQs(r.p.id)]))",
+"c": 38
+},
+{
+"eval": "JSON.stringify(APP.S.all(\"achat\",x=>1).map(se=>({id:se.id,lprob:se.lprob,lprobAt:se.lprobAt,log:se.lprobLog,msgs:(se.msgs||[]).map(m=>m.role+\"@\"+(m.at||\"\")+\": \"+String(m.text).slice(0,160))})))",
+"c": 39
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQItems(r.p.id)]))",
+"c": 40
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t||x)]),null,0)",
+"c": 41
+},
+{
+"eval": "JSON.stringify({mx:[...document.querySelectorAll(\".as-msg .mx\")].map(e=>e.getAttribute(\"data-src\")+\" => \"+e.textContent),s:APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,g:(s.coach||{}).guess&&s.coach.guess.text}))})",
+"c": 42
+},
+{
+"eval": "(()=>{const r=APP.liveAll().find(r=>/۹ مهمان/.test(r.p.title));APP.go(\"lprob\",r.p.id,\"back\");const e=document.getElementById(\"lpBBest\");return e?[...e.options].map(o=>o.textContent).join(\" || \"):\"NOSEL \"+(document.getElementById(\"main\").innerText.match(/پرسشی که بیشتر کمک کرد[^\\n]*/)||[\"\"])[0]})()",
+"c": 43
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()",
+"c": 44
+},
+{
+"eval": "APP.today()",
+"c": 45
+},
+{
+"eval": "APP.liveAll().map(r=>r.p.id).join(\" \")",
+"c": 46
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()",
+"c": 47
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 48
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 49
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 50
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 51
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 52
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 53
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 54
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 55
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 56
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))",
+"c": 57
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜 پروندهٔ کامل · فقط'))})()",
+"c": 58
+},
+{
+"eval": "\"clock->2026-10-24\"",
+"clock": "2026-10-24",
+"c": 59
+},
+{
+"reload": true,
+"c": 60
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())",
+"c": 61
+},
+{
+"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()",
+"c": 62
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");const j=t.indexOf(\"⚫ نقطه\");return t.slice(i,j+400)})()",
+"c": 63
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()",
+"c": 64
+},
+{
+"eval": "APP.today()+' '+APP.ASSIST.cur().id+' '+APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>r.p.id+':'+r.p.title+':'+(APP.liveClosure(r.p.id)||{}).label).join(' | ')",
+"c": 65
+},
+{
+"eval": "APP.go('lprob','pb_l_mvaqm4m3no2')",
+"c": 66
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()",
+"c": 67
+},
+{
+"say": "یه اصلاح دربارهٔ اولین پیامم: نوشتم «۹ نفر، سه تا میز سه‌نفره» — اشتباه نوشتم، میزها چهارنفره‌ان، نه سه‌نفره.",
+"c": 68
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()",
+"c": 69
+},
+{
+"eval": "(()=>{const b=[...document.querySelectorAll('.as-panel .as-askyes')];b.forEach(x=>x.click());return b.length+' '+TT()})()",
+"c": 70
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()",
+"c": 71
+},
+{
+"eval": "MT('',1200)",
+"c": 72
+},
+{
+"say": "جمعه دوباره با میزهای چهارنفره می‌شمرم ببینم هنوز ناممکنه یا نه.",
+"c": 73
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()",
+"c": 74
+},
+{
+"eval": "(async()=>{const MID='u6',FROM='جمعه',TO='پنجشنبه';const s=APP.ASSIST.cur();const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await new Promise(r=>setTimeout(r,300));const m=s.msgs.find(m=>APP.ASSIST.msgId(m)==MID);if(!m)return 'NOMSG';const b=document.querySelector('.as-mtools[data-mid=\"'+MID+'\"] .as-editb');if(!b)return 'NOEDIT';b.click();await new Promise(r=>setTimeout(r,400));const ta=document.querySelector('.as-edtx');ta.scrollIntoView({block:'center'});const nt=m.text.replace(FROM,TO);ta.value=nt;ta.dispatchEvent(new Event('input',{bubbles:true}));const cs=getComputedStyle(ta);return 'OPEN '+nt+' | color='+cs.color+' bg='+cs.backgroundColor})()",
+"c": 75
+},
+{
+"eval": "(()=>{document.querySelector('.as-edsave').click();return 'saved'})()",
+"c": 76
+},
+{
+"say": "خواهرم گفت «اشتباه کردی که این‌قدر وقت گذاشتی، یه چیدمانِ تقریبی هم بس بود».",
+"c": 77
+},
+{
+"eval": "JSON.stringify({sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-3).map(m=>m.text.slice(0,220)),due:(APP.dueList()||[]).map(x=>x.txt).filter(x=>/📅|⏰/.test(x))})",
+"c": 78
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()",
+"c": 79
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()",
+"c": 80
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()",
+"clock": "2026-10-29",
+"c": 81
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 82
+},
+{
+"say": "پنجشنبه‌ست. با میزهای چهارنفره دوباره شمردم: حالا هر میز یه صندلیِ خالی داره و یه چیدمان پیدا کردم که همهٔ قانون‌ها توش برقرارن. پس با میزِ چهارنفره ممکنه و اون اثباتِ ناممکن بودن دیگه به کار نمیاد.",
+"c": 83
+},
+{
+"eval": "JSON.stringify(APP.liveClosure(APP.liveAll().find(r=>/چیدمان/.test(r.p.title)).p.id))",
+"c": 84
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 85
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 86
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 87
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 88
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqluwpbef3f');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 89
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 90
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 91
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 92
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 93
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 94
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 95
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 96
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlryhh77mo');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 97
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 98
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 99
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 100
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t})()",
+"c": 101
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t})()",
+"c": 102
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 103
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 104
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 105
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 106
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 107
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltb3arffn');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 108
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 109
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 110
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 111
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t})()",
+"c": 112
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t})()",
+"c": 113
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 114
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 115
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 116
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 117
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 118
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqluuom5q4m');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 119
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 120
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 121
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 122
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t})()",
+"c": 123
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t})()",
+"c": 124
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 125
+},
+{
+"eval": "APP.today()+\" \"+new Date().toString().slice(0,15)",
+"c": 126
+},
+{
+"clock": "2026-10-30",
+"c": 127
+},
+{
+"eval": "APP.today()+\" \"+new Date().toString().slice(0,15)",
+"c": 128
+},
+{
+"say": "با میزهای چهارنفره شمردم و چیدمان درومد. تا جمعه چیدمانِ نهایی رو برای خواهرم می‌فرستم.",
+"c": 129
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.filter(m=>m.role!=\"ai\").slice(-10).map(m=>m.role[0]+\": \"+m.text.slice(0,230)).join(\"\\n\")})()",
+"c": 130
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({dp:s.datePend,plans:(s.plans||[]).map(p=>[p.text.slice(0,50),p.when,p.whenAsk,p.state]),sys:s.msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,300))})})()",
+"c": 131
+},
+{
+"say": "جمعهٔ بعد.",
+"c": 132
+},
+{
+"eval": "APP.today()",
+"c": 133
+},
+{
+"eval": "JSON.stringify({t:APP.today(),dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,40),x.date]),sys:APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-1).map(m=>m.text.slice(0,250)),due:(APP.dueList()||[]).map(x=>x.txt).filter(x=>/📅|⏰/.test(x)),pl:(APP.ASSIST.cur().plans||[]).map(p=>[p.text&&p.text.slice(0,30),p.when,p.state])})",
+"c": 134
+},
+{
+"eval": "JSON.stringify(APP.S.all(\"deadline\",x=>1).map(x=>({w:x.what,d:x.date,src:x.src,by:x.by,c:x.created})))",
+"c": 135
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({dp:s.datePend&&[s.datePend.state,s.datePend.items],plans:(s.plans||[]).map(p=>[p.text.slice(0,40),p.when,p.state]),dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,50),x.date,x.by]),sys:s.msgs.filter(m=>m.role==\"sys\").slice(-1).map(m=>m.text.slice(0,300)),due:DUE().slice(0,400)})})()",
+"c": 136
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({dp:s.datePend&&[s.datePend.state,s.datePend.items],plans:(s.plans||[]).map(p=>[p.text.slice(0,40),p.when,p.state]),dl:APP.S.all(\"deadline\",x=>1).map(x=>[x.what.slice(0,50),x.date,x.by]),sys:s.msgs.filter(m=>m.role==\"sys\").slice(-1).map(m=>m.text.slice(0,300)),due:DUE().slice(0,500)})})()",
+"c": 137
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 138
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 139
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 140
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 141
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltfbebdg9');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 142
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 143
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 144
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 145
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t})()",
+"c": 146
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t})()",
+"c": 147
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 148
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 149
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 150
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 151
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 152
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsvyb11gs');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 153
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 154
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 155
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 156
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t})()",
+"c": 157
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t})()",
+"c": 158
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 159
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.filter(m=>m.role!=\"ai\").slice(-12).map(m=>m.role[0]+\": \"+m.text.slice(0,260)).join(\"\\n\")+\"\\n--DUE\\n\"+DUE()+\"\\nDL:\"+JSON.stringify(APP.S.all(\"deadline\",x=>1).map(x=>[x.what,x.date,x.done]))})()",
+"c": 160
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 161
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 162
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 163
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 164
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt9cf0j0e');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 165
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 166
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 167
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 168
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t})()",
+"c": 169
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t})()",
+"c": 170
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 171
+},
+{
+"say": "یه حسابِ کناری: ۳ × ۴ = ۱۲ صندلی داریم. اگه ۲ مهمونِ دیگه بیان ۱۴ نفریم، ۱۴ ÷ ۴ = ۳ و ۲ تا می‌مونه، پس ۴ تا میز لازمه؛ یعنی ۱۴ − ۱۲ = ۳ نفر اضافه داریم.",
+"c": 172
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 173
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 174
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 175
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 176
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlth1tb4lw');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()",
+"c": 177
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 178
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 179
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 180
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t})()",
+"c": 181
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t})()",
+"c": 182
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 183
+},
+{
+"say": "فردا لیستِ مهمونا رو می‌فرستم و پس‌فردا کیک رو سفارش میدم.",
+"c": 184
+},
+{
+"say": "آره، هر دو.",
+"c": 185
+},
+{
+"say": "دوازده نفر. لیست بمونه برای فردا.",
+"c": 186
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")",
+"c": 187
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 188
+},
+{
+"c": 189
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()",
+"c": 190
+},
+{
+"c": 191
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")",
+"c": 192
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltl0u8i9p');try{CT('^کلِ گفت‌وگو')}catch(e){};return new Promise(r=>setTimeout(()=>{const t=document.getElementById('main').innerText;r(t.slice(Math.max(0,t.indexOf('📜'))))},700))})()",
+"c": 193
+},
+{
+"c": 194
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()",
+"c": 195
+},
+{
+"c": 196
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()",
+"c": 197
+},
+{
+"c": 198
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()",
+"c": 199
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm4m3no2');const t=document.getElementById('main').innerText;return t})()",
+"c": 200
+},
+{
+"c": 201
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvc61o6ie9q');const t=document.getElementById('main').innerText;return t})()",
+"c": 202
+},
+{
+"c": 203
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()",
+"c": 204
+},
+{
+"c": 205
+},
+{
+"c": 206,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"ده چیدمان آزمودی و همیشه یک قانون می‌شکند — این خودش داده است، نه اشتباه. پیش از چیدمانِ یازدهم: مجهول دقیقاً چیست — دنبالِ یک چیدمانی، یا دانستنِ این‌که اصلاً چنین چیدمانی هست؟\", \"title\": \"چیدمانِ ۹ مهمان\", \"pinned\": \"آیا چیدمانی هست که همهٔ قوانین را برآورد\", \"memory\": \"چیدمانِ ۹ مهمان سرِ سه میزِ سه‌نفره با ۸ قانون؛ ۱۰ چیدمان همه یک قانون را می‌شکنند. مجهول را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"پس مجهولت این است: «آیا اصلاً چیدمانی هست که همهٔ قانون‌ها را برآورد؟». «ممکن نیست» یک حدسِ تازه است — درست یا غلط نمی‌گویم؛ راهش این است که ثابتش کنی یا با یک چیدمانِ درست (مثالِ نقض) ردش کنی. چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟\", \"memory\": \"چیدمانِ ۹ مهمان: کاربر می‌خواهد بداند ممکن است یا نه؛ حدس می‌زند ناممکن است. پرسیدم چطور می‌آزمایدش.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"guess\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"guess\": {\"text\": \"شاید اصلاً ممکن نیست\", \"q\": \"چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟\"}}]}",
+"{\"reply\": \"سؤالِ خوبی است: همهٔ قوانین را باور نمی‌کنیم، «فرضاً» برقرار می‌گیریم تا ببینیم به کجا می‌رسد — ذهنِ باز؛ اگر به تناقض رسید، همان فرض نادرست است. شمردنِ جفت‌ها راهِ خوبی است؛ پیش از اثبات، حالت‌های خاص و حدی را بیازما: مثالِ نقضی پیدا می‌شود؟\", \"memory\": \"چیدمانِ ۹ مهمان (pod): کاربر دربارهٔ برهانِ خلف گیج است و جفت‌ها را می‌شمارد. رویهٔ ذهن‌باز را گفتم؛ پرسیدم مثالِ نقض.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"«فرض کنیم ممکن است…» برای کشف خوب بود، ولی برای توضیح گیج‌کننده است. استدلالت غیرمستقیم (خلف) بود — مستقیمش می‌کنی؟ یعنی بخشِ مثبتش را جدا بگو: در هر چیدمان، $p_1+p_2+p_3$ (جفت‌های عمه–پسرعموی کناری) حداکثر چند است، و قانون چند تا می‌خواهد؟\", \"memory\": \"چیدمانِ ۹ مهمان: برهانِ خلف با شمارشِ جفت‌ها؛ خانواده گیج شدند. پرسیدم برهان را مستقیم می‌کند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"direct\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"اصلاحِ ظرفیتِ میزها (چهارنفره به‌جای سه‌نفره) را فرستادم؛ صفحه در نوبتِ بعد نتیجه را نشان خواهد داد. با میزِ چهارنفره، شمارشِ جفت‌هایت هنوز همان نتیجه را می‌دهد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"retract\": {\"msg\": \"۹ نفر، سه تا میز سه‌نفره\", \"key\": \"datum:ظرفیتِ میز\", \"what\": \"fact\", \"fix\": \"چهارنفره\", \"old\": \"سه‌نفره\"}}]}",
+"{\"reply\": \"صورت و «دادهٔ ۲» با «بله» ِ تو به «سه میزِ چهارنفره» رفت و حکمِ «اثبات شد»، «حل شد» و داوریِ کافی‌بودن کنار رفت. شمردنِ دوباره در جمعه همان وارسی است: با میزِ چهارنفره، فکر می‌کنی هنوز همان جواب — ناممکن — درمی‌آید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"جمعه دوباره با میزهای چهارنفره می‌شمرم ببینم هنوز ناممکنه یا نه\", \"when\": \"2026-10-30\"}}]}",
+"{\"reply\": \"برنامه‌ات از جمعه به پنجشنبه رفت.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"این حرفِ خواهرت است، نه اصلاحِ حرفِ خودت — پس چیزی عوض نمی‌شود. برای خودت، دانستنِ «ممکن یا ناممکن» چه ارزشی داشت که چیدمانِ تقریبی نداشت؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"پس با دادهٔ درست (میزِ چهارنفره) حکمِ «ناممکن است» برقرار نمی‌ماند و تو چیدمانی پیدا کردی. پیش از آن‌که «ممکن است» را قطعی بگیری، چیدمانت را با هر قانون یکی‌یکی وارسی کن — همهٔ نُه قانون برقرارند؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"با میزِ چهارنفره ممکنه\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan_done\": {\"id\": \"pl1\", \"done\": true}}]}",
+"{\"reply\": \"با میزهای چهارنفره خودت دوباره شمردی و چیدمان درآمد — همان وارسی‌ای که قولش را داده بودی. چیدمانی که درآمد را با تک‌تکِ قانون‌ها سنجیده‌ای — همهٔ قانون‌ها در آن برقرار است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\", \"plan\"], \"result\": \"با میزهای چهارنفره شمردم و چیدمان درومد\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"plan\": {\"text\": \"تا جمعه چیدمانِ نهایی رو برای خواهرم می‌فرستم\", \"when\": \"2026-11-06\"}}]}",
+"{\"reply\": \"باشه، برای جمعهٔ بعد. حالا که چیدمان درآمد، همهٔ فرض به کار رفت — هر قانون کجای چیدمانت دیده می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"ضرب و تقسیم با باقی‌مانده درست‌اند و ۴ میز درست است؛ تفریقِ «۱۴ − ۱۲» را یک بار دیگر خودت بزن. نتیجهٔ چیدمان را برای مسئلهٔ دیگری هم به کار می‌بری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"l\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"باشه. لیست و کیک هر دو در برنامه‌ات. برای کیک، شمارِ مهمان‌ها را از همان چیدمان برمی‌داری؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"فردا لیستِ مهمونا رو می‌فرستم\"}}]}",
+"{\"reply\": \"باشه. پس شمارِ مهمان‌ها برای کیک چند است؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"دوازده نفر برای کیک. لیست همان فردا. کیکِ دوازده‌نفره را از کجا سفارش می‌دهی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}"
+],
+"keys": [
+"۹ نفر، سه تا میز سه‌نفره. قوانین: هر کدوم از سه تا عمه باید کنار دقیقاً یکی از سه تا پسرعمو باشن، هیچ دو پسرعمویی سر یه میز نباشن، و ... (۶ قانون دیگه). دو روزه جابه‌جا می‌کنم، ۱۰ تا چیدمان امتحان کردم، همیشه یه قانون نقض می‌شه. دارم اشتباه",
+"با عمه‌ها و پسرعموها تنها راحتم: یه چیدمان دارم که فقط یه قانون نقض می‌شه. شاید اصلاً ممکن نیست؟ باید بدونم بشه یا نه.",
+"فردا. یه چیزی گیجم کرده: اگه ممکن نیست، چرا باید فرض کنم که همهٔ قوانین برقرارن؟ ولی شمردم: هر عمه یه جفتِ کناری با پسرعمو می‌خواد، یعنی ۳ جفت، ولی با این قوانین سر هر میز حداکثر یه جفت جا میشه و…",
+"برای خانواده توضیح دادم، با «فرض کنیم ممکنه…» همه گیج شدن. چطوری بگم؟",
+"یه اصلاح دربارهٔ اولین پیامم: نوشتم «۹ نفر، سه تا میز سه‌نفره» — اشتباه نوشتم، میزها چهارنفره‌ان، نه سه‌نفره.",
+"جمعه دوباره با میزهای چهارنفره می‌شمرم ببینم هنوز ناممکنه یا نه.",
+"[اصلاحِ پیامِ قبلی] «جمعه» ⇐ «پنجشنبه» — متنِ درستِ پیامم: «پنجشنبه دوباره با میزهای چهارنفره می‌شمرم ببینم هنوز ناممکنه یا نه.»",
+"خواهرم گفت «اشتباه کردی که این‌قدر وقت گذاشتی، یه چیدمانِ تقریبی هم بس بود».",
+"پنجشنبه‌ست. با میزهای چهارنفره دوباره شمردم: حالا هر میز یه صندلیِ خالی داره و یه چیدمان پیدا کردم که همهٔ قانون‌ها توش برقرارن. پس با میزِ چهارنفره ممکنه و اون اثباتِ ناممکن بودن دیگه به کار نمیاد.",
+"با میزهای چهارنفره شمردم و چیدمان درومد. تا جمعه چیدمانِ نهایی رو برای خواهرم می‌فرستم.",
+"جمعهٔ بعد.",
+"یه حسابِ کناری: ۳ × ۴ = ۱۲ صندلی داریم. اگه ۲ مهمونِ دیگه بیان ۱۴ نفریم، ۱۴ ÷ ۴ = ۳ و ۲ تا می‌مونه، پس ۴ تا میز لازمه؛ یعنی ۱۴ − ۱۲ = ۳ نفر اضافه داریم.",
+"فردا لیستِ مهمونا رو می‌فرستم و پس‌فردا کیک رو سفارش میدم.",
+"آره، هر دو.",
+"دوازده نفر. لیست بمونه برای فردا."
+]
+}

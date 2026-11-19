@@ -1,0 +1,243 @@
+{
+"from": "round30C/s24",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سؤال مصاحبه: به چند روش می‌شه ۳۰ پله رو بالا رفت اگه هر بار ۱ یا ۲ یا ۳ پله برداریم؟ نوشتم همه‌ی حالت‌ها رو تولید کنه، برنامه تموم نمیشه. می‌خوام بهینه‌ترش کنم ولی کد نده، خودم می‌خوام بفهمم. ثبتش کن.",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok'",
+"c": 1
+},
+{
+"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='2002-04-20';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()",
+"c": 2
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const nv0=document.getElementById('lpNat').value;P('lpNat',/کامل‌بیان‌شده/);await W(600);F('lpOne','می‌خواهم بشمارم به چند روشِ متفاوت می‌شود ۳۰ پله را با گام‌های ۱، ۲ یا ۳ بالا رفت.');F('lpWhy','برای مصاحبهٔ فنی و این‌که بفهمم چرا روشِ تولیدِ همه‌چیز کند است.');await W(300);B(/ثبتِ کل/);await W(900);F('lpUnk','تعدادِ روش‌های بالا رفتنِ ۳۰ پله');F('lpD_d1','۳۰ پله');F('lpD_d2','هر گام ۱، ۲ یا ۳ پله است');F('lpCond','ترتیبِ گام‌ها مهم است\\nمجموعِ گام‌ها دقیقاً ۳۰ است');P('lpSat',/^بله/);P('lpSuff',/^کافی/);F('lpSuffW','تعدادِ پله و گام‌های مجاز معلوم است');F('lpFig','جدولی با ستونِ n و ستونِ تعدادِ روش‌ها');F('lpGuess','عدد خیلی بزرگ است، شاید چند میلیون');P('lpConf',/۶۰/);F('lpTest','حالت‌های کوچک را دستی می‌شمارم');P('lpIfRef',/کنار می‌گذارم/);await W(400);const ids=IDS();return 'nat0='+nv0+' kind='+JSON.stringify(APP.liveKindInfo(pid))+' GK '+ids.split(' | ').filter(x=>/GK/.test(x)).join(' | ')+' || '+T('ابزارهای حدس',1200);})()",
+"c": 3
+},
+{
+"eval": "(async()=>{const x=document.getElementById('lpGK5_x0');let p=x;for(let i=0;i<8&&p;i++){p=p.parentElement;if(p&&p.tagName==='DETAILS')break;}if(p&&p.tagName==='DETAILS')p.open=true;await W(300);const box=p||x.closest('section,div');return [...box.querySelectorAll('button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ')+' || '+box.innerText.slice(0,2500);})()",
+"c": 4
+},
+{
+"eval": "(async()=>{const box=document.getElementById('lpGK5_x0').closest('details')||document.getElementById('main');const add=()=>{const b=[...box.querySelectorAll('button')].find(b=>/حالتِ دیگر/.test(b.textContent));b.click();};for(let i=0;i<3;i++){add();await W(300);}const T2=[['۱','۱'],['۲','۲'],['۳','۴'],['۴','۶'],['۵','۱۳'],['۶','۲۴']];T2.forEach((r,i)=>{F('lpGK5_x'+i,r[0]);F('lpGK5_y'+i,r[1]);});await W(300);const b=[...box.querySelectorAll('button')].find(b=>/بسنج/.test(b.textContent));b.click();await W(1000);const bx=document.getElementById('lpGK5_x0').closest('details')||box;return bx.innerText.slice(bx.innerText.indexOf('جدولِ حالت‌ها'),bx.innerText.indexOf('جدولِ حالت‌ها')+1800);})()",
+"c": 5
+},
+{
+"eval": "(async()=>{const box=document.getElementById('lpGK5_x0').closest('details')||document.getElementById('main');F('lpGK5_f','a(n) = a(n−1) + a(n−2) + a(n−3)');await W(200);const b=[...box.querySelectorAll('button')].find(b=>/بسنج/.test(b.textContent));b.click();await W(1000);const bx=document.getElementById('lpGK5_x0').closest('details')||box;const t=bx.innerText;const kc=APP.kCountRe?String(APP.kCountRe):'none';return 'kCountRe='+kc.slice(0,200)+' test='+(APP.kCountRe&&APP.kCountRe.test?APP.kCountRe.test('به چند روش می‌شه ۳۰ پله رو بالا رفت'):'')+' || '+t.slice(t.indexOf('y: '),t.indexOf('y: ')+900);})()",
+"c": 6
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const box=document.getElementById('lpGK5_x0').closest('details')||document.getElementById('main');F('lpGK5_y3','۷');F('lpGK5_y4','۱۳');F('lpGK5_y5','۲۴');await W(200);[...box.querySelectorAll('button')].find(b=>/بسنج/.test(b.textContent)).click();await W(900);const t=box.innerText;const r=t.slice(t.indexOf('y: '),t.indexOf('y: ')+600);let t0=document.body.innerText;B(/ثبتِ فهم/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,12).join(' ¦ ');return r+' || NEW: '+diff;})()",
+"c": 7
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;B(/^۲ کامل$/);await W(1000);const k=JSON.stringify(APP.liveKindInfo(pid));P('lpMv',/شکستن به حالت/);F('lpMvWhy','روش‌ها را بر اساسِ گامِ اول (۱، ۲ یا ۳) جدا می‌کنم');await W(200);B(/افزودنِ حرکت/);await W(700);F('lpPlan','نخست روش‌ها را بر اساسِ گامِ اول به سه دسته جدا می‌کنم، سپس تعدادِ هر دسته را با تعدادِ روش‌های پله‌های باقی‌مانده می‌نویسم و رابطه را ثابت می‌کنم.');document.querySelectorAll('[id^=lpPC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);let t0=document.body.innerText;B(/ثبتِ طرح/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,8).join(' ¦ ');return 'kind='+k+' phase='+APP.livePhase(pid)+' NEW: '+diff;})()",
+"c": 8
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const m=APP.liveMentions('نخست روش‌ها را بر اساسِ گامِ اول به سه دسته جدا می‌کنم، سپس تعدادِ هر دسته را با تعدادِ روش‌های پله‌های باقی‌مانده می‌نویسم','هر گام ۱، ۲ یا ۳ پله است');P('lpPU_a_d1',/حالا به کارش/);F('lpPU_w_d1','رابطه را تا n = ۳۰ پیش می‌برم');P('lpPU_a_d2',/حالا به کارش/);F('lpPU_w_d2','همان سه دستهٔ گامِ اول');await W(300);B(/ثبتِ طرح/);await W(1200);F('lpStep','برای n ≥ ۴: W(n) = W(n−1) + W(n−2) + W(n−3)');P('lpClear',/^بله/);await W(400);F('lpProof','هر روش با گامِ اولِ ۱، ۲ یا ۳ شروع می‌شود و این سه دسته جدا از هم‌اند؛ پس از گامِ اولِ k، بقیه یک روش برای n−k پله است.');document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);let t0=document.body.innerText;B(/ثبتِ گام/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,10).join(' ¦ ');return 'mention='+m+' phase='+APP.livePhase(pid)+' IDS '+IDS().split(' | ').filter(x=>/Base|Step|Proof/.test(x)).join(' | ')+' NEW: '+diff;})()",
+"c": 9
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;F('lpBase','W(1)=1، W(2)=2، W(3)=4 را با فهرستِ کامل شمردم؛ با این سه، رابطه W(4)=7 می‌دهد که با فهرستِ دستیِ ۷ تایی می‌خواند.');await W(300);let t0=document.body.innerText;B(/ثبتِ گام/);await W(1200);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,6).join(' ¦ ');F('lpStep','با رابطه از W(4) تا W(30) جلو رفتم: W(30) = ۵۳۷۹۸۰۸۰');P('lpClear',/^بله/);await W(400);F('lpProof','هر مقدار از سه مقدارِ پیشین با رابطهٔ ثابت‌شده و حالت‌های پایهٔ وارسی‌شده به دست آمد');document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);B(/ثبتِ گام/);await W(1100);const c=B(/✅ حل شد/);await W(1200);return 'NEW1: '+diff+' || '+c+' phase='+APP.livePhase(pid)+' gate='+JSON.stringify(APP.liveClosure(pid).gate);})()",
+"c": 10
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const ids=IDS();P('lpBWant',/همان‌قدر/);document.querySelectorAll('[id^=lpBCP_]').forEach(s=>{const o=[...s.options].find(o=>/^بله/.test(o.text));s.value=o.value;s.dispatchEvent(new Event('change',{bubbles:true}));});F('lpBChk','W(4)=7 و W(5)=13 را با فهرستِ کامل دوباره شمردم');P('lpBRes',/سالم/);F('lpBOther','با فهرست‌کردنِ همهٔ ترکیب‌ها برای n کوچک، ولی برای ۳۰ نشدنی است');F('lpBGlance','هر روش با گامِ اول به سه دسته می‌شکند و هر دسته همان مسئلهٔ کوچک‌تر است');F('lpBWorked','جدولِ حالت‌های کوچک و سنجیدنِ رابطه با آن');P('lpBMulti',/^یکی/);F('lpBUse','مسئلهٔ شمارش را بر اساسِ نخستین انتخاب بشکنم و رابطهٔ بازگشتی بنویسم');F('lpBTaste','رابطهٔ بازگشتی را دوست داشتم؛ شمارشِ دستی را نه');F('lpBNew','به چند روش می‌شود یک نوارِ ۱×n را با کاشی‌های طولِ ۱، ۲ و ۳ پر کرد؟');P('lpBNewS',/ساختار/);F('lpBNewW','دقیقاً همان مسئله است');await W(500);const sel=[...document.querySelectorAll('#main select')].filter(e=>/lpB/.test(e.id)).map(e=>e.id).join(',');P('lpBHit',/نادرست/);await W(300);if(document.getElementById('lpBHitW'))F('lpBHitW','فکر کردم چون ۳۰ بزرگ است جواب میلیون‌ها است و درست بود ولی حدسم عدد نبود');let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1300);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,8).join(' ¦ ');return 'sel='+sel+' NEW: '+diff+' || '+T('چه چیزی مشترک دارد',700);})()",
+"c": 11
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const o=[...document.getElementById('lpBBest').options].map(o=>o.text).join(' / ');const tl=[...document.getElementById('lpBTool').options].map(o=>o.text).join(' / ');P('lpBBest',/دیده‌ای|مرتبط|پیش‌تر/);if(document.getElementById('lpBBest').value===''){document.getElementById('lpBBest').selectedIndex=1;document.getElementById('lpBBest').dispatchEvent(new Event('change',{bubbles:true}));}await W(300);let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1300);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,10).join(' ¦ ');return 'BEST='+o+' || TOOL='+tl+' || phase='+APP.livePhase(pid)+' NEW: '+diff;})()",
+"c": 12
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;const ids=IDS().split(' | ').filter(x=>/نگاشت|Map/i.test(x)).join(' | ');const mid=(IDS().split(' | ').find(x=>/نگاشت/.test(x))||'').split(':')[0];F(mid,'پله‌ها ⇐ خانه‌های نوار، گامِ k پله ⇐ کاشیِ طولِ k، ترتیبِ گام‌ها ⇐ ترتیبِ کاشی‌ها از چپ');F('lpBLimit','برای n = ۰ یک روش (هیچ گام) و برای n = ۱ یک روش؛ رابطه از n = ۴ با همین‌ها می‌خواند');await W(300);let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1300);let L0=new Set(t0.split('\\n'));let diff=document.body.innerText.split('\\n').filter(l=>!L0.has(l)&&l.trim()).slice(0,14).join(' ¦ ');return 'mapfield='+ids+' phase='+APP.livePhase(pid)+' closure='+JSON.stringify(APP.liveClosure(pid)).slice(0,200)+' NEW: '+diff;})()",
+"c": 13
+},
+{
+"eval": "(async()=>{const r=APP.liveRec(APP.state.arg);const b=JSON.stringify((r.p.sol||r.p).b||'').slice(0,10);const all=APP.liveAll().map(x=>({t:x.p.title.slice(0,40),nat:x.p.nat,by:x.p.natBy,o:x.p.origin}));const m1=APP.liveMapOk?APP.liveMapOk('دقیقاً همان مسئله است'):'na';const m2=APP.liveMapOk?APP.liveMapOk('پله‌ها ⇐ خانه‌های نوار، گامِ k ⇐ کاشیِ طولِ k'):'na';const child=APP.liveAll().find(x=>/نوار/.test(x.p.title));APP.go('lprob',child.p.id);await W(900);return 'mapOk(vague)='+JSON.stringify(m1)+' mapOk(real)='+JSON.stringify(m2)+' all='+JSON.stringify(all)+' || CHILD: '+T('',1200);})()",
+"c": 14
+},
+{
+"say": "جلسه دوم. این مسئله‌ی کاشی‌کاری دقیقاً همون مسئله‌ی پله‌هاست! هر پله یه خونه‌ی نوار، هر گام یه کاشی. پس جوابش همون رابطه‌ست: a_n = a_(n−1) + a_(n−2) + a_(n−3) با a_1 = 1، a_2 = 2، a_3 = 4.",
+"c": 15
+},
+{
+"eval": "(async()=>{const t=document.querySelector('#main').innerText;return 'map shown on child page: '+(t.indexOf('خانه‌های نوار')>=0)+' | '+(t.indexOf('هم‌ریخت')>=0);})()",
+"c": 16
+},
+{
+"eval": "(()=>{const ss=APP.ASSIST.sessions();return JSON.stringify(ss.map(s=>s.coach&&{ans:s.coach.ans,ansLog:s.coach.ansLog,ph:s.coach.ph})).slice(0,1500);})()\n",
+"c": 17
+},
+{
+"c": 18,
+"reload": true
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur()||{};const L=APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const sv=pg.solve||{};return {t:r.p.title,st:(APP.liveClosure?APP.liveClosure(r.p.id).state:''),g:sv.g,steps:((sv.live||{}).steps||[]).map(x=>({t:(x.text||'').slice(0,60),out:x.out}))}});const ph=APP.MIND.phases();return JSON.stringify({ph:ph.rows.map(x=>[x.id,x.k,x.n,Object.keys(x.src).join('+'),Math.round(x.pWeak*100)]),weak:ph.weakest&&ph.weakest.fa,coachGuess:s.coach&&s.coach.guess,checkRep:s.coach&&s.coach.checkRep,reg:s.register||(s.coach&&s.coach.reg),prom:s.promises,plans:s.plans||(s.coach&&s.coach.plans),dl:(APP.S.all('deadline')||[]).map(d=>[d.what||d.title,d.date||d.due]),live:L})})()",
+"c": 19
+},
+{
+"c": 20,
+"reload": true
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));if(APP.ASSIST&&APP.ASSIST.toggle)APP.ASSIST.toggle(false);const L=APP.liveAll().filter(r=>!APP.liveClosure||APP.liveClosure(r.p.id).state!=='solved');const r=L[L.length-1]||APP.liveAll()[0];APP.go('lprob',r.p.id);await W(1500);const f=[...document.querySelectorAll('#main textarea[id^=lp],#main input[id^=lp][type=text]')].filter(e=>e.offsetParent)[0];if(!f)return 'NOFIELD';f.scrollIntoView({block:'center'});f.focus();f.value=\"a_n = a_(n−1) + a_(n−2) + a_(n−3)\";f.dispatchEvent(new Event('input',{bubbles:true}));f.setSelectionRange(f.value.length,f.value.length);await W(300);const tog=document.querySelector('.mx-bar-tog');if(tog&&tog.getAttribute('aria-expanded')!=='true')tog.click();await W(200);const sq=document.querySelector('.mx-sym[data-k=le]');if(sq)sq.click();await W(200);f.value=f.value+' ۱۰۰';f.dispatchEvent(new Event('input',{bubbles:true}));await W(400);const pv=document.querySelector('.mx-prev[data-for=\"'+f.id+'\"]');return 'PID '+r.p.title+' FIELD '+f.id+' VAL '+f.value+' || PREV '+(pv&&!pv.hidden?pv.innerText:'(none)')+' || BAR '+(document.querySelector('.mx-bar')?[...document.querySelectorAll('.mx-sym')].map(x=>x.textContent).join(' '):'none')+' focus='+(document.activeElement===f);})()",
+"c": 21
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.ASSIST.toggle(true);await W(600);const i=document.querySelector('textarea.as-in');i.focus();i.value=\"W(n) = W(n−1) + W(n−2) + W(n−3)، W(1)=1\";i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const tog=document.querySelector('.mx-bar-tog');if(tog&&tog.getAttribute('aria-expanded')!=='true')tog.click();await W(300);const pv=document.querySelector('.mx-prev[data-for]')&&[...document.querySelectorAll('.mx-prev')].find(p=>p.previousElementSibling===i||p.parentElement===i.parentElement||p.closest('.as-root'));const all=[...document.querySelectorAll('.as-root .mx-prev')];const vis=all.filter(p=>!p.hidden);if(vis[0])vis[0].scrollIntoView({block:'end'});return 'CHATPREV '+vis.map(p=>p.innerText).join(' | ')+' || plots='+document.querySelectorAll('.as-msg .mx-plot').length+' boards='+document.querySelectorAll('.as-msg .mx-board').length;})()",
+"c": 22
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const i=document.querySelector('textarea.as-in');i.value=\"مصاحبه ۱۴۰۵/۰۷/۲۸ ساعت ۱۰:۳۰، شماره ۰۹۱۲۳۴۵۶۷۸۹، تابع count_ways_v2\";i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const vis=[...document.querySelectorAll('.as-root .mx-prev')].filter(p=>!p.hidden);return 'NONMATH prev='+vis.map(p=>p.innerText).join(' | ');})()",
+"c": 23
+},
+{
+"eval": "(()=>{const i=document.querySelector('textarea.as-in');if(i){i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));}return 'cleared'})()",
+"c": 24
+},
+{
+"c": 25,
+"reload": true
+},
+{
+"eval": "(()=>{const o=[];APP.ASSIST.sessions().forEach(s=>(s.msgs||[]).forEach((m,i)=>{const t=m.text||'';const se=APP.MATH.series(t),f=APP.MATH.fen(t),segs=(APP.MATH.segments?APP.MATH.segments(t):[]);const mx=Array.isArray(segs)?segs.filter(x=>x&&x.m).map(x=>x.src||x.text||x.tex||JSON.stringify(x).slice(0,60)):[];if(se||f)o.push(m.role+' PLOT/FEN '+(se?JSON.stringify(se).slice(0,80):'')+(f?' FEN':'')+' :: '+t.slice(0,80));if(mx.length)o.push(m.role+' MATH '+mx.slice(0,6).join(' ¦ ').slice(0,200));}));return o.join('\\n')||'none';})()",
+"c": 26
+},
+{
+"eval": "(()=>{const L=APP.liveAll();const p=window.__PID||APP.state.arg||(L.slice(-1)[0]||{p:{}}).p.id;localStorage.setItem('__PID',p);return 'pid '+p+' || '+L.map(r=>r.p.id+':'+r.p.title+':'+APP.liveClosure(r.p.id).state).join(' | ')})()",
+"c": 27
+},
+{
+"c": 28,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 29
+},
+{
+"eval": "(()=>{const o={today:APP.today()};const s=APP.ASSIST.cur();const cl=(x,n)=>String(x==null?'':x).slice(0,n||200);\no.user=(s.msgs||[]).filter(m=>m.role==='user').map((m,i)=>(i+1)+'['+APP.ASSIST.msgId(m)+'] '+cl(m.text,110)+((m.corr||[]).length?' {corr:'+JSON.stringify(m.corr).slice(0,200)+'}':'')+(m.textHist?' {hist:'+JSON.stringify(m.textHist).slice(0,200)+'}':''));\no.probs=APP.liveAll().map(r=>{const pg=APP.S.get('eprog_'+r.p.id)||{};const sv=pg.solve||{};const L=sv.live||{};return {t:cl(r.p.title,50),st:APP.liveClosure(r.p.id).state,stmt:cl(r.p.statement,220),pfix:cl(JSON.stringify(r.p.fixHist||null),300),u1:cl(JSON.stringify(sv.u||null),300),g:cl(JSON.stringify(sv.g||null),500),chat:cl(JSON.stringify(L.chat||null),300),plan:cl(JSON.stringify(L.plan||null),160),retr:cl(JSON.stringify(L.retracts||null),500),steps:(L.steps||[]).map(x=>cl((x.text||''),50)+' due='+x.due+' out='+cl(JSON.stringify(x.out||null),260)+' fix='+cl(JSON.stringify(x.fixHist||null),200))}});\no.plans=(APP.ASSIST.plansAll?APP.ASSIST.plansAll(s):[]).map(x=>{const p=x.p;return p.id+' «'+cl(p.text,60)+'» when='+p.when+' state='+p.state+(p.corr?' corr='+cl(JSON.stringify(p.corr),200):'')});\no.guesses=((s.coach||{}).guesses||[]).map(g=>g.id+' «'+cl(g.text,60)+'» res='+(g.res||'')+(g.wd||g.retracted?' WD':'')+(g.corr?' corr='+cl(JSON.stringify(g.corr),160):''));\no.retracts=cl(JSON.stringify((s.coach||{}).retracts||null),600)+' | se='+cl(JSON.stringify(s.retracts||null),600);\ntry{const P=APP.MIND.phases();o.mind=(P.weakest?'WEAK '+P.weakest.fa+' ':'nodistinct ')+P.rows.map(X=>X.fa+' '+X.k+'/'+X.n+' acts:'+(X.acts||[]).map(a=>(a.ok?'+':'-')+a.src).join(',')).join(' || ');}catch(e){o.mind='ERR '+e.message}\ntry{const d=APP.dossier(APP.liveAll().slice(-1)[0].p.id);o.dossier=(d.events||[]).length+' events: '+(d.events||[]).map(e=>e.k+(e.hist&&e.hist.length?'*':'')).join(',');}catch(e){o.dossier='ERR '+e.message}\nreturn JSON.stringify(o,null,1);})()\n",
+"c": 30
+},
+{
+"c": 31
+},
+{
+"c": 32
+},
+{
+"c": 33
+},
+{
+"c": 34
+},
+{
+"c": 35
+},
+{
+"c": 36
+},
+{
+"eval": "(()=>{const o=[];APP.liveAll().forEach(r=>{try{const d=APP.dossier(r.p.id);o.push(r.p.title+' :: '+(d.events||[]).map(e=>e.k+'@'+String(e.at||'').slice(0,16)+' '+String(e.title||'').slice(0,50)).join(' | '))}catch(e){o.push('ERR '+e.message)}});return o.join('\\n')})()",
+"c": 37
+},
+{
+"c": 38
+},
+{
+"c": 39,
+"reload": true
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('lprob',r.p.id);await W(900);const h=[...document.querySelectorAll('#main summary,#main h3,#main h2')].find(x=>/پرونده‌های تمرین/.test(x.innerText));let t='';if(h){const b=h.closest('details')||h.parentElement;t=b.innerText.split('\\n').filter(x=>/حدس/.test(x)).join(' / ')}const pg=APP.S.get('eprog_'+r.p.id)||{};const g=((pg.solve||{}).g||{})[1]||{};o.push(r.p.title.slice(0,30)+' ['+APP.liveClosure(r.p.id).state+'] BOX: '+t+' || g.hit='+(g.hit||'')+' testRes='+(g.testRes||'')+' refuted='+(g.refuted||'')+' res='+(g.res||''))}return o.join('\\n')})()",
+"c": 40
+},
+{
+"c": 41,
+"reload": true
+},
+{
+"c": 42
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();let d=null;try{d=APP.dossierSess?APP.dossierSess(s.id):APP.dossier(s.id)}catch(e){return 'ERR '+e.message}return 'EVENTS '+((d&&d.events)||[]).map(e=>(e.at||'').slice(0,16)+' '+e.k+' '+String(e.title||'').slice(0,60)).join(' | ')+' || TEXT '+document.querySelector('#main').innerText.slice(0,6000)})()",
+"c": 43
+},
+{
+"c": 44
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,50))}:'NO MODEL')})()",
+"c": 45
+},
+{
+"c": 46
+},
+{
+"c": 47
+},
+{
+"c": 48
+},
+{
+"c": 49
+},
+{
+"c": 50
+},
+{
+"c": 51
+},
+{
+"eval": "(()=>document.querySelector('#main').innerText.slice(0,6000))()",
+"c": 52
+},
+{
+"c": 53,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-10-19');APP.render&&APP.render();'clock '+APP.today()",
+"c": 54
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const L=APP.liveAll();const t=L.find(r=>/نوار/.test(r.p.title));APP.go('dossier',t.p.id);await W(1500);const bs=[...document.querySelectorAll('#main .lp-dmv')];if(!bs.length)return 'NO MOVE BTN';const b=bs[0];const li=b.closest('li')||b.parentElement;const line=li.innerText.slice(0,160);b.scrollIntoView({block:'center'});b.click();await W(1600);return 'MOVED: '+line.replace(/\\n/g,' / ')+' ||| TILING NOW: '+document.querySelector('#main').innerText.slice(1200,3200).replace(/\\n/g,' / ')})()",
+"c": 55
+},
+{
+"c": 56
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.liveAll().find(r=>/پله/.test(r.p.title));APP.go('dossier',s.p.id);await W(1500);const t=document.querySelector('#main').innerText;const i=t.indexOf('جابه‌جا');return 'STAIRS: '+(i<0?'NO MOVED LINE':t.slice(Math.max(0,i-500),i+500).replace(/\\n/g,' / '))+' || undo btns '+document.querySelectorAll('#main .lp-dunmv').length})()",
+"c": 57
+},
+{
+"c": 58
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.liveAll().find(r=>/پله/.test(r.p.title));APP.go('dossier',s.p.id);await W(1500);const b=document.querySelector('#main .lp-dunmv');if(!b)return 'NO UNDO';b.scrollIntoView({block:'center'});b.click();await W(1600);const t1=document.querySelector('#main').innerText;const i=t1.indexOf('برگشت');const t=APP.liveAll().find(r=>/نوار/.test(r.p.title));APP.go('dossier',t.p.id);await W(1500);const t2=document.querySelector('#main').innerText;const j=t2.indexOf('نتیجه (از گفت‌وگو)');return 'STAIRS AFTER UNDO: '+t1.slice(Math.max(0,i-400),i+300).replace(/\\n/g,' / ')+' ||| TILING AFTER UNDO: '+t2.slice(Math.max(0,j-100),j+900).replace(/\\n/g,' / ')})()",
+"c": 59
+},
+{
+"c": 60
+},
+{
+"c": 61,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ کد نمی‌دهم. پیش از جزئیات: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: سؤال مصاحبه: به چند روش می‌شه ۳۰ پله رو بالا رفت اگه هر بار ۱ یا ۲ یا ۳ پله برداریم؟ نوشتم / دستیار: ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ کد نمی‌دهم. پیش از جزئیات: کلِ مسئل\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"شمارِ راه‌های بالا رفتن از ۳۰ پله با گام‌های ۱، ۲ یا ۳\", \"statement\": \"سؤال مصاحبه: به چند روش می‌شه ۳۰ پله رو بالا رفت اگه هر بار ۱ یا ۲ یا ۳ پله برداریم؟ نوشتم همه‌ی حالت‌ها رو تولید کنه، برنامه تموم نمیشه. می‌خوام بهینه‌ترش کنم.\", \"nat\": \"objective\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"d\"], \"ans\": [], \"stuck\": true, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\", \"defer\": {\"what\": \"می‌خوام بهینه‌ترش کنم ولی کد نده، خودم می‌خوام بفهمم\"}}]}",
+"{\"reply\": \"نگاشتت (هر پله یک خانهٔ نوار، هر گام یک کاشی) و رابطه با سه مقدارِ آغازین هر دو درست‌اند؛ درخواستِ «بهینه‌تر کردن» را هم خودت با همین رابطه در مسئلهٔ پله‌ها برآورده کردی، پس آن را می‌بندم. گامِ بعدیِ خودت برای این مسئلهٔ کاشی‌کاری چیست؟\", \"title\": \"گفت‌وگو\", \"pinned\": \"\", \"memory\": \"کاربر: سؤال مصاحبه: به چند روش می‌شه ۳۰ پله رو بالا رفت اگه هر بار ۱ یا ۲ یا ۳ پله برداریم؟ نوشتم / دستیار: ثبتش می‌کنم تا صفحهٔ خودش باز شود؛ کد نمی‌دهم. پیش از جزئیات: کلِ مسئل / کاربر: جلسه دوم. این مسئله‌ی کاشی‌کاری دقیقاً همون مسئله‌ی پله‌هاست! هر پله یه خونه‌ی نوار، هر گا / دستیار: نگاشتت (هر پله یک خانهٔ نوار، هر گام یک کاشی) و رابطه با سه مقدارِ آغا\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"promise_done\", \"id\": \"pr1\"}, {\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\", \"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"پس جوابش همون رابطه‌ست: a_n = a_(n−1) + a_(n−2) + a_(n−3) با a_1 = 1، a_2 = 2، a_3 = 4\", \"prior\": [{\"step\": \"نگاشت به مسئلهٔ پله‌ها\", \"quote\": \"هر پله یه خونه‌ی نوار، هر گام یه کاشی\", \"verdict\": \"ok\", \"why\": \"تناظرِ یک‌به‌یک میانِ چینشِ کاشی‌ها و دنبالهٔ گام‌ها\", \"dep\": []}, {\"step\": \"رابطهٔ بازگشتی و مقدارهای آغازین\", \"quote\": \"a_n = a_(n−1) + a_(n−2) + a_(n−3) با a_1 = 1، a_2 = 2، a_3 = 4\", \"verdict\": \"ok\", \"why\": \"دسته‌بندی بر اساسِ نخستین کاشی؛ a_3 = 1 + 2 + 1 = 4\", \"dep\": [1]}]}]}"
+],
+"keys": [
+"سؤال مصاحبه: به چند روش می‌شه ۳۰ پله رو بالا رفت اگه هر بار ۱ یا ۲ یا ۳ پله برداریم؟ نوشتم همه‌ی حالت‌ها رو تولید کنه، برنامه تموم نمیشه. می‌خوام بهینه‌ترش کنم ولی کد نده، خودم می‌خوام بفهمم. ثبتش کن.",
+"جلسه دوم. این مسئله‌ی کاشی‌کاری دقیقاً همون مسئله‌ی پله‌هاست! هر پله یه خونه‌ی نوار، هر گام یه کاشی. پس جوابش همون رابطه‌ست: a_n = a_(n−1) + a_(n−2) + a_(n−3) با a_1 = 1، a_2 = 2، a_3 = 4."
+]
+}

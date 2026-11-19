@@ -380,6 +380,7 @@
     ["داده‌ها (یا فرض) چیست؟", "چه چیزهایی را می‌دانیم؟"],
     ["شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟", "مسئله چه گفته که باید همان‌طور باشد؟"],
     ["آیا شرط برای تعیینِ مجهول کافی است؟ زائد است؟ متناقض است؟", "با چیزهایی که می‌دانیم می‌شود جواب را پیدا کرد؟"],
+    ["آیا شرط برای تعیینِ مجهول کافی است، یا زائد، یا متناقض؟", "با چیزهایی که می‌دانیم می‌شود جواب را پیدا کرد؟"],   // دورِ ۳۰ (C184): متنِ تازهٔ همان بندِ پولیا؛ کلیدِ پیشین هم می‌ماند
     ["شکلی بکش یا نام‌گذاریِ مناسبی بکن؛ مسئله را به زبانِ خودت دوباره بگو.", "شکلش را بکش و مسئله را با حرفِ خودت دوباره بگو."]
   ];
   G.childBand = function () { try { var ag = G.age(), b = ag != null && G.band(ag); return !!b && (b.id === "early" || b.id === "child"); } catch (e) { return false; } };
@@ -399,6 +400,12 @@
        ضمیرش را AS.regSys هنگامِ نقش بستن می‌گذارد («تولدتان» برای «شما» و سالمند). */
     G.confirmLine = function (iso) { return "✓ تاریخِ تولدت ثبت شد: " + G.faDate(iso) + " — سن هر بار از همین تاریخ حساب می‌شود."; };
     G.confirmed = function (s, iso) { return !!s && (s.msgs || []).some(function (m) { return m && m.role === "sys" && m.birth === iso; }); };
+    /* دورِ ۳۰ (surface، B26·D16 aB1 p9 «مامانم گفت اینم بگم: من ۳۰ اردیبهشت ۹۶ به دنیا اومدم» — تاریخ از پیش ثبت و تأییدشده بود): همان تاریخ دوباره گفته شد ⇒ صفحه
+       خاموش نمی‌ماند؛ یک سطر برای همان پیام که می‌گوید از پیش ثبت است و چیزی عوض نشد (حرفِ او دیده شد). */
+    G.sameOnce = function (s, iso) { if (!s || !iso) return false; var M = s.msgs || [], u = null, ui = -1; for (var i = M.length - 1; i >= 0; i--) { if (M[i] && M[i].role === "user") { u = M[i]; ui = i; break; } }
+      var k = u ? String(u.at || u.text || "") : ""; if (!k || M.some(function (m) { return m && m.role === "sys" && m.birthSame === k; })) return false;
+      if (M.slice(ui + 1).some(function (m) { return m && m.role === "sys" && m.birth === iso; })) return false;   // همین پیام آن را تازه ثبت کرد (صفحه از پیام خواند، بعد کنشِ مدل) — «از پیش» نیست (C179: s17 c4)
+      M.push({ role: "sys", at: new Date().toISOString(), birthSame: k, text: "✓ همین تاریخِ تولدت از پیش ثبت است: " + G.faDate(iso) + " — چیزی عوض نشد." }); s.msgs = M; try { S.put(s); } catch (e) { } return true; };
     G.confirmOnce = function (s, iso) { if (!s || !iso || G.confirmed(s, iso)) return false; s.msgs = s.msgs || []; s.msgs.push({ role: "sys", at: new Date().toISOString(), birth: iso, text: G.confirmLine(iso) }); s.ageAsk = "given"; try { S.put(s); } catch (e) { } return true; };
     /* تاریخی که صفحه خودش از آخرین پیامِ او خواند (همان OWN_BIRTH ِ fromChat) — کنشِ مدل هرگز آن را بازنویسی نمی‌کند (B24·D7) */
     G.pageParse = function (s) { var M = (s && s.msgs) || [], u = null; for (var i = M.length - 1; i >= 0; i--) { if (M[i] && M[i].role === "user") { u = M[i]; break; } }
@@ -413,8 +420,8 @@
       if (!r) return "تاریخِ تولد ثبت نشد: تاریخ را نشناختم — همان‌طور که گفت بفرست (مثلاً «۲۰ اردیبهشت ۱۳۳۸»).";
       if (r.need) return "تاریخِ تولد ثبت نشد: روز (" + fa(r.jd) + " " + JM[r.jm - 1] + ") هست، سال نیست — سنی که گفت را با \"age\" بفرست.";
       if (r.err) return "تاریخِ تولد ثبت نشد: " + r.err;
-      if (G.birth() !== r.iso) { var w = G.setBirthInfo(r.iso); if (!w.iso) return "تاریخِ تولد ثبت نشد: " + (w.err || ""); }
-      if (s) { G.confirmOnce(s, r.iso); return ""; }
+      var was30 = G.birth(); if (was30 !== r.iso) { var w = G.setBirthInfo(r.iso); if (!w.iso) return "تاریخِ تولد ثبت نشد: " + (w.err || ""); }
+      if (s) { if (!G.confirmOnce(s, r.iso) && was30 === r.iso) G.sameOnce(s, r.iso); return ""; }
       return RE.test(d) ? "" : G.confirmLine(r.iso);   // بی سشن: قراردادِ پیشین — ISO ⇒ "" (test_age_sync)؛ تاریخِ گفته‌شده ⇒ همان یک سطرِ شمسی
     };
     G.fromChat = function (s, msg) {
@@ -422,14 +429,14 @@
       var x = normTx(t), age = G.ageSaid(t), st = S.settings(), pr = st.profile = st.profile || {}, out = null;
       if (OWN_BIRTH.test(x)) {
         var r = G.parse(t, { age: age });
-        if (r && r.iso) { var w = G.setBirthInfo(t, { age: age }); if (w.iso) out = { saved: w.iso }; }
+        if (r && r.iso) { var was30 = G.birth(); var w = G.setBirthInfo(t, { age: age }); if (w.iso) out = { saved: w.iso, same: was30 === w.iso }; }
         else if (r && r.need && !G.birth()) { pr.birthMD = { jm: r.jm, jd: r.jd, at: A.today() }; S.saveSettings(st); out = { need: true }; }
       }
       if (!out && age != null && !G.birth()) {
         var md = pr.birthMD; if (md && md.jm) { var w2 = G.setBirthInfo(fa(md.jd) + " " + JM[md.jm - 1], { age: age }); if (w2.iso) out = { saved: w2.iso }; }
         if (!out) { pr.ageSaid = { age: age, on: A.today() }; S.saveSettings(st); out = { age: age }; }
       }
-      if (out && out.saved && s) G.confirmOnce(s, out.saved);
+      if (out && out.saved && s && !G.confirmOnce(s, out.saved) && out.same) G.sameOnce(s, out.saved);
       return out;
     };
     AS.promptHooks = AS.promptHooks || [];

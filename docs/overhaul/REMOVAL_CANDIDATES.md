@@ -523,3 +523,10 @@ Also unchanged but now unused for display: P3 records closed by a practice case 
   `which29`, `stay29`), and `lapse27` no longer closes ask items itself through `didIt28`. The old body stays as `PR.R29_QUARANTINE.doneFromHer28`.
 - **Why replaced:** DECISIONS_R29 C117 (B29·D19, D29-18; group C's «held» was only the line — the asks were silently closed by `lapse27`), C165–C167.
 - **Status:** reachable, not called. Delete only with the owner's approval.
+
+## 2026-11-18 — Tour 1 round 30, fixer «arith»: `remains29` and the round-29 statement reading kept as quarantine in `a46_arith.js`
+- **What:** `remains29(t, all, out, U)` (the round-29 remainder reader) is no longer called — `run()` calls `remains30` unless `ST.arithRem29On` is set (never set).
+  `focusStmt30` returns the session's raw `coach.stmt` (the round-29 reading) only when `ST.arithStmtR29On` is set (never set).
+- **Why replaced:** DECISIONS_R30 C180 (S1 C30-7: a stale statement of another problem and a per-unit rate became a remainder's total), F2 (C30-13, D30-5,
+  A30-2, A30-9, B30·D11, D26-24), C189, C191, C192.
+- **Status:** reachable only by flipping the switches; not called. Delete only with the owner's approval.

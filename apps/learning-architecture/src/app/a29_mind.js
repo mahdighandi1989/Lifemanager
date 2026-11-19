@@ -388,6 +388,7 @@
     S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); tutOf(pg.tut, { id: pg.id, pid: pid0, title: pTitle(pid0) }); });
     /* RN2e: شناسهٔ کارهای زنده‌ای که پیامدشان در همین جدول شمرده می‌شود (گامِ بسته با پیامد) */
     var liveActs = {}, seenAct = {};
+    var lbDone30 = {}; S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""), B = (pg.solve || {}).b || {}; Object.keys(B).forEach(function (lv) { var b = B[lv]; if (!b || b.skip || b.superseded) return; var t = String(b.at || b.doneAt || ""); if (t && (b.verdict === "verified" || b.chkBy === "msgs" || b.own) && (!lbDone30[pid0] || t < lbDone30[pid0])) lbDone30[pid0] = t; }); });
     S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); (((pg.solve || {}).live || {}).steps || []).forEach(function (st) { var o = st && st.out; if (o && !o.auto && o.done && !wdOut(o)) liveActs["lstep:" + pid0 + ":" + st.id] = 1; }); });
     S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut, { id: c.id, title: c.title }); });
     S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut, { id: r.id }); });
@@ -397,6 +398,10 @@
       /* تورِ پولیا (RN3c): رویدادِ «در انتظارِ» الگو (pend، بی گزارشِ مدل) شمرده نمی‌شود؛ (RN2e) هر کار یک بار — رویدادی که شناسه‌اش (act) همان گامِ ثبت‌شدهٔ
          مسئلهٔ زنده است کنار می‌رود (پیامد همان‌جا شمرده می‌شود)، و دو رویدادِ گفت‌وگو با یک شناسه و یک مرحله یکی‌اند */
       (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok" || e.src === "prior") || e.pend || e.wd) return;
+        /* دورِ ۳۰ (surface، C185 — A26-25 aA2 «بازنگری ۱ از ۴ · ۹۶٪»): فقط داوریِ **همان** مرحله در آن مرحله شمرده می‌شود. گیرِ گفت‌وگویی با ph «b» که **پس از** ثبتِ
+           بازنگریِ وارسی‌شدهٔ همان مسئله آمد («روزِ ۷: … گامِ استقرا رو قاطی کردم»، «امروز بی‌نگاه نوشتم ولی یادم نیومد») گزارشِ یادآوریِ تمرین است، نه بازنگریِ حل —
+           شکستِ بازنگری نیست (بازنگریِ درست و وارسی‌شده موفقیتِ آن مرحله است و همان‌جا شمرده شده). */
+        if (e.ph === "b" && !e.ok && e.pid && lbDone30[e.pid] && String(e.at || "") > lbDone30[e.pid]) return;
         /* دورِ ۲۵ (P1، A25-6/B25·D11/C25-18): گامِ کارِ پیشین — درست ⇒ به حسابِ خودش (اجرا +)؛ نادرست/ناقص ⇒ با علتِ خودش؛ اصلاحِ خودش ⇒ موفقیت. پیش‌تر رویدادِ src «prior» اصلاً خوانده نمی‌شد */
         /* دورِ ۲۶ (Q9، U24 s11 «− گامِ کارِ پیشین که درست نبود» برای گامِ «⚠️ ناقص»؛ بانکِ R26 #237): «درست نبود» فقط گامی است که دفترِ کارِ پیشین همین حالا «نادرست» می‌داند.
            گامِ ناقص یا فقط «وابسته» شکست نیست و در کارنامه «−» نمی‌گیرد (نه + و نه −). حکم از خودِ دفتر (A.STORY.priorFor) خوانده می‌شود، نه از رویداد. */
@@ -508,7 +513,7 @@
           return h("tr", { "data-ph": X.id }, h("td", {}, X.fa), h("td", { class: "mind-php" }, pf(X.p) + " (" + fa(X.n) + ")"), h("td", {}, fa(X.k) + " از " + fa(X.n)), h("td", { class: "mind-phw" }, Q.weakest ? pf(X.pWeak) : "—"),
             h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return (Q.src[s] || srcFa26(s)) + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)", fromList(X.acts, "ph:" + X.id)));
         })))),
-      h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
+      h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + "، بر پایهٔ " + fa(((Q.rows || []).filter(function (X) { return X.id === Q.weakest.id; })[0] || {}).n || 0) + " داوریِ همین مرحله) از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
         : Q.n && Q.ranked >= 2 ? M.NO_DISTINCT + " (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای شکستی ندارد یا مرحله‌ها برابرند؛ «ضعیف‌ترین» فقط وقتی نام برده می‌شود که مرحله‌ای شکست دارد و از همهٔ مرحله‌های دیگر به‌روشنی پایین‌تر است."
         : Q.n ? "فقط یک مرحله داده دارد (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای «ضعیف‌ترین» نامیده نمی‌شود؛ مرحله‌های بی‌داده با پیشینِ ½ سنجیده نمی‌شوند." : "هنوز هیچ رویدادِ سنجیده‌ای نیست — هیچ مرحله‌ای رتبه نمی‌گیرد (نمی‌دانیم)."),
       causesSection(Q),
@@ -726,11 +731,22 @@
       })));
   }
   M.techList = techList;
+  /* دورِ ۳۰ (forecast؛ A30-15 s05 p39 «کالیبراسیون فقط ۳ پیش‌بینیِ تمرینِ T24 را می‌شمارد، نه ۹ پیش‌بینیِ داوری‌شدهٔ گفت‌وگو»): 🎯 های داوری‌شدهٔ گفت‌وگو و دفتر در بُعدها و
+     «پیش‌بینی‌های رویداد» شمرده می‌شدند، ولی سطرِ کالیبراسیونِ این بخش فقط می‌گفت «… فقط آن‌جا شمرده می‌شود» — کالیبراسیونِ خودِ دفترِ 🎯 (شمار، طرفِ محتمل‌تر، Brier) کنارش
+     نام برده می‌شود تا ببیند داوری‌اش کجا نشست. همان برآوردِ A.PSY.forecastEst (A3/A4)؛ عددِ تازه‌ای ساخته نمی‌شود */
+  function fcLedger30() { try {
+      var F = S.all("fcast", function (x) { return !x.sample && x.p != null && !x.est && (x.outcome === "شد" || x.outcome === "نشد"); }); if (!F.length || !A.PSY || !A.PSY.forecastEst) return null;
+      var e = A.PSY.forecastEst(F.map(function (x) { return { p: x.p / 100, ok: x.outcome === "شد", at: x.outcomeAt || x.due }; })), br = A.fcastBrier ? A.fcastBrier(F) : null;
+      return h("div", { class: "mind-fc-cal small", "data-n": String(F.length) }, h("b", {}, "کالیبراسیونِ 🎯 دفترِ پیش‌بینی (گفت‌وگو و دفتر): "),
+        fa(F.length) + " پیش‌بینیِ داوری‌شده" + (br ? " · Brier " + fa(String(br.brier).replace(/(\d)\.(\d)/, "$1٫$2")) : "") + (e && e.dirN ? " · طرفِ محتمل‌تر " + fa(e.hit) + " بار از " + fa(e.dirN) + " رخ داد" : "") + " — همین‌ها در ستونِ «پیش‌بینی‌ها» ِ بُعدها و «پیش‌بینی‌های رویداد» شمرده شده‌اند.");
+    } catch (e) { return null; } }
+  M.fcLedger30 = fcLedger30;
   function techSection() {
     var W = M.techWork(), dimFa = {}; M.dims().forEach(function (d) { dimFa[d.id] = d.fa; });
     var sec = h("section", { class: "card mind-tech", dir: "rtl", "data-n": String(W.acts.length), "data-cal": String(W.cal.n) }, h("h2", {}, "🏋 کارِ تکنیک‌ها"),
       h("p", { class: "small muted" }, "پرونده‌های تمرین، برگه‌های کامل‌شده، جدول‌های کالیبراسیونِ برگه‌ها، چرخهٔ ۱-۳-۷ و برگهٔ سفیدِ هفتگی — هر نشست یک بار، تکرارِ همان روز یک سطر؛ پیش‌نویس، کارِ پس‌گرفته و پیش‌بینیِ داوری‌نشده شمرده نمی‌شوند. روبریک خودسنجی است، نه اندازه. «" + UNMAPPED + "» یعنی کارنامه نگاشتی از این تکنیک به بُعدهای بالا ندارد و نمی‌سازد؛ پس این کارها فقط این‌جا می‌آیند و عددهای بُعدها را جابه‌جا نمی‌کنند."));
-    if (!W.rows.length && !W.cal.n) { sec.appendChild(h("p", { class: "small muted mind-tech-empty" }, "هنوز کارِ تکنیکیِ کامل‌شده‌ای نیست.")); return sec; }
+    var fl30 = fcLedger30();
+    if (!W.rows.length && !W.cal.n) { sec.appendChild(h("p", { class: "small muted mind-tech-empty" }, "هنوز کارِ تکنیکیِ کامل‌شده‌ای نیست.")); if (fl30) sec.appendChild(fl30); return sec; }
     sec.appendChild(h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small mind-techtable" },
       h("thead", {}, h("tr", {}, ["تکنیک و موضوع", "نشست‌ها (روزهای جدا)", "اندازه (نخست ← آخر)", "بُعد", "از کجا"].map(function (x) { return h("th", {}, x); }))),
       h("tbody", {}, W.rows.map(function (R) {
@@ -747,6 +763,7 @@
     if (C.n) sec.appendChild(h("div", { class: "mind-tech-cal", "data-n": String(C.n), "data-brier": C.brier.toFixed(4) },
       h("b", {}, "کالیبراسیونِ برگه‌ها و تمرین‌ها: "), fa(C.n) + " پیش‌بینیِ داوری‌شده · Brier " + fa(C.brier.toFixed(3)) + " · درست " + pf0(100 * C.hit) + " در برابرِ میانگینِ اطمینانِ " + pf0(100 * C.meanP) + " (" + (C.meanP > C.hit ? "بیش‌اطمینانی " : C.meanP < C.hit ? "کم‌اطمینانی " : "") + sgn(100 * (C.meanP - C.hit)) + " واحد) — " + UNMAPPED + "؛ پیش‌بینی‌ای که همان پیش‌بینیِ دفترِ 🎯 است فقط آن‌جا شمرده می‌شود.",
       techList(C.acts.map(function (c) { return { id: c.id, at: c.at, ok: c.ok, fa: c.fa, go: c.go, src: "cal", kind: "cal" }; }), "techcal")));
+    if (fl30) sec.appendChild(fl30);
     if (W.gaps.length) sec.appendChild(h("div", { class: "mind-tech-gaps", "data-n": String(W.gaps.length) }, h("b", {}, "پیش‌بینی از یادگیریِ خودت در برابرِ واقعی: "), techList(W.gaps, "techgap")));
     return sec;
   }

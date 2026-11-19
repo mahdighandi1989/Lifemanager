@@ -1,0 +1,592 @@
+{
+"from": "round30A/s04",
+"t0": "2026-10-16T09:00:00",
+"base": 0,
+"inject": "window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n",
+"steps": [
+{
+"say": "چهار تا خواهر و برادریم. خونه‌ی پدری رو هیچ‌کس نمی‌خواد بفروشه، هر کدوم سهم مساوی می‌خوایم، خواهرم می‌خواد خودش توش زندگی کنه، برادرم پول نقد می‌خواد همین امسال. یه راه‌حل بده که همه راضی باشن."
+},
+{
+"eval": "(()=>{const i=document.querySelector('.age-ask .age-in');if(!i)return 'NO CARD';i.focus();i.value='1981-01-20';i.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.age-ask .btn.sm:not(.ghost)').click();return 'AGE '+APP.AGE.birth()+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+document.querySelectorAll('.age-ask').length})()"
+},
+{
+"say": "آره، ثبتش کن."
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))\n"
+},
+{
+"say": "داده‌ها: خونه حدود ۸ میلیارد می‌ارزه. خواهرم پس‌انداز نداره. برادرم امسال پول لازم داره. شرطامون اینه: ۱. خونه فروخته نشه. ۲. سهم هر کدوم مساوی باشه. ۳. خواهرم توش زندگی کنه. ۴. برادرم امسال پول نقدشو بگیره. باید یه تصمیم بگیرم."
+},
+{
+"eval": "(()=>{const p=APP.liveSessionPid(APP.ASSIST.cur());APP.go('lprob',p);F('lpOne','می‌خوایم با خونهٔ بابا کاری کنیم که هیچ‌کدوممون حس نکنه حقش خورده شده.');F('lpWhy','نمی‌خوام رابطهٔ خواهر برادری خراب بشه');C('.lp-onesave');\nconst D=['خانه حدود ۸ میلیارد می‌ارزد','خواهرم پس‌انداز ندارد','برادرم امسال پول لازم دارد'];C('.lp-dadd');const ids=[...document.querySelectorAll('[id^=lpD_]')].map(e=>e.id);ids.forEach((id,i)=>{F(id,D[i]||'');S(id.replace('lpD_','lpDE_'),'big')});\nF('lpUnk','یه ترتیب برای خونه که هر چهار تا شرط رو برآورده کنه');F('lpCond','خانه فروخته نشود\\nسهمِ هر چهار نفر مساوی باشد\\nخواهرم در خانه زندگی کند\\nبرادرم امسال سهمش را نقد بگیرد');\nS('lpSat','unknown');S('lpSuff','هنوز نمی‌دانم');F('lpSuffW','هنوز حساب نکردم');F('lpGuess','یه راهی باید باشه');S('lpConf','60');F('lpTest','اگه حساب کنم و پول نقد برادر از جایی جز فروش خونه درنیاد');S('lpIfRef','حدس را کنار می‌گذارم یا اصلاحش می‌کنم');S('lpGWant','yes');F('lpGContra','اگه هیچ‌کدوممون نتونیم سهم برادر رو بخریم');\n[...document.querySelectorAll('#main [id^=lpPr]')].forEach(e=>{if(!e.value)F(e.id,'نمی‌دونم')});\nC('.lp-usave');C('.sv-g2');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn p+' '+st()+' SUB:'+APP.state.sub+' '+JSON.stringify(APP.liveKindInfo(p))})()\n"
+},
+{
+"say": "دیشب نشستم حساب کردم. خونه فروخته نشه ولی برادرم امسال نقد بخواد، خواهرم هم پولی نداره که سهمشو بخره... پس راهی نیست. ولش کنم دیگه، هیچ کاری نمیشه کرد.",
+"eval0": "(()=>{0;return 1})()",
+"clock": "2026-10-17"
+},
+{
+"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"
+},
+{
+"eval": "(()=>{const p='pb_l_mvaqm0kzvjj';const t='دیشب نشستم حساب کردم. خونه فروخته نشه ولی برادرم امسال نقد بخواد، خواهرم هم پولی نداره که سهمشو بخره... پس راهی نیست. ولش کنم دیگه، هیچ کاری نمیشه کرد.';const a=APP.liveCoach(p,{stuck:true,turn:{text:t,stuck:true}});const b=APP.liveCoach(p,{turn:{text:t}});return a.q+' | '+a.src+' || '+b.q+' | '+b.src+' ph='+a.ph+'\\nREP:'+JSON.stringify(APP.ASSIST.cur().coach.rep||{}).slice(0,300)})()\n"
+},
+{
+"eval": "(()=>{const p='pb_l_mvaqm0kzvjj';APP.go('lprob',p);C('.lp-reu2');const t1=MT('بیانِ تازه',300);\nreturn FL('lpSat|lpSuff|lpRe')+'\\n'+BL().slice(-500)+'\\n'+t1})()\n"
+},
+{
+"eval": "(()=>{S('lpSat','no');S('lpSuff','متناقض است');F('lpSuffW','«نفروختن» با «نقدِ امسالِ برادر» و «پس‌اندازِ صفرِ خواهر» با هم نمی‌خوانند');S('lpRestate','eq');F('lpRestateW','فقط فهمیدم شرط متناقض است؛ خودِ مسئله همان است');\nC('.lp-usave');C('.sv-g2');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn st()+'\\nSUB:'+APP.state.sub+'\\n'+FL('lpCx|lpRelax|lpImp|lpPartC|lpCon')+'\\n'+MT('۲) طرح',1500)})()\n"
+},
+{
+"eval": "(()=>{S('lpRelax','3');F('lpRelaxW','زمانِ «امسال» را شل می‌کنم؛ برادر پولش را می‌گیرد ولی در چند قسط؛ از دست دادنش: کمی صبر برای برادر');\nconst v1=document.getElementById('lpRelaxVary');if(v1)F('lpRelaxVary','بی «امسال» چند ترتیب ممکن می‌شود (اجاره، وام، قسط)؛ هر چه زمانِ برادر بلندتر شود، راه‌ها بیشتر و ارزان‌تر می‌شوند');\nS('lpAuxK','part');const f=FL('lpAux');F('lpAuxT','فقط سه شرط: نفروختن، سهمِ مساوی، زندگیِ خواهر — بی «امسال»');F('lpAuxB','اگر با سه شرط دو راه پیدا شد، می‌بینم کدام نزدیک‌ترین زمان را به برادر می‌دهد');\nC('.lp-auxsave');const t1=TT();const v2=document.getElementById('lpAuxVary');if(v2){F('lpAuxVary','با برداشتن «امسال»، مجهول از «هیچ» به چند ترتیب می‌رسد؛ هر سالی که برادر صبر کند، اجاره و قسط سبک‌تر می‌شود');C('.lp-auxsave');}\nreturn f+'\\nT1:'+t1+'\\nT2:'+TT()+'\\n'+MT('مسئلهٔ کمکی',600)})()\n"
+},
+{
+"eval": "JSON.stringify(APP.liveCoach(\"pb_l_mvaqm0kzvjj\").q)+\" | list:\"+APP.liveCoach(\"pb_l_mvaqm0kzvjj\").list.length\n"
+},
+{
+"eval": "(()=>{F('lpPlan','نخست با سه شرط دو راه را می‌سنجم: اجاره دادنِ سهم‌ها به خواهر و وامِ بانکی برای برادر؛ سپس در جلسهٔ خانوادگی هر دو را می‌گذارم و زمانِ پرداختِ برادر را با خودش توافق می‌کنیم.');\n[...document.querySelectorAll('[id^=lpPU_a_]')].forEach(e=>S(e.id,'use'));[...document.querySelectorAll('[id^=lpPU_w_]')].forEach((e,i)=>F(e.id,['ارزش خانه مبنای سهم و اجاره است','خواهر پس‌انداز ندارد پس اجاره به‌جای خرید','برادر پول می‌خواهد پس وام یا قسط'][i]||'در طرح'));\n[...document.querySelectorAll('[id^=lpPC_]')].forEach(e=>{if(!e.checked)e.click()});\nC('.lp-plansave');let st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-1).join(' || ');const a=st();\nF('lpStep','جلسهٔ خانوادگی جمعه: دو راه را می‌گویم و می‌پرسم برادر با پرداختِ دوساله کنار می‌آید');S('lpClear','بله');F('lpPrem','اجاره و وام هر دو بی فروش ممکن‌اند');F('lpPred','خواهر قبول می‌کند ولی برادر می‌گوید دیر است');S('lpConf','60');F('lpWhen','۱ آبان');\n[...document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]')].slice(0,3).forEach(e=>{if(!e.checked)e.click()});C('.lp-stepsave');\nreturn a+' | '+st()+' SUB:'+APP.state.sub})()\n"
+},
+{
+"eval": "JSON.stringify(APP.liveClosure(\"pb_l_mvaqm0kzvjj\").aux)+JSON.stringify((APP.liveAll().find(r=>r.p.id==\"pb_l_mvaqm0kzvjj\").live||{}).aux||null).slice(0,400)"
+},
+{
+"eval": "(()=>{0;const d=DUE();APP.go('lprob','pb_l_mvaqm0kzvjj','exec');S('lpODone','yes');F('lpOWhat','جلسه به دعوا کشید؛ برادر گفت دو سال خیلی دیره و خواهرم گفت اجاره نمی‌تونه بده.');S('lpOMatch','no');S('lpOProg','نه');S('lpOWant','less');S('lpOGuess','refute');C('.lp-outsave');\nF('lpOReflect','نه؛ فکر می‌کردم خواهرم اجاره می‌ده. شاید مسئله رو باید از اول جور دیگه بگم.');C('.lp-outsave');\nconst st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn d.split('\\n').filter(x=>/خانهٔ پدری|میانهٔ/.test(x)).join('\\n')+'\\n'+st()+'\\n'+MT('غافلگیر',500)})()\n",
+"clock": "2026-10-25"
+},
+{
+"eval": "MT(\"🎯\",250)+\"\\n\"+MT(\"🌱\",600)"
+},
+{
+"eval": "JSON.stringify(APP.liveCoach(\"pb_l_mvaqm0kzvjj\").q)\n"
+},
+{
+"eval": "JSON.stringify(APP.liveCoach(\"pb_l_mvaqm0kzvjj\",{turn:{text:\"فکر کنم باید خود مسئله رو یه جور دیگه بگم\",fail:true}})).slice(0,400)+\"\\nPLAIN:\"+APP.liveCoach(\"pb_l_mvaqm0kzvjj\").q+\" src:\"+APP.liveCoach(\"pb_l_mvaqm0kzvjj\").src"
+},
+{
+"say": "جلسه خراب شد، دعوامون شد. عصبانیم، وقتم هدر رفت. فکر کنم باید خود مسئله رو یه جور دیگه بگم."
+},
+{
+"eval": "(()=>{C('.lp-reu2');F('lpUnk','راهی که رابطهٔ ما چهار نفر سالم بماند و هر کس سهمش را در زمانی که با خودش توافق شده بگیرد');S('lpRestate','wider');F('lpRestateW','شرطِ «نفروختن» را برداشتم و «امسال» را به «زمانِ توافقی» تبدیل کردم؛ چون جلسه نشان داد مهم‌ترین چیز رابطه است');\nC('.lp-usave');C('.sv-g2');const st=()=>[...document.querySelectorAll('[aria-live]')].map(e=>e.textContent.trim()).filter(x=>x&&x.length<400).slice(-2).join(' || ');\nreturn st()+' SUB:'+APP.state.sub+'\\n'+JSON.stringify(APP.MIND&&APP.MIND.model?Object.keys(APP.MIND.model()):0)})()\n"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s);const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};return JSON.stringify({pid,today:APP.today(),msgs:s.msgs.filter(m=>m.role==\"user\").map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,120)]),stmt:r.p.statement,u1:so.u&&so.u[1],g:so.g,live:{plan:(so.live||{}).plan,steps:((so.live||{}).steps||[]).map(s=>({t:s.text,out:s.out,due:s.due,src:s.src})),chat:(so.live||{}).chat}}).slice(0,6000)})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm0kzvjj\")"
+},
+{
+"say": "یه اصلاح: تو پیامِ داده‌ها گفتم «خونه حدود ۸ میلیارد می‌ارزه» — اشتباه گفتم، قیمتِ کارشناسی ۱۱ میلیارد بود؛ ۱۱ میلیارد درسته."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const c=s.coach||{};const pick=o=>JSON.stringify(o,null,0);return pick({own:c.ownLog,ans:c.ansLog,keys:Object.keys(c),seR:s.retracts,live:(APP.S.get(\"eprog_pb_l_mvaqm0kzvjj\").solve.live||{}).retracts})})()"
+},
+{
+"say": "باشه. تصمیم گرفتم پنجشنبه یه جلسهٔ کوتاه با خواهر و برادرم بذارم، این بار فقط دربارهٔ زمانِ پرداختِ سهمِ برادرم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"say": "ببخشید، اشتباه گفتم: جلسه رو شنبه می‌ذارم، نه پنجشنبه — پنجشنبه برادرم سرِ کاره."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "JSON.stringify({r:(APP.ASSIST.cur().coach||{}).retracts,last:APP.ASSIST.cur().msgs.slice(-3).map(m=>m.role+\": \"+m.text.slice(0,200))})"
+},
+{
+"say": "راستش اشتباه کردم که دیروز سرِ برادرم داد زدم؛ امروز زنگ زدم و ازش عذرخواهی کردم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "JSON.stringify(((APP.ASSIST.cur().coach||{}).retracts||[]).slice(2))"
+},
+{
+"say": "خواهرم امروز گفت «اشتباه گفتی، سهم‌ها رو باید با قیمتِ روز حساب کنیم نه ۱۱ میلیارد». نمی‌دونم حق با اونه یا نه."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "(async()=>{const s=APP.ASSIST.cur();const m=s.msgs.find(m=>APP.ASSIST.msgId(m)==\"u3\");const b=document.querySelector(\".as-mtools[data-mid=\\\"u3\\\"] .as-editb\");if(!b)return \"NOEDIT\";b.click();await new Promise(r=>setTimeout(r,400));const ta=document.querySelector(\".as-edtx\");ta.scrollIntoView({block:\"center\"});const nt=m.text.replace(\"برادرم امسال پول لازم داره\",\"برادرم تا آخرِ سالِ بعد پول لازم داره\");ta.value=nt;ta.dispatchEvent(new Event(\"input\",{bubbles:true}));return \"OPEN \"+nt})()"
+},
+{
+"eval": "(()=>{const t=[...document.querySelectorAll(\".as-edtx\")];return t.length+\" | \"+t.map(x=>x.id+\"=\"+x.value.slice(0,80)+\" h=\"+x.clientHeight+\" color=\"+getComputedStyle(x).color+\" bg=\"+getComputedStyle(x).backgroundColor).join(\" || \")})()"
+},
+{
+"eval": "(()=>{document.querySelector(\".as-edsave\").click();return TT()})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "(async()=>{const s=APP.ASSIST.cur();const m=s.msgs.find(m=>APP.ASSIST.msgId(m)==\"u7\");const b=document.querySelector(\".as-mtools[data-mid=\\\"u7\\\"] .as-editb\");if(!b)return \"NOEDIT\";b.click();await new Promise(r=>setTimeout(r,400));const ta=document.querySelector(\".as-edtx\");const nt=m.text.replace(\"پنجشنبه\",\"شنبه\");ta.value=nt;ta.dispatchEvent(new Event(\"input\",{bubbles:true}));document.querySelector(\".as-edsave\").click();await new Promise(r=>setTimeout(r,300));return \"SAVED \"+nt+\" | \"+TT()})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid(s)||s.lprob;const r=APP.liveRec(pid);const P=APP.S.get(\"eprog_\"+pid)||{};const so=P.solve||{};const L=so.live||{};\nreturn JSON.stringify({today:APP.today(),stmt:r&&r.p.statement,stmtHist:r&&(r.p.fixHist||null),u:so.u&&{d:so.u[1].d,dl:so.u[1].dl,c:so.u[1].c,fix:so.u[1].fixHist},g:so.g&&so.g[1]&&{guess:so.g[1].guess,fix:so.g[1].fixHist,refuted:so.g[1].refuted},\nplan:L.plan&&{t:L.plan.t,fix:L.plan.fixHist},steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out&&{done:x.out.done,what:x.out.what,match:x.out.match,from:x.out.from,wd:x.out.wd},fix:x.fixHist})),Lretr:L.retracts,\nsess:{plans:s.plans,guesses:(s.coach||{}).guesses,retracts:(s.coach||{}).retracts,seRetr:s.retracts,promises:s.promises,corrMsgs:s.msgs.filter(m=>m.corr||m.textHist).map(m=>[APP.ASSIST.msgId(m),m.text.slice(0,140),m.corr,m.textHist])},\ndue:(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).filter(t=>/برنامه|📌|جلسه|خانه|🔭/.test(t))})})()\n"
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm0kzvjj\")"
+},
+{
+"eval": "(()=>{localStorage.setItem(\"lla.dev\",\"1\");APP.clock.dev=true;return 0})()",
+"clock": "2026-10-29"
+},
+{
+"reload": true
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\nDUE:\"+JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "\"clock->2026-10-29\"",
+"clock": "2026-10-29"
+},
+{
+"reload": true
+},
+{
+"eval": "APP.today()+\" \"+JSON.stringify(APP.clock.check())"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return JSON.stringify((APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")))})()"
+},
+{
+"eval": "(()=>{APP.go(\"dossier\",\"pb_l_mvaqm0kzvjj\");const t=document.getElementById(\"main\").innerText;return t.slice(t.indexOf(\"گفت‌وگوهای این مسئله\"))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(i,i+2600)})()"
+},
+{
+"eval": "APP.go(\"lprob\",\"pb_l_mvaqm0kzvjj\")"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return 'ERR '+e}})()"
+},
+{
+"eval": "(()=>{APP.go('today');return APP.today()+' | '+(APP.dueList()||[]).map(x=>x.txt+' / '+(x.sub||'')).join(' || ')})()"
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"eval": "(()=>{APP.ASSIST.toggle(true);const b=[...document.querySelectorAll('.as-panel button')].filter(b=>/بله|عوض شود|این‌جا هم/.test(b.textContent));return b.map(x=>x.className+':'+x.textContent.trim().slice(0,60)).join(' | ')})()"
+},
+{
+"eval": "(()=>{document.querySelector('.as-panel .as-askyes').click();return TT()})()"
+},
+{
+"eval": "(()=>{if(!window.REC){window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};\nwindow.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};\nwindow.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};\nwindow.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for=\"'+e.id+'\"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\\n');\nwindow.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');\nwindow.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};\nwindow.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\\n');\nwindow.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();\nwindow.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};\nwindow.REC=()=>{const s=APP.ASSIST.cur()||{};const cut=(o,n)=>{try{return JSON.parse(JSON.stringify(o,(k,v)=>typeof v==='string'&&v.length>(n||300)?v.slice(0,n||300)+'…':v))}catch(e){return String(e)}};\nconst probs=APP.S.all('eprob',r=>r&&r.live&&r.p).map(r=>{const P=APP.S.get('eprog_'+r.p.id)||{};const so=P.solve||{};return {pid:r.p.id,title:r.p.title,stmt:r.p.statement,src:r.src||r.p.src,fixHist:r.p.fixHist||r.fixHist,closure:(()=>{try{const c=APP.liveClosure(r.p.id);return c&&{state:c.state,verdict:c.verdict,label:c.label}}catch(e){return null}})(),u:cut(so.u),g:cut(so.g),b:cut(so.b),live:cut(so.live)}});\nreturn JSON.stringify({today:APP.today(),probs,sess:{id:s.id,plans:cut(s.plans),coach:cut(s.coach&&{guesses:s.coach.guesses,retracts:s.coach.retracts,acts20:s.coach.acts20,reg:s.coach.reg}),retracts:cut(s.retracts),copyAsk:cut(s.copyAsk),evlog:cut(s.evlog),msgs:(s.msgs||[]).map(m=>[APP.ASSIST.msgId(m),m.role,(m.text||'').slice(0,160),m.corr||null,m.textHist||null])},\ndeadlines:APP.S.all('deadline',x=>1).map(x=>({what:x.what,date:x.date,done:x.done,src:x.src,fixHist:x.fixHist})),cards:APP.S.all('card',x=>x&&x.src).map(x=>({q:(x.q||x.front||'').slice(0,80),src:x.src})),prc:(APP.PR&&APP.PR.all?APP.PR.all():[]).map(c=>cut(c,200)),\ndue:(APP.dueList()||[]).map(x=>(x.txt||'')+' | '+(x.sub||''))},null,0)};\nwindow.MINDFROM=()=>{APP.go('mind');document.querySelectorAll('details').forEach(d=>{if(/از کجا/.test(d.textContent.slice(0,80)))d.open=true});const t=document.getElementById('main').innerText;const i=t.indexOf('بخشِ حل (پولیا)');return t.slice(Math.max(0,i),i+6000)};\nwindow.DOSS=(pid)=>{APP.go('dossier',pid);const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')),t.indexOf('📜')+20000)};\n};return REC()})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\" | \"+(APP.dueList()||[]).map(x=>x.txt+\" / \"+(x.sub||\"\")).join(\" || \")})()",
+"clock": "2026-10-31"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlt9tiux2j');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlu3fdiujq');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlsuyyshl4');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltat5kcm3');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqlvj5tsare');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "برای جلسهٔ شنبه عدد آماده کردم: ۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد برای هر نفر. اگه سهمِ برادرم رو تو ۱۰ قسط بدیم، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط."
+},
+{
+"say": "اشتباه گفتم: ما ۵ نفر وارثیم نه ۴ نفر — مادرم هم سهم داره."
+},
+{
+"say": "خب حالا سهمِ هر نفر چقدر میشه؟ خودم حساب می‌کنم: ۱۱ / ۵ = ۲٫۲ میلیارد."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({dp:s.datePend&&{st:s.datePend.state,items:s.datePend.items},sys:s.msgs.filter(m=>m.role==\"sys\").slice(-4).map(m=>m.text.slice(0,260))})})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltiv6rxgp');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "یه چیز دیگه هم برای جلسه: خونه ۵ اتاق داره و ۲۰۰ متره؛ اگه بفروشیم، هر نفر از ۲٫۲ میلیارد ۵ درصد کمیسیون میده."
+},
+{
+"say": "ببخشید، باز اشتباه از من بود: مادرم وارث نیست، سندِ خونه فقط به اسمِ بابام و ما چهار تا بچه‌ست — پس ۴ نفریم نه ۵. حالا سهمِ هر نفر و قسطِ برادرم چقدر میشه؟"
+},
+{
+"eval": "JSON.stringify(APP.ASSIST.cur().msgs.filter(m=>m.role==\"sys\").slice(-2).map(m=>m.text.slice(0,700)))"
+},
+{
+"say": "یعنی دوباره ۱۱ / ۴ = ۲٫۷۵ میلیارد، و قسطِ برادرم ۲٫۷۵ میلیارد تقسیم بر ۱۰ = ۲۷۵ میلیون."
+},
+{
+"eval": "JSON.stringify(REC ? JSON.parse(REC()).probs.map(p=>p.stmt&&p.stmt.slice(0,200)):0)"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltmypqk0n');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "وکیل زنگ زد: مادرم هم توی سند هست، پس ۵ نفریم نه ۴."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).map(m=>m.role+\": \"+m.text).join(\"\\n\")})()"
+},
+{
+"say": "آره، همون ۲٫۲ درسته."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-2).map(m=>m.role+\": \"+m.text).join(\"\\n\")})()"
+},
+{
+"say": "نه، ۲۲۰ نیست؛ قسط رو هنوز با برادرم نبستیم."
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();return s.msgs.slice(-4).filter(m=>m.role!=\"user\").map(m=>m.role+\": \"+m.text.slice(0,500)).join(\"\\n\")})()"
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltnoew4w7');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "ای وای، باز یکی جا افتاد: خاله‌م هم سهم داره، پس ۶ نفریم نه ۵."
+},
+{
+"say": "یعنی تعدادِ وارث‌ها ۶ تاست، نه ۵ — همون عددی که گفتم وکیل تأیید کرد رو درست کن."
+},
+{
+"say": "باشه ولش کن. اون پیشنهادِ قبلی که گفتی ۲٫۷۵ — آره، همون ۲٫۷۵ درسته."
+},
+{
+"say": "یه اصلاحِ دیگه: قیمتِ خونه ۱۱ میلیارد نیست، ۱۲ میلیارده؛ کارشناس امروز گفت."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltmvsr4xd');const t=document.getElementById('main').innerText;return t.slice(Math.max(0,t.indexOf('📜')))})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t})()"
+},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{
+"say": "نه، اشتباه شد؛ خاله‌م سهم نداره. همون ۵ نفر درست بود."
+},
+{
+"say": "اون پیشنهادِ قبلی که گفت ۲ میلیارد — آره، همون ۲ درسته."
+},
+{
+"say": "۱۲ تقسیم بر ۵ میشه ۲٫۴. ولی کارشناس دقیق‌ترش رو گفت: ۱۲ میلیارد نه، از ۱۱٫۵ تا ۱۲٫۵ میلیارد."
+},
+{
+"eval": "APP.S.all(\"eprob\",r=>r&&r.live&&r.p).map(r=>r.p.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t.slice(t.indexOf('📜'))})()"
+},
+{},
+{
+"eval": "APP.S.all(\"achat\",x=>x&&x.msgs&&x.msgs.length).map(x=>x.id).join(\" \")"
+},
+{
+"eval": "(()=>{APP.go('dossier','achat_mvaqltluj0v06');try{CT('^کلِ گفت‌وگو')}catch(e){};return new Promise(r=>setTimeout(()=>{const t=document.getElementById('main').innerText;r(t.slice(Math.max(0,t.indexOf('📜'))))},700))})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"بخشِ حل (پولیا)\");return t.slice(Math.max(0,i),i+9000)})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"today\");return APP.today()+\"\\n\"+(APP.dueList()||[]).map(x=>x.txt+\" | \"+(x.sub||\"\")).join(\"\\n\")})()"
+},
+{},
+{
+"eval": "(()=>{try{return APP.MIND.phasesText()}catch(e){return \"ERR \"+e}})()"
+},
+{
+"eval": "(()=>{APP.go('route','pb_l_mvaqm0kzvjj');const t=document.getElementById('main').innerText;return t})()"
+},
+{},
+{
+"eval": "(()=>{APP.go(\"mind\");document.querySelectorAll(\"details\").forEach(d=>{d.open=true});const t=document.getElementById(\"main\").innerText;const i=t.indexOf(\"📐\");return \"AGE=\"+APP.AGE.age()+\" band=\"+((APP.AGE.band(APP.AGE.age())||{}).id)+\"\\n\"+t.slice(Math.max(0,i),i+5000)})()"
+},
+{},
+{}
+],
+"replies": [
+"{\"reply\": \"راه‌حل را من جای تو نمی‌دهم، ولی کمک می‌کنم خودت به آن برسی. اگر بخواهی، این را در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبت می‌کنیم تا فهم و طرح و گام‌هایش بماند. پیش از نخستین سرنخ: خودت تا کجا رفتی و کجا ماندی؟\", \"title\": \"خانهٔ پدری\", \"pinned\": \"راهی برای خانهٔ پدری که هر چهار نفر راضی باشند\", \"memory\": \"چهار خواهر و برادر، خانهٔ پدری؛ شرط‌ها: نفروختن، سهم مساوی، خواهر ساکن، برادر نقدِ امسال. «یه راه‌حل بده». مسئلهٔ زنده ثبت شد؛ پرسیدم خودش تا کجا رفته.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"register\": \"تو\"}]}",
+"{\"reply\": \"ثبت شد و صفحه‌اش باز است. پیش از نخستین سرنخ: خودت تا کجا رفتی و کجا ماندی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"خانهٔ پدری\", \"statement\": \"چهار تا خواهر و برادریم. خونه‌ی پدری رو هیچ‌کس نمی‌خواد بفروشه، هر کدوم سهم مساوی می‌خوایم، خواهرم می‌خواد خودش توش زندگی کنه، برادرم پول نقد می‌خواد همین امسال. یه راه‌حل بده که همه راضی باشن.\", \"nat\": \"life\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}], \"title\": \"خانهٔ پدری\", \"memory\": \"مسئلهٔ خانهٔ پدری با «آری» ِ کاربر در 🔭 ثبت شد؛ پرسیدم خودش تا کجا رفته.\"}",
+"{\"reply\": \"داده‌ها و چهار بخشِ شرط را خودت روشن جدا کردی. پیش از جزءها، اول کل، بعد جزءها: کلِ مسئله را بی‌جزئیات، در یک جملهٔ کامل و به زبانِ خودت، می‌گویی؟\", \"memory\": \"خانهٔ پدری ۸ میلیارد؛ خواهر پس‌انداز ندارد؛ برادر امسال نقد می‌خواهد. چهار شرط را کاربر جدا گفت. پرسشِ کل‌اولِ صفحه را پرسیدم.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\", \"c\"], \"ans\": [\"u2\", \"u3\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"دیشب حساب کردی و دیدی بخش‌های شرط با هم نمی‌خوانند — این یافته است، نه بن‌بست. پیش از رها کردن: مسئلهٔ کوچک‌تری که از پسش برمی‌آیی کدام است — فقط بخشی از شرط را نگه دار (مثلاً یکی از چهار بخش را کنار بگذار)، یا یک حالتِ خاص را حل کن؟\", \"memory\": \"pb_l_mvaqm0kzvjj: روز ۲ کاربر دید شرط‌ها ناسازگارند و گفت راهی نیست، می‌خواهد رها کند. گفتم یافته است؛ پرسیدم مسئلهٔ کوچک‌تر با بخشی از شرط.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"c\"], \"ans\": [], \"stuck\": true, \"fail\": true, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"جلسه تلخ بود، ولی وقتت هدر نرفت: راهت را با واقعیت آزمودی و حالا می‌دانی خواهرت اجاره نمی‌دهد و «دو سال» برای برادرت دیر است. خودت گفتی مسئله را باید جورِ دیگری گفت — کدام قید یا واژهٔ آن را می‌شود جورِ دیگری دید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"c\", \"said\": [\"restate\"], \"ans\": [], \"stuck\": false, \"fail\": true, \"role\": \"self\", \"nat\": \"life\", \"step\": {\"step\": \"1\", \"done\": \"yes\", \"what\": \"جلسه خراب شد، دعوامون شد\", \"match\": \"no\"}}]}",
+"{\"reply\": \"اصلاحِ ارزشِ خانه (۱۱ میلیارد به‌جای ۸) را فرستادم؛ صفحه در نوبتِ بعد نتیجه را می‌گوید. با این عدد هم، کدام قید یا واژهٔ مسئله را می‌شود جورِ دیگری دید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"retract\": {\"msg\": \"خونه حدود ۸ میلیارد می‌ارزه\", \"key\": \"datum:ارزشِ خانه\", \"what\": \"fact\", \"fix\": \"۱۱ میلیارد\", \"old\": \"۸ میلیارد\"}}]}",
+"{\"reply\": \"صفحه دادهٔ ارزشِ خانه را در دفترِ گفت‌وگو به «۱۱ میلیارد» برد، و برای «دادهٔ ۱» ِ فهرستِ داده‌هایت در صفحه از خودت می‌پرسد «این‌جا هم عوض شود؟». جلسهٔ کوتاهِ پنجشنبه، فقط دربارهٔ زمانِ پرداختِ سهمِ برادرت — پیش از انجامش فکر می‌کنی چه می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"plan\": {\"text\": \"تصمیم گرفتم پنجشنبه یه جلسهٔ کوتاه با خواهر و برادرم بذارم\", \"when\": \"2026-10-29\"}}]}",
+"{\"reply\": \"اصلاحِ روزِ جلسه را فرستادم؛ صفحه نتیجه را نشان خواهد داد. پیش از جلسهٔ شنبه: فکر می‌کنی چه می‌شود، و چقدر مطمئنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"retract\": {\"msg\": \"تصمیم گرفتم پنجشنبه یه جلسهٔ کوتاه با خواهر و برادرم بذارم\", \"key\": \"plan:pl1\", \"what\": \"plan\", \"fix\": \"شنبه\", \"old\": \"پنجشنبه\"}}]}",
+"{\"reply\": \"عذرخواهی کردی — این خودش گامی برای همان رابطه‌ای است که می‌خواهی سالم بماند. برای جلسهٔ شنبه: دادهٔ دیگری لازم است — چه چیزی را باید بپرسی، بسنجی یا پیدا کنی تا خواسته معین شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"این حرفِ خواهرت است، نه اصلاحِ حرفِ خودت — پس چیزی را عوض نمی‌کنم؛ «قیمتِ روز» یک قیدِ تازه است که می‌شود سنجیدش. «سهمِ مساوی» را شما چهار نفر به چه معنا می‌گیرید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"صفحه «امسال» را در دادهٔ دفترِ گفت‌وگو به «تا آخرِ سالِ بعد» برد، و برای «دادهٔ ۳» ِ فرمِ فهم («برادرم امسال پول لازم دارد») از خودت می‌پرسد «این‌جا هم عوض شود؟» — تا «بله» نزنی همان می‌ماند.\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"عددِ قسط‌ها با حسابِ صفحه می‌خواند: ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون. حکمِ گامِ ۴ («پس راهی نیست») را پذیرفتی — حالا درستِ همین گام را خودت چطور می‌نویسی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\", \"result\"], \"result\": \"۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"اصلاحِ تعدادِ وارث‌ها (۵ نفر به‌جای ۴ نفر) را فرستادم؛ صفحه در نوبتِ بعد نتیجه را می‌گوید. با پنج سهم، گامِ بعدیِ تو پیش از جلسهٔ شنبه چیست؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"retract\": {\"msg\": \"۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد برای هر نفر\", \"key\": \"datum:تعدادِ وارث‌ها\", \"what\": \"fact\", \"fix\": \"۵ نفر\", \"old\": \"۴ نفر\", \"rests\": []}}]}",
+"{\"reply\": \"صفحه دادهٔ وارث‌ها را به «۵ نفر» برد. حسابِ تازه‌ات «۱۱ / ۵» را صفحه با عددِ نوشته‌شده هم‌خوان ندید — عدد را نمی‌گویم؛ خودت دوباره وارسی می‌کنی که کجایش می‌لنگد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"result\": \"۱۱ / ۵ = ۲٫۲ میلیارد\", \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"این‌ها داده‌های خوبی برای جلسه‌اند: پنج اتاق، ۲۰۰ متر، و کمیسیونِ ۵ درصد روی سهمِ هر نفر. پیش از جلسهٔ شنبه فکر می‌کنی برادرت با کدام بخش بیشتر کنار می‌آید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\"}]}",
+"{\"reply\": \"اصلاحِ تعدادِ وارث‌ها (۴ نفر به‌جای ۵) را فرستادم؛ صفحه نتیجه را می‌گوید. سهمِ هر نفر و قسطِ برادرت را با ۴ نفر خودت دوباره حساب می‌کنی — از کدام عدد شروع می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"retract\": {\"msg\": \"ما ۵ نفر وارثیم نه ۴ نفر\", \"key\": \"datum:تعدادِ وارث‌ها\", \"what\": \"fact\", \"fix\": \"۴ نفر\", \"old\": \"۵ نفر\", \"rests\": []}}]}",
+"{\"reply\": \"هر دو حساب می‌خوانند: ۱۱ / ۴ = ۲٫۷۵ میلیارد، و قسطِ برادرت ۲۷۵ میلیون. صفحه هم «۴ نفر» را نشاند و «۲٫۲» را کهنه کرد. پیش از جلسهٔ شنبه فکر می‌کنی برادرت با ده قسط کنار می‌آید؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"life\", \"retract\": {\"msg\": \"ما ۵ نفر وارثیم نه ۴ نفر\", \"key\": \"datum:تعدادِ وارث‌ها\", \"what\": \"fact\", \"fix\": \"۴ نفر\", \"old\": \"۵ نفر\", \"rests\": []}}]}",
+"{\"reply\": \"اصلاحِ «۵ نفر» را فرستادم؛ صفحه نتیجه‌اش را می‌گوید. با پنج سهم، کدام عدد را اول دوباره حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"retract\": {\"msg\": \"۴ نفریم نه ۵\", \"key\": \"datum:شمارِ وارث\", \"what\": \"said\", \"fix\": \"۵ نفر\", \"rests\": []}}]}",
+"{\"reply\": \"باشد. با سهمِ ۲٫۲ میلیارد، قسطِ برادرت را خودت دوباره حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"روشن. پس قسط هنوز باز است؛ با برادرت دربارهٔ چند قسط حرف می‌زنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": []}",
+"{\"reply\": \"اصلاحِ «۶ نفر» را فرستادم؛ صفحه نتیجه‌اش را می‌گوید. با شش سهم، سهمِ هر نفر را خودت دوباره حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"retract\": {\"msg\": \"پس ۵ نفریم نه ۴\", \"key\": \"datum:شمارِ وارث\", \"what\": \"said\", \"fix\": \"۶ نفر\", \"rests\": []}}]}",
+"{\"reply\": \"اصلاحِ «۶ نفر» را دوباره فرستادم؛ صفحه نتیجه‌اش را می‌گوید. با شش سهم، سهمِ هر نفر را خودت حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"retract\": {\"msg\": \"وکیل زنگ زد: مادرم هم توی سند هست، پس ۵ نفریم نه ۴.\", \"key\": \"datum:شمارِ وارث\", \"what\": \"said\", \"old\": \"۵\", \"fix\": \"۶\", \"rests\": []}}]}",
+"{\"reply\": \"صفحه آن اصلاحِ ۶ نفر را ثبت نکرد. دربارهٔ ۲٫۷۵: آن پیشنهاد روی «۴ نفر» ساخته شده بود؛ با شمارِ وارث‌های الان، سهمِ هر نفر را خودت دوباره حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"اصلاحِ قیمت به «۱۲ میلیارد» را فرستادم؛ صفحه نتیجه‌اش را می‌گوید. با قیمتِ تازه، سهمِ هر نفر را خودت دوباره حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"retract\": {\"msg\": \"۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد برای هر نفر\", \"key\": \"datum:قیمتِ خانه\", \"what\": \"said\", \"old\": \"۱۱ میلیارد\", \"fix\": \"۱۲ میلیارد\", \"rests\": []}}]}",
+"{\"reply\": \"باشه، شمارِ وارث‌ها دوباره ۵ نفر. با ۱۲ میلیارد و ۵ نفر، سهمِ هر نفر را خودت حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"retract\": {\"msg\": \"خاله‌م هم سهم داره، پس ۶ نفریم نه ۵\", \"key\": \"datum:تعدادِ وارث‌ها\", \"what\": \"said\", \"old\": \"۶\", \"fix\": \"۵\", \"rests\": []}}]}",
+"{\"reply\": \"صبر کن: آن «۲» با ۶ نفر ساخته شده بود و حالا دوباره ۵ نفرید. با ۵ نفر، ۱۲ تقسیم بر ۵ چند می‌شود؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"۲٫۴ درست است. اگر قیمت بازه‌ای از ۱۱٫۵ تا ۱۲٫۵ است، سهمِ هر نفر هم بازه می‌شود — دو سرِ آن را حساب می‌کنی؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}"
+],
+"keys": [
+"چهار تا خواهر و برادریم. خونه‌ی پدری رو هیچ‌کس نمی‌خواد بفروشه، هر کدوم سهم مساوی می‌خوایم، خواهرم می‌خواد خودش توش زندگی کنه، برادرم پول نقد می‌خواد همین امسال. یه راه‌حل بده که همه راضی باشن.",
+"آره، ثبتش کن.",
+"داده‌ها: خونه حدود ۸ میلیارد می‌ارزه. خواهرم پس‌انداز نداره. برادرم امسال پول لازم داره. شرطامون اینه: ۱. خونه فروخته نشه. ۲. سهم هر کدوم مساوی باشه. ۳. خواهرم توش زندگی کنه. ۴. برادرم امسال پول نقدشو بگیره. باید یه تصمیم بگیرم.",
+"دیشب نشستم حساب کردم. خونه فروخته نشه ولی برادرم امسال نقد بخواد، خواهرم هم پولی نداره که سهمشو بخره... پس راهی نیست. ولش کنم دیگه، هیچ کاری نمیشه کرد.",
+"جلسه خراب شد، دعوامون شد. عصبانیم، وقتم هدر رفت. فکر کنم باید خود مسئله رو یه جور دیگه بگم.",
+"یه اصلاح: تو پیامِ داده‌ها گفتم «خونه حدود ۸ میلیارد می‌ارزه» — اشتباه گفتم، قیمتِ کارشناسی ۱۱ میلیارد بود؛ ۱۱ میلیارد درسته.",
+"باشه. تصمیم گرفتم پنجشنبه یه جلسهٔ کوتاه با خواهر و برادرم بذارم، این بار فقط دربارهٔ زمانِ پرداختِ سهمِ برادرم.",
+"ببخشید، اشتباه گفتم: جلسه رو شنبه می‌ذارم، نه پنجشنبه — پنجشنبه برادرم سرِ کاره.",
+"راستش اشتباه کردم که دیروز سرِ برادرم داد زدم؛ امروز زنگ زدم و ازش عذرخواهی کردم.",
+"خواهرم امروز گفت «اشتباه گفتی، سهم‌ها رو باید با قیمتِ روز حساب کنیم نه ۱۱ میلیارد». نمی‌دونم حق با اونه یا نه.",
+"[اصلاحِ پیامِ قبلی] «امسال» ⇐ «تا آخرِ سالِ بعد» — متنِ درستِ پیامم: «داده‌ها: خونه حدود ۸ میلیارد می‌ارزه. خواهرم پس‌انداز نداره. برادرم تا آخرِ سالِ بعد پول لازم داره. شرطامون اینه: ۱. خونه فروخته نشه. ۲. سهم هر کدوم مساوی باشه. ۳. خواهرم",
+"برای جلسهٔ شنبه عدد آماده کردم: ۱۱ میلیارد تقسیم بر ۴ نفر میشه ۲٫۷۵ میلیارد برای هر نفر. اگه سهمِ برادرم رو تو ۱۰ قسط بدیم، ۲۷۵۰ میلیون / ۱۰ = ۲۷۵ میلیون هر قسط.",
+"اشتباه گفتم: ما ۵ نفر وارثیم نه ۴ نفر — مادرم هم سهم داره.",
+"خب حالا سهمِ هر نفر چقدر میشه؟ خودم حساب می‌کنم: ۱۱ / ۵ = ۲٫۲ میلیارد.",
+"یه چیز دیگه هم برای جلسه: خونه ۵ اتاق داره و ۲۰۰ متره؛ اگه بفروشیم، هر نفر از ۲٫۲ میلیارد ۵ درصد کمیسیون میده.",
+"ببخشید، باز اشتباه از من بود: مادرم وارث نیست، سندِ خونه فقط به اسمِ بابام و ما چهار تا بچه‌ست — پس ۴ نفریم نه ۵. حالا سهمِ هر نفر و قسطِ برادرم چقدر میشه؟",
+"یعنی دوباره ۱۱ / ۴ = ۲٫۷۵ میلیارد، و قسطِ برادرم ۲٫۷۵ میلیارد تقسیم بر ۱۰ = ۲۷۵ میلیون.",
+"وکیل زنگ زد: مادرم هم توی سند هست، پس ۵ نفریم نه ۴.",
+"آره، همون ۲٫۲ درسته.",
+"نه، ۲۲۰ نیست؛ قسط رو هنوز با برادرم نبستیم.",
+"ای وای، باز یکی جا افتاد: خاله‌م هم سهم داره، پس ۶ نفریم نه ۵.",
+"یعنی تعدادِ وارث‌ها ۶ تاست، نه ۵ — همون عددی که گفتم وکیل تأیید کرد رو درست کن.",
+"باشه ولش کن. اون پیشنهادِ قبلی که گفتی ۲٫۷۵ — آره، همون ۲٫۷۵ درسته.",
+"یه اصلاحِ دیگه: قیمتِ خونه ۱۱ میلیارد نیست، ۱۲ میلیارده؛ کارشناس امروز گفت.",
+"نه، اشتباه شد؛ خاله‌م سهم نداره. همون ۵ نفر درست بود.",
+"اون پیشنهادِ قبلی که گفت ۲ میلیارد — آره، همون ۲ درسته.",
+"۱۲ تقسیم بر ۵ میشه ۲٫۴. ولی کارشناس دقیق‌ترش رو گفت: ۱۲ میلیارد نه، از ۱۱٫۵ تا ۱۲٫۵ میلیارد."
+]
+}

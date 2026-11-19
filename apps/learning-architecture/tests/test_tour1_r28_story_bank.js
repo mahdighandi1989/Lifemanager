@@ -140,7 +140,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   E[212] = async () => { const [, Q] = await PQ(); await turnA('صورتِ مسئله رو دوباره بگم: قفسه‌ها ۸۰ سانتی‌ان و ۵ تا طبقه دارن', [csx({ ph: 'u', said: ['d'] })]); const n = await p.evaluate(() => APP.S.all('eprob', r => r && r.live).length); return [n === 2, n]; };
   E[213] = async () => ({ nc: 'not mine: «امروز ۴۰ دقیقه پیاده رفتم» ⇒ practice dossier is the practice/a41 filing (D27-17 path, test_tour1_r27b_history #224/#244); the story layer adds no line for it (no calculation, no coach_state) — checked by A28_12_neg' });
   E[214] = async () => { const [P, Q] = await misfiled(); await clickMv(P, '۶ متر در ۵ متر', 'کفِ انباری'); const R = await p.evaluate((P) => __ev(P).filter(e => e.l.some(l => /۶ متر در ۵ متر/.test(l))).map(e => ({ wd: e.wd, out: e.out })), P);
-    return [R.length === 1 && R[0].wd && /جابه‌جا شد ⇒ «کفِ انباری»/.test(R[0].out), J(R)]; };
+    return [R.length === 1 && R[0].wd && /جابه‌جا شد (?:⇒|به) «کفِ انباری»/.test(R[0].out), J(R)]; };
   E[215] = async () => { const R = await other('با کمکِ معلمم فهمیدم چرا ضرب می‌کنیم', ['d']); return [!R.o.length, J(R.D)]; };
   E[216] = async () => { const R = await other('مامانم گفت برنج ۲ کیلوئه', ['d']); return [!R.o.length && R.mine.some(e => e.k === 'cdata' && e.l.some(l => /منبع: به گفتهٔ «مامانم»/.test(l))) && !R.mine.some(e => e.k === 'ccalc'), J(R.D)]; };
   E[217] = async () => { const [P, Q] = await PQ(); await p.evaluate((P) => APP.liveBindSession(P, __cur(), { force: true }), P); await turnA('قفسه‌ها: ۵ × ۸۰ = ۴۰۰ سانت', [csx({ ph: 'e', said: [] })]);
@@ -155,3 +155,4 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   console.log(errors.length ? 'ERRORS(' + errors.length + '):\n' + errors.join('\n') : 'NO ERRORS');
   await b.close(); process.exit(errors.length ? 1 : 0);
 })();
+// دورِ ۳۰ (surface، C30-6 / #294 — یک قراردادِ پیکان): جابه‌جایی حالا «جابه‌جا شد به «…»» نوشته می‌شود (بی ⇒)؛ انتظارهای «جابه‌جا شد ⇒» هر دو ریخت را می‌پذیرند.

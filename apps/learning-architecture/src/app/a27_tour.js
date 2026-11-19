@@ -891,8 +891,10 @@
      دارد مسئله‌ای حل می‌کند (شبیه‌ساز/صفحهٔ یک مسئله، موقعیتِ گره‌گشا از نوعِ مسئله، «بیان دیگر» در حالتِ مسئله، یا وجهِ «مسئله» ِ تور
      همین حالا) قاعده‌ها را به نوبتِ دستیار می‌افزاید (AS.promptHooks؛ پرامپتِ سامانه دست نمی‌خورد). داده: فهم و بازنگری روی رکوردِ همان
      مسئله (eprog_<pid>.tut | kcase.tut | داده‌های «بیان دیگر») ثبت می‌شود و پاسخِ بازنگری یک کارتِ مرور می‌سازد (تکرارِ فاصله‌دار). */
+  /* دورِ ۳۰ (story، C184 — A26-9 pA1 p3، s03 p4): بندِ پولیا «کافی، زائد، متناقض» یک پرسش با گزینه‌هاست ⇒ یک جمله با «یا» («آیا شرط … کافی است، یا زائد، یا متناقض؟»)؛
+     پیش‌تر سه «؟» داشت و oneQ25 آن را با «،» به هم می‌چسباند. دو پرسشِ واقعاً جدا در یک نوبت هنوز نقص است (هم‌شکلِ منفی). */
   var TQ = {
-    und: { fa: "فهمِ مسئله", qs: ["مجهول (یا حکمی که باید ثابت شود) چیست؟", "داده‌ها (یا فرض) چیست؟", "شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟", "آیا شرط برای تعیینِ مجهول کافی است؟ زائد است؟ متناقض است؟", "شکلی بکش یا نام‌گذاریِ مناسبی بکن؛ مسئله را به زبانِ خودت دوباره بگو.", "چه؟ چرا؟ کجا؟ کی؟ چگونه؟ — کدام‌یک دربارهٔ این مسئله هنوز بی‌پاسخ است؟"] },
+    und: { fa: "فهمِ مسئله", qs: ["مجهول (یا حکمی که باید ثابت شود) چیست؟", "داده‌ها (یا فرض) چیست؟", "شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟", "آیا شرط برای تعیینِ مجهول کافی است، یا زائد، یا متناقض؟", "شکلی بکش یا نام‌گذاریِ مناسبی بکن؛ مسئله را به زبانِ خودت دوباره بگو.", "چه؟ چرا؟ کجا؟ کی؟ چگونه؟ — کدام‌یک دربارهٔ این مسئله هنوز بی‌پاسخ است؟"] },
     plan: { fa: "طرح‌ریزی", qs: ["پیش‌تر همین را — یا همین را به شکلِ کمی دیگر — دیده‌ای؟", "به مجهول نگاه کن: مسئلهٔ آشنایی با همین مجهول، یا مجهولِ مشابه، می‌شناسی؟", "می‌توانی مسئله را به شکلِ دیگری بیان کنی؟ به تعریف‌ها برگرد.", "از خواسته به عقب: فرض کن حل شده — یک گام مانده به آخر چه وضعی بود که از آن به خواسته می‌رسیدی؟ و آن وضع از کجا؟", "اگر نمی‌توانی همین را حل کنی، مسئلهٔ مرتبطِ ساده‌تری را حل کن: حالتِ خاص‌تر؟ کلی‌تر؟ فقط بخشی از شرط را نگه دار.", "همهٔ داده‌ها و کلِ شرط را به کار بردی؟ همهٔ مفهوم‌های اساسیِ مسئله را در نظر گرفتی؟"] },
     exec: { fa: "اجرای طرح", qs: ["هر گام را وارسی کن: روشن می‌بینی که این گام درست است؟", "می‌توانی ثابت کنی که درست است (کدام مقدمه آن را لازم می‌آورد)؟"] },
     back: { fa: "بازنگری", qs: ["می‌توانی نتیجه را وارسی کنی — در حالتی خاص یا حدی، با ابعاد یا تقارن؟ همهٔ داده‌ها در جواب آمده‌اند؟", "می‌توانی استدلال را در نقطه‌های حساسش وارسی کنی؟", "می‌توانی نتیجه را از راهِ دیگری به دست آوری؟ می‌توانی آن را در یک نگاه ببینی؟", "می‌توانی نتیجه یا روش را در مسئلهٔ دیگری به کار ببری؟ یک مسئلهٔ تازه بساز.", "این نوع مسئله برایت چطور بود — کدام بخشش را دوست داشتی و کدامش را نه؟ (شناختنِ نوعِ مسئله‌هایی که با سلیقه و توانت می‌خواند)"] }
@@ -1389,6 +1391,11 @@
      تلاشِ دیدنی = کارِ خودش در متنِ خودش (فرمول، رابطه با متغیر، طرح، حدس، حدسِ ردشده، یافته) — «گیر کردم»/«نیم ساعته موندم» تلاش را نشان نمی‌دهد. */
   var ONLY_Q = "خودت تا کجا رفتی و کجا ماندی؟", OPT_Q = "گزینه‌ات را با تک‌تکِ بخش‌های شرط بسنج — هر بخش را برآورده می‌کند؟",
     CLAIM_Q = "ثابتش می‌کنی یا با مثالِ نقض ردش می‌کنی — کدام را اول امتحان می‌کنی؟",
+    /* دورِ ۳۰ (C26-23/24): نامِ مرحله‌های روشِ خودِ صفحه؛ پرسشِ معنایشان پرسشِ روش است (پاسخ از فهرستِ خودِ همان مرحله) */
+    METHT30 = /^(?:بازنگری|بازبینی|وارسی|طرح[‌\s]?ریزی|اجرای\s*طرح|فهمِ?\s*مسئله|فهمیدنِ?\s*مسئله)$/,   // «طرح» ِ تنها نه — «طرحِ لباس/کاشی» واژهٔ مسئلهٔ اوست
+    METHG30 = /(?:^|[\s.،])یعنی\s+(?:[^؟?.\n]{0,20}\s)?(?:چک|وارسی|بررسی|امتحان|نگاه|مرور)\s*(?:کنم|کنیم|بکنم)\s+(?:که|ببینم)[^؟?\n]{0,30}[؟?]/,
+    METH_Q30 = function (w) { return "«" + w + "» نامِ یکی از چهار مرحلهٔ کار است (پولیا) — معنایش را با پرسش‌های خودِ همین مرحله (فهرستِ بالا) کوتاه بگو، بی داوریِ حلِ او؛ بعد بپرس کدام را اول روی حلِ خودش انجام می‌دهد"; },
+    METHG_Q30 = "حدسش دربارهٔ معنای همین مرحله است، نه ادعایی دربارهٔ مسئله — بگو کدام بخشِ حدسش با پرسش‌های خودِ این مرحله (فهرستِ بالا) می‌خواند و کدام را هنوز نگفته؛ همان یکی را بپرس",
     REL_Q = "از نتیجه یا روشِ همان که بلدی، این‌جا می‌توانی استفاده کنی؟",
     PROOF_Q = "در حالت‌هایی که امتحان کردی، چه چیزی هست که نشدن را لازم می‌آورد — و برای هر حالتی، نه فقط این‌ها، برقرار می‌ماند؟",
     /* دورِ ۱۳ (M4، s38 p6 در برابرِ s11 p3): پرسشِ برهان تابعِ آن است که حالت‌های آزموده چه نشان دادند — «امتحان کردم درسته … چطور ثابت کنم» (حالت‌ها جواب دادند)
@@ -1414,6 +1421,22 @@
   function optCheck(t) { t = ownText(t); return OPTCHK_RE.test(t) && OPT_RE.test(t); }
   /* دورِ ۱۰ (ادغام): کارِ خودش به اول‌شخص — «تا اینجا … حساب کردم/گرفتم/نوشتم/کشیدم/امتحان کردم/به دست آوردم» — تلاشِ دیدنی است */
   var OWNWORK_RE = /(?:تا\s*(?:این\s*جا|اینجا)[^.؟?!\n]{0,80})?(?:حساب|امتحان|رسم|فرض|جایگذاری|جای‌گذاری)\s*کردم|(?:^|[\s،؛])(?:گرفتم|نوشتم|کشیدم|به\s*دست\s*آوردم|بدست\s*آوردم|رسیدم)(?=$|[\s.،؛!؟])/;
+  /* دورِ ۳۰ (prior، C27-3 s28 p4 «… فهرست کردم ۱۴×۱۴ حالت، با حداقل یه پسرِ سه‌شنبه ۲۷ حالت، دوپسر ۱۳ تا ⇒ ۱۳/۲۷. فکر کنم درسته»): مدل «⇒ ۱۳/۲۷. فکر کنم درسته» را guess
+     گزارش کرد و صفحه آن را حدسِ «از گفت‌وگو» ثبت کرد، «تأیید شد» گرفت و به کالیبراسیون رفت. مدل گزارش می‌دهد، صفحه می‌سنجد: حکمِ خودش («فکر کنم / به نظرم درسته»،
+     «همینه») دربارهٔ نتیجه‌ای که همین پیام از کارِ خودش («فهرست/حساب کردم، شمردم، نوشتم …») به دست آورده — هر عددِ آن نتیجه پیش‌تر در همان کار آمده — حدسِ تازه نیست.
+     شبیهِ منفی: «حساب کردم ۱۲ تا میشه، فکر کنم جوابِ کل ۵۰ باشه» (۵۰ در کارش نیست) و «فکر کنم ۱/۲ درسته» بی کار ⇒ همان حدس. */
+  var SELFOK30 = /(?:فکر\s*(?:می[‌\s]?)?کنم|به\s*نظرم|احتمالاً|احتمالا)?\s*(?:درسته|درست\s*(?:است|ه|باشه)|همینه|همین\s*(?:است|ه))\s*[.!؟?]*\s*$/;
+  var OWNWORK30 = /(?:فهرست|لیست|شمارش|بررسی|حساب|جدول|رسم)\s*کردم|شمردم|نوشتم|درآوردم|به\s*دست\s*آوردم|رسیدم/;
+  function dg30(t) { return String(t || "").replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 1776); }).replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 1632); }).replace(/٫/g, "."); }
+  function selfVerdict30(ut, gt) {
+    var u = String(ut || ""), g = String(gt || "").trim(); if (!SELFOK30.test(g)) return false;
+    var core = g.replace(SELFOK30, "").replace(/^[\s⇒=>→،,.:]+|[\s،,.:]+$/g, ""), cn = dg30(core).match(/\d+(?:\.\d+)?/g) || []; if (!cn.length) return false;
+    var i = u.indexOf(g.slice(0, 12)); if (i < 0) i = u.indexOf(core.slice(0, 8)); if (i <= 0) return false;
+    var pre = ownText(u.slice(0, i)); if (!(OWNWORK30.test(pre) || OWNWORK_RE.test(pre))) return false;
+    var pn = dg30(pre).match(/\d+(?:\.\d+)?/g) || [];
+    return cn.every(function (n) { return pn.indexOf(n) >= 0; });
+  }
+  AS.selfVerdict30 = selfVerdict30;
   function attemptIn(t, teach) { var w = ownText(t); return formulas(w).length > 0 || OWNWORK_RE.test(w) || varEq(w) || PLAN_RE.test(w) || GUESS_REF_RE.test(w) || FOUND_RE.test(w) || AHA_RE.test(w) || guessNow(t, teach); }
   /* پیامِ معرفیِ مسئله فقط خودش؛ وگرنه پیام‌های پیشینِ همین سشن هم (تلاشی که پیش‌تر گفت) */
   function attemptSeen(s, mt, teach, intro) {
@@ -1425,7 +1448,13 @@
     var teach = !!o.teach, has = {}, list = [];
     var add = function (id, on, q) { if (!on) return; var m = { id: id, q: q }; has[id] = m; list.push(m); };
     var attempt = attemptSeen(x.s, mt, teach, !!o.isIntro), only = ONLY_ANS_RE.test(mt) && !attempt;
-    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt);
+    /* دورِ ۳۰ (story، B24·D15 bp1 p11 «x²−9 = (x−3)(x+3). درسته؟ با ضرب پرانتز هم چک کردم، …»): «درسته؟» پس از وارسیِ گزارش‌شدهٔ خودش در همان پیام ادعای محلِ بحث نیست —
+       پرسشِ «ثابتش می‌کنی یا ردش؟» وارسیِ او را نادیده می‌گرفت (همان قاعدهٔ guessWhy ِ دورِ ۲۴، CHECKED24، این‌جا هم). هم‌شکلِ منفی: وارسی‌ای که شکست گزارش کرد یا گیر است ⇒ همان ادعا. */
+    var ot30 = faDigits(ownText(mt)), chk30 = CHECKED24.test(ot30) && !CASES_FAIL.test(ot30.replace(CHECKED24, " ")) && !STUCK_RE.test(ot30);
+    /* دورِ ۳۰ (surface، C26-23/C26-24 aC2 p1–p2): «بازنگری دقیقاً یعنی چی؟» پرسش از **روشِ خودِ صفحه** است (نامِ یکی از چهار مرحلهٔ پولیا)، نه واژهٔ کلیدیِ مسئلهٔ او ⇒
+       نه «به تعریف‌ها برگرد» (A038)؛ و حدسِ خودش دربارهٔ معنای همان مرحله («یعنی دوباره چک کنم که درسته؟») ادعای محلِ بحث نیست ⇒ نه «ثابتش کن یا ردش کن». */
+    var mterm30 = defAsk(mt) ? ((/([آ-ی‌]{2,}(?:\s*(?:ِ|‌ی)?\s*[آ-ی‌]{2,})?)\s*(?:دقیقاً|دقیقا|اصلاً|اصلا|واقعاً|واقعا)?\s*یعنی\s*(?:چی|چه)\s*[؟?]/.exec(ownText(mt)) || [])[1] || defWord(mt)) : "", meth30 = METHT30.test(String(mterm30 || "").replace(/[\s‌]*(?:دقیقاً|دقیقا|اصلاً|اصلا|واقعاً|واقعا)[\s‌]*$/, "").trim()), mguess30 = METHG30.test(ownText(mt));
+    var opt = !o.guess && optCheck(mt), claim = !o.guess && !opt && DISPUTE_RE.test(mt) && !chk30 && !mguess30;   // دورِ ۳۰ ادغام: story (chk30) + surface (mguess30)
     /* دورِ ۲۵ (P1، DECISIONS_R25): پیامِ آغازینِ کارِ پیشین ⇒ نقطهٔ ازسرگیری؛ ردِ حکم ⇒ دوباره‌سنجی با شاهد — بالاتر از «اول کل»، آزمونِ حدس و «خودت فکر می‌کنی چرا؟»
        (A25-1، B25·D2/D3، C25-12/13، D25-6؛ خوانش از a45 A.STORY.priorTurn) */
     var pw25 = x.prior && /^(?:open|dispute|again|undo|which)$/.test(x.prior.id) ? x.prior : null;   // دورِ ۲۶ (Q4): پس گرفتنِ رد و «کدام گام؟» هم پرسشِ نوبتِ دفترند
@@ -1439,7 +1468,9 @@
     /* دورِ ۱۲ (L1، s11 p3): خودش آزمود («امتحان کردم، نشد») و برهان می‌خواهد ⇒ پرسشِ برهان (خانوادهٔ C145)، نه «چطور می‌آزمایی‌اش؟» */
     add("C145p", !x.hc && !o.guess && testedProof(mt), proofQ(mt));
     /* دورِ ۱۲ (L1، s13 p3، s27 p2): معنای واژهٔ کلیدی را می‌جوید (نامزدها/تردید) ⇒ «به تعریف‌ها برگرد» (A038) پرسشِ نوبت است */
-    add("A038", !o.guess && defAsk(mt), DEF_Q(defWord(mt)));
+    mterm30 = String(mterm30 || "").replace(/[\s‌]*(?:دقیقاً|دقیقا|اصلاً|اصلا|واقعاً|واقعا)[\s‌]*$/, "").trim();
+    add("M30", !o.guess && (meth30 || mguess30), meth30 ? METH_Q30(mterm30) : METHG_Q30);
+    add("A038", !o.guess && defAsk(mt) && !meth30, DEF_Q(defWord(mt)));
     add("check", opt, OPT_Q);
     add("claim", claim, CLAIM_Q);
     add("B231", !!x.refTurn, "از ردش چه آموختی و کدام فرضِ پنهان شکست؟");
@@ -1589,6 +1620,7 @@
     if (ph === "c" || ph === "p") L.push("- زمینه (نه پرسشِ دوم): سلیقه و درنگ (B14): در مکثی طبیعی، نه کنارِ پرسشِ این نوبت، جا دارد بداند تا این‌جا کدام بخشش را دوست دارد و کدام را نه " + (srcQ("C120") || "") + " (C120؛ و پس از تلاشِ خودش، حلِ نویسندگانِ خوب — C117)؛ اگر خسته یا گیر است، ایدهٔ خوب پس از تلاشِ جدی می‌آید — «بگذار ته‌نشین شود، بعد برگرد» (کارِ ناخودآگاه، D009: فقط مسئله‌ای ته‌نشین می‌شود که جدی رویش کار شده — کنار گذاشتنِ آگاهانه، نه رها کردن؛ وقتی برگشت، نخست همان «چه چیزی به ذهنت رسید») . حلِ نویسنده‌ای خوب را فقط پس از تلاشِ خودش.");
     if (ph === "b" && !a129) L.push("- بازنگری مهم‌ترین بخشِ کار است " + (srcQ("C115") || "") + " و هیچ مسئله‌ای کاملاً تمام نمی‌شود " + (srcQ("A138") || "") + ": «حل شد» را تأیید یا رد نکن؛ پرسشِ این نوبت یک پرسشِ بازنگری است (همان بالا). اگر بازنگری را بیهوده خواند، همین دو جمله را آرام بگو. زمینه (نه پرسشِ دوم): سلیقه " + (srcQ("C120") || "") + " — این‌که کدام بخشش را دوست داشت — و " + (srcQ("C117") || "تقلید و تمرین") + " — حلِ نویسنده‌ای خوب را بخواند و بعد بی‌نگاه بازسازی کند.");
     /* E8 (دورِ ۴): سطرهای همان مرحله از دفترِ پوششِ منبع (sources/polya_how_to_solve_it: A038/B052، A263/B188–B189، B162، C168) */
+    if (MO.has.M30) L.push((isWin("M30") ? "- **پرسشِ این نوبت همین است:** پرسشِ روش (دربارهٔ روشِ خودِ صفحه، نه مسئلهٔ تازه): " : "- زمینه (نه پرسشِ دوم): پرسشِ روش: ") + MO.has.M30.q + ".");
     if (MO.has.A038) L.push(isWin("A038") ? "- **پرسشِ این نوبت همین است:** معنای واژهٔ کلیدی را می‌جوید (نامزدها یا تردید) — این حدس نیست؛ به تعریف‌ها برگرد " + cite("A038") + "، بازگشت به تعریف خودش تغییرِ مسئله است " + cite("B052") + ": «" + MO.has.A038.q + "» — «درست است/نه» نگو و معنایی را جای او برنگزین."
       : "- زمینه (نه پرسشِ دوم): معنای واژهٔ کلیدی را می‌جوید — به تعریف‌ها برگرد " + cite("A038") + "؛ " + MO.ptr + ".");
     else if (ph === "u" || ph === "p") L.push(altOr("به تعریف‌ها برگرد " + (srcQ("A038") || "") + ": واژهٔ کلیدیِ مبهمِ صورت یا شرط — در مسئلهٔ زندگی هم («شریکِ جرم یعنی چه»، «موفق یعنی چه») — دقیقاً یعنی چه؛ بازگشت به تعریف خودش تغییرِ مسئله است " + (srcQ("B052") || "") + ".", " اگر واژه‌ای همین حالا مبهم است، همان پرسشِ نوبت را با معنای دقیقِ آن واژه همراه کن (نه پرسشی کنارش)."));
@@ -1833,8 +1865,16 @@
   var WHEREIN29 = /کجای[\s‌]*(?:این[\s‌]*)?(?:پرونده|دفتر|کارنامه|صفحه|نقشه|سامانه|امروز)(?:‌?م|‌?ام|‌?مون)?[\s‌]*(?:ببینم|ببینمش|پیداش|پیدا[\s‌]*کنم|هست|ثبت|می[‌\s]?بینم)/;
   /* بانکِ R26 #245 «چطور از همین صفحه برای کنکورم برنامه بریزم؟»: کارِ خودِ او (اول‌شخص) با کمکِ صفحه، مسئلهٔ اوست — نامِ صفحه نهادِ پرسش نیست */
   var OWNACT29 = /(?:بریزم|بچینم|بنویسم|بسازم|حل[\s‌]*کنم|حلش[\s‌]*کنم|بخونم|بخوانم|برسم|بگیرم|بفروشم|بخرم)[\s‌]*[؟?]\s*$/;
+  /* دورِ ۳۰ (surface، F13 — A30-1 s06 p14 «وقتی تو پرونده کنارِ کلِ جمله‌م ✓ میاد، از کجا بدونم کدوم تکه‌ش رو صفحه سنجیده؟» «مسئلهٔ ۲ از ۲» شد): «صفحه» ِ بی‌اضافه
+     (نه «صفحهٔ …»، نه «یه/۴۸ صفحه») وقتی **نهادِ کارِ خودِ صفحه** است — سنجیدن، حساب‌کردن، نگه‌داشتن، درست/غلط خواندن، ثبت‌کردن، زدنِ نشان — یا وقتی خطا/تقصیر/✓✗
+     به صفحه نسبت داده می‌شود، پرسش دربارهٔ خودِ سامانه است. «صفحه پرسید …» (نقلِ پرسشِ صفحه دربارهٔ مسئلهٔ او: «صفحه پرسید شرط کافی بود؟») بیرون است.
+     نمونه‌های واقعی (C136، رونوشت‌های ۲۹/۳۰): «صفحه اینو یه قرار برای من حساب نمی‌کنه؟» (29C s28)، «این ✗ ها خطای صفحه‌ست یا من؟» (29D arD1)، «صفحه هر کدوم رو جدا نگه
+     داشته …؟» (29D pwD1)، «اگه صفحه یه حسابِ درستم رو غلط بخونه، … تقصیرِ صفحه‌ست نه من؟» (30D tD3) — درون؛ «صفحه پرسید شرط کافی بود؟» (29D s37)، «یه صفحه ۱۰×۱۰ …» — بیرون. */
+  var PAGEAG30 = /(?:^|[\s‌«(،:])صفحه(?![آ-یءٔ‌ِ])[^؟?.!]{0,40}?(?:سنجید|سنجیده|(?:ن?می[‌\s]?)سنج|حساب[\s‌]*(?:ن?می[‌\s]?)?(?:کنه|کند|کرد|کرده)|نگه[\s‌]*(?:ن?می[‌\s]?)?(?:داره|دارد|داشته|داشت)|(?:غلط|درست|اشتباه)[\s‌]*(?:بخونه|بخواند|خوند|خونده|خوانده|(?:ن?می[‌\s]?)(?:خونه|خواند))|ثبت[\s‌]*(?:ن?می[‌\s]?)?(?:کنه|کند|کرد|کرده)|(?:ن?می[‌\s]?)زنه|زده)(?![آ-ی])/;
+  var PAGEFAULT30 = /(?:خطا(?:ی|ی‌)?|تقصیر)(?:ِ)?[\s‌]*(?:از[\s‌]*)?صفحه(?:‌?ست|ه)?(?![آ-یءٔ‌ِ])|(?:خطا|تقصیر|اشتباه)[^؟?]{0,20}از[\s‌]*صفحه(?:‌?ست|ه)?(?![آ-یءٔ‌ِ])|[✓✗][\s‌]*(?:ِ|ی)?[\s‌]*(?:صفحه)(?![آ-یءٔ‌ِ])/;
   function sysQ29(q) { var x = faDigits(q); if (/[0-9]/.test(x) || /[=<>≤≥×÷]/.test(x) || OWNACT29.test(q)) return false;
     if (SYSNAME29.test(q) || SYSAPP29.test(q) || WHEREIN29.test(q)) return true;
+    if (PAGEAG30.test(q) || PAGEFAULT30.test(q)) return true;
     if (FACET29.test(q) || FACET2P29.test(q)) return true;
     return SHOW29.test(q) && ARTEF29.test(q) && MYWORK29.test(q); }
   AS.sysQ28 = sysQ28; AS.sysQ29 = sysQ29;
@@ -3176,7 +3216,7 @@
         nd.__r26 = out; nd.nodeValue = out; });
     } catch (e) { } }
   AS.regDom26 = regDom26;
-  if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); } catch (e) { } return r; }; A.render._reg26 = true;
+  if (typeof document !== "undefined" && !A.render._reg26) { var render26 = A.render; A.render = function () { var r = render26.apply(this, arguments); try { regDom26(document.getElementById("main")); regDom26(document.querySelector(".crumbs, .here, #here")); regDom26(document.querySelector("nav.side")); } catch (e) { } return r; }; A.render._reg26 = true;   // دورِ ۳۰ (surface، D26-40 aD3 «تو کجای آنی»، «از کجا شروع کنی»، «برای یادگرفتنِ خودت»): منوی کناری هم متنِ ایستای صفحه است
     try { if (typeof MutationObserver !== "undefined") { var mo26 = new MutationObserver(function (ms) { try { var seen = []; ms.forEach(function (m) { var el = m.target && m.target.nodeType === 3 ? m.target.parentNode : m.target; var mn = el && el.closest ? el.closest("#main") : null; if (mn && seen.indexOf(mn) < 0) seen.push(mn); }); seen.forEach(regDom26); } catch (e) { } });
       var arm26 = function () { var mn = document.getElementById("main"); if (mn) mo26.observe(mn, { childList: true, subtree: true, characterData: true }); else setTimeout(arm26, 300); }; arm26(); } } catch (e) { } }
   AS.sysRaw25 = function (m) { return m && m.text0 != null && m.text === m.textR ? m.text0 : (m ? m.text : ""); };
@@ -3450,6 +3490,13 @@
     if (!(a && a.check)) { b.verdict = "unverified"; b.chkBy = "none"; return; }
     /* پشتیبان: هم‌پوشانی فقط «شاید» — هیچ واژهٔ معنادارِ مشترکی در پیام‌های همین مسئله ⇒ «وارسی نشد» (چیزی برای سنجیدن نیست، نه داوریِ هم‌پوشانی) */
     var tk = tokN(a.check).filter(function (w) { return !LIGHT.test(w); }), any = chkWindow(s, st).some(function (m) { var u = tokN(m.text); return tk.some(function (w) { return u.indexOf(w) >= 0; }); });
+    /* دورِ ۳۰ (story، C186 — D26-28 s33/dp2/aD3: «حکمِ وارسی: شاید … از پیام‌هایت سنجیده نشد» برای وارسیِ عینیِ خودش): مدل پیامِ وارسی را نقل نکرد (msgs نبود)، پس صفحه
+       فقط هم‌پوشانی می‌دید و «شاید» می‌گفت، حتی وقتی وارسی در پیامِ خودِ او بود. حالا صفحه خودش در پیام‌های او (پس از صورت، نه خودِ پیامِ صورت) پیامی می‌جوید که وارسیِ گزارش‌شده
+       را با دست‌کم دو واژهٔ معنادار در خود دارد؛ یافت ⇒ «وارسی شد — با پیام‌های خودت» با نقلِ همان پیام. «شاید …» فقط وقتی پیام‌هایش چنین وارسی‌ای ندارند.
+       هم‌شکلِ منفی: هم‌پوشانیِ یک‌واژه‌ای یا فقط با خودِ صورت ⇒ همان «شاید». */
+    if (any && !msgs && !rep) { var need30 = Math.min(2, tk.length), own30 = chkWindow(s, st).filter(function (m) { return !(st && (quoteIn(st, m.text) || sameStmt(m.text, st))); })
+        .map(function (m) { var u = tokN(m.text); return { m: m, n: tk.filter(function (w) { return u.indexOf(w) >= 0; }).length }; }).filter(function (x) { return need30 >= 2 && x.n >= need30; }).sort(function (x, y) { return y.n - x.n; });
+      if (own30.length) { b.verdict = "verified"; b.chkRes = "نتیجه سالم ماند"; b.chkBy = "page30"; b.chkMsgs = [clip(own30[0].m.text, 160)]; return; } }
     if (any) { b.verdict = "maybe"; b.chkBy = "overlap"; b.chkRes = "نتیجه سالم ماند — به گزارشِ گفت‌وگو؛ از پیام‌های خودت هنوز سنجیده نشد"; }
     else { b.verdict = "unverified"; b.chkBy = "none"; }
   }
@@ -3457,7 +3504,7 @@
   /* coach_state.check که پس از chat_solved ِ همین نوبت (یا دیرتر) می‌رسد: حکمِ مسئلهٔ بسته‌شدهٔ همین سشن به‌روز می‌شود */
   function chkLate(s, ok) {
     var mine = chatClosed().filter(function (x) { return (x.L.chat || {}).sess === s.id; }).pop(); if (!mine || !ok.length) return;
-    var b = mine.b; if (b.verdict === "verified") return;
+    var b = mine.b; if (b.verdict === "verified" && b.chkBy !== "page30") return;   // دورِ ۳۰ (C186): پیامِ وارسی‌ای که صفحه خودش یافت جای نقلِ دقیقِ دیرآمدهٔ مدل را نمی‌گیرد
     var W = chkWindow(s, mine.r.p.statement, mine.r), ok2 = ok.filter(function (m) { return W.indexOf(m) >= 0; }); if (!ok2.length) return;
     b.verdict = "verified"; b.chkRes = "نتیجه سالم ماند"; b.chkBy = "msgs"; b.chkMsgs = ok2.map(function (m) { return clip(m.text, 160); }); S.put(mine.pg);
   }
@@ -3510,6 +3557,7 @@
     if (rk) { var sg = regSigns(userVoice25(ut)), own = rk === "shoma" ? sg.sh : sg.to; if (own) { C.reg = rk; C.regAt = at; } }
     // guess {text}
     var gt = txtOf(a.guess);
+    if (gt && quoteIn(gt, ut) && selfVerdict30(ut, gt)) gt = "";   // دورِ ۳۰ (C27-3): داوریِ خودش دربارهٔ نتیجهٔ کارِ خودش حدس نیست
     if (gt && quoteIn(gt, ut) && predTurn23(s, ut)) { if (A.PR && A.PR.bookPred) A.PR.bookPred(s, gt, at, key, "model"); gt = ""; }   // دورِ ۲۳ (A23-15): پیش‌بینی، نه حدس — PR.bookPred (a41) ثبتش می‌کند
     if (gt && quoteIn(gt, ut)) { C.guess = { text: clip(gt, 300), key: key, at: at }; guessReg(s, gt, key, at);   // RN2d: شناسهٔ حدس برای پیوندِ on_guess
       /* تورِ پولیا (RM4b): حدس روی پیامِ دستیارِ همین نوبت (m.guess) با «q» — همان پرسشی از همین پیام که حدس را می‌آزماید، عیناً زیررشتهٔ آن پیام؛
@@ -3625,6 +3673,8 @@
     /* دورِ ۲۷ (DECISIONS_R26 C35 دوباره؛ A27-20 aA3 p4، C27-27 tC1 p3): آیندهٔ شرطی («اگر اولی را زودتر شروع کنم…»، «اگه با یه سنسور نشه…») تا خودش تعهد نکند
        نه برنامه می‌شود نه «📌 قولِ بی‌تاریخ» */
     if (/(?:^|[\s،,!؟?.:])(?:اگه|اگر)(?![آ-ی‌])/.test(String(pt || ""))) return;
+    /* دورِ ۳۰ (A26-30 aA4، C19): عادت/روایتِ گذشته («اول طولِ هر تکه را درمی‌آوردم …») برنامه نیست (a41 PR.pastHabit30) */
+    try { if (A.PR && A.PR.pastHabit30 && A.PR.pastHabit30(pt)) return; } catch (e) { }
     /* حرفِ زمان‌دارِ او در همین پیام یا دو پیامِ پیشِ خودش («از کی؟» ⇐ «از فردا»)؛ تاریخِ گذشته همچنان رد می‌شود (پایین) */
     var her24 = (s.msgs || []).filter(isUser).slice(-3).map(function (m) { return String(m.text || ""); }).join(" \n ");
     if (realDate(w) && w >= td && !HER_WHEN24.test(String(pt || "")) && !HER_WHEN24.test(her24)) w = "next-session";
@@ -3748,8 +3798,13 @@
   }
   AS.plansDue = plansDue;
   /* یک تپِ «امروز» (INF10): همان وضعِ برنامه که plan_done ِ گفت‌وگو می‌نویسد؛ «هنوز نه» ⇒ باز می‌ماند، تا فردا پنهان، و دست‌کم یک بارِ دیگر پرسیده می‌شود (نه بیشتر) */
+  /* دورِ ۳۰ (D30-15 tD4 ۵ آذر): 📌 ِ ثبت‌شده‌ای که روزش گذشت و «انجام شد؟» ِ گفت‌وگو بی‌پاسخ ماند (plansDueR18 ⇒ expired) هنوز تعهدِ باز است — «expired» یعنی گفت‌وگو
+     دیگر نمی‌پرسد، نه اینکه کار بسته شد. ریشه: یک وضع (state) هر دو را می‌گفت، پس 📌 ِ بانک/بیمه/آرایشگاه از «امروز» افتادند و ⏰ ِ خیاطی (که این وضع را ندارد) ماند.
+     حالا 📌 ِ تاریخ‌دارِ expired در «امروز» با همان «موعد: … — انجام شد؟» و همان سه دکمه می‌ماند تا خودش جواب دهد. */
+  function dueExp30(q) { return !!q && !q.done && q.state === "expired" && q.dateBy === "her-yes" && /^\d{4}-\d\d-\d\d$/.test(String(q.when || "")); }   /* فقط 📌 ِ «ثبت‌شده» با «آره» ِ خودش (a41 bookItem26: dateBy) — برنامهٔ تاریخ‌دارِ مدل/کهنه مثلِ پیش (بانکِ R18 #9، R19 #15) */
+  AS.dueExp30 = dueExp30;
   function planTap(pid, v) {
-    var x = plansAll(null).filter(function (y) { return y.p.id === pid; })[0]; if (!x || !planOpen(x.p)) return false; var q = x.p;
+    var x = plansAll(null).filter(function (y) { return y.p.id === pid; })[0]; if (!x || !(planOpen(x.p) || dueExp30(x.p))) return false; var q = x.p;
     if (v === "notyet") { q.notYet = (q.notYet || 0) + 1; delete q.askKey; delete q.askD; delete q.askSess; q.snooze = A.addDays(A.today(), 1); q.notYetAt = nowIso(); }
     else { q.done = true; q.state = v === "done" ? "done" : "notdone"; q.doneAt = nowIso(); q.by = "today"; }
     try { S.put(x.s); } catch (e) { } return true;
@@ -3888,7 +3943,7 @@
     A.dueList = function () {
       var items = rawDueP.apply(this, arguments) || [], td = A.today();
       /* RN2d: وضعِ مؤثر (گامِ پیوسته، سرانجامِ حدس) پیش از نمایش؛ INF10: یک‌تپ «انجام دادم / انجام ندادم / هنوز نه» — همان وضعِ plan_done (AS.planTap) */
-      try { plansAll(null).forEach(function (x) { var q = x.p; if (planSync(x) !== "open") return; if (q.when !== "next-session" && (!q.when || String(q.when) > td)) return; if (q.snooze && String(q.snooze) > td) return;
+      try { plansAll(null).forEach(function (x) { var q = x.p; if (planSync(x) !== "open" && !dueExp30(q)) return; if (q.when !== "next-session" && (!q.when || String(q.when) > td)) return; if (q.snooze && String(q.snooze) > td) return;
         var rer = function () { if (A.state && A.state.view === "home" && A.render) A.render(); };
         var acts = [{ t: "انجام دادم", v: "done" }, { t: "انجام ندادم", v: "notdone" }].concat(q.notYet ? [] : [{ t: "هنوز نه", v: "notyet" }]).map(function (b) {
           return { t: b.t, cls: "dopt plan-tap plan-" + b.v, fn: function () { if (planTap(q.id, b.v)) { A.toast(b.v === "notyet" ? "باشد — فردا دوباره می‌آید." : "ثبت شد: «" + clip(plainTx(q.text), 40) + "» — " + b.t + "."); rer(); } } }; });
@@ -3974,7 +4029,11 @@
   /* دورِ ۲۹ (D29-26 arD2 «چراغ ۱۵ متره» ⇒ «چراغ ۱۲ متر»): وقتی پیشین و تازه فقط در عدد فرق دارند (پسوندِ «ـه/است» جزوِ داده نیست) فقط رقم‌ها عوض می‌شوند — نقلِ او بیرون از عدد بایت‌به‌بایت */
   function numOnly29(o, n) { o = String(o); n = String(n); var D0 = /[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g, a = o.match(D0) || [], b = n.match(D0) || []; if (a.length !== 1 || b.length !== 1) return n;
     var cut = function (t, d) { return t.replace(d, "#").replace(/[\s‌]*[،,:؛.]+[\s‌]*$/, "").replace(/[\s‌]*(?:ـ?ه|است|هست|اند|ان)[\s‌]*$/, "").replace(/[\s‌]+/g, " ").trim(); };
-    return cut(o, a[0]) === cut(n, b[0]) ? o.replace(a[0], b[0]) : n; }
+    if (cut(o, a[0]) === cut(n, b[0])) return o.replace(a[0], b[0]);
+    /* دورِ ۳۰ (correction، C30-5/C142 «۱۸ تان» ⇐ «۱۶ تا میشن» ⇒ «دخترم ۱۶ تا میشن مهمون»): واژه‌های تازهٔ مقدارِ درست که فعل/رابطه‌اند («میشن»، «می‌خورن»، «تان»، «ـه») جزوِ مقدار نیستند —
+       فقط رقم عوض می‌شود؛ واژهٔ معنادارِ تازه («۱۶ تا بزرگسال») همان رفتارِ پیشین */
+    var W = function (t, d) { return cut(t, d).replace("#", " ").split(/[\s‌]+/).filter(Boolean); }, Wo = W(o, a[0]), extra = W(n, b[0]).filter(function (w) { return Wo.indexOf(w) < 0; });
+    return extra.length && extra.every(function (w) { return (/^(?:می|نمی)/.test(w) && !/^(?:میلی|میلیون|میلیارد|میلیار)/.test(w)) ||   /* «میلیون/میلی‌متر» بزرگی/یکاست، نه فعل (R28 story C86_neg_stillwrong) */ /^(?:تا|تان|تاست|است|هست|هستن|بود|بودن|شد|شدن|میشن|میشه|ه|ـه|ست|ان)$/.test(w); }) ? o.replace(a[0], b[0]) : n; }
   function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
   function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
   var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
@@ -4161,6 +4220,12 @@
   /* دورِ ۲۹ (R2 correction، C142؛ C29-13 s23 «یه اصلاحِ دیگه: هر کیک ۸ تیکه نمیشه، ۱۰ تیکه میشه» رد شد): «X نمیشه/نمیاد، Y میشه/میاد» (با عددِ تازه پس از ویرگول) و «یه اصلاحِ (دیگه):» هم اصلاح‌اند.
      منفی‌ها (بانکِ R29 #84، #91): «… نمیشه مساوی تقسیم کرد» (بی مقدارِ تازه) و «یه اصلاحِ دیگه هم بکنم؟» (بی دونقطه) اصلاح نیستند. */
   CORR20 = new RegExp(CORR20.source + "|(?:^|[\\s،,.:])(?:یه|یک)[\\s‌]*اصلاحِ?(?:[\\s‌]*(?:دیگه|دیگر|دیگهٔ?|کوچیک|کوچک))?[\\s‌]*[:：]|نمی[\\s‌]*(?:شه|شود|یاد|آید|اد)[\\s‌]*[،,][^.!؟?\\n]{0,40}?[0-9۰-۹][^.!؟?\\n]{0,30}?می[\\s‌]*(?:شه|شود|یاد|آید|اد)(?![آ-ی])");
+  /* دورِ ۳۰ (correction، F8 «یک خوانندهٔ اصلاح»؛ C30-5 «مهمونا ۱۸ تا نمیشن، ۱۶ تا میشن»، C30-3 «۲ تیکه نمی‌خورن، ۳ تیکه می‌خورن»): ریشه — C142 فقط صورت‌های «نمیشه/نمیاد» را
+     نام برده بود و هر صرفِ دیگرِ همان قالب (جمع، فعلِ دیگر، بی «می») بیرون می‌ماند. قالبِ کلی: فعلِ منفی، ویرگول، عددِ تازه، و **همان** فعل مثبت («نمی‌X…، N … می‌X…» / «نX…، N … X…»)
+     — یک قاعده برای همهٔ صرف‌ها؛ عددِ پیشین در بندِ منفی است. منفی‌ها: بی عددِ پیشین («سارا نمیاد، ۴ نفر میان»)، بی عددِ تازه پس از ویرگول، یا فعلِ دیگری در بندِ دوم («۲ تا نمی‌خورن، ۳ تا رو می‌برن») اصلاح نیست. */
+  var CORR_PAIR30 = /[0-9۰-۹][^.!؟?\n،,]{0,30}?(?:^|[\s‌])ن(?:می[\s‌]*)?(?<v30>[آ-ی]{1,6}?)(?:ن|ند|ه|د|م|یم|ی|ید|ست)?[\s‌]*[،,][^.!؟?\n]{0,40}?[0-9۰-۹][^.!؟?\n]{0,30}?(?:^|[\s‌])(?:می[\s‌]*)?\k<v30>(?:ن|ند|ه|د|م|یم|ی|ید|ست)?(?![آ-ی])/;
+  AS.CORR_PAIR30 = CORR_PAIR30;
+  CORR20 = new RegExp(CORR20.source + "|" + CORR_PAIR30.source);
   AS.CORR_RE20 = CORR20;
   /* دلیلِ رد به زبانِ ساده (سطرِ سامانه برای خودش) */
   function plainErr20(e) { e = String(e || "");
@@ -4246,6 +4311,18 @@
     /* دورِ ۲۸ (R2، C88؛ D28-12 tD1 «۵ متر نیست، ۵٫۵ متره» بی old ِ مدل ⇒ «۴ متر» جایگزین شد): عددی که خودش نام برد («X نیست، Y» / «Y نه X») مقدارِ پیشین است —
        اگر در آن پیام نیست، صفحه می‌پرسد کدام عدد (هرگز عددِ دیگری از همان جمله) */
     for (var j = 0; j <= M.indexOf(src); j++) if (M[j] && M[j].role === "user") n++;
+    /* دورِ ۳۰ (correction — یک خواننده؛ C30-5 «۱۸ تان» ⇐ «۱۶ تا میشن»): مقدارِ درستی که همان تکه است با فعل/رابطهٔ جملهٔ اصلاح («میشن»، «می‌خورن»، «ـه») همان تکه با رقمِ تازه است —
+       فعلِ جملهٔ اصلاح به متنِ صورت/رکورد نمی‌رود («دخترم ۱۶ تا میشن مهمون») */
+    try { var nf30 = numOnly29(txtOf(x.old).trim() || frag, fix); if (nf30 !== fix && (nf30.match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []).length === 1) fix = nf30; } catch (e30) { }
+    /* دورِ ۳۰ (A25-21 s09 p16، C88): «درست»ِ گزارش‌شده گاهی واژهٔ پیش از «نادرست» در پیامِ او و فعلِ ربطِ جملهٔ اصلاح را هم دارد (old «۱۵ آذر»، fix «تا ۲۰ آذره» در
+       «باید تا ۱۵ آذر قیمت…») و جایگزینی «باید تا تا ۲۰ آذره قیمت…» می‌ساخت. نقلِ او بیرون از تکهٔ جایگزین‌شده دست نمی‌خورد: واژه‌های آغازِ fix که همان واژه‌های پیش از old
+       در پیامِ اوست، و «ـه/است/ست» ِ پایانِ fix وقتی پس از old در پیامِ او چنین فعلی نیست، کنار می‌روند. */
+    try { var o30 = txtOf(x.old).trim(); if (o30 && fix && src && src.text) { var T30 = String(src.text), k30 = T30.indexOf(o30);
+        if (k30 >= 0) { var pre30 = T30.slice(0, k30).trim().split(/\s+/).filter(Boolean), fw30 = String(fix).trim().split(/\s+/), cut = 0;
+          for (var c30 = Math.min(fw30.length - 1, pre30.length); c30 >= 1; c30--) if (fw30.slice(0, c30).join(" ") === pre30.slice(pre30.length - c30).join(" ")) { cut = c30; break; }
+          var f30 = fw30.slice(cut).join(" "), post30 = T30.slice(k30 + o30.length);
+          if (!/^(?:‌?ه|‌?ست| ?است|‌?اِ?)(?![آ-ی])/.test(post30) && /[^\s‌](?:‌?ه|‌?ست)$/.test(f30) && !/ه$/.test(o30)) { var g30 = f30.replace(/‌?(?:ه|ست)$/, ""); if (/[0-9۰-۹]\s*(?:فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)$/.test(g30)) f30 = g30; }   /* فقط روزِ تقویمی («۲۰ آذره» ⇒ «۲۰ آذر»)؛ «۱۸۰ متره» دست نمی‌خورد (بانکِ R23 #94) */
+          if (f30 && f30 !== fix) fix = f30; } } } catch (e30) { }
     return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, key: key, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um), edit: edit, rests: A.liveRestsOf ? A.liveRestsOf(x.rests) : null, srcSess: xsS ? xsS.id : "" };
   }
   AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
@@ -4355,6 +4432,9 @@
     /* دورِ ۲۸ (R2، C88): عبارتِ عددیِ کامل («۲ میلیون و ۳۰۰» ⇐ «۲ میلیون و ۵۰۰») همان کوچک‌ترین تکه است — نه «… و ۳۰۰» */
     var NP28 = function (t) { var w = String(t || "").trim().split(/\s+/); return w.length > 1 && w.length <= 7 && w.every(function (x) { return /^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(x) || /^(?:و|هزار|میلیون|میلیارد)$/.test(x); }); };
     if (NP28(o) && NP28(n)) return label + ": «" + String(n).trim() + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + String(o).trim() + "»" + (extraO || "") + ")";
+    /* دورِ ۳۰ (tail D26-43، C55 «سرخط تغییر را دقیق می‌گوید»؛ s36 «حدس: «۲۸ میشه ۱۴٪. پس» (اصلاح شد ⇐ «پس»)»): تکه‌ای که تکهٔ پیشینش درونِ تکهٔ تازه‌اش است همترازیِ نادرست است
+       (واژهٔ مشترکِ «پس» دو تکه ساخت) — آن وقت یک پنجره از نخستین تا واپسین واژهٔ متفاوت نشان داده می‌شود (winDiff23)، نه تکه‌های بریده */
+    if (d.runs.length > 1 && d.runs.some(function (r) { var ro = String(r.o || "").trim(), rn = String(r.n || "").trim(); return !ro || !rn || (" " + rn + " ").indexOf(" " + ro + " ") >= 0 || (" " + ro + " ").indexOf(" " + rn + " ") >= 0; })) { var w30 = winDiff23(o, n); return label + ": «" + w30.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + w30.o + "»" + (extraO || "") + ")"; }
     if (d.runs.length > 1) return label + ": " + d.runs.slice(0, 4).map(function (r) { return "«" + r.n + "» (اصلاح شد ⇐ «" + r.o + "»)"; }).join("، ") + (extraN || "");
     /* دورِ ۲۳ (Q4، A23-30 «صورتِ مسئلهٔ گفت‌وگو: «۱۲» (اصلاح شد ⇐ «۱۰»)»): تکهٔ تنهای عددی یا بسیار کوتاه با واژهٔ پیرامونش نشان داده می‌شود */
     if (d.runs.length === 1 && /^[^\s]{1,8}$/.test(d.o) && /^[^\s]{1,8}$/.test(d.n) && /[0-9۰-۹]/.test(d.o + d.n) && String(o || "").split(/\s+/).length > 2) { var w23 = winDiff23(plainTx(String(o)).replace(/\s+/g, " ").trim(), plainTx(String(n)).replace(/\s+/g, " ").trim()); return label + ": «" + w23.n + "»" + (extraN || "") + " (اصلاح شد ⇐ «" + w23.o + "»" + (extraO || "") + ")"; }
@@ -4558,7 +4638,14 @@
     /* صورتِ مسئلهٔ گفت‌وگو و مجهول به حرفِ خودش — فقط همان تکه (بی جایگزینیِ کلِ متن با مقدارِ درست) */
     /* دورِ ۲۹ (R2 correction، C142؛ بانکِ R29 #62 «نه ببخشید، ۵ نفریم نه ۴»؛ A29-14 s04): اصلاحِ دومِ همان داده پیامِ اصلاحِ اول را نشانه می‌گیرد — صورتی که آن اصلاح نوشت (stmtHist.by) هم پیرو است */
     var stBy29 = (C.stmtHist || []).some(function (h) { return h && h.by && h.by === R.srcId; });
-    if (C.stmt && (hasFrag(R.src.text, String(C.stmt).slice(0, 40)) || stBy29) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
+    /* دورِ ۳۰ (tail D26-50، C88 «درست کردنِ یک نتیجه هرگز داده را عوض نمی‌کند»؛ dp2 «پس طوفان ۷۳۴۴ متر دور بوده؟» ⇒ صورت «… طوفان ۲۰۴۰ متر …»): وقتی آنچه او درست کرد جواب/نتیجهٔ خودش است
+       (what = ans/result) و هر جای مقدارِ پیشین در صورتِ گفت‌وگو جایگاهِ حاصل دارد (پس از «میشه/پس/=…» — همان خوانندهٔ موتورِ کهنگی، A.liveAnn25)، صورت همان نوشتهٔ اوست و دست نمی‌خورد؛
+       نتیجه در ثبتِ خودش (حدس/دفتر) درست می‌شود. دادهٔ صورت («۶ ثانیه»، «۱۲۲۴») هرگز با این راه عوض نمی‌شد. */
+    var res30 = false; try { if (C.stmt && /^(?:ans|result|res|answer)$/i.test(String(R.what || "")) && A.liveAnn25) { var ov30 = (A.liveNumOccs ? A.liveNumOccs(String((D21 && D21.o) || R.frag || "")) : []).map(function (x) { return x.v; });
+        var AO30 = A.liveAnn25(C.stmt).filter(function (x) { return ov30.some(function (v) { return Math.abs(v - x.v) < 1e-9; }); }); res30 = AO30.length > 0 && AO30.every(function (x) { return x.mark && !x.opnd; });
+        /* فقط وقتی صورت دادهٔ دیگری هم دارد («۶ ثانیه»، «۱۲۲۴») — صورتی که خودش فقط جوابِ اوست («جواب نهایی ۸۹ است»؛ بانکِ R19b #15.4/#17.71) همان رکوردِ جواب است و عوض می‌شود */
+        if (res30) res30 = A.liveAnn25(C.stmt).some(function (x) { return !x.word && !x.struct && !ov30.some(function (v) { return Math.abs(v - x.v) < 1e-9; }) && !(x.mark && !x.opnd); }); } } catch (e30) { res30 = false; }
+    if (C.stmt && !res30 && (hasFrag(R.src.text, String(C.stmt).slice(0, 40)) || stBy29) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false);
       /* دورِ ۲۳ (Q4، B·D4 s19): جایگزینیِ درجایی که ترتیبِ واژه‌ها را وارونه می‌کند («عروسی ۱۵ اسفنده برادرم مونده») نه — صورتِ گفت‌وگو همان می‌ماند و جملهٔ اصلاحِ خودش کنارش */
       if (sv != null && sv !== C.stmt && D21 && A.liveGrowGarble && A.liveGrowGarble(C.stmt, D21)) { var fs23 = (A.liveFragSent ? A.liveFragSent(ownText(cu), R.fix) : "") || R.fix; sv = String(C.stmt).replace(/[\s.!]+$/, "") + " (اصلاحِ خودم: " + String(fs23).trim().replace(/[.!]+$/, "") + ")."; }
       if (sv != null && sv !== C.stmt) { var stP = false; try { stP = !AS.notProblem(C.stmt) && (/[؟?0-9۰-۹=]/.test(C.stmt) || qToks(C.stmt).length >= 6) && (/[0-9۰-۹=+\-−×÷^√]/.test(R.frag + " " + R.fix) || qToks(R.frag).length >= 6 || R.what === "fact" || R.what === "ans"); } catch (e) { }
@@ -4684,7 +4771,7 @@
     if (!Object.keys(pids).length && !R.edit && typeof A.liveRetractSessApply === "function") { try { var ls22 = A.liveRetractSessApply(s.id, R.srcId, { frag: R.frag, fix: R.fix, old: R.old, key: R.key || "", cur: cu });
       (ls22.changed || []).forEach(function (c) { var o0 = typeof c.old === "string" ? c.old : "", n0 = typeof c["new"] === "string" ? c["new"] : ""; chS.push({ rec: String(c.label || c.rec || "رکورد"), old: clip(plainTx(o0), 160), "new": clip(plainTx(n0), 160), why: !String(c.why || "").trim() || /^اصلاح شد ⇐ «/.test(String(c.why)) ? why23 : String(c.why) }); ch.push(o0 || n0 ? chLine20(String(c.label || c.rec || "رکورد"), o0, n0) : String(c.label || "")); }); } catch (e) { console.warn(e); } }
     /* دورِ ۲۶ (Q2، C26-37 s23 p6 «یعنی ۱۰۰ دقیقه»، بانکِ R26 #52): مسئلهٔ گفت‌وگو (بی رکوردِ زنده) هم فهرستِ «عددهای حساب‌شده از …» ِ خودش را دارد — همان موتور، روی نوشته‌های همین سشن */
-    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId, cm: R.curId || "", mAt: (R.src && R.src.at) || "", cAt: (R.cur && R.cur.at) || "" });   // دورِ ۲۹ (C89/C142): پیامِ اصلاح‌کننده و زمان‌ها برای ثبتِ اصلاح
+    if (!Object.keys(pids).length && typeof A.liveSessStale === "function") { try { var ss26 = A.liveSessStale(s.id, D21 && D21.o ? D21 : { o: R.old || R.frag, n: R.fix }, { clause: R.frag, src: srcT, mid: R.srcId, cm: R.curId || "", cur30: (R.cur && R.cur.text) || "", mAt: (R.src && R.src.at) || "", cAt: (R.cur && R.cur.at) || "" });   // دورِ ۲۹ (C89/C142): پیامِ اصلاح‌کننده و زمان‌ها برای ثبتِ اصلاح
       if (ss26 && !chS.some(function (c) { return c.rec === ss26.label; })) { chS.push({ rec: ss26.label, old: ss26.old, "new": ss26["new"], why: ss26.why }); ch.push(ss26.label + ": «" + ss26.old + "» — " + ss26["new"]); } } catch (e) { console.warn(e); } }
     /* دفترِ کارها: خودِ اصلاح یک کارِ تاریخ‌دار است (برای پرونده و کارنامه) */
     C.acts20 = (C.acts20 || []).concat([{ at: nowIso(), kind: "correction", sess: s.id, msg: R.curId, from: R.srcId, key: R.key || R.what, old: clip(R.frag, 160), "new": clip(R.fix, 160), changed: ch.length, edit: !!R.edit }]).slice(-80);

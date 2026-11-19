@@ -1,0 +1,581 @@
+{
+"from": "round30C/aC1",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. تیله‌های من ۳ برابرِ تیله‌های داداشمه. هر کدوم چند تا تیله داریم؟» من گفتم ۱۲ تا و ۱۲ تا ولی مامانم گفت غلطه. چرا غلطه؟",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';APP.clock.dev=true;localStorage.setItem('lla.dev','1');'ok'",
+"c": 1
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(300);const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value=\"۴۱ فروردین ۹۶\";i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();await W(400);const e=c.querySelector('.age-err');return 'typed='+\"۴۱ فروردین ۹۶\"+' err='+(e?e.textContent:'')+' | birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+!!document.querySelector('.age-ask')})()",
+"c": 2
+},
+{
+"c": 3
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(300);const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value=\"۱۴ فروردین ۹۶\";i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();await W(400);const e=c.querySelector('.age-err');return 'typed='+\"۱۴ فروردین ۹۶\"+' err='+(e?e.textContent:'')+' | birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+!!document.querySelector('.age-ask')})()",
+"c": 4
+},
+{
+"eval": "(()=>'birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' said='+JSON.stringify((APP.S.settings().profile||{}).ageSaid||null)+' sys='+JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys'&&/تولد/.test(m.text)).map(m=>m.text)))()",
+"c": 5
+},
+{
+"say": "چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش کنم که بازم روی هم ۲۴ بشه.",
+"c": 6
+},
+{
+"c": 7
+},
+{
+"eval": "(()=>{const p=(APP.ASSIST.cur().id);const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 8
+},
+{
+"c": 9
+},
+{
+"say": "من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو بین ۴ تا جعبه پخش کنم؟ تقسیم رو هنوز خوب بلد نیستم، فقط ضرب رو بلدم.",
+"c": 10
+},
+{
+"say": "۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟",
+"c": 11
+},
+{
+"say": "۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم ۱ جعبه یعنی ۶ تا، من ۳ جعبه یعنی ۱۸ تا.",
+"c": 12
+},
+{
+"c": 13
+},
+{
+"eval": "(()=>{const p=(APP.ASSIST.cur().id);const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 14
+},
+{
+"c": 15
+},
+{
+"say": "۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه برابرِ ۱۲ نیست.",
+"c": 16
+},
+{
+"say": "بازم ۴ تا جعبه! ۳۲ رو بین ۴ تا پخش می‌کنم: ۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا. یاد گرفتم اول جعبه بکشم، بعد پخش کنم.",
+"c": 17
+},
+{
+"say": "کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم.",
+"c": 18
+},
+{
+"say": "راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟",
+"c": 19
+},
+{
+"eval": "(()=>'birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' said='+JSON.stringify((APP.S.settings().profile||{}).ageSaid||null)+' sys='+JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys'&&/تولد/.test(m.text)).map(m=>m.text)))()",
+"c": 20
+},
+{
+"c": 21
+},
+{
+"eval": "(()=>{const p=(APP.ASSIST.cur().id);const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 22
+},
+{
+"c": 23
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('psy_item');await W(1500);return document.querySelector('#main').innerText.slice(0,1500)})()",
+"c": 24
+},
+{
+"c": 25
+},
+{
+"c": 26
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('mind');await W(1800);const t=document.querySelector('#main').innerText;const out=[];let i=-1;for(const m of t.matchAll(/هنجار|هم‌سن|گروه‌های سنی|سن: |علت|ضعیف‌ترین|پیش‌نیاز ·/g)){if(m.index-i>250){out.push(t.slice(Math.max(0,m.index-150),m.index+350));i=m.index;}}return out.join(' ⟂ ').slice(0,4000)})()",
+"c": 27
+},
+{
+"c": 28
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1200);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2500)})()",
+"c": 29
+},
+{
+"c": 30
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();APP.go('dossier',s.id);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 31
+},
+{
+"c": 32
+},
+{
+"c": 33,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 34
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-2).map(m=>m.text)))()",
+"c": 35
+},
+{
+"say": "من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تونم حلش کنم؟",
+"c": 36
+},
+{
+"say": "یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش کن ببینم درسته یا نه.",
+"c": 37
+},
+{
+"eval": "(()=>APP.liveAll().map(r=>r.p.title).join(' | ')+' || '+document.querySelector('#main').innerText.slice(0,600))()",
+"c": 38
+},
+{
+"c": 39
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>{const t=document.querySelector('#main').innerText;r('SCHOOL='+(/شهید بهشتی|کرج/.test(t))+' LIST='+(t.match(/مسئله‌های این گفت‌وگو[^]{0,200}/)||[''])[0].replace(/\\n/g,' | '))},900))})()",
+"c": 40
+},
+{
+"eval": "(()=>{APP.go('mind');return new Promise(r=>setTimeout(()=>{const t=document.querySelector('#main').innerText;r((t.match(/[^\\n]*معما[^\\n]*/g)||[]).slice(0,4).join(' ## ')+' @@ '+(t.match(/[^\\n]*هنجار[^\\n]*/g)||[]).slice(0,2).join(' ## '))},900))})()",
+"c": 41
+},
+{
+"c": 42
+},
+{
+"eval": "(()=>document.querySelector('#main').innerText.slice(0,700))()",
+"c": 43
+},
+{
+"c": 44,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-10-19');APP.render&&APP.render();'clock '+APP.today()",
+"c": 45
+},
+{
+"say": "سلام! یه مسئلهٔ دیگه: «سه تا دفتر داریم، هر کدوم ۴۰۰ تومن. روی هم چند تومن میشه؟» داداشم حساب کرد ۳ × ۴۰۰ = ۱۲۰۰.",
+"c": 46
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 47
+},
+{
+"say": "منم همینو قبول دارم، ۱۲۰۰ تومن.",
+"c": 48
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 49
+},
+{
+"say": "داداشم یه حسابِ دیگه هم کرد: ۴ × ۲۵۰ = ۹۰۰. ولی فکر کنم غلطه.",
+"c": 50
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 51
+},
+{
+"say": "حسابی که داداشم کرد به اسمِ من ثبت شد؟ کجا می‌بینمش؟",
+"c": 52
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 53
+},
+{
+"say": "امروز با مامانم رفتیم خرید، ۲ × ۳ = ۶ تا تخم‌مرغ خریدیم.",
+"c": 54
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 55
+},
+{
+"say": "۷ × ۸ = ۵۶ بود دیگه؟",
+"c": 56
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 57
+},
+{
+"say": "اگه ۱۲۰۰ غلط باشه چی؟ آهان نه، ۴۰۰ و ۴۰۰ و ۴۰۰ میشه ۱۲۰۰، درسته.",
+"c": 58
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 59
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3500)),1500))})()",
+"c": 60
+},
+{
+"c": 61
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,9000)),1500))})()",
+"c": 62
+},
+{
+"c": 63
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1300);o.push('## '+r.p.title+' ['+(APP.liveClosure(r.p.id)||{}).state+']\\n'+document.querySelector('#main').innerText.slice(0,6000));}return o.join('\\n\\n')})()",
+"c": 64
+},
+{
+"c": 65,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-10-20');APP.render&&APP.render();'clock '+APP.today()",
+"c": 66
+},
+{
+"say": "سلام! امروز با تیله‌ها بازی کردیم. ۱۸ تا تیله داشتیم، ۱۵ تا دادیم به دوستم: ۱۸ − ۱۵ = ۳، ۳ تا می‌مونه.",
+"c": 67
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 68
+},
+{
+"say": "بعدش ۸ + ۶ = ۱۴ و ۲ تا می‌مونه برای داداشم.",
+"c": 69
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 70
+},
+{
+"say": "۲۵ تا تیله رو بین ۴ نفر پخش کردیم: ۲۵ ÷ ۴ = ۶، ۱ تا می‌مونه. ۲۹ تا رو هم بین ۴ نفر: ۲۹ ÷ ۴ = ۶، ۳ تا می‌مونه.",
+"c": 71
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 72
+},
+{
+"say": "اگه بخوایم به ۴ نفر نفری ۸ تا بدیم، ۴ × ۸ = ۳۲، ولی ۳۰ تا داریم، ۲ تا کم میاد.",
+"c": 73
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 74
+},
+{
+"say": "یه مسئله: می‌خوایم بستهٔ تیله بخریم. فروشنده گفت ۱۲ درصد تخفیف میده. هر بسته ۱۲ تا تیله داره. ۵ تا بسته چند تا تیله میشه؟",
+"c": 75
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 76
+},
+{
+"say": "داداشم حساب کرد ۵ × ۱۲ = ۶۰.",
+"c": 77
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 78
+},
+{
+"say": "داداشم یه حسابِ دیگه هم کرد: ۶ × ۱۲ = ۷۰.",
+"c": 79
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 80
+},
+{
+"say": "مامانم کمکم کرد، ۳ × ۱۲ = ۳۶ رو با هم حساب کردیم.",
+"c": 81
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 82
+},
+{
+"say": "بابام گفت هر بسته ۱۲ تا تیله داره، پس ۴ تا بسته میشه ۴ × ۱۲ = ۴۸ تا.",
+"c": 83
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 84
+},
+{
+"say": "حسابایی که داداشم کرد کجا نوشته شده؟ به اسمِ منه؟",
+"c": 85
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 86
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3500)),1500))})()",
+"c": 87
+},
+{
+"c": 88
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,9000)),1500))})()",
+"c": 89
+},
+{
+"c": 90
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1300);o.push('## '+r.p.title+' ['+(APP.liveClosure(r.p.id)||{}).state+']\\n'+document.querySelector('#main').innerText.slice(0,6000));}return o.join('\\n\\n')})()",
+"c": 91
+},
+{
+"c": 92,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=localStorage.getItem('__PID')||(APP.liveAll()[0]||{p:{}}).p.id;APP.go('lprob',window.__PID);'restored '+APP.today();APP.clock.dev=true;localStorage.setItem('lla.dev','1');window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID;APP.clock.dev=true;APP.clock.set('2026-10-21');APP.render&&APP.render();'clock '+APP.today()",
+"c": 93
+},
+{
+"say": "سلام! امروز ۶ تا بسته شکلات خریدیم، هر بسته ۷ تا: ۶ × ۷ = ۴۲، از ۵۰ تا ۷ تا می‌مونه.",
+"c": 94
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 95
+},
+{
+"say": "۵ تا جعبه آب‌نبات داریم، هر کدوم ۴ تا: ۵ × ۴ = ۲۰ تا، پس ۸ تا اضافه میاد.",
+"c": 96
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 97
+},
+{
+"say": "۹ + ۹ = ۱۸، نصفش میشه ۹. بعدش ۱۲ + ۱۰ = ۲۲، نصفش میشه ۱۲.",
+"c": 98
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 99
+},
+{
+"say": "نصفش میشه ۷.",
+"c": 100
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 101
+},
+{
+"say": "۲۰ تا تیله لازمه، ۱۴ تا دارم، ۶ تا کم دارم. برای مسابقه هم ۳۰ تا لازمه، ۲۵ تا داریم، ۶ تا کم میاد.",
+"c": 102
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 103
+},
+{
+"say": "۱۲ تا کیک داشتیم، ۱۲ تا رو خوردیم: ۱۲ − ۱۲ = ۰، هیچی نمی‌مونه. ۱۴ تا شکلات هم داشتیم، ۱۰ تا رو امروز خوردیم، ۴ تا هم برای فردا می‌مونه.",
+"c": 104
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 105
+},
+{
+"say": "۵۰ هزار تومن پول توجیبی داشتم، ۳۵ هزار تومن دادم کتاب، ۱۵ هزار تومن می‌مونه.",
+"c": 106
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 107
+},
+{
+"say": "داداشم یه حسابِ دیگه کرد: ۷ × ۸ = ۵۶.",
+"c": 108
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 109
+},
+{
+"say": "داداشم گفت هر جعبه ۶ تا مداد داره، پس ۳ × ۶ = ۱۸ تا مداد داریم.",
+"c": 110
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 111
+},
+{
+"say": "مامانم کمکم کرد، ۹ × ۳ = ۲۷ رو با هم حساب کردیم.",
+"c": 112
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 113
+},
+{
+"say": "مدرسه‌مون اردو داره، اولیش ۱ اردیبهشته.",
+"c": 114
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 115
+},
+{
+"say": "حسابایی که امروز داداشم کرد کجا نوشته شده؟ اونا مالِ منه؟",
+"c": 116
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 117
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1200);const t=document.querySelector('#main').innerText;o.push('## '+r.p.title.slice(0,40)+'\\n'+t.slice(-5000));}const s=APP.ASSIST.cur();if(s){APP.go('dossier',s.id);await W(1300);o.push('## SESSION\\n'+document.querySelector('#main').innerText.slice(-6000));}return o.join('\\n')})()",
+"c": 118
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,4000)),1500))})()",
+"c": 119
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r('TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,3500)),1500))})()",
+"c": 120
+},
+{
+"c": 121
+},
+{
+"eval": "(()=>{const s=APP.ASSIST.cur();APP.go('dossier',s.id);return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,9000)),1500))})()",
+"c": 122
+},
+{
+"c": 123
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const o=[];for(const r of APP.liveAll()){APP.go('dossier',r.p.id);await W(1300);o.push('## '+r.p.title+' ['+(APP.liveClosure(r.p.id)||{}).state+']\\n'+document.querySelector('#main').innerText.slice(0,6000));}return o.join('\\n\\n')})()",
+"c": 124
+},
+{
+"c": 125,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"سلام آرین. ۱۲ و ۱۲ را خودت پیدا کردی و جمعشان ۲۴ می‌شود؛ این یک قدمِ درست است. خودت فکر می‌کنی چرا مامانت گفت غلط است؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. ت / دستیار: سلام آرین. ۱۲ و ۱۲ را خودت پیدا کردی و جمعشان ۲۴ می‌شود؛ این یک قدمِ د\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": true, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"۱۲ تا و ۱۲ تا\", \"guess\": {\"text\": \"من گفتم ۱۲ تا و ۱۲ تا\", \"q\": \"خودت فکر می‌کنی چرا مامانت گفت غلط است؟\"}}]}",
+"{\"reply\": \"خودت دیدی کجا نمی‌خواند: باید ۳ برابر باشد، نه مساوی. با یک عددِ کوچک امتحان کنیم: اگر داداشت فقط ۱ تیله داشته باشد، تو چند تا داری و روی هم چند تا می‌شود؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. ت / دستیار: سلام آرین. ۱۲ و ۱۲ را خودت پیدا کردی و جمعشان ۲۴ می‌شود؛ این یک قدمِ د / کاربر: چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش ک / دستیار: خودت دیدی کجا نمی‌خواند: باید ۳ برابر باشد، نه مساوی. با یک عددِ کوچک \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"c\"], \"ans\": [\"u3\"], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"cause\": {\"kind\": \"knot\", \"quote\": \"نمی‌دونم چطوری ۳ برابرش کنم که بازم روی هم ۲۴ بشه\"}}]}",
+"{\"reply\": \"جعبه‌ها فکرِ خوبی بود: ۳ جعبه برای تو، ۱ جعبه برای داداشت. برای پخش کردنِ ۲۴ بینِ ۴ جعبه «تقسیم» لازم است، و می‌شود با همان ضربی که بلدی به آن رسید: ۴ ضرب در چند می‌شود ۲۴؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. ت / دستیار: سلام آرین. ۱۲ و ۱۲ را خودت پیدا کردی و جمعشان ۲۴ می‌شود؛ این یک قدمِ د / کاربر: چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش ک / دستیار: خودت دیدی کجا نمی‌خواند: باید ۳ برابر باشد، نه مساوی. با یک عددِ کوچک  / کاربر: من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو  / دستیار: جعبه‌ها فکرِ خوبی بود: ۳ جعبه برای تو، ۱ جعبه برای داداشت. برای پخش کر\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq\": {\"concept\": \"تقسیم (پخشِ مساوی؛ وارونِ ضرب)\", \"step\": \"پخش کردنِ ۲۴ تیله بینِ ۴ جعبه\", \"quote\": \"تقسیم رو هنوز خوب بلد نیستم، فقط ضرب رو بلدم\", \"q\": \"۴ ضرب در چند می‌شود ۲۴؟\", \"topic\": \"چهار عملِ اصلی\"}}]}",
+"{\"reply\": \"فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که روی هم ۲۴ شود. فقط «۴ و ۴ می‌شود ۸» جمع بود، نه ضرب. بیا ۴ تا ۴ تا بشماریم: ۴، ۸، ۱۲… تا به ۲۴ برسی چند بار می‌شماری؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. ت / دستیار: سلام آرین. ۱۲ و ۱۲ را خودت پیدا کردی و جمعشان ۲۴ می‌شود؛ این یک قدمِ د / کاربر: چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش ک / دستیار: خودت دیدی کجا نمی‌خواند: باید ۳ برابر باشد، نه مساوی. با یک عددِ کوچک  / کاربر: من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو  / دستیار: جعبه‌ها فکرِ خوبی بود: ۳ جعبه برای تو، ۱ جعبه برای داداشت. برای پخش کر / کاربر: ۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟ / دستیار: فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"prereq\": {\"concept\": \"ضرب به‌عنوانِ جمعِ تکراری (چند تا ۴ تایی)\", \"step\": \"پیدا کردنِ عددی که ۴ برابرش ۲۴ شود\", \"quote\": \"۴ تا! چون ۴ و ۴ میشه ۸\", \"q\": \"۴ تا ۴ تا بشمار: ۴، ۸، ۱۲… تا ۲۴ چند بار می‌شماری؟\", \"parent\": \"pq1\"}}]}",
+"{\"reply\": \"خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را با خودِ مسئله بسنج: ۶ و ۱۸ هر دو چیزی را که مسئله گفته دارند؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. ت / دستیار: سلام آرین. ۱۲ و ۱۲ را خودت پیدا کردی و جمعشان ۲۴ می‌شود؛ این یک قدمِ د / کاربر: چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش ک / دستیار: خودت دیدی کجا نمی‌خواند: باید ۳ برابر باشد، نه مساوی. با یک عددِ کوچک  / کاربر: من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو  / دستیار: جعبه‌ها فکرِ خوبی بود: ۳ جعبه برای تو، ۱ جعبه برای داداشت. برای پخش کر / کاربر: ۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟ / دستیار: فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که  / کاربر: ۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم / دستیار: خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"داداشم ۱ جعبه یعنی ۶ تا، من ۳ جعبه یعنی ۱۸ تا\", \"guess_res\": {\"id\": \"g1\", \"res\": \"refuted\"}, \"learned\": [{\"concept\": \"ضرب به‌عنوانِ جمعِ تکراری (چند تا ۴ تایی)\", \"quote\": \"۶ و ۶ و ۶ و ۶ میشه ۲۴\"}, {\"concept\": \"تقسیم (پخشِ مساوی؛ وارونِ ضرب)\", \"quote\": \"پس توی هر جعبه ۶ تا\"}]}]}",
+"{\"reply\": \"هر دو را خودت وارسی کردی: ۱۸ سه برابرِ ۶ است و روی هم ۲۴ می‌شود. و فهمیدی چرا ۱۲ و ۱۲ نمی‌خواند. دفعهٔ بعد که مسئله‌ای مثلِ این دیدی، اول چه کار می‌کنی؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. ت / دستیار: سلام آرین. ۱۲ و ۱۲ را خودت پیدا کردی و جمعشان ۲۴ می‌شود؛ این یک قدمِ د / کاربر: چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش ک / دستیار: خودت دیدی کجا نمی‌خواند: باید ۳ برابر باشد، نه مساوی. با یک عددِ کوچک  / کاربر: من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو  / دستیار: جعبه‌ها فکرِ خوبی بود: ۳ جعبه برای تو، ۱ جعبه برای داداشت. برای پخش کر / کاربر: ۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟ / دستیار: فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که  / کاربر: ۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم / دستیار: خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را  / کاربر: ۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه بر / دستیار: هر دو را خودت وارسی کردی: ۱۸ سه برابرِ ۶ است و روی هم ۲۴ می‌شود. و فهم\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"۱۸ و ۶ هم میشه ۲۴\", \"check\": {\"msgs\": [\"۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴\"]}}]}",
+"{\"reply\": \"همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ خودت را هم نوشتی: اول جعبه بکشی، بعد پخش کنی. از پرسش‌هایی که در راه پرسیدم، کدام بیشتر کمکت کرد؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. ت / دستیار: سلام آرین. ۱۲ و ۱۲ را خودت پیدا کردی و جمعشان ۲۴ می‌شود؛ این یک قدمِ د / کاربر: چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش ک / دستیار: خودت دیدی کجا نمی‌خواند: باید ۳ برابر باشد، نه مساوی. با یک عددِ کوچک  / کاربر: من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو  / دستیار: جعبه‌ها فکرِ خوبی بود: ۳ جعبه برای تو، ۱ جعبه برای داداشت. برای پخش کر / کاربر: ۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟ / دستیار: فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که  / کاربر: ۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم / دستیار: خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را  / کاربر: ۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه بر / دستیار: هر دو را خودت وارسی کردی: ۱۸ سه برابرِ ۶ است و روی هم ۲۴ می‌شود. و فهم / کاربر: بازم ۴ تا جعبه! ۳۲ رو بین ۴ تا پخش می‌کنم: ۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"تیله‌های من و داداشم\", \"statement\": \"من و داداشم روی هم ۲۴ تا تیله داریم. تیله‌های من ۳ برابرِ تیله‌های داداشمه. هر کدوم چند تا تیله داریم؟\", \"kind\": \"find\", \"lesson\": \"یاد گرفتم اول جعبه بکشم، بعد پخش کنم\", \"check\": \"۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا\"}]}",
+"{\"reply\": \"هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان کردن را دوست داشتی. فردا کارتِ «بازسازی» ِ همین مسئله برمی‌گردد تا بی‌نگاه دوباره حلش کنی.\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش ک / دستیار: خودت دیدی کجا نمی‌خواند: باید ۳ برابر باشد، نه مساوی. با یک عددِ کوچک  / کاربر: من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو  / دستیار: جعبه‌ها فکرِ خوبی بود: ۳ جعبه برای تو، ۱ جعبه برای داداشت. برای پخش کر / کاربر: ۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟ / دستیار: فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که  / کاربر: ۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم / دستیار: خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را  / کاربر: ۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه بر / دستیار: هر دو را خودت وارسی کردی: ۱۸ سه برابرِ ۶ است و روی هم ۲۴ می‌شود. و فهم / کاربر: بازم ۴ تا جعبه! ۳۲ رو بین ۴ تا پخش می‌کنم: ۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"chat_lookback\", \"pid\": \"pb_l_mwcnr79ma2m\", \"bestQ\": \"کشیدنِ جعبه‌ها\", \"taste\": \"امتحان کردن رو هم دوست داشتم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"taste\": {\"text\": \"امتحان کردن رو هم دوست داشتم\"}}]}",
+"{\"reply\": \"همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌دهد چه ثبت شد تا ببینی درست است.\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو  / دستیار: جعبه‌ها فکرِ خوبی بود: ۳ جعبه برای تو، ۱ جعبه برای داداشت. برای پخش کر / کاربر: ۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟ / دستیار: فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که  / کاربر: ۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم / دستیار: خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را  / کاربر: ۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه بر / دستیار: هر دو را خودت وارسی کردی: ۱۸ سه برابرِ ۶ است و روی هم ۲۴ می‌شود. و فهم / کاربر: بازم ۴ تا جعبه! ۳۲ رو بین ۴ تا پخش می‌کنم: ۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"1396/01/14\"}]}",
+"{\"reply\": \"لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ «معمای امروز» را باز می‌کنم تا خودش نشان بدهد برای تو چه دارد.\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"کاربر: ۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟ / دستیار: فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که  / کاربر: ۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم / دستیار: خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را  / کاربر: ۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه بر / دستیار: هر دو را خودت وارسی کردی: ۱۸ سه برابرِ ۶ است و روی هم ۲۴ می‌شود. و فهم / کاربر: بازم ۴ تا جعبه! ۳۲ رو بین ۴ تا پخش می‌کنم: ۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ\", \"status\": \"related\", \"next\": true, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"go\", \"view\": \"psy_item\"}]}",
+"{\"reply\": \"این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد نمی‌شود؛ پس این صفحه فعلاً برای تو معما ندارد و مسئله‌های خودت مثلِ همان تیله‌ها جای تمرینِ توست.\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"دستیار: فکرت دربارهٔ جعبه‌ها درست است: باید ببینی در هر جعبه چند تا بگذاری که  / کاربر: ۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم / دستیار: خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را  / کاربر: ۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه بر / دستیار: هر دو را خودت وارسی کردی: ۱۸ سه برابرِ ۶ است و روی هم ۲۴ می‌شود. و فهم / کاربر: بازم ۴ تا جعبه! ۳۲ رو بین ۴ تا پخش می‌کنم: ۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند تا تیله داری و داداشت چند تا؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \"دستیار: خودت پیدایش کردی: اول ۵ را آزمودی و دیدی کم است، بعد ۶. حالا جوابت را  / کاربر: ۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه بر / دستیار: هر دو را خودت وارسی کردی: ۱۸ سه برابرِ ۶ است و روی هم ۲۴ می‌شود. و فهم / کاربر: بازم ۴ تا جعبه! ۳۲ رو بین ۴ تا پخش می‌کنم: ۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن / کاربر: یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش / دستیار: باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"حرفِ داداشم علی: با دادنِ ۶ تیله برابر می‌شیم؟\", \"statement\": \"داداشم علی میگه اگه من ۶ تا تیله‌م رو بهش بدم، تیله‌هامون برابر میشه. می‌خوام ببینم درسته یا نه.\", \"nat\": \"objective\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"داداشت این‌طوری حساب کرده: ۳ × ۴۰۰ = ۱۲۰۰، و حسابش درست است. ولی این حسابِ داداشت است، نه کارِ خودت. تو خودت چی فکر می‌کنی: سه تا ۴۰۰ تومنی روی هم چند تومن می‌شود و چرا؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \" ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن / کاربر: یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش / دستیار: باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"u\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"خوب، حالا ۱۲۰۰ تومن جوابِ خودت هم هست. یک راه برای این‌که خودت مطمئن شوی: اگر ۴۰۰ و ۴۰۰ و ۴۰۰ را پشتِ هم جمع کنی، چند می‌شود؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \" ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن / کاربر: یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش / دستیار: باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"objective\", \"result\": \"منم همینو قبول دارم، ۱۲۰۰ تومن\"}]}",
+"{\"reply\": \"این حسابِ داداشت است، نه حسابِ تو. خودت فکر می‌کنی غلط است — چطور می‌آزمایی‌اش؟ مثلاً ۴ تا ۲۵۰ را یکی‌یکی کنار هم جمع کنی، چند می‌شود؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"other\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"حسابِ «۳ × ۴۰۰ = ۱۲۰۰» را صفحه «کارِ داداشت» گذاشت، نه کارِ تو؛ جوابِ ۱۲۰۰ را خودت بعد گفتی. همه‌اش را در «📜 پروندهٔ این گفت‌وگو» می‌بینی — بازش می‌کنم.\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \" ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن / کاربر: یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش / دستیار: باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"go\", \"view\": \"dossier\"}]}",
+"{\"reply\": \"این‌جا فهرستِ مسئله‌هایت است؛ پروندهٔ هر کدام را که باز کنی، می‌بینی کدام حساب مالِ داداشت بود.\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \" ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن / کاربر: یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش / دستیار: باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"چه خوب! دو بسته‌ی سه‌تایی همان ۶ تا می‌شود. برگردیم به دفترها: جمعِ ۴۰۰ و ۴۰۰ و ۴۰۰ را خودت حساب کردی؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \" ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن / کاربر: یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش / دستیار: باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"آره، ۷ × ۸ = ۵۶. می‌خواهی ببینی از کجا می‌دانی؟ مثلاً ۷ تا هشت‌تایی را پشتِ هم جمع کنی چند می‌شود؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \" ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن / کاربر: یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش / دستیار: باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"e\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"خودت وارسی‌اش کردی: ۴۰۰ و ۴۰۰ و ۴۰۰ می‌شود ۱۲۰۰؛ پس ۱۲۰۰ درست است. از این مسئله چه یاد گرفتی که دفعهٔ بعد به کارت بیاید؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"حلِ مسئلهٔ تیله‌ها به دستِ خودش\", \"memory\": \" ۳۲. داداشم ۸ تا، من ۲۴ تا. ی / دستیار: همان روش را روی ۳۲ تیله هم خودت به کار بردی و درست درآمد: ۸ و ۲۴. درسِ / کاربر: کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم. / دستیار: هر دو را نگه می‌دارم: آنچه بیشتر کمکت کرد کشیدنِ جعبه‌ها بود، و امتحان / کاربر: راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟ / دستیار: همان‌طور که گفتی به صفحه می‌دهم؛ خودِ صفحه آن را می‌سنجد و نشانت می‌ده / کاربر: من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تو / دستیار: لازم نیست نامِ مدرسه‌ات را این‌جا بنویسی؛ برای کارمان لازم نیست. صفحهٔ / دستیار: این‌جا نوشته برای سنِ تو مقایسهٔ معتبری در دست نیست و معمایی پیشنهاد ن / کاربر: یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش / دستیار: باشه، ثبتش می‌کنم تا صفحهٔ خودش باز شود. اول خودت حدس بزن: الان تو چند\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"ph\": \"b\", \"nat\": \"objective\", \"result\": \"۴۰۰ و ۴۰۰ و ۴۰۰ میشه ۱۲۰۰، درسته\"}]}",
+"{\"reply\": \"درست است: ۱۸ − ۱۵ = ۳، پس ۳ تیله برایتان ماند. بعدش چه شد؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۸ + ۶ = ۱۴ درست است. آن ۲ تیله‌ای که برای داداشت ماند از چند تا بود — اول چند تا داشتی؟\", \"title\": \"تیله‌های من و داداشم\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"اولی درست است: ۴ تا ۶ تایی می‌شود ۲۴ و ۱ تا می‌ماند. دومی را خودت وارسی کن: ۴ نفر هر کدام ۶ تا، به‌علاوهٔ ۳ تا، روی هم چند می‌شود — ۲۹ درمی‌آید؟\", \"title\": \"تیله‌های امروز\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۴ × ۸ = ۳۲ درست است و ۳۲ از ۳۰ دو تا بیشتر است، پس ۲ تا کم می‌آید. اگر بخواهی با همین ۳۰ تا به هر ۴ نفر مساوی بدهی، نفری چند تا می‌شود؟\", \"title\": \"تیله‌های امروز\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"مسئلهٔ تازهٔ خوبی است. با حرفِ خودت بگو: دقیقاً چه چیزی را می‌خواهیم پیدا کنیم — تعدادِ تیله‌ها یا پولشان؟\", \"title\": \"بسته‌های تیله\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"d\", \"u\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"حسابِ داداشت ۵ × ۱۲ = ۶۰ درست است، ولی این کارِ داداشت است. تو خودت چطور می‌فهمی ۵ بستهٔ ۱۲ تایی چند تا می‌شود؟\", \"title\": \"بسته‌های تیله\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"این هم حسابِ داداشت است و با حساب نمی‌خواند. اگر خواستی، ۶ تا ۱۲ را خودت جمع بزن و ببین چند می‌شود. حالا برای خودِ مسئله: ۵ بسته‌ی ۱۲ تایی چند تیله است؟\", \"title\": \"بسته‌های تیله\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"other\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۳ × ۱۲ = ۳۶ را درست حساب کردید. حالا برگردیم به خودِ مسئله: ۵ بسته — با همین روش چند تا تیله می‌شود؟\", \"title\": \"بسته‌های تیله\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۴ × ۱۲ = ۴۸ درست است. «هر بسته ۱۲ تا» را بابات گفت، ولی «پس ۴ بسته ۴۸ تا» را خودت نتیجه گرفتی. با همین راه، ۵ بسته چند تا می‌شود؟\", \"title\": \"بسته‌های تیله\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"حسابی که داداشت کرد با برچسبِ «کارِ دیگری» در پروندهٔ همین گفت‌وگو (📜) نوشته می‌شود، نه به اسمِ تو. پرونده را باز می‌کنم تا خودت ببینی کدام سطر به اسمِ کیست.\", \"title\": \"بسته‌های تیله\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"go\", \"view\": \"dossier\"}]}",
+"{\"reply\": \"این‌جا فهرستِ همهٔ مسئله‌ها و گفت‌وگوهایت است؛ «پروندهٔ کامل» ِ هر کدام را بزنی، می‌بینی کدام حساب «کارِ دیگری» نوشته شده.\", \"title\": \"بسته‌های تیله\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": []}",
+"{\"reply\": \"۶ × ۷ = ۴۲ درست است! ولی آن‌چه از ۵۰ می‌ماند با حساب نمی‌خواند. ۵۰ منهای ۴۲ را با انگشت یا روی کاغذ دوباره بشمار — چند می‌شود؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۵ × ۴ = ۲۰ درست است. «۸ تا اضافه میاد» یعنی از چند تا که لازم بود اضافه می‌آید؟ چند نفر قرار است آب‌نبات بگیرند؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۵ × ۴ = ۲۰ درست است. «۸ تا اضافه میاد» یعنی از چند تایی که لازم بود؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۹ + ۹ = ۱۸ و نصفش ۹ درست است؛ ۱۲ + ۱۰ = ۲۲ هم درست است. ولی نصفِ ۲۲ با حساب نمی‌خواند — ۲۲ تیله را دو دسته‌ی برابر کن؛ هر دسته چند تا می‌شود؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"نصفِ چه چیزی ۷ می‌شود؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"اولی درست است: از ۲۰ تا، ۱۴ تا داری، ۶ تا کم داری. برای مسابقه ولی حساب نمی‌خواند — از ۲۵ تا تا ۳۰ تا، چند تا باید اضافه کنی؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"درست است: ۱۲ − ۱۲ = ۰، هیچ کیکی نماند؛ و از ۱۴ شکلات، ۱۰ تا خوردید و ۴ تا برای فردا ماند. فردا ۴ تا را بین چند نفر تقسیم می‌کنید؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"درست حساب کردی: ۵۰ هزار منهای ۳۵ هزار، ۱۵ هزار تومن می‌ماند. با ۱۵ هزار تومن چه می‌خواهی بخری؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"این حسابِ داداشت درست است: ۷ × ۸ = ۵۶. تو هم ضربِ ۷ را بلدی — ۷ × ۹ چند می‌شود؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"other\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"آفرین، خودت از حرفِ داداشت نتیجه گرفتی: ۳ × ۶ = ۱۸ مداد، درست است. اگر یک جعبه‌ی دیگر بخرید، چند مداد می‌شود؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"۹ × ۳ = ۲۷ درست است، و با کمکِ مامانت خودت حسابش کردی. ۹ × ۴ را هم خودت می‌گویی؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"چه خوب، اردو! تا اردیبهشت چند ماه مانده، فکر می‌کنی؟\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"حساب‌های داداشت در پروندهٔ همین گفت‌وگو با برچسبِ «کارِ دیگری — داداشم» نوشته شده‌اند؛ مالِ تو شمرده نمی‌شوند. حسابِ «۳ × ۶ = ۱۸» و «۹ × ۳ = ۲۷» مالِ خودت است.\", \"title\": \"شکلات‌ها\", \"pinned\": \"\", \"memory\": \"\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}"
+],
+"keys": [
+"سلام من آرینم کلاس سومم. معلممون این سؤال رو داده: «من و داداشم روی هم ۲۴ تا تیله داریم. تیله‌های من ۳ برابرِ تیله‌های داداشمه. هر کدوم چند تا تیله داریم؟» من گفتم ۱۲ تا و ۱۲ تا ولی مامانم گفت غلطه. چرا غلطه؟",
+"چون ۱۲ و ۱۲ مساوی‌ان، ولی تیله‌های من باید ۳ برابرِ داداشم باشه. نمی‌دونم چطوری ۳ برابرش کنم که بازم روی هم ۲۴ بشه.",
+"من ۳ تا جعبه، داداشم ۱ جعبه. پس روی هم ۴ تا جعبه‌ست که ۲۴ تا تیله توشونه. حالا باید ۲۴ رو بین ۴ تا جعبه پخش کنم؟ تقسیم رو هنوز خوب بلد نیستم، فقط ضرب رو بلدم.",
+"۴ تا! چون ۴ و ۴ میشه ۸. یعنی باید ببینم چند تا توی هر جعبه بذارم که با هم بشه کلش؟",
+"۵ تا؟ ۵ و ۵ و ۵ و ۵ میشه ۲۰، کمه. ۶ تا: ۶ و ۶ و ۶ و ۶ میشه ۲۴! پس توی هر جعبه ۶ تا. داداشم ۱ جعبه یعنی ۶ تا، من ۳ جعبه یعنی ۱۸ تا.",
+"۶ و ۶ و ۶ میشه ۱۸، آره ۳ برابره! ۱۸ و ۶ هم میشه ۲۴. درسته! پس ۱۲ و ۱۲ غلط بود چون ۱۲ سه برابرِ ۱۲ نیست.",
+"بازم ۴ تا جعبه! ۳۲ رو بین ۴ تا پخش می‌کنم: ۸ و ۸ و ۸ و ۸ میشه ۳۲. داداشم ۸ تا، من ۲۴ تا. یاد گرفتم اول جعبه بکشم، بعد پخش کنم.",
+"کشیدنِ جعبه‌ها! چون وقتی کشیدم دیدم ۴ تا جعبه‌ست نه ۲ تا. امتحان کردن رو هم دوست داشتم.",
+"راستی معلممون گفت تاریخ تولدمو بلد باشم: تولدم 1396/01/14 ـه. اینو درست نوشتی؟",
+"من مدرسهٔ شهید بهشتیِ کرج می‌رم. اون «معمای امروز» که تو صفحه‌ست مالِ بچه‌ها هم هست؟ می‌تونم حلش کنم؟",
+"[سامانه: «معمای امروز» باز شد. این نما فیلدی برای پر کردن ندارد — چیزی پر نکن و دکمه‌ای نزن؛ در یک جمله بگو همین‌جا چه می‌بیند و به کدام پرسشش جواب می‌دهد؛ reply خیلی کوتاه.]",
+"یه معمای دیگه: داداشم علی میگه اگه من ۶ تا تیله‌ م رو بهش بدم، تیله‌هامون برابر میشه. ثبتش کن ببینم درسته یا نه.",
+"سلام! یه مسئلهٔ دیگه: «سه تا دفتر داریم، هر کدوم ۴۰۰ تومن. روی هم چند تومن میشه؟» داداشم حساب کرد ۳ × ۴۰۰ = ۱۲۰۰.",
+"منم همینو قبول دارم، ۱۲۰۰ تومن.",
+"داداشم یه حسابِ دیگه هم کرد: ۴ × ۲۵۰ = ۹۰۰. ولی فکر کنم غلطه.",
+"حسابی که داداشم کرد به اسمِ من ثبت شد؟ کجا می‌بینمش؟",
+"[سامانه: « مسئله‌های بزرگ ›» باز شد. کاربر فقط خواست ببیند («حسابی که داداشم کرد به اسمِ من ثبت شد؟ کجا می‌بینمش؟») — هیچ فیلدی را پر نکن و هیچ دکمه‌ای (ثبت/ساخت/بعدی) را نزن؛ چیزی ساخته نشود. در یک جملهٔ کوتاه بگو در همین نما چه و کجا می‌ب",
+"امروز با مامانم رفتیم خرید، ۲ × ۳ = ۶ تا تخم‌مرغ خریدیم.",
+"۷ × ۸ = ۵۶ بود دیگه؟",
+"اگه ۱۲۰۰ غلط باشه چی؟ آهان نه، ۴۰۰ و ۴۰۰ و ۴۰۰ میشه ۱۲۰۰، درسته.",
+"سلام! امروز با تیله‌ها بازی کردیم. ۱۸ تا تیله داشتیم، ۱۵ تا دادیم به دوستم: ۱۸ − ۱۵ = ۳، ۳ تا می‌مونه.",
+"بعدش ۸ + ۶ = ۱۴ و ۲ تا می‌مونه برای داداشم.",
+"۲۵ تا تیله رو بین ۴ نفر پخش کردیم: ۲۵ ÷ ۴ = ۶، ۱ تا می‌مونه. ۲۹ تا رو هم بین ۴ نفر: ۲۹ ÷ ۴ = ۶، ۳ تا می‌مونه.",
+"اگه بخوایم به ۴ نفر نفری ۸ تا بدیم، ۴ × ۸ = ۳۲، ولی ۳۰ تا داریم، ۲ تا کم میاد.",
+"یه مسئله: می‌خوایم بستهٔ تیله بخریم. فروشنده گفت ۱۲ درصد تخفیف میده. هر بسته ۱۲ تا تیله داره. ۵ تا بسته چند تا تیله میشه؟",
+"داداشم حساب کرد ۵ × ۱۲ = ۶۰.",
+"داداشم یه حسابِ دیگه هم کرد: ۶ × ۱۲ = ۷۰.",
+"مامانم کمکم کرد، ۳ × ۱۲ = ۳۶ رو با هم حساب کردیم.",
+"بابام گفت هر بسته ۱۲ تا تیله داره، پس ۴ تا بسته میشه ۴ × ۱۲ = ۴۸ تا.",
+"حسابایی که داداشم کرد کجا نوشته شده؟ به اسمِ منه؟",
+"[سامانه: « مسئله‌های بزرگ ›» باز شد. این نما فیلدی برای پر کردن ندارد — چیزی پر نکن و دکمه‌ای نزن؛ در یک جمله بگو همین‌جا چه می‌بیند و به کدام پرسشش جواب می‌دهد؛ reply خیلی کوتاه.]",
+"سلام! امروز ۶ تا بسته شکلات خریدیم، هر بسته ۷ تا: ۶ × ۷ = ۴۲، از ۵۰ تا ۷ تا می‌مونه.",
+"۵ تا جعبه آب‌نبات داریم، هر کدوم ۴ تا: ۵ × ۴ = ۲۰ تا، پس ۸ تا اضافه میاد.",
+"۵ تا جعبه آب‌نبات داریم، هر کدوم ۴ تا: ۵ × ۴ = ۲۰ تا، پس ۸ تا اضافه میاد.\n\n[سامانه — وارسیِ صفحه پیش از نشان دادنِ پاسخ؛ یک بار بازنویسی کن: دو پرسش پرسیدی — در هر نوبت فقط یک پرسش (همان پرسشِ نوبت). همان پاسخ را با همان actions دوباره بده ",
+"۹ + ۹ = ۱۸، نصفش میشه ۹. بعدش ۱۲ + ۱۰ = ۲۲، نصفش میشه ۱۲.",
+"نصفش میشه ۷.",
+"۲۰ تا تیله لازمه، ۱۴ تا دارم، ۶ تا کم دارم. برای مسابقه هم ۳۰ تا لازمه، ۲۵ تا داریم، ۶ تا کم میاد.",
+"۱۲ تا کیک داشتیم، ۱۲ تا رو خوردیم: ۱۲ − ۱۲ = ۰، هیچی نمی‌مونه. ۱۴ تا شکلات هم داشتیم، ۱۰ تا رو امروز خوردیم، ۴ تا هم برای فردا می‌مونه.",
+"۵۰ هزار تومن پول توجیبی داشتم، ۳۵ هزار تومن دادم کتاب، ۱۵ هزار تومن می‌مونه.",
+"داداشم یه حسابِ دیگه کرد: ۷ × ۸ = ۵۶.",
+"داداشم گفت هر جعبه ۶ تا مداد داره، پس ۳ × ۶ = ۱۸ تا مداد داریم.",
+"مامانم کمکم کرد، ۹ × ۳ = ۲۷ رو با هم حساب کردیم.",
+"مدرسه‌مون اردو داره، اولیش ۱ اردیبهشته.",
+"حسابایی که امروز داداشم کرد کجا نوشته شده؟ اونا مالِ منه؟"
+]
+}

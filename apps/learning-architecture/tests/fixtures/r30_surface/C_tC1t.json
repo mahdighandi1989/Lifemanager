@@ -1,0 +1,403 @@
+{
+"from": "round30C/tC1t",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بده — یه سنسورِ دما و رطوبت تو باغ و یه پیامک. پارسال سرما نصفِ باغِ زردآلوی داییم رو زد. می‌خوام از این ایده برسم به یه برنامهٔ مشخص که بدونم قدمِ اول چیه. ولی نمی‌دونم چی رو می‌دونم و چی رو نمی‌دونم.",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';APP.clock.dev=true;localStorage.setItem('lla.dev','1');'ok'",
+"c": 1
+},
+{
+"eval": "(()=>{const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value='1992-05-11';i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();return 'age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)})()",
+"c": 2
+},
+{
+"say": "یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پاشی)، با دستگاهی که پولش رو داشته باشه. چیزایی که می‌دونم: دما زیرِ صفر گل‌ها رو می‌کشه، داییم حاضره تا ۲ میلیون بده. چیزایی که نمی‌دونم: چند ساعت زودتر لازمه؟ با یه سنسور میشه پیش‌بینی کرد؟ سنسورِ ارزون دقیق هست؟ ثبتش کن.",
+"c": 3
+},
+{
+"say": "دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم پرسیدم: میگه ۳ ساعت زودتر کافیه که آتیش روشن کنه. سومی هم مهمه ولی بعدش.",
+"c": 4
+},
+{
+"say": "پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی نمی‌دونم نقطهٔ شبنم دقیقاً چیه و چرا با رطوبت ربط داره.",
+"c": 5
+},
+{
+"say": "از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دونم این چه ربطی به یخ‌زدگیِ باغ داره.",
+"c": 6
+},
+{
+"say": "آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر بود. پس سنسورم باید دما و رطوبت رو بگیره که نقطهٔ شبنم رو حساب کنه.",
+"c": 7
+},
+{
+"say": "قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون صاف، پیامک می‌دم. ولی گیرِ اصلیم اینجاست: سنسورِ ارزون (حدود ۲۰۰ هزار تومن) دقتش ±۲ درجه‌ست؛ دقیقِ ±۰٫۳ حدود ۳ میلیونه. هر چی ارزون‌تر، بی‌دقت‌تر — این دو تا با هم تضاد دارن. شنیدم یه روشی به اسم TRIZ هست برای حلِ همین‌جور تضادهای فنی. تو این سامانه چیزی برای این هست؟",
+"c": 8
+},
+{
+"c": 9
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1200);const c=document.querySelector('.lp-syscard');const all=(APP.PRE&&APP.PRE.sysAll?APP.PRE.sysAll():[]).map(x=>({n:x.e.number,st:x.e.state,step:x.e.step,stepBy:x.e.stepBy,checks:(x.e.checks||[]).map(c=>c.reason).slice(-2),tool:x.e.tool}));return 'SYSCARD='+(c?c.innerText:'NONE')+' || SYS='+JSON.stringify(all)})()",
+"c": 10
+},
+{
+"c": 11
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 12
+},
+{
+"c": 13
+},
+{
+"c": 14
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);const t=document.querySelector('#main').innerText;const i=t.search(/منتظر|برگهٔ|ابزارِ لازم|از راهِ دیگری|وارسیِ برگه/);return i>=0?t.slice(Math.max(0,i-400),i+1600):'NO SHEET LINES || '+t.slice(0,800)})()",
+"c": 15
+},
+{
+"say": "فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پیدا کردم و لازم نیست منتظرِ اون روشِ تضاد بمونم: شاید سنسورِ ارزون رو فقط نزدیکِ صفر با یه دماسنجِ دقیقِ قرضی کالیبره کنم؟ یه شب کنار هم می‌ذارمشون و خطاش رو اندازه می‌گیرم.",
+"c": 16
+},
+{
+"c": 17
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1200);const c=document.querySelector('.lp-syscard');const all=(APP.PRE&&APP.PRE.sysAll?APP.PRE.sysAll():[]).map(x=>({n:x.e.number,st:x.e.state,step:x.e.step,stepBy:x.e.stepBy,checks:(x.e.checks||[]).map(c=>c.reason).slice(-2),tool:x.e.tool}));return 'SYSCARD='+(c?c.innerText:'NONE')+' || SYS='+JSON.stringify(all)})()",
+"c": 18
+},
+{
+"c": 19
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 20
+},
+{
+"c": 21
+},
+{
+"c": 22
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);const t=document.querySelector('#main').innerText;const i=t.search(/منتظر|برگهٔ|ابزارِ لازم|از راهِ دیگری|وارسیِ برگه/);return i>=0?t.slice(Math.max(0,i-400),i+1600):'NO SHEET LINES || '+t.slice(0,800)})()",
+"c": 23
+},
+{
+"say": "فکر کنم حدودِ ۲ درجه خطا داره و ثابته — یعنی همیشه یه مقدار بیشتر نشون می‌ده.",
+"c": 24
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-22')+' pid='+p})()",
+"c": 25
+},
+{
+"c": 26,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 27
+},
+{
+"say": "آزمایش کردم: یه شب کنارِ دماسنجِ دقیقِ همسایه. نزدیکِ صفر، سنسورِ ارزون همیشه حدودِ ۱٫۸ درجه بالاتر نشون داد؛ تقریباً ثابت. با کم کردنِ ۱٫۸ خطا زیرِ ۰٫۴ شد. پس با ۲۰۰ هزار تومن میشه! حالا یه سؤال: اون برگهٔ کمبودی که گفتی ثبت کردی چی شد؟ اگه یه روز اون روشِ تضاد رو ساختن، خودت می‌فهمی و برمی‌گردی سراغِ مسئلهٔ من؟",
+"c": 28
+},
+{
+"say": "قدمِ اول: تا آخرِ هفتهٔ بعد یه نمونه با سنسورِ ارزون و یه برد کوچیک می‌سازم و یه هفته تو باغِ داییم کنارِ دماسنجِ دقیق می‌ذارم.",
+"c": 29
+},
+{
+"say": "یه گیرِ دیگه هم دارم: نمی‌دونم باغدارها واقعاً حاضرن چقدر بدن. اگه ازشون بپرسم «می‌خریش؟» همه از رودربایستی میگن آره. روشی هست که بفهمم واقعاً می‌خرن و با چه قیمتی، بی‌اینکه تعارف کنن؟ تو این سامانه چیزی برای این هست؟",
+"c": 30
+},
+{
+"c": 31
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1200);const c=document.querySelector('.lp-syscard');const all=(APP.PRE&&APP.PRE.sysAll?APP.PRE.sysAll():[]).map(x=>({n:x.e.number,st:x.e.state,step:x.e.step,stepBy:x.e.stepBy,checks:(x.e.checks||[]).map(c=>c.reason).slice(-2),tool:x.e.tool}));return 'SYSCARD='+(c?c.innerText:'NONE')+' || SYS='+JSON.stringify(all)})()",
+"c": 32
+},
+{
+"c": 33
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 34
+},
+{
+"c": 35
+},
+{
+"c": 36
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);const t=document.querySelector('#main').innerText;const i=t.search(/منتظر|برگهٔ|ابزارِ لازم|از راهِ دیگری|وارسیِ برگه/);return i>=0?t.slice(Math.max(0,i-400),i+1600):'NO SHEET LINES || '+t.slice(0,800)})()",
+"c": 37
+},
+{
+"eval": "(async()=>{const s=await window.__sheetLoad('sh102');if(!s)return 'NO SHEET';s.status='answered';s.notes.push({id:'r'+Date.now(),by:'routine',at:new Date().toISOString(),text:\"پاسخ به برگهٔ دستیار #102 — انجام شد: حوزهٔ `sc_persuasion` (اقناع و نفوذ) کامل شد و ابزارِ «چرا قانع شدم؟» به آن افزوده شد؛ برای فروختنِ ایده به باغدارها از همین استفاده کنید.\"});await window.__sheetSave(s);return 'sheet sh102 '+s.status+' notes='+s.notes.length})()",
+"c": 38
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-25')+' pid='+p})()",
+"c": 39
+},
+{
+"c": 40,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 41
+},
+{
+"c": 42
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 43
+},
+{
+"c": 44
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1200);const c=document.querySelector('.lp-syscard');const all=(APP.PRE&&APP.PRE.sysAll?APP.PRE.sysAll():[]).map(x=>({n:x.e.number,st:x.e.state,step:x.e.step,stepBy:x.e.stepBy,checks:(x.e.checks||[]).map(c=>c.reason).slice(-2),tool:x.e.tool}));return 'SYSCARD='+(c?c.innerText:'NONE')+' || SYS='+JSON.stringify(all)})()",
+"c": 45
+},
+{
+"c": 46
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 47
+},
+{
+"c": 48
+},
+{
+"c": 49
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);const t=document.querySelector('#main').innerText;const i=t.search(/منتظر|برگهٔ|ابزارِ لازم|از راهِ دیگری|وارسیِ برگه/);return i>=0?t.slice(Math.max(0,i-400),i+1600):'NO SHEET LINES || '+t.slice(0,800)})()",
+"c": 50
+},
+{
+"eval": "(async()=>{const s=await window.__sheetLoad('sh102');return s.status+' || '+s.notes.slice(-2).map(n=>n.by+': '+n.text).join(' ⟂ ')})()",
+"c": 51
+},
+{
+"say": "دیدم نوشتی چیزی که برای اون برگه ساختن به کارِ من نمیاد. درسته — من نمی‌خوام کسی رو قانع کنم، می‌خوام بفهمم واقعاً می‌خرن یا نه. پس هنوز منتظرم؟",
+"c": 52
+},
+{
+"c": 53
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1200);const c=document.querySelector('.lp-syscard');const all=(APP.PRE&&APP.PRE.sysAll?APP.PRE.sysAll():[]).map(x=>({n:x.e.number,st:x.e.state,step:x.e.step,stepBy:x.e.stepBy,checks:(x.e.checks||[]).map(c=>c.reason).slice(-2),tool:x.e.tool}));return 'SYSCARD='+(c?c.innerText:'NONE')+' || SYS='+JSON.stringify(all)})()",
+"c": 54
+},
+{
+"c": 55
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 56
+},
+{
+"c": 57
+},
+{
+"c": 58
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);const t=document.querySelector('#main').innerText;const L=t.split(String.fromCharCode(10)).filter(l=>/برگه|ابزار|منتظر|از راهِ دیگری|وارسیِ برگه|از سر گرفته/.test(l));return L.join(' ⟂ ').slice(0,2500)})()",
+"c": 59
+},
+{
+"eval": "(async()=>{const s=await window.__sheetLoad('sh102');if(!s)return 'NO SHEET';s.status='answered';s.notes.push({id:'r'+Date.now(),by:'routine',at:new Date().toISOString(),text:\"پاسخ به برگهٔ دستیار #102 — انجام شد: حوزهٔ `pr_creativity` (خلاقیت و تولیدِ ایده) با روشِ «طوفانِ فکری» و «ترکیبِ اجباری» تکمیل شد؛ برای ایده‌پردازیِ محصولِ باغ از همین استفاده کنید.\"});await window.__sheetSave(s);return 'sheet sh102 '+s.status+' notes='+s.notes.length})()",
+"c": 60
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-26')+' pid='+p})()",
+"c": 61
+},
+{
+"c": 62,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 63
+},
+{
+"c": 64
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 65
+},
+{
+"c": 66
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1200);const c=document.querySelector('.lp-syscard');const all=(APP.PRE&&APP.PRE.sysAll?APP.PRE.sysAll():[]).map(x=>({n:x.e.number,st:x.e.state,step:x.e.step,stepBy:x.e.stepBy,checks:(x.e.checks||[]).map(c=>c.reason).slice(-2),tool:x.e.tool}));return 'SYSCARD='+(c?c.innerText:'NONE')+' || SYS='+JSON.stringify(all)})()",
+"c": 67
+},
+{
+"c": 68
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 69
+},
+{
+"c": 70
+},
+{
+"c": 71
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);const t=document.querySelector('#main').innerText;const L=t.split(String.fromCharCode(10)).filter(l=>/برگه|ابزار|منتظر|از راهِ دیگری|وارسیِ برگه|از سر گرفته/.test(l));return L.join(' ⟂ ').slice(0,2500)})()",
+"c": 72
+},
+{
+"eval": "(async()=>{const s=await window.__sheetLoad('sh102');return s?(s.status+' || '+s.notes.slice(-2).map(n=>n.by+': '+n.text).join(' ⟂ ')):'NO SHEET'})()",
+"c": 73
+},
+{
+"say": "دیدم روتین برای همون برگهٔ #۱۰۲ این بار «خلاقیت» رو ساخته. اگه این به کارم نمیاد، صبر می‌کنم تا ابزارِ درستش بیاد.",
+"c": 74
+},
+{
+"c": 75
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('lprob',p);await W(1200);const c=document.querySelector('.lp-syscard');const all=(APP.PRE&&APP.PRE.sysAll?APP.PRE.sysAll():[]).map(x=>({n:x.e.number,st:x.e.state,step:x.e.step,stepBy:x.e.stepBy,checks:(x.e.checks||[]).map(c=>c.reason).slice(-2),tool:x.e.tool}));return 'SYSCARD='+(c?c.innerText:'NONE')+' || SYS='+JSON.stringify(all)})()",
+"c": 76
+},
+{
+"c": 77
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 78
+},
+{
+"c": 79
+},
+{
+"eval": "(async()=>{const s=await window.__sheetLoad('sh102');if(!s)return 'NO SHEET';s.status='answered';s.notes.push({id:'r'+Date.now(),by:'routine',at:new Date().toISOString(),text:\"پاسخ به برگهٔ دستیار #102 — ساخته شد: دو حوزهٔ تازه در قلمروِ «تصمیم، برنامه‌ریزی و خودتنظیمی»، هر دو با پرسش‌های کلیدی و منبع — `dc_market_sizing` («تخمینِ اندازهٔ بازار از بالا به پایین») و `dc_customer_validation` («اعتبارسنجیِ ایده با مشتری: رفتارِ گذشته، نه نظر»). نسخهٔ تازهٔ صفحه منتشر شد.\"});await window.__sheetSave(s);return 'sheet sh102 '+s.status+' notes='+s.notes.length})()",
+"c": 80
+},
+{
+"eval": "window.__setPage('/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round28C/tC1_build3/learning-architecture.html')",
+"c": 81
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-28')+' pid='+p})()",
+"c": 82
+},
+{
+"c": 83,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 84
+},
+{
+"eval": "(()=>'page='+location.pathname+' area='+JSON.stringify(!!(APP.SYST&&APP.SYST.find('dc_customer_validation'))))()",
+"c": 85
+},
+{
+"c": 86
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1500);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2000)})()",
+"c": 87
+},
+{
+"c": 88
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 89
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,2500)),1200))})()",
+"c": 90
+},
+{
+"c": 91
+},
+{
+"say": "دو تا ابزار اومده. اون «کارگاهی» همونیه که برای گامِ قیمت می‌خواستم.",
+"c": 92
+},
+{
+"eval": "(()=>JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys').slice(-3).map(m=>m.text)))()",
+"c": 93
+},
+{
+"eval": "(async()=>{const s=await window.__sheetLoad('sh102');return s?(s.status+' || '+s.notes.slice(-2).map(n=>n.by+': '+n.text.slice(0,400)).join(' ⟂ ')):'NO SHEET'})()",
+"c": 94
+},
+{
+"eval": "(()=>{APP.go('today');return new Promise(r=>setTimeout(()=>r(document.querySelector('#main').innerText.slice(0,2500)),1200))})()",
+"c": 95
+},
+{
+"eval": "(()=>{const o=[];APP.liveAll().forEach(r=>{try{const d=APP.dossier(r.p.id);const c=APP.liveClosure(r.p.id)||{};o.push('## '+r.p.title+' ['+(c.state||'')+'/'+APP.livePhase(r.p.id)+']\\n'+(d.events||[]).map(e=>'  '+e.k+' · '+String(e.title||'').slice(0,60)+' · '+String(e.text||e.body||e.sum||e.v||'').replace(/\\s+/g,' ').slice(0,110)).join('\\n'))}catch(e){o.push('ERR '+e.message)}});return o.join('\\n')})()",
+"c": 96
+},
+{
+"c": 97,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"از یک ایده تا برنامهٔ مشخص راه دارد و جدا کردنِ «می‌دانم» از «نمی‌دانم» همان قدمِ اول است. پیش از جزئیاتِ سنسور: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بد / دستیار: از یک ایده تا برنامهٔ مشخص راه دارد و جدا کردنِ «می‌دانم» از «نمی‌دانم\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"کل و دانسته/ندانسته‌ها را روشن گفتی؛ در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. از آن سه «نمی‌دانم»، کدام یکی اول باید روشن شود؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بد / دستیار: از یک ایده تا برنامهٔ مشخص راه دارد و جدا کردنِ «می‌دانم» از «نمی‌دانم / کاربر: یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پ / دستیار: کل و دانسته/ندانسته‌ها را روشن گفتی؛ در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"هشدارِ یخ‌زدگی برای باغدارِ کوچک\", \"statement\": \"باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پاشی)، با دستگاهی که پولش رو داشته باشه. چیزایی که می‌دونم: دما زیرِ صفر گل‌ها رو می‌کشه، داییم حاضره تا ۲ میلیون بده. چیزایی که نمی‌دونم: چند ساعت زودتر لازمه؟ با یه سنسور میشه پیش‌بینی کرد؟ سنسورِ ارزون دقیق هست؟\", \"nat\": \"practical\"}, {\"do\": \"coach_state\", \"ph\": \"u\", \"said\": [\"u\", \"d\"], \"ans\": [\"u1\", \"u2\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"ترتیب را خودت چیدی: اول «با یک سنسور می‌شود ۳ ساعت زودتر پیش‌بینی کرد؟»، بعد دقتِ سنسورِ ارزان. برای همین اولی: پیش‌تر مسئله‌ای شبیه پیش‌بینیِ هوا — در کارِ خودت یا دیگران — دیده‌ای، از آن چه به کار می‌آید؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بد / دستیار: از یک ایده تا برنامهٔ مشخص راه دارد و جدا کردنِ «می‌دانم» از «نمی‌دانم / کاربر: یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پ / دستیار: کل و دانسته/ندانسته‌ها را روشن گفتی؛ در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش  / کاربر: دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم / دستیار: ترتیب را خودت چیدی: اول «با یک سنسور می‌شود ۳ ساعت زودتر پیش‌بینی کرد؟\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"d\", \"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه\", \"steps\": [\"با یه سنسور میشه پیش‌بینی کرد؟\", \"سومی هم مهمه ولی بعدش\"]}}]}",
+"{\"reply\": \"برای گامِ «با یک سنسور می‌شود پیش‌بینی کرد؟» یک مفهومِ مشخص کم است: نقطهٔ شبنم. از یک چیزِ آشنا شروع کنیم: صبحِ یک روزِ سرد روی شیشه یا علف قطره‌های آب دیده‌ای — آن آب از کجا می‌آید؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بد / دستیار: از یک ایده تا برنامهٔ مشخص راه دارد و جدا کردنِ «می‌دانم» از «نمی‌دانم / کاربر: یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پ / دستیار: کل و دانسته/ندانسته‌ها را روشن گفتی؛ در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش  / کاربر: دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم / دستیار: ترتیب را خودت چیدی: اول «با یک سنسور می‌شود ۳ ساعت زودتر پیش‌بینی کرد؟ / کاربر: پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی ن / دستیار: برای گامِ «با یک سنسور می‌شود پیش‌بینی کرد؟» یک مفهومِ مشخص کم است: نق\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"prereq\": {\"concept\": \"نقطهٔ شبنم (دمایی که در آن بخارِ آبِ هوا شروع به قطره‌شدن می‌کند)\", \"step\": \"با یه سنسور میشه پیش‌بینی کرد؟\", \"quote\": \"نمی‌دونم نقطهٔ شبنم دقیقاً چیه و چرا با رطوبت ربط داره\", \"q\": \"صبحِ یک روزِ سرد روی شیشه یا علف قطره‌های آب دیده‌ای — آن آب از کجا می‌آید؟\", \"topic\": \"رطوبتِ هوا\"}}]}",
+"{\"reply\": \"درست دیدی: آن آبِ نامرئیِ هواست. نقطهٔ شبنم دمایی است که هوا تا آن‌جا که سرد شود همان آب قطره می‌شود؛ هوای خشک‌تر نقطهٔ شبنمِ پایین‌تری دارد، و در شبِ صاف دمای باغ معمولاً تا نزدیکِ همان نقطه پایین می‌آید. حالا خودت بگو: اگر عصر نقطهٔ شبنم ۲- باشد، امشب خطرِ یخ‌زدگی هست؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بد / دستیار: از یک ایده تا برنامهٔ مشخص راه دارد و جدا کردنِ «می‌دانم» از «نمی‌دانم / کاربر: یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پ / دستیار: کل و دانسته/ندانسته‌ها را روشن گفتی؛ در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش  / کاربر: دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم / دستیار: ترتیب را خودت چیدی: اول «با یک سنسور می‌شود ۳ ساعت زودتر پیش‌بینی کرد؟ / کاربر: پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی ن / دستیار: برای گامِ «با یک سنسور می‌شود پیش‌بینی کرد؟» یک مفهومِ مشخص کم است: نق / کاربر: از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دون / دستیار: درست دیدی: آن آبِ نامرئیِ هواست. نقطهٔ شبنم دمایی است که هوا تا آن‌جا \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"همین است: نقطهٔ شبنم را فهمیدی و خودت به کارش بستی. برمی‌گردیم به همان گامِ اصلی، «با یک سنسور می‌شود پیش‌بینی کرد؟»: با دما و رطوبتِ عصر، قاعدهٔ هشدارِ تو چه می‌شود؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بد / دستیار: از یک ایده تا برنامهٔ مشخص راه دارد و جدا کردنِ «می‌دانم» از «نمی‌دانم / کاربر: یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پ / دستیار: کل و دانسته/ندانسته‌ها را روشن گفتی؛ در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش  / کاربر: دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم / دستیار: ترتیب را خودت چیدی: اول «با یک سنسور می‌شود ۳ ساعت زودتر پیش‌بینی کرد؟ / کاربر: پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی ن / دستیار: برای گامِ «با یک سنسور می‌شود پیش‌بینی کرد؟» یک مفهومِ مشخص کم است: نق / کاربر: از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دون / دستیار: درست دیدی: آن آبِ نامرئیِ هواست. نقطهٔ شبنم دمایی است که هوا تا آن‌جا  / کاربر: آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر / دستیار: همین است: نقطهٔ شبنم را فهمیدی و خودت به کارش بستی. برمی‌گردیم به همان\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"d\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"learned\": {\"concept\": \"نقطهٔ شبنم (دمایی که در آن بخارِ آبِ هوا شروع به قطره‌شدن می‌کند)\", \"quote\": \"سنسورم باید دما و رطوبت رو بگیره که نقطهٔ شبنم رو حساب کنه\"}}]}",
+"{\"reply\": \"قاعدهٔ هشدارت روشن است و گامِ اول را برداشتی. برای تضادِ «ارزان ولی دقیق» دو جا را نگاه کردم: حوزهٔ «خلاقیت و تولیدِ ایده» ایده‌سازیِ آزاد دارد و «تصمیم» سبک‌سنگین‌کردنِ گزینه‌ها را؛ هیچ‌کدام روشِ حلِ تضادِ فنی (مثلِ TRIZ) ندارد. این در سامانه نیست؛ برای ثبت بررسی می‌کنم و این گام منتظرِ همان می‌ماند.\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بد / دستیار: از یک ایده تا برنامهٔ مشخص راه دارد و جدا کردنِ «می‌دانم» از «نمی‌دانم / کاربر: یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پ / دستیار: کل و دانسته/ندانسته‌ها را روشن گفتی؛ در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش  / کاربر: دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم / دستیار: ترتیب را خودت چیدی: اول «با یک سنسور می‌شود ۳ ساعت زودتر پیش‌بینی کرد؟ / کاربر: پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی ن / دستیار: برای گامِ «با یک سنسور می‌شود پیش‌بینی کرد؟» یک مفهومِ مشخص کم است: نق / کاربر: از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دون / دستیار: درست دیدی: آن آبِ نامرئیِ هواست. نقطهٔ شبنم دمایی است که هوا تا آن‌جا  / کاربر: آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر / دستیار: همین است: نقطهٔ شبنم را فهمیدی و خودت به کارش بستی. برمی‌گردیم به همان / کاربر: قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون  / دستیار: قاعدهٔ هشدارت روشن است و گامِ اول را برداشتی. برای تضادِ «ارزان ولی دق\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\", \"d\"], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"cause\": {\"kind\": \"knot\", \"quote\": \"هر چی ارزون‌تر، بی‌دقت‌تر — این دو تا با هم تضاد دارن\"}}], \"gap\": {\"title\": \"روشِ حلِ تضادِ فنی (از نوعِ TRIZ: دو خواستهٔ ناسازگار در یک طراحی)\", \"area\": \"sys-territory\", \"kind\": \"build\", \"abstract\": \"مسئله‌های طراحی و اختراع که در آن بهتر شدنِ یک ویژگی ویژگیِ دیگر را بدتر می‌کند و راهِ نظام‌مندی برای برداشتنِ تضاد (نه مصالحه) لازم است\", \"missing\": \"حوزه و ابزاری برای تضادِ فنی: نام‌گذاریِ دو ویژگیِ ناسازگار، اصل‌های رفعِ تضاد، جداسازی در زمان/مکان/شرط؛ «خلاقیت و تولیدِ ایده» و «تصمیم» بررسی و کنار گذاشته شد\", \"where\": \"🗺 قلمروِ سامانه‌ها — حوزهٔ تازه زیرِ حل مسئله\", \"how\": \"حوزه با گزاره‌های رده‌دار و ابزاری که دو ویژگیِ ناسازگارِ کاربر را بگیرد و اصل‌های جداسازی را یکی‌یکی بپرسد\", \"relations\": \"گامِ دقتِ سنسورِ ارزان در مسئلهٔ «هشدارِ یخ‌زدگی برای باغدارِ کوچک»\", \"docs\": \"apps/learning-architecture/AGENTS.md — قراردادِ «💬 دستیار»\", \"why_area\": \"کمبودِ حوزهٔ قلمرو است\", \"why_not\": \"pr_creativity ایده‌سازیِ آزاد است، نه رفعِ تضاد؛ s_decision مقایسهٔ گزینه است\", \"evidence\": \"در نقشهٔ سامانه هیچ حوزه‌ای با تضادِ فنی یا TRIZ نیست\", \"confidence\": 0.85, \"step\": \"سنسورِ ارزون دقیق هست؟ — تضادِ ارزانی و دقت\"}}",
+"{\"agree\":true,\"area\":\"sys-territory\",\"kind\":\"build\",\"dup_of\":null,\"reason\":\"در نقشهٔ سامانه و برگه‌های باز چیزی همین را پوشش نمی‌دهد؛ برگهٔ بازِ دیگر موضوعِ جدایی دارد. قلمرو و نوع درست است.\",\"fix\":{}}\n",
+"{\"reply\": \"این راهِ خودت است: دقت را فقط همان‌جا که لازم است (نزدیکِ صفر) بخواهی و با یک شب آزمایش بسنجی. هنوز حدس است تا آزموده شود و برگهٔ #۱۰۱ تا آن وقت باز می‌ماند. پیش از آن شبِ آزمایش: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پ / دستیار: کل و دانسته/ندانسته‌ها را روشن گفتی؛ در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش  / کاربر: دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم / دستیار: ترتیب را خودت چیدی: اول «با یک سنسور می‌شود ۳ ساعت زودتر پیش‌بینی کرد؟ / کاربر: پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی ن / دستیار: برای گامِ «با یک سنسور می‌شود پیش‌بینی کرد؟» یک مفهومِ مشخص کم است: نق / کاربر: از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دون / دستیار: درست دیدی: آن آبِ نامرئیِ هواست. نقطهٔ شبنم دمایی است که هوا تا آن‌جا  / کاربر: آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر / دستیار: همین است: نقطهٔ شبنم را فهمیدی و خودت به کارش بستی. برمی‌گردیم به همان / کاربر: قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون  / دستیار: قاعدهٔ هشدارت روشن است و گامِ اول را برداشتی. برای تضادِ «ارزان ولی دق / کاربر: فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پ / دستیار: این راهِ خودت است: دقت را فقط همان‌جا که لازم است (نزدیکِ صفر) بخواهی \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"p\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"guess\": {\"text\": \"شاید سنسورِ ارزون رو فقط نزدیکِ صفر با یه دماسنجِ دقیقِ قرضی کالیبره کنم\", \"q\": \"پیش از آن شبِ آزمایش: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟\"}}]}",
+"{\"reply\": \"پیش‌بینی‌ات روشن است: خطای حدودِ ۲ درجه و ثابت، همیشه رو به بالا. در آن شبِ آزمایش، کدام مشاهده این پیش‌بینی را رد می‌کند؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم / دستیار: ترتیب را خودت چیدی: اول «با یک سنسور می‌شود ۳ ساعت زودتر پیش‌بینی کرد؟ / کاربر: پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی ن / دستیار: برای گامِ «با یک سنسور می‌شود پیش‌بینی کرد؟» یک مفهومِ مشخص کم است: نق / کاربر: از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دون / دستیار: درست دیدی: آن آبِ نامرئیِ هواست. نقطهٔ شبنم دمایی است که هوا تا آن‌جا  / کاربر: آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر / دستیار: همین است: نقطهٔ شبنم را فهمیدی و خودت به کارش بستی. برمی‌گردیم به همان / کاربر: قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون  / دستیار: قاعدهٔ هشدارت روشن است و گامِ اول را برداشتی. برای تضادِ «ارزان ولی دق / کاربر: فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پ / دستیار: این راهِ خودت است: دقت را فقط همان‌جا که لازم است (نزدیکِ صفر) بخواهی  / کاربر: فکر کنم حدودِ ۲ درجه خطا داره و ثابته — یعنی همیشه یه مقدار بیشتر نشون می‌ده. / دستیار: پیش‌بینی‌ات روشن است: خطای حدودِ ۲ درجه و ثابت، همیشه رو به بالا. در آ\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}",
+"{\"reply\": \"آزمایش را کردی و پیش‌بینی‌ات نزدیک بود: ۱٫۸ به‌جای حدودِ ۲، و ثابت. چون این گام را خودت از راهِ دیگری برداشتی، دیگر منتظرِ برگهٔ #۱۰۱ نیست؛ برگه باز می‌ماند و اگر روزی آن روش ساخته شود صفحه خبرش را در «امروز» می‌دهد، ولی کارِ تو به آن بند نیست. فاصلهٔ ۱٫۸ با ۲ دربارهٔ فهمت از این سنسور چه می‌گوید؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی ن / دستیار: برای گامِ «با یک سنسور می‌شود پیش‌بینی کرد؟» یک مفهومِ مشخص کم است: نق / کاربر: از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دون / دستیار: درست دیدی: آن آبِ نامرئیِ هواست. نقطهٔ شبنم دمایی است که هوا تا آن‌جا  / کاربر: آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر / دستیار: همین است: نقطهٔ شبنم را فهمیدی و خودت به کارش بستی. برمی‌گردیم به همان / کاربر: قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون  / دستیار: قاعدهٔ هشدارت روشن است و گامِ اول را برداشتی. برای تضادِ «ارزان ولی دق / کاربر: فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پ / دستیار: این راهِ خودت است: دقت را فقط همان‌جا که لازم است (نزدیکِ صفر) بخواهی  / کاربر: فکر کنم حدودِ ۲ درجه خطا داره و ثابته — یعنی همیشه یه مقدار بیشتر نشون می‌ده. / دستیار: پیش‌بینی‌ات روشن است: خطای حدودِ ۲ درجه و ثابت، همیشه رو به بالا. در آ / کاربر: آزمایش کردم: یه شب کنارِ دماسنجِ دقیقِ همسایه. نزدیکِ صفر، سنسورِ ارزون همیشه حدودِ ۱٫۸ در / دستیار: آزمایش را کردی و پیش‌بینی‌ات نزدیک بود: ۱٫۸ به‌جای حدودِ ۲، و ثابت. چو\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"result\": \"سنسورِ ارزون همیشه حدودِ ۱٫۸ درجه بالاتر نشون داد؛ تقریباً ثابت. با کم کردنِ ۱٫۸ خطا زیرِ ۰٫۴ شد\", \"guess_res\": {\"id\": \"g1\", \"res\": \"confirmed\"}, \"sys_done\": {\"sheet\": 101, \"quote\": \"آزمایش کردم: یه شب کنارِ دماسنجِ دقیقِ همسایه\"}}]}",
+"{\"reply\": \"این همان قدمِ اولِ مشخصی است که می‌خواستی: نمونه تا آخرِ هفتهٔ بعد و یک هفته آزمون در باغ. پیگیری‌اش می‌تواند همان روز در «امروز» بیاید. پیش از ساختن، چه دادهٔ دیگری باید پیدا کنی تا «دستگاهی که پولش را داشته باشند» معین شود؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دون / دستیار: درست دیدی: آن آبِ نامرئیِ هواست. نقطهٔ شبنم دمایی است که هوا تا آن‌جا  / کاربر: آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر / دستیار: همین است: نقطهٔ شبنم را فهمیدی و خودت به کارش بستی. برمی‌گردیم به همان / کاربر: قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون  / دستیار: قاعدهٔ هشدارت روشن است و گامِ اول را برداشتی. برای تضادِ «ارزان ولی دق / کاربر: فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پ / دستیار: این راهِ خودت است: دقت را فقط همان‌جا که لازم است (نزدیکِ صفر) بخواهی  / کاربر: فکر کنم حدودِ ۲ درجه خطا داره و ثابته — یعنی همیشه یه مقدار بیشتر نشون می‌ده. / دستیار: پیش‌بینی‌ات روشن است: خطای حدودِ ۲ درجه و ثابت، همیشه رو به بالا. در آ / کاربر: آزمایش کردم: یه شب کنارِ دماسنجِ دقیقِ همسایه. نزدیکِ صفر، سنسورِ ارزون همیشه حدودِ ۱٫۸ در / دستیار: آزمایش را کردی و پیش‌بینی‌ات نزدیک بود: ۱٫۸ به‌جای حدودِ ۲، و ثابت. چو / کاربر: قدمِ اول: تا آخرِ هفتهٔ بعد یه نمونه با سنسورِ ارزون و یه برد کوچیک می‌سازم و یه هفته تو ب / دستیار: این همان قدمِ اولِ مشخصی است که می‌خواستی: نمونه تا آخرِ هفتهٔ بعد و ی\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [\"plan\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"plan\": {\"text\": \"تا آخرِ هفتهٔ بعد یه نمونه با سنسورِ ارزون و یه برد کوچیک می‌سازم و یه هفته تو باغِ داییم کنارِ دماسنجِ دقیق می‌ذارم\", \"when\": \"2026-10-30\"}}]}",
+"{\"reply\": \"دو جا را نگاه کردم: «اقناع و نفوذ» دربارهٔ قانع‌کردنِ دیگران است، نه فهمیدنِ این‌که واقعاً می‌خرند؛ «تصمیم و برنامه‌ریزی» هم سبک‌سنگین‌کردنِ گزینه‌های خودت است. روشی برای سنجیدنِ خریدِ واقعیِ مشتری پیش از ساختن در سامانه نیست؛ برای ثبت بررسی می‌کنم و این گام منتظرِ همان می‌ماند.\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر / دستیار: همین است: نقطهٔ شبنم را فهمیدی و خودت به کارش بستی. برمی‌گردیم به همان / کاربر: قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون  / دستیار: قاعدهٔ هشدارت روشن است و گامِ اول را برداشتی. برای تضادِ «ارزان ولی دق / کاربر: فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پ / دستیار: این راهِ خودت است: دقت را فقط همان‌جا که لازم است (نزدیکِ صفر) بخواهی  / کاربر: فکر کنم حدودِ ۲ درجه خطا داره و ثابته — یعنی همیشه یه مقدار بیشتر نشون می‌ده. / دستیار: پیش‌بینی‌ات روشن است: خطای حدودِ ۲ درجه و ثابت، همیشه رو به بالا. در آ / کاربر: آزمایش کردم: یه شب کنارِ دماسنجِ دقیقِ همسایه. نزدیکِ صفر، سنسورِ ارزون همیشه حدودِ ۱٫۸ در / دستیار: آزمایش را کردی و پیش‌بینی‌ات نزدیک بود: ۱٫۸ به‌جای حدودِ ۲، و ثابت. چو / کاربر: قدمِ اول: تا آخرِ هفتهٔ بعد یه نمونه با سنسورِ ارزون و یه برد کوچیک می‌سازم و یه هفته تو ب / دستیار: این همان قدمِ اولِ مشخصی است که می‌خواستی: نمونه تا آخرِ هفتهٔ بعد و ی / کاربر: یه گیرِ دیگه هم دارم: نمی‌دونم باغدارها واقعاً حاضرن چقدر بدن. اگه ازشون بپرسم «می‌خریش؟»  / دستیار: دو جا را نگاه کردم: «اقناع و نفوذ» دربارهٔ قانع‌کردنِ دیگران است، نه ف\", \"status\": \"gap\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": true, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}], \"gap\": {\"title\": \"سنجیدنِ خواستِ واقعیِ مشتری و قیمتِ پذیرفتنی پیش از ساختن (بی تعارف و رودربایستی)\", \"area\": \"sys-territory\", \"kind\": \"build\", \"abstract\": \"کسی که ایدهٔ محصول دارد باید پیش از ساختن بفهمد مشتری واقعاً می‌خرد و چقدر می‌دهد، در حالی که پرسشِ مستقیم جوابِ تعارفی می‌گیرد\", \"missing\": \"حوزه و ابزاری برای اعتبارسنجیِ تقاضا: پرسیدن از رفتار و خرجِ گذشته به‌جای نظر، نشانه‌های تعهدِ واقعی، برآوردِ قیمتِ پذیرفتنی؛ «اقناع و نفوذ» (sc_persuasion) بررسی و کنار گذاشته شد چون دربارهٔ قانع‌کردن است، نه سنجشِ خریدِ واقعی\", \"where\": \"🗺 قلمروِ سامانه‌ها — حوزهٔ تازه زیرِ «تصمیم، برنامه‌ریزی و خودتنظیمی»\", \"how\": \"حوزه با پرسش‌های کلیدی دربارهٔ رفتارِ گذشتهٔ مشتری و ابزاری که پاسخ‌ها را به «می‌خرد/نمی‌خرد و با چه قیمتی» برساند\", \"relations\": \"گامِ «باغدارها واقعاً چقدر می‌دهند» در مسئلهٔ «هشدارِ یخ‌زدگی برای باغدارِ کوچک»\", \"docs\": \"apps/learning-architecture/AGENTS.md — قراردادِ «💬 دستیار»\", \"why_area\": \"کمبودِ حوزهٔ قلمرو است\", \"why_not\": \"sc_persuasion اقناع است؛ s_decision مقایسهٔ گزینه‌های خودِ فرد\", \"evidence\": \"در نقشهٔ سامانه حوزه‌ای برای اعتبارسنجیِ مشتری یا قیمت‌گذاری نیست\", \"confidence\": 0.85, \"step\": \"باغدارها واقعاً حاضرن چقدر بدن — بی تعارف بفهمم می‌خرن و با چه قیمتی\"}}",
+"{\"agree\":true,\"area\":\"sys-territory\",\"kind\":\"build\",\"dup_of\":null,\"reason\":\"در نقشهٔ سامانه و برگه‌های باز چیزی همین را پوشش نمی‌دهد؛ برگهٔ بازِ دیگر موضوعِ جدایی دارد. قلمرو و نوع درست است.\",\"fix\":{}}\n",
+"{\"reply\": \"بله، هنوز منتظری: آنچه برای برگهٔ #۱۰۲ آمد دربارهٔ قانع‌کردن بود، نه فهمیدنِ خریدِ واقعی؛ صفحه زیرِ برگه نوشت و برگه دوباره باز شد. تا رسیدنِ ابزارِ درست، ساختنِ نمونه‌ات را پیش می‌بری؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون  / دستیار: قاعدهٔ هشدارت روشن است و گامِ اول را برداشتی. برای تضادِ «ارزان ولی دق / کاربر: فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پ / دستیار: این راهِ خودت است: دقت را فقط همان‌جا که لازم است (نزدیکِ صفر) بخواهی  / کاربر: فکر کنم حدودِ ۲ درجه خطا داره و ثابته — یعنی همیشه یه مقدار بیشتر نشون می‌ده. / دستیار: پیش‌بینی‌ات روشن است: خطای حدودِ ۲ درجه و ثابت، همیشه رو به بالا. در آ / کاربر: آزمایش کردم: یه شب کنارِ دماسنجِ دقیقِ همسایه. نزدیکِ صفر، سنسورِ ارزون همیشه حدودِ ۱٫۸ در / دستیار: آزمایش را کردی و پیش‌بینی‌ات نزدیک بود: ۱٫۸ به‌جای حدودِ ۲، و ثابت. چو / کاربر: قدمِ اول: تا آخرِ هفتهٔ بعد یه نمونه با سنسورِ ارزون و یه برد کوچیک می‌سازم و یه هفته تو ب / دستیار: این همان قدمِ اولِ مشخصی است که می‌خواستی: نمونه تا آخرِ هفتهٔ بعد و ی / کاربر: یه گیرِ دیگه هم دارم: نمی‌دونم باغدارها واقعاً حاضرن چقدر بدن. اگه ازشون بپرسم «می‌خریش؟»  / دستیار: دو جا را نگاه کردم: «اقناع و نفوذ» دربارهٔ قانع‌کردنِ دیگران است، نه ف / کاربر: دیدم نوشتی چیزی که برای اون برگه ساختن به کارِ من نمیاد. درسته — من نمی‌خوام کسی رو قانع ک / دستیار: بله، هنوز منتظری: آنچه برای برگهٔ #۱۰۲ آمد دربارهٔ قانع‌کردن بود، نه ف\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"sys_fit\": {\"sheet\": 102, \"fit\": false, \"quote\": \"من نمی‌خوام کسی رو قانع کنم، می‌خوام بفهمم واقعاً می‌خرن یا نه\"}}]}",
+"{\"reply\": \"درست می‌بینی: «خلاقیت و تولیدِ ایده» برای ساختنِ ایده است، نه سنجیدنِ این‌که باغدار واقعاً می‌خرد. پس گام همچنان منتظرِ برگهٔ #۱۰۲ می‌ماند. در این فاصله، نمونهٔ دستگاه به کجا رسیده؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پ / دستیار: این راهِ خودت است: دقت را فقط همان‌جا که لازم است (نزدیکِ صفر) بخواهی  / کاربر: فکر کنم حدودِ ۲ درجه خطا داره و ثابته — یعنی همیشه یه مقدار بیشتر نشون می‌ده. / دستیار: پیش‌بینی‌ات روشن است: خطای حدودِ ۲ درجه و ثابت، همیشه رو به بالا. در آ / کاربر: آزمایش کردم: یه شب کنارِ دماسنجِ دقیقِ همسایه. نزدیکِ صفر، سنسورِ ارزون همیشه حدودِ ۱٫۸ در / دستیار: آزمایش را کردی و پیش‌بینی‌ات نزدیک بود: ۱٫۸ به‌جای حدودِ ۲، و ثابت. چو / کاربر: قدمِ اول: تا آخرِ هفتهٔ بعد یه نمونه با سنسورِ ارزون و یه برد کوچیک می‌سازم و یه هفته تو ب / دستیار: این همان قدمِ اولِ مشخصی است که می‌خواستی: نمونه تا آخرِ هفتهٔ بعد و ی / کاربر: یه گیرِ دیگه هم دارم: نمی‌دونم باغدارها واقعاً حاضرن چقدر بدن. اگه ازشون بپرسم «می‌خریش؟»  / دستیار: دو جا را نگاه کردم: «اقناع و نفوذ» دربارهٔ قانع‌کردنِ دیگران است، نه ف / کاربر: دیدم نوشتی چیزی که برای اون برگه ساختن به کارِ من نمیاد. درسته — من نمی‌خوام کسی رو قانع ک / دستیار: بله، هنوز منتظری: آنچه برای برگهٔ #۱۰۲ آمد دربارهٔ قانع‌کردن بود، نه ف / کاربر: دیدم روتین برای همون برگهٔ #۱۰۲ این بار «خلاقیت» رو ساخته. اگه این به کارم نمیاد، صبر می‌ک / دستیار: درست می‌بینی: «خلاقیت و تولیدِ ایده» برای ساختنِ ایده است، نه سنجیدنِ \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\", \"sys_fit\": {\"sheet\": 102, \"fit\": false, \"quote\": \"اگه این به کارم نمیاد، صبر می‌کنم تا ابزارِ درستش بیاد\"}}]}",
+"{\"reply\": \"گفتی «کارگاهی» همان است که گامِ قیمت لازم داشت؛ صفحه همین را می‌گیرد و همان گام از سر گرفته می‌شود. با آن، از باغدارها دربارهٔ کدام رفتارِ گذشته‌شان می‌پرسی؟\", \"title\": \"هشدارِ یخ‌زدگی برای باغدار\", \"pinned\": \"رساندنِ ایدهٔ هشدارِ یخ‌زدگی به یک برنامهٔ مشخص با قدمِ اولِ روشن\", \"memory\": \"کاربر: دیدم نوشتی چیزی که برای اون برگه ساختن به کارِ من نمیاد. درسته — من نمی‌خوام کسی رو قانع ک / دستیار: بله، هنوز منتظری: آنچه برای برگهٔ #۱۰۲ آمد دربارهٔ قانع‌کردن بود، نه ف / کاربر: دیدم روتین برای همون برگهٔ #۱۰۲ این بار «خلاقیت» رو ساخته. اگه این به کارم نمیاد، صبر می‌ک / دستیار: درست می‌بینی: «خلاقیت و تولیدِ ایده» برای ساختنِ ایده است، نه سنجیدنِ  / کاربر: راستش این ابزارِ تازه رو نگاه کردم؛ نه، اون چیزی نیست که می‌خواستم — من قیمت می‌خوام، نه پ / دستیار: باشد؛ اگر «اعتبارسنجیِ ایده با مشتری» آن چیزی نیست که این گام می‌خواست / کاربر: ببخشید، اشتباهی گفتم نه؛ دوباره خوندمش، همون بود که می‌خواستم. / دستیار: باشد، «نه» ِ پیش را پس می‌گیریم: «اعتبارسنجیِ ایده با مشتری» همان است  / کاربر: امروز تو «امروز» دیدم ابزارِ لازم اومده. بازش کردم: میگه از رفتارِ گذشته بپرس، نه از نظرشو / دستیار: این گام را با همان ابزار و از رفتارِ گذشته برداشتی: سه خرجِ واقعی (۳،  / کاربر: آخرش بگو: با همین روشِ پولیا و ابزارهای الانِ سامانه، از یه ایده تا یه برنامهٔ مشخص رسیدیم / دستیار: رسیدیم، با دو جای کم: از ایده به قاعدهٔ هشدار (با نقطهٔ شبنم که همین‌ج / کاربر: دو تا ابزار اومده. اون «کارگاهی» همونیه که برای گامِ قیمت می‌خواستم. / دستیار: گفتی «کارگاهی» همان است که گامِ قیمت لازم داشت؛ صفحه همین را می‌گیرد و\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"e\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"practical\"}]}"
+],
+"keys": [
+"سلام. یه ایده دارم: یه دستگاهِ ارزون برای باغدارها که شبِ یخ‌زدگی رو چند ساعت زودتر خبر بده — یه سنسورِ دما و رطوبت تو باغ و یه پیامک. پارسال سرما نصفِ باغِ زردآلوی داییم رو زد. می‌خوام از این ایده برسم به یه برنامهٔ مشخص که بدونم قدمِ اول ",
+"یه جمله: باغدارِ کوچیک باید شبِ یخ‌زدگی رو اونقدر زود بفهمه که بتونه کاری بکنه (آتیش، آب‌پاشی)، با دستگاهی که پولش رو داشته باشه. چیزایی که می‌دونم: دما زیرِ صفر گل‌ها رو می‌کشه، داییم حاضره تا ۲ میلیون بده. چیزایی که نمی‌دونم: چند ساعت زود",
+"دومی! اگه با یه سنسور نشه چند ساعت زودتر پیش‌بینی کرد، کلِ ایده می‌خوابه. اولی رو از داییم پرسیدم: میگه ۳ ساعت زودتر کافیه که آتیش روشن کنه. سومی هم مهمه ولی بعدش.",
+"پیش‌بینیِ هوا رو فقط از اخبار دیدم. یه جا خوندم «نقطهٔ شبنم» یه ربطی به یخ‌زدگی داره ولی نمی‌دونم نقطهٔ شبنم دقیقاً چیه و چرا با رطوبت ربط داره.",
+"از خودِ هوا؟ یعنی تو هوا آبِ نامرئی هست و وقتی به شیشهٔ سرد می‌خوره قطره میشه؟ ولی نمی‌دونم این چه ربطی به یخ‌زدگیِ باغ داره.",
+"آره، چون دما می‌تونه تا حدودِ ۲- بیاد پایین، زیرِ صفر. ولی اگه نقطهٔ شبنم ۵+ بود خطرش کمتر بود. پس سنسورم باید دما و رطوبت رو بگیره که نقطهٔ شبنم رو حساب کنه.",
+"قاعده: عصر دما و رطوبت رو می‌گیرم، نقطهٔ شبنم رو حساب می‌کنم؛ اگه زیرِ ۱ درجه بود و آسمون صاف، پیامک می‌دم. ولی گیرِ اصلیم اینجاست: سنسورِ ارزون (حدود ۲۰۰ هزار تومن) دقتش ±۲ درجه‌ست؛ دقیقِ ±۰٫۳ حدود ۳ میلیونه. هر چی ارزون‌تر، بی‌دقت‌تر — ای",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"فقط نزدیکِ صفر! بالای ۵ درجه که خطری نیست، دقت هم مهم نیست. پس فکر کنم خودم یه راهِ دیگه پیدا کردم و لازم نیست منتظرِ اون روشِ تضاد بمونم: شاید سنسورِ ارزون رو فقط نزدیکِ صفر با یه دماسنجِ دقیقِ قرضی کالیبره کنم؟ یه شب کنار هم می‌ذارمشون و ",
+"فکر کنم حدودِ ۲ درجه خطا داره و ثابته — یعنی همیشه یه مقدار بیشتر نشون می‌ده.",
+"آزمایش کردم: یه شب کنارِ دماسنجِ دقیقِ همسایه. نزدیکِ صفر، سنسورِ ارزون همیشه حدودِ ۱٫۸ درجه بالاتر نشون داد؛ تقریباً ثابت. با کم کردنِ ۱٫۸ خطا زیرِ ۰٫۴ شد. پس با ۲۰۰ هزار تومن میشه! حالا یه سؤال: اون برگهٔ کمبودی که گفتی ثبت کردی چی شد؟ اگ",
+"قدمِ اول: تا آخرِ هفتهٔ بعد یه نمونه با سنسورِ ارزون و یه برد کوچیک می‌سازم و یه هفته تو باغِ داییم کنارِ دماسنجِ دقیق می‌ذارم.",
+"یه گیرِ دیگه هم دارم: نمی‌دونم باغدارها واقعاً حاضرن چقدر بدن. اگه ازشون بپرسم «می‌خریش؟» همه از رودربایستی میگن آره. روشی هست که بفهمم واقعاً می‌خرن و با چه قیمتی، بی‌اینکه تعارف کنن؟ تو این سامانه چیزی برای این هست؟",
+"RAW:# نقشهٔ سامانه\n## خودِ سامانه (کاربرد، جا، آفلاین، مدل — پرسشِ «کجا نگهش می‌داری؟» از همین)\n- ذخیرهٔ داده‌های این صفحه —",
+"دیدم نوشتی چیزی که برای اون برگه ساختن به کارِ من نمیاد. درسته — من نمی‌خوام کسی رو قانع کنم، می‌خوام بفهمم واقعاً می‌خرن یا نه. پس هنوز منتظرم؟",
+"دیدم روتین برای همون برگهٔ #۱۰۲ این بار «خلاقیت» رو ساخته. اگه این به کارم نمیاد، صبر می‌کنم تا ابزارِ درستش بیاد.",
+"دو تا ابزار اومده. اون «کارگاهی» همونیه که برای گامِ قیمت می‌خواستم."
+]
+}

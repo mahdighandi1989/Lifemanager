@@ -1,0 +1,221 @@
+{
+"from": "round30C/aC2",
+"t0": "2026-10-18T09:00:00",
+"base": 0,
+"inject": "",
+"steps": [
+{
+"say": "سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد فرد یه «L» دورِ مربعِ قبلی می‌سازه و مربع یکی بزرگ‌تر میشه. معلممون گفت «حالا بازنگری کن». بازنگری دقیقاً یعنی چی؟ چی کار باید بکنم؟",
+"eval0": "APP.clock.dev=true;localStorage.setItem('lla.dev','1');APP.clock.set('2026-10-18');window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';APP.clock.dev=true;localStorage.setItem('lla.dev','1');'ok'",
+"c": 1
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(300);const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value=\"۳۱ بهمن ۱۳۸۸\";i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();await W(400);const e=c.querySelector('.age-err');return 'typed='+\"۳۱ بهمن ۱۳۸۸\"+' err='+(e?e.textContent:'')+' | birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+!!document.querySelector('.age-ask')})()",
+"c": 2
+},
+{
+"c": 3
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await W(300);const c=[...document.querySelectorAll('.age-ask')].pop();if(!c)return 'NO CARD';const i=c.querySelector('.age-in');i.focus();i.value=\"1388/11/02\";i.dispatchEvent(new Event('input',{bubbles:true}));[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='ثبت').click();await W(400);const e=c.querySelector('.age-err');return 'typed='+\"1388/11/02\"+' err='+(e?e.textContent:'')+' | birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' card='+!!document.querySelector('.age-ask')})()",
+"c": 4
+},
+{
+"eval": "(()=>'birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' said='+JSON.stringify((APP.S.settings().profile||{}).ageSaid||null)+' sys='+JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys'&&/تولد/.test(m.text)).map(m=>m.text)))()",
+"c": 5
+},
+{
+"say": "فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش کنیم.",
+"c": 6
+},
+{
+"eval": "(async()=>{const pid=APP.state.arg;window.__PID=pid;localStorage.setItem('__PID',pid);return 'pid='+pid+' phase='+APP.livePhase(pid)+' IDS '+IDS()+' || BTNS '+BTNS().slice(0,900)})()",
+"c": 7
+},
+{
+"eval": "(async()=>{const pid=window.__PID||APP.state.arg;F('lpOne','می‌خواهم ثابت کنم که مجموعِ n عددِ فردِ اول همیشه n² است، و بعد برهانم را بازنگری کنم.');F('lpWhy','معلم گفته بازنگری کن و می‌خواهم یاد بگیرم بازنگری یعنی چه.');await W(300);B(/ثبتِ کل/);await W(1000);return 'phase='+APP.livePhase(pid)+' IDS '+IDS()+' || BTNS '+BTNS().slice(0,600)})()",
+"c": 8
+},
+{
+"eval": "(async()=>{const pid=window.__PID||APP.state.arg;F('lpUnk','برای هر عددِ طبیعیِ n: 1 + 3 + 5 + … + (2n − 1) = n²');F('lpD_d1','n عددی طبیعی است (n ≥ 1)');F('lpD_d2','جمعِ n عددِ فردِ اول: 1، 3، 5، …، 2n − 1');F('lpCond','حکم: سمتِ چپ (جمعِ n فردِ اول) برابرِ n² است — برای هر n، نه فقط چند تا');F('lpRel','فرضِ ۲ می‌گوید جمله‌ها چیستند؛ n ِ فرضِ ۱ همان ضلعِ مربعِ حکم است');if(document.getElementById('lpSuff'))P('lpSuff',/^بله|لازم/);F('lpSuffW','بی n ِ طبیعی، جمع معنا ندارد');F('lpFig','مربعِ نقطه‌ای n × n؛ هر عددِ فرد یک L است که دورِ مربعِ قبلی می‌پیچد');F('lpGuess','درست است — با شکلِ L ها ثابتش کردم');if(document.getElementById('lpConf'))P('lpConf',/۹۰|۸۰/);F('lpTest','حالت‌های n = 1، 2، 3 و برهانِ شکلی');await W(400);let t0=document.body.innerText;B(/ثبتِ فهم/);await W(1300);let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,14).join(' ¦ ');return 'phase='+APP.livePhase(pid)+' NEW: '+diff+' || IDS '+IDS().slice(0,1500)})()",
+"c": 9
+},
+{
+"eval": "(async()=>{const pid=window.__PID||APP.state.arg;B(/^۲ کامل$/);await W(1200);F('lpPlan','مربعِ n × n را لایه‌لایه می‌سازم: هر لایه یک L است؛ نشان می‌دهم L ِ k اُم دقیقاً 2k − 1 نقطه دارد، پس جمعِ L ها همان n² است.');document.querySelectorAll('[id^=lpPC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);if(document.getElementById('lpMv')){P('lpMv',/شکل|کمکی|حالتِ خاص|تبدیل/);F('lpMvWhy','شکلِ مربعِ نقطه‌ای جمع را دیدنی کرد');B(/افزودنِ حرکت/);await W(600);}let t0=document.body.innerText;B(/ثبتِ طرح/);await W(1300);let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,14).join(' ¦ ');return 'phase='+APP.livePhase(pid)+' NEW: '+diff+' || IDS '+IDS().slice(0,1200)})()",
+"c": 10
+},
+{
+"eval": "(async()=>{const pid=window.__PID||APP.state.arg;F('lpStep','L ِ k اُم: مربعِ (k − 1) × (k − 1) را به مربعِ k × k می‌رساند؛ k نقطه در ستون + k نقطه در ردیف − ۱ نقطهٔ گوشه = 2k − 1');P('lpClear',/^بله/);await W(300);if(document.getElementById('lpProof'))F('lpProof','k² − (k − 1)² = 2k − 1؛ پس هر L همان عددِ فردِ k اُم است');document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);let t0=document.body.innerText;B(/ثبتِ گام/);await W(1200);F('lpStep','جمعِ L های ۱ تا n همان مربعِ n × n است، پس 1 + 3 + … + (2n − 1) = n²');P('lpClear',/^بله/);await W(300);if(document.getElementById('lpProof'))F('lpProof','هر لایه یک بار و فقط یک بار شمرده شد؛ لایه‌ها روی هم مربعِ n × n را می‌سازند');document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);B(/ثبتِ گام/);await W(1200);const c=B(/✅ حل شد/);await W(1500);let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,16).join(' ¦ ');return c+' phase='+APP.livePhase(pid)+' gate='+JSON.stringify(APP.liveClosure(pid)).slice(0,300)+' NEW: '+diff+' || IDS '+IDS().slice(0,1500)})()",
+"c": 11
+},
+{
+"eval": "(async()=>{const pid=window.__PID||APP.state.arg;for(const d of ['d1','d2']){if(document.getElementById('lpPU_a_'+d)){P('lpPU_a_'+d,/حالا به کارش|استفاده کردم|^بله/);}}F('lpPU_w_d1','n همان ضلعِ مربع و شمارِ لایه‌هاست');F('lpPU_w_d2','هر جملهٔ 2k − 1 یک لایه (L) است');await W(300);let t0=document.body.innerText;B(/ثبتِ طرح/);await W(1300);let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,10).join(' ¦ ');return 'phase='+APP.livePhase(pid)+' NEW: '+diff})()",
+"c": 12
+},
+{
+"eval": "(async()=>{const pid=window.__PID||APP.state.arg;F('lpStep','L ِ k اُم: مربعِ (k − 1) × (k − 1) را به مربعِ k × k می‌رساند؛ k نقطه در ستون + k نقطه در ردیف − ۱ نقطهٔ گوشه = 2k − 1');P('lpClear',/^بله/);await W(300);if(document.getElementById('lpProof'))F('lpProof','k² − (k − 1)² = 2k − 1؛ پس هر L همان عددِ فردِ k اُم است');document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);let t0=document.body.innerText;B(/ثبتِ گام/);await W(1200);F('lpStep','جمعِ L های ۱ تا n همان مربعِ n × n است، پس 1 + 3 + … + (2n − 1) = n²');P('lpClear',/^بله/);await W(300);if(document.getElementById('lpProof'))F('lpProof','هر لایه یک بار و فقط یک بار شمرده شد؛ لایه‌ها روی هم مربعِ n × n را می‌سازند');document.querySelectorAll('[id^=lpSD_],[id^=lpSC_]').forEach(e=>{if(!e.checked)e.click();});await W(300);B(/ثبتِ گام/);await W(1200);const c=B(/✅ حل شد/);await W(1500);let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,16).join(' ¦ ');return c+' phase='+APP.livePhase(pid)+' gate='+JSON.stringify(APP.liveClosure(pid)).slice(0,300)+' NEW: '+diff+' || IDS '+IDS().slice(0,1800)})()",
+"c": 13
+},
+{
+"say": "«✅ حل شد» رو زدم و حالا صفحهٔ بازنگری باز شده. کلی سؤال داره. از کجا شروع کنم؟",
+"c": 14
+},
+{
+"say": "n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به کار رفت. حالا وارسی: با n = 4 میشه 1+3+5+7 = 16 = 4² و با n = 10 هم 100. ولی اینا که فقط چند تا حالتن، برهان رو که دارم. بازم چی کار کنم؟",
+"c": 15
+},
+{
+"say": "استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ بعدی رو اضافه کنم: k² + (2k + 1) = (k + 1)². پس برای k + 1 هم درسته. همون L ِ شکلم بود، فقط با فرمول!",
+"c": 16
+},
+{
+"say": "تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد همون‌جا اومد. حالا یه چیزی: می‌خوام ازش یه مسئلهٔ دیگه هم دربیارم. جمعِ زوج‌ها: 2 + 4 + … + 2n چی میشه؟ هر زوج یکی بیشتر از فردِ قبلیشه...",
+"c": 17
+},
+{
+"say": "هر زوج = فردِ همون جایگاه + ۱: 2 = 1+1، 4 = 3+1، … ، 2n = (2n − 1) + 1. پس 2 + 4 + … + 2n = (1 + 3 + … + (2n − 1)) + n = n² + n = n(n + 1). با n = 3: 2+4+6 = 12 = 3×4. درسته!",
+"c": 18
+},
+{
+"say": "همون حکمه: برای هر n ِ طبیعی جمعِ n تا فرد n² میشه، نه بیشتر نه کمتر. حالا بقیهٔ فرم بازنگری رو پر می‌کنم.",
+"c": 19
+},
+{
+"eval": "(async()=>{const pid=window.__PID||APP.state.arg;APP.go('lprob',pid);await W(1200);P('lpBWant',/بیشتر/);document.querySelectorAll('[id^=lpBCP_]').forEach(s=>{const o=[...s.options].find(o=>/^بله/.test(o.text));if(o){s.value=o.value;s.dispatchEvent(new Event('change',{bubbles:true}));}});F('lpBChk','n = 1، 2، 3، 4، 10 را حساب کردم؛ همه n² شد');P('lpBRes',/سالم/);F('lpBOther','با استقرا: k² + (2k + 1) = (k + 1)²');F('lpBGlance','هر عددِ فرد یک L است که مربع را یکی بزرگ‌تر می‌کند');F('lpBWorked','شکلِ مربعِ نقطه‌ای و دیدنِ L ها');if(document.getElementById('lpBMulti'))P('lpBMulti',/^دو|^یکی/);F('lpBUse','جمعِ زوج‌ها: 2 + 4 + … + 2n = n² + n — همین‌جا با همین نتیجه حلش کردم');F('lpBTaste','برهانِ شکلی را بیشتر از فرمول دوست داشتم؛ استقرا هم قانع‌کننده بود');F('lpBNew','جمعِ n عددِ طبیعیِ اول 1 + 2 + … + n چند است؟');if(document.getElementById('lpBNewS'))P('lpBNewS',/ساختار|همان|مرتبط/);if(document.getElementById('lpBNewW'))F('lpBNewW','از جمعِ زوج‌ها: 2 + 4 + … + 2n = 2(1 + 2 + … + n)');await W(400);if(document.getElementById('lpBHit'))P('lpBHit',/درست/);await W(300);const o=document.getElementById('lpBBest')?[...document.getElementById('lpBBest').options].map(o=>o.text).join(' / '):'NO BEST';if(document.getElementById('lpBBest')){const s=document.getElementById('lpBBest');const i=[...s.options].findIndex(o=>/راهِ دیگر|از راهِ دیگری/.test(o.text));s.selectedIndex=i>0?i:Math.min(2,s.options.length-1);s.dispatchEvent(new Event('change',{bubbles:true}));}await W(300);let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1500);let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,16).join(' ¦ '); return 'BEST='+o+' || phase='+APP.livePhase(pid)+' closure='+JSON.stringify(APP.liveClosure(pid)).slice(0,250)+' NEW: '+diff+' || IDS '+IDS().slice(0,800)})()",
+"c": 20
+},
+{
+"c": 21
+},
+{
+"eval": "(()=>[...document.querySelectorAll('#main input,#main select,#main textarea')].filter(e=>/^lpB/.test(e.id)).map(e=>e.id+'['+e.type+']:'+(e.getAttribute('aria-label')||'').slice(0,90)+'='+(e.type==='checkbox'?e.checked:String(e.value).slice(0,40))+(e.options?' {'+[...e.options].map(o=>o.text.slice(0,30)).join('/')+'}':'')).join(' | '))()",
+"c": 22
+},
+{
+"eval": "(async()=>{const pid=window.__PID||APP.state.arg;P('lpBEquiv',/^بله/);P('lpBHyp',/^بله/);P('lpBConcl',/^یکی است/);F('lpBDef','عددِ فرد = 2k − 1 در گامِ L به کار رفت: k² − (k − 1)² = 2k − 1');await W(300);let t0=document.body.innerText;B(/ثبتِ بازنگری/);await W(1600);let L0=new Set(t0.split(String.fromCharCode(10)));let diff=document.body.innerText.split(String.fromCharCode(10)).filter(l=>!L0.has(l)&&l.trim()).slice(0,16).join(' ¦ '); return 'phase='+APP.livePhase(pid)+' closure='+JSON.stringify(APP.liveClosure(pid)).slice(0,300)+' NEW: '+diff})()",
+"c": 23
+},
+{
+"c": 24
+},
+{
+"c": 25
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 26
+},
+{
+"c": 27
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id);if(p)localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-10-21')+' pid='+p})()",
+"c": 28
+},
+{
+"c": 29,
+"reload": true
+},
+{
+"eval0": "window.F=(id,v)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return 'ok';};\nwindow.B=(re,root)=>{const b=[...(root||document.querySelector('#main')).querySelectorAll('button')].find(b=>re.test(b.textContent)); if(!b) return 'NOBTN '+re; b.click(); return 'clicked '+b.textContent.slice(0,40);};\nwindow.IDS=()=>[...document.querySelectorAll('#main input,#main textarea,#main select')].map(e=>e.id+':'+(e.labels&&e.labels[0]?e.labels[0].textContent.slice(0,50):'')).join(' | ');\nwindow.BTNS=()=>[...document.querySelectorAll('#main button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ');\n'helpers'\n\nwindow.P=(id,re)=>{const e=document.getElementById(id); if(!e) return 'NOFIELD '+id; const o=[...e.options].find(o=>re.test(o.text)); if(!o) return 'NOOPT '+re+' in '+[...e.options].map(o=>o.text).join('/'); return F(id,o.value);};\nwindow.T=(a,n)=>{const t=document.querySelector('#main').innerText; const i=a?t.indexOf(a):0; return t.slice(Math.max(0,i),Math.max(0,i)+(n||2000));};\nwindow.W=ms=>new Promise(r=>setTimeout(r,ms));\n'helpers';window.__PID=window.__PID||localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(APP.state.view==='lprob'&&!APP.state.arg&&window.__PID)APP.go('lprob',window.__PID);'ok';window.__PID=localStorage.getItem('__PID')||(APP.liveAll().slice(-1)[0]||{p:{}}).p.id;if(window.__PID)APP.go('lprob',window.__PID);'restored '+APP.today()+' '+window.__PID",
+"c": 30
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go(\"today\");await W(1500);return \"TODAY \"+APP.today()+\" || \"+document.querySelector(\"#main\").innerText.slice(0,3000)})()",
+"c": 31
+},
+{
+"c": 32
+},
+{
+"say": "سلام، امروز «امروز» گفت مسئلهٔ ۱ + ۲ + … + n برگشته. با همون نتیجه حلش کردم: 2 + 4 + … + 2n = 2(1 + 2 + … + n) = n(n + 1)، پس 1 + 2 + … + n = n(n + 1)/2. با n = 4: ۱۰ = 4×5/2. درسته! راستی ۱۶ سالمه، تولدم ۲ بهمنه — اون روز تو کارت درست زدم؟",
+"c": 33
+},
+{
+"eval": "(()=>'birth='+APP.AGE.birth()+' j='+JSON.stringify(APP.AGE.g2j(APP.AGE.birth()||'x'))+' age='+APP.AGE.age()+' band='+((APP.AGE.band(APP.AGE.age())||{}).id)+' said='+JSON.stringify((APP.S.settings().profile||{}).ageSaid||null)+' sys='+JSON.stringify((APP.ASSIST.cur().msgs||[]).filter(m=>m.role==='sys'&&/تولد/.test(m.text)).map(m=>m.text)))()",
+"c": 34
+},
+{
+"say": "اون پرسشی که گفت «نتیجهٔ همین مسئله رو چطور برای جمعِ زوج‌ها به کار می‌بری؟» — همون باعث شد ببینم هر زوج یکی بیشتر از فرده.",
+"c": 35
+},
+{
+"say": "دوست داشتم که یه نتیجه، سه تا مسئله رو حل کرد. چیزی که دوست نداشتم: فرمِ بازنگری چند تا سؤال رو دوباره پرسید که تو گفت‌وگو جواب داده بودم.",
+"c": 36
+},
+{
+"c": 37
+},
+{
+"eval": "(()=>{const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));const M=APP.ROUTE&&APP.ROUTE.model(p);return JSON.stringify(M?{n:M.pts.length,now:M.nowFa,dest:M.dest,remain:M.remain,dets:M.dets.map(d=>({k:d.kind,c:d.concept,depth:d.depth,open:d.open,rejoin:d.rejoin,sheet:d.sheet})),backs:M.backs.length,pts:M.pts.map(x=>x.cls+'|'+x.k+'|'+String(x.title||'').slice(0,60))}:'NO MODEL')})()",
+"c": 38
+},
+{
+"c": 39
+},
+{
+"c": 40
+},
+{
+"c": 41
+},
+{
+"c": 42
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('mind');await W(1800);const t=document.querySelector('#main').innerText;const out=[];let i=-1;for(const m of t.matchAll(/هنجار|هم‌سن|گروه‌های سنی|سن: |علت|ضعیف‌ترین|پیش‌نیاز ·/g)){if(m.index-i>250){out.push(t.slice(Math.max(0,m.index-150),m.index+350));i=m.index;}}return out.join(' ⟂ ').slice(0,4000)})()",
+"c": 43
+},
+{
+"c": 44
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.go('today');await W(1200);return 'TODAY '+APP.today()+' || '+document.querySelector('#main').innerText.slice(0,2500)})()",
+"c": 45
+},
+{
+"c": 46
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const s=APP.ASSIST.cur();APP.go('dossier',s.id);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 47
+},
+{
+"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const p=(window.__PID||localStorage.getItem('__PID')||APP.state.arg||((APP.liveAll().slice(-1)[0]||{p:{}}).p.id));APP.go('dossier',p);await W(1200);return document.querySelector('#main').innerText.slice(0,5000)})()",
+"c": 48
+},
+{
+"c": 49
+},
+{
+"c": 50,
+"reload": true
+}
+],
+"replies": [
+"{\"reply\": \"سلام نیلوفر. اثباتت با شکلِ L را خودت ساختی؛ «بازنگری» نگاهِ دوباره به همین حلِ تمام‌شده است و چند کار را می‌شود زیرِ آن گذاشت: وارسیِ نتیجه و استدلال، رسیدن از راهی دیگر، دیدنِ کل با یک نگاه، و به‌کاربردنِ نتیجه یا روش در مسئله‌ای دیگر. برای اثباتِ خودت، «بازنگری» را کدام‌یک از این‌ها می‌گیری تا از همان شروع کنی؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد / دستیار: سلام نیلوفر. اثباتت با شکلِ L را خودت ساختی؛ «بازنگری» نگاهِ دوباره به\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n²\"}]}",
+"{\"reply\": \"در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. چک‌کردنِ n = 1، 2، 3 وارسیِ نتیجه است و با هر سه خواند؛ وارسیِ خودِ استدلال قدمِ بعد است: در شکلِ تو، از کجا می‌دانی L ِ شمارهٔ n دقیقاً 2n − 1 خانه دارد؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد / دستیار: سلام نیلوفر. اثباتت با شکلِ L را خودت ساختی؛ «بازنگری» نگاهِ دوباره به / کاربر: فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. چک‌کردنِ n = 1، 2، 3 وارسیِ ن\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"live_new\", \"title\": \"جمعِ عددهای فرد برابرِ n²\", \"statement\": \"ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد فرد یه «L» دورِ مربعِ قبلی می‌سازه و مربع یکی بزرگ‌تر میشه. معلممون گفت «حالا بازنگری کن».\", \"nat\": \"objective\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد\", \"check\": {\"msgs\": [\"با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد\"]}}]}",
+"{\"reply\": \"لازم نیست همه را یک‌جا جواب بدهی؛ از همان که به اثباتِ خودت نزدیک‌تر است شروع کن: نتیجه را با سه حالت وارسی کرده‌ای — از راهِ دیگری هم (جز شکلِ L) به همین n² می‌رسی؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد / دستیار: سلام نیلوفر. اثباتت با شکلِ L را خودت ساختی؛ «بازنگری» نگاهِ دوباره به / کاربر: فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. چک‌کردنِ n = 1، 2، 3 وارسیِ ن / کاربر: «✅ حل شد» رو زدم و حالا صفحهٔ بازنگری باز شده. کلی سؤال داره. از کجا شروع کنم؟ / دستیار: لازم نیست همه را یک‌جا جواب بدهی؛ از همان که به اثباتِ خودت نزدیک‌تر ا\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"فرض‌ها را خودت وارسی کردی و حسابِ n = 4 هم می‌خواند: ۱+۳+۵+۷ = ۱۶ = ۴². حق داری که چند حالت برهان نیست و برهانت را داری؛ بازنگری حالا یکنوایی را می‌خواهد: اگر n یکی بیشتر شود، جمع دقیقاً چقدر بیشتر می‌شود — و این با رفتنِ n² به (n + 1)² می‌خواند؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد  / دستیار: با k² − (k − 1)² = 2k − 1 همان جایی را که شکل «می‌دید» ثابت کردی. مسئل / کاربر: هر زوج = فردِ همون جایگاه + ۱: 2 = 1+1، 4 = 3+1، … ، 2n = (2n − 1) + 1. پس 2 + 4 + … + 2n  / دستیار: از یک نتیجه، نتیجهٔ دوم را خودت ساختی و با n = 3 وارسی‌اش کردی (۱۲ = ۳ / کاربر: همون حکمه: برای هر n ِ طبیعی جمعِ n تا فرد n² میشه، نه بیشتر نه کمتر. حالا بقیهٔ فرم بازنگ / دستیار: حکم را دقیق گفتی: برای هر n ِ طبیعی، جمعِ n عددِ فردِ نخست n² است. تا  / کاربر: سلام، امروز «امروز» گفت مسئلهٔ ۱ + ۲ + … + n برگشته. با همون نتیجه حلش کردم: 2 + 4 + … + 2 / دستیار: سومین مسئله را هم با همان نتیجه حل کردی و با n = 4 وارسی شد (۱۰ = ۴×۵/ / کاربر: اون پرسشی که گفت «نتیجهٔ همین مسئله رو چطور برای جمعِ زوج‌ها به کار می‌بری؟» — همون باعث ش / دستیار: این را برای بازنگری‌ات نگه می‌دارم: پرسشی که بیشتر کمک کرد همان «به‌کا / کاربر: دوست داشتم که یه نتیجه، سه تا مسئله رو حل کرد. چیزی که دوست نداشتم: فرمِ بازنگری چند تا سؤ / دستیار: هر دو را با حرفِ خودت نگه می‌دارم: دوست داشتی که یک نتیجه سه مسئله را  / کاربر: n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به  / دستیار: فرض‌ها را خودت وارسی کردی و حسابِ n = 4 هم می‌خواند: ۱+۳+۵+۷ = ۱۶ = ۴²\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\", \"c\"], \"ans\": [\"u4\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"با n = 4 میشه 1+3+5+7 = 16 = 4²\"}]}\n",
+"{\"reply\": \"از راهِ دوم هم رسیدی و خودت دیدی که گامِ استقرا همان L ِ شکلت است با فرمول؛ این پیوند خودش بخشی از بازنگری است. حالا قدمِ بعد: می‌توانی همین نتیجه یا همین روش (L یا استقرا) را برای مسئلهٔ دیگری به کار ببری؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد / دستیار: سلام نیلوفر. اثباتت با شکلِ L را خودت ساختی؛ «بازنگری» نگاهِ دوباره به / کاربر: فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. چک‌کردنِ n = 1، 2، 3 وارسیِ ن / کاربر: «✅ حل شد» رو زدم و حالا صفحهٔ بازنگری باز شده. کلی سؤال داره. از کجا شروع کنم؟ / دستیار: لازم نیست همه را یک‌جا جواب بدهی؛ از همان که به اثباتِ خودت نزدیک‌تر ا / کاربر: n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به  / دستیار: فرض‌ها را خودت وارسی کردی و ۱۶ = ۴² می‌خواند. فقط یک جا در همین پیام « / کاربر: استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ / دستیار: از راهِ دوم هم رسیدی و خودت دیدی که گامِ استقرا همان L ِ شکلت است با ف\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"k² + (2k + 1) = (k + 1)². پس برای k + 1 هم درسته\", \"check\": {\"msgs\": [\"برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ بعدی رو اضافه کنم: k² + (2k + 1) = (k + 1)²\"]}}]}",
+"{\"reply\": \"با k² − (k − 1)² = 2k − 1 همان جایی را که شکل «می‌دید» ثابت کردی. مسئلهٔ تازه را هم خودت از دلِ همین درآوردی و سرنخش را هم داری (هر زوج یکی بیشتر از فردِ پیشش). با همین سرنخ، حدست برای 2 + 4 + … + 2n چیست؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد / دستیار: سلام نیلوفر. اثباتت با شکلِ L را خودت ساختی؛ «بازنگری» نگاهِ دوباره به / کاربر: فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. چک‌کردنِ n = 1، 2، 3 وارسیِ ن / کاربر: «✅ حل شد» رو زدم و حالا صفحهٔ بازنگری باز شده. کلی سؤال داره. از کجا شروع کنم؟ / دستیار: لازم نیست همه را یک‌جا جواب بدهی؛ از همان که به اثباتِ خودت نزدیک‌تر ا / کاربر: n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به  / دستیار: فرض‌ها را خودت وارسی کردی و ۱۶ = ۴² می‌خواند. فقط یک جا در همین پیام « / کاربر: استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ / دستیار: از راهِ دوم هم رسیدی و خودت دیدی که گامِ استقرا همان L ِ شکلت است با ف / کاربر: تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد  / دستیار: با k² − (k − 1)² = 2k − 1 همان جایی را که شکل «می‌دید» ثابت کردی. مسئل\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1\"}]}",
+"{\"reply\": \"از یک نتیجه، نتیجهٔ دوم را خودت ساختی و با n = 3 وارسی‌اش کردی (۱۲ = ۳×۴). این همان «به‌کاربردنِ نتیجه در مسئله‌ای دیگر» است. برای این‌که در صفحه هم بنشیند: حکمی که در مسئلهٔ اول ثابت کردی، دقیق و در یک جمله چیست؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد / دستیار: سلام نیلوفر. اثباتت با شکلِ L را خودت ساختی؛ «بازنگری» نگاهِ دوباره به / کاربر: فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. چک‌کردنِ n = 1، 2، 3 وارسیِ ن / کاربر: «✅ حل شد» رو زدم و حالا صفحهٔ بازنگری باز شده. کلی سؤال داره. از کجا شروع کنم؟ / دستیار: لازم نیست همه را یک‌جا جواب بدهی؛ از همان که به اثباتِ خودت نزدیک‌تر ا / کاربر: n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به  / دستیار: فرض‌ها را خودت وارسی کردی و ۱۶ = ۴² می‌خواند. فقط یک جا در همین پیام « / کاربر: استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ / دستیار: از راهِ دوم هم رسیدی و خودت دیدی که گامِ استقرا همان L ِ شکلت است با ف / کاربر: تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد  / دستیار: با k² − (k − 1)² = 2k − 1 همان جایی را که شکل «می‌دید» ثابت کردی. مسئل / کاربر: هر زوج = فردِ همون جایگاه + ۱: 2 = 1+1، 4 = 3+1، … ، 2n = (2n − 1) + 1. پس 2 + 4 + … + 2n  / دستیار: از یک نتیجه، نتیجهٔ دوم را خودت ساختی و با n = 3 وارسی‌اش کردی (۱۲ = ۳\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"2 + 4 + … + 2n = (1 + 3 + … + (2n − 1)) + n = n² + n = n(n + 1)\"}]}",
+"{\"reply\": \"حکم را دقیق گفتی: برای هر n ِ طبیعی، جمعِ n عددِ فردِ نخست n² است. تا این‌جا وارسی، راهِ دوم و مسئلهٔ تازه را خودت انجام داده‌ای. درسِ خودت از این بازنگری، به قلمِ خودت، چیست؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش / دستیار: در «🔭 مسئلهٔ حل‌نشدهٔ خودم» ثبتش می‌کنم. چک‌کردنِ n = 1، 2، 3 وارسیِ ن / کاربر: «✅ حل شد» رو زدم و حالا صفحهٔ بازنگری باز شده. کلی سؤال داره. از کجا شروع کنم؟ / دستیار: لازم نیست همه را یک‌جا جواب بدهی؛ از همان که به اثباتِ خودت نزدیک‌تر ا / کاربر: n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به  / دستیار: فرض‌ها را خودت وارسی کردی و ۱۶ = ۴² می‌خواند. فقط یک جا در همین پیام « / کاربر: استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ / دستیار: از راهِ دوم هم رسیدی و خودت دیدی که گامِ استقرا همان L ِ شکلت است با ف / کاربر: تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد  / دستیار: با k² − (k − 1)² = 2k − 1 همان جایی را که شکل «می‌دید» ثابت کردی. مسئل / کاربر: هر زوج = فردِ همون جایگاه + ۱: 2 = 1+1، 4 = 3+1، … ، 2n = (2n − 1) + 1. پس 2 + 4 + … + 2n  / دستیار: از یک نتیجه، نتیجهٔ دوم را خودت ساختی و با n = 3 وارسی‌اش کردی (۱۲ = ۳ / کاربر: همون حکمه: برای هر n ِ طبیعی جمعِ n تا فرد n² میشه، نه بیشتر نه کمتر. حالا بقیهٔ فرم بازنگ / دستیار: حکم را دقیق گفتی: برای هر n ِ طبیعی، جمعِ n عددِ فردِ نخست n² است. تا \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"u\"], \"ans\": [\"u1\"], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"سومین مسئله را هم با همان نتیجه حل کردی و با n = 4 وارسی شد (۱۰ = ۴×۵/۲). تاریخِ تولد را همان‌طور که گفتی به صفحه می‌دهم؛ خودش با آنچه ثبت است می‌سنجد و نشانت می‌دهد. از این سه مسئله‌ای که از یک نتیجه درآمد، درسِ خودت چیست؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: «✅ حل شد» رو زدم و حالا صفحهٔ بازنگری باز شده. کلی سؤال داره. از کجا شروع کنم؟ / دستیار: لازم نیست همه را یک‌جا جواب بدهی؛ از همان که به اثباتِ خودت نزدیک‌تر ا / کاربر: n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به  / دستیار: فرض‌ها را خودت وارسی کردی و ۱۶ = ۴² می‌خواند. فقط یک جا در همین پیام « / کاربر: استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ / دستیار: از راهِ دوم هم رسیدی و خودت دیدی که گامِ استقرا همان L ِ شکلت است با ف / کاربر: تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد  / دستیار: با k² − (k − 1)² = 2k − 1 همان جایی را که شکل «می‌دید» ثابت کردی. مسئل / کاربر: هر زوج = فردِ همون جایگاه + ۱: 2 = 1+1، 4 = 3+1، … ، 2n = (2n − 1) + 1. پس 2 + 4 + … + 2n  / دستیار: از یک نتیجه، نتیجهٔ دوم را خودت ساختی و با n = 3 وارسی‌اش کردی (۱۲ = ۳ / کاربر: همون حکمه: برای هر n ِ طبیعی جمعِ n تا فرد n² میشه، نه بیشتر نه کمتر. حالا بقیهٔ فرم بازنگ / دستیار: حکم را دقیق گفتی: برای هر n ِ طبیعی، جمعِ n عددِ فردِ نخست n² است. تا  / کاربر: سلام، امروز «امروز» گفت مسئلهٔ ۱ + ۲ + … + n برگشته. با همون نتیجه حلش کردم: 2 + 4 + … + 2 / دستیار: سومین مسئله را هم با همان نتیجه حل کردی و با n = 4 وارسی شد (۱۰ = ۴×۵/\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"birth\", \"date\": \"۲ بهمن\", \"age\": 16}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [\"result\"], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"result\": \"1 + 2 + … + n = n(n + 1)/2\"}]}",
+"{\"reply\": \"این را برای بازنگری‌ات نگه می‌دارم: پرسشی که بیشتر کمک کرد همان «به‌کاربردنِ نتیجه برای جمعِ زوج‌ها» بود. یک چیزِ دیگر هم برای بازنگری مانده: این نوع مسئله برایت چطور بود — کدام بخشش را دوست داشتی و کدامش را نه؟\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به  / دستیار: فرض‌ها را خودت وارسی کردی و ۱۶ = ۴² می‌خواند. فقط یک جا در همین پیام « / کاربر: استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ / دستیار: از راهِ دوم هم رسیدی و خودت دیدی که گامِ استقرا همان L ِ شکلت است با ف / کاربر: تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد  / دستیار: با k² − (k − 1)² = 2k − 1 همان جایی را که شکل «می‌دید» ثابت کردی. مسئل / کاربر: هر زوج = فردِ همون جایگاه + ۱: 2 = 1+1، 4 = 3+1، … ، 2n = (2n − 1) + 1. پس 2 + 4 + … + 2n  / دستیار: از یک نتیجه، نتیجهٔ دوم را خودت ساختی و با n = 3 وارسی‌اش کردی (۱۲ = ۳ / کاربر: همون حکمه: برای هر n ِ طبیعی جمعِ n تا فرد n² میشه، نه بیشتر نه کمتر. حالا بقیهٔ فرم بازنگ / دستیار: حکم را دقیق گفتی: برای هر n ِ طبیعی، جمعِ n عددِ فردِ نخست n² است. تا  / کاربر: سلام، امروز «امروز» گفت مسئلهٔ ۱ + ۲ + … + n برگشته. با همون نتیجه حلش کردم: 2 + 4 + … + 2 / دستیار: سومین مسئله را هم با همان نتیجه حل کردی و با n = 4 وارسی شد (۱۰ = ۴×۵/ / کاربر: اون پرسشی که گفت «نتیجهٔ همین مسئله رو چطور برای جمعِ زوج‌ها به کار می‌بری؟» — همون باعث ش / دستیار: این را برای بازنگری‌ات نگه می‌دارم: پرسشی که بیشتر کمک کرد همان «به‌کا\", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"chat_solved\", \"title\": \"جمعِ عددهای فرد برابرِ n²\", \"statement\": \"ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد فرد یه «L» دورِ مربعِ قبلی می‌سازه و مربع یکی بزرگ‌تر میشه.\", \"kind\": \"prove\", \"check\": \"با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد\", \"bestQ\": \"نتیجهٔ همین مسئله رو چطور برای جمعِ زوج‌ها به کار می‌بری؟\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\"}]}",
+"{\"reply\": \"هر دو را با حرفِ خودت نگه می‌دارم: دوست داشتی که یک نتیجه سه مسئله را حل کرد، و دوست نداشتی که فرمِ بازنگری چیزهای گفته‌شده را دوباره پرسید. بقیهٔ بازنگری در صفحهٔ همان مسئله منتظرِ خودت است.\", \"title\": \"بازنگریِ اثباتِ جمعِ عددهای فرد\", \"pinned\": \"بازنگریِ اثباتِ 1+3+5+…+(2n−1)=n² به دستِ خودش\", \"memory\": \"کاربر: استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ / دستیار: از راهِ دوم هم رسیدی و خودت دیدی که گامِ استقرا همان L ِ شکلت است با ف / کاربر: تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد  / دستیار: با k² − (k − 1)² = 2k − 1 همان جایی را که شکل «می‌دید» ثابت کردی. مسئل / کاربر: هر زوج = فردِ همون جایگاه + ۱: 2 = 1+1، 4 = 3+1، … ، 2n = (2n − 1) + 1. پس 2 + 4 + … + 2n  / دستیار: از یک نتیجه، نتیجهٔ دوم را خودت ساختی و با n = 3 وارسی‌اش کردی (۱۲ = ۳ / کاربر: همون حکمه: برای هر n ِ طبیعی جمعِ n تا فرد n² میشه، نه بیشتر نه کمتر. حالا بقیهٔ فرم بازنگ / دستیار: حکم را دقیق گفتی: برای هر n ِ طبیعی، جمعِ n عددِ فردِ نخست n² است. تا  / کاربر: سلام، امروز «امروز» گفت مسئلهٔ ۱ + ۲ + … + n برگشته. با همون نتیجه حلش کردم: 2 + 4 + … + 2 / دستیار: سومین مسئله را هم با همان نتیجه حل کردی و با n = 4 وارسی شد (۱۰ = ۴×۵/ / کاربر: اون پرسشی که گفت «نتیجهٔ همین مسئله رو چطور برای جمعِ زوج‌ها به کار می‌بری؟» — همون باعث ش / دستیار: این را برای بازنگری‌ات نگه می‌دارم: پرسشی که بیشتر کمک کرد همان «به‌کا / کاربر: دوست داشتم که یه نتیجه، سه تا مسئله رو حل کرد. چیزی که دوست نداشتم: فرمِ بازنگری چند تا سؤ / دستیار: هر دو را با حرفِ خودت نگه می‌دارم: دوست داشتی که یک نتیجه سه مسئله را \", \"status\": \"related\", \"next\": false, \"outside\": \"\", \"know\": [], \"steps\": [], \"actions\": [{\"do\": \"chat_lookback\", \"pid\": \"pb_l_mwcnxbzsmv3\", \"taste\": \"دوست داشتم که یه نتیجه، سه تا مسئله رو حل کرد. چیزی که دوست نداشتم: فرمِ بازنگری چند تا سؤال رو دوباره پرسید که تو گفت‌وگو جواب داده بودم\"}, {\"do\": \"coach_state\", \"ph\": \"b\", \"said\": [], \"ans\": [], \"stuck\": false, \"fail\": false, \"role\": \"self\", \"nat\": \"objective\", \"taste\": {\"text\": \"دوست داشتم که یه نتیجه، سه تا مسئله رو حل کرد\"}}]}"
+],
+"keys": [
+"سلام. من نیلوفرم، کلاس دهم. ثابت کردم که 1 + 3 + 5 + … + (2n − 1) = n² — با یه شکل: هر عدد فرد یه «L» دورِ مربعِ قبلی می‌سازه و مربع یکی بزرگ‌تر میشه. معلممون گفت «حالا بازنگری کن». بازنگری دقیقاً یعنی چی؟ چی کار باید بکنم؟",
+"فکر کنم یعنی دوباره چک کنم که درسته؟ با n = 1، 2، 3 چک کردم: 1، 4، 9 درست درمیاد. بیا ثبتش کنیم.",
+"«✅ حل شد» رو زدم و حالا صفحهٔ بازنگری باز شده. کلی سؤال داره. از کجا شروع کنم؟",
+"n یعنی چند تا لایه می‌کشم، پس طبیعی بودنش لازمه. جمله‌ها هم هر کدوم یه L ان. همه‌ی فرض به کار رفت. حالا وارسی: با n = 4 میشه 1+3+5+7 = 16 = 4² و با n = 10 هم 100. ولی اینا که فقط چند تا حالتن، برهان رو که دارم. بازم چی کار کنم؟",
+"استقرا! برای n = 1 درسته. اگه برای k درست باشه یعنی جمع تا (2k − 1) میشه k²، بعد اگه جملهٔ بعدی رو اضافه کنم: k² + (2k + 1) = (k + 1)². پس برای k + 1 هم درسته. همون L ِ شکلم بود، فقط با فرمول!",
+"تو گامِ L: هر L دقیقاً 2k − 1 تا نقطه داره چون k² − (k − 1)² = 2k − 1. پس تعریفِ عددِ فرد همون‌جا اومد. حالا یه چیزی: می‌خوام ازش یه مسئلهٔ دیگه هم دربیارم. جمعِ زوج‌ها: 2 + 4 + … + 2n چی میشه؟ هر زوج یکی بیشتر از فردِ قبلیشه...",
+"هر زوج = فردِ همون جایگاه + ۱: 2 = 1+1، 4 = 3+1، … ، 2n = (2n − 1) + 1. پس 2 + 4 + … + 2n = (1 + 3 + … + (2n − 1)) + n = n² + n = n(n + 1). با n = 3: 2+4+6 = 12 = 3×4. درسته!",
+"همون حکمه: برای هر n ِ طبیعی جمعِ n تا فرد n² میشه، نه بیشتر نه کمتر. حالا بقیهٔ فرم بازنگری رو پر می‌کنم.",
+"سلام، امروز «امروز» گفت مسئلهٔ ۱ + ۲ + … + n برگشته. با همون نتیجه حلش کردم: 2 + 4 + … + 2n = 2(1 + 2 + … + n) = n(n + 1)، پس 1 + 2 + … + n = n(n + 1)/2. با n = 4: ۱۰ = 4×5/2. درسته! راستی ۱۶ سالمه، تولدم ۲ بهمنه — اون روز تو کارت درست زدم؟",
+"اون پرسشی که گفت «نتیجهٔ همین مسئله رو چطور برای جمعِ زوج‌ها به کار می‌بری؟» — همون باعث شد ببینم هر زوج یکی بیشتر از فرده.",
+"دوست داشتم که یه نتیجه، سه تا مسئله رو حل کرد. چیزی که دوست نداشتم: فرمِ بازنگری چند تا سؤال رو دوباره پرسید که تو گفت‌وگو جواب داده بودم."
+]
+}
