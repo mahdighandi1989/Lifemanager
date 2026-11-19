@@ -1,5 +1,5 @@
 {
- "round": 41,
+ "round": 42,
  "at": "2026-11-18",
  "classes": {
   "B": 25,
@@ -1136,18 +1136,18 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 329,
+    "ok": 336,
     "health_alarm": 0,
-    "missed": 29,
+    "missed": 32,
     "mislocated": 10
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 306,
+    "ok": 312,
     "health_alarm": 0,
-    "missed": 43,
+    "missed": 47,
     "mislocated": 19
    },
    "changed": [
@@ -1286,6 +1286,12 @@
     {
      "id": "r39_salamander_letter_1985",
      "t": "«نامهٔ سمندر» و «نشانی از جعل نیست» (۱۹۸۴–۱۹۸۵)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r42_abs_contractor_references",
+     "t": "سناریوی انتزاعی: پیمانکارِ بازسازی و «معرف‌هایش»",
      "from": "ok",
      "to": "missed"
     }
@@ -1293,18 +1299,18 @@
   },
   "derived": {
    "kinds": {
-    "ok": 329,
+    "ok": 336,
     "health_alarm": 0,
-    "missed": 29,
+    "missed": 32,
     "mislocated": 10
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 306,
+    "ok": 312,
     "health_alarm": 0,
-    "missed": 43,
+    "missed": 47,
     "mislocated": 19
    },
    "changed": [
@@ -1443,6 +1449,12 @@
     {
      "id": "r39_salamander_letter_1985",
      "t": "«نامهٔ سمندر» و «نشانی از جعل نیست» (۱۹۸۴–۱۹۸۵)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r42_abs_contractor_references",
+     "t": "سناریوی انتزاعی: پیمانکارِ بازسازی و «معرف‌هایش»",
      "from": "ok",
      "to": "missed"
     }
@@ -1607,8 +1619,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 189,
-   "fullAfter": 189
+   "fullBefore": 193,
+   "fullAfter": 193
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1617,8 +1629,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 189,
-   "fullAfter": 189
+   "fullBefore": 193,
+   "fullAfter": 193
   },
   "p_found_scope": null
  },

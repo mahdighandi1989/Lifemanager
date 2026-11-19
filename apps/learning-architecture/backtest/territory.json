@@ -646,8 +646,20 @@
    "bookOnly": true
   },
   "a_higher_order_knowledge": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 42,
+     "at": "2026-11-18",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای «معرفتِ مرتبهٔ دوم و اصلِ KK»: مدخلِ «منطقِ معرفتی» ِ SEP (اصلِ ۴ = «درون‌نگریِ مثبت» یا اصلِ KK: Kφ → KKφ؛ دفاعِ هینتیکا (۱۹۶۲) از KK بر پایه‌ای جز درون‌نگری — تعهدِ دانسته‌شده در همهٔ بدیل‌های معرفتی؛ اشکالِ لنتسن به ۴ برای باور؛ استدلالِ ویلیامسون علیه پذیرشِ عامِ KK با «اصلِ حاشیهٔ خطا» برای معرفتِ برآمده از مشاهدهٔ اندکی نادقیق) و کتابِ ویلیامسون ۲۰۰۰، فصل‌های ۴ («ضدِ درخشش») و ۵ («حاشیه‌ها و تکرارها»).",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Epistemic Logic» (first published 7 Jun 2019, substantive revision 1 Dec 2023) — https://plato.stanford.edu/entries/logic-epistemic/",
+    "Timothy Williamson (2000), Knowledge and Its Limits, Oxford University Press, ch. 4–5 — https://global.oup.com/academic/product/knowledge-and-its-limits-9780199256563"
+   ]
   },
   "a_justification_concept": {
    "stage": 0,
@@ -3258,6 +3270,6 @@
    "bookOnly": true
   }
  },
- "round": 41,
+ "round": 42,
  "updated": "2026-11-18"
 }

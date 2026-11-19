@@ -14,6 +14,8 @@ Set RATE_LIMIT_DISABLED=true to bypass enforcement in tests.
 Authentication failures intentionally return 401 with a generic message
 ("Invalid email or password") so we don't leak whether the email exists.
 """
+from typing import cast
+
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -99,7 +101,7 @@ async def register(
         try:
             from app.services.owner_identity_service import set_date_of_birth
 
-            await set_date_of_birth(db, user.id, payload.date_of_birth.isoformat())
+            await set_date_of_birth(db, cast(int, user.id), payload.date_of_birth.isoformat())
         except Exception as exc:  # pragma: no cover - defensive
             import logging
 

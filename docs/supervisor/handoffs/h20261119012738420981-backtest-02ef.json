@@ -1,0 +1,16 @@
+{
+ "id": "h20261119012738420981-backtest-02ef",
+ "at": "2026-11-19T01:27:38Z",
+ "by": "backtest",
+ "area": "app",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "گیتِ قانونِ ۴ با mypy ِ نصب‌شده قرمز بود (tests/test_types.py): ۴ خطای Column[...] در auth_service.py:155,175، dependencies/auth.py:246، routes/auth.py:102 — روی main ِ دست‌نخورده. اصلاح فقط با typing.cast (بی هیچ اثرِ زمانِ اجرا)؛ ۱۱۶ آزمونِ auth/types سبز. روتینِ مالک (general/urgent) بسنجد؛ راهِ ریشه‌ای‌تر: Mapped[...] در مدل‌ها.",
+ "procedure": "CLAUDE.md#Non-negotiable rules",
+ "commit": "",
+ "status": "open"
+}

@@ -20,7 +20,7 @@ The active/admin gates are still meaningful — a pending OAuthUser
 still gets 403 — but they no longer crash on a User-backed token
 where the column doesn't exist.
 """
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer
@@ -243,7 +243,7 @@ async def _resolve_data_scope_user_id(token: str, db: AsyncSession) -> Optional[
         return None
     result = await db.execute(select(User).where(User.id == uid))
     user = result.scalar_one_or_none()
-    return user.id if user else None
+    return cast(int, user.id) if user else None
 
 
 async def get_current_user(

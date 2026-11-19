@@ -17,7 +17,7 @@ Class wrappers (AuthService, UserService) preserve the existing call-sites
 in app/dependencies/auth.py and app/routes/users.py.
 """
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, cast
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -152,7 +152,7 @@ async def login(db: AsyncSession, credentials: UserLogin) -> TokenResponse:
     if user is not None and not user.is_active:
         raise UserDisabledError("Account is disabled")
 
-    if not user or not verify_password(credentials.password, user.hashed_password):
+    if not user or not verify_password(credentials.password, cast(str, user.hashed_password)):
         # Audit critical auth failures. notify_event swallows its own
         # DB errors so a notification outage can never block the 401.
         # silent=False + priority="high" matches the AC for the
@@ -172,7 +172,7 @@ async def login(db: AsyncSession, credentials: UserLogin) -> TokenResponse:
     from app.services.notification_service import notify_event
 
     try:
-        await notify_event(event="login_succeeded", user_id=user.id, db=db, silent=True)
+        await notify_event(event="login_succeeded", user_id=cast(int, user.id), db=db, silent=True)
     except Exception:  # a notification outage must never block login
         pass
 
