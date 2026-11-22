@@ -1,0 +1,52 @@
+{
+ "round": 43,
+ "reviewer": "زیرعاملِ جدا",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "problems": [
+  {
+   "what": "r43_wvu_vw_nox_2014 sources URL https://theicct.org/publication/in-use-emissions-testing-of-light-duty-diesel-vehicles-in-the-united-states/ returns HTTP 404.",
+   "fix": "Replace with https://theicct.org/publication/in-use-emissions-testing-of-light-duty-diesel-vehicles-in-the-u-s/ (200) or the report PDF https://theicct.org/wp-content/uploads/2021/06/WVU_LDDV_in-use_ICCT_Report_Final_may2014.pdf (200). — انجام شد: PDF ِ گزارش.",
+   "fixed": true
+  },
+  {
+   "what": "r43_kiszko_molseed_1976 story calls Kiszko «با ناتوانی‌های جسمی» (physically disabled). The sources describe hypogonadism under testosterone treatment, obesity, a recently broken ankle, and a mental/emotional age of about 12, not a physical disability as such.",
+   "fix": "Reword to «با اختلالِ هورمونی و ناتوانیِ ذهنیِ خفیف» or drop the phrase.",
+   "fixed": true
+  },
+  {
+   "what": "r43_godel_incompleteness_1931: the story and claim say «هر دستگاهِ صوریِ سازگار», but Gödel 1931 assumed ω-consistency. Plain consistency is Rosser 1936, which truth.why itself mentions. Small imprecision in what is attributed to Gödel 1931. Also src gives Shankar 1994 (book) while why says «شانکار ۱۹۸۶» (the 1986 thesis/verification); both dates are real but they are inconsistent.",
+   "fix": "Story: «سازگار (به معنای ω-سازگار)» or add «(و روسر ۱۹۳۶ با سازگاریِ ساده)»; align the Shankar date or note both.",
+   "fixed": true
+  },
+  {
+   "what": "r43_mincemeat_huelva_1943 encoding hint: the quotes around the officer's name and the phrase «داستانِ یک افسرِ واقعی را می‌ساختند» signal fabrication to the blind encoder.",
+   "fix": "Remove the quotes and write «که با هم تصویرِ یک افسرِ واقعی را نشان می‌داد», then re-encode blind if needed.",
+   "fixed": true
+  },
+  {
+   "what": "r43_kant_logic_complete_1787: the label (pure st_istiqra) is plausible but simplified. Kant also grounds logic's completeness in its abstracting from all objects (B viii-ix), which is not only induction from history. Not wrong enough to change the label.",
+   "fix": "Optional: add one clause in the story or why that Kant also gave a structural ground, and say the case judges only the history-based support.",
+   "fixed": true
+  }
+ ],
+ "note": "Truth labels: all plausible. ok=false for Amaranth, Chernobyl, Kiszko, Mincemeat, Kant, Good to Great and both abstract cases; ok=true for WVU (controlled, repeated measurement with a control vehicle and no causal overclaim) and Gödel. Station and section refs (s40-s53) fit each why. The two abstract cases faithfully carry the structure of their sources (one-season induction plus position size; coerced confession versus ignored contrary record). Problems 1-3 are factual or source fixes, 4 is minor encoding hygiene, and 5 is advisory. Nothing fabricated. | پس از بازبینی (روتین): هر ۵ مشکل اصلاح شد — پیوندِ WVU، واژهٔ کیشکو، ω-سازگاری و تاریخِ شانکار در گودل، خنثی‌سازیِ دو عبارتِ مینس‌میت + بازرمزگذاریِ کور (و گودل)، دلیلِ دومِ کانت در truth.why. حکم‌ها پس از run --rerun همه درست ماند.",
+ "checkedNotes": {
+  "events_real": "All 8 real events checked and confirmed. Amaranth: ~$1bn profit in 2005 after Katrina, Senate PSI report of 25 Jun 2007, March/April 2007 spread, about $6bn lost in Sept 2006. Chernobyl: INSAG-7, the 1983 Ignalina positive-scram discovery (per Wikipedia citing INSAG-7), operating reactivity margin below 15 rods. Kiszko: 5 Oct 1975, age 23, tax clerk, hypogonadism, sperm on the clothing but none in his sample and this withheld, no solicitor, cleared 1992, girls admitted lying in 1991, Castree convicted Nov 2007. Mincemeat: confirmed. Kant B viii wording: confirmed. Good to Great: selection criteria, 11 companies, Circuit City 2008 bankruptcy, Fannie Mae 2008 conservatorship; Niendorf & Beck AMP 22(4):13-20 and the DOI confirmed via Crossref. WVU: May 2014 report, Jetta 15-35x, Passat 5-20x, BMW at or below the limit. Gödel: Monatshefte 38:173-198 confirmed. Small precision problems and one dead source URL are listed under problems; none is fabricated.",
+  "encoding_blind": "No outcome or truth label appears directly. Mild hints: Mincemeat puts the name «سرگرد ویلیام مارتین» in quotes and says the pocket items «داستانِ یک افسرِ واقعی را می‌ساختند», which suggests fabrication; the encoder then wrote chain='به‌ظاهر مستقل از یک منبع'. Chernobyl reveals the designers' 1983 knowledge, which is a hidden factor but real pre-event context. Good to Great names Circuit City and Fannie Mae, whose later fates are well known.",
+  "frames_unselected": "n/a: no sample frame (path 1) was added in round 43.",
+  "verified_by_real": "n/a: no frame this round. Cited src/sources exist. Exception: the WVU sources URL returns 404 (see problems).",
+  "proofs_from_axioms": "No new proofs, theorems, rules or ceilings in the diff. foundation.json changed only in round/date, mode counters and fullBefore/fullAfter (193 to 200).",
+  "no_conventional": "epi_backtest.js audit gives violations [] and warnings [].",
+  "territory_evidence": "SEP «Legal Probabilism»: first published 8 Jun 2021, URL is valid; it covers BRD at about 0.95, the prosecutor's fallacy with Bayes, the likelihood ratio, and Blue Bus/Gatecrasher/Prisoner (§6.1). SEP «The Legal Concept of Evidence»: 13 Nov 2015, revised 8 Oct 2021, URL is valid; it covers relevance as LR≠1, probative value, standards of proof and the conjunction paradox, normic support/knowledge/sensitivity/safety, and the hearsay rationale (no cross-examination of the original declarant). The stage-1 «what» text reflects both entries faithfully, and stage 1 (sources read) is an honest classification.",
+  "findings_diagnosed": "No new open finding for any r43 case. All 10 have k='ok' in results. Amaranth was only added to the retest ids of two existing missed findings, and the others only had lastSeenRound bumped. Amaranth and the fan-shop case changed ok to mislocated in deg mode only (extra st_resp), which is recorded in foundation.modes."
+ }
+}

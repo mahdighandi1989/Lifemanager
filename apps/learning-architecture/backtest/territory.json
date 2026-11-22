@@ -1869,8 +1869,8 @@
    ],
    "verify": {
     "since": 13,
-    "fresh": 10,
-    "ok": 7,
+    "fresh": 11,
+    "ok": 8,
     "ids": [
      "r14_kahneman_flight_instructors",
      "r17_dewey_1948",
@@ -2176,8 +2176,20 @@
    "bookOnly": true
   },
   "a_legal_epistemology": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 43,
+     "at": "2026-11-21",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای «معرفت‌شناسیِ حقوقی»: مدخلِ «احتمال‌گراییِ حقوقی» ِ SEP (معیارِ «فراتر از شکِ معقول» به‌صورتِ آستانهٔ احتمالِ مجرمیت، مثلاً بالای ۰٫۹۵؛ مغالطهٔ دادستان = جابه‌جاییِ دو جهتِ احتمالِ شرطی و پرهیز از آن با قاعدهٔ بیز؛ نسبتِ درست‌نمایی به‌عنوانِ سنجهٔ قوتِ شاهد؛ چالشِ شواهدِ صرفاً آماری — اتوبوسِ آبی، ورودِ بی‌بلیت، زندانیان) و مدخلِ «مفهومِ حقوقیِ شاهد» ِ SEP (مربوط‌بودن = نسبتِ درست‌نمایی ≠ ۱؛ ارزشِ اثباتی درجه‌مند؛ معیارهای اثبات و پارادوکسِ عطف؛ تبیین‌های نارسایی شاهدِ آماریِ برهنه: حمایتِ نُرمیک، معرفت، حساسیت و ایمنی؛ قاعدهٔ شهادتِ دست‌دوم و دلیلِ آن: آزمون‌ناپذیریِ گویندهٔ اصلی).",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Legal Probabilism» (first published 8 Jun 2021) — https://plato.stanford.edu/entries/legal-probabilism/",
+    "Stanford Encyclopedia of Philosophy, «The Legal Concept of Evidence» (first published 13 Nov 2015, substantive revision 8 Oct 2021) — https://plato.stanford.edu/entries/evidence-legal/"
+   ]
   },
   "a_other_minds": {
    "stage": 0,
@@ -3270,6 +3282,6 @@
    "bookOnly": true
   }
  },
- "round": 42,
- "updated": "2026-11-18"
+ "round": 43,
+ "updated": "2026-11-22"
 }

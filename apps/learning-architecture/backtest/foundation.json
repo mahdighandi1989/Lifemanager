@@ -1,6 +1,6 @@
 {
- "round": 42,
- "at": "2026-11-18",
+ "round": 43,
+ "at": "2026-11-22",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 336,
+    "ok": 347,
     "health_alarm": 0,
-    "missed": 32,
+    "missed": 31,
     "mislocated": 10
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 312,
+    "ok": 319,
     "health_alarm": 0,
-    "missed": 47,
-    "mislocated": 19
+    "missed": 48,
+    "mislocated": 21
    },
    "changed": [
     {
@@ -1290,28 +1290,52 @@
      "to": "missed"
     },
     {
+     "id": "r42_dehn_lemma_1910",
+     "t": "ماکس دن و اثباتِ «لمِ دن» (۱۹۱۰)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
      "id": "r42_abs_contractor_references",
      "t": "سناریوی انتزاعی: پیمانکارِ بازسازی و «معرف‌هایش»",
      "from": "ok",
      "to": "missed"
+    },
+    {
+     "id": "r43_amaranth_natgas_2006",
+     "t": "آمارانت و موقعیت‌های بزرگِ گازِ طبیعی (۲۰۰۶)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r43_mincemeat_huelva_1943",
+     "t": "جسدِ «سرگرد ویلیام مارتین» و اسنادِ هوئلوا (۱۹۴۳)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r43_abs_fan_shop_one_summer",
+     "t": "سناریوی انتزاعی: انبارِ پنکهٔ یک مغازه پس از یک تابستانِ گرم",
+     "from": "ok",
+     "to": "mislocated"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 336,
+    "ok": 347,
     "health_alarm": 0,
-    "missed": 32,
+    "missed": 31,
     "mislocated": 10
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 312,
+    "ok": 319,
     "health_alarm": 0,
-    "missed": 47,
-    "mislocated": 19
+    "missed": 48,
+    "mislocated": 21
    },
    "changed": [
     {
@@ -1453,10 +1477,34 @@
      "to": "missed"
     },
     {
+     "id": "r42_dehn_lemma_1910",
+     "t": "ماکس دن و اثباتِ «لمِ دن» (۱۹۱۰)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
      "id": "r42_abs_contractor_references",
      "t": "سناریوی انتزاعی: پیمانکارِ بازسازی و «معرف‌هایش»",
      "from": "ok",
      "to": "missed"
+    },
+    {
+     "id": "r43_amaranth_natgas_2006",
+     "t": "آمارانت و موقعیت‌های بزرگِ گازِ طبیعی (۲۰۰۶)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r43_mincemeat_huelva_1943",
+     "t": "جسدِ «سرگرد ویلیام مارتین» و اسنادِ هوئلوا (۱۹۴۳)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r43_abs_fan_shop_one_summer",
+     "t": "سناریوی انتزاعی: انبارِ پنکهٔ یک مغازه پس از یک تابستانِ گرم",
+     "from": "ok",
+     "to": "mislocated"
     }
    ]
   }
@@ -1619,8 +1667,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 193,
-   "fullAfter": 193
+   "fullBefore": 201,
+   "fullAfter": 201
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1629,8 +1677,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 193,
-   "fullAfter": 193
+   "fullBefore": 201,
+   "fullAfter": 201
   },
   "p_found_scope": null
  },
