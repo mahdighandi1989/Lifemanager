@@ -12,5 +12,11 @@
  "what": "گیتِ قانونِ ۴ با mypy ِ نصب‌شده قرمز بود (tests/test_types.py): ۴ خطای Column[...] در auth_service.py:155,175، dependencies/auth.py:246، routes/auth.py:102 — روی main ِ دست‌نخورده. اصلاح فقط با typing.cast (بی هیچ اثرِ زمانِ اجرا)؛ ۱۱۶ آزمونِ auth/types سبز. روتینِ مالک (general/urgent) بسنجد؛ راهِ ریشه‌ای‌تر: Mapped[...] در مدل‌ها.",
  "procedure": "CLAUDE.md#Non-negotiable rules",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "general",
+  "at": "2026-11-22T02:00:27Z",
+  "note": "۲۰۲۶-۱۱-۲۲ ناظرِ عمومی: سه cast فقط حاشیه‌نویسیِ نوع‌اند (typing.cast بی اثرِ زمانِ اجرا)؛ با mypy ِ نصب‌شده tests/test_types.py سبز و کلِ pytest ِ گیت سبز. راهِ ریشه‌ای (Mapped[...]) پیشنهاد می‌ماند، فوری نیست.",
+  "commit": ""
+ }
 }

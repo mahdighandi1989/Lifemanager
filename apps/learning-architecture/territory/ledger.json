@@ -2383,9 +2383,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-22",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI و چکیده در Crossref، PubMed 22645164 وارسی شد) — Breines & Chen 2012"
+    },
+    {
+     "at": "2026-11-22",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "۳ گزارهٔ موجود؛ گزارهٔ «شفقت ≠ کاهشِ معیار» با چهار آزمایشِ منبعِ دوم پشتیبانی شد — Breines & Chen 2012"
+    },
+    {
+     "at": "2026-11-22",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌دار (empirical) با پایهٔ نوشته‌شده — Breines & Chen 2012"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_self"
   },
   "sf_self_tracking": {
@@ -2431,9 +2449,33 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-22",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI و چکیده در Crossref، PubMed 15189583 وارسی شد) — Bardi & Schwartz 2003"
+    },
+    {
+     "at": "2026-11-22",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "۴ گزارهٔ موجود؛ دو گزارهٔ empirical با منبعِ دوم پشتیبانی شد — Bardi & Schwartz 2003"
+    },
+    {
+     "at": "2026-11-22",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌دار (empirical/theorem/outside) با پایهٔ نوشته‌شده — Bardi & Schwartz 2003"
+    },
+    {
+     "at": "2026-11-22",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 4,
+     "what": "ابزارهای صفحه (view:vals، view:concerns، tech:12، tech:15، kfam:F12، station:st_truth) موجودند و gap_fa خالی است — شرطِ گامِ ۴"
     }
    ],
-   "stage": 0,
+   "stage": 4,
    "system": "s_self"
   },
   "sf_wellbeing": {
