@@ -662,8 +662,20 @@
    ]
   },
   "a_justification_concept": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 44,
+     "at": "2026-11-22",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای «مفهومِ توجیهِ معرفتی»: مدخلِ «معرفت‌شناسی» ِ SEP §۳ «توجیه چیست؟» (تلقیِ وظیفه‌گرایانه: S در باورِ p موجه است اگر و تنها اگر موظف به خودداری از آن نباشد، با دو اشکال — ناارادی‌بودنِ باور و فاعلِ منزوی/ناتوان؛ تلقیِ ناوظیفه‌گرایانه: باور به شیوه‌ای که صدقش را به‌قدرِ کافی محتمل کند؛ این دو از هم جدا می‌شوند؛ شاهدگرایی در برابرِ اعتمادگرایی؛ درون‌گرایی/برون‌گرایی با آزمایشِ فکریِ مغز در خمره) و مدخلِ «توجیهِ معرفتی» ِ IEP (توجیه = جایگاهِ درستِ باورها نسبت به معرفت؛ وظیفه‌گرایانه در برابرِ طبیعت‌گرایانه؛ توجیهِ گزاره‌ای = داشتنِ حالت‌های ذهنیِ پشتیبان، توجیهِ باوری = افزون بر آن، ابتنای باور بر همان حالت‌ها؛ مبناگرایی و انسجام‌گرایی و دشواریِ توجیهِ استنتاجی).",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Epistemology» (M. Steup & R. Neta; first published 14 Dec 2005, substantive revision 26 Oct 2024), §3 «What is Justification?» — https://plato.stanford.edu/entries/epistemology/",
+    "Internet Encyclopedia of Philosophy, «Epistemic Justification» — https://iep.utm.edu/epi-just/"
+   ]
   },
   "a_internalism_externalism": {
    "stage": 0,
@@ -3282,6 +3294,6 @@
    "bookOnly": true
   }
  },
- "round": 43,
+ "round": 44,
  "updated": "2026-11-22"
 }
