@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-14T20:00:00Z"
 created_at: "2026-10-14T20:00:00Z"
-updated_at: "2026-10-14T20:00:00Z"
+updated_at: "2026-11-24T04:00:00Z"
 merged_from: []
 ---
 
@@ -79,3 +79,15 @@ merged_from: []
 - **A re-plan only appends** (fresh keys); never rewrite finished facets.
 - **Following a ticket to done:** verify the routine's answer against the *current* system map; an answer newer than the loaded page ⇒ reload first; "maybe not deployed yet" ⇒ wait, don't reopen; inadequate ⇒ reasoned note under the same ticket (it reopens), capped.
 - **Test it live:** real page + a real model answering every AI request + a scripted user/routine found 17 defects that unit tests had not.
+
+## Update 2026-11-24 — a "never trim" prompt section must not be fed by an unbounded registry
+
+**What happened.** The assistant's system map had a protected list of sections that the budget trimmer never shortens. One of them listed every undecided proposal (id + 60 title characters). Other routines keep adding proposals, so that protected section grew until a long page no longer fitted and the trimmer cut the user's form fields instead — the exact thing the protection order was meant to prevent. The merge gate went red for whoever added the 13th proposal, in a file they had not touched.
+
+**Lesson.** "Protected from trimming" and "grows with someone else's data" cannot both be true of the same prompt section. Every protected section needs a last-resort form whose size does not depend on the number of items (a count plus where to find the full list), reached through explicit, declared steps — full on a normal turn, compact only under pressure.
+
+**How to Apply Elsewhere.**
+- When a prompt has a fixed budget, list each section's growth source. Any section fed by a registry that other processes append to needs a constant-size fallback.
+- Prefer stepwise degradation driven by the actual budget (full → ids → count) over a fixed "last N items" cap; the cap discards data even when there is room.
+- Say in the prompt itself what was dropped and where it lives, so the model does not reason as if the list were complete.
+- Test with item counts far above today's (10× and more), not just the current count — a margin test that passes "with today's data" is a time bomb for the next contributor.
