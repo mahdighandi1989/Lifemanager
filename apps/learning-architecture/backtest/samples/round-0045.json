@@ -1,7 +1,7 @@
 [
  {
   "id": "ioannidis2005_highly_cited",
-  "frame": "Ioannidis JPA (2005), «Contradicted and Initially Stronger Effects in Highly Cited Clinical Research», JAMA 294(2):218–228: ALL original clinical-research articles published 1990–2003 in NEJM, JAMA, Lancet or specialty journals with impact factor > 7.0 that had received > 1000 ISI citations and addressed the efficacy of a therapeutic or preventive intervention (49 studies; 45 claimed efficacy). قاب با شمارِ ارجاع تعریف شده، پیش از بررسیِ سرانجام و بی‌توجه به آن. موردها = هر ۳۴ مطالعهٔ مدعیِ اثر که پژوهشِ بعدیِ بزرگ‌تر یا بهتر-کنترل‌شده سرانجامش را روشن کرده است (۷ «نقض‌شده» ⇒ نادرست؛ ۲۰ «تکرارشده» و ۷ «اثرِ نخستین قوی‌تر» ⇒ درست، چون متنِ هر مورد فقط جهتِ اثر را می‌گوید نه اندازه‌اش). ۱۱ مطالعهٔ «بی‌چالش» (سرانجام نامعلوم) و ۴ مطالعهٔ منفی (بی ادعای اثر) طبقِ قاعدهٔ «نامعلوم ⇒ کنار بگذار» نیامده‌اند و در skipped فهرست شده‌اند.",
+  "frame": "Ioannidis JPA (2005), «Contradicted and Initially Stronger Effects in Highly Cited Clinical Research», JAMA 294(2):218–228: ALL original clinical-research articles published 1990–2003 in NEJM, JAMA, Lancet or specialty journals with impact factor > 7.0 that had received > 1000 ISI citations and addressed the efficacy of a therapeutic or preventive intervention (49 studies; 45 claimed efficacy). قاب با شمارِ ارجاع تعریف شده، پیش از بررسیِ سرانجام و بی‌توجه به آن. موردها = هر ۳۳ مطالعهٔ مدعیِ اثر که پژوهشِ بعدیِ بزرگ‌تر یا بهتر-کنترل‌شده سرانجامش را روشن کرده است (۷ «نقض‌شده» ⇒ نادرست؛ ۲۰ «تکرارشده» و ۶ «اثرِ نخستین قوی‌تر» ⇒ درست، چون متنِ هر مورد فقط جهتِ اثر را می‌گوید نه اندازه‌اش). یک مطالعه که فقط با پژوهشِ هم‌طرحِ کنترل‌نشده سنجیده شده (Hertog 1993)، ۱۱ مطالعهٔ «بی‌چالش» (سرانجام نامعلوم) و ۴ مطالعهٔ منفی (بی ادعای اثر) طبقِ قاعدهٔ «نامعلوم ⇒ کنار بگذار» نیامده‌اند و در skipped فهرست شده‌اند.",
   "src": [
    "Ioannidis JPA (2005), JAMA 294(2):218–228, doi:10.1001/jama.294.2.218",
    "https://olympias.lib.uoi.gr/jspui/bitstream/123456789/22811/1/Ioannidis-2005-Contradicted%20and%20ini.pdf"
@@ -10,7 +10,7 @@
   "items": [
    {
     "id": "io01",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Volberding et al (AIDS Clinical Trials Group)، NEJM 1990): زیدوودین در آلودگیِ بی‌نشانهٔ HIV-1 پیشرفتِ بیماری را کند می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 1338 نفر (Volberding et al (AIDS Clinical Trials Group)، NEJM 1990): زیدوودین در آلودگیِ بی‌نشانهٔ HIV-1 در کوتاه‌مدت پیشرفتِ بیماری را کند می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «initially stronger effects»",
@@ -26,13 +26,14 @@
    },
    {
     "id": "io02",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Brown et al، NEJM 1990): پایین‌آوردنِ فشردهٔ چربیِ خون ضایعه‌های سرخرگِ کرونر و رویدادهای قلبی را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 146 نفر (Brown et al، NEJM 1990): پایین‌آوردنِ فشردهٔ چربیِ خون ضایعه‌های سرخرگِ کرونر و رویدادهای قلبی را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Law, Wald, Rudnicka 2003, BMJ (meta-analysis of RCTs, n=148321)"
     ],
     "class": "replicated",
+    "grp": "io_statins",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -42,7 +43,7 @@
    },
    {
     "id": "io03",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Moertel et al، NEJM 1990): لوامیزول همراهِ فلوئورواوراسیل پس از جراحی، بقای بیمارانِ سرطانِ کولون را بهتر می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 246 نفر (Moertel et al، NEJM 1990): لوامیزول همراهِ فلوئورواوراسیل پس از جراحی، بقای بیمارانِ سرطانِ کولون را بهتر می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
@@ -58,7 +59,7 @@
    },
    {
     "id": "io05",
-    "txt": "پژوهشِ مشاهده‌ایِ کوهورتِ آینده‌نگر (بی تخصیصِ تصادفی؛ مقایسهٔ کسانی که خودشان مصرف می‌کردند با کسانی که نمی‌کردند، با تعدیلِ آماری) (Stampfer et al، NEJM 1991): هورمون‌درمانیِ پس از یائسگی خطرِ بیماریِ سرخرگِ کرونر را در زنان کم می‌کند.",
+    "txt": "پژوهشِ مشاهده‌ایِ کوهورتِ آینده‌نگر (بی تخصیصِ تصادفی)، 48470 نفر (Stampfer et al، NEJM 1991): هورمون‌درمانیِ پس از یائسگی خطرِ بیماریِ سرخرگِ کرونر را در زنان کم می‌کند.",
     "truth": false,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «contradicted»",
@@ -70,12 +71,11 @@
      "badihi": "نظری",
      "vazraf": false,
      "hidden_ctrl": false
-    },
-    "enc_note": "کوهورتِ مشاهده‌ای بی تخصیصِ تصادفی؛ تعدیلِ آماری فقط عواملِ سنجیده را می‌پوشاند."
+    }
    },
    {
     "id": "io06",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (North American Symptomatic Carotid Endarterectomy Trial Collaborators، NEJM 1991): اندآرترکتومیِ کاروتید در بیمارانِ علامت‌دار با تنگیِ شدید، خطرِ سکتهٔ مغزی را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 659 نفر (North American Symptomatic Carotid Endarterectomy Trial Collaborators، NEJM 1991): اندآرترکتومیِ کاروتید در بیمارانِ علامت‌دار با تنگیِ شدید، خطرِ سکتهٔ مغزی را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
@@ -91,7 +91,7 @@
    },
    {
     "id": "io07",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (۲۰۰ بیمار) (Ziegler et al (HA-1A Sepsis Study Group)، NEJM 1991): پادتنِ تک‌دودمانیِ ضدِ اندوتوکسین (HA-1A) مرگ‌ومیرِ سپسیسِ گرم‌منفی را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 200 نفر (Ziegler et al (HA-1A Sepsis Study Group)، NEJM 1991): پادتنِ تک‌دودمانیِ ضدِ اندوتوکسین (HA-1A) مرگ‌ومیرِ سپسیسِ گرم‌منفی را کم می‌کند.",
     "truth": false,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «contradicted»",
@@ -103,12 +103,11 @@
      "badihi": "نظری",
      "vazraf": true,
      "hidden_ctrl": true
-    },
-    "enc_note": "کارآزماییِ تصادفی؛ حجمِ نمونهٔ ذکرشده در متن: ۲۰۰ بیمار."
+    }
    },
    {
     "id": "io08",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (The SOLVD Investigators، NEJM 1991): انالاپریل در بیمارانِ نارساییِ بطنِ چپ مرگ‌ومیر و بستری را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 2569 نفر (The SOLVD Investigators، NEJM 1991): انالاپریل در بیمارانِ نارساییِ بطنِ چپ مرگ‌ومیر و بستری را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
@@ -124,7 +123,7 @@
    },
    {
     "id": "io09",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Pfeffer et al (SAVE Investigators)، NEJM 1992): کاپتوپریل پس از سکتهٔ قلبی مرگ‌ومیر را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 2231 نفر (Pfeffer et al (SAVE Investigators)، NEJM 1992): کاپتوپریل پس از سکتهٔ قلبی مرگ‌ومیر را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
@@ -140,7 +139,7 @@
    },
    {
     "id": "io10",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Grines et al (PAMI Study Group)، NEJM 1993): آنژیوپلاستیِ فوری در سکتهٔ قلبیِ حاد از داروی لخته‌گشا بهتر است (مرگ یا سکتهٔ دوبارهٔ کمتر).",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 395 نفر (Grines et al (PAMI Study Group)، NEJM 1993): آنژیوپلاستیِ فوری در سکتهٔ قلبیِ حاد از داروی لخته‌گشا بهتر است (مرگ یا سکتهٔ دوبارهٔ کمتر).",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «initially stronger effects»",
@@ -156,7 +155,7 @@
    },
    {
     "id": "io12",
-    "txt": "پژوهشِ مشاهده‌ایِ کوهورتِ آینده‌نگر (بی تخصیصِ تصادفی؛ مقایسهٔ کسانی که خودشان مصرف می‌کردند با کسانی که نمی‌کردند، با تعدیلِ آماری) (Rimm et al، NEJM 1993): مصرفِ ویتامین E خطرِ بیماریِ سرخرگِ کرونر را در مردان کم می‌کند.",
+    "txt": "پژوهشِ مشاهده‌ایِ کوهورتِ آینده‌نگر (بی تخصیصِ تصادفی)، 39910 نفر (Rimm et al، NEJM 1993): مصرفِ ویتامین E خطرِ بیماریِ سرخرگِ کرونر را در مردان کم می‌کند.",
     "truth": false,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «contradicted»",
@@ -169,12 +168,11 @@
      "badihi": "نظری",
      "vazraf": false,
      "hidden_ctrl": false
-    },
-    "enc_note": "کوهورتِ مشاهده‌ای بی تخصیصِ تصادفی؛ تعدیلِ آماری فقط عواملِ سنجیده را می‌پوشاند."
+    }
    },
    {
     "id": "io13",
-    "txt": "پژوهشِ مشاهده‌ایِ کوهورتِ آینده‌نگر (بی تخصیصِ تصادفی؛ مقایسهٔ کسانی که خودشان مصرف می‌کردند با کسانی که نمی‌کردند، با تعدیلِ آماری) (Stampfer et al، NEJM 1993): مصرفِ ویتامین E خطرِ بیماریِ سرخرگِ کرونر را در زنان کم می‌کند.",
+    "txt": "پژوهشِ مشاهده‌ایِ کوهورتِ آینده‌نگر (بی تخصیصِ تصادفی)، 87245 نفر (Stampfer et al، NEJM 1993): مصرفِ ویتامین E خطرِ بیماریِ سرخرگِ کرونر را در زنان کم می‌کند.",
     "truth": false,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «contradicted»",
@@ -187,12 +185,11 @@
      "badihi": "نظری",
      "vazraf": false,
      "hidden_ctrl": false
-    },
-    "enc_note": "کوهورتِ مشاهده‌ای بی تخصیصِ تصادفی؛ تعدیلِ آماری فقط عواملِ سنجیده را می‌پوشاند."
+    }
    },
    {
     "id": "io14",
-    "txt": "گزارشِ مجموعهٔ ۹ بیمار، بی گروهِ شاهد (Rossaint et al، NEJM 1993): استنشاقِ نیتریک اکسید در سندرمِ زجرِ تنفسیِ حادِ بزرگسالان درمانِ مؤثری است (اکسیژن‌رسانی را بهتر می‌کند).",
+    "txt": "گزارشِ مجموعهٔ بیماران، بی گروهِ شاهد، 9 نفر (Rossaint et al، NEJM 1993): استنشاقِ نیتریک اکسید در سندرمِ زجرِ تنفسیِ حادِ بزرگسالان بسیار مؤثر است.",
     "truth": false,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «contradicted»",
@@ -204,18 +201,18 @@
      "badihi": "نظری",
      "vazraf": false,
      "hidden_ctrl": false
-    },
-    "enc_note": "مجموعهٔ بیماران بی گروهِ شاهد. نمونهٔ بسیار کوچک (۹ بیمار)؛ پیامدِ سنجیده اکسیژن‌رسانی است."
+    }
    },
    {
     "id": "io16",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (The EPIC Investigation، NEJM 1994): پادتنِ ضدِ گلیکوپروتئینِ IIb/IIIa در آنژیوپلاستیِ پرخطر رویدادهای قلبی را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 2099 نفر (The EPIC Investigation، NEJM 1994): پادتنِ ضدِ گلیکوپروتئینِ IIb/IIIa در آنژیوپلاستیِ پرخطر رویدادهای قلبی را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Karvouni, Katritsis, Ioannidis 2003, J Am Coll Cardiol (meta-analysis of RCTs, n=20137)"
     ],
     "class": "replicated",
+    "grp": "io_gp2b3a",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -225,13 +222,14 @@
    },
    {
     "id": "io18",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Fischman et al (Stent Restenosis Study Investigators)، NEJM 1994): استنت‌گذاری در بیماریِ کرونر از آنژیوپلاستیِ با بالون بهتر است (نیازِ کمتر به بازگشاییِ دوباره).",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 410 نفر (Fischman et al (Stent Restenosis Study Investigators)، NEJM 1994): استنت‌گذاری در بیماریِ کرونر از آنژیوپلاستیِ با بالون بهتر است (نیازِ کمتر به بازگشاییِ دوباره).",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «initially stronger effects»",
      "Brophy, Belisle, Joseph 2003, Ann Intern Med (meta-analysis of RCTs, n=9918)"
     ],
     "class": "initially stronger effects",
+    "grp": "io_stents",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -241,13 +239,14 @@
    },
    {
     "id": "io19",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Serruys et al (BENESTENT Study Group)، NEJM 1994): استنت‌گذاری در بیماریِ تک‌رگیِ کرونر از آنژیوپلاستیِ با بالون بهتر است (نیازِ کمتر به بازگشاییِ دوباره).",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 520 نفر (Serruys et al (BENESTENT Study Group)، NEJM 1994): استنت‌گذاری در بیماریِ تک‌رگیِ کرونر از آنژیوپلاستیِ با بالون بهتر است (نیازِ کمتر به بازگشاییِ دوباره).",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «initially stronger effects»",
      "Brophy, Belisle, Joseph 2003, Ann Intern Med (meta-analysis of RCTs, n=9918)"
     ],
     "class": "initially stronger effects",
+    "grp": "io_stents",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -257,7 +256,7 @@
    },
    {
     "id": "io21",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (The NINDS rt-PA Stroke Study Group، NEJM 1995): فعال‌کنندهٔ پلاسمینوژنِ بافتی (rt-PA) در سکتهٔ مغزیِ ایسکمیکِ حاد پیامدِ بیماران را بهتر می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 624 نفر (The NINDS rt-PA Stroke Study Group، NEJM 1995): فعال‌کنندهٔ پلاسمینوژنِ بافتی (rt-PA) در سکتهٔ مغزیِ ایسکمیکِ حاد پیامدِ بیماران را بهتر می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «initially stronger effects»",
@@ -273,13 +272,14 @@
    },
    {
     "id": "io22",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Shepherd et al (West of Scotland Coronary Prevention Study Group)، NEJM 1995): پراواستاتین در مردانِ دچارِ کلسترولِ بالا رویدادهای کرونری را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 6595 نفر (Shepherd et al (West of Scotland Coronary Prevention Study Group)، NEJM 1995): پراواستاتین در مردانِ دچارِ کلسترولِ بالا رویدادهای کرونری را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Law, Wald, Rudnicka 2003, BMJ (meta-analysis of RCTs, n=148321)"
     ],
     "class": "replicated",
+    "grp": "io_statins",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -289,13 +289,14 @@
    },
    {
     "id": "io23",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Sacks et al (Cholesterol and Recurrent Events Trial Investigators)، NEJM 1996): پراواستاتین پس از سکتهٔ قلبی در بیمارانِ با کلسترولِ متوسط رویدادهای کرونری را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 4195 نفر (Sacks et al (Cholesterol and Recurrent Events Trial Investigators)، NEJM 1996): پراواستاتین پس از سکتهٔ قلبی در بیمارانِ با کلسترولِ متوسط رویدادهای کرونری را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Law, Wald, Rudnicka 2003, BMJ (meta-analysis of RCTs, n=148321)"
     ],
     "class": "replicated",
+    "grp": "io_statins",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -305,13 +306,14 @@
    },
    {
     "id": "io24",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Packer et al (US Carvedilol Heart Failure Study Group)، NEJM 1996): کارودیلول در نارساییِ مزمنِ قلب مرگ‌ومیر را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 1094 نفر (Packer et al (US Carvedilol Heart Failure Study Group)، NEJM 1996): کارودیلول در نارساییِ مزمنِ قلب مرگ‌ومیر را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Brophy, Joseph, Rouleau 2001, Ann Intern Med (meta-analysis of RCTs, n=10135)"
     ],
     "class": "replicated",
+    "grp": "io_betablock_chf",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -321,7 +323,7 @@
    },
    {
     "id": "io27",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Hammer et al (ACTG 320 Study Team)، NEJM 1997): درمانِ سه‌داروییِ دارای ایندیناویر در آلودگیِ HIV-1 از درمانِ دو نوکلئوزیدی بهتر است (پیشرفتِ بیماری و مرگِ کمتر).",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 1156 نفر (Hammer et al (ACTG 320 Study Team)، NEJM 1997): درمانِ سه‌داروییِ دارای ایندیناویر در آلودگیِ HIV-1 از درمانِ دو نوکلئوزیدی بهتر است (پیشرفتِ بیماری و مرگِ کمتر).",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
@@ -337,13 +339,14 @@
    },
    {
     "id": "io28",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (The EPILOG Investigators، NEJM 1997): آبسیکسیماب در مداخلهٔ کرونریِ از راهِ پوست رویدادهای قلبی را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 2792 نفر (The EPILOG Investigators، NEJM 1997): آبسیکسیماب در مداخلهٔ کرونریِ از راهِ پوست رویدادهای قلبی را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Karvouni, Katritsis, Ioannidis 2003, J Am Coll Cardiol (meta-analysis of RCTs, n=20137)"
     ],
     "class": "replicated",
+    "grp": "io_gp2b3a",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -353,13 +356,14 @@
    },
    {
     "id": "io29",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (McHutchison et al (Hepatitis Interventional Therapy Group)، NEJM 1998): اینترفرونِ آلفا-2b همراهِ ریباویرین در هپاتیتِ C ِ مزمن از اینترفرونِ تنها بهتر است.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 912 نفر (McHutchison et al (Hepatitis Interventional Therapy Group)، NEJM 1998): اینترفرونِ آلفا-2b همراهِ ریباویرین در هپاتیتِ C ِ مزمن از اینترفرونِ تنها بهتر است.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Kjaergard, Krogsgaard, Gluud 2001, BMJ (meta-analysis of RCTs, n=6585)"
     ],
     "class": "replicated",
+    "grp": "io_ifn_ribavirin",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -369,13 +373,14 @@
    },
    {
     "id": "io30",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (The LIPID Study Group، NEJM 1998): پراواستاتین در پیشگیریِ ثانویهٔ بیماریِ کرونر مرگ‌ومیر و رویدادهای کرونری را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 9014 نفر (The LIPID Study Group، NEJM 1998): پراواستاتین در پیشگیریِ ثانویهٔ بیماریِ کرونر مرگ‌ومیر و رویدادهای کرونری را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Law, Wald, Rudnicka 2003, BMJ (meta-analysis of RCTs, n=148321)"
     ],
     "class": "replicated",
+    "grp": "io_statins",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -385,7 +390,7 @@
    },
    {
     "id": "io33",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (SHEP Cooperative Research Group، JAMA 1991): درمانِ دارویی پرفشاریِ سیستولیِ تنها در سالمندان خطرِ سکتهٔ مغزی را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 4736 نفر (SHEP Cooperative Research Group، JAMA 1991): درمانِ دارویی پرفشاریِ سیستولیِ تنها در سالمندان خطرِ سکتهٔ مغزی را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
@@ -401,7 +406,7 @@
    },
    {
     "id": "io34",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (سنجشِ نشانگرهای جانشین) (The Writing Group for the PEPI Trial، JAMA 1995): استروژن/پروژستینِ پس از یائسگی از راهِ بهتر کردنِ لیپوپروتئین‌ها و فیبرینوژن، برای پیشگیری از بیماریِ کرونر سودمند است.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 875 نفر (The Writing Group for the PEPI Trial، JAMA 1995): استروژن/پروژستینِ پس از یائسگی برای پیشگیری از بیماریِ کرونر سودمند است.",
     "truth": false,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «contradicted»",
@@ -413,12 +418,11 @@
      "badihi": "نظری",
      "vazraf": true,
      "hidden_ctrl": true
-    },
-    "enc_note": "کارآزماییِ تصادفی، ولی متن می‌گوید فقط نشانگرهای جانشین سنجیده شده (نه خودِ پیامدِ بالینی)."
+    }
    },
    {
     "id": "io35",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Executive Committee for the Asymptomatic Carotid Atherosclerosis Study، JAMA 1995): اندآرترکتومی در تنگیِ بی‌نشانهٔ کاروتیدِ بیش از ۶۰٪ خطرِ سکتهٔ مغزی یا مرگ را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 1662 نفر (Executive Committee for the Asymptomatic Carotid Atherosclerosis Study، JAMA 1995): اندآرترکتومی در تنگیِ بی‌نشانهٔ کاروتیدِ بیش از ۶۰٪ خطرِ سکتهٔ مغزی یا مرگ را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «initially stronger effects»",
@@ -434,13 +438,14 @@
    },
    {
     "id": "io37",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Downs et al، JAMA 1998): لوواستاتین در پیشگیریِ اولیه در افرادِ با کلسترولِ متوسط رویدادهای کرونری را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 6605 نفر (Downs et al، JAMA 1998): لوواستاتین در پیشگیریِ اولیه در افرادِ با کلسترولِ متوسط رویدادهای کرونری را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Law, Wald, Rudnicka 2003, BMJ (meta-analysis of RCTs, n=148321)"
     ],
     "class": "replicated",
+    "grp": "io_statins",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -449,31 +454,15 @@
     }
    },
    {
-    "id": "io40",
-    "txt": "پژوهشِ مشاهده‌ایِ کوهورت روی ۸۰۵ مردِ سالمند (بی تخصیصِ تصادفی، با تعدیلِ آماری) (Hertog et al، Lancet 1993): دریافتِ فلاونوئیدها از خوراک خطرِ مرگ از بیماریِ کرونر را کم می‌کند.",
-    "truth": true,
-    "verified_by": [
-     "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «initially stronger effects»",
-     "Huxley & Neil 2003, Eur J Clin Nutr (meta-analysis of prospective cohorts, n~105000)"
-    ],
-    "class": "initially stronger effects",
-    "f": {
-     "way": "تجربه",
-     "badihi": "نظری",
-     "vazraf": false,
-     "hidden_ctrl": false
-    },
-    "enc_note": "کوهورتِ مشاهده‌ای بی تخصیصِ تصادفی؛ تعدیلِ آماری فقط عواملِ سنجیده را می‌پوشاند. نمونه: ۸۰۵ مردِ سالمند."
-   },
-   {
     "id": "io41",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Scandinavian Simvastatin Survival Study (no personal author in reference)، Lancet 1994): سیمواستاتین در بیمارانِ کرونری با کلسترولِ بالا مرگ‌ومیر را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 4444 نفر (Scandinavian Simvastatin Survival Study (no personal author in reference)، Lancet 1994): سیمواستاتین در بیمارانِ کرونری با کلسترولِ بالا مرگ‌ومیر را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Law, Wald, Rudnicka 2003, BMJ (meta-analysis of RCTs, n=148321)"
     ],
     "class": "replicated",
+    "grp": "io_statins",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -483,7 +472,7 @@
    },
    {
     "id": "io43",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (۲۰۰۲ بیمار) (Stephens et al، Lancet 1996): ویتامین E در بیمارانِ کرونری سکتهٔ قلبی و مرگِ قلبی را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 2002 نفر (Stephens et al، Lancet 1996): ویتامین E در بیمارانِ کرونری سکتهٔ قلبی و مرگِ قلبی را کم می‌کند.",
     "truth": false,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «contradicted»",
@@ -495,18 +484,18 @@
      "badihi": "نظری",
      "vazraf": true,
      "hidden_ctrl": true
-    },
-    "enc_note": "کارآزماییِ تصادفی؛ حجمِ نمونهٔ ذکرشده در متن: ۲۰۰۲ بیمار."
+    }
    },
    {
     "id": "io45",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Poynard et al (International Hepatitis Interventional Therapy Group)، Lancet 1998): اینترفرونِ آلفا-2b همراهِ ریباویرین در هپاتیتِ C ِ مزمنِ درمان‌نشده از اینترفرونِ تنها بهتر است.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 832 نفر (Poynard et al (International Hepatitis Interventional Therapy Group)، Lancet 1998): اینترفرونِ آلفا-2b همراهِ ریباویرین در هپاتیتِ C ِ مزمنِ درمان‌نشده از اینترفرونِ تنها بهتر است.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Kjaergard, Krogsgaard, Gluud 2001, BMJ (meta-analysis of RCTs, n=6585)"
     ],
     "class": "replicated",
+    "grp": "io_ifn_ribavirin",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -516,13 +505,14 @@
    },
    {
     "id": "io47",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (CIBIS-II (no personal author in reference)، Lancet 1999): بیزوپرولول در نارساییِ قلب مرگ‌ومیر را کم می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 2647 نفر (CIBIS-II (no personal author in reference)، Lancet 1999): بیزوپرولول در نارساییِ قلب مرگ‌ومیر را کم می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
      "Brophy, Joseph, Rouleau 2001, Ann Intern Med (meta-analysis of RCTs, n=10135)"
     ],
     "class": "replicated",
+    "grp": "io_betablock_chf",
     "f": {
      "way": "تجربه",
      "badihi": "نظری",
@@ -532,7 +522,7 @@
    },
    {
     "id": "io48",
-    "txt": "گزارشِ مجموعه‌ای از بیماران، بی گروهِ شاهد (Castaigne et al، Blood 1990): اسیدِ رتینوئیکِ تمام‌ترانس در لوسمیِ پرومیلوسیتیِ حاد بهبودِ کامل می‌آورد.",
+    "txt": "گزارشِ مجموعهٔ بیماران، بی گروهِ شاهد، 22 نفر (Castaigne et al، Blood 1990): اسیدِ رتینوئیکِ تمام‌ترانس در لوسمیِ پرومیلوسیتیِ حاد بهبودِ کامل می‌آورد.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
@@ -544,12 +534,11 @@
      "badihi": "نظری",
      "vazraf": false,
      "hidden_ctrl": false
-    },
-    "enc_note": "مجموعهٔ بیماران بی گروهِ شاهد."
+    }
    },
    {
     "id": "io49",
-    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد (Fisher et al، J Natl Cancer Inst 1998): تاموکسیفن در زنانِ پرخطر از سرطانِ پستان پیشگیری می‌کند.",
+    "txt": "کارآزماییِ بالینیِ تصادفی‌شده با گروهِ شاهد، 13388 نفر (Fisher et al، J Natl Cancer Inst 1998): تاموکسیفن در زنانِ پرخطر از سرطانِ پستان پیشگیری می‌کند.",
     "truth": true,
     "verified_by": [
      "Ioannidis JPA (2005), JAMA 294(2):218–228, Table 2 — «replicated»",
@@ -639,16 +628,29 @@
     "n": 46,
     "study": "UK Prospective Diabetes Study (UKPDS) Group 1998",
     "why": "unchallenged"
+   },
+   {
+    "n": 40,
+    "study": "Hertog et al 1993",
+    "why": "initially stronger effects — ولی پژوهشِ سنجندهٔ آن (Huxley & Neil 2003) فراتحلیلِ کوهورت‌هاست، همان طرحِ کنترل‌نشده؛ سرانجام با راهِ یقینی یا نزدیک به یقین احراز نشده (شرطِ ۲ ِ قضیه) ⇒ کنار"
    }
   ],
   "caveats": [
    "سرانجام به داوریِ Ioannidis تا ۲۰۰۵ است؛ خودش می‌گوید پژوهشِ بعدی الزاماً درست نیست",
    "گزینش با شمارِ ارجاع (>۱۰۰۰) است، نه نمونهٔ تصادفی از همهٔ پژوهش‌ها",
    "فقط ۶ مطالعهٔ غیرتصادفی در قاب هست",
-   "دو کوهورتِ ویتامین E با یک کارآزمایی (HOPE) سنجیده شده‌اند ⇒ یک grp"
+   "دو کوهورتِ ویتامین E با یک کارآزمایی (HOPE) سنجیده شده‌اند ⇒ یک grp",
+   "io05 (Stampfer 1991) و io13 (Stampfer 1993) هر دو از کوهورتِ Nurses' Health Study اند ⇒ واحدهای مستقلِ غیرتصادفی شاید ۳ باشد نه ۴",
+   "io14 (Rossaint 1993): آنچه خودِ مقاله سنجید (اکسیژن‌رسانی) رد نشد؛ «نقض‌شده» به خوانشِ Ioannidis از ادعای کارایی است (بقا بهتر نشد)",
+   "حساسیتِ مقدارِ پایه (غیرتصادفی‌ها): ۴ گروه، ۱ درست ⇒ (۱+۱)/(۴+۲)=۳۳٫۳؛ با ادغامِ NHS ⇒ ۳ گروه، ۱ درست ⇒ ۴۰٫۰؛ اگر io14 درست شمرده شود ⇒ ۵۰٫۰؛ اگر Hertog هم درست شمرده می‌شد ⇒ ۴۲٫۹",
+   "io01: «اثرِ نخستین قوی‌تر» این‌جا یعنی سودِ کوتاه‌مدتی که پس از ۱۸ ماه از میان رفت",
+   "متنِ هر مورد یک قالبِ یکسان دارد: طرح، شمارِ نمونهٔ Table 1، ارجاع، جهتِ اثر — بی هیچ قیدِ ویژهٔ موردی"
   ],
-  "encoding": "رمزگذارِ کورِ جدا (زیرعاملِ دورِ ۴۵): فقط متنِ هر مورد و epi_feat.js را دید، نه truth/class را؛ قاعدهٔ یکسان از روی طرحِ پژوهش",
+  "encoding": "رمزگذارِ کورِ جدا (زیرعاملِ دومِ دورِ ۴۵، پس از یکدست‌شدنِ متن‌ها به خواستِ بازبینِ مستقل): فقط متنِ هر مورد و epi_feat.js را دید؛ قاعدهٔ یکسان از روی طرحِ پژوهش",
   "by": "routine",
-  "round": 45
+  "round": 45,
+  "excluded": true,
+  "excludedWhy": "کنار گذاشتهٔ خودِ روتین (نه مالک) تا تصمیم دربارهٔ p_base_hidden_factor_scope: قاب درست و کامل است، ولی مقدارِ سنجیده روی ۴ گروهِ پژوهشِ بالینیِ غیرتصادفی با قاعدهٔ امروز بر همهٔ حوزه‌ها اعمال می‌شد (بازبینیِ مستقلِ دورِ ۴۵، بندِ ۱۳). با «بپذیر» ِ مالک روی آن پیشنهاد، excluded برداشته می‌شود.",
+  "review": "بازبینِ مستقلِ دورِ ۴۵: تعریفِ قاب، شمارها (۷/۷/۲۰ + ۱۱ + ۴) و طرح/ردهٔ هر ۳۴ مورد با Table 1/2 ِ مقاله خواند؛ اصلاح‌ها: قالبِ یکسانِ متن، کنار رفتنِ Hertog 1993، گروه‌بندی‌ها، قیدِ io01/io14"
  }
 ]

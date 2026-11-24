@@ -1,6 +1,6 @@
 {
- "round": 44,
- "at": "2026-11-23",
+ "round": 45,
+ "at": "2026-11-24",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,7 +1136,7 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 356,
+    "ok": 365,
     "health_alarm": 0,
     "missed": 32,
     "mislocated": 10
@@ -1145,9 +1145,9 @@
   },
   "deg": {
    "kinds": {
-    "ok": 328,
+    "ok": 336,
     "health_alarm": 0,
-    "missed": 49,
+    "missed": 50,
     "mislocated": 21
    },
    "changed": [
@@ -1318,12 +1318,18 @@
      "t": "سناریوی انتزاعی: انبارِ پنکهٔ یک مغازه پس از یک تابستانِ گرم",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r45_sun_hillsborough_truth_1989",
+     "t": "روزنامهٔ «سان» و تیترِ «حقیقت» دربارهٔ فاجعهٔ هیلزبورو (۱۹۸۹)",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 356,
+    "ok": 365,
     "health_alarm": 0,
     "missed": 32,
     "mislocated": 10
@@ -1332,9 +1338,9 @@
   },
   "both": {
    "kinds": {
-    "ok": 328,
+    "ok": 336,
     "health_alarm": 0,
-    "missed": 49,
+    "missed": 50,
     "mislocated": 21
    },
    "changed": [
@@ -1505,6 +1511,12 @@
      "t": "سناریوی انتزاعی: انبارِ پنکهٔ یک مغازه پس از یک تابستانِ گرم",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r45_sun_hillsborough_truth_1989",
+     "t": "روزنامهٔ «سان» و تیترِ «حقیقت» دربارهٔ فاجعهٔ هیلزبورو (۱۹۸۹)",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   }
@@ -1667,8 +1679,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 208,
-   "fullAfter": 208
+   "fullBefore": 216,
+   "fullAfter": 216
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1677,8 +1689,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 208,
-   "fullAfter": 208
+   "fullBefore": 216,
+   "fullAfter": 216
   },
   "p_found_scope": null
  },

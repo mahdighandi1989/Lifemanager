@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-23",
- "round": 44,
+ "updated": "2026-11-24",
+ "round": 45,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -79,8 +79,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 86,
-    "freshOk": 67,
+    "fresh": 89,
+    "freshOk": 70,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -138,8 +138,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 46,
-    "freshOk": 31,
+    "fresh": 47,
+    "freshOk": 32,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -190,8 +190,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 37,
-    "freshOk": 34,
+    "fresh": 39,
+    "freshOk": 36,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 89,
-    "freshOk": 67,
+    "fresh": 91,
+    "freshOk": 69,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -448,8 +448,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 50,
-    "freshOk": 43,
+    "fresh": 52,
+    "freshOk": 45,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,8 +1154,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 38,
-    "freshOk": 29,
+    "fresh": 43,
+    "freshOk": 34,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1327,8 +1327,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 38,
-    "freshOk": 29,
+    "fresh": 43,
+    "freshOk": 34,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1444,8 +1444,8 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 38,
-    "freshOk": 29,
+    "fresh": 43,
+    "freshOk": 34,
     "ids": [
      "r19_killian_memos_2004",
      "r21_camping_rapture_2011",
@@ -1505,8 +1505,8 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 13,
-    "freshOk": 13,
+    "fresh": 15,
+    "freshOk": 15,
     "ids": [
      "r21_meselson_stahl_1958",
      "r27_hpylori_nih_1994",
@@ -1634,7 +1634,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1647,8 +1647,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 50,
-    "freshOk": 41,
+    "fresh": 57,
+    "freshOk": 48,
     "ids": [
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
@@ -1734,7 +1734,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1747,8 +1747,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 31,
-    "freshOk": 26,
+    "fresh": 33,
+    "freshOk": 28,
     "ids": [
      "r23_wirecard_trust_accounts_2019",
      "r23_ariane5_501_1996",
@@ -1824,7 +1824,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1862,7 +1862,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1904,7 +1904,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1953,7 +1953,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1985,7 +1985,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -2019,7 +2019,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2068,7 +2068,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2108,7 +2108,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2138,7 +2138,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2172,7 +2172,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2204,7 +2204,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2242,7 +2242,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2270,7 +2270,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2335,8 +2335,8 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 24,
-    "freshOk": 22,
+    "fresh": 29,
+    "freshOk": 27,
     "ids": [
      "r31_bre_x_busang_1996",
      "r34_chicago_tribune_election_1948",
@@ -2414,7 +2414,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2468,8 +2468,8 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 24,
-    "freshOk": 22,
+    "fresh": 29,
+    "freshOk": 27,
     "ids": [
      "r31_bre_x_busang_1996",
      "r34_chicago_tribune_election_1948",
@@ -2648,7 +2648,7 @@
     "s19",
     "s22"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r27_frege_basic_law_v_1893",
@@ -2683,7 +2683,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 44,
+   "lastSeenRound": 45,
    "resolved": "2026-11-02",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
    "reopened": "2026-11-02"
@@ -2719,7 +2719,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r28_surgisphere_lancet_2020",
@@ -2752,7 +2752,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r29_abs_pilot_supplier",
@@ -2784,7 +2784,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r29_wakefield_lancet_1998",
@@ -2816,7 +2816,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2832,8 +2832,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 83,
-    "freshOk": 70,
+    "fresh": 87,
+    "freshOk": 74,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -2911,7 +2911,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r31_bre_x_busang_1996",
@@ -2944,7 +2944,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r31_dreyfus_bordereau_1894",
@@ -2960,8 +2960,8 @@
    },
    "retest": {
     "since": 31,
-    "fresh": 22,
-    "freshOk": 19,
+    "fresh": 25,
+    "freshOk": 22,
     "ids": [
      "r32_hitler_diaries_1983",
      "r32_madoff_trackrecord_2005",
@@ -3036,7 +3036,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r32_madoff_trackrecord_2005",
@@ -3071,7 +3071,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r33_beringer_lying_stones_1725",
@@ -3154,8 +3154,8 @@
    },
    "retest": {
     "since": 35,
-    "fresh": 21,
-    "freshOk": 21,
+    "fresh": 23,
+    "freshOk": 23,
     "ids": [
      "r36_jimmys_world_1980",
      "r37_abs_rent_plateau_loan",
@@ -3204,8 +3204,8 @@
    },
    "retest": {
     "since": 37,
-    "fresh": 27,
-    "freshOk": 26,
+    "fresh": 30,
+    "freshOk": 29,
     "ids": [
      "r38_dow36000_1999",
      "r38_shiller_exuberance_2000",
@@ -3264,8 +3264,8 @@
    },
    "retest": {
     "since": 37,
-    "fresh": 27,
-    "freshOk": 26,
+    "fresh": 30,
+    "freshOk": 29,
     "ids": [
      "r38_dow36000_1999",
      "r38_shiller_exuberance_2000",
@@ -3324,8 +3324,8 @@
    },
    "retest": {
     "since": 38,
-    "fresh": 21,
-    "freshOk": 20,
+    "fresh": 25,
+    "freshOk": 24,
     "ids": [
      "r39_quebec_bridge_1907",
      "r39_credit_suisse_archegos_2021",
@@ -3470,20 +3470,22 @@
    "case": "r42_dehn_lemma_1910",
    "opened": "2026-11-18",
    "openedRound": 42,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خطای رمزگذاری پرونده",
-   "note": "خطای پرونده (داستان)، نه خطای رمزگذار: داستان (به قاعدهٔ «بی نشتِ سرانجام» ِ دورِ ۴۱) گامِ ناقصِ خودِ برهان را نگفت، پس رمزگذارِ کور نه form نوشت نه matter؛ ولی رخنه در متنِ خودِ برهانِ ۱۹۱۰ بود، نه فقط در سرانجام — s40: «یقین در تصدیقِ نظری تنها با مادهٔ بدیهی و صورتِ معتبر». قراردادِ بذرِ همانند (cs_kempe_fourcolor) گامِ ناقص را در داستان می‌آورد. اصلاحِ داستان + بازرمزگذاریِ کور به دورِ بعد سپرده شد و بستن فقط با وقایعِ تازه شمرده می‌شود؛ برچسب دست نخورد.",
+   "note": "خطای پرونده (داستان)، نه خطای رمزگذار: داستان (به قاعدهٔ «بی نشتِ سرانجام» ِ دورِ ۴۱) گامِ ناقصِ خودِ برهان را نگفت، پس رمزگذارِ کور نه form نوشت نه matter؛ ولی رخنه در متنِ خودِ برهانِ ۱۹۱۰ بود، نه فقط در سرانجام — s40: «یقین در تصدیقِ نظری تنها با مادهٔ بدیهی و صورتِ معتبر». قراردادِ بذرِ همانند (cs_kempe_fourcolor) گامِ ناقص را در داستان می‌آورد. اصلاحِ داستان + بازرمزگذاریِ کور به دورِ بعد سپرده شد و بستن فقط با وقایعِ تازه شمرده می‌شود؛ برچسب دست نخورد. [دورِ ۴۵] «verified» ِ ابزار با وقایعِ هم‌ساختار پشتیبانی نشده است (بازبینِ مستقلِ دورِ ۴۵، بندِ ۱۶): وقایعِ تازهٔ شمرده‌شده همان الگوی این یافته را نمی‌آزمایند؛ ملاکِ تأیید تصمیمِ مالک است ⇒ افزودهٔ دورِ ۴۵ به پیشنهادِ p_partial_location_findings. تا آزمونِ هم‌ساختار، این تأیید را موقت بدان.",
    "fix": {
     "what": "خطای پرونده: داستان گامِ کوتاه‌استدلالِ حذفِ خودبرخوردها را (از متنِ خودِ برهانِ ۱۹۱۰، نه از سرانجام) آورد و رمزگذارِ جدا کور بازرمز کرد ⇒ matter=«مقدمه اثبات‌نشده»؛ برچسب دست نخورد. تأیید فقط با وقایعِ تازه.",
     "round": 43
    },
    "retest": {
     "since": 43,
-    "fresh": 2,
-    "freshOk": 2,
+    "fresh": 4,
+    "freshOk": 4,
     "ids": [
      "r44_tractatus_final_1918",
-     "r44_people_v_collins_1964"
+     "r44_people_v_collins_1964",
+     "r45_descartes_collision_rules_1644",
+     "r45_kelvin_age_of_earth_1897"
     ]
    },
    "kind": "missed",
@@ -3509,7 +3511,8 @@
    ],
    "lastSeenRound": 43,
    "resolved": "2026-11-21",
-   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
+   "verified": "2026-11-23"
   },
   {
    "id": "f_r42_diphoton_750gev_2015",
@@ -3541,7 +3544,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r42_tnr_hack_heaven_1998",
@@ -3579,7 +3582,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r44_barry_george_fdr_2001",
@@ -3612,25 +3615,31 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 45
   },
   {
    "id": "f_r44_mobible_dss_fragments_2009",
    "case": "r44_mobible_dss_fragments_2009",
    "opened": "2026-11-22",
    "openedRound": 44,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
-   "note": "خطای سازنده (روتین): تصدیقِ یگانه دو راه را در هم آمیخته بود — گفتهٔ فروشندگان (نقل، s47–s48) و نسبت‌دادنِ پژوهشگران (تخصصِ دیگران، s49: «گواهیِ کارشناس به اندازهٔ روشش اعتبار دارد») — و برچسب فقط یکی را می‌گفت؛ رمزگذارِ کور به‌درستی راهِ کارشناس را برگزید. جزوه و موتور درست‌اند.",
+   "note": "خطای سازنده (روتین): تصدیقِ یگانه دو راه را در هم آمیخته بود — گفتهٔ فروشندگان (نقل، s47–s48) و نسبت‌دادنِ پژوهشگران (تخصصِ دیگران، s49: «گواهیِ کارشناس به اندازهٔ روشش اعتبار دارد») — و برچسب فقط یکی را می‌گفت؛ رمزگذارِ کور به‌درستی راهِ کارشناس را برگزید. جزوه و موتور درست‌اند. [دورِ ۴۵] «verified» ِ ابزار با وقایعِ هم‌ساختار پشتیبانی نشده است (بازبینِ مستقلِ دورِ ۴۵، بندِ ۱۶): وقایعِ تازهٔ شمرده‌شده همان الگوی این یافته را نمی‌آزمایند؛ ملاکِ تأیید تصمیمِ مالک است ⇒ افزودهٔ دورِ ۴۵ به پیشنهادِ p_partial_location_findings. تا آزمونِ هم‌ساختار، این تأیید را موقت بدان.",
    "fix": {
     "what": "تصدیق به دو تصدیق (فروشندگان / پژوهشگران) شکست، برچسب [st_naql, st_expert] با دلیلِ مستند، بازرمزگذاریِ کورِ جدا؛ تأیید فقط با وقایعِ تازه",
     "round": 44
    },
    "retest": {
     "since": 44,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 5,
+    "freshOk": 5,
+    "ids": [
+     "r45_parmalat_bonlat_confirmation_2003",
+     "r45_sun_hillsborough_truth_1989",
+     "r45_sacromonte_lead_books_1595",
+     "r45_abs_wholesaler_bank_letter",
+     "r45_abs_local_channel_factory_fire"
+    ]
    },
    "kind": "mislocated",
    "title": "پاره‌های «طومارهای بحرالمیت» ِ موزهٔ کتابِ مقدس (۲۰۰۹ تا ۲۰۱۴)",
@@ -3660,7 +3669,8 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 44
+   "lastSeenRound": 44,
+   "verified": "2026-11-23"
   },
   {
    "id": "f_r4_redfield_arsenic",
@@ -3721,8 +3731,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 51,
-    "freshOk": 37,
+    "fresh": 53,
+    "freshOk": 39,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
@@ -3776,8 +3786,8 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 51,
-    "freshOk": 37,
+    "fresh": 53,
+    "freshOk": 39,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",

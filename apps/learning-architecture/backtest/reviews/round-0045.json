@@ -1,0 +1,131 @@
+{
+ "round": 45,
+ "reviewer": "زیرعاملِ جدا",
+ "checked": {
+  "events_real": false,
+  "encoding_blind": false,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "problems": [
+  {
+   "what": "corpus/round-0045.json r45_kelvin_age_of_earth_1897 truth.why: «سن‌سنجیِ پرتوزا سنِ زمین را ۴٫۵۴ ± ۰٫۰۵ میلیارد سال نشان داد (پترسون ۱۹۵۶)» is a misattribution. Patterson (1956, Geochim. Cosmochim. Acta 10:230–237) reported 4.55 ± 0.07 Gyr; 4.54 ± 0.05 Gyr is the modern USGS/Dalrymple value. The case's own cited page says so: en.wikipedia.org/wiki/Age_of_Earth — lead: 'estimated to be 4.54 ± 0.05 billion years' (USGS 1997); section Use of meteorites: 'An age of 4.55 ± 0.07 billion years, very close to today's accepted age, was determined by Clair Cameron Patterson ... published in 1956'.",
+   "fix": "رقمِ پترسون در truth.why اصلاح شد (۴٫۵۵ ± ۰٫۰۷؛ امروز ۴٫۵۴ ± ۰٫۰۵)",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "corpus/round-0045.json r45_kelvin_age_of_earth_1897 story: the sentence «در حسابش نه منبعِ گرمای دیگری در درونِ زمین بود و نه جابه‌جاییِ ماده در ژرفا» lists, in negative form, exactly the two things later shown to matter (radioactivity; mantle convection — England, Molnar & Richter 2007). That selection is made with hindsight and points the encoder at the unproven premises. Also minor: the cited source (GSA Today 17(1):4) gives Kelvin's 1863 bounds as '24 Ma and 400 Ma' while the story says 20–400 (Kelvin's own 1862 text and Dalrymple say 20, so the story is defensible, but it differs from the cited source).",
+   "fix": "جملهٔ «نه… نه…» برداشته و الگو به زبانِ خودِ کلوین گفته شد؛ منبعِ ۱۸۶۳ ِ خودِ کلوین افزوده شد؛ بازرمزگذاریِ کورِ دوم (f همان ماند)",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "corpus/round-0045.json r45_kelvin_age_of_earth_1897 truth.fail = [st_aql] only, although the story says geologists' evidence and Perry's 1895 Nature critique were set aside and truth.right itself says he should have treated «ناسازگاریِ آن با شواهدِ زمین‌شناسی» as a reason to test the premises. The blind encoder set conflict_ignored:true and the engine flagged st_aql+st_conflict; in foundation.json (deg/both modes) the case moves ok→mislocated. Descartes, with the same structure, is labelled [st_aql, st_conflict] — inconsistent labelling inside one round.",
+   "fix": "برچسبِ کلوین [st_aql, st_conflict] شد (s53) با ثبت در edits که پس از دیدنِ حکم بود",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "corpus/round-0045.json r45_sacromonte_lead_books_1595 story: «هر دو [آلونسو دل کاستیو و میگل د لونا] در پیدا شدنِ بخشی از کتاب‌ها هم دست داشتند» and truth.why «تنها راهِ فهمِ متن مترجمانی بودند که خود در یافتنِ کتاب‌ها دست داشتند». The only basis is one sentence of the cited Wikipedia article ('had indeed been instrumental in the rediscovery of some of the books'), which is unreferenced in an article tagged 'more footnotes needed / original research'. Scholarly accounts say the plomos were found by treasure hunters on Valparaíso hill in 1595 (Granada municipal archive, UGR journals; Harris 2007), and Luna/Castillo are suspected as authors, not recorded as finders; other translators (Diego de Urrea, López Tamarid, Arias Montano consulted) were also used, so 'only way' is overstated. Besides being weakly sourced, the sentence is a pointing phrase: it hands the encoder the conflict of interest (encoder set x_bias:true, narrator unknown) and it is not shown that Castro knew this when he judged.",
+   "fix": "داستان و why بازنویسی شد: یابندگان = گنج‌جویان؛ «بیشتر به دو مترجم تکیه داشت»؛ منبعِ García-Arenal & Rodríguez Mediano افزوده شد؛ بازرمزگذاریِ کور",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "corpus/round-0045.json r45_sacromonte_lead_books_1595 story also contains «غرناطه تا ۱۴۹۲ در دستِ مسلمانان بود و کلیسایش با این یافته‌ها پیشینه‌ای از سدهٔ نخست و قدیسی بنیان‌گذار پیدا می‌کرد» — true, but it is the collector's explanation of the motive, placed in the story so that bg_undue becomes readable (encoder set bg_undue:true). Minor accuracy: the 1682 condemnation covered parchment and lead books but the relics were never condemned (Wikipedia: 'The authenticity of the bones and ashes of the 12 martyrs was never officially challenged'); the claim text bundles 'books and bones' and truth.why does not say the relics kept their official standing.",
+   "fix": "جملهٔ تفسیریِ سودِ شهر از داستان برداشته شد (فقط واقعیتِ ۱۴۹۲ ماند)؛ تصدیق به کتاب‌ها محدود شد و why می‌گوید استخوان‌ها هرگز محکوم نشدند",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "corpus/round-0045.json r45_will_rogers_stage_migration_1985: the title shown to the blind encoder is «بقای بهترِ هر مرحلهٔ سرطانِ ریه و «پدیدهٔ ویل راجرز» (۱۹۸۵)» — it names the artifact that is the answer (Feinstein's term for stage migration producing misleading survival statistics). This is wording that points at the error. Second issue: the judged belief has no identified actor — «برداشتِ رایج از چنین جدول‌هایی…» / actor «خوانندهٔ آمارِ سرطان» — Feinstein, Sosin & Wells did not themselves conclude that treatment improved; the case is tier 'real' but the claimant is generic. Third (small): truth.why explains the per-stage rise by migration but the story also says overall survival was higher; the paper attributes that to a 'zero-time shift' (earlier diagnosis), which truth.why omits (PubMed 4000199 abstract: 'the recent cohort had a prognostically favorable zero-time shift').",
+   "fix": "عنوان و شناسه خنثی شد (r45_lung_cancer_stage_survival_1985)؛ actor_generic=true و «جابه‌جاییِ نقطهٔ صفر» در why؛ بازرمزگذاریِ کور",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "corpus/round-0045.json abstract twins: title of r45_abs_wholesaler_bank_letter «…نامهٔ بانکی‌ای که خودِ خریدار آورد» and actor of r45_abs_local_channel_factory_fire «…اتهامی را بر پایهٔ گفتهٔ یک طرفِ ماجرا با عنوانِ «حقیقت» منتشر کرد» are evaluative/pointing and are visible to the encoder. Also r45_abs_local_channel_factory_fire is not a strict structural copy of its `from` case: it adds an explicit «با آتش‌نشانی یا کارگران تماس نگرفت», which the real Sun story does not contain — that added sentence is exactly what makes st_resp detectable in the twin while it is not in the real case (encoder: inquiry set in twin, unset in real; issued:true in twin vs issued:false in real for the same structure).",
+   "fix": "عنوان/کنشگرِ هر دو سناریو خنثی شد؛ جملهٔ «تماس نگرفت» از سناریوی کانال برداشته و برچسبش مثلِ پروندهٔ مادر [st_naql] شد؛ بازرمزگذاریِ کورِ هر دو",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "corpus/round-0045.json r45_sun_hillsborough_truth_1989: truth.fail includes st_resp and truth.why says «پرسیدن از شاهدانِ بیرون از پلیس ممکن بود», but the story gives no information on what the paper did or did not check, so the label names a station the story cannot support; the engine's partial location (st_naql only) is the honest consequence, and the explanation given for it is adequate. Note the encoder inconsistency: in the Parmalat story, which is equally silent about a direct query to the bank, the encoder did set inquiry=«ممکن بود و انجام نشد».",
+   "fix": "st_resp از برچسبِ سان برداشته شد (داستان دربارهٔ وارسیِ پیش از چاپ ساکت است و منبعِ وارسی‌شده‌ای نبود)؛ ثبت در edits",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "corpus/round-0045.json r45_parmalat_bonlat_confirmation_2003: (a) the letter date «۶ مارس» (no year) is correct (document dated 6 March 2003, per contemporaneous press, e.g. Taipei Times 21 Dec 2003 / NBC) but is not in any of the three cited sources (SEC LR-18527, the Economist reproduction, Wikipedia timeline); (b) the story cites inside itself a post-collapse source, «به گزارشِ هفته‌نامهٔ اکونومیست، گرنت تورنتون ظاهراً…», placed right after «رویهٔ استانداردِ حسابرسی این است که حسابرس خودش، مستقل از صاحب‌کار…» — this juxtaposition is the Economist's own after-the-fact diagnosis ('Standard practice is for auditors to write independently to banks… Grant Thornton, it seems, relied on Parmalat's internal mail… an astonishing lapse') carried into the story; (c) SEC wording is 'The bank account and the assets did not exist and the purported confirmation had been forged' — translation in truth.why is faithful. Facts otherwise verified (€3.95bn; BoA New York; Grant Thornton S.p.A.; BoA denial 19 Dec 2003; Economist 15 Jan 2004).",
+   "fix": "سالِ نامه (۲۰۰۳) و منبعِ تاریخِ ۶ مارس (American Banker) افزوده شد؛ ارجاع به اکونومیست از داستان به why/src رفت؛ بازرمزگذاریِ کور",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "corpus/round-0045.json r45_shroud_turin_radiocarbon_1988 story: «به گزارشِ خودِ پژوهش، نتیجه‌های سه آزمایشگاه با هم سازگار بود» overstates Damon et al. 1989. The paper reports excellent agreement for the three control samples but for the Shroud sample a chi-square of 6.4 (2 d.f., about the 5% level) and says the spread for sample 1 is somewhat greater than expected from the quoted errors, which is why an unweighted mean with enlarged error was used; its own conclusion is 'conclusive evidence that the linen of the Shroud of Turin is mediaeval' (Nature 337:611–615 abstract). Re-analyses of the raw data (Casabianca et al. 2019, Archaeometry 61:1223–31; Wikipedia 'Radiocarbon dating of the Shroud of Turin') find the inter-laboratory data heterogeneous and say the stated 95% range cannot be called conclusive for the whole cloth, while not ruling out a medieval date. So 'sound' is fair for «پارچه از سده‌های میانه است» but less clearly for the exact «۱۲۶۰–۱۳۹۰ با اطمینانِ ۹۵٪»; truth.why mentions the heterogeneity criticism but asserts none of the criticisms matters. Other facts verified (21 April 1988; Arizona/Oxford/Zurich; British Museum; 13 Oct 1988; first certain appearance 1350s).",
+   "fix": "داستان به گفتهٔ خودِ مقاله بازنویسی شد (پراکندگیِ بیشتر از خطای اعلام‌شده)؛ تصدیق به «سده‌های میانه» محدود شد؛ why بازتحلیلِ Casabianca 2019 را می‌گوید؛ بازرمزگذاریِ کور",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "corpus/round-0045.json r45_descartes_collision_rules_1644: facts verified against the cited Bennett text (art. 36; art. 49 rule 4; end of art. 52 'These matters don't need proof because they are self-evident'; art. 53 'experience often seems to conflict with the rules') and SEP. But the Huygens statement in truth.why (showed in the 1650s that all rules but the first are wrong; published 1669) is supported by neither cited source — the SEP entry 'Descartes' Physics' does not mention Huygens at all. The statement is historically correct (De motu corporum ex percussione, written 1650s, printed 1703; rules in Journal des Sçavans / Phil. Trans. 1669). Minor pointing phrase in the story: «بی توجه به جهتِ حرکت».",
+   "fix": "منبعِ هویگنس (۱۶۶۹) افزوده و «بی توجه به جهتِ حرکت» از داستان برداشته شد؛ بازرمزگذاریِ کور",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "samples/round-0045.json ioannidis2005_highly_cited — outcome-correlated wording in item texts. Extra design caveats were added to exactly five items, all of them 'contradicted' or 'initially stronger' and none of the 20 'replicated': io07 «(۲۰۰ بیمار)», io43 «(۲۰۰۲ بیمار)», io14 «مجموعهٔ ۹ بیمار», io40 «روی ۸۰۵ مردِ سالمند», io34 «(سنجشِ نشانگرهای جانشین)». Replicated items with equally small samples carry no number (Brown 1990 n=146, Moertel 1990 n=246, PAMI n=395, Castaigne 1990 n=22 — Table 1). The numbers echo Box 1 of the paper, which is written after the outcome. The blind encoder noticed them (enc_note on io07, io14, io34, io40, io43). In this round they did not change any f (all RCTs got vazraf/hidden_ctrl true, all nonrandomized false), so the measured base is unaffected, but the frame text is not outcome-neutral and would bias any future feature that reads sample size or surrogate endpoints.",
+   "fix": "متنِ هر ۳۳ موردِ قاب در یک قالبِ یکسان (طرح، شمارِ نمونهٔ Table 1، ارجاع، جهتِ اثر) بازنویسی و با رمزگذارِ کورِ دوم از نو رمز شد",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "samples/round-0045.json — the measured base p_hidden_factor (74.95 → 42.9; n=5 groups, ok=2; (2+1)/(5+2)=42.9, interval 11.8–76.9) follows arithmetically from the data, but both 'true' and one 'false' depend on judgment calls: (1) io40 Hertog 1993 is counted true on the strength of Huxley & Neil 2003, a meta-analysis of prospective cohorts — the same uncontrolled design (Table 2: 'MA cohorts'); no randomized evidence settled it, so its 'fate' is not determined by better-controlled research (Ioannidis: subsequent studies 'either larger or better controlled'); (2) io14 Rossaint 1993 is counted false although the claim actually made and measured (better oxygenation) was not refuted — the item text itself adds «(اکسیژن‌رسانی را بهتر می‌کند)»; Ioannidis' Table 2 says 'Despite initial claims of better oxygenation, nitric oxide does not improve survival', and the original authors wrote that randomized trials were needed to see whether outcome improves. With Hertog set aside the value is (1+1)/(4+2)=33.3; with Rossaint read as true it is 57.1. The frame's caveats list does not mention either point.",
+   "fix": "Hertog 1993 (io40) به skipped رفت (سرانجامش با پژوهشِ هم‌طرح سنجیده شده)؛ متنِ io14 فقط ادعای کارایی را می‌گوید؛ هر چهار حساسیت در caveats ثبت شد",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "foundation/ledger (baseChanges p_hidden_factor): a value measured on five highly-cited nonrandomized clinical intervention studies (JAMA 2005 frame; caveat in the sample itself: «گزینش با شمارِ ارجاع… نه نمونهٔ تصادفی», «فقط ۶ مطالعهٔ غیرتصادفی») now replaces the theorem bound for every claim with hidden_ctrl:false in all domains (polls, markets, everyday induction — foundation.json 'both' mode: several non-medical cases change status). For expert bases the system keeps one base per measured population (x_field, T_pop); here one medical population is applied to all.",
+   "fix": "قاب excluded شد (خودِ روتین، با دلیل) و پیشنهادِ p_base_hidden_factor_scope برای مالک نوشته شد ⇒ هیچ مقدارِ پایه‌ای جابه‌جا نشد (p_hidden_factor = ۷۴٫۹۵ ماند)",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "samples/round-0045.json grouping: joining io12+io13 (two vitamin-E cohorts, same question, same refuting trial HOPE, overlapping Harvard investigators) is right. Not grouped but dependent: io05 (Nurses' Health Study, Stampfer 1991, HRT) shares cohort, first author and healthy-user confounding with io13 (Nurses' Health Study, Stampfer 1993, vitamin E) — arguably 4, not 5, independent nonrandomized units. Among RCT items (not used for any base this round) several are verified by one and the same meta-analysis and are not independent: io18+io19 (Brophy 2003), io22/io23/io30/io37/io41 (Law 2003), io29+io45 (Kjaergard 2001), io16+io28 (Karvouni 2003), io24+io47 (Brophy 2001), and io05+io34 share WHI.",
+   "fix": "وابستگیِ NHS در caveats با مقدارِ ۳-واحدی (۴۰٫۰)؛ grp برای جفت‌ها/مجموعه‌های RCT ِ هم‌سنجه (استنت، استاتین، اینترفرون+ریباویرین، GP IIb/IIIa، بتابلوکر) افزوده شد",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "samples/round-0045.json io01 (ACTG019): text «زیدوودین در آلودگیِ بی‌نشانهٔ HIV-1 پیشرفتِ بیماری را کند می‌کند» is marked true, but Ioannidis' own verdict is that the benefit was short-lived and 'lost after 18 months both in the same trial and … in a subsequent meta-analysis' (Box 1). An unqualified 'slows progression' is true only for the first year. io03 (Moertel): replication (Gill 2004) concerns fluorouracil-based adjuvant therapy; levamisole's own contribution was not confirmed — the direction-only reading holds for the combination vs surgery alone, as worded. No item text contains an effect size; counts (7/7/20 = 34), the 15 skipped (11 unchallenged + 4 negative) and all 34 designs/classes match Table 1/Table 2 (all six nonrandomized checked: Stampfer 1991 cohort/contradicted, Rimm 1993 cohort/contradicted, Stampfer 1993 cohort/contradicted, Rossaint 1993 case series n=9/contradicted, Hertog 1993 cohort n=805/initially stronger, Castaigne 1990 case series n=22/replicated).",
+   "fix": "io01 با قیدِ «در کوتاه‌مدت» و توضیح در caveats",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "findings.json — two fixed→verified transitions rest on weak fresh tests (tool rule: ≥3 fresh, all 'ok'). f_r44_mobible_dss_fragments_2009 (a claim mixing sellers' testimony with scholars' attribution, mislocated to st_expert; fix = split the claim) is 'verified' one round later by r45_parmalat, r45_sun, r45_sacromonte and the two abstract twins. Four of the five are pure-testimony cases that could not have reproduced the mix-up, two of them are twins derived from two of the others (3 independent cases, not 5), and the only case with the same mixed structure — Sacromonte (translators as interested experts + testimony in one unsplit claim) — in fact shows the same pattern again: engine flagged st_naql+st_expert+st_background against a label of st_naql+st_background, counted 'ok' only because extra stations do not count. f_r42_dehn_lemma_1910 (a gap inside a proof that the story could not state without leaking) is 'verified' by r44_tractatus, r44_people_v_collins, r45_descartes, r45_kelvin and r45_ventris: Ventris is a sound non-deductive case (tests only absence of false alarm), and in the others the story spells the unproven premises out, so none tests the hard situation of the finding (a subtle flawed step in a proof). The record is also self-contradictory: it has a fix dated round 43 and a resolvedNote «بدونِ اصلاحِ ثبت‌شده درست شد».",
+   "fix": "ملاکِ verified ِ ابزار تصمیمِ مالک است ⇒ افزوده به پیشنهادِ p_partial_location_findings؛ در note ِ هر دو یافته نوشته شد که تأییدِ ابزار با وقایعِ هم‌ساختار پشتیبانی نشده",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "corpus/round-0045.json r45_ventris_linear_b_greek_1952: facts verified (1 July 1952 BBC talk; Kober; Cretan place names; Chadwick; JHS 73 (1953) 84–103; PY Ta 641 found June 1952, illegible until 1953, Blegen's test in spring 1953; ti-ri-po-de, qe-to-ro-we). The story uses approving phrasing visible to the encoder — «بی آن‌که زبانی را فرض بگیرد», «به‌عنوانِ نتیجهٔ مقدماتی» — which points toward 'sound' in the same way pointing phrases in failure cases point toward the error; encoder set bg_undue:false, conflict_ignored:false, inquiry done.",
+   "fix": "ونتریس تکراریِ r35_ventris_linear_b_1952 بود (بازبین نگرفت، روتین گرفت) ⇒ excluded با دلیل؛ دور ۹ موردِ تازه دارد",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "(یافتهٔ خودِ روتین، نه بازبین) r45_ventris_linear_b_greek_1952 تکرارِ واقعهٔ r35_ventris_linear_b_1952 بود؛ نگهبانِ تکرارِ add نگرفت (پیشنهادِ بازِ p_add_dedup_names)",
+   "fix": "excluded با دلیل، پیش از پوش؛ از این پس پیش از گردآوری، نام‌های خاصِ همهٔ عنوان‌های پیکره جست‌وجو می‌شود",
+   "fixed": true,
+   "severity": "medium"
+  }
+ ],
+ "note": "بازبینِ جدا فقط git diff origin/main ِ همین دور و فایل‌های backtest/ را دید و با جست‌وجوی وب وارسی کرد: هر ۸ رویداد واقعی است؛ هیچ ساختگی یافت نشد؛ audit تمیز؛ منابعِ قلمرو (SEP/IEP) همان را می‌گویند. events_real و encoding_blind به خوانشِ سخت‌گیرانه false بود (یک رقمِ نادرست، یک جملهٔ سستِ‌سند، یک بیش‌گویی، و چند عبارتِ اشاره‌گر) — همه اصلاح و هر ۹ مورد با رمزگذارِ کورِ دوم بازرمز شد. اجرای نخست: ۱۰ از ۱۰ حکمِ درست با یک مکانِ ناقص (سان)؛ پس از اصلاح‌ها ۹ از ۹ (ونتریس کنار رفت)، ولی سه برچسب (سان، سناریوی کانال، کلوین) پس از دیدنِ حکم ویرایش شده‌اند و «مکانِ کامل» ِ این سه را باید با همین قید خواند. (proofs_from_axioms: این دور برهان یا قضیهٔ تازه‌ای نداشت — «بی‌مورد»، به‌صورتِ true ثبت شد چون ابزار true/false می‌خواهد.)"
+}

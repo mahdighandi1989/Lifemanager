@@ -1881,8 +1881,8 @@
    ],
    "verify": {
     "since": 13,
-    "fresh": 11,
-    "ok": 8,
+    "fresh": 12,
+    "ok": 9,
     "ids": [
      "r14_kahneman_flight_instructors",
      "r17_dewey_1948",
@@ -3306,6 +3306,6 @@
    "bookOnly": true
   }
  },
- "round": 44,
- "updated": "2026-11-23"
+ "round": 45,
+ "updated": "2026-11-24"
 }
