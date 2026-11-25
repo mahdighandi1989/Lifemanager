@@ -1,0 +1,77 @@
+{
+ "round": 46,
+ "reviewer": "زیرعاملِ جدا",
+ "checked": {
+  "events_real": false,
+  "encoding_blind": false,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": false
+ },
+ "problems": [
+  {
+   "what": "backtest/corpus/round-0046.json — r46_hobbes_circle_quadrature_1669 is a duplicate of the seed case cs_pb_greek_hobbes («ادعای تربیع دایره توسط هابز و نقد والیس (دهه ۱۶۵۰)», round 0, same actor, same claim «ساخت هابز دایره را دقیقاً تربیع می‌کند», same source Jesseph 1999, same truth label fail=[st_aql,st_conflict]). It is the same Hobbes–Wallis controversy at a later date, not an independent event; it counts one event twice in the corpus (and as a second 'missed').",
+   "fix": "r46_hobbes_circle_quadrature_1669 کنار رفت (excluded با دلیل: تکراریِ بذرِ cs_pb_greek_hobbes)؛ از این پس جست‌وجوی تکرار شناسه‌های بذر (epi_cases*.js، از جمله cs_pb_*) را هم می‌بیند",
+   "fixed": true,
+   "severity": "high"
+  },
+  {
+   "what": "round-0046.json — r46_lowell_mars_lines_1895 and r46_hobbes_circle_quadrature_1669: truth.why asserts facts that the routine itself removed from the story because the cited source did not support them (finding notes say so). Lowell truth.why: «دیدن در شرایطِ کنترل‌نشده بود و ذهن، بی‌آن‌که رصدگر بداند، نشانه‌های جدا را به خط پیوند می‌داد» and «نظر را عوض نکرد [بی‌سنجش]»; Hobbes truth.why: «ترسیم‌های هابز گام‌هایی اثبات‌نشده داشت و ردیه‌های والیس … او را به بازسنجیِ برهان نکشاند». The cited pages (https://en.wikipedia.org/wiki/Martian_canals ; https://en.wikipedia.org/wiki/Hobbes%E2%80%93Wallis_controversy) only say the canals 'could arise as an optical illusion' and that Hobbes 'neither backed down completely, nor applied adequate self-criticism' and did retract/modify some proofs. So the fail stations st_hiss/st_conflict (Lowell) and st_aql/st_conflict (Hobbes) rest on statements not in the story and not sourced; the cases were added in a state known to be defective.",
+   "fix": "هابز کنار رفت؛ لوول: why فقط به گفتهٔ منبع محدود شد و st_conflict از برچسب برداشته شد (ثبت در edits که پس از دیدنِ حکم بود)",
+   "fixed": true,
+   "severity": "high"
+  },
+  {
+   "what": "round-0046.json — r46_romer_io_eclipses_1676: story says «در سپتامبرِ ۱۶۷۶ به فرهنگستان … اعلام کرد که گرفتِ ۹ نوامبر حدودِ ۱۰ دقیقه دیرتر … دیده خواهد شد» and «گرفتِ ۹ نوامبر … حدودِ ۱۰ دقیقه دیرتر ثبت شد». The cited source https://en.wikipedia.org/wiki/R%C3%B8mer%27s_determination_of_the_speed_of_light says otherwise: the announcement to the Academy was on 22 August 1676 and was made 'by Cassini and not Rømer'; the prediction was that 'the emergence of Io on 16 November 1676 would be observed about ten minutes later'; there is no record of a 16 Nov observation, 'an emergence was observed on 9 November', and the page does not say it was 10 min late. The story's version follows the traditional reading of the 7 Dec 1676 Journal des Sçavans note, but it contradicts the secondary source the case itself cites; the case's whole 'ok' verdict rests on 'prediction announced beforehand and then observed'. Also «کاسینی، مدیرِ رصدخانه» — Cassini led the observatory de facto but did not hold a director title.",
+   "fix": "r46_romer_io_eclipses_1676 کنار رفت (excluded: جزئیاتِ تعیین‌کننده میانِ منابع ناسازگار است)؛ دور ۲ پروندهٔ سالم دارد",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "round-0046.json — r46_macarthur_china_korea_1950: truth.why «شاهدهای ناسازگار … پیش از پیشرویِ ۲۴ نوامبر وزن نگرفت» is not supported by the cited sources. https://en.wikipedia.org/wiki/Wake_Island_Conference contains none of the story's quotations (it has no 'very little', no 300,000/50–60,000, no Zhou–Panikkar warning); these are only in FRUS doc 680, which does support them. https://en.wikipedia.org/wiki/Battle_of_Unsan says MacArthur launched the offensive 'under the assumption that only a weak Chinese force was present in Korea' — i.e. the evidence was weighed and under-estimated, not left unweighed; the story also omits that the Chinese broke contact after the first-phase attacks (early November), a fact that bears directly on his judgement. Blind encoder nevertheless wrote conflict_ignored=true, which the text does not state (the same encoder refused it for Hobbes and Lowell on identical textual grounds: 'evidence existed and he persisted').",
+   "fix": "عقب‌کشیدنِ ۶ نوامبر به داستان افزوده شد؛ why به «برآورد را عوض نکرد / اندک فرض شد» دقیق شد؛ بازرمزگذاریِ کورِ سوم (conflict_ignored را همان نوشت)",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "round-0046.json — r46_krone_ancona_trials_1992: (a) truth.why «دی‌ان‌ایِ بزاق و خونِ به‌جامانده بر لباسِ مقتول» — both cited sources say the saliva and blood were 'found on the victim' / 'from the victim's body' (https://innocenceproject.org/cases/ray-krone/ ; https://en.wikipedia.org/wiki/Ray_Krone); 'clothing' (the tank top) comes from other reports not cited. (b) «سه دندان‌پزشکِ قانونی برای دفاع» is true (Daily Herald: 'three top forensic dentists') but neither cited source gives a number. (c) truth.right says «کارشناسانِ دیگر خلافش را می‌گویند» and the story gives three contrary experts, yet fail=[st_expert] only, while the parallel r21_mayfield_fingerprint_2004 is labelled [st_expert, st_conflict] and Hobbes/Lowell/MacArthur get st_conflict for persisting against contrary evidence — inconsistent labelling across cases (same for the twin r46_abs_bank_signature_committee).",
+   "fix": "«بر لباس» ⇒ «بر مقتول»؛ منبعِ سه کارشناسِ دفاع افزوده شد؛ دلیلِ نبودِ st_conflict در برچسب (نظرِ مخالف شنیده و سنجیده شد) در why ِ کرون و سناریوی بانک نوشته شد",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "round-0046.json — pointing sentences in stories. r46_zeno_fast_and_slow_runner: last sentence «در میدان‌های مسابقهٔ همان روزگار دونده‌های تندرو از کندروها پیش می‌افتادند» is unsourced (not in Aristotle Phys. VI.9, SEP or IEP as a reported fact) and exists only to hand conflict_cert to the encoder. r46_macondo_pressure_test_2010 (and its twin): «هر دو لوله به یک فضای چاه راه داشتند» placed right after the two readings is an evaluative pointer to the contradiction. r46_gvt_basketball_streaks_1985: the story reports only the one analysis that Miller–Sanjurjo attack (controlled shooting, 'درست پس از سه موفقیت … در همان رشتهٔ ۱۰۰‌تایی') and omits GVT's other evidence (76ers field data, Celtics free throws, runs/serial-correlation tests) — facts selected by the outcome. r46_macondo: title/story fine otherwise; numbers (1,400 psi, 30 min, ~8 pm, ~21:45, 11 dead) are correct.",
+   "fix": "زنون کنار رفت؛ جملهٔ «هر دو لوله/شیر به یک … راه داشتند» از ماکوندو و سناریوی گاز برداشته شد؛ دو تحلیلِ دیگرِ مقالهٔ ۱۹۸۵ به داستانِ دستِ داغ افزوده شد؛ هر سه کور بازرمز شد",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "round-0046.json — r46_zeno_fast_and_slow_runner: the actor's 'claim' is treated as Zeno's sincere assertion with truth.ok=false, but the story itself says (Plato, Parm. 127d–128e) that the book was written to defend Parmenides, i.e. the argument is a reductio against motion/plurality; what Zeno asserted and with what confidence is not known. Year −450 and 'truth' of a 5th-c. BC intention are not checkable facts.",
+   "fix": "ثبت شد: منبعِ گفتهٔ کمیسیون به ماکوندو افزوده شد؛ تاریخِ آزمایش‌های اوانز–ماندر ۱۹۰۲–۱۹۰۳ شد؛ زنون کنار رفت؛ رقم‌های ریچاردِ سوم از خودِ King et al. 2014 است (در src هست)؛ جملهٔ کیچر در territory.json بازگفت است نه نقلِ لفظی (آن فایل فقط با ابزار عوض می‌شود — در WORKLOG ثبت شد)",
+   "fixed": true,
+   "severity": "low"
+  },
+  {
+   "what": "backtest/findings.json — attribution «خطای رمزگذاری پرونده» for f_r46_hobbes_circle_quadrature_1669 and f_r46_lowell_mars_lines_1895 contradicts their own notes, which say the blind encoder encoded correctly and the defect is that story/label lack the observable facts ('نقص از پرونده است'). That is a wrong/unsupported truth label (attribution «برچسب حقیقت پرونده نادرست است») or an invalid case, not an encoding error; filing it as encoding error hides that two invalid cases were knowingly added and counted as 'missed'. f_r46_zeno: also filed as case-encoding error although the note says the encoder followed the rule and the cause is the open encoding-rule proposal p_encode_flat_assertion_conf (a method gap, consistent with f_r13 only by repeating the same mislabel). f_r46_gvt_basketball_streaks_1985: attributed «خلأ جزوه (ملاکی ندارد)» while the case's own truth.why cites s40 as the violated criterion ('صورتِ معتبر ندارد') — the booklet has the criterion (valid form); what is missing is an observable feature/rule, so the attribution and the truth text disagree; truth.why also contains diagnosis text («جزوه برای این خطا … قاعدهٔ جدایی ندارد») that belongs in the finding, not in the truth label.",
+   "fix": "هابز و زنون: «برچسب حقیقت پرونده نادرست است» + resolved با قیدِ «پرونده کنار رفت»؛ لوول: یادداشتِ اختلافِ دو رمزگذار؛ دستِ داغ: جملهٔ تشخیصی از why برداشته و یادداشتِ یافته بازنویسی شد (ملاکِ عمومیِ s40 هست، ملاکِ جدا نیست)",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "backtest/proposals.json — p_expert_method_absent evidence: re-measured, 19 corpus cases have a way=«تخصص دیگران» claim without x_method (confirmed), but ALL 19 are failure cases (truth.ok=false), so «۰ پروندهٔ سالم پرچم می‌خورد» is vacuous — the corpus contains no sound expert-reliance case with x_method absent, hence no evidence about false alarms. «۸ بار نامعلومِ صریح» is 9 claims in 8 cases (r4_bre_x_busang twice). 5 of the 19 (semmelweis ×2, mko_eclecticism, madoff, piltdown …) do not have st_expert in truth.fail, so reading 'absent' as 'unknown' adds st_expert flags the truth label does not name (the proposal calls this 'حکم همان').",
+   "fix": "متنِ پیشنهاد اصلاح شد: هر ۱۹ پرونده شکست‌اند و «۰ سالمِ پرچم‌خورده» چیزی دربارهٔ خطرِ هشدارِ نادرست نمی‌گوید؛ «۹ تصدیق در ۸ پرونده»؛ پرچمِ اضافهٔ st_expert در ۷ پرونده گفته شد",
+   "fixed": true,
+   "severity": "medium"
+  },
+  {
+   "what": "round-0046.json — minor source mismatches: r46_krone cited Innocence Project page gives the new trial as 'won on appeal in 1996' and conviction date 08/08/1992 vs Wikipedia 22 June 1995 / 7 Aug 1992 (story uses 1995; fine but sources disagree). r46_greyfriars: the cited Wikipedia page gives the radiocarbon 95.4% range as 1450–1540; 1456–1530 is from King et al. 2014 (correct there) — attribute it to King et al.; 99.999% is not on the Wikipedia page (only in the paper). r46_macondo: sources[0] URL (sec.gov dex993) is BP's own report, not the Chief Counsel's Report whose wording truth.why paraphrases ('Every industry expert the investigative team met with dismissed the so-called bladder effect'); no URL for the Chief Counsel's Report is given. r46_lowell: Evans–Maunder experiments ran 1902-07-01 to 1903-05-22 (published 1903) — «در ۱۹۰۳ … آزمایشی کردند» is imprecise.",
+   "fix": "ثبت شد: منبعِ گفتهٔ کمیسیون به ماکوندو افزوده شد؛ تاریخِ آزمایش‌های اوانز–ماندر ۱۹۰۲–۱۹۰۳ شد؛ زنون کنار رفت؛ رقم‌های ریچاردِ سوم از خودِ King et al. 2014 است (در src هست)؛ جملهٔ کیچر در territory.json بازگفت است نه نقلِ لفظی (آن فایل فقط با ابزار عوض می‌شود — در WORKLOG ثبت شد)",
+   "fixed": true,
+   "severity": "low"
+  }
+ ],
+ "note": "بازبینِ جدا فقط git diff origin/main ِ همین دور و فایل‌های backtest/ را دید و با جست‌وجوی وب وارسی کرد. events_real، encoding_blind و findings_diagnosed به خوانشِ سخت‌گیرانه false بود: یک پروندهٔ تکراریِ بذر (هابز)، یک پرونده با منابعِ ناسازگار (رومر)، یک پرونده با باورِ احرازنشدهٔ کنشگر (زنون) ⇒ هر سه excluded؛ چند جملهٔ اشاره‌گر یا بی‌پشتوانه ⇒ اصلاح و بازرمزگذاریِ کورِ سوم. اجرای نخست: ۶ از ۱۲ حکمِ درست؛ پس از اصلاح‌ها: ۶ از ۹ (۳ ندیده: کرون و سناریوی بانک ⇒ پیشنهادِ p_expert_method_absent؛ دستِ داغ ⇒ خلأ جزوه). یک برچسب (لوول) پس از دیدنِ حکم ویرایش شد. بازبین گفت رقم‌های ۱۴۰۰ psi/ساعت‌های ماکوندو و ۹۹٫۹۹۹٪ ِ ریچاردِ سوم را برخط نتوانست تأیید کند و بر حافظه تکیه کرد — روتین ۱۴۰۰ psi را در جست‌وجوی خودش (گزارشِ BP) دید؛ ۹۹٫۹۹۹٪ فقط به خودِ مقالهٔ King et al. 2014 ارجاع دارد که پشتِ دیوارِ ورود بود. (frames_unselected/verified_by_real/proofs_from_axioms: این دور قاب یا برهانِ تازه نداشت — «بی‌مورد»، true چون ابزار true/false می‌خواهد.) Verified true against sources: Wake Island quotation and numbers (FRUS d680), Zhou–Panikkar 3 Oct, first Chinese POW 25 Oct, 8th Cavalry at Unsan 1–2 Nov, 24/25 Nov; Krone dates, Rawson, video, 1995 reversal, three defence dentists, Phillips, 8 Apr 2002, NAS 2009; Macondo figures; Lowell 1894, 12/18-inch, 1895/1906 books, Antoniadi 1909 33-inch, 1916, Mariner 4; GVT 26 Cornell players ×100 shots and Miller–Sanjurjo 2018 abstract ('conclusions … are reversed'); Kepler (12 referees, Fejes Tóth, 99%, 2005, 10 Aug 2014, 2017); Richard III (Aug 2012, 30–34, 1456–1530 in King et al., two matrilineal relatives, Y mismatch, 99.999%, 26 Mar 2015); Hobbes 1669 title, Wallis same-year reply, 1678, Lindemann 1882. Items 3/4: no file under backtest/samples changed (n/a). Item 5: foundation.json diff is counters only, no theorem/proof added; proposal reasoning is coherent but its 'no false alarm' evidence is empty (see problem). I did not re-run the engine for the 8/7/4 split. Item 6: audit returns violations=[] warnings=[]. Item 7: both SEP entries exist with the stated authors/dates (Stanford 12 Aug 2009 / rev. 4 Apr 2023; Chakravartty 27 Apr 2011 / rev. 12 Jun 2017) and the `what` summary matches them point by point; only nit: the Kitcher line is a paraphrase put in quotation marks (actual: 'give us a rival explanation, and we'll consider whether it is sufficiently serious to threaten our confidence'). Abstract twins: structurally faithful, same information level, f identical to the `from` case. Duplicate check was done against all 419 cases including seeds: only the Hobbes duplicate found."
+}

@@ -121,3 +121,11 @@ if (fresh.length >= 3 && fresh.every(ok)) finding.status = "verified";
 - **Search the whole corpus by proper name before collecting,** not just by the ids you happen to think of: a duplicate (same event, different title) passed the signature guard and was only noticed in an unrelated test's output.
 - **Neutral ids and titles for the blind encoder.** A title or id that names the diagnosis ("the X phenomenon") hands the encoder the answer even when the story is clean; re-encode under opaque ids (`case01…`).
 
+
+## Update 2026-11-24
+
+- **Duplicate search must include the seed set, not only the appended corpus.** Round 46 listed every corpus id and still re-added an event that lived in the hand-written seed cases under a differently-prefixed id (`cs_pb_*`); the independent reviewer caught it. Enumerate ids/titles from *every* source the judge loads (seed files + appended rounds) and grep proper names across all of them.
+- **When sources disagree on the decisive detail, drop the case.** A "sound" case whose verdict hinged on who announced a prediction and for which date had two incompatible accounts in reputable sources. A case is only usable if the facts that carry its label are the same in every cited source.
+- **A label may only name what the story states.** After removing sentences that the cited source did not support, the truth label still named stations whose observable facts were no longer in the story — so a correct blind encoding produced a "missed" verdict that said nothing about the judge. Re-derive the label from the final story text before the first run.
+- **Encoder variance is a first-class result.** The same story, re-encoded by a second blind encoder, flipped missed ⇒ seen (one wrote a diagnostic feature the other left unknown) and another case flipped mislocated ⇒ missed (confidence omitted). Record which verdict changes came from the encoder rather than from the judge or the facts, and never count such a flip as a fix.
+- **"Absent" and explicit "unknown" must mean the same thing to the judge.** If the rule fires on an explicit `unknown` enum value but is silent on a missing key, the verdict depends on encoder habit. Measure the gap on the whole corpus and hand it to the rule owner; do not patch the cases.

@@ -1,6 +1,6 @@
 {
- "round": 45,
- "at": "2026-11-24",
+ "round": 46,
+ "at": "2026-11-25",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 365,
+    "ok": 371,
     "health_alarm": 0,
-    "missed": 32,
+    "missed": 35,
     "mislocated": 10
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 336,
+    "ok": 341,
     "health_alarm": 0,
-    "missed": 50,
-    "mislocated": 21
+    "missed": 53,
+    "mislocated": 22
    },
    "changed": [
     {
@@ -1324,24 +1324,30 @@
      "t": "روزنامهٔ «سان» و تیترِ «حقیقت» دربارهٔ فاجعهٔ هیلزبورو (۱۹۸۹)",
      "from": "ok",
      "to": "missed"
+    },
+    {
+     "id": "r46_lowell_mars_lines_1895",
+     "t": "پرسیوال لوول و خط‌های سطحِ مریخ (۱۸۹۴–۱۹۱۶)",
+     "from": "ok",
+     "to": "mislocated"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 365,
+    "ok": 371,
     "health_alarm": 0,
-    "missed": 32,
+    "missed": 35,
     "mislocated": 10
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 336,
+    "ok": 341,
     "health_alarm": 0,
-    "missed": 50,
-    "mislocated": 21
+    "missed": 53,
+    "mislocated": 22
    },
    "changed": [
     {
@@ -1517,6 +1523,12 @@
      "t": "روزنامهٔ «سان» و تیترِ «حقیقت» دربارهٔ فاجعهٔ هیلزبورو (۱۹۸۹)",
      "from": "ok",
      "to": "missed"
+    },
+    {
+     "id": "r46_lowell_mars_lines_1895",
+     "t": "پرسیوال لوول و خط‌های سطحِ مریخ (۱۸۹۴–۱۹۱۶)",
+     "from": "ok",
+     "to": "mislocated"
     }
    ]
   }

@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-24",
- "round": 45,
+ "updated": "2026-11-25",
+ "round": 46,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,7 +25,7 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 43,
+    "fresh": 44,
     "freshOk": 29,
     "ids": [
      "r4_wald_survivorship",
@@ -190,8 +190,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 39,
-    "freshOk": 36,
+    "fresh": 41,
+    "freshOk": 38,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -292,7 +292,7 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 43,
+    "fresh": 44,
     "freshOk": 29,
     "ids": [
      "r4_wald_survivorship",
@@ -341,8 +341,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 91,
-    "freshOk": 69,
+    "fresh": 98,
+    "freshOk": 73,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -448,8 +448,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 52,
-    "freshOk": 45,
+    "fresh": 57,
+    "freshOk": 49,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1215,7 +1215,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 19,
+    "fresh": 21,
     "freshOk": 10,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1271,7 +1271,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 19,
+    "fresh": 21,
     "freshOk": 10,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1388,7 +1388,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 19,
+    "fresh": 21,
     "freshOk": 10,
     "ids": [
      "r20_willingham_fire_1991",
@@ -1505,8 +1505,8 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 15,
-    "freshOk": 15,
+    "fresh": 17,
+    "freshOk": 17,
     "ids": [
      "r21_meselson_stahl_1958",
      "r27_hpylori_nih_1994",
@@ -1554,7 +1554,7 @@
    },
    "retest": {
     "since": 20,
-    "fresh": 18,
+    "fresh": 20,
     "freshOk": 9,
     "ids": [
      "r21_mayfield_fingerprint_2004",
@@ -1634,7 +1634,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1647,8 +1647,8 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 57,
-    "freshOk": 48,
+    "fresh": 61,
+    "freshOk": 52,
     "ids": [
      "r22_nayirah_incubators_1990",
      "r22_emulex_hoax_2000",
@@ -1734,7 +1734,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1824,7 +1824,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1862,7 +1862,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1904,7 +1904,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1953,7 +1953,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1985,7 +1985,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -2019,7 +2019,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2068,7 +2068,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2108,7 +2108,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2138,7 +2138,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2172,7 +2172,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2204,7 +2204,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2242,7 +2242,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2270,7 +2270,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2283,7 +2283,7 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 19,
+    "fresh": 20,
     "freshOk": 16,
     "ids": [
      "r26_ltcm_models_1998",
@@ -2414,7 +2414,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2526,7 +2526,7 @@
    "fix": null,
    "retest": {
     "since": 26,
-    "fresh": 18,
+    "fresh": 19,
     "freshOk": 15,
     "ids": [
      "r26_ltcm_models_1998",
@@ -2578,7 +2578,7 @@
    "fix": null,
    "retest": {
     "since": 26,
-    "fresh": 18,
+    "fresh": 19,
     "freshOk": 15,
     "ids": [
      "r26_abs_lender_boom_model",
@@ -2648,7 +2648,7 @@
     "s19",
     "s22"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r27_frege_basic_law_v_1893",
@@ -2683,7 +2683,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 45,
+   "lastSeenRound": 46,
    "resolved": "2026-11-02",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
    "reopened": "2026-11-02"
@@ -2719,7 +2719,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r28_surgisphere_lancet_2020",
@@ -2752,7 +2752,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r29_abs_pilot_supplier",
@@ -2784,7 +2784,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r29_wakefield_lancet_1998",
@@ -2816,7 +2816,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2832,8 +2832,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 87,
-    "freshOk": 74,
+    "fresh": 92,
+    "freshOk": 78,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -2911,7 +2911,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r31_bre_x_busang_1996",
@@ -2944,7 +2944,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r31_dreyfus_bordereau_1894",
@@ -2960,8 +2960,8 @@
    },
    "retest": {
     "since": 31,
-    "fresh": 25,
-    "freshOk": 22,
+    "fresh": 30,
+    "freshOk": 25,
     "ids": [
      "r32_hitler_diaries_1983",
      "r32_madoff_trackrecord_2005",
@@ -3036,7 +3036,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r32_madoff_trackrecord_2005",
@@ -3071,14 +3071,14 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r33_beringer_lying_stones_1725",
    "case": "r33_beringer_lying_stones_1725",
    "opened": "2026-11-08",
    "openedRound": 33,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "موتور st_hiss را نگرفت چون زیرعاملِ کور فقط inquiry را نوشت و sense_ctrl/hidden_inf را نه؛ r_hiss_hidden_inf (s43,s46,s19) استنتاجِ پنهانِ آزموده‌نشده را می‌خواهد. متنِ داستان می‌گوید برینگر «دربارهٔ آوردنِ سنگ‌ها هیچ پرسشی نکرد» که با hidden_inf=true هم‌خوان است و رمزگذار می‌توانست بنویسد؛ این کاستیِ رمزگذاری است نه قاعده. چون اصلاحِ پس از دیدنِ نتیجه کور نیست، اصلاح نمی‌شود؛ رمزگذاریِ مستقلِ دوم در دورِ بعد.",
    "fix": {
@@ -3087,11 +3087,12 @@
    },
    "retest": {
     "since": 35,
-    "fresh": 2,
-    "freshOk": 2,
+    "fresh": 3,
+    "freshOk": 3,
     "ids": [
      "r38_birmingham_griess_1974",
-     "r38_abs_home_drug_test"
+     "r38_abs_home_drug_test",
+     "r46_lowell_mars_lines_1895"
     ]
    },
    "kind": "missed",
@@ -3110,7 +3111,8 @@
     "s43",
     "s46"
    ],
-   "lastSeenRound": 34
+   "lastSeenRound": 34,
+   "verified": "2026-11-24"
   },
   {
    "id": "f_r33_kant_euclid_apodictic_1781",
@@ -3204,8 +3206,8 @@
    },
    "retest": {
     "since": 37,
-    "fresh": 30,
-    "freshOk": 29,
+    "fresh": 36,
+    "freshOk": 34,
     "ids": [
      "r38_dow36000_1999",
      "r38_shiller_exuberance_2000",
@@ -3264,8 +3266,8 @@
    },
    "retest": {
     "since": 37,
-    "fresh": 30,
-    "freshOk": 29,
+    "fresh": 36,
+    "freshOk": 34,
     "ids": [
      "r38_dow36000_1999",
      "r38_shiller_exuberance_2000",
@@ -3324,8 +3326,8 @@
    },
    "retest": {
     "since": 38,
-    "fresh": 25,
-    "freshOk": 24,
+    "fresh": 31,
+    "freshOk": 28,
     "ids": [
      "r39_quebec_bridge_1907",
      "r39_credit_suisse_archegos_2021",
@@ -3470,7 +3472,7 @@
    "case": "r42_dehn_lemma_1910",
    "opened": "2026-11-18",
    "openedRound": 42,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "خطای پرونده (داستان)، نه خطای رمزگذار: داستان (به قاعدهٔ «بی نشتِ سرانجام» ِ دورِ ۴۱) گامِ ناقصِ خودِ برهان را نگفت، پس رمزگذارِ کور نه form نوشت نه matter؛ ولی رخنه در متنِ خودِ برهانِ ۱۹۱۰ بود، نه فقط در سرانجام — s40: «یقین در تصدیقِ نظری تنها با مادهٔ بدیهی و صورتِ معتبر». قراردادِ بذرِ همانند (cs_kempe_fourcolor) گامِ ناقص را در داستان می‌آورد. اصلاحِ داستان + بازرمزگذاریِ کور به دورِ بعد سپرده شد و بستن فقط با وقایعِ تازه شمرده می‌شود؛ برچسب دست نخورد. [دورِ ۴۵] «verified» ِ ابزار با وقایعِ هم‌ساختار پشتیبانی نشده است (بازبینِ مستقلِ دورِ ۴۵، بندِ ۱۶): وقایعِ تازهٔ شمرده‌شده همان الگوی این یافته را نمی‌آزمایند؛ ملاکِ تأیید تصمیمِ مالک است ⇒ افزودهٔ دورِ ۴۵ به پیشنهادِ p_partial_location_findings. تا آزمونِ هم‌ساختار، این تأیید را موقت بدان.",
    "fix": {
@@ -3479,13 +3481,19 @@
    },
    "retest": {
     "since": 43,
-    "fresh": 4,
-    "freshOk": 4,
+    "fresh": 10,
+    "freshOk": 9,
     "ids": [
      "r44_tractatus_final_1918",
      "r44_people_v_collins_1964",
      "r45_descartes_collision_rules_1644",
-     "r45_kelvin_age_of_earth_1897"
+     "r45_kelvin_age_of_earth_1897",
+     "r46_macarthur_china_korea_1950",
+     "r46_macondo_pressure_test_2010",
+     "r46_lowell_mars_lines_1895",
+     "r46_gvt_basketball_streaks_1985",
+     "r46_kepler_proof_referees_2003",
+     "r46_abs_gas_pipe_two_gauges"
     ]
    },
    "kind": "missed",
@@ -3544,7 +3552,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r42_tnr_hack_heaven_1998",
@@ -3582,7 +3590,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r44_barry_george_fdr_2001",
@@ -3615,14 +3623,14 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 45
+   "lastSeenRound": 46
   },
   {
    "id": "f_r44_mobible_dss_fragments_2009",
    "case": "r44_mobible_dss_fragments_2009",
    "opened": "2026-11-22",
    "openedRound": 44,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "بدفهمی یا پیاده‌سازی نادرست سازنده",
    "note": "خطای سازنده (روتین): تصدیقِ یگانه دو راه را در هم آمیخته بود — گفتهٔ فروشندگان (نقل، s47–s48) و نسبت‌دادنِ پژوهشگران (تخصصِ دیگران، s49: «گواهیِ کارشناس به اندازهٔ روشش اعتبار دارد») — و برچسب فقط یکی را می‌گفت؛ رمزگذارِ کور به‌درستی راهِ کارشناس را برگزید. جزوه و موتور درست‌اند. [دورِ ۴۵] «verified» ِ ابزار با وقایعِ هم‌ساختار پشتیبانی نشده است (بازبینِ مستقلِ دورِ ۴۵، بندِ ۱۶): وقایعِ تازهٔ شمرده‌شده همان الگوی این یافته را نمی‌آزمایند؛ ملاکِ تأیید تصمیمِ مالک است ⇒ افزودهٔ دورِ ۴۵ به پیشنهادِ p_partial_location_findings. تا آزمونِ هم‌ساختار، این تأیید را موقت بدان.",
    "fix": {
@@ -3631,14 +3639,16 @@
    },
    "retest": {
     "since": 44,
-    "fresh": 5,
+    "fresh": 7,
     "freshOk": 5,
     "ids": [
      "r45_parmalat_bonlat_confirmation_2003",
      "r45_sun_hillsborough_truth_1989",
      "r45_sacromonte_lead_books_1595",
      "r45_abs_wholesaler_bank_letter",
-     "r45_abs_local_channel_factory_fire"
+     "r45_abs_local_channel_factory_fire",
+     "r46_krone_ancona_trials_1992",
+     "r46_abs_bank_signature_committee"
     ]
    },
    "kind": "mislocated",
@@ -3673,6 +3683,229 @@
    "verified": "2026-11-23"
   },
   {
+   "id": "f_r46_abs_bank_signature_committee",
+   "case": "r46_abs_bank_signature_committee",
+   "opened": "2026-11-24",
+   "openedRound": 46,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۶: همان علتِ f_r46_krone_ancona_trials_1992 (سناریوی هم‌ساختارِ همان پرونده؛ رمزگذاریِ کور یکسان درآمد): x_method ننوشته ⇒ موتور ساکت، در حالی که s49 احرازِ اعتبارِ روش را شرط می‌داند ⇒ p_expert_method_absent. پرونده دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "سناریوی انتزاعی: کمیتهٔ انضباطیِ بانک و امضای برگهٔ برداشت",
+   "tier": "abstract",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 46
+  },
+  {
+   "id": "f_r46_gvt_basketball_streaks_1985",
+   "case": "r46_gvt_basketball_streaks_1985",
+   "opened": "2026-11-24",
+   "openedRound": 46,
+   "status": "diagnosed",
+   "attribution": "خلأ جزوه (ملاکی ندارد)",
+   "note": "دورِ ۴۶ (مسیرِ ۲ — «آنچه در جزوه نیست»): خطای واقعی قضیه‌ای از حسابِ احتمالات است: در رشتهٔ کران‌دار، نسبتِ موفقیت «پس از k موفقیتِ پیاپی» حتی زیرِ استقلال به‌طورِ میانگین کمتر از نرخِ واقعی است (Miller & Sanjurjo 2018)، پس گذر از «برابریِ دو درصد» به «استقلال» معتبر نیست. جزوه فقط ملاکِ عمومیِ «صورتِ درست» را دارد (s40) و برای سوگیریِ گزینش در نمونه‌گیریِ شرطی ملاکِ جدا و ویژگیِ رمزگذاری ندارد ⇒ خلأ. رفتارِ موتور به رمزگذار بسته بود: در اجرای نخست (رمزگذارِ اول: conf=۱۰۰، ind_n=۲۶) به دلیلِ عمومیِ استقراء پرچم زد (جای نادرست)؛ پس از افزودنِ دو تحلیلِ دیگرِ مقاله به داستان، رمزگذارِ سوم conf ننوشت (نتیجه‌گیریِ بی‌قید، بی کنش — همان الگوی p_encode_flat_assertion_conf) و موتور ندید. در هیچ‌کدام خودِ خطا دیده نشد. پیشنهادِ قاعده نوشته نشد: قضیه دربارهٔ یک سنجهٔ خاص است و ویژگیِ مشاهده‌پذیرِ عمومی‌ای که رمزگذارِ کور بی دانستنِ جواب بنویسد برایش نیافتم؛ قاعدهٔ تک‌موردی برازش روی یک پرونده می‌شد. اگر وقایعِ هم‌خانواده جمع شد، پیشنهادِ عمومی با برهان نوشته می‌شود.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "گیلوویچ، والون و تورسکی و رشته‌های پرتابِ بسکتبال (۱۹۸۵)",
+   "tier": "real",
+   "expected": [
+    "st_aql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50"
+   ],
+   "lastSeenRound": 46
+  },
+  {
+   "id": "f_r46_hobbes_circle_quadrature_1669",
+   "case": "r46_hobbes_circle_quadrature_1669",
+   "opened": "2026-11-24",
+   "openedRound": 46,
+   "status": "diagnosed",
+   "attribution": "برچسب حقیقت پرونده نادرست است",
+   "note": "دورِ ۴۶: پروندهٔ خودِ روتین معیوب بود و پس از بازبینیِ مستقل کنار رفت (excluded): تکراریِ بذرِ cs_pb_greek_hobbes بود، و برچسبش دو ایستگاه (st_aql، st_conflict) را نام می‌برد که واقعیتِ مشاهده‌پذیرشان در داستان نبود (جمله‌هایش چون با منبع نخواند پیش از افزودن برداشته شده بود) — رمزگذارِ کور درست رمز کرده بود (s40، s53). قاعده‌ای محکِ این یافته نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "تامس هابز و رسالهٔ «تربیعِ دایره، تکعیبِ کره، تضعیفِ مکعب» (۱۶۶۹)",
+   "tier": "real",
+   "expected": [
+    "st_aql",
+    "st_conflict"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_conflict_cert",
+    "r_conflict_ignored",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50",
+    "s53"
+   ],
+   "lastSeenRound": 46
+  },
+  {
+   "id": "f_r46_krone_ancona_trials_1992",
+   "case": "r46_krone_ancona_trials_1992",
+   "opened": "2026-11-24",
+   "openedRound": 46,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۶: رمزگذارِ کور way=«تخصص دیگران» و x_comp=«احراز شده» نوشت و x_method را ننوشت (متن دربارهٔ اعتبارِ روشِ تطبیقِ جای گاز ساکت است). جزوه رجوع به کارشناس را فقط با «احرازِ» اعتبارِ روش و صلاحیت معتبر می‌داند (s49)؛ پس روشِ احرازنشده خودش نقص است. ولی موتور فقط روی مقدارِ صریحِ «نامعلوم» قاعده دارد (r_expert_method_weak) و روی «ننوشته» ساکت است. سنجش در حافظه: ۱۹ پروندهٔ پیکره همین وضع را دارند؛ با خواندنِ «ننوشته» به‌جای «نامعلوم» ۸ شکستِ ندیده دیده می‌شود (۷ در جای درست، ۱ جای نادرست) و هیچ پروندهٔ سالمی پرچم نمی‌خورد. تغییرِ موتور/دستورِ رمزگذاری تصمیمِ مالک است ⇒ پیشنهادِ p_expert_method_absent. پرونده دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "دادگاه‌های ری کرون در پروندهٔ قتلِ کیم آنکونا (فینیکس، ۱۹۹۲ و ۱۹۹۶)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 46
+  },
+  {
+   "id": "f_r46_lowell_mars_lines_1895",
+   "case": "r46_lowell_mars_lines_1895",
+   "opened": "2026-11-24",
+   "openedRound": 46,
+   "status": "resolved",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "دورِ ۴۶: اجرای نخست «ندیده» بود — رمزگذارِ کورِ دوم sense_ctrl، hidden_inf و conflict_ignored را ننوشت («متن نمی‌گوید بی‌سنجش کنار گذاشت»). پس از بازبینیِ مستقل why به آنچه منبع می‌گوید محدود و st_conflict از برچسب برداشته شد (داستان دربارهٔ واکنشِ لوول ساکت است) و فقط تاریخِ آزمایش در داستان عوض شد (۱۹۰۲–۱۹۰۳). رمزگذارِ کورِ سوم از تقریباً همان متن hidden_inf=true و conflict_ignored=true نوشت و موتور در st_hiss دید (s43، s46). یعنی بسته‌شدنِ این یافته از اختلافِ سلیقهٔ دو رمزگذارِ کور آمده، نه از تغییرِ قاعده یا واقعیتِ تازه — «درست» ِ این پرونده را با همین قید بخوانید (شاهدِ دیگری برای پیشنهادِ بازِ p_encode_* دربارهٔ یکدستیِ رمزگذاری).",
+   "fix": null,
+   "retest": {
+    "since": 46,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "missed",
+   "title": "پرسیوال لوول و خط‌های سطحِ مریخ (۱۸۹۴–۱۹۱۶)",
+   "tier": "real",
+   "expected": [
+    "st_hiss",
+    "st_conflict",
+    "st_aql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_hiss_uncontrolled",
+    "r_hiss_hidden_inf",
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_conflict_cert",
+    "r_conflict_ignored",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s19",
+    "s40",
+    "s43",
+    "s44",
+    "s46",
+    "s50",
+    "s53"
+   ],
+   "lastSeenRound": 46,
+   "resolved": "2026-11-24",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r46_zeno_fast_and_slow_runner",
+   "case": "r46_zeno_fast_and_slow_runner",
+   "opened": "2026-11-24",
+   "openedRound": 46,
+   "status": "diagnosed",
+   "attribution": "برچسب حقیقت پرونده نادرست است",
+   "note": "دورِ ۴۶: پروندهٔ خودِ روتین پس از بازبینیِ مستقل کنار رفت (excluded): جملهٔ پایانیِ داستان بی‌منبع بود و این‌که استدلال ادعای جدیِ زنون بود یا برهانِ خلف، در منابع محلِ اختلاف است ⇒ «باورِ کنشگر» و پس برچسب احراز نشده بود. (در اجرای نخست موتور ندید چون رمزگذارِ کور conf ننوشت — همان الگوی p_encode_flat_assertion_conf؛ s40، s53.)",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "زنون و استدلالِ دوندهٔ تندرو و دوندهٔ کندرو (سدهٔ پنجم پیش از میلاد)",
+   "tier": "real",
+   "expected": [
+    "st_aql",
+    "st_conflict"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_conflict_cert",
+    "r_conflict_ignored",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50",
+    "s53"
+   ],
+   "lastSeenRound": 46
+  },
+  {
    "id": "f_r4_redfield_arsenic",
    "case": "r4_redfield_arsenic",
    "opened": "2026-10-14",
@@ -3683,7 +3916,7 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 37,
+    "fresh": 39,
     "freshOk": 22,
     "ids": [
      "r5_hitler_diaries_1983",
@@ -3731,7 +3964,7 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 53,
+    "fresh": 54,
     "freshOk": 39,
     "ids": [
      "r13_challenger_1986",
@@ -3786,7 +4019,7 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 53,
+    "fresh": 54,
     "freshOk": 39,
     "ids": [
      "r13_challenger_1986",
