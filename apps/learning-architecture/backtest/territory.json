@@ -678,8 +678,26 @@
    ]
   },
   "a_internalism_externalism": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 47,
+     "at": "2026-11-25",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای «درون‌گرایی و برون‌گرایی»: مدخلِ «Internalist vs. Externalist Conceptions of Epistemic Justification» ِ SEP (درون‌گرایی: توجیه بر عواملِ درونی سوار است؛ دو خوانشِ «درونی» — دسترسی‌گرایی: شرط‌های توجیه در دسترسِ تأملِ شخص‌اند، و ذهن‌گرایی: حالت‌های ذهنی‌اند؛ برون‌گرایی نفیِ همین سوار‌بودن است. دلیل‌های درون‌گرا: نورمنِ غیب‌بینِ بونژور، استدلالِ وظیفه‌گرایانه، راهنمایی، شاهدگرایی، «شیطانِ فریبکارِ تازه». دلیل‌های برون‌گرا: پیوند با صدق — توجیه باید صدق‌رسان باشد؛ تبیینِ باورهای انباشته در حافظه، گواهی نزدِ کودکان و قاعده‌های J ِ گلدمن؛ هنجارهای باور. جمع‌بندی: برنده‌ای اعلام نمی‌شود؛ اختلاف به این بسته است که کدام برداشت از «توجیه» در کار است) و مدخلِ «Internalism and Externalism in Epistemology» ِ IEP، نوشتهٔ Ted Poston (درون‌گرایی دربارهٔ توجیهِ گزاره‌ای است؛ دسترسی‌گرایی ِ چیزم و بونژور در برابرِ ذهن‌گراییِ فلدمن و کانی؛ برون‌گرایی بر پیوندِ باور با محیط — علیت، اعتمادپذیری، احتمالِ عینیِ صدق — تکیه دارد؛ نورمن و مسئلهٔ شیطانِ تازهٔ لرر و کوهن؛ پاسخِ گلدمن ۱۹۹۳؛ دانشِ مادربزرگ و کودک و حیوان؛ پاسخ به شکاکیت؛ ریشهٔ بحث در شکستِ تحلیلِ «باورِ صادقِ موجه» پس از گتیه ۱۹۶۳).",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    {
+     "title": "Internalist vs. Externalist Conceptions of Epistemic Justification — Stanford Encyclopedia of Philosophy",
+     "url": "https://plato.stanford.edu/entries/justep-intext/"
+    },
+    {
+     "title": "Internalism and Externalism in Epistemology — Internet Encyclopedia of Philosophy (Ted Poston)",
+     "url": "https://iep.utm.edu/int-ext/"
+    }
+   ]
   },
   "a_evidentialism": {
    "stage": 2,
@@ -3318,6 +3336,6 @@
    "bookOnly": true
   }
  },
- "round": 46,
+ "round": 47,
  "updated": "2026-11-25"
 }

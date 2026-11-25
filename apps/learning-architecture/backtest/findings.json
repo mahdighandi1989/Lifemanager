@@ -1,6 +1,6 @@
 {
  "updated": "2026-11-25",
- "round": 46,
+ "round": 47,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -341,7 +341,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 98,
+    "fresh": 101,
     "freshOk": 73,
     "ids": [
      "r2_cbs_killian_memos",
@@ -448,7 +448,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 57,
+    "fresh": 60,
     "freshOk": 49,
     "ids": [
      "r2_chamberlain_hitler_face",
@@ -516,7 +516,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r13_challenger_1986",
@@ -550,7 +550,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -582,7 +582,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -615,7 +615,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r14_abs_flood_insurer",
@@ -647,7 +647,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r14_abs_warehouse_fires",
@@ -680,7 +680,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r14_fcic_ratings_2007",
@@ -712,7 +712,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r14_kahneman_flight_instructors",
@@ -740,7 +740,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r14_sally_clark_1999",
@@ -773,7 +773,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r16_abs_archive_diaries",
@@ -822,7 +822,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r16_cottingley_1920",
@@ -861,7 +861,7 @@
     "s46",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r16_hitler_diaries_1983",
@@ -910,7 +910,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r16_vulcan_leverrier_1859",
@@ -943,7 +943,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r17_abs_acquisition_source",
@@ -1154,7 +1154,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 43,
+    "fresh": 45,
     "freshOk": 34,
     "ids": [
      "r19_killian_memos_2004",
@@ -1327,7 +1327,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 43,
+    "fresh": 45,
     "freshOk": 34,
     "ids": [
      "r19_killian_memos_2004",
@@ -1444,7 +1444,7 @@
    },
    "retest": {
     "since": 18,
-    "fresh": 43,
+    "fresh": 45,
     "freshOk": 34,
     "ids": [
      "r19_killian_memos_2004",
@@ -1634,7 +1634,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r21_camping_rapture_2011",
@@ -1647,7 +1647,7 @@
    "fix": null,
    "retest": {
     "since": 21,
-    "fresh": 61,
+    "fresh": 63,
     "freshOk": 52,
     "ids": [
      "r22_nayirah_incubators_1990",
@@ -1734,7 +1734,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r21_mars_climate_orbiter_1999",
@@ -1824,7 +1824,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r22_emulex_hoax_2000",
@@ -1862,7 +1862,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r22_mozart_effect_georgia_1998",
@@ -1904,7 +1904,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r23_abs_manuscript_auction",
@@ -1953,7 +1953,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r23_abs_poll_model_reuse",
@@ -1985,7 +1985,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r23_ariane5_501_1996",
@@ -2019,7 +2019,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r23_gospel_jesus_wife_2012",
@@ -2068,7 +2068,7 @@
     "s49",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r23_wirecard_trust_accounts_2019",
@@ -2108,7 +2108,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r24_abs_bank_symmetry_rule",
@@ -2138,7 +2138,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r24_abs_trader_five_years",
@@ -2172,7 +2172,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r24_fermat_numbers_1640",
@@ -2204,7 +2204,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r24_katrina_superdome_rumors_2005",
@@ -2242,7 +2242,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r24_parity_conservation_1956",
@@ -2270,7 +2270,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r25_abs_apartment_wiring_sample",
@@ -2335,7 +2335,7 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 29,
+    "fresh": 31,
     "freshOk": 27,
     "ids": [
      "r31_bre_x_busang_1996",
@@ -2414,7 +2414,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r25_neisser_challenger_memory_1986",
@@ -2468,7 +2468,7 @@
    "fix": null,
    "retest": {
     "since": 25,
-    "fresh": 29,
+    "fresh": 31,
     "freshOk": 27,
     "ids": [
      "r31_bre_x_busang_1996",
@@ -2648,7 +2648,7 @@
     "s19",
     "s22"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r27_frege_basic_law_v_1893",
@@ -2683,7 +2683,7 @@
     "s39",
     "s40"
    ],
-   "lastSeenRound": 46,
+   "lastSeenRound": 47,
    "resolved": "2026-11-02",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد",
    "reopened": "2026-11-02"
@@ -2719,7 +2719,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r28_surgisphere_lancet_2020",
@@ -2752,7 +2752,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r29_abs_pilot_supplier",
@@ -2784,7 +2784,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r29_wakefield_lancet_1998",
@@ -2816,7 +2816,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -2832,7 +2832,7 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 92,
+    "fresh": 95,
     "freshOk": 78,
     "ids": [
      "r4_wald_survivorship",
@@ -2911,7 +2911,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r31_bre_x_busang_1996",
@@ -2944,7 +2944,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r31_dreyfus_bordereau_1894",
@@ -3036,7 +3036,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r32_madoff_trackrecord_2005",
@@ -3071,14 +3071,14 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r33_beringer_lying_stones_1725",
    "case": "r33_beringer_lying_stones_1725",
    "opened": "2026-11-08",
    "openedRound": 33,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "موتور st_hiss را نگرفت چون زیرعاملِ کور فقط inquiry را نوشت و sense_ctrl/hidden_inf را نه؛ r_hiss_hidden_inf (s43,s46,s19) استنتاجِ پنهانِ آزموده‌نشده را می‌خواهد. متنِ داستان می‌گوید برینگر «دربارهٔ آوردنِ سنگ‌ها هیچ پرسشی نکرد» که با hidden_inf=true هم‌خوان است و رمزگذار می‌توانست بنویسد؛ این کاستیِ رمزگذاری است نه قاعده. چون اصلاحِ پس از دیدنِ نتیجه کور نیست، اصلاح نمی‌شود؛ رمزگذاریِ مستقلِ دوم در دورِ بعد.",
    "fix": {
@@ -3087,12 +3087,15 @@
    },
    "retest": {
     "since": 35,
-    "fresh": 3,
+    "fresh": 6,
     "freshOk": 3,
     "ids": [
      "r38_birmingham_griess_1974",
      "r38_abs_home_drug_test",
-     "r46_lowell_mars_lines_1895"
+     "r46_lowell_mars_lines_1895",
+     "r47_st_francis_dam_inspection_1928",
+     "r47_amex_warehouse_receipts_1963",
+     "r47_abs_backup_certificate_client_admins"
     ]
    },
    "kind": "missed",
@@ -3206,7 +3209,7 @@
    },
    "retest": {
     "since": 37,
-    "fresh": 36,
+    "fresh": 39,
     "freshOk": 34,
     "ids": [
      "r38_dow36000_1999",
@@ -3266,7 +3269,7 @@
    },
    "retest": {
     "since": 37,
-    "fresh": 36,
+    "fresh": 39,
     "freshOk": 34,
     "ids": [
      "r38_dow36000_1999",
@@ -3326,7 +3329,7 @@
    },
    "retest": {
     "since": 38,
-    "fresh": 31,
+    "fresh": 34,
     "freshOk": 28,
     "ids": [
      "r39_quebec_bridge_1907",
@@ -3481,7 +3484,7 @@
    },
    "retest": {
     "since": 43,
-    "fresh": 10,
+    "fresh": 13,
     "freshOk": 9,
     "ids": [
      "r44_tractatus_final_1918",
@@ -3493,7 +3496,9 @@
      "r46_lowell_mars_lines_1895",
      "r46_gvt_basketball_streaks_1985",
      "r46_kepler_proof_referees_2003",
-     "r46_abs_gas_pipe_two_gauges"
+     "r46_abs_gas_pipe_two_gauges",
+     "r47_malfatti_marble_columns_1803",
+     "r47_st_francis_dam_inspection_1928"
     ]
    },
    "kind": "missed",
@@ -3552,7 +3557,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r42_tnr_hack_heaven_1998",
@@ -3590,7 +3595,7 @@
     "s48",
     "s53"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r44_barry_george_fdr_2001",
@@ -3623,7 +3628,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r44_mobible_dss_fragments_2009",
@@ -3639,7 +3644,7 @@
    },
    "retest": {
     "since": 44,
-    "fresh": 7,
+    "fresh": 9,
     "freshOk": 5,
     "ids": [
      "r45_parmalat_bonlat_confirmation_2003",
@@ -3648,7 +3653,9 @@
      "r45_abs_wholesaler_bank_letter",
      "r45_abs_local_channel_factory_fire",
      "r46_krone_ancona_trials_1992",
-     "r46_abs_bank_signature_committee"
+     "r46_abs_bank_signature_committee",
+     "r47_commons_oates_plot_1678",
+     "r47_abs_board_accuser_two_coincidences"
     ]
    },
    "kind": "mislocated",
@@ -3713,7 +3720,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r46_gvt_basketball_streaks_1985",
@@ -3746,7 +3753,7 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r46_hobbes_circle_quadrature_1669",
@@ -3816,7 +3823,7 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 46
+   "lastSeenRound": 47
   },
   {
    "id": "f_r46_lowell_mars_lines_1895",
@@ -3829,9 +3836,15 @@
    "fix": null,
    "retest": {
     "since": 46,
-    "fresh": 0,
+    "fresh": 5,
     "freshOk": 0,
-    "ids": []
+    "ids": [
+     "r47_malfatti_marble_columns_1803",
+     "r47_st_francis_dam_inspection_1928",
+     "r47_amex_warehouse_receipts_1963",
+     "r47_deen_dna_testimony",
+     "r47_abs_backup_certificate_client_admins"
+    ]
    },
    "kind": "missed",
    "title": "پرسیوال لوول و خط‌های سطحِ مریخ (۱۸۹۴–۱۹۱۶)",
@@ -3904,6 +3917,243 @@
     "s53"
    ],
    "lastSeenRound": 46
+  },
+  {
+   "id": "f_r47_abs_backup_certificate_client_admins",
+   "case": "r47_abs_backup_certificate_client_admins",
+   "opened": "2026-11-25",
+   "openedRound": 47,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۷: رمزگذارِ کور way=«حس» نوشت و sense_ctrl و hidden_inf را ننوشت (متن صریح نمی‌گوید وارسی کنترل‌شده بود یا نه) و conf هم نبود. سنجش در حافظه: حتی با conf=۱۰۰ هیچ قاعده‌ای فعال نمی‌شود، چون r_hiss_uncontrolled فقط روی sense_ctrl=false ِ صریح کار می‌کند. جزوه اعتبارِ حکمِ حسی را به احرازِ شرایطِ ادراک بسته می‌داند («شناخت حسی و سازوکار وقوع خطا در ادراکات حسی»، s43)؛ پس «شرایطِ احرازنشده» خودش نقص است و موتور بر آن ساکت است — هم‌ساختار با p_expert_method_absent ⇒ پیشنهادِ p_sense_ctrl_absent. برچسبِ st_naql پس از بازبینیِ مستقل برداشته شد (جمله‌اش در منبع نبود). پرونده دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "سناریوی انتزاعی: گواهیِ «پشتیبان‌گیریِ کامل» از سوی شرکتِ ممیز",
+   "tier": "abstract",
+   "expected": [
+    "st_hiss"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_hiss_uncontrolled",
+    "r_hiss_hidden_inf"
+   ],
+   "secs": [
+    "s19",
+    "s43",
+    "s46"
+   ],
+   "lastSeenRound": 47
+  },
+  {
+   "id": "f_r47_abs_board_accuser_two_coincidences",
+   "case": "r47_abs_board_accuser_two_coincidences",
+   "opened": "2026-11-25",
+   "openedRound": 47,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۷: رمزگذارِ کور conf را ننوشت (متن عددی برای اطمینان نمی‌دهد) و همهٔ قاعده‌های این ایستگاه «سقف»‌اند — بی conf هیچ‌کدام فعال نمی‌شود. سنجش در حافظه (بی تغییرِ پرونده): با conf=۱۰۰ همین رمزگذاری در جای درست دیده می‌شود (r_naql_unreliable و r_naql_ahad). ملاک در جزوه هست (s47، s48)؛ آنچه نیست قاعده‌ای برای «تصدیقِ بی‌قید که مبنای عمل شده» است ⇒ همان پیشنهادهای بازِ p_encode_flat_assertion_conf و p_qual_conf_high (منتظرِ مالک). پرونده دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "سناریوی انتزاعی: هیئت‌مدیره و گزارشِ کارمندِ پیشین دربارهٔ تبانیِ مدیرانِ خرید",
+   "tier": "abstract",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 47
+  },
+  {
+   "id": "f_r47_amex_warehouse_receipts_1963",
+   "case": "r47_amex_warehouse_receipts_1963",
+   "opened": "2026-11-25",
+   "openedRound": 47,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۷: رمزگذارِ کور way=«حس» نوشت و sense_ctrl و hidden_inf را ننوشت (متن صریح نمی‌گوید وارسی کنترل‌شده بود یا نه) و conf هم نبود. سنجش در حافظه: حتی با conf=۱۰۰ هیچ قاعده‌ای فعال نمی‌شود، چون r_hiss_uncontrolled فقط روی sense_ctrl=false ِ صریح کار می‌کند. جزوه اعتبارِ حکمِ حسی را به احرازِ شرایطِ ادراک بسته می‌داند («شناخت حسی و سازوکار وقوع خطا در ادراکات حسی»، s43)؛ پس «شرایطِ احرازنشده» خودش نقص است و موتور بر آن ساکت است — هم‌ساختار با p_expert_method_absent ⇒ پیشنهادِ p_sense_ctrl_absent. برچسبِ st_naql پس از بازبینیِ مستقل برداشته شد (جمله‌اش در منبع نبود). پرونده دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "رسیدهای انبارِ امریکن اکسپرس برای روغنِ شرکتِ اَلاید (۱۹۶۳)",
+   "tier": "real",
+   "expected": [
+    "st_hiss"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_hiss_uncontrolled",
+    "r_hiss_hidden_inf"
+   ],
+   "secs": [
+    "s19",
+    "s43",
+    "s46"
+   ],
+   "lastSeenRound": 47
+  },
+  {
+   "id": "f_r47_commons_oates_plot_1678",
+   "case": "r47_commons_oates_plot_1678",
+   "opened": "2026-11-25",
+   "openedRound": 47,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۷: رمزگذارِ کور conf را ننوشت (متن عددی برای اطمینان نمی‌دهد) و همهٔ قاعده‌های این ایستگاه «سقف»‌اند — بی conf هیچ‌کدام فعال نمی‌شود. سنجش در حافظه (بی تغییرِ پرونده): با conf=۱۰۰ همین رمزگذاری در جای درست دیده می‌شود (r_naql_unreliable و r_naql_ahad). ملاک در جزوه هست (s47، s48)؛ آنچه نیست قاعده‌ای برای «تصدیقِ بی‌قید که مبنای عمل شده» است ⇒ همان پیشنهادهای بازِ p_encode_flat_assertion_conf و p_qual_conf_high (منتظرِ مالک). پرونده دست نخورد. پس از ویرایشِ متن (بازبینیِ مستقل) رمزگذارِ کورِ دوم qarina=«قرینه همسو» و dalala=«ظاهر» نوشت؛ با conf=۱۰۰ در حافظه: r_naql_unreliable_corrob، r_naql_ahad، r_naql_nonnass.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "پارلمانِ انگلستان و گواهیِ تایتس اوتس (پاییزِ ۱۶۷۸)",
+   "tier": "real",
+   "expected": [
+    "st_naql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53"
+   ],
+   "lastSeenRound": 47
+  },
+  {
+   "id": "f_r47_deen_dna_testimony",
+   "case": "r47_deen_dna_testimony",
+   "opened": "2026-11-25",
+   "openedRound": 47,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۷: رمزگذارِ کور conf را ننوشت (متن عددی برای اطمینان نمی‌دهد) و همهٔ قاعده‌های این ایستگاه «سقف»‌اند — بی conf هیچ‌کدام فعال نمی‌شود. سنجش در حافظه (بی تغییرِ پرونده): با conf=۱۰۰ همین رمزگذاری در جای درست دیده می‌شود (r_aql_invalid_form). ملاک در جزوه هست (s40)؛ آنچه نیست قاعده‌ای برای «تصدیقِ بی‌قید که مبنای عمل شده» است ⇒ همان پیشنهادهای بازِ p_encode_flat_assertion_conf و p_qual_conf_high (منتظرِ مالک). پرونده دست نخورد. (مسیرِ ۲: این نمونهٔ «نادیده‌گرفتنِ نرخِ پایه» با form=«نامعتبر» زیرِ ملاکِ صورتِ استدلال می‌افتد — این‌جا خلأ جزوه نیست؛ ولی «نامعتبر» داوریِ خودِ رمزگذار از صورتِ استدلال بود، نه واقعیتِ مشاهده‌پذیر.)",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "گواهیِ کارشناسِ دی‌ان‌ای در دادگاهِ اندرو دین (انگلستان)",
+   "tier": "real",
+   "expected": [
+    "st_aql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50"
+   ],
+   "lastSeenRound": 47
+  },
+  {
+   "id": "f_r47_malfatti_marble_columns_1803",
+   "case": "r47_malfatti_marble_columns_1803",
+   "opened": "2026-11-25",
+   "openedRound": 47,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۷: رمزگذارِ کور conf را ننوشت (متن عددی برای اطمینان نمی‌دهد) و همهٔ قاعده‌های این ایستگاه «سقف»‌اند — بی conf هیچ‌کدام فعال نمی‌شود. سنجش در حافظه (بی تغییرِ پرونده): با conf=۱۰۰ همین رمزگذاری در جای درست دیده می‌شود (r_aql_matter_unproven). ملاک در جزوه هست (s40)؛ آنچه نیست قاعده‌ای برای «تصدیقِ بی‌قید که مبنای عمل شده» است ⇒ همان پیشنهادهای بازِ p_encode_flat_assertion_conf و p_qual_conf_high (منتظرِ مالک). پرونده دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "مالفاتی و سه ستون از منشورِ مرمر (۱۸۰۳)",
+   "tier": "real",
+   "expected": [
+    "st_aql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50"
+   ],
+   "lastSeenRound": 47
+  },
+  {
+   "id": "f_r47_st_francis_dam_inspection_1928",
+   "case": "r47_st_francis_dam_inspection_1928",
+   "opened": "2026-11-25",
+   "openedRound": 47,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۴۷: رمزگذارِ کور conf را ننوشت (متن عددی برای اطمینان نمی‌دهد) و همهٔ قاعده‌های این ایستگاه «سقف»‌اند — بی conf هیچ‌کدام فعال نمی‌شود. سنجش در حافظه (بی تغییرِ پرونده): با conf=۱۰۰ همین رمزگذاری در جای درست دیده می‌شود (r_aql_matter_unproven و r_aql_nondeductive). ملاک در جزوه هست (s40)؛ آنچه نیست قاعده‌ای برای «تصدیقِ بی‌قید که مبنای عمل شده» است ⇒ همان پیشنهادهای بازِ p_encode_flat_assertion_conf و p_qual_conf_high (منتظرِ مالک). پرونده دست نخورد. ایستگاهِ st_hiss ِ برچسب با این رمزگذاری (way=«عقل») دیده نمی‌شود: مکانِ ناقص.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "بازدیدِ مالهالند از نشتیِ تازهٔ سدِ سنت فرانسیس (۱۲ مارسِ ۱۹۲۸)",
+   "tier": "real",
+   "expected": [
+    "st_hiss",
+    "st_aql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_hiss_uncontrolled",
+    "r_hiss_hidden_inf",
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_aql_conseq",
+    "r_aql_analogy",
+    "r_aql_matter_zanni"
+   ],
+   "secs": [
+    "s19",
+    "s40",
+    "s43",
+    "s44",
+    "s46",
+    "s50"
+   ],
+   "lastSeenRound": 47
   },
   {
    "id": "f_r4_redfield_arsenic",
