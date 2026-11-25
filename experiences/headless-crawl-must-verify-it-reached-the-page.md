@@ -111,3 +111,11 @@ every new 5xx as a finding even when the totals look unchanged. For any "get-or-
 key" path that a client can call concurrently, either use the database's native upsert or catch
 the unique-violation, roll back, and retry once (the row now exists, so the update branch wins).
 Prove it with a deterministic test that makes the first lookup stale.
+
+## Update 2026-11-25
+
+A 4xx seen by a local crawl is not yet a product defect: a `404 /auth/me` sat in the open-items list for seven weeks
+because the crawl server lacks the env var (`GOOGLE_CLIENT_ID`) that conditionally mounts that router. One unauthenticated
+request to production settled it — `401` means "route exists, needs a token", `404` means "not mounted". Before filing a
+bad response from a local run, (1) check whether the route is conditionally mounted, and (2) compare the status code of
+the same path on the deployed service; and look at the page itself — a 404 the UI renders as an empty state is not an error.

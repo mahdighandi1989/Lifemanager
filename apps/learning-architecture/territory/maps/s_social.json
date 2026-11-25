@@ -210,6 +210,11 @@
    "tag": "pennycook_rand2021",
    "title": "Pennycook, G., & Rand, D. G. (2021). The Psychology of Fake News. Trends in Cognitive Sciences 25(5)",
    "url": "https://doi.org/10.1016/j.tics.2021.02.007"
+  },
+  {
+   "tag": "galinsky_mussweiler2001",
+   "title": "Galinsky & Mussweiler (2001). First offers as anchors: The role of perspective-taking and negotiator focus. Journal of Personality and Social Psychology, 81(4), 657–669",
+   "url": "https://doi.org/10.1037/0022-3514.81.4.657"
   }
  ],
  "groups": [
@@ -1178,7 +1183,8 @@
       "آیا مسئله را تک‌موضوعی دیده‌ام در حالی که چند موضوع برای معامله هست؟"
      ],
      "src": [
-      "thompson2010"
+      "thompson2010",
+      "galinsky_mussweiler2001"
      ],
      "tools": [
       "kfam:F8",
@@ -1199,9 +1205,10 @@
       {
        "fa": "پیشنهادِ اول مثلِ لنگر عمل می‌کند و نتیجهٔ نهایی را به سمتِ خودش می‌کشد.",
        "kind": "empirical",
-       "basis_fa": "جمع‌بندیِ Thompson و همکاران (۲۰۱۰) از آزمایش‌های مذاکره؛ هم‌سو با پژوهشِ گستردهٔ لنگراندازی.",
+       "basis_fa": "جمع‌بندیِ Thompson و همکاران (۲۰۱۰) از آزمایش‌های مذاکره؛ هم‌سو با پژوهشِ گستردهٔ لنگراندازی. شاهدِ آزمایشیِ مستقیم، گالینسکی و موس‌وایلر (۲۰۰۱)، سه آزمایش: هر طرفی (خریدار یا فروشنده) که پیشنهادِ اول را داد نتیجهٔ بهتری گرفت و پیشنهادِ اول قیمتِ نهایی را قوی پیش‌بینی کرد. اثر وقتی از بین رفت که طرفِ مقابل بر اطلاعاتِ ناهمسو با آن لنگر تمرکز کرد — گزینهٔ جایگزینِ حریف، قیمتِ مقاومتِ حریف، یا هدفِ خودش (حضوری و ایمیلی هر دو).",
        "src": [
-        "thompson2010"
+        "thompson2010",
+        "galinsky_mussweiler2001"
        ]
       },
       {

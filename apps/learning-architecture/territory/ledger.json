@@ -79,9 +79,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI و چکیده در Crossref وارسی شد) — Chernev, Böckenholt & Goodman 2015 (فراتحلیل، ۹۹ مشاهده)"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "دستِ‌کم سه گزاره با پایه در نقشه هست"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌بندی‌شده (theorem/empirical/outside)؛ gap_fa باز است ⇒ گامِ ۴ نه"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_decision"
   },
   "dc_decision_review": {
@@ -109,9 +127,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI و چکیده در Crossref وارسی شد) — Lerner, Li, Valdesolo & Kassam 2015 (PubMed 25251484) + گزارهٔ چهارم"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "دستِ‌کم سه گزاره با پایه در نقشه هست"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌بندی‌شده (theorem/empirical/outside)؛ gap_fa باز است ⇒ گامِ ۴ نه"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_decision"
   },
   "dc_expected_utility": {
@@ -433,9 +469,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI و چکیده در Crossref وارسی شد) — Claessens et al. 2007 (مرورِ ۳۲ مطالعه)"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "دستِ‌کم سه گزاره با پایه در نقشه هست"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌بندی‌شده (theorem/empirical/outside)؛ gap_fa باز است ⇒ گامِ ۴ نه"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_decision"
   },
   "dc_values_based": {
@@ -1939,9 +1993,27 @@
      "by": "نشستِ ۲۰۲۶-۱۰-۱۴ — پژوهشِ نقشه (۶ پژوهشگر، منابع با Crossref وارسی شد)",
      "stage": 0,
      "what": "در نقشه آمد"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 1,
+     "what": "منبعِ دوم افزوده شد (DOI و چکیده در Crossref وارسی شد) — Galinsky & Mussweiler 2001 (PubMed 11642352)"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 2,
+     "what": "دستِ‌کم سه گزاره با پایه در نقشه هست"
+    },
+    {
+     "at": "2026-11-25",
+     "by": "ناظرِ عمومی (general)",
+     "stage": 3,
+     "what": "همهٔ گزاره‌ها رده‌بندی‌شده (theorem/empirical/outside)؛ gap_fa باز است ⇒ گامِ ۴ نه"
     }
    ],
-   "stage": 0,
+   "stage": 3,
    "system": "s_social"
   },
   "sc_online_discourse": {
