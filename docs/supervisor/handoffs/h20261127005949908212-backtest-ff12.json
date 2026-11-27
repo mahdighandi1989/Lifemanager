@@ -1,0 +1,16 @@
+{
+ "id": "h20261127005949908212-backtest-ff12",
+ "at": "2026-11-27T00:59:49Z",
+ "by": "backtest",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "request",
+ "sheet": null,
+ "what": "آزمونِ apps/learning-architecture/tests/test_tour1_r27b_history.js (بندِ C52_attached) روزهای جمعه (UTC) سرخ می‌شود و دروازهٔ قانونِ ۴ را برای همه می‌بندد: سناریو «جمعه قرارداد رو امضا می‌کنم» با __nextDow(5) ساخته می‌شود و وقتی امروز خودش جمعه است خروجی [0, …] می‌دهد (دیده‌شده در ۲۰۲۶-۱۱-۲۷، روی درختِ دست‌نخوردهٔ همان آزمون؛ کارِ دورِ ۴۸ ِ بک‌تست به آن دست نزده). لطفاً معلوم کنید خطا در آزمون است (ساعتِ ثابت بدهید) یا در خودِ صفحه («جمعه» وقتی امروز جمعه است) و اصلاح کنید. دورِ ۴۸ ِ بک‌تست به همین دلیل روی supervisor-pending/backtest-2026-11-26 پارک شد، نه main. نکتهٔ محیطی: test_tour1_r11_coach/r12_coach به apps/learning-architecture/node_modules/playwright نیاز دارند (tests/prompt_tap.js)؛ در کانتینرِ تازه نیست و باید به /opt/node-tools/node_modules پیوند شود.",
+ "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
+ "commit": "",
+ "status": "open"
+}

@@ -1,6 +1,6 @@
 {
- "round": 47,
- "at": "2026-11-25",
+ "round": 48,
+ "at": "2026-11-27",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,19 +1136,19 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 372,
+    "ok": 375,
     "health_alarm": 0,
-    "missed": 42,
-    "mislocated": 10
+    "missed": 46,
+    "mislocated": 11
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 342,
+    "ok": 344,
     "health_alarm": 0,
-    "missed": 60,
-    "mislocated": 22
+    "missed": 64,
+    "mislocated": 24
    },
    "changed": [
     {
@@ -1328,6 +1328,12 @@
     {
      "id": "r46_lowell_mars_lines_1895",
      "t": "پرسیوال لوول و خط‌های سطحِ مریخ (۱۸۹۴–۱۹۱۶)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r48_wallace_first_century_mark_2012",
+     "t": "دانیل والاس و اعلامِ پاره‌ای از انجیلِ مرقس از سدهٔ یکم (۲۰۱۲)",
      "from": "ok",
      "to": "mislocated"
     }
@@ -1335,19 +1341,19 @@
   },
   "derived": {
    "kinds": {
-    "ok": 372,
+    "ok": 375,
     "health_alarm": 0,
-    "missed": 42,
-    "mislocated": 10
+    "missed": 46,
+    "mislocated": 11
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 342,
+    "ok": 344,
     "health_alarm": 0,
-    "missed": 60,
-    "mislocated": 22
+    "missed": 64,
+    "mislocated": 24
    },
    "changed": [
     {
@@ -1527,6 +1533,12 @@
     {
      "id": "r46_lowell_mars_lines_1895",
      "t": "پرسیوال لوول و خط‌های سطحِ مریخ (۱۸۹۴–۱۹۱۶)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r48_wallace_first_century_mark_2012",
+     "t": "دانیل والاس و اعلامِ پاره‌ای از انجیلِ مرقس از سدهٔ یکم (۲۰۱۲)",
      "from": "ok",
      "to": "mislocated"
     }
