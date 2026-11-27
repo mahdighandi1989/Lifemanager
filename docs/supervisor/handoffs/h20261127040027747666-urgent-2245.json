@@ -1,0 +1,15 @@
+{
+ "id": "h20261127040027747666-urgent-2245",
+ "at": "2026-11-27T04:00:27Z",
+ "by": "urgent",
+ "area": "epi-foundation",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "محتوای روتینِ backtest (دورِ ۴۸، کامیت‌های b32e22f2 و 4f5f39e4) دست‌نخورده از supervisor-pending/backtest-2026-11-26 با fast-forward روی main برده شد (URGENT_PROMPT §۱٫۲)؛ روتینِ فوری هیچ فایلِ این قلمرو را ویرایش نکرد — فقط آزمونِ جمعه‌ایِ lla-page اصلاح شد (WORKLOG 165). برای سنجشِ روتینِ backtest.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۱",
+ "commit": "4f5f39e4",
+ "status": "open"
+}

@@ -1,6 +1,6 @@
 // تورِ پولیا (دستهٔ ۱، دورِ ۲۷b، سهمِ «history» — ۲۰۲۶-۱۱-۱۶): نیمهٔ 📜 ِ R6 و باقی‌ماندهٔ «story» (FIX27B).
 //  هر بخش از جملهٔ خودِ دونده‌ها یا ورودیِ بانکِ مستقلِ tests/variants/VARIANTS_R27.json (شمارهٔ ۱-مبنا) ساخته شده و «شبیهِ منفی» ِ خودش را دارد.
-//  قرمزِ نخست: LLA_FILE=<ساختِ BASE27B> — بخش‌های مثبت باید قرمز شوند. ساعتِ صفحه دست نمی‌خورد؛ هیچ تاریخِ تقویمی در انتظارها نیست.
+//  قرمزِ نخست: LLA_FILE=<ساختِ BASE27B> — بخش‌های مثبت باید قرمز شوند. ساعتِ صفحه روی «اکنون» نصب می‌شود (بخش‌ها همان روزِ واقعی را می‌بینند)؛ فقط بخشِ پایانیِ C52 آن را روزبه‌روز جلو می‌برد تا هر هفت روزِ هفته سنجیده شود. هیچ تاریخِ تقویمی در انتظارها نیست.
 //  ONLY=<نامِ بخش‌ها با ویرگول>.
 const { chromium } = require('playwright');
 const path = require('path');
@@ -15,6 +15,7 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
   p.on('pageerror', e => errors.push('pageerror: ' + e.message));
   p.on('dialog', d => { d.dismiss(); });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
+  await p.clock.install({ time: new Date() });   // «اکنون» — رفتارِ بخش‌ها بی‌تغییر؛ فقط C52_week (پایان) روز را جلو می‌برد
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(250);
   await p.evaluate(() => {
     APP.S.loaded = true; window.__calls = []; window.__q = []; window.__noNav = true;
@@ -119,11 +120,20 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
   await ev(() => { window.__wd = (d) => { const p = d.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).getDay(); };
     window.__nextDow = (dow) => { const t = APP.today(); let k = (dow - __wd(t) + 7) % 7; if (!k) k = 7; return APP.addDays(t, k); }; });
   const sdos = () => ev(() => (APP.dossier(__cur().id).events || []).map(e => e.k + ' | ' + (e.title || '') + ' ¦ ' + (e.lines || []).join(' ¦ ')));
-  K.C52_attached = async () => { await ev(async () => { __wipe(); __fresh(); const thu = __nextDow(4), fri = __nextDow(5);
-      await __turn('جمعه قرارداد رو امضا می‌کنم.', [cs({ said: ['plan'], plan: { text: 'جمعه قرارداد رو امضا می‌کنم', when: fri } })]); await __turn('آره', [cs({})]);
+  /* ۲۰۲۶-۱۱-۲۷ (دست‌به‌دستِ h…ff12): جملهٔ «جمعه …» در خودِ جمعه دوپهلوست و صفحه — درست — می‌پرسد «همین امروز یا جمعهٔ بعد؟» و «آره» را جواب نمی‌شمرد
+     (دورِ ۲۵/۲۶). پس در جمعه جوابِ او خودِ روز است («جمعهٔ بعد») و راهِ بی‌حدس هم سنجیده می‌شود: تا جوابِ روشن، هیچ برنامه‌ای با تاریخ ثبت نشده است. */
+  K.C52_attached = async () => { const noGuess = await ev(async () => { __wipe(); __fresh(); const fri = __nextDow(5), same = __wd(APP.today()) === 5;
+      await __turn('جمعه قرارداد رو امضا می‌کنم.', [cs({ said: ['plan'], plan: { text: 'جمعه قرارداد رو امضا می‌کنم', when: fri } })]);
+      const asked = String(((__cur().msgs || []).slice(-1)[0] || {}).text || '');
+      const dated = () => (APP.dossier(__cur().id).events || []).some(e => e.k === 'cplan' && !(e.lines || []).some(l => /موعد: جلسهٔ بعد/.test(l)));
+      if (!same) { await __turn('آره', [cs({})]); return [true, 'not friday']; }
+      const q1 = /همین امروز یا جمعهٔ بعد/.test(asked) && !dated();
+      await __turn('آره', [cs({})]); const q2 = !dated();   // «آره» جوابِ پرسشِ دوگزینه‌ای نیست ⇒ هنوز بی‌تاریخ
+      await __turn('جمعهٔ بعد', [cs({})]); return [q1 && q2 && dated(), JSON.stringify([asked.slice(0, 120), q1, q2, dated()])]; });
+    await ev(async () => { const thu = __nextDow(4);
       await __turn('پنجشنبه یادم بنداز که مدارکِ امضا رو آماده کنم.', [{ do: 'deadline', what: 'یادآور: آماده‌کردنِ مدارکِ امضا', date: thu }, cs({})]); await __turn('آره', [cs({})]); });
     const D = await sdos(), dl = await ev(() => APP.S.all('deadline').filter(d => !d.done && d.plan).length);
-    return [dl === 1 && !D.some(x => /^deadline/.test(x)) && D.filter(x => /^cplan/.test(x) && /قرارداد/.test(x) && /⏰ یادآور \(همین برنامه\)/.test(x)).length === 1, J([dl, D])]; };
+    return [noGuess[0] && dl === 1 && !D.some(x => /^deadline/.test(x)) && D.filter(x => /^cplan/.test(x) && /قرارداد/.test(x) && /⏰ یادآور \(همین برنامه\)/.test(x)).length === 1, J([noGuess, dl, D])]; };
   K.C52_neg = async () => {   // منفی: یادآورِ بی برنامه رویدادِ خودش را دارد
     await ev(async () => { __wipe(); __fresh(); const thu = __nextDow(4); await __turn('پنجشنبه یادم بنداز قبضِ برق رو بدم.', [{ do: 'deadline', what: 'یادآور: قبضِ برق', date: thu }, cs({})]); await __turn('آره', [cs({})]); });
     const D = await sdos(); return [D.some(x => /^deadline/.test(x) && /قبضِ برق/.test(x)), J(D)]; };
@@ -261,6 +271,11 @@ const BANK = fs.existsSync(BF) ? JSON.parse(fs.readFileSync(BF, 'utf8')) : [];
   for (const n of Object.keys(E).map(Number).sort((a, c) => a - c)) { if (process.env.ONLY && !process.env.ONLY.split(',').includes('#' + n)) continue; info.n++;
     const be = BANK[n - 1]; if (!be) { info.nc[n] = 'bank entry missing'; continue; }
     try { const r = await E[n](); if (r && r.nc) { info.nc[n] = r.nc; continue; } if (r[0]) info.ok++; else errors.push('#' + n + ' [' + be.rc + '] «' + String(be.text).slice(0, 60) + '» ⇒ ' + String(r[1]).slice(0, 900)); } catch (e) { errors.push('#' + n + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } }
+  /* C52 در شش روزِ دیگرِ هفته (experiences/one-clock-one-scheduler…، ۲۰۲۶-۱۱-۱۷: هر انتظارِ وابسته به روزِ هفته در هر هفت روز). فقط رو به جلو و در پایان — پس از آن بخشی اجرا نمی‌شود. */
+  if (!process.env.ONLY || process.env.ONLY.split(',').includes('C52_week')) { const t0 = Date.now(), WD = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+    for (let n = 1; n < 7; n++) { await p.clock.setSystemTime(new Date(t0 + n * 864e5)); const wd = WD[new Date(t0 + n * 864e5).getDay()];
+      for (const nm of ['C52_attached', 'C52_neg']) { info.n++;
+        try { const r = await K[nm](); if (r[0]) info.ok++; else errors.push(nm + ' @' + wd + ' ⇒ ' + String(r[1]).slice(0, 900)); } catch (e) { errors.push(nm + ' @' + wd + ' exception: ' + String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')); } } } }
   console.log(JSON.stringify({ n: info.n, ok: info.ok, nc: Object.keys(info.nc).length }));
   if (Object.keys(info.nc).length) console.log('NC: ' + JSON.stringify(info.nc, null, 1));
   console.log(errors.length ? 'ERRORS(' + errors.length + '):\n' + errors.join('\n') : 'NO ERRORS');

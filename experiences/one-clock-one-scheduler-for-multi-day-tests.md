@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T12:00:00Z"
 created_at: "2026-10-17T12:00:00Z"
-updated_at: "2026-11-17T18:00:00Z"
+updated_at: "2026-11-27T05:00:00Z"
 merged_from: []
 ---
 
@@ -126,3 +126,15 @@ same act; keep the owner line (the one with the person's answer buttons) and fol
   no-guess path where the readings disagree.
 - **A year-less date that has passed is not «next year» by default.** Use the nearest occurrence (past this year vs. coming next year) — it follows from
   the data, needs no tolerance constant, and keeps «1 Farvardin said in Esfand» in the future.
+
+## Update 2026-11-27
+- **The seven-weekday rule has to be applied to OLD tests too, not only to the ones written after the lesson.** A test written one day before the
+  rule («Friday I sign the contract» → «yes») stayed on the machine clock; it was green for ten days and closed the merge gate for every routine on
+  its first Friday, parking another routine's unrelated work. The product was right: on the named weekday itself it asks «today or next Friday?» and
+  does not take «yes» as an answer.
+- **Fix pattern:** install the page clock at «now» (other sections unchanged), make the scenario answer the ambiguity explicitly on the colliding
+  weekday *and assert the no-guess path there* (question shown, vague «yes» books nothing, explicit day books), then re-run the scenario on the six
+  other weekdays in a final forward-only block. Do not just swap the weekday word — that hides the collision instead of testing it.
+- **How to apply elsewhere:** after adopting a clock rule, grep the existing suite for weekday words / relative-day helpers (`nextDow`, «tomorrow»)
+  that still read the machine clock, and convert them in the same change. Probing all seven days also surfaces product gaps on days nobody ran
+  (here: a reminder path without the two-way question that the plan path has) — record them even when the fix is out of scope.
